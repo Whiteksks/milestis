@@ -1,0 +1,45 @@
+{
+  "HomePage": {
+    "welcome": "Welcome to <strong>Memento Book</strong>"
+  },
+  "ResetPassword": {
+    "title": "Reset Password",
+    "description": "Enter a new password for your account",
+    "success": "Password successfully changed! You can now log in.",
+    "button": "Change password",
+    "backToHome": "Back to home"
+  },
+  "Password": {
+    "placeholder": "Password",
+    "show": "Show password",
+    "hide": "Hide password",
+    "strength": {
+      "empty": "Enter a password",
+      "weak": "Weak password",
+      "medium": "Medium password",
+      "strong": "Strong password",
+      "veryStrong": "Very strong password"
+    },
+    "requirements": {
+      "length": "At least 8 characters",
+      "lowercase": "At least 1 lowercase letter",
+      "uppercase": "At least 1 uppercase letter",
+      "number": "At least 1 number"
+    },
+    "met": " — Requirement met",
+    "notMet": " — Requirement not met"
+  },
+  "auth": {
+    "signInTitle": "Sign in with email",
+    "recoveryTitle": "Password recovery",
+    "recoveryDesc": "Enter your email and we will send you a link to reset your password.",
+    "recoverySuccess": "Check your email for a recovery link.",
+    "email": "Email",
+    "password": "Password",
+    "forgot": "Forgot password?",
+    "sendRecovery": "Send recovery email",
+    "getStarted": "Get Started",
+    "subText": "Make a new doc to bring your words, data and teams together. For free."
+  }
+
+}
