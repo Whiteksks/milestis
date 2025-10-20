@@ -18,7 +18,7 @@ const AuthDialogController = ({ open, setOpen }: AuthDialogControllerProps) => {
   // Сброс шага при открытии/закрытии диалога
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      setStep('options');
+      setTimeout(() => setStep("options"), 300);
     }
     if (setOpen) setOpen(isOpen);
   };

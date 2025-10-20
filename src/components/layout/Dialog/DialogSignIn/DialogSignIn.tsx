@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
+import { signInWithEmail, sendPasswordReset } from "@/lib/auth";
 
 type DialogSignInProps = {
   onBack?: () => void
@@ -19,10 +20,31 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
   const [password, setPassword] = useState("")
   const [forgotEmail, setForgotEmail] = useState("")
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleForgotSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSent(true)
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const { user, error } = await signInWithEmail(email, password);
+    if (error) {
+      setError(error.message);
+    }
+    setLoading(false);
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const { success, error } = await sendPasswordReset(forgotEmail);
+    if (success) {
+      setSent(true)
+    } else if (error) {
+      setError(error.message);
+    }
+    setLoading(false);
   }
 
   if (forgot) {
@@ -32,7 +54,7 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
-            onClick={() => setForgot(false)}
+            onClick={() => { setForgot(false); setError(null); }}
             className="p-2 rounded hover:bg-muted/40 transition-colors cursor-pointer"
             aria-label="Назад"
           >
@@ -48,9 +70,10 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
         </div>
 
         <p className="text-center text-muted-foreground text-sm">{t("recoveryDesc")}</p>
+        {error && <p className="text-center text-red-500 text-sm mt-2">{error}</p>}
 
         {sent ? (
-          <div className="text-center text-success mb-4">{t("recoverySuccess")}</div>
+          <div className="text-center text-green-500 mb-4">{t("recoverySuccess")}</div>
         ) : (
           <form className="flex flex-col gap-4" onSubmit={handleForgotSubmit}>
             <div className="grid gap-3">
@@ -70,8 +93,9 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
               className="w-full mt-4 bg-primary text-primary-foreground 
                          hover:bg-primary/90 focus-visible:ring-primary 
                          transition-colors duration-200 cursor-pointer"
+              disabled={loading}
             >
-              {t("sendRecovery")}
+              {loading ? "Sending..." : t("sendRecovery")}
             </Button>
           </form>
         )}
@@ -101,9 +125,10 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
       </div>
 
       <p className="text-center text-muted-foreground text-sm">{t("subText")}</p>
+      {error && <p className="text-center text-red-500 text-sm mt-2">{error}</p>}
 
       {/* Форма входа */}
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSignIn}>
         <div className="grid gap-3">
           <Label htmlFor="email">{t("email")}</Label>
           <Input
@@ -113,6 +138,7 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
             placeholder="example@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
 
@@ -125,23 +151,26 @@ const DialogSignIn = ({ onBack }: DialogSignInProps) => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
 
         <button
           type="button"
           className="text-xs text-primary hover:underline self-center cursor-pointer"
-          onClick={() => setForgot(true)}
+          onClick={() => { setForgot(true); setError(null); }}
         >
           {t("forgot")}
         </button>
 
         <Button
+          type="submit"
           className="w-full bg-primary text-primary-foreground 
                      hover:bg-primary/90 focus-visible:ring-primary 
                      transition-colors duration-200 cursor-pointer"
+          disabled={loading}
         >
-          {t("getStarted")}
+          {loading ? "Signing In..." : t("getStarted")}
         </Button>
       </form>
     </>

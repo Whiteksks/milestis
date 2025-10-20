@@ -40,5 +40,19 @@
     "sendRecovery": "Қалпына келтіру хат жіберу",
     "getStarted": "Кіру",
     "subText": "Жаңа құжаттар жасап, топты біріктіріңіз. Тегін."
+  },
+  "signupauth": {
+    "signUpTitle": "Тіркелу",
+    "subTextSignUp": "Қызметті пайдалану үшін жаңа есептік жазба жасаңыз.",
+    "firstName": "Атыңыз",
+    "firstNamePlaceholder": "Атыңызды енгізіңіз",
+    "lastName": "Тегіңіз",
+    "lastNamePlaceholder": "Тегіңізді енгізіңіз",
+    "email": "Электрондық пошта",
+    "password": "Құпиясөз",
+    "passwordPlaceholder": "Құпиясөзіңізді енгізіңіз",
+    "getStarted": "Тіркелу",
+    "signingUp": "Тіркелу жүріп жатыр...",
+    "checkEmailTitle": "Электрондық поштаңызды тексеріңіз"
   }
 }

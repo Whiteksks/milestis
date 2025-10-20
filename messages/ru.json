@@ -40,5 +40,19 @@
     "sendRecovery": "Отправить письмо для восстановления",
     "getStarted": "Войти",
     "subText": "Создавайте новые документы и объединяйте команды. Бесплатно."
+  },
+  "signupauth": {
+    "signUpTitle": "Регистрация",
+    "subTextSignUp": "Создайте новый аккаунт, чтобы начать использовать сервис.",
+    "firstName": "Имя",
+    "firstNamePlaceholder": "Введите имя",
+    "lastName": "Фамилия",
+    "lastNamePlaceholder": "Введите фамилию",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "getStarted": "Зарегистрироваться",
+    "signingUp": "Регистрация...",
+    "checkEmailTitle": "Проверьте вашу почту"
   }
 }
