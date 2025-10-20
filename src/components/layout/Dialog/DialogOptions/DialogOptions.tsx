@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button'
 type DialogSignInOptionsProps = {
   onSignInClick?: () => void
   onSignUpClick?: () => void
+  onMagicLinkClick?: () => void
 }
 
-const DialogSignInOptions = ({ onSignInClick, onSignUpClick }: DialogSignInOptionsProps) => {
+const DialogSignInOptions = ({ onSignInClick, onSignUpClick, onMagicLinkClick }: DialogSignInOptionsProps) => {
   return (
     <>
       {/* Иконка сверху */}
@@ -40,6 +41,10 @@ const DialogSignInOptions = ({ onSignInClick, onSignUpClick }: DialogSignInOptio
           variant="secondary"
           className="w-full cursor-pointer 
                      hover:bg-secondary/80 transition-colors duration-200"
+          onClick={() => {
+            console.log('Magic link button clicked')
+            onMagicLinkClick?.()
+          }}
         >
           Sign in via Magic Link (Email)
         </Button>

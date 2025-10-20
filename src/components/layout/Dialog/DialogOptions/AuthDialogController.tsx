@@ -4,6 +4,7 @@ import DialogSignInOptions from './DialogOptions';
 import DialogSignIn from '../DialogSignIn/DialogSignIn';
 import DialogSignUp from '../DialogSignUp/DialogSignUp';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import DialogSignInMagicLink from '../DialogSignIn/DialogSignInMagicLink';
 
 type AuthDialogControllerProps = {
   open?: boolean;
@@ -13,7 +14,7 @@ type AuthDialogControllerProps = {
 
 const AuthDialogController = ({ open, setOpen }: AuthDialogControllerProps) => {
   // step: 'options' | 'signin' | 'signup'
-  const [step, setStep] = useState<'options' | 'signin' | 'signup'>('options');
+  const [step, setStep] = useState<'options' | 'signin' | 'signup' | 'magicLink'>('options');
 
   // Сброс шага при открытии/закрытии диалога
   const handleOpenChange = (isOpen: boolean) => {
@@ -37,6 +38,7 @@ const AuthDialogController = ({ open, setOpen }: AuthDialogControllerProps) => {
             <DialogSignInOptions 
               onSignInClick={() => setStep('signin')} 
               onSignUpClick={() => setStep('signup')} 
+              onMagicLinkClick={() => setStep('magicLink')}
             />
           </>
         )}
@@ -54,6 +56,14 @@ const AuthDialogController = ({ open, setOpen }: AuthDialogControllerProps) => {
               <DialogTitle className='sr-only'>Sign Up</DialogTitle>
             </DialogHeader>
             <DialogSignUp onBack={() => setStep('options')} />
+          </>
+        )}
+        {step === 'magicLink' && (
+          <>
+            <DialogHeader>
+              <DialogTitle className='sr-only'>Sign In with Magic Link</DialogTitle>
+            </DialogHeader>
+            <DialogSignInMagicLink onBack={() => setStep('options')} />
           </>
         )}
       </DialogContent>
