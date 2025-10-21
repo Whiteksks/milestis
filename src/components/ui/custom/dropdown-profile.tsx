@@ -1,5 +1,8 @@
-import type { ReactNode } from 'react'
+'use client'
+
+import { useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import {
   UserIcon,
@@ -21,6 +24,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/custom/dropdown-menu'
+
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 
 type Props = {
   trigger: ReactNode
@@ -46,45 +52,67 @@ const menuConfig = [
 ]
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = 'end' }: Props) => {
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+
+  // Следим за изменением авторизации
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  // Выход из аккаунта
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+      router.push('/auth/login')
+    } catch (error) {
+      console.error('Ошибка при выходе:', error)
+    }
+  }
+
+  // Фоллбэк, если пользователь не найден
+  const displayName = user?.displayName || 'Anonymous User'
+  const email = user?.email || 'no-email@example.com'
+  const photoURL = user?.photoURL || 'https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png'
+  const initials = displayName
+    .split(' ')
+    .map((word) => word[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+
       <DropdownMenuContent className="w-80" align={align}>
-        {/* Label с аватаркой */}
+        {/* --- User Info --- */}
         <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
           <div className="relative">
             <Avatar className="size-10">
-              <AvatarImage
-                src="https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"
-                alt="John Doe"
-              />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={photoURL} alt={displayName} />
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <span className="ring-card absolute right-0 bottom-0 block size-2 rounded-full bg-green-600 ring-2" />
           </div>
           <div className="flex flex-1 flex-col items-start">
-            <span className="text-foreground text-lg font-semibold">
-              John Doe
-            </span>
-            <span className="text-muted-foreground text-base">
-              john.doe@example.com
-            </span>
+            <span className="text-foreground text-lg font-semibold">{displayName}</span>
+            <span className="text-muted-foreground text-base">{email}</span>
           </div>
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 
-        {/* Рендер меню из массива */}
+        {/* --- Menu Groups --- */}
         {menuConfig.map((group, groupIndex) => (
           <div key={groupIndex}>
             {groupIndex > 0 && <DropdownMenuSeparator />}
             <DropdownMenuGroup>
               {group.items.map(({ icon: Icon, label, href }) => (
-                <DropdownMenuItem
-                  key={label}
-                  asChild
-                  className="px-4 py-2.5 text-base"
-                >
+                <DropdownMenuItem key={label} asChild className="px-4 py-2.5 text-base">
                   <Link href={href} className="flex items-center gap-2 w-full">
                     <Icon className="text-foreground size-5" />
                     <span>{label}</span>
@@ -97,15 +125,13 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = 'end' }: Props) => {
 
         <DropdownMenuSeparator />
 
-        {/* Logout вынесен отдельно */}
+        {/* --- Logout --- */}
         <DropdownMenuItem
-          asChild
-          className="px-4 py-2.5 text-base text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+          onClick={handleLogout}
+          className="px-4 py-2.5 text-base text-red-600 hover:bg-red-50 dark:hover:bg-red-950 cursor-pointer"
         >
-          <Link href="/account/logout" className="flex items-center gap-2 w-full">
-            <LogOutIcon className="size-5" />
-            <span>Logout</span>
-          </Link>
+          <LogOutIcon className="size-5" />
+          <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

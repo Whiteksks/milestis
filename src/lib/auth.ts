@@ -1,5 +1,5 @@
 import { auth } from "./firebase";
-import { signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword, AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword, AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail, signOut } from "firebase/auth";
 
 export const signInWithEmail = async (email: string, password: string) => {
   try {
@@ -43,3 +43,12 @@ export const sendSignInLinkToEmail = async (email: string) => {
     return { success: false, error: error as AuthError };
   }
 };
+
+export const signOutUser = async () => {
+  try {
+    await signOut(auth)
+    return { success: true, error: null }
+  } catch (error) {
+    return { success: false, error: error as AuthError }
+  }
+}
