@@ -8,7 +8,7 @@ const navigationData = [
   },
   {
     title: 'Products',
-    href: '/products'
+    href: '/design/id/edit'
   },
   {
     title: 'About Us',
