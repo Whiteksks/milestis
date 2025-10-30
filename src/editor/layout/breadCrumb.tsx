@@ -21,7 +21,7 @@ const BreadcrumbNavigation = () => {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href='#'>Documents</BreadcrumbLink>
+          <BreadcrumbLink href='#'>Design</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>

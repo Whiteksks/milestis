@@ -1,8 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Share2, Globe } from 'lucide-react'
+import { Share2 } from 'lucide-react'
 
 export default function DomainsSettingsPage() {
 
@@ -14,36 +13,36 @@ export default function DomainsSettingsPage() {
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8 mb-8 md:mb-0">
-      <h2 className="text-2xl font-bold text-center">Домены и публикации</h2>
+      <header className="text-center">
+        <h2 className="text-2xl font-bold mb-1">Домены и публикации</h2>
+        <p className="text-sm text-muted-foreground">
+          Каждая книга имеет свой уникальный адрес на основном домене.
+        </p>
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Ваши фотокниги</CardTitle>
-          <CardDescription>
-            Каждая книга имеет свой уникальный адрес на основном домене.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {books.map((book) => (
-            <div
-              key={book.id}
-              className="flex items-center justify-between border rounded-lg p-3"
-            >
-              <div>
-                <p className="font-medium">{book.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  memento-book.com/{book.slug}
-                </p>
-                <p className="text-xs text-muted-foreground">Создана: {book.date}</p>
-              </div>
-              <Button variant="secondary" size="sm">
-                <Share2 className="w-4 h-4 mr-2" />
-                Поделиться
-              </Button>
+      <section className="flex flex-col gap-3">
+        {books.map((book) => (
+          <div
+            key={book.id}
+            className="flex items-center justify-between bg-card border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <div>
+              <p className="font-semibold">{book.title}</p>
+              <p className="text-sm text-muted-foreground">
+                milestis.site/{book.slug}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Создана: {book.date}
+              </p>
             </div>
-          ))}
-        </CardContent>
-      </Card>
+
+            <Button variant="secondary" size="sm" className="flex items-center gap-2">
+              <Share2 className="w-4 h-4" />
+              Поделиться
+            </Button>
+          </div>
+        ))}
+      </section>
     </div>
   )
 }

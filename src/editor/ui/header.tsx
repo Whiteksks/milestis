@@ -7,13 +7,10 @@ import { Separator } from '@/components/ui/separator'
 import ZoomButtons from '../layout/zoomButtons'
 import BreadcrumbNavigation from '../layout/breadCrumb'
 
-interface HeaderAppProps {
-  title?: string
-}
 
-export const HeaderApp = ({ title = 'Lorem Ipsum' }: HeaderAppProps) => {
+export const HeaderApp = () => {
   return (
-    <header className="border-b bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 sticky top-0 z-50">
+    <header className="bg-card/10 dark:bg-card/50 sticky top-0 z-50">
       <div className="flex items-center justify-between h-12 px-2 sm:px-4">
         {/* LEFT: Breadcrumb */}
         <div className="flex items-center text-sm text-muted-foreground">
@@ -22,7 +19,7 @@ export const HeaderApp = ({ title = 'Lorem Ipsum' }: HeaderAppProps) => {
 
         {/* CENTER: Title */}
         <div className="absolute left-1/2 -translate-x-1/2">
-          <h2 className="text-sm sm:text-base font-semibold text-foreground">{title}</h2>
+          <h2 className="text-sm sm:text-base font-semibold text-foreground"></h2>
         </div>
 
         {/* RIGHT: Controls */}

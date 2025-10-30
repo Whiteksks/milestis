@@ -7,17 +7,16 @@ import { Workspace } from "@/editor/ui/workspace";
 
 export default function Page() {
   return (
-    <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
-      <div className="flex flex-col flex-shrink-0">
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
+      <div>
         <HeaderApp />
         <HeaderTools />
       </div>
 
-      {/* Основная область */}
-      <div className="flex flex-1 relative overflow-hidden">
+
         <SidebarEditorComponents />
         <Workspace />
-      </div>
+
     </div>
   );
 }

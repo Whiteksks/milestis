@@ -1,47 +1,46 @@
 "use client";
 
 import React from "react";
+import { useEditorStore } from "@/hooks/store/useEditorStore";
 
 export const Workspace: React.FC = () => {
+  const { activeDevice } = useEditorStore();
+
+  const getWidthClass = () => {
+    switch (activeDevice) {
+      case "tablet":
+        return "max-w-3xl scale-[0.9]";
+      case "mobile":
+        return "max-w-sm scale-[0.85]";
+      default:
+        return "max-w-7xl scale-100";
+    }
+  };
+
   return (
-    // Внешний контейнер: занимает оставшееся место, центрирует контент и управляет прокруткой
-    <div className="flex-1 flex justify-center p-6 sm:p-10 lg:p-16 overflow-y-auto bg-gray-50">
-      {/* Рабочий холст: 
-        max-w-4xl (или 5xl) - для лучшей читаемости, так как очень широкие строки тяжело читать. 
-        min-h-full - гарантирует, что он занимает всю вертикаль, даже если контента мало.
-      */}
+    <div className="flex-1 flex justify-center p-4 overflow-y-auto transition-all duration-300">
       <div
         contentEditable
         suppressContentEditableWarning
-        // 'group' для стилизации вложенных элементов и placeholder
-        className="
-          w-full
-          max-w-7xl
-          bg-white 
-          rounded-xl 
-          shadow-xl 
-          outline-none 
-          p-8 sm:p-12 lg:p-16
-          text-gray-900 
-          ring-2 ring-transparent
-          focus:ring-blue-500/50 
-          transition-all 
-          duration-300
-          relative
-          group
-        "
+        className={`
+          w-full min-h-full h-fit
+          bg-card/50 rounded-xl shadow-xl outline-none
+          p-8 sm:p-12 lg:p-16 ring-2 ring-transparent
+          focus:ring-accent transition-all duration-300
+          relative group
+          ${getWidthClass()}
+        `}
       >
-        <h1 className="text-4xl font-extrabold mb-8 placeholder-text">
+        <h1 className="text-4xl text-card-foreground font-extrabold mb-8 placeholder-text">
           Заголовок Документа
         </h1>
 
-        <div className="text-xl leading-relaxed text-gray-700 min-h-[400px] placeholder-text">
+        <div className="text-xl leading-relaxed text-card-foreground min-h-[400px] placeholder-text">
           <p>
-            Начните писать здесь. Используйте Enter для нового абзаца. 
+            Начните писать здесь. Используйте Enter для нового абзаца.
             Рабочая область автоматически подстроится по высоте.
           </p>
         </div>
-
       </div>
     </div>
   );
