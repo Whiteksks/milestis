@@ -2,9 +2,29 @@
 
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
+// import { Sortable } from "../registerComponents";
+import { HeaderBlock, TestComponentB, TestComponentA } from "../components";
+// DragDropProvider is provided at a higher level so sidebar and workspace share the same DnD context
+import { Draggable, Droppable } from "../hooks";
 
-export const Workspace: React.FC = () => {
+
+export interface EditorBlock {
+  id: string;
+  component: React.ReactNode;
+}
+
+interface WorkspaceProps {
+  isDropped: boolean;
+}
+
+export const Workspace: React.FC<WorkspaceProps> = ({ isDropped }) => {
   const { activeDevice } = useEditorStore();
+  // Все подключённые блоки
+  const [blocks, setBlocks] = React.useState<EditorBlock[]>([
+    { id: "header", component: <HeaderBlock /> },
+    { id: "text", component: <TestComponentA /> },
+    { id: "image", component: <TestComponentB /> },
+  ]);
 
   const getWidthClass = () => {
     switch (activeDevice) {
@@ -19,29 +39,16 @@ export const Workspace: React.FC = () => {
 
   return (
     <div className="flex-1 flex justify-center p-4 overflow-y-auto transition-all duration-300">
-      <div
-        contentEditable
-        suppressContentEditableWarning
-        className={`
-          w-full min-h-full h-fit
-          bg-card/50 rounded-xl shadow-xl outline-none
-          p-8 sm:p-12 lg:p-16 ring-2 ring-transparent
-          focus:ring-accent transition-all duration-300
-          relative group
-          ${getWidthClass()}
-        `}
-      >
-        <h1 className="text-4xl text-card-foreground font-extrabold mb-8 placeholder-text">
-          Заголовок Документа
-        </h1>
-
-        <div className="text-xl leading-relaxed text-card-foreground min-h-[400px] placeholder-text">
-          <p>
-            Начните писать здесь. Используйте Enter для нового абзаца.
-            Рабочая область автоматически подстроится по высоте.
-          </p>
-        </div>
-      </div>
+        <Droppable id="droppable">
+          <div>
+            {isDropped && <Draggable />}
+          </div>
+        </Droppable>
+        {/* {blocks.map((block, index) => (
+          <Sortable key={block.id} id={block.id} index={index}>
+            {block.component}
+          </Sortable>
+        ))} */}
     </div>
   );
 };
