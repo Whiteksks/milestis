@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -27,7 +27,7 @@ const WorkspaceDnD: React.FC<{ items: EditorBlock[]; overId?: string | null }> =
                 <div className="w-3/4 h-0.5 bg-accent rounded" />
               </div>
             )}
-            <SortableItem id={block.id} className="cursor-grab">
+            <SortableItem id={block.id}>
               {block.component}
             </SortableItem>
           </div>

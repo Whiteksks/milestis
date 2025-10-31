@@ -44,8 +44,8 @@ function DraggablePreview({ id, label, componentName }: { id: string; label: str
 
   const compMap: Record<string, React.ReactNode> = {
     HeaderBlock: <HeaderBlock />,
-    TestComponentA: <TestComponentA className="p-2" />,
-    TestComponentB: <TestComponentB className="p-2" />,
+    TestComponentA: <TestComponentA />,
+    TestComponentB: <TestComponentB />,
   };
 
   return (
@@ -56,8 +56,10 @@ function DraggablePreview({ id, label, componentName }: { id: string; label: str
       className="p-2 bg-primary rounded-md border shadow-sm cursor-grab"
     >
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
-      <div className="bg-white p-2 rounded">
-        {compMap[componentName] ?? <div className="text-sm text-muted-foreground">Preview</div>}
+      <div className="bg-white rounded" style={{ height: "80px", overflow: "hidden" }}>
+        <div style={{ width: "250%", height: "250%", transform: "scale(0.4)", transformOrigin: "top left", pointerEvents: "none" }}>
+            {compMap[componentName] ?? <div className="text-sm text-muted-foreground">Preview</div>}
+        </div>
       </div>
     </div>
   );

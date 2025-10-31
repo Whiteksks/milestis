@@ -30,14 +30,14 @@ export const Workspace: React.FC<WorkspaceProps> = ({ isDropped, items = [] }) =
         className={`
           w-full min-h-full h-fit
           bg-card/50 rounded-xl shadow-xl outline-none
-          p-8 sm:p-12 lg:p-16 ring-2 ring-transparent
+          p-8 ring-2 ring-transparent
           focus:ring-accent transition-all duration-300
           relative group
           ${getWidthClass()}
         `}
       >
   {/* DnD logic is moved to WorkspaceDnD to keep this file minimal and scalable */}
-  <WorkspaceDnD items={items} />
+      <WorkspaceDnD items={items} />
       </div>
     </div>
   );

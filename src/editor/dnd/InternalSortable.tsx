@@ -56,7 +56,7 @@ const InnerSortableItem: React.FC<{ id: string; children: React.ReactNode }> = (
   return (
     <div ref={setNodeRef} style={style} className="flex items-center gap-3">
       <div {...attributes} {...listeners} className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded cursor-grab">≡</div>
-      <div className="flex-1">{children}</div>
+      <div {...attributes} {...listeners} className="flex-1">{children}</div>
     </div>
   );
 };

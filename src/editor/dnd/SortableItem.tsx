@@ -8,10 +8,19 @@ interface SortableItemProps {
   id: string;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
-export const SortableItem: React.FC<SortableItemProps> = ({ id, children, className }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+export const SortableItem: React.FC<SortableItemProps> = ({
+  id,
+  children,
+  className,
+  disabled = true,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled,
+  });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -23,15 +32,17 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, children, classN
   return (
     <div ref={setNodeRef} style={style} className={className}>
       <div className="flex items-start gap-3">
-        {/* Drag handle: only this element receives the listeners/attributes so dragging starts from handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="w-8 h-8 flex items-center justify-center rounded border bg-white/80 text-sm text-muted-foreground cursor-grab"
-          aria-hidden
-        >
-          ☰
-        </div>
+        {/* Показываем drag handle только если не disabled */}
+        {!disabled && (
+          <div
+            {...attributes}
+            {...listeners}
+            className="w-8 h-8 flex items-center justify-center rounded border bg-white/80 text-sm text-muted-foreground cursor-grab"
+            aria-hidden
+          >
+            ☰
+          </div>
+        )}
         <div className="flex-1">{children}</div>
       </div>
     </div>
