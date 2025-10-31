@@ -2,7 +2,6 @@
 
 import React from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-
 import SortableItem from "./SortableItem";
 
 export interface EditorBlock {
@@ -11,36 +10,58 @@ export interface EditorBlock {
 }
 
 /**
- * WorkspaceDnDInternal — stateless: renders SortableContext and items.
- * DndContext (sensors, onDragEnd) should be initialized by the caller (for example the page)
- * when multiple parts of the editor (sidebar + workspace) must share the same context.
+ * WorkspaceDnD — чисто визуальный слой.
+ * DndContext должен быть инициализирован выше по дереву.
  */
 const WorkspaceDnD: React.FC<{ items: EditorBlock[]; overId?: string | null }> = ({ items, overId = null }) => {
   return (
-    <SortableContext items={items.map((b) => b.id)} strategy={verticalListSortingStrategy}>
-      <div className="space-y-4">
-        {items.map((block) => (
-          <div key={block.id} className="relative">
-            {/* insertion indicator above the item when overId matches */}
-            {overId === block.id && (
-              <div className="absolute -top-2 left-0 right-0 flex justify-center" aria-hidden>
-                <div className="w-3/4 h-0.5 bg-accent rounded" />
-              </div>
-            )}
-            <SortableItem id={block.id}>
-              {block.component}
-            </SortableItem>
-          </div>
-        ))}
+    <div
+      className="
+        fixed top-0 left-0 right-0
+        bg-background/50 backdrop-blur-sm
+        px-6 py-8
+        flex justify-center
+      "
+    >
+      <div className="w-full space-y-0">
+        <SortableContext items={items.map((b) => b.id)} strategy={verticalListSortingStrategy}>
+          {items.map((block) => (
+            <div key={block.id} className="relative group">
+              {/* Линия-подсказка при наведении */}
+              {overId === block.id && (
+                <div
+                  className="
+                    absolute -top-3 left-0 right-0 flex justify-center
+                    pointer-events-none
+                  "
+                  aria-hidden
+                >
+                  <div className="w-3/4 h-0.5 bg-accent rounded-full shadow-sm transition-all" />
+                </div>
+              )}
 
-        {/* if overId is null and there are items, show an end placeholder when dragging new item to end */}
-        {overId === null && items.length > 0 && (
-          <div className="flex justify-center">
-            <div className="w-3/4 h-0.5 bg-transparent" />
-          </div>
-        )}
+              <SortableItem id={block.id}>
+                <div
+                  className="
+                    border border-border rounded-2xl bg-card shadow-sm
+                    hover:shadow-md transition-all duration-150
+                  "
+                >
+                  {block.component}
+                </div>
+              </SortableItem>
+            </div>
+          ))}
+
+          {/* Если перетаскивание ниже последнего элемента */}
+          {overId === null && items.length > 0 && (
+            <div className="flex justify-center pt-4">
+              <div className="w-3/4 h-0.5 bg-accent/40 rounded-full" />
+            </div>
+          )}
+        </SortableContext>
       </div>
-    </SortableContext>
+    </div>
   );
 };
 
