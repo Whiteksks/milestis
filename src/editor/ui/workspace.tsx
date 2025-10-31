@@ -2,29 +2,16 @@
 
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
-// import { Sortable } from "../registerComponents";
-import { HeaderBlock, TestComponentB, TestComponentA } from "../components";
-// DragDropProvider is provided at a higher level so sidebar and workspace share the same DnD context
-import { Draggable, Droppable } from "../hooks";
-
-
-export interface EditorBlock {
-  id: string;
-  component: React.ReactNode;
-}
+import WorkspaceDnD, { EditorBlock } from "../dnd/WorkspaceDnDInternal";
 
 interface WorkspaceProps {
   isDropped: boolean;
+  items?: EditorBlock[];
+  overId?: string | null;
 }
 
-export const Workspace: React.FC<WorkspaceProps> = ({ isDropped }) => {
+export const Workspace: React.FC<WorkspaceProps> = ({ isDropped, items = [] }) => {
   const { activeDevice } = useEditorStore();
-  // Все подключённые блоки
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>([
-    { id: "header", component: <HeaderBlock /> },
-    { id: "text", component: <TestComponentA /> },
-    { id: "image", component: <TestComponentB /> },
-  ]);
 
   const getWidthClass = () => {
     switch (activeDevice) {
@@ -39,16 +26,19 @@ export const Workspace: React.FC<WorkspaceProps> = ({ isDropped }) => {
 
   return (
     <div className="flex-1 flex justify-center p-4 overflow-y-auto transition-all duration-300">
-        <Droppable id="droppable">
-          <div>
-            {isDropped && <Draggable />}
-          </div>
-        </Droppable>
-        {/* {blocks.map((block, index) => (
-          <Sortable key={block.id} id={block.id} index={index}>
-            {block.component}
-          </Sortable>
-        ))} */}
+      <div
+        className={`
+          w-full min-h-full h-fit
+          bg-card/50 rounded-xl shadow-xl outline-none
+          p-8 sm:p-12 lg:p-16 ring-2 ring-transparent
+          focus:ring-accent transition-all duration-300
+          relative group
+          ${getWidthClass()}
+        `}
+      >
+  {/* DnD logic is moved to WorkspaceDnD to keep this file minimal and scalable */}
+  <WorkspaceDnD items={items} />
+      </div>
     </div>
   );
 };

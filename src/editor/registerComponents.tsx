@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 
 interface SortableProps {
   id: string | number;
@@ -10,10 +10,10 @@ interface SortableProps {
 }
 
 export const Sortable: React.FC<SortableProps> = ({ id, index, children }) => {
-  const { ref } = useSortable({ id, index });
+  const { setNodeRef } = useSortable({ id });
 
   return (
-    <div ref={ref} className="m-4">
+    <div ref={setNodeRef as any} className="m-4">
       {children}
     </div>
   );
