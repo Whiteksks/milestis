@@ -10,6 +10,7 @@ import SimpleBlockB from "@/editor/components/SimpleBlockB";
 import { HeaderBlock, TestComponentA, TestComponentB } from "@/editor/components";
 import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
 import React from "react";
+import { useEditorStore } from "@/hooks/store/useEditorStore";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);
@@ -26,6 +27,14 @@ export default function Page() {
   // active drag id for overlay preview
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
+  const { setSelectedBlock } = useEditorStore();
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Проверяем, содержит ли элемент кликнутый target атрибут "data-block"
+    const isInsideBlock = (e.target as HTMLElement).closest("[data-block]");
+    if (!isInsideBlock) {
+      setSelectedBlock(null);
+    }
+  };
   // Initialize default blocks on mount if store is empty
   React.useEffect(() => {
     if (blocks.length === 0) {
@@ -92,7 +101,7 @@ export default function Page() {
 
   return (
     
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex flex-col h-screen bg-background overflow-hidden" onClick={handleClick}>
       <div>
         <HeaderApp />
         <HeaderTools />
