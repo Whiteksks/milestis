@@ -3,7 +3,7 @@
 import { HeaderApp } from "@/editor/ui/header";
 import { HeaderTools } from "@/editor/ui/headerEditorFields";
 import { SidebarEditorComponents } from "@/editor/ui/sidebarEditorComponents";
-import  {Workspace}  from "@/editor/ui/workspace";
+import { Workspace } from "@/editor/ui/workspace";
 import { DndContext, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import SimpleBlockA from "@/editor/components/SimpleBlockA";
 import SimpleBlockB from "@/editor/components/SimpleBlockB";
@@ -12,6 +12,9 @@ import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
 import { SidebarRightDnD } from "@/editor/layout/desktop/InspectorDnD";
+import { MobileEditorNavigation } from "@/editor/layout/mobile/MobileEditorNavigation";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);
@@ -29,7 +32,9 @@ export default function Page() {
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
   const { setSelectedBlock } = useEditorStore();
-    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const isMobile = useIsMobile();
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Проверяем, содержит ли элемент кликнутый target атрибут "data-block"
     const isInsideBlock = (e.target as HTMLElement).closest("[data-block]");
     if (!isInsideBlock) {
@@ -102,16 +107,37 @@ export default function Page() {
 
   return (
     
-    <div className="flex flex-col h-screen bg-background overflow-hidden" onClick={handleClick}>
+    <div className={cn(
+      "flex flex-col h-screen bg-background overflow-hidden",
+      isMobile ? "pb-24" : ""
+    )} onClick={handleClick}>
       <div>
         <HeaderApp />
         <HeaderTools />
       </div>
 
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={(e) => { handleDragEnd(e); setOverId(null); setActiveId(null); }}>
-        <SidebarEditorComponents />
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={(e) => {
+          handleDragEnd(e);
+          setOverId(null);
+          setActiveId(null);
+        }}
+      >
+        {!isMobile && (
+          <div className="hidden lg:block">
+            <SidebarEditorComponents />
+          </div>
+        )}
         <Workspace isDropped={isDropped} items={blocks} overId={overId} />
-        <SidebarRightDnD />
+        {!isMobile && (
+          <div className="hidden lg:block">
+            <SidebarRightDnD />
+          </div>
+        )}
+        {isMobile && <MobileEditorNavigation />}
 
         <DragOverlay>
           {activeId ? (
