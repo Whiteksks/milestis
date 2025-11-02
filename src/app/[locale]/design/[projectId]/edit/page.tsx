@@ -11,6 +11,7 @@ import { HeaderBlock, TestComponentA, TestComponentB } from "@/editor/components
 import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
+import { SidebarRightDnD } from "@/editor/layout/desktop/sidebarRightDnD";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);
@@ -110,6 +111,7 @@ export default function Page() {
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={(e) => { handleDragEnd(e); setOverId(null); setActiveId(null); }}>
         <SidebarEditorComponents />
         <Workspace isDropped={isDropped} items={blocks} overId={overId} />
+        <SidebarRightDnD />
 
         <DragOverlay>
           {activeId ? (

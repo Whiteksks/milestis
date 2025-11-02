@@ -1,11 +1,12 @@
 "use client";
 
-import { SidebarDropdown } from "../layout/sidebarDropdown";
-import { SidebarIsland } from "../layout/sidebarIsland";
-import { SidebarSettings } from "../layout/sidebarSettings";
+import { SidebarDropdown } from "../layout/desktop/sidebarDropdown";
+import { SidebarIsland } from "../layout/desktop/sidebarIsland";
+import { SidebarSettings } from "../layout/desktop/sidebarSettings";
 import { HeaderBlock, TestComponentA, TestComponentB } from "../components";
 import React from "react";
 import { useDraggable } from "@dnd-kit/core";
+import DraggablePreview from "../layout/DraggablePreview"
 
 type SidebarBlock = { id: string; label: string; componentName: string };
 
@@ -34,32 +35,6 @@ export function SidebarEditorComponents() {
 
       <div className="absolute bottom-4">
         <SidebarSettings />
-      </div>
-    </div>
-  );
-}
-
-function DraggablePreview({ id, label, componentName }: { id: string; label: string; componentName: string }) {
-  const { attributes, listeners, setNodeRef } = useDraggable({ id });
-
-  const compMap: Record<string, React.ReactNode> = {
-    HeaderBlock: <HeaderBlock />,
-    TestComponentA: <TestComponentA />,
-    TestComponentB: <TestComponentB />,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className="p-2 bg-primary rounded-md border shadow-sm cursor-grab"
-    >
-      <div className="text-xs text-muted-foreground mb-1">{label}</div>
-      <div className="bg-white rounded" style={{ height: "80px", overflow: "hidden" }}>
-        <div style={{ width: "250%", height: "250%", transform: "scale(0.4)", transformOrigin: "top left", pointerEvents: "none" }}>
-            {compMap[componentName] ?? <div className="text-sm text-muted-foreground">Preview</div>}
-        </div>
       </div>
     </div>
   );

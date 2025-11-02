@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Edit3, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import useEditorDnDStore, { EditorBlock } from '../store/useEditorDnDStore';
+import useEditorDnDStore, { EditorBlock } from '../../store/useEditorDnDStore';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
