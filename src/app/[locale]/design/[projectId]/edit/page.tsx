@@ -11,7 +11,7 @@ import { HeaderBlock, TestComponentA, TestComponentB } from "@/editor/components
 import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
-import { SidebarRightDnD } from "@/editor/layout/desktop/sidebarRightDnD";
+import { SidebarRightDnD } from "@/editor/layout/desktop/InspectorDnD";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);

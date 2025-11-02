@@ -1,140 +1,94 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Edit3, Layers } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Settings, Edit3, Layers, Eye, EyeOff, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import useEditorDnDStore, { EditorBlock } from '../../store/useEditorDnDStore';
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
-  restrictToVerticalAxis,
-} from '@dnd-kit/modifiers';
-
-function SortableItem({ block }: { block: EditorBlock }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: block.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="p-2 bg-primary rounded-md border shadow-sm cursor-grab mb-2"
-    >
-      <div className="text-xs text-muted-foreground mb-1">{block.id}</div>
-      <div className="bg-white p-2 rounded" style={{ height: '50px', overflow: 'hidden' }}>
-        <div
-          style={{
-            width: '250%',
-            height: '250%',
-            transform: 'scale(0.4)',
-            transformOrigin: 'top left',
-            pointerEvents: 'none',
-          }}
-        >
-          {block.component}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function SidebarSettings() {
-  const [isLayersOpen, setIsLayersOpen] = useState(false);
-  const { blocks, moveBlock } = useEditorDnDStore();
-
   const iconButtons = [
     { id: 'edit', Icon: Edit3, label: 'Редактировать' },
     { id: 'file', Icon: Settings, label: 'Файл' },
-    {
-      id: 'layers',
-      Icon: Layers,
-      label: 'Слои',
-      onClick: () => setIsLayersOpen((prev) => !prev),
-    },
+    { id: 'layers', Icon: Layers, label: 'Слои' },
   ];
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = blocks.findIndex((b) => b.id === active.id);
-      const newIndex = blocks.findIndex((b) => b.id === over.id);
-      moveBlock(oldIndex, newIndex);
+  const renderPopoverContent = (id: string) => {
+    switch (id) {
+      case 'edit':
+        return (
+          <div className="space-y-2">
+            <div className="font-medium text-sm">Редактирование</div>
+            <Button variant="outline" size="sm" className="w-full justify-start">
+              Изменить текст
+            </Button>
+            <Button variant="outline" size="sm" className="w-full justify-start">
+              Изменить изображение
+            </Button>
+          </div>
+        );
+
+      case 'file':
+        return (
+          <div className="space-y-2">
+            <div className="font-medium text-sm">Файл</div>
+            <Button variant="outline" size="sm" className="w-full justify-start">
+              Сохранить проект
+            </Button>
+            <Button variant="outline" size="sm" className="w-full justify-start">
+              Экспортировать
+            </Button>
+          </div>
+        );
+
+      case 'layers':
+        return (
+          <div className="space-y-2">
+            <div className="font-medium text-sm mb-1">Слои</div>
+            <div className="flex flex-col gap-1">
+              <Button variant="outline" size="sm" className="w-full justify-between">
+                <span>Фон</span>
+                <Eye className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="w-full justify-between">
+                <span>Фото</span>
+                <EyeOff className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="w-full justify-between">
+                <span>Текст</span>
+                <Eye className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="text-sm text-muted-foreground">Нет данных для отображения.</div>
+        );
     }
-  }
+  };
 
   return (
-    <motion.div
-      initial={false}
-      animate={{
-        width: isLayersOpen ? 260 : 56,
-        height: isLayersOpen ? 420 : iconButtons.length * 56 + 20,
-      }}
-      transition={{ type: 'spring', stiffness: 220, damping: 26 }}
-      className="bg-popover border shadow-lg rounded-2xl overflow-hidden flex flex-col items-center p-2"
-    >
-      <AnimatePresence mode="wait">
-        {!isLayersOpen && (
-          <motion.div
-            key="icons"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="w-full flex flex-col items-center space-y-2"
-          >
-            {iconButtons.map(({ id, Icon, label, onClick }) => (
-              <button
-                key={id}
-                title={label}
-                onClick={onClick}
-                className={cn(
-                  'w-full flex items-center justify-center h-12 rounded-xl hover:bg-accent transition-colors'
-                )}
-              >
-                <Icon className="w-5 h-5 text-popover-foreground" />
-              </button>
-            ))}
-          </motion.div>
-        )}
-
-        {isLayersOpen && (
-          <motion.div
-            key="layers"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.25 }}
-            className="w-full flex-1 p-2 overflow-y-auto"
-          >
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-              <SortableContext items={blocks} strategy={verticalListSortingStrategy}>
-                {blocks.map((block) => (
-                  <SortableItem key={block.id} block={block} />
-                ))}
-              </SortableContext>
-            </DndContext>
-
-            <button
-              onClick={() => setIsLayersOpen(false)}
-              className="mt-3 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+    <div className="bg-popover shadow-lg rounded-2xl flex flex-col items-center p-2 w-12 space-y-2">
+      {iconButtons.map(({ id, Icon, label }) => (
+        <Popover key={id}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'w-10 h-10 flex items-center justify-center rounded-xl hover:bg-accent transition-colors'
+              )}
+              title={label}
             >
-              ← Свернуть
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+              <Icon className="w-5 h-5 text-popover-foreground" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="right" sideOffset={8} className="w-56">
+            {renderPopoverContent(id)}
+          </PopoverContent>
+        </Popover>
+      ))}
+    </div>
   );
 }

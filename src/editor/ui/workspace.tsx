@@ -25,7 +25,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({ isDropped, items = [] }) =
   };
 
   return (
-    <div className="flex-1 flex justify-center p-4 overflow-y-auto transition-all duration-300">
+    <div className="flex-1 flex justify-center overflow-y-auto transition-all duration-300">
       <div
         className={`
           w-full rounded-xl shadow-xl outline-none

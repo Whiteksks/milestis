@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { X, GripVertical, Settings2 } from "lucide-react";
 import React from "react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
@@ -74,7 +74,7 @@ export function SidebarRightDnD() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          "fixed right-6 top-1/2 -translate-y-1/2 z-40 p-3 rounded-l-lg shadow-lg bg-primary text-white hover:bg-primary/90 transition"
+          "fixed right-6 top-1/2 -translate-y-1/2 z-40 p-3 rounded-l-lg shadow-lg bg-popover text-white hover:bg-accent transition"
         )}
       >
         <Settings2 className="w-5 h-5" />
@@ -85,16 +85,15 @@ export function SidebarRightDnD() {
         {open && (
           <motion.div
             key="dock-inspector"
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: "320px", opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
             transition={{ type: "spring", stiffness: 180, damping: 22 }}
             className={cn(
-              // отступ справа — не перекрывает скроллбар
-              // отступ сверху — под header (64px)
-              "fixed top-[108px] bottom-4 right-[20px] z-50 bg-popover/95 backdrop-blur-xl border border-border shadow-xl rounded-xl flex flex-col overflow-hidden"
+              "fixed top-[108px] bottom-4 right-[20px] z-50 bg-popover/95 backdrop-blur-xl border border-border shadow-xl rounded-xl flex flex-col overflow-hidden w-80"
             )}
           >
+
             {/* Заголовок */}
             <div className="flex items-center justify-between p-3 border-b bg-background/70 backdrop-blur-sm">
               <h2 className="text-sm font-semibold text-foreground">Инспектор</h2>
