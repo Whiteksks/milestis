@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Layers, Settings as SettingsIcon, ChevronLeft } from "lucide-react";
+import { Layers, Settings as SettingsIcon, ChevronLeft, Heart, BookTemplate } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +20,8 @@ import { BLOCK_LIBRARY, type BlockLibraryItem } from "@/editor/blocks/block-libr
 const PANEL_CONFIG = [
   { id: "blocks", label: "Блоки", icon: Layers },
   { id: "settings", label: "Настройки", icon: SettingsIcon },
+  { id: "favorites", label: "Избранное", icon: Heart },
+  { id: "templates", label: "Шаблоны", icon: BookTemplate },
 ] as const;
 
 type PanelConfig = (typeof PANEL_CONFIG)[number];
@@ -37,9 +39,11 @@ export function SidebarEditorComponents() {
 
   const panelContent = React.useMemo<Record<PanelId, React.ReactNode>>(
     () => ({
-  blocks: <BlocksPanel blocks={blocks} />,
-      settings: <SettingsPanel />,
-    }),
+        blocks: <BlocksPanel blocks={blocks} />,
+        settings: <SettingsPanel />,
+        favorites: <FavoritesPanel />,
+        templates: <LayoutTemplate />,
+      }),
     [blocks]
   );
 
@@ -78,29 +82,32 @@ interface FloatingPanelTogglesProps {
 
 function FloatingPanelToggles({ panels, activePanel, onToggle }: FloatingPanelTogglesProps) {
   return (
-    <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
-      {panels.map(({ id, icon: Icon, label }) => (
-        <Tooltip key={id} delayDuration={200}>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={() => onToggle(id)}
-              variant="ghost"
-              size="icon"
-              className={`h-12 w-12 rounded-full transition-all duration-200 ${
-                activePanel === id
-                  ? "bg-accent text-accent-foreground shadow-lg shadow-accent/20"
-                  : "bg-card text-foreground hover:bg-muted"
-              }`}
-            >
-              <Icon className="h-5 w-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">{label}</TooltipContent>
-        </Tooltip>
-      ))}
+    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40">
+      <div className="flex flex-col gap-1 bg-card border border-border rounded-r-2xl shadow-lg p-2">
+        {panels.map(({ id, icon: Icon, label }) => (
+          <Tooltip key={id} delayDuration={200}>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => onToggle(id)}
+                variant="ghost"
+                size="icon"
+                className={`h-10 w-10 rounded-xl transition-all duration-200 ${
+                  activePanel === id
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{label}</TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
     </div>
   );
 }
+
 
 interface SidebarDrawerProps {
   panel: PanelConfig;
@@ -173,6 +180,28 @@ function SettingsPanel() {
       <div className="flex">
         <SidebarSettings />
       </div>
+    </div>
+  );
+}
+
+function FavoritesPanel() {
+  return (
+    <div className="space-y-4">
+      <p className="text-sm font-medium text-foreground">Избранные блоки</p>
+      <p className="text-sm text-muted-foreground">
+        Здесь появятся ваши избранные элементы.
+      </p>
+    </div>
+  );
+}
+
+function LayoutTemplate() {
+  return (
+    <div className="w-4 h-4 bg-foreground/20 rounded-sm relative">
+      <div className="absolute top-1 left-1 w-2 h-1 bg-foreground rounded-sm" />
+      <div className="absolute top-2 left-1 w-2 h-1 bg-foreground rounded-sm" />
+      <div className="absolute top-3 left-1 w-2 h-1 bg-foreground rounded-sm" />
+      <div className="absolute top-1 right-1 w-1 h-3 bg-foreground rounded-sm" />
     </div>
   );
 }

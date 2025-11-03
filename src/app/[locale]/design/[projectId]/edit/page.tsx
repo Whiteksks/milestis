@@ -211,7 +211,7 @@ export default function Page() {
                   SimpleBlockB: <SimpleBlockB />,
                 };
                 return (
-                  <div className="pointer-events-none w-80">
+                  <div className="pointer-events-none w-96 max-h-64 overflow-hidden rounded-md border bg-background/90 shadow-md p-2">
                     {compMap[type] ?? <div className="p-4 bg-muted/10 rounded">Preview</div>}
                   </div>
                 );
@@ -220,7 +220,11 @@ export default function Page() {
               // preview when dragging existing workspace item
               (() => {
                 const found = blocks.find((b) => b.id === String(activeId));
-                return <div className="pointer-events-none w-80">{found?.component ?? null}</div>;
+                return (
+                  <div className="pointer-events-none w-96 max-h-64 overflow-hidden rounded-md border bg-background/90 shadow-md p-2">
+                    {found?.component ?? null}
+                  </div>
+                );
               })()
             )
           ) : null}
