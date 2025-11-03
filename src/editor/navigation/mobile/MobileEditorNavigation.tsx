@@ -32,12 +32,7 @@ import DraggablePreview from "@/editor/palette/DraggablePreview";
 import useEditorDnDStore, {
   EditorBlock,
 } from "@/editor/state/useEditorDnDStore";
-
-const AVAILABLE_BLOCKS = [
-  { id: "HeaderBlock", label: "Header", componentName: "HeaderBlock" },
-  { id: "TestComponentA", label: "Text A", componentName: "TestComponentA" },
-  { id: "TestComponentB", label: "Text B", componentName: "TestComponentB" },
-];
+import { BLOCK_LIBRARY } from "@/editor/blocks/block-library";
 
 type MobileSheetView = "blocks" | "inspector" | "settings";
 
@@ -92,13 +87,14 @@ function SortableInspectorItem({ block }: { block: EditorBlock }) {
 
 function BlocksSheetContent() {
   return (
-    <div className="grid gap-3">
-      {AVAILABLE_BLOCKS.map((block) => (
+    <div className="grid gap-3 grid-cols-2">
+      {BLOCK_LIBRARY.map((block) => (
         <DraggablePreview
           key={block.id}
           id={`new:${block.componentName}`}
-          label={block.label}
           componentName={block.componentName}
+          title={block.title}
+          description={block.description}
         />
       ))}
     </div>

@@ -15,6 +15,7 @@ import { SidebarRightDnD } from "@/editor/panels/inspector/InspectorDnD";
 import { MobileEditorNavigation } from "@/editor/navigation/mobile/MobileEditorNavigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { createBlockElement } from "@/editor/blocks/block-library";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);
@@ -66,15 +67,8 @@ export default function Page() {
       const type = activeId.split(":")[1];
       const newId = `block-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      const compMap: Record<string, React.ReactNode> = {
-        HeaderBlock: <HeaderBlock />,
-        TestComponentA: <SimpleBlockC />,
-        TestComponentB: <SimpleBlockD />,
-        SimpleBlockA: <SimpleBlockA />,
-        SimpleBlockB: <SimpleBlockB />,
-      };
-
-      const newBlock = { id: newId, component: compMap[type] ?? <div /> };
+      const component = createBlockElement(type) ?? <div />;
+      const newBlock = { id: newId, component };
 
       // If dropped on an existing block, insert before it, otherwise append
       const targetIndex = blocks.findIndex((b) => b.id === overId);

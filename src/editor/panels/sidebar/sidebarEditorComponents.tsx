@@ -15,8 +15,7 @@ import {
 
 import { SidebarSettings } from "./sidebarSettings";
 import DraggablePreview from "../../palette/DraggablePreview";
-
-type SidebarBlock = { id: string; label: string; componentName: string };
+import { BLOCK_LIBRARY, type BlockLibraryItem } from "@/editor/blocks/block-library";
 
 const PANEL_CONFIG = [
   { id: "blocks", label: "Блоки", icon: Layers },
@@ -29,14 +28,7 @@ type PanelId = PanelConfig["id"];
 export function SidebarEditorComponents() {
   const [activePanel, setActivePanel] = React.useState<PanelId | null>("blocks");
 
-  const blocks: SidebarBlock[] = React.useMemo(
-    () => [
-      { id: "HeaderBlock", label: "Header", componentName: "HeaderBlock" },
-      { id: "TestComponentA", label: "Text A", componentName: "TestComponentA" },
-      { id: "TestComponentB", label: "Text B", componentName: "TestComponentB" },
-    ],
-    []
-  );
+  const blocks = React.useMemo(() => BLOCK_LIBRARY, []);
 
   const activePanelConfig = React.useMemo<PanelConfig | null>(
     () => PANEL_CONFIG.find((panel) => panel.id === activePanel) ?? null,
@@ -45,7 +37,7 @@ export function SidebarEditorComponents() {
 
   const panelContent = React.useMemo<Record<PanelId, React.ReactNode>>(
     () => ({
-      blocks: <BlocksPanel blocks={blocks} />,
+  blocks: <BlocksPanel blocks={blocks} />,
       settings: <SettingsPanel />,
     }),
     [blocks]
@@ -119,13 +111,16 @@ interface SidebarDrawerProps {
 function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
   return (
     <motion.aside
-      className="fixed top-28 left-2 bottom-4 w-[min(20rem,calc(100vw-6rem))] bg-background border border-border z-30 flex flex-col shadow-lg rounded-2xl"
+      className="fixed top-26 left-2 bottom-2 w-[min(30rem,calc(100vw-6rem))] 
+                 bg-background border border-border z-30 flex flex-col 
+                 shadow-lg rounded-2xl overflow-hidden"
       initial={{ x: -320, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -320, opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+      {/* Заголовок панели */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Панель</p>
           <h2 className="text-base font-semibold text-foreground">{panel.label}</h2>
@@ -140,27 +135,30 @@ function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
         </Button>
       </div>
 
-      <ScrollArea className="flex-1">
+      {/* Прокручиваемая часть */}
+      <ScrollArea className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-6">{children}</div>
       </ScrollArea>
     </motion.aside>
   );
 }
 
-function BlocksPanel({ blocks }: { blocks: SidebarBlock[] }) {
+
+function BlocksPanel({ blocks }: { blocks: BlockLibraryItem[] }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-medium text-foreground">Библиотека блоков</p>
         <p className="text-sm text-muted-foreground">Перетащите компонент на холст для добавления.</p>
       </div>
-      <div className="grid gap-2">
+      <div className="grid gap-3 grid-cols-2">
         {blocks.map((block) => (
           <DraggablePreview
             key={block.id}
             id={`new:${block.componentName}`}
-            label={block.label}
             componentName={block.componentName}
+            title={block.title}
+            description={block.description}
           />
         ))}
       </div>
