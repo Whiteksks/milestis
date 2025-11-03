@@ -1,8 +1,86 @@
 "use client"
 
 import type React from "react"
-import InternalSortable from "@/editor/dnd/InternalSortable"
+import InternalDnD, { type InternalDnDItem } from "@/editor/dnd/InternalDnD"
 import { Code2, Palette, Layers } from "lucide-react"
+
+const editorGridItems: InternalDnDItem[] = [
+  {
+    id: "block-hero",
+    wrapperClassName: "md:col-span-2",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Hero</p>
+        <h3 className="text-lg font-semibold text-foreground">Impact hero</h3>
+        <p className="text-sm text-muted-foreground">
+          Full width introduction with headline, supporting copy, and primary actions.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "block-feature-grid",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Features</p>
+        <h3 className="text-lg font-semibold text-foreground">Feature highlights</h3>
+        <p className="text-sm text-muted-foreground">
+          Three column cards with icons and concise value propositions.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "block-testimonials",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Social proof</p>
+        <h3 className="text-lg font-semibold text-foreground">Testimonials</h3>
+        <p className="text-sm text-muted-foreground">
+          Rotating quotes with avatars and company logos for trust.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "block-pricing",
+    wrapperClassName: "md:col-span-3",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Plans</p>
+        <h3 className="text-lg font-semibold text-foreground">Pricing table</h3>
+        <p className="text-sm text-muted-foreground">
+          Tiered cards with plan comparison and call to action buttons.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "block-blog",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Content</p>
+        <h3 className="text-lg font-semibold text-foreground">Blog feed</h3>
+        <p className="text-sm text-muted-foreground">
+          Recent articles with cover imagery, author, and publication metadata.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "block-contact",
+    wrapperClassName: "md:col-span-2",
+    content: (
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Support</p>
+        <h3 className="text-lg font-semibold text-foreground">Contact section</h3>
+        <p className="text-sm text-muted-foreground">
+          Form layout with office locations and direct support channels.
+        </p>
+      </div>
+    ),
+  },
+]
 
 export const SimpleBlockB: React.FC = () => {
   return (
@@ -94,7 +172,12 @@ export const SimpleBlockB: React.FC = () => {
               </div>
 
               <div className="min-h-96 bg-background/50 border border-border/40 rounded-lg p-6 border-dashed">
-                <InternalSortable />
+                <InternalDnD
+                  items={editorGridItems}
+                  columns={3}
+                  gapClassName="gap-5"
+                  itemClassName="bg-background border border-border/30 rounded-xl p-5 shadow-sm transition-shadow hover:shadow-md"
+                />
               </div>
             </div>
 

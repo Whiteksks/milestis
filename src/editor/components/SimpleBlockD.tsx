@@ -1,8 +1,41 @@
 "use client"
 
 import type React from "react"
-import InternalSortable from "@/editor/dnd/InternalSortable"
+import InternalSortable, { type InternalSortableItem } from "@/editor/dnd/InternalSortable"
 import { BookOpen, Award, Users, FileText } from "lucide-react"
+
+const builderItems: InternalSortableItem[] = [
+  {
+    id: "overview",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Overview</p>
+        <h3 className="text-lg font-semibold text-foreground">Project summary</h3>
+        <p className="text-sm text-muted-foreground">Describe the goal of your page and outline the intended audience.</p>
+      </div>
+    ),
+  },
+  {
+    id: "media",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Media</p>
+        <h3 className="text-lg font-semibold text-foreground">Visual showcase</h3>
+        <p className="text-sm text-muted-foreground">Highlight imagery, video embeds, or interactive content.</p>
+      </div>
+    ),
+  },
+  {
+    id: "details",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Details</p>
+        <h3 className="text-lg font-semibold text-foreground">Information blocks</h3>
+        <p className="text-sm text-muted-foreground">Add feature highlights, testimonials, or pricing tables.</p>
+      </div>
+    ),
+  },
+]
 
 export const SimpleBlockD: React.FC = () => {
   const sections = [
@@ -88,7 +121,11 @@ export const SimpleBlockD: React.FC = () => {
 
           <div className="bg-card border border-border/40 rounded-xl p-12 shadow-md hover:shadow-lg transition-shadow">
             <div className="min-h-96 bg-background/50 border-2 border-dashed border-border/50 rounded-lg p-8 flex items-center justify-center">
-              <InternalSortable />
+              <InternalSortable
+                items={builderItems}
+                containerClassName="space-y-4"
+                itemClassName="bg-background border border-border/40 rounded-lg p-5 shadow-sm transition-shadow hover:shadow-md"
+              />
             </div>
           </div>
         </div>

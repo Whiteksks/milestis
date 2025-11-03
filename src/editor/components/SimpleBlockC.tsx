@@ -1,8 +1,41 @@
 "use client"
 
 import type React from "react"
-import InternalSortable from "@/editor/dnd/InternalSortable"
+import InternalSortable, { type InternalSortableItem } from "@/editor/dnd/InternalSortable"
 import { Grid3x3, Zap, Lock, Rocket } from "lucide-react"
+
+const selectionItems: InternalSortableItem[] = [
+  {
+    id: "layout",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Structure</p>
+        <h3 className="text-lg font-semibold text-foreground">Layout builder</h3>
+        <p className="text-sm text-muted-foreground">Arrange sections, adjust spacing, and create responsive grids.</p>
+      </div>
+    ),
+  },
+  {
+    id: "style",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Design</p>
+        <h3 className="text-lg font-semibold text-foreground">Style controls</h3>
+        <p className="text-sm text-muted-foreground">Apply typography, colors, and effects consistently across blocks.</p>
+      </div>
+    ),
+  },
+  {
+    id: "content",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Content</p>
+        <h3 className="text-lg font-semibold text-foreground">Dynamic regions</h3>
+        <p className="text-sm text-muted-foreground">Drop in cards, media, or forms to match your template selection.</p>
+      </div>
+    ),
+  },
+]
 
 export const SimpleBlockC: React.FC = () => {
   const templates = [
@@ -86,8 +119,12 @@ export const SimpleBlockC: React.FC = () => {
             <p className="text-muted-foreground">Choose from the templates above and customize it for your needs</p>
           </div>
 
-          <div className="min-h-72 bg-background/50 border-2 border-dashed border-border/50 rounded-lg p-8 flex items-center justify-center">
-            <InternalSortable />
+          <div className="min-h-72 bg-background/50 border-2 border-dashed border-border/50 rounded-lg p-8">
+            <InternalSortable
+              items={selectionItems}
+              containerClassName="space-y-4"
+              itemClassName="bg-card/80 border border-border/40 rounded-lg p-5 shadow-sm transition-shadow hover:shadow-md"
+            />
           </div>
         </div>
 

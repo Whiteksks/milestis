@@ -42,7 +42,7 @@ export const DraggableBlock: React.FC<DraggableBlockProps> = ({
     <SortableItem id={block.id}>
       <div
         className={`
-          border-2 bg-card shadow-sm
+          border-l border-r bg-card shadow-sm
           hover:shadow-md transition-all duration-150
           ${isSelected ? 'border-accent' : 'border-popover'}
         `}

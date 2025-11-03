@@ -1,8 +1,41 @@
 "use client"
 
 import type React from "react"
-import InternalSortable from "@/editor/dnd/InternalSortable"
+import InternalSortable, { type InternalSortableItem } from "@/editor/dnd/InternalSortable"
 import { Sparkles, Layout, Zap } from "lucide-react"
+
+const contentAreaItems: InternalSortableItem[] = [
+  {
+    id: "hero-intro",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Hero</p>
+        <h3 className="text-lg font-semibold text-foreground">Welcome banner</h3>
+        <p className="text-sm text-muted-foreground">Craft a compelling introduction with a clear value proposition.</p>
+      </div>
+    ),
+  },
+  {
+    id: "feature-list",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Content</p>
+        <h3 className="text-lg font-semibold text-foreground">Feature overview</h3>
+        <p className="text-sm text-muted-foreground">Combine imagery and text to highlight a key product capability.</p>
+      </div>
+    ),
+  },
+  {
+    id: "cta-strip",
+    content: (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Call to action</p>
+        <h3 className="text-lg font-semibold text-foreground">Conversion block</h3>
+        <p className="text-sm text-muted-foreground">Place interactive buttons or forms to guide users toward action.</p>
+      </div>
+    ),
+  },
+]
 
 export const SimpleBlockA: React.FC = () => {
   return (
@@ -68,7 +101,11 @@ export const SimpleBlockA: React.FC = () => {
 
           <div className="border border-border bg-card rounded-xl p-8 shadow-lg shadow-accent/5 hover:shadow-xl hover:shadow-accent/10 transition-shadow duration-300 min-h-96 flex items-center justify-center">
             <div className="w-full">
-              <InternalSortable />
+              <InternalSortable
+                items={contentAreaItems}
+                itemClassName="bg-card border border-border/40 rounded-xl p-5 shadow-sm transition-shadow hover:shadow-lg"
+                handleClassName="w-9 h-9 flex items-center justify-center rounded-md border border-border/40 bg-background/80 text-muted-foreground shadow-sm transition-transform hover:scale-105 focus:outline-none cursor-grab active:cursor-grabbing"
+              />
             </div>
           </div>
         </div>
