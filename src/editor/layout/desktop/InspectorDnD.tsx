@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { X, GripVertical, Settings2 } from "lucide-react";
+import { X, GripVertical, Settings2, PanelRight } from "lucide-react";
 import React from "react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import {
@@ -70,14 +70,10 @@ export function SidebarRightDnD() {
       {/* Кнопка-инспектор по центру справа */}
       <motion.button
         onClick={() => setOpen((prev) => !prev)}
-        initial={{ opacity: 0, x: 40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "fixed right-6 top-1/2 -translate-y-1/2 z-40 p-3 rounded-l-lg shadow-lg bg-popover text-white hover:bg-accent transition"
-        )}
+        className="fixed right-6 top-1/2 -translate-y-1/2 z-40 flex items-center justify-center h-12 w-12 bg-card border border-border border-r-0 rounded-l-lg hover:bg-muted transition-colors"
+        aria-label="Toggle inspector panel"
       >
-        <Settings2 className="w-5 h-5" />
+       <PanelRight className="h-4 w-4 text-muted-foreground" />
       </motion.button>
 
       {/* Док-инспектор с отступами */}

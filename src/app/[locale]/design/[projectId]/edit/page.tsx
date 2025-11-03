@@ -7,7 +7,7 @@ import { Workspace } from "@/editor/ui/workspace";
 import { DndContext, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import SimpleBlockA from "@/editor/components/SimpleBlockA";
 import SimpleBlockB from "@/editor/components/SimpleBlockB";
-import { HeaderBlock, TestComponentA, TestComponentB } from "@/editor/components";
+import { HeaderBlock, SimpleBlockC, SimpleBlockD } from "@/editor/components";
 import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
 import React from "react";
 import { useEditorStore } from "@/hooks/store/useEditorStore";
@@ -25,6 +25,7 @@ export default function Page() {
   const setBlocks = useEditorDnDStore((s) => s.setBlocks);
   const blocks = useEditorDnDStore((s) => s.blocks);
   const moveBlock = useEditorDnDStore((s) => s.moveBlock);
+  const removeBlock = useEditorDnDStore((s) => s.removeBlock);
 
   // Drag over id for UX (insertion indicator)
   const [overId, setOverId] = React.useState<string | null>(null);
@@ -32,6 +33,7 @@ export default function Page() {
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
   const { setSelectedBlock } = useEditorStore();
+  const selectedBlock = useEditorStore((s) => s.selectedBlock);
   const isMobile = useIsMobile();
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -66,8 +68,8 @@ export default function Page() {
 
       const compMap: Record<string, React.ReactNode> = {
         HeaderBlock: <HeaderBlock />,
-        TestComponentA: <TestComponentA />,
-        TestComponentB: <TestComponentB />,
+        TestComponentA: <SimpleBlockC />,
+        TestComponentB: <SimpleBlockD />,
         SimpleBlockA: <SimpleBlockA />,
         SimpleBlockB: <SimpleBlockB />,
       };
@@ -105,6 +107,60 @@ export default function Page() {
     setOverId(overId);
   };
 
+  const handleDeleteBlock = React.useCallback(
+    (id: string) => {
+      removeBlock(id);
+      if (selectedBlock?.id === id) {
+        setSelectedBlock(null);
+      }
+    },
+    [removeBlock, selectedBlock?.id, setSelectedBlock]
+  );
+
+  const handleMoveBlockUp = React.useCallback(
+    (id: string) => {
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index > 0) {
+        moveBlock(index, index - 1);
+      }
+    },
+    [blocks, moveBlock]
+  );
+
+  const handleMoveBlockDown = React.useCallback(
+    (id: string) => {
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index !== -1 && index < blocks.length - 1) {
+        moveBlock(index, index + 1);
+      }
+    },
+    [blocks, moveBlock]
+  );
+
+  const handleDuplicateBlock = React.useCallback(
+    (id: string) => {
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index === -1) return;
+
+      const original = blocks[index];
+      const clonedId = `block-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const clonedComponent = React.isValidElement(original.component)
+        ? React.cloneElement(original.component, { key: clonedId })
+        : original.component;
+
+      const clonedBlock = {
+        id: clonedId,
+        component: clonedComponent,
+      };
+
+      const next = [...blocks];
+      next.splice(index + 1, 0, clonedBlock);
+      setBlocks(next);
+      setSelectedBlock(clonedBlock);
+    },
+    [blocks, setBlocks, setSelectedBlock]
+  );
+
   return (
     
     <div className={cn(
@@ -131,7 +187,15 @@ export default function Page() {
             <SidebarEditorComponents />
           </div>
         )}
-        <Workspace isDropped={isDropped} items={blocks} overId={overId} />
+        <Workspace
+          isDropped={isDropped}
+          items={blocks}
+          overId={overId}
+          onDeleteBlock={handleDeleteBlock}
+          onMoveBlockUp={handleMoveBlockUp}
+          onMoveBlockDown={handleMoveBlockDown}
+          onDuplicateBlock={handleDuplicateBlock}
+        />
         {!isMobile && (
           <div className="hidden lg:block">
             <SidebarRightDnD />
@@ -147,8 +211,8 @@ export default function Page() {
                 const type = String(activeId).split(":")[1];
                 const compMap: Record<string, React.ReactNode> = {
                   HeaderBlock: <HeaderBlock />,
-                  TestComponentA: <TestComponentA />,
-                  TestComponentB: <TestComponentB />,
+                  TestComponentA: <SimpleBlockC />,
+                  TestComponentB: <SimpleBlockD />,
                   SimpleBlockA: <SimpleBlockA />,
                   SimpleBlockB: <SimpleBlockB />,
                 };

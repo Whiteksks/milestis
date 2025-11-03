@@ -1,5 +1,5 @@
 import { useDraggable } from "@dnd-kit/core";
-import { HeaderBlock, TestComponentA, TestComponentB } from "../components";
+import { HeaderBlock, SimpleBlockC, SimpleBlockD } from "../components";
 
 export default function DraggablePreview({
   id,
@@ -14,8 +14,8 @@ export default function DraggablePreview({
 
   const compMap: Record<string, React.ReactNode> = {
     HeaderBlock: <HeaderBlock />,
-    TestComponentA: <TestComponentA />,
-    TestComponentB: <TestComponentB />,
+    SimpleBlockC: <SimpleBlockC />,
+    SimpleBlockD: <SimpleBlockD />,
   };
 
   return (

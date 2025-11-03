@@ -1,39 +1,178 @@
 "use client";
 
-import { SidebarDropdown } from "../layout/desktop/sidebarDropdown";
-import { SidebarIsland } from "../layout/desktop/sidebarIsland";
-import { SidebarSettings } from "../layout/desktop/sidebarSettings";
-import { HeaderBlock, TestComponentA, TestComponentB } from "../components";
 import React from "react";
-import { useDraggable } from "@dnd-kit/core";
-import DraggablePreview from "../layout/DraggablePreview"
+import { motion, AnimatePresence } from "framer-motion";
+import { Layers, Settings as SettingsIcon, ChevronLeft } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { SidebarSettings } from "../layout/desktop/sidebarSettings";
+import DraggablePreview from "../layout/DraggablePreview";
 
 type SidebarBlock = { id: string; label: string; componentName: string };
 
+const PANEL_CONFIG = [
+  { id: "blocks", label: "Блоки", icon: Layers },
+  { id: "settings", label: "Настройки", icon: SettingsIcon },
+] as const;
+
+type PanelConfig = (typeof PANEL_CONFIG)[number];
+type PanelId = PanelConfig["id"];
+
 export function SidebarEditorComponents() {
-  const blocks: SidebarBlock[] = [
-    { id: "HeaderBlock", label: "Header", componentName: "HeaderBlock" },
-    { id: "TestComponentA", label: "Text A", componentName: "TestComponentA" },
-    { id: "TestComponentB", label: "Text B", componentName: "TestComponentB" },
-  ];
+  const [activePanel, setActivePanel] = React.useState<PanelId | null>("blocks");
+
+  const blocks: SidebarBlock[] = React.useMemo(
+    () => [
+      { id: "HeaderBlock", label: "Header", componentName: "HeaderBlock" },
+      { id: "TestComponentA", label: "Text A", componentName: "TestComponentA" },
+      { id: "TestComponentB", label: "Text B", componentName: "TestComponentB" },
+    ],
+    []
+  );
+
+  const activePanelConfig = React.useMemo<PanelConfig | null>(
+    () => PANEL_CONFIG.find((panel) => panel.id === activePanel) ?? null,
+    [activePanel]
+  );
+
+  const panelContent = React.useMemo<Record<PanelId, React.ReactNode>>(
+    () => ({
+      blocks: <BlocksPanel blocks={blocks} />,
+      settings: <SettingsPanel />,
+    }),
+    [blocks]
+  );
+
+  const handleTogglePanel = React.useCallback((panelId: PanelId) => {
+    setActivePanel((current) => (current === panelId ? null : panelId));
+  }, []);
 
   return (
-    <div className="fixed h-full p-4 z-50">
-      <div className="absolute top-28">
-        <SidebarDropdown />
+    <TooltipProvider>
+      <FloatingPanelToggles
+        panels={PANEL_CONFIG}
+        activePanel={activePanel}
+        onToggle={handleTogglePanel}
+      />
+
+      <AnimatePresence initial={false}>
+        {activePanelConfig && activePanel && (
+          <SidebarDrawer
+            key={activePanel}
+            panel={activePanelConfig}
+            onClose={() => setActivePanel(null)}
+          >
+            {panelContent[activePanel]}
+          </SidebarDrawer>
+        )}
+      </AnimatePresence>
+    </TooltipProvider>
+  );
+}
+
+interface FloatingPanelTogglesProps {
+  panels: readonly PanelConfig[];
+  activePanel: PanelId | null;
+  onToggle: (panelId: PanelId) => void;
+}
+
+function FloatingPanelToggles({ panels, activePanel, onToggle }: FloatingPanelTogglesProps) {
+  return (
+    <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
+      {panels.map(({ id, icon: Icon, label }) => (
+        <Tooltip key={id} delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => onToggle(id)}
+              variant="ghost"
+              size="icon"
+              className={`h-12 w-12 rounded-full transition-all duration-200 ${
+                activePanel === id
+                  ? "bg-accent text-accent-foreground shadow-lg shadow-accent/20"
+                  : "bg-card text-foreground hover:bg-muted"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">{label}</TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+
+interface SidebarDrawerProps {
+  panel: PanelConfig;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
+  return (
+    <motion.aside
+      className="fixed top-28 left-2 bottom-4 w-[min(20rem,calc(100vw-6rem))] bg-background border border-border z-30 flex flex-col shadow-lg rounded-2xl"
+      initial={{ x: -320, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -320, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Панель</p>
+          <h2 className="text-base font-semibold text-foreground">{panel.label}</h2>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          onClick={onClose}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
       </div>
 
-      <div className="absolute top-1/2 transform -translate-y-1/2">
-        <SidebarIsland title="Блоки">
-          <div className="flex flex-col gap-2">
-            {blocks.map((b) => (
-              <DraggablePreview key={b.id} id={`new:${b.componentName}`} label={b.label} componentName={b.componentName} />
-            ))}
-          </div>
-        </SidebarIsland>
-      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-6">{children}</div>
+      </ScrollArea>
+    </motion.aside>
+  );
+}
 
-      <div className="absolute bottom-4">
+function BlocksPanel({ blocks }: { blocks: SidebarBlock[] }) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-foreground">Библиотека блоков</p>
+        <p className="text-sm text-muted-foreground">Перетащите компонент на холст для добавления.</p>
+      </div>
+      <div className="grid gap-2">
+        {blocks.map((block) => (
+          <DraggablePreview
+            key={block.id}
+            id={`new:${block.componentName}`}
+            label={block.label}
+            componentName={block.componentName}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SettingsPanel() {
+  return (
+    <div className="space-y-4">
+      <p className="text-sm font-medium text-foreground">Быстрые настройки</p>
+      <div className="flex">
         <SidebarSettings />
       </div>
     </div>

@@ -3,6 +3,6 @@
 export { HeaderBlock } from "./headerBlock";
 export { ImageBlock } from "./imageBlock";
 export { TextBlock } from "./textBlock";
-export { TestComponentA } from "./TestComponentA";
-export { TestComponentB } from "./TestComponentB";
+export { SimpleBlockC } from "./SimpleBlockC";
+export { SimpleBlockD } from "./SimpleBlockD";
 

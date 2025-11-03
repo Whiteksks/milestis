@@ -14,6 +14,7 @@ interface DraggableBlockProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDelete: () => void;
+  onDuplicate: () => void;
 }
 
 export const DraggableBlock: React.FC<DraggableBlockProps> = ({
@@ -24,6 +25,7 @@ export const DraggableBlock: React.FC<DraggableBlockProps> = ({
   onMoveUp,
   onMoveDown,
   onDelete,
+  onDuplicate,
 }) => (
   <div key={block.id} className="relative group" onClick={onClick}>
     {overId === block.id && <Hint />}
@@ -32,6 +34,7 @@ export const DraggableBlock: React.FC<DraggableBlockProps> = ({
       <FloatingToolbar
         onMoveUp={onMoveUp}
         onMoveDown={onMoveDown}
+        onDuplicate={onDuplicate}
         onDelete={onDelete}
       />
     )}

@@ -16,7 +16,8 @@ const WorkspaceDnDInternal: React.FC<{
   onDelete?: (id: string) => void;
   onMoveUp?: (id: string) => void;
   onMoveDown?: (id: string) => void;
-}> = ({ items, overId = null, onDelete, onMoveUp, onMoveDown }) => {
+  onDuplicate?: (id: string) => void;
+}> = ({ items, overId = null, onDelete, onMoveUp, onMoveDown, onDuplicate }) => {
   const { selectedBlock, setSelectedBlock } = useEditorStore();
 
   return (
@@ -35,7 +36,13 @@ const WorkspaceDnDInternal: React.FC<{
               }}
               onMoveUp={() => onMoveUp?.(block.id)}
               onMoveDown={() => onMoveDown?.(block.id)}
-              onDelete={() => onDelete?.(block.id)}
+              onDelete={() => {
+                if (selectedBlock?.id === block.id) {
+                  setSelectedBlock(null);
+                }
+                onDelete?.(block.id);
+              }}
+              onDuplicate={() => onDuplicate?.(block.id)}
             />
           ))}
 
