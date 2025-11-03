@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, LayoutTemplate, Image, Type, Heart } from "lucide-react";
 import { cn } from "@/lib/utils"; 
 
 interface SidebarIslandProps {
   title?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const iconButtons = [

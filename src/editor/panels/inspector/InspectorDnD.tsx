@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import useEditorDnDStore, { EditorBlock } from "@/editor/store/useEditorDnDStore";
+import useEditorDnDStore, { EditorBlock } from "@/editor/state/useEditorDnDStore";
 import { cn } from "@/lib/utils";
 
 // DnD элемент

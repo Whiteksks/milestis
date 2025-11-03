@@ -13,8 +13,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { SidebarSettings } from "../layout/desktop/sidebarSettings";
-import DraggablePreview from "../layout/DraggablePreview";
+import { SidebarSettings } from "./sidebarSettings";
+import DraggablePreview from "../../palette/DraggablePreview";
 
 type SidebarBlock = { id: string; label: string; componentName: string };
 

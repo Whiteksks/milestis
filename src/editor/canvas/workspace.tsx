@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useEditorStore } from "@/hooks/store/useEditorStore";
+import { useEditorStore } from "@/editor/state/useEditorStore";
 import WorkspaceDnD, { EditorBlock } from "../dnd/WorkspaceDnDInternal";
 
 interface WorkspaceProps {
@@ -52,15 +52,15 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           <h2 className="text-2xl font-semibold text-foreground mb-2">Start Creating</h2>
           <p className="text-muted-foreground">Click the buttons on the left to add content to your canvas</p>
         </div>
-  {/* DnD logic is moved to WorkspaceDnD to keep this file minimal and scalable */}
-      <WorkspaceDnD
-        items={items}
-        overId={overId}
-        onDelete={onDeleteBlock}
-        onMoveUp={onMoveBlockUp}
-        onMoveDown={onMoveBlockDown}
-        onDuplicate={onDuplicateBlock}
-      />
+        {/* DnD logic is moved to WorkspaceDnD to keep this file minimal and scalable */}
+        <WorkspaceDnD
+          items={items}
+          overId={overId}
+          onDelete={onDeleteBlock}
+          onMoveUp={onMoveBlockUp}
+          onMoveDown={onMoveBlockDown}
+          onDuplicate={onDuplicateBlock}
+        />
       </div>
     </div>
   );

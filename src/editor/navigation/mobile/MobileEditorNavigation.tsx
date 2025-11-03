@@ -28,10 +28,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import DraggablePreview from "@/editor/layout/DraggablePreview";
+import DraggablePreview from "@/editor/palette/DraggablePreview";
 import useEditorDnDStore, {
   EditorBlock,
-} from "@/editor/store/useEditorDnDStore";
+} from "@/editor/state/useEditorDnDStore";
 
 const AVAILABLE_BLOCKS = [
   { id: "HeaderBlock", label: "Header", componentName: "HeaderBlock" },

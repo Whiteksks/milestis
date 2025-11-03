@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Eye, Settings2, Monitor, Tablet, Smartphone } from 'lucide-react'
-import { useEditorStore } from '@/hooks/store/useEditorStore'
+import { useEditorStore } from '@/editor/state/useEditorStore'
 
 export const HeaderTools = () => {
   const { activeDevice, setActiveDevice } = useEditorStore()

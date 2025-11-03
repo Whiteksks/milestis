@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useEditorStore } from '@/hooks/store/useEditorStore';
-import { DraggableBlock } from '../ui/DraggableBlock';
+import { useEditorStore } from '@/editor/state/useEditorStore';
+import { DraggableBlock } from '../canvas/DraggableBlock';
 
 export interface EditorBlock {
   id: string;

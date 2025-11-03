@@ -4,8 +4,8 @@ import { Redo2, Undo2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import ZoomButtons from '../layout/zoomButtons'
-import BreadcrumbNavigation from '../layout/breadCrumb'
+import ZoomButtons from '../../navigation/zoomButtons'
+import BreadcrumbNavigation from '../../navigation/breadCrumb'
 
 
 export const HeaderApp = () => {

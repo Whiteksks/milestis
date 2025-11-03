@@ -1,18 +1,18 @@
 "use client";
 
-import { HeaderApp } from "@/editor/ui/header";
-import { HeaderTools } from "@/editor/ui/headerEditorFields";
-import { SidebarEditorComponents } from "@/editor/ui/sidebarEditorComponents";
-import { Workspace } from "@/editor/ui/workspace";
+import { HeaderApp } from "@/editor/panels/header/header";
+import { HeaderTools } from "@/editor/panels/header/headerEditorFields";
+import { SidebarEditorComponents } from "@/editor/panels/sidebar/sidebarEditorComponents";
+import { Workspace } from "@/editor/canvas/workspace";
 import { DndContext, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import SimpleBlockA from "@/editor/components/SimpleBlockA";
 import SimpleBlockB from "@/editor/components/SimpleBlockB";
 import { HeaderBlock, SimpleBlockC, SimpleBlockD } from "@/editor/components";
-import useEditorDnDStore from "@/editor/store/useEditorDnDStore";
+import useEditorDnDStore from "@/editor/state/useEditorDnDStore";
 import React from "react";
-import { useEditorStore } from "@/hooks/store/useEditorStore";
-import { SidebarRightDnD } from "@/editor/layout/desktop/InspectorDnD";
-import { MobileEditorNavigation } from "@/editor/layout/mobile/MobileEditorNavigation";
+import { useEditorStore } from "@/editor/state/useEditorStore";
+import { SidebarRightDnD } from "@/editor/panels/inspector/InspectorDnD";
+import { MobileEditorNavigation } from "@/editor/navigation/mobile/MobileEditorNavigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 

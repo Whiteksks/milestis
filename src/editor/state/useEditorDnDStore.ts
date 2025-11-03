@@ -1,8 +1,9 @@
 "use client";
 
 import { create } from "zustand";
+import type { ReactNode } from "react";
 
-export type EditorBlock = { id: string; component: React.ReactNode };
+export type EditorBlock = { id: string; component: ReactNode };
 
 type EditorDnDState = {
   blocks: EditorBlock[];
