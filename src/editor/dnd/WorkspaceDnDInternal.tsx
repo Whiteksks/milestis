@@ -4,10 +4,13 @@ import React from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useEditorStore } from '@/editor/state/useEditorStore';
 import { DraggableBlock } from '../canvas/DraggableBlock';
+import { getBlockType } from '../utils/blockTypeDetector';
 
 export interface EditorBlock {
   id: string;
   component: React.ReactNode;
+  type?: 'text' | 'image' | 'header' | 'generic';
+  componentName?: string;
 }
 
 const WorkspaceDnDInternal: React.FC<{
@@ -19,6 +22,18 @@ const WorkspaceDnDInternal: React.FC<{
   onDuplicate?: (id: string) => void;
 }> = ({ items, overId = null, onDelete, onMoveUp, onMoveDown, onDuplicate }) => {
   const { selectedBlock, setSelectedBlock } = useEditorStore();
+
+  const handleBlockClick = (block: EditorBlock) => {
+    // Determine block type if not already set
+    const blockType = block.type || getBlockType(block.componentName);
+    
+    // Set the selected block with type information
+    setSelectedBlock({
+      id: block.id,
+      type: blockType,
+      componentName: block.componentName,
+    });
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 bg-background/50 backdrop-blur-sm px-6 py-8 flex justify-center">
@@ -32,7 +47,7 @@ const WorkspaceDnDInternal: React.FC<{
               overId={overId}
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedBlock(block);
+                handleBlockClick(block);
               }}
               onMoveUp={() => onMoveUp?.(block.id)}
               onMoveDown={() => onMoveDown?.(block.id)}

@@ -16,6 +16,7 @@ import { MobileEditorNavigation } from "@/editor/navigation/mobile/MobileEditorN
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { createBlockElement } from "@/editor/blocks/block-library";
+import { useEditorKeyboardShortcuts } from "@/editor/hooks/useEditorKeyboardShortcuts";
 
 export default function Page() {
   const [isDropped, setIsDropped] = React.useState(false);
@@ -37,10 +38,16 @@ export default function Page() {
   const selectedBlock = useEditorStore((s) => s.selectedBlock);
   const isMobile = useIsMobile();
 
+  // Enable keyboard shortcuts for undo/redo
+  useEditorKeyboardShortcuts();
+
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Проверяем, содержит ли элемент кликнутый target атрибут "data-block"
-    const isInsideBlock = (e.target as HTMLElement).closest("[data-block]");
-    if (!isInsideBlock) {
+    // Don't deselect if clicking inside a block or on the header/toolbar
+    const target = e.target as HTMLElement;
+    const isInsideBlock = target.closest("[data-block]");
+    const isInsideHeader = target.closest("[data-header-toolbar]");
+    
+    if (!isInsideBlock && !isInsideHeader) {
       setSelectedBlock(null);
     }
   };
@@ -48,10 +55,10 @@ export default function Page() {
   React.useEffect(() => {
     if (blocks.length === 0) {
       setBlocks([
-        { id: "block-a", component: <SimpleBlockA /> },
-        { id: "block-b", component: <SimpleBlockB /> },
-        { id: "block-a-2", component: <SimpleBlockA /> },
-      ]);
+        { id: "block-a", component: <SimpleBlockA />, componentName: "SimpleBlockA" },
+        { id: "block-b", component: <SimpleBlockB />, componentName: "SimpleBlockB" },
+        { id: "block-a-2", component: <SimpleBlockA />, componentName: "SimpleBlockA" },
+      ], false); // Don't save initial state to history
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -64,20 +71,20 @@ export default function Page() {
     const overId = String(over.id ?? "");
 
     if (activeId.startsWith("new:")) {
-      const type = activeId.split(":")[1];
+      const componentName = activeId.split(":")[1];
       const newId = `block-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      const component = createBlockElement(type) ?? <div />;
-      const newBlock = { id: newId, component };
+      const component = createBlockElement(componentName) ?? <div />;
+      const newBlock = { id: newId, component, componentName };
 
       // If dropped on an existing block, insert before it, otherwise append
       const targetIndex = blocks.findIndex((b) => b.id === overId);
       if (targetIndex === -1) {
-        setBlocks([...blocks, newBlock]);
+        setBlocks([...blocks, newBlock], true); // Save to history
       } else {
         const next = [...blocks];
         next.splice(targetIndex, 0, newBlock);
-        setBlocks(next);
+        setBlocks(next, true); // Save to history
       }
       return;
     }
@@ -145,11 +152,13 @@ export default function Page() {
       const clonedBlock = {
         id: clonedId,
         component: clonedComponent,
+        componentName: original.componentName,
+        type: original.type,
       };
 
       const next = [...blocks];
       next.splice(index + 1, 0, clonedBlock);
-      setBlocks(next);
+      setBlocks(next, true); // Save to history
       setSelectedBlock(clonedBlock);
     },
     [blocks, setBlocks, setSelectedBlock]

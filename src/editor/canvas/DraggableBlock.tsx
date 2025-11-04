@@ -27,7 +27,12 @@ export const DraggableBlock: React.FC<DraggableBlockProps> = ({
   onDelete,
   onDuplicate,
 }) => (
-  <div key={block.id} className="relative group" onClick={onClick}>
+  <div 
+    key={block.id} 
+    className="relative group" 
+    onClick={onClick}
+    data-block="true"
+  >
     {overId === block.id && <Hint />}
 
     {isSelected && (

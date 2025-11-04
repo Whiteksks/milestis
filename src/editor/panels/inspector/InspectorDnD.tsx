@@ -65,13 +65,21 @@ export function SidebarRightDnD() {
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+  }
+
   return (
     <>
       {/* Кнопка-инспектор по центру справа */}
       <motion.button
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={(e) => {
+          e.stopPropagation()
+          setOpen((prev) => !prev)
+        }}
         className="fixed right-6 top-1/2 -translate-y-1/2 z-40 flex items-center justify-center h-12 w-12 bg-card border border-border border-r-0 rounded-l-lg hover:bg-muted transition-colors"
         aria-label="Toggle inspector panel"
+        data-header-toolbar="true"
       >
        <PanelRight className="h-4 w-4 text-muted-foreground" />
       </motion.button>
@@ -88,6 +96,8 @@ export function SidebarRightDnD() {
             className={cn(
               "fixed top-[108px] bottom-4 right-[20px] z-50 bg-popover/95 backdrop-blur-xl border border-border shadow-xl rounded-xl flex flex-col overflow-hidden w-80"
             )}
+            data-header-toolbar="true"
+            onClick={handleClick}
           >
 
             {/* Заголовок */}

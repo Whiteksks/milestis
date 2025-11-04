@@ -81,8 +81,16 @@ interface FloatingPanelTogglesProps {
 }
 
 function FloatingPanelToggles({ panels, activePanel, onToggle }: FloatingPanelTogglesProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+  }
+
   return (
-    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40">
+    <div 
+      className="fixed left-0 top-1/2 -translate-y-1/2 z-40"
+      data-header-toolbar="true"
+      onClick={handleClick}
+    >
       <div className="flex flex-col gap-1 bg-card border border-border rounded-r-2xl shadow-lg p-2">
         {panels.map(({ id, icon: Icon, label }) => (
           <Tooltip key={id} delayDuration={200}>
@@ -116,6 +124,10 @@ interface SidebarDrawerProps {
 }
 
 function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+  }
+
   return (
     <motion.aside
       className="fixed top-26 left-2 bottom-2 w-[min(30rem,calc(100vw-6rem))] 
@@ -125,6 +137,8 @@ function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -320, opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      data-header-toolbar="true"
+      onClick={handleClick}
     >
       {/* Заголовок панели */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">

@@ -1,10 +1,13 @@
 import { create } from 'zustand'
 
 type DeviceMode = 'desktop' | 'tablet' | 'mobile'
+export type BlockType = 'text' | 'image' | 'header' | 'generic'
 
 // Simple block type
 export interface Block {
   id: string;
+  type?: BlockType;
+  componentName?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
