@@ -14,8 +14,11 @@ import {
 } from "@/components/ui/tooltip";
 
 import { SidebarSettings } from "./sidebarSettings";
-import DraggablePreview from "../../palette/DraggablePreview";
+import ClickableBlockPreview from "../../palette/ClickableBlockPreview";
 import { BLOCK_LIBRARY, type BlockLibraryItem } from "@/editor/blocks/block-library";
+import { BlockPreviewDialog } from "@/editor/components/BlockPreviewDialog";
+import { useEditorDnDStore } from "@/editor/state/useEditorDnDStore";
+import { nanoid } from "nanoid";
 
 const PANEL_CONFIG = [
   { id: "blocks", label: "Блоки", icon: Layers },
@@ -29,7 +32,10 @@ type PanelId = PanelConfig["id"];
 
 export function SidebarEditorComponents() {
   const [activePanel, setActivePanel] = React.useState<PanelId | null>("blocks");
+  const [selectedBlock, setSelectedBlock] = React.useState<BlockLibraryItem | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
+  const { setBlocks, addBlock } = useEditorDnDStore();
   const blocks = React.useMemo(() => BLOCK_LIBRARY, []);
 
   const activePanelConfig = React.useMemo<PanelConfig | null>(
@@ -37,14 +43,39 @@ export function SidebarEditorComponents() {
     [activePanel]
   );
 
+  const handleBlockClick = React.useCallback((block: BlockLibraryItem) => {
+    setSelectedBlock(block);
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleApplyTemplate = React.useCallback((action: "replace" | "add") => {
+    if (!selectedBlock) return;
+
+    const newBlock = {
+      id: nanoid(),
+      componentName: selectedBlock.componentName,
+      component: React.createElement(selectedBlock.component),
+      type: "generic" as const,
+    };
+
+    if (action === "replace") {
+      setBlocks([newBlock], true);
+    } else {
+      addBlock(newBlock);
+    }
+
+    setIsDialogOpen(false);
+    setSelectedBlock(null);
+  }, [selectedBlock, setBlocks, addBlock]);
+
   const panelContent = React.useMemo<Record<PanelId, React.ReactNode>>(
     () => ({
-        blocks: <BlocksPanel blocks={blocks} />,
+        blocks: <BlocksPanel blocks={blocks} onBlockClick={handleBlockClick} />,
         settings: <SettingsPanel />,
         favorites: <FavoritesPanel />,
         templates: <LayoutTemplate />,
       }),
-    [blocks]
+    [blocks, handleBlockClick]
   );
 
   const handleTogglePanel = React.useCallback((panelId: PanelId) => {
@@ -70,6 +101,13 @@ export function SidebarEditorComponents() {
           </SidebarDrawer>
         )}
       </AnimatePresence>
+
+      <BlockPreviewDialog
+        block={selectedBlock}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onApply={handleApplyTemplate}
+      />
     </TooltipProvider>
   );
 }
@@ -165,21 +203,22 @@ function SidebarDrawer({ panel, onClose, children }: SidebarDrawerProps) {
 }
 
 
-function BlocksPanel({ blocks }: { blocks: BlockLibraryItem[] }) {
+function BlocksPanel({ blocks, onBlockClick }: { blocks: BlockLibraryItem[]; onBlockClick: (block: BlockLibraryItem) => void }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-medium text-foreground">Библиотека блоков</p>
-        <p className="text-sm text-muted-foreground">Перетащите компонент на холст для добавления.</p>
+        <p className="text-sm text-muted-foreground">Нажмите на блок для предпросмотра и применения.</p>
       </div>
       <div className="grid gap-3 grid-cols-2">
         {blocks.map((block) => (
-          <DraggablePreview
+          <ClickableBlockPreview
             key={block.id}
-            id={`new:${block.componentName}`}
+            id={block.id}
             componentName={block.componentName}
             title={block.title}
             description={block.description}
+            onClick={() => onBlockClick(block)}
           />
         ))}
       </div>
