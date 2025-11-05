@@ -28,7 +28,6 @@ export function EditorLayout() {
   const [isStructureOpen, setIsStructureOpen] = useState(false)
   const { isTouchDevice } = useDeviceType()
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop")
-
   const addBlock = (blockType: any, mode: "replace" | "add" = "add") => {
     if (mode === "replace") {
       setBlocks([{ ...blockType, id: `block-${Date.now()}`, order: 0, children: [] }])
@@ -75,7 +74,7 @@ export function EditorLayout() {
       <TopBar viewport={viewport} onViewportChange={setViewport} />
 
       <div
-        className="flex flex-1 overflow-hidden relative pb-20 md:pb-0"
+        className="flex flex-1 overflow-hidden relative pb-20 md:pb-0 pt-16"
         style={{ paddingBottom: shouldShowBottomNav ? "80px" : "0" }}
       >
         {!shouldHideLeftSidebar && (
@@ -84,14 +83,16 @@ export function EditorLayout() {
           </div>
         )}
 
-        <Canvas
-          blocks={blocks}
-          selectedBlockId={selectedBlockId}
-          onSelectBlock={setSelectedBlockId}
-          onDeleteBlock={deleteBlock}
-          onReorderBlocks={reorderBlocks}
-          viewport={viewport}
-        />
+        <div className={`flex-1 transition-all duration-300 ${selectedBlock ? 'mr-72' : 'mr-0'}`}>
+            <Canvas
+                blocks={blocks}
+                selectedBlockId={selectedBlockId}
+                onSelectBlock={setSelectedBlockId}
+                onDeleteBlock={deleteBlock}
+                onReorderBlocks={reorderBlocks}
+                viewport={viewport}
+            />
+        </div>
 
         {!shouldHideRightSidebar && (
           <AnimatePresence>

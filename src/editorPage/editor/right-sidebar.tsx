@@ -69,7 +69,7 @@ export function RightSidebar({ block, onUpdateBlock, onClose }: RightSidebarProp
 
   return (
     <motion.div
-      className="relative w-72 h-screen border-l border-border bg-card flex flex-col"
+      className="fixed w-72 h-[calc(100vh-3.5rem)] top-14 right-0 border-l border-border bg-card flex flex-col"
       initial={{ x: 400, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 400, opacity: 0 }}

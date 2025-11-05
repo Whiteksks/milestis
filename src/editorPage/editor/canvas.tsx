@@ -3,6 +3,7 @@
 import { motion, AnimatePresence, Reorder } from "framer-motion"
 import type { CanvasBlock } from "@/editorPage/lib/block-types"
 import { BlockCard } from "./block-card"
+import { ViewportFrame } from "./ViewportFrame"
 
 interface CanvasProps {
   blocks: CanvasBlock[]
@@ -33,8 +34,8 @@ export function Canvas({
     }
   }
 
-  return (
-    <div className={`${getCanvasWidth()} w-full mx-auto p-8 transition-all duration-300`}>
+  const content = (
+    <div className={`${getCanvasWidth()} w-full mx-auto p-4 transition-all duration-300`}>
       {blocks.length === 0 ? (
         <motion.div
           className="h-96 rounded-lg border border-dashed border-border flex flex-col items-center justify-center gap-4 text-center"
@@ -80,6 +81,13 @@ export function Canvas({
           </AnimatePresence>
         </Reorder.Group>
       )}
+    </div>
+  )
+
+  // Use an iframe to emulate viewport so CSS media queries respond to the selected device size
+  return (
+    <div className="w-full mx-auto">
+      <ViewportFrame device={viewport} heightOffset={80}>{content}</ViewportFrame>
     </div>
   )
 }
