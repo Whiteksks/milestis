@@ -2,7 +2,7 @@ export interface GalleryPreset {
   name: string
   description: string
   layout: "grid" | "masonry" | "carousel" | "featured"
-  columns: 2 | 3 | 4
+  columns: 1 | 2 | 3 | 4
   hasCaption: boolean
   spacing: "tight" | "normal" | "loose"
 }

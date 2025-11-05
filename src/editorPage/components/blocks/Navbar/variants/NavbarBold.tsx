@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import Logo from "@/editorPage/components/ui/logo"
+import Logo from "@/components/ui/logo"
 import { NAVBAR_PRESETS } from "@/editorPage/lib/presets/navbarPresets"
 import type { CanvasBlock } from "@/editorPage/lib/block-types"
 
