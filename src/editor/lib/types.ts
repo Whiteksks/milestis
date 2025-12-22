@@ -1,0 +1,247 @@
+export type DeviceView = 'desktop' | 'tablet' | 'mobile' | 'fullscreen'
+
+export const THEMES = {
+  vellumVintage: 'vellum-vintage',
+  nordicLight: 'nordic-light',
+  midnightNeon: 'midnight-neon',
+  sunsetWarm: 'sunset-warm',
+  oceanPro: 'ocean-pro',
+  royalClassic: 'royal-classic',
+  glassmorphism: 'glass-frost',
+  monochromeMinimal: 'mono-noir',
+  floralBloom: 'floral-bloom',
+} as const
+
+export type Theme = (typeof THEMES)[keyof typeof THEMES]
+
+export const EDITOR_MODES = {
+  portfolio: 'portfolio',
+  photobook: 'photobook',
+} as const
+
+export type EditorMode = (typeof EDITOR_MODES)[keyof typeof EDITOR_MODES]
+
+export const FRAME_STYLES = {
+  none: 'none',
+  soft: 'soft',
+  organic: 'organic',
+  polaroid: 'polaroid',
+  gallery: 'gallery',
+  film: 'film',
+  shadowSoft: 'shadow-soft',
+  shadowStrong: 'shadow-strong',
+  borderThin: 'border-thin',
+  borderBold: 'border-bold',
+  roundedXl: 'rounded-xl',
+  circle: 'circle',
+} as const
+
+export type FrameStyle = (typeof FRAME_STYLES)[keyof typeof FRAME_STYLES]
+
+export const ASPECT_RATIOS = {
+  square: 'square',
+  portrait: 'portrait',
+  landscape: 'landscape',
+} as const
+
+export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
+
+export const TEMPLATE_IDS = {
+  classic: 'classic',
+  minimal: 'minimal',
+  elegant: 'elegant',
+  modern: 'modern',
+  weddingTimeline: 'wedding-timeline',
+  masonry: 'masonry',
+} as const
+
+export type TemplateId = (typeof TEMPLATE_IDS)[keyof typeof TEMPLATE_IDS]
+
+export interface SectionVisibility {
+  showHeader: boolean
+  showHero: boolean
+  showBio: boolean
+  showFeaturedWork: boolean
+  showVideo: boolean
+  showContact: boolean
+  showFooter: boolean
+}
+
+export interface SectionContent {
+  header: {
+    title: string
+    links: Array<{ label: string; href: string }>
+  }
+  hero: {
+    title: string
+    subtitle: string
+    description: string
+  }
+  bio: {
+    title: string
+    subtitle?: string
+    description: string
+    image?: string
+    imageAspectRatio?: AspectRatio
+    imageFrameStyle?: FrameStyle
+    achievements?: string[]
+  }
+  featuredWork: {
+    title: string
+    subtitle?: string
+    projects: Array<{
+      title: string
+      description: string
+      image: string
+      tags?: string[]
+      aspectRatio?: AspectRatio
+      frameStyle?: FrameStyle
+    }>
+  }
+  video: {
+    title: string
+    subtitle?: string
+    description: string
+    videoUrl: string
+  }
+  contact: {
+    title: string
+    subtitle?: string
+    description: string
+    email: string
+    phone?: string
+  }
+  footer: {
+    copyright: string
+    socialLinks?: Array<{ icon: string; href: string }>
+  }
+}
+
+export interface MediaImage {
+  id: string
+  url: string
+  name: string
+  uploadedAt: Date
+}
+
+export interface ThemeCustomDecorations {
+  id: string
+  type: 'flower' | 'dove' | 'shapes' | 'bubbles'
+  position: {
+    top?: string
+    bottom?: string
+    left?: string
+    right?: string
+  }
+  image: string
+  opacity: number
+  size: 'small' | 'medium' | 'large' | 'xlarge'
+  zIndex?: number
+}
+
+export interface DecorationElement {
+  type: 'flower' | 'dove' | 'shapes' | 'bubbles'
+  position?: {
+    top?: string
+    bottom?: string
+    left?: string
+    right?: string
+  }
+  image: string
+  opacity: number
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | string
+  zIndex?: number
+}
+
+export interface DecorationsConfig {
+  id?: string
+  name?: string
+  backgroundImage?: {
+    url: string
+    opacity?: number
+    type?: 'fixed' | 'scroll'
+  }
+  animation?: 'none' | 'fade' | 'slide-up' | 'slide-down'
+  elements?: DecorationElement[]
+}
+
+
+// Visibility model specifically for Photobook sections
+export interface PhotobookSectionVisibility {
+  showCover: boolean
+  showIntroduction: boolean
+  showStory: boolean
+  showGallery: boolean
+  showHighlight: boolean
+  showEnding: boolean
+}
+
+export interface PhotobookSlot {
+  id: string
+  label?: string
+  images: string[]
+  caption?: string
+  imageSettings: Array<{
+    aspectRatio?: AspectRatio
+    frameStyle?: FrameStyle
+  }>
+}
+
+export interface PhotoBlock {
+  id: string
+  image: string
+  caption?: string
+  imageSettings: Array<{
+    aspectRatio?: AspectRatio
+    frameStyle?: FrameStyle
+  }>
+}
+
+
+// Section content model for Photobook mode
+export interface PhotobookSectionContent {
+  cover: {
+    title: string
+    subtitle?: string
+    date?: string
+    location?: string
+    tagline?: string
+    images?: PhotoBlock
+  }
+
+  introduction: {
+    title?: string
+    quote?: string
+    dedication?: string
+    images?: PhotoBlock
+  }
+
+  story: {
+    title?: string
+    date?: string
+    location?: string
+    paragraphs?: string[]
+    images?: PhotobookSlot[]
+  }
+
+  gallery: {
+    title?: string
+    description?: string
+    images?: PhotoBlock[]
+  }
+
+  highlight: {
+    title?: string
+    description?: string
+    quote?: string
+    images?: PhotoBlock
+    videoUrl?: string
+  }
+
+  ending: {
+    text?: string
+    date?: string
+    signature?: string
+    images?: PhotoBlock
+  }
+}

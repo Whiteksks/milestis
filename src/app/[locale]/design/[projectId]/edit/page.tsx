@@ -1,0 +1,95 @@
+'use client'
+
+import { Canvas } from '@/editor/components/editor/canvas'
+import { EditorHeader } from '@/editor/components/editor/ui/editor-header'
+import { FloatingActions } from '@/editor/components/editor/ui/floating-actions'
+import { TemplateSelectorModal } from '@/editor/components/editor/ui/template-selector-modal'
+import { ThemeSelectorModal } from '@/editor/components/editor/ui/theme-selector-modal'
+import { MediaLibraryModal } from '@/editor/components/editor/ui/media-library-modal'
+import { DecorationsModal } from '@/editor/components/editor/ui/decorations-modal'
+import { SectionsSidebar } from '@/editor/components/editor/ui/sections-sidebar'
+import { MobileBottomNav } from '@/editor/components/editor/ui/mobile-bottom-nav'
+import { MobileBottomSheet } from '@/editor/components/editor/ui/mobile-bottom-sheet'
+import { SettingsContent } from '@/editor/components/editor/ui/settings-content'
+import { ThemeSettingsPanel } from '@/editor/components/editor/ui/theme-settings-panel'
+import { useState } from 'react'
+import { useUiStore } from '@/editor/lib/store'
+
+import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
+
+import { ThemeSelectorContent } from '@/editor/components/editor/ui/theme-selector-content'
+import { DecorationsSelectorContent } from '@/editor/components/editor/ui/decorations-selector-content'
+
+export default function EditorPage() {
+  const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+  const { toggleTemplateModal, toggleThemeModal, editorMode } = useUiStore()
+
+  const handleMobileTabChange = (tab: 'sections' | 'theme' | 'templates' | 'decorations') => {
+    setMobileActiveTab(tab)
+    
+    if (tab === 'templates') {
+      toggleTemplateModal()
+    } else if (tab === 'theme') {
+      setIsBottomSheetOpen(true)
+    } else if (tab === 'decorations') {
+      setIsBottomSheetOpen(true)
+    } else {
+      setIsBottomSheetOpen(true)
+    }
+  }
+
+  const getSheetTitle = () => {
+    if (mobileActiveTab === 'sections') {
+      return editorMode === 'photobook' ? 'Photobook Sections' : 'Page Sections'
+    }
+    if (mobileActiveTab === 'theme') return 'Choose a Theme'
+    if (mobileActiveTab === 'decorations') return 'Decorations'
+    return 'Settings'
+  }
+
+  return (
+    <div className="h-screen flex flex-col overflow-hidden">
+      <EditorHeader />
+      <div className="flex flex-1 overflow-hidden relative pb-16 md:pb-0">
+        <Canvas />
+        <SectionsSidebar />
+      </div>
+      
+      {/* Desktop floating actions */}
+      <FloatingActions />
+      
+      {/* Mobile bottom navigation */}
+      <MobileBottomNav 
+        activeTab={mobileActiveTab} 
+        onTabChange={handleMobileTabChange}
+      />
+      
+      {/* Mobile bottom sheet */}
+      <MobileBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        title={getSheetTitle()}
+      >
+        {mobileActiveTab === 'sections' && <SettingsContent />}
+        {mobileActiveTab === 'theme' && (
+          <div className="p-4">
+            <ThemeSelectorContent onClose={() => setIsBottomSheetOpen(false)} />
+          </div>
+        )}
+        {mobileActiveTab === 'decorations' && (
+          <div className="p-4">
+             <DecorationsSelectorContent onClose={() => setIsBottomSheetOpen(false)} />
+          </div>
+        )}
+      </MobileBottomSheet>
+
+      {/* Modals */}
+      <TemplateSelectorModal />
+      <ThemeSelectorModal />
+      <DecorationsModal />
+      {/* Upload/manage images */}
+      <MediaLibraryModal mode="manage" />
+    </div>
+  )
+}

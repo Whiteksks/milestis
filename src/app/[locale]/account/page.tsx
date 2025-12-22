@@ -1,11 +1,14 @@
 'use client'
 
-const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-export default SettingsLayout
+export default function AccountPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace("/account/profile")
+  }, [router])
+  
+  return null
+}

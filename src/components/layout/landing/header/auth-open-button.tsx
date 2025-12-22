@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import AuthDialogController from "../../Dialog/DialogOptions/AuthDialogController"
+import AuthDialogController from "../../Dialog/AuthDialogController"
 import { getAuth, onAuthStateChanged, User } from "firebase/auth"
 import ProfileDropdown from "@/components/ui/custom/dropdown-profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"

@@ -1,26 +1,57 @@
 'use client'
 
-import HeaderApp from '@/components/layout/dashboard/dashboard-header'
-import { Card } from '@/components/ui/card'
-import SettingsSidebar from '@/components/layout/dashboard/SettingsSidebar'
+import { AppSidebar } from "@/components/layout/dashboard/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { DashboardHeader } from "@/components/layout/dashboard/header"
+import { SettingsMenu } from "@/components/layout/settings/settings-menu"
+import { useRouter, usePathname } from "next/navigation"
 
-const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
+const AccountLayout = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleNavigate = (item: string) => {
+    if (item === "dashboard") {
+      router.push("/dashboard")
+    }
+  }
+
+  // Determine active section based on pathname
+  const getActiveSection = () => {
+    if (pathname.includes("/account/profile")) return "profile"
+    if (pathname.includes("/account/account")) return "account"
+    if (pathname.includes("/account/billing")) return "billing"
+    if (pathname.includes("/account/domains")) return "domains"
+    if (pathname.includes("/account/appearance")) return "appearance"
+    if (pathname.includes("/account/security")) return "security"
+    return "profile" // Default
+  }
+
   return (
-    <div>
-      <HeaderApp withSidebarTrigger={false} />
-      <div className="w-full flex justify-center px-4 py-8">
-        <div className="flex w-full max-w-7xl gap-8 flex-col md:flex-row">
-          <SettingsSidebar />
+    <SidebarProvider defaultOpen={true}>
+      <AppSidebar activeItem="settings" onNavigate={handleNavigate} />
+      <SidebarInset>
+        <div className="relative flex h-screen flex-col overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-50/40 via-background to-rose-50/20" />
 
-          <div className="flex-1">
-            <Card className="p-0 md:p-6 md:min-h-[400px] h-full border-0 md:border shadow-none md:shadow">
-              {children}
-            </Card>
+          <div className="relative pt-4">
+            <DashboardHeader title="Settings" />
           </div>
+
+          <main className="relative flex-1 overflow-y-auto p-6">
+             <div className="mx-auto flex max-w-5xl gap-8">
+                <SettingsMenu activeSection={getActiveSection()} onSectionChange={() => {}} />
+                <div className="min-h-150 min-w-0 flex-1">
+                  <div className="transition-opacity duration-200">
+                    {children}
+                  </div>
+                </div>
+              </div>
+          </main>
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 
-export default SettingsLayout
+export default AccountLayout
