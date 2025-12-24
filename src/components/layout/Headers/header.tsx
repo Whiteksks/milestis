@@ -16,8 +16,8 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import Logo from '../logo'
 import HeaderAuthButton from './auth-open-button'
+import Logo from '../landing/logo'
 
 export type NavigationSection = {
   title: string

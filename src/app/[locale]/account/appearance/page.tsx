@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Check, Sun, Moon } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTheme } from "next-themes"
 
 const themes = [
   {
@@ -43,20 +44,15 @@ const themes = [
   },
 ]
 
-const densityOptions = [
-  { id: "comfortable", name: "Comfortable", description: "More breathing room" },
-  { id: "compact", name: "Compact", description: "Fits more content" },
-]
-
-const roundnessOptions = [
-  { id: "soft", name: "Soft", radius: "rounded-lg" },
-  { id: "extra-soft", name: "Extra Soft", radius: "rounded-2xl" },
-]
 
 export default function AppearanceSettings() {
-  const [selectedTheme, setSelectedTheme] = useState("light")
-  const [selectedDensity, setSelectedDensity] = useState("comfortable")
-  const [selectedRoundness, setSelectedRoundness] = useState("extra-soft")
+  const { theme, setTheme } = useTheme()
+  const [selectedTheme, setSelectedTheme] = useState(theme || "light")
+
+
+  useEffect(() => {
+    setTheme(selectedTheme)
+  }, [selectedTheme])
 
   return (
     <div className="space-y-6">
@@ -113,75 +109,6 @@ export default function AppearanceSettings() {
                       </div>
                     )}
                   </div>
-                </button>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* UI Density */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>UI Density</CardTitle>
-          <CardDescription>Adjust spacing and padding throughout the app</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {densityOptions.map((option) => {
-              const isActive = selectedDensity === option.id
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => setSelectedDensity(option.id)}
-                  className={`flex items-center justify-between rounded-xl border-2 p-4 transition-all duration-200 ${
-                    isActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"
-                  }`}
-                >
-                  <div className="text-left">
-                    <p className="font-medium">{option.name}</p>
-                    <p className="text-sm text-muted-foreground">{option.description}</p>
-                  </div>
-                  {isActive && (
-                    <div className="flex size-5 items-center justify-center rounded-full bg-primary">
-                      <Check className="size-3 text-primary-foreground" />
-                    </div>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Roundness */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>Corner Roundness</CardTitle>
-          <CardDescription>Choose how rounded you want UI elements to be</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {roundnessOptions.map((option) => {
-              const isActive = selectedRoundness === option.id
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => setSelectedRoundness(option.id)}
-                  className={`flex items-center gap-4 rounded-xl border-2 p-4 transition-all duration-200 ${
-                    isActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"
-                  }`}
-                >
-                  {/* Preview shape */}
-                  <div className={`size-12 bg-primary/20 ${option.radius}`} />
-                  <div className="text-left">
-                    <p className="font-medium">{option.name}</p>
-                  </div>
-                  {isActive && (
-                    <div className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary">
-                      <Check className="size-3 text-primary-foreground" />
-                    </div>
-                  )}
                 </button>
               )
             })}

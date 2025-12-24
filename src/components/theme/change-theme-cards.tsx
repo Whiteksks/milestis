@@ -20,7 +20,7 @@ export function ThemeCards() {
         <Card
           key={t.value}
           onClick={() => setTheme(t.value)}
-          className={`w-[200px] cursor-pointer transition hover:shadow-lg ${
+          className={`w-50 cursor-pointer transition hover:shadow-lg ${
             theme === t.value ? 'ring-2 ring-primary' : ''
           }`}
         >

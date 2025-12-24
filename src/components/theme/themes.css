@@ -32,10 +32,6 @@
   --sidebar-border: oklch(0.91 0.01 80);
   --sidebar-ring: oklch(0.7 0.08 30);
 
-  --font-sans: Open Sans, sans-serif;
-  --font-serif: Source Serif 4, serif;
-  --font-mono: IBM Plex Mono, monospace;
-
   --radius: 1.5rem;
   
   --shadow-2xs: 0px 8px 16px -4px oklch(0.00 0 0 / 0.04);

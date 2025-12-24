@@ -1,5 +1,5 @@
+import Header from "@/components/layout/Headers/header";
 import { HelpPage } from "@/components/layout/supportPage/help-page";
-import Header from "@/components/layout/landing/header/header";
 
 const navigationData = [
   {

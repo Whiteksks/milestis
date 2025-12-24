@@ -16,15 +16,11 @@ export function SettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
 
-  // Функция для проверки, активен ли пункт
   const getIsActive = (itemPath: string) => {
-    // Если путь совпадает полностью или текущий URL заканчивается этим путем
     return pathname === itemPath || pathname.endsWith(itemPath)
   }
 
   const handleNavigation = (targetPath: string) => {
-    // Если вы используете вложенные роуты (например, /dashboard/settings)
-    // Лучше просто пушить абсолютный путь или формировать его стабильно
     router.push(targetPath) 
   }
 
