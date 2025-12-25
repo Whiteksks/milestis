@@ -1,8 +1,8 @@
 "use client"
 
-import { useUiStore, useThemeStore, useContentStore } from '@/editor/lib/store'
-import type { TemplateId, EditorMode } from '@/editor/lib/types'
-import { defaultSectionContent, defaultSectionVisibility } from '@/editor/lib/default-content'
+import { useUiStore, useThemeStore } from '@/editor/lib/store'
+import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
+import type { TemplateId } from '@/editor/lib/types'
 import {
   Dialog,
   DialogContent,
@@ -23,22 +23,8 @@ export function TemplateSelectorModal() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId | null>(null)
   const isMobile = useIsMobile()
 
-  const fallbackTemplates: Array<{ id: TemplateId; name: string; type: EditorMode }> = [
-    { id: 'classic' as TemplateId, name: 'Classic', type: 'portfolio' },
-    { id: 'minimal' as TemplateId, name: 'Minimal', type: 'portfolio' },
-    { id: 'elegant' as TemplateId, name: 'Elegant', type: 'portfolio' },
-    { id: 'modern' as TemplateId, name: 'Modern', type: 'portfolio' },
-    { id: 'wedding-timeline' as TemplateId, name: 'Photobook Timeline', type: 'photobook' },
-    { id: 'masonry' as TemplateId, name: 'Photobook Masonry', type: 'photobook' },
-    { id: 'photobook-classic' as TemplateId, name: 'Photobook Classic', type: 'photobook' },
-    { id: 'photobook-circle' as TemplateId, name: 'Photobook Circle', type: 'photobook' },
-    { id: 'photobook-magazine' as TemplateId, name: 'Photobook Magazine', type: 'photobook' },
-    { id: 'photobook-polaroid' as TemplateId, name: 'Photobook Polaroid', type: 'photobook' },
-    { id: 'photobook-split' as TemplateId, name: 'Photobook Split', type: 'photobook' },
-    { id: 'photobook-vertical' as TemplateId, name: 'Photobook Vertical', type: 'photobook' },
-  ]
-
-  const filteredTemplates = fallbackTemplates.filter((template) => template.type === editorMode)
+  const templates = getModeTemplates(editorMode)
+  const sectionCount = getModeSectionCount(editorMode)
 
   const handleSelectTemplate = () => {
     if (selectedTemplateId) {
@@ -53,8 +39,8 @@ export function TemplateSelectorModal() {
   const content = (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 py-6">
-        {filteredTemplates.length > 0 ? (
-          filteredTemplates.map((template) => (
+        {templates.length > 0 ? (
+          templates.map((template) => (
             <button
               key={template.id}
               onClick={() => setSelectedTemplateId(template.id as TemplateId)}
@@ -78,7 +64,7 @@ export function TemplateSelectorModal() {
               <div className="w-full px-1">
                 <div className="font-medium text-slate-900 tracking-tight">{template.name}</div>
                 <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1.5">
-                    {Object.keys(defaultSectionContent).length} Sections
+                    {sectionCount} Sections
                 </div>
               </div>
             </button>

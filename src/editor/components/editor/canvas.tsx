@@ -3,22 +3,8 @@
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
+import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
-import { ClassicTemplateDesign } from '../templates/portfolio/classic-template'
-import { MinimalTemplateDesign } from '../templates/portfolio/minimal-template'
-import { ElegantTemplateDesign } from '../templates/portfolio/elegant-template'
-import { ModernParallaxTemplate } from '../templates/portfolio/modern-template'
-import React from 'react'
-import { PhotobookTimelineTemplate } from '../templates/photobook/photobook-timeline'
-import PhotobookMasonryTemplate from '../templates/photobook/photobook-masonry'
-import { TemplateClassic } from '../templates/photobook/template-classic'
-import { TemplateCircle } from '../templates/photobook/template-circle'
-import { TemplateMagazine } from '../templates/photobook/template-magazine'
-import { TemplatePolaroid } from '../templates/photobook/template-polaroid'
-import { TemplateSplit } from '../templates/photobook/template-split'
-import { TemplateVertical } from '../templates/photobook/template-vertical'
-import { PortfolioTemplateShell } from '@/editor/components/editor/ui/portfolio-template-shell'
-import type { PortfolioTemplateProps, PhotobookTemplateProps } from '@/editor/lib/template-types'
 import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
 
 export function Canvas() {
@@ -41,40 +27,16 @@ export function Canvas() {
     photobookSectionVisibility: state.photobookSectionVisibility,
   }))
 
-  const portfolioDesigns: Record<string, React.ComponentType<PortfolioTemplateProps>> = {
-    classic: ClassicTemplateDesign,
-    minimal: MinimalTemplateDesign,
-    elegant: ElegantTemplateDesign,
-    modern: ModernParallaxTemplate,
-  }
-
-  const photobookDesigns: Record<string, React.ComponentType<PhotobookTemplateProps>> = {
-    'wedding-timeline': PhotobookTimelineTemplate,
-    masonry: PhotobookMasonryTemplate,
-    'photobook-classic': TemplateClassic,
-    'photobook-circle': TemplateCircle,
-    'photobook-magazine': TemplateMagazine,
-    'photobook-polaroid': TemplatePolaroid,
-    'photobook-split': TemplateSplit,
-    'photobook-vertical': TemplateVertical,
-  }
-  
   const renderTemplate = () => {
-    if (editorMode === 'photobook') {
-      const PhotobookDesign = photobookDesigns[currentTemplateId] || PhotobookTimelineTemplate
+    const modeEntry = MODE_REGISTRY[editorMode]
 
-      return (
-        <PhotobookDesign
-          theme={theme}
-          sectionVisibility={photobookSectionVisibility}
-          sectionContent={photobookSectionContent}
-          frameStyle={frameStyle}
-        />
-      )
-    }
-
-    const Design = portfolioDesigns[currentTemplateId] ?? portfolioDesigns.classic
-    return <PortfolioTemplateShell Design={Design} />
+    return modeEntry.renderCanvas({
+      templateId: currentTemplateId,
+      theme,
+      frameStyle,
+      photobookSectionContent,
+      photobookSectionVisibility,
+    })
   }
 
   const allDecorations = [

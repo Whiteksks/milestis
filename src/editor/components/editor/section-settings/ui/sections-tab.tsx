@@ -2,27 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useUiStore, useContentStore } from '@/editor/lib/store'
+import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-import { HeaderSettings } from '../portfolio/header-settings'
-import { HeroSettings } from '../portfolio/hero-settings'
-import { BioSettings } from '../portfolio/bio-settings'
-import { FeaturedWorkSettings } from '../portfolio/featured-work-settings'
-import { VideoSettings } from '../portfolio/video-settings'
-import { ContactSettings } from '../portfolio/contact-settings'
-import { FooterSettings } from '../portfolio/footer-settings'
-
-import PhotobookCoverSettings from '../photobook/cover-settings'
-import PhotobookIntroductionSettings from '../photobook/introduction-settings'
-import PhotobookStorySettings from '../photobook/story-settings'
-import PhotobookGallerySettings from '../photobook/gallery-settings'
-import PhotobookHighlightSettings from '../photobook/highlight-settings'
-import PhotobookEndingSettings from '../photobook/ending-settings'
 
 export function SectionsTab() {
   const { editorMode } = useUiStore()
@@ -33,77 +19,40 @@ export function SectionsTab() {
     togglePhotobookSection
   } = useContentStore()
 
-  const [activeSection, setActiveSection] = useState(
-    editorMode === 'photobook' ? 'cover' : 'hero'
-  )
+  const modeEntry = MODE_REGISTRY[editorMode]
+
+  const [activeSection, setActiveSection] = useState(modeEntry.defaultActiveSectionId)
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
 
-  const portfolioSections = [
-    { id: 'header', name: 'Header', visible: sectionVisibility.showHeader, toggleKey: 'showHeader' },
-    { id: 'hero', name: 'Hero Section', visible: sectionVisibility.showHero, toggleKey: 'showHero' },
-    { id: 'bio', name: 'Bio / About', visible: sectionVisibility.showBio, toggleKey: 'showBio' },
-    { id: 'featuredWork', name: 'Featured Work', visible: sectionVisibility.showFeaturedWork, toggleKey: 'showFeaturedWork' },
-    { id: 'video', name: 'Video Section', visible: sectionVisibility.showVideo, toggleKey: 'showVideo' },
-    { id: 'contact', name: 'Contact Form', visible: sectionVisibility.showContact, toggleKey: 'showContact' },
-    { id: 'footer', name: 'Footer', visible: sectionVisibility.showFooter, toggleKey: 'showFooter' }
-  ]
-
-  const photobookSections = [
-    { id: 'cover', name: 'Cover', visible: photobookSectionVisibility.showCover, toggleKey: 'showCover' },
-    { id: 'introduction', name: 'Introduction', visible: photobookSectionVisibility.showIntroduction, toggleKey: 'showIntroduction' },
-    { id: 'story', name: 'Story', visible: photobookSectionVisibility.showStory, toggleKey: 'showStory' },
-    { id: 'gallery', name: 'Gallery', visible: photobookSectionVisibility.showGallery, toggleKey: 'showGallery' },
-    { id: 'highlight', name: 'Highlight', visible: photobookSectionVisibility.showHighlight, toggleKey: 'showHighlight' },
-    { id: 'ending', name: 'Ending', visible: photobookSectionVisibility.showEnding, toggleKey: 'showEnding' }
-  ]
-
-  const sections = editorMode === 'portfolio' ? portfolioSections : photobookSections
+  const sections = modeEntry.sections.map((section) => ({
+    ...section,
+    visible: modeEntry.getSectionVisible({
+      section,
+      portfolioVisibility: sectionVisibility,
+      photobookVisibility: photobookSectionVisibility,
+    }),
+  }))
 
   useEffect(() => {
-    if (editorMode === 'photobook') {
-      setActiveSection('cover')
-    } else if (editorMode === 'portfolio') {
-      setActiveSection('hero')
-    }
+    setActiveSection(MODE_REGISTRY[editorMode].defaultActiveSectionId)
   }, [editorMode])
 
   const toggleVisibility = (key: string) => {
-    if (editorMode === 'portfolio') {
-      toggleSection(key as keyof typeof sectionVisibility)
-    } else {
-      togglePhotobookSection(key as keyof typeof photobookSectionVisibility)
-    }
+    MODE_REGISTRY[editorMode].toggleSection({
+      toggleKey: key,
+      portfolioVisibility: sectionVisibility,
+      photobookVisibility: photobookSectionVisibility,
+      togglePortfolio: toggleSection,
+      togglePhotobook: togglePhotobookSection,
+    })
   }
 
   const currentSection = sections.find(s => s.id === activeSection)
 
   const renderSettings = () => {
-    if (editorMode === 'photobook') {
-      switch (activeSection) {
-        case 'cover': return <PhotobookCoverSettings />
-        case 'introduction': return <PhotobookIntroductionSettings />
-        case 'story': return <PhotobookStorySettings />
-        case 'gallery': return <PhotobookGallerySettings />
-        case 'highlight': return <PhotobookHighlightSettings />
-        case 'ending': return <PhotobookEndingSettings />
-        default: return null
-      }
-    }
-
-    if (editorMode === 'portfolio') {
-      switch (activeSection) {
-        case 'header': return <HeaderSettings />
-        case 'hero': return <HeroSettings />
-        case 'bio': return <BioSettings />
-        case 'featuredWork': return <FeaturedWorkSettings />
-        case 'video': return <VideoSettings />
-        case 'contact': return <ContactSettings />
-        case 'footer': return <FooterSettings />
-        default: return null
-      }
-    }
-
-    return null
+    const SettingsComponent = MODE_REGISTRY[editorMode].getSettingsComponent(activeSection)
+    if (!SettingsComponent) return null
+    return <SettingsComponent />
   }
 
   return (
