@@ -2,20 +2,22 @@
 
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, PhotobookSectionVisibility } from '@/editor/lib/types'
+import { PhotobookSectionContent, PhotobookSectionVisibility, PhotobookSlot } from '@/editor/lib/types'
 import { MasonryImage } from '../masonry-ui'
 
 interface MasonryGalleryProps {
   sectionContent: PhotobookSectionContent
   sectionVisibility: PhotobookSectionVisibility
   theme: ThemeConfig
-  longForm: any[]
 }
 
-export function MasonryGallery({ sectionContent, sectionVisibility, theme, longForm }: MasonryGalleryProps) {
+export function MasonryGallery({ sectionContent, sectionVisibility, theme }: MasonryGalleryProps) {
   if (!sectionVisibility.showStory && !sectionVisibility.showGallery) {
     return null
   }
+
+  const storySlots: PhotobookSlot[] = sectionContent.story.images || []
+  const longForm = storySlots.slice(5)
 
   return (
     <section className="py-20 border-t border-border/60 bg-muted/10">

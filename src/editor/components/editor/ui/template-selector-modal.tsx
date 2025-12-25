@@ -28,9 +28,14 @@ export function TemplateSelectorModal() {
     { id: 'minimal' as TemplateId, name: 'Minimal', type: 'portfolio' },
     { id: 'elegant' as TemplateId, name: 'Elegant', type: 'portfolio' },
     { id: 'modern' as TemplateId, name: 'Modern', type: 'portfolio' },
-    // Photobook templates reuse same visual ids
     { id: 'wedding-timeline' as TemplateId, name: 'Photobook Timeline', type: 'photobook' },
     { id: 'masonry' as TemplateId, name: 'Photobook Masonry', type: 'photobook' },
+    { id: 'photobook-classic' as TemplateId, name: 'Photobook Classic', type: 'photobook' },
+    { id: 'photobook-circle' as TemplateId, name: 'Photobook Circle', type: 'photobook' },
+    { id: 'photobook-magazine' as TemplateId, name: 'Photobook Magazine', type: 'photobook' },
+    { id: 'photobook-polaroid' as TemplateId, name: 'Photobook Polaroid', type: 'photobook' },
+    { id: 'photobook-split' as TemplateId, name: 'Photobook Split', type: 'photobook' },
+    { id: 'photobook-vertical' as TemplateId, name: 'Photobook Vertical', type: 'photobook' },
   ]
 
   const filteredTemplates = fallbackTemplates.filter((template) => template.type === editorMode)

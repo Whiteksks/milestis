@@ -9,8 +9,14 @@ import { MinimalTemplateDesign } from '../templates/portfolio/minimal-template'
 import { ElegantTemplateDesign } from '../templates/portfolio/elegant-template'
 import { ModernParallaxTemplate } from '../templates/portfolio/modern-template'
 import React from 'react'
-import {PhotobookTimelineTemplate} from '../templates/photobook/photobook-timeline'
+import { PhotobookTimelineTemplate } from '../templates/photobook/photobook-timeline'
 import PhotobookMasonryTemplate from '../templates/photobook/photobook-masonry'
+import { TemplateClassic } from '../templates/photobook/template-classic'
+import { TemplateCircle } from '../templates/photobook/template-circle'
+import { TemplateMagazine } from '../templates/photobook/template-magazine'
+import { TemplatePolaroid } from '../templates/photobook/template-polaroid'
+import { TemplateSplit } from '../templates/photobook/template-split'
+import { TemplateVertical } from '../templates/photobook/template-vertical'
 import { PortfolioTemplateShell } from '@/editor/components/editor/ui/portfolio-template-shell'
 import type { PortfolioTemplateProps, PhotobookTemplateProps } from '@/editor/lib/template-types'
 import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
@@ -43,8 +49,14 @@ export function Canvas() {
   }
 
   const photobookDesigns: Record<string, React.ComponentType<PhotobookTemplateProps>> = {
-    timeline: PhotobookTimelineTemplate,
+    'wedding-timeline': PhotobookTimelineTemplate,
     masonry: PhotobookMasonryTemplate,
+    'photobook-classic': TemplateClassic,
+    'photobook-circle': TemplateCircle,
+    'photobook-magazine': TemplateMagazine,
+    'photobook-polaroid': TemplatePolaroid,
+    'photobook-split': TemplateSplit,
+    'photobook-vertical': TemplateVertical,
   }
   
   const renderTemplate = () => {

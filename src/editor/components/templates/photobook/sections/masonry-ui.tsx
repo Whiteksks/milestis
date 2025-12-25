@@ -1,4 +1,5 @@
-import { AspectRatio, FrameStyle } from '@/editor/lib/types'
+import type { ThemeConfig } from '@/editor/lib/themes'
+import { AspectRatio, FrameStyle, PhotobookSlot } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { cn } from '@/lib/utils'
@@ -8,13 +9,8 @@ export function FeaturedCard({
   slot,
   theme,
 }: {
-  slot: {
-    id: string
-    label?: string
-    caption?: string
-    images: string[]
-  }
-  theme: any
+  slot: PhotobookSlot
+  theme: ThemeConfig
 }) {
   const img = slot.images?.[0]
   return (

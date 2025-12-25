@@ -14,10 +14,6 @@ export default function PhotobookMasonryTemplate({
   sectionContent,
   frameStyle: _frameStyle,
 }: PhotobookTemplateProps) {
-  const storySlots = sectionContent.story.images || []
-  const featured = storySlots.slice(0, 5)
-  const longForm = storySlots.slice(5)
-
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <main>
@@ -36,7 +32,6 @@ export default function PhotobookMasonryTemplate({
           <MasonryStory
             sectionContent={sectionContent}
             theme={theme}
-            featured={featured}
           />
         )}
 
@@ -45,7 +40,6 @@ export default function PhotobookMasonryTemplate({
           sectionContent={sectionContent}
           sectionVisibility={sectionVisibility}
           theme={theme}
-          longForm={longForm}
         />
 
         {/* HIGHLIGHT section */}

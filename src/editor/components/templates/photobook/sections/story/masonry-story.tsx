@@ -4,16 +4,18 @@ import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent } from '@/editor/lib/types'
+import { PhotobookSectionContent, PhotobookSlot } from '@/editor/lib/types'
 import { FeaturedCard } from '../masonry-ui'
 
 interface MasonryStoryProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  featured: any[]
 }
 
-export function MasonryStory({ sectionContent, theme, featured }: MasonryStoryProps) {
+export function MasonryStory({ sectionContent, theme }: MasonryStoryProps) {
+  const storySlots: PhotobookSlot[] = sectionContent.story.images || []
+  const featured = storySlots.slice(0, 5)
+
   return (
     <>
       {/* FEATURED STRIP from first story slots */}

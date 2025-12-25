@@ -51,6 +51,12 @@ export const TEMPLATE_IDS = {
   minimal: 'minimal',
   elegant: 'elegant',
   modern: 'modern',
+  photobookClassic: 'photobook-classic',
+  photobookCircle: 'photobook-circle',
+  photobookMagazine: 'photobook-magazine',
+  photobookPolaroid: 'photobook-polaroid',
+  photobookSplit: 'photobook-split',
+  photobookVertical: 'photobook-vertical',
   weddingTimeline: 'wedding-timeline',
   masonry: 'masonry',
 } as const

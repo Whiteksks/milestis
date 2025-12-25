@@ -4,7 +4,7 @@ import { motion, useScroll, useSpring } from 'framer-motion'
 import { useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, AspectRatio, FrameStyle } from '@/editor/lib/types'
+import { PhotobookSectionContent, PhotobookSlot } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 
@@ -86,19 +86,10 @@ function TimelineItem({
   isEven,
   theme,
 }: {
-  slot: {
-    id: string
-    label?: string
-    caption?: string
-    images: string[]
-    imageSettings: Array<{
-      aspectRatio?: AspectRatio
-      frameStyle?: FrameStyle
-    }>
-  }
+  slot: PhotobookSlot
   index: number
   isEven: boolean
-  theme: any
+  theme: ThemeConfig
 }) {
   const hasImages = slot.images && slot.images.length > 0
 
