@@ -30,23 +30,15 @@ export interface ThemeConfig {
   input: string               // Фон поля ввода (input)
   ring: string                // Базовый цвет кольца фокуса (ring-color)
 
-  // --- ИНТЕРАКТИВНЫЕ ЦВЕТОВЫЕ СОСТОЯНИЯ (ПОЛНЫЕ КЛАССЫ) ---
-  
-  // Hover & Active
-  primaryHover: string        // hover:bg-...
-  textHover: string           // hover:text-...
-  borderHover: string         // hover:border-...
-  ringFocus: string           // focus:ring-2 focus:ring-... (полный класс)
-
-  // Специфичные состояния
+  // --- СПЕЦИФИЧНЫЕ СОСТОЯНИЯ ---
   placeholder: string         // placeholder-... (Цвет плейсхолдера)
   caretColor: string          // caret-... (Цвет курсора)
 
-  // --- УСЛОВНЫЕ ЦВЕТА/ЭФФЕКТЫ ---
-  // Цвет фона, который включает прозрачность, для glass effect или других эффектов
+  // --- ЭФФЕКТЫ ---
   cardStyle: string           // Полный стиль карточки: bg-color/opac, backdrop-blur, border
+  glassPanel: string          // ✨ NEW: Для хедеров и оверлеев (bg + blur + border)
   elementGlow: string         // Свечение или сложная тень
-  transitionStyle: string   // bg-color/opacity (например, 'bg-card/70')
+  gradient: string            // ✨ NEW: Градиент для акцентов
 
   // --- ТИПОГРАФИКА ---
   fontTitle: string
@@ -62,16 +54,16 @@ export interface ThemeConfig {
 
 export const themes: ThemeConfig[] = [
   // -------------------------------------------------------
-  // 1. VELLUM VINTAGE — Улучшено: более дорогая бумага, мягкий чернильный текст
+  // 1. VELLUM VINTAGE
   // -------------------------------------------------------
   {
     id: 'vellum-vintage',
     name: 'Vellum Vintage',
     description: 'Elegant aged paper with warm contrast and soft serif typography',
 
-    background: 'bg-[#F2EFE9]', // Чуть светлее и нейтральнее
-    foreground: 'text-[#463C33]', // Глубокий кофейный
-    primary: 'bg-[#8C7A63]', // Благородная бронза
+    background: 'bg-[#F2EFE9]',
+    foreground: 'text-[#463C33]',
+    primary: 'bg-[#8C7A63]',
     primaryText: 'text-[#F9F7F5]',
     muted: 'bg-[#E6E2D8]',
     mutedText: 'text-[#8A8175]',
@@ -79,10 +71,10 @@ export const themes: ThemeConfig[] = [
 
     secondary: 'bg-[#D1C7B7]',
     secondaryText: 'text-[#2E2822]',
-    accent: 'bg-[#A65D46]', // Терракотовый акцент
+    accent: 'bg-[#A65D46]',
     accentText: 'text-white',
-    success: 'bg-[#5F7D58]', // Винтажный зеленый
-    warning: 'bg-[#C48F45]', // Золотистая охра
+    success: 'bg-[#5F7D58]',
+    warning: 'bg-[#C48F45]',
 
     card: 'bg-[#F9F7F5]',
     cardForeground: 'text-[#463C33]',
@@ -91,16 +83,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#EBE7DE]',
     ring: 'ring-[#B5A896]',
 
-    primaryHover: 'hover:bg-[#756552]',
-    textHover: 'hover:text-[#2E2822]',
-    borderHover: 'hover:border-[#B5A896]',
-    ringFocus: 'focus:ring-2 focus:ring-[#8C7A63]/50',
     placeholder: 'placeholder:text-[#9D9388]',
     caretColor: 'caret-[#8C7A63]',
 
     cardStyle: 'bg-[#F9F7F5]/80 backdrop-blur-[2px] border border-[#E6E2D8] shadow-sm',
+    glassPanel: 'bg-[#F2EFE9]/80 backdrop-blur-md border-b border-[#D6CEC3]/50',
     elementGlow: 'shadow-[0_0_20px_rgba(140,122,99,0.15)]',
-    transitionStyle: 'transition-all duration-300 ease-out',
+    gradient: 'bg-gradient-to-r from-[#8C7A63] to-[#A65D46]',
 
     fontTitle: 'font-serif',
     fontBody: 'font-sans',
@@ -109,21 +98,19 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-md',
     shadow: 'shadow-[0_4px_20px_-2px_rgba(70,60,50,0.1)]',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 2. NORDIC LIGHT — Улучшено: холодный, кристально чистый, «умные» серые
+  // 2. NORDIC LIGHT
   // -------------------------------------------------------
   {
     id: 'nordic-light',
     name: 'Nordic Light',
     description: 'Minimal clean theme inspired by Scandinavian aesthetics',
 
-    background: 'bg-[#F8FAFC]', // Slate-50 (холодный белый)
-    foreground: 'text-[#0F172A]', // Slate-900
-    primary: 'bg-[#0F172A]', // Почти черный для контраста (сканди стиль)
+    background: 'bg-[#F8FAFC]',
+    foreground: 'text-[#0F172A]',
+    primary: 'bg-[#0F172A]',
     primaryText: 'text-white',
     muted: 'bg-[#F1F5F9]',
     mutedText: 'text-[#64748B]',
@@ -131,7 +118,7 @@ export const themes: ThemeConfig[] = [
 
     secondary: 'bg-[#FFFFFF]',
     secondaryText: 'text-[#0F172A]',
-    accent: 'bg-[#38BDF8]', // Яркий ледяной голубой
+    accent: 'bg-[#38BDF8]',
     accentText: 'text-white',
     success: 'bg-[#10B981]',
     warning: 'bg-[#F59E0B]',
@@ -143,16 +130,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-white',
     ring: 'ring-[#94A3B8]',
 
-    primaryHover: 'hover:bg-[#1E293B]',
-    textHover: 'hover:text-[#0F172A]',
-    borderHover: 'hover:border-[#CBD5E1]',
-    ringFocus: 'focus:ring-2 focus:ring-[#0F172A]/20',
     placeholder: 'placeholder:text-[#94A3B8]',
     caretColor: 'caret-[#0F172A]',
 
     cardStyle: 'bg-white border border-[#E2E8F0] shadow-sm',
+    glassPanel: 'bg-[#F8FAFC]/80 backdrop-blur-md border-b border-[#E2E8F0]/60',
     elementGlow: 'shadow-[0_0_15px_rgba(56,189,248,0.1)]',
-    transitionStyle: 'transition-all duration-200',
+    gradient: 'bg-gradient-to-r from-[#0F172A] to-[#334155]',
 
     fontTitle: 'font-sans',
     fontBody: 'font-sans',
@@ -161,21 +145,19 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-lg',
     shadow: 'shadow-sm',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 3. MIDNIGHT NEON — Улучшено: глубокий черный (не серый), кислотные акценты
+  // 3. MIDNIGHT NEON
   // -------------------------------------------------------
   {
     id: 'midnight-neon',
     name: 'Midnight Neon',
     description: 'Dark futuristic theme with neon highlights',
 
-    background: 'bg-[#030712]', // Практически pure black с синим подтоном
+    background: 'bg-[#030712]',
     foreground: 'text-[#F3F4F6]',
-    primary: 'bg-[#6366F1]', // Indigo Neon
+    primary: 'bg-[#6366F1]',
     primaryText: 'text-white',
     muted: 'bg-[#111827]',
     mutedText: 'text-[#9CA3AF]',
@@ -183,7 +165,7 @@ export const themes: ThemeConfig[] = [
 
     secondary: 'bg-[#1F2937]',
     secondaryText: 'text-[#F3F4F6]',
-    accent: 'bg-[#D946EF]', // Magenta Neon
+    accent: 'bg-[#D946EF]',
     accentText: 'text-white',
     success: 'bg-[#22C55E]',
     warning: 'bg-[#EAB308]',
@@ -195,16 +177,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#111827]',
     ring: 'ring-[#818CF8]',
 
-    primaryHover: 'hover:bg-[#4F46E5]',
-    textHover: 'hover:text-white',
-    borderHover: 'hover:border-[#374151]',
-    ringFocus: 'focus:ring-2 focus:ring-[#6366F1]',
     placeholder: 'placeholder:text-[#4B5563]',
     caretColor: 'caret-[#D946EF]',
 
     cardStyle: 'bg-[#0B0F19]/80 backdrop-blur-md border border-[#1F2937]',
+    glassPanel: 'bg-[#030712]/70 backdrop-blur-xl border-b border-[#1F2937]/60',
     elementGlow: 'shadow-[0_0_30px_rgba(99,102,241,0.3)]',
-    transitionStyle: 'transition-all duration-300',
+    gradient: 'bg-gradient-to-r from-[#6366F1] via-[#818CF8] to-[#D946EF]',
 
     fontTitle: 'font-sans',
     fontBody: 'font-sans',
@@ -213,21 +192,19 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-xl',
     shadow: 'shadow-[0_10px_40px_-10px_rgba(99,102,241,0.2)]',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 4. SUNSET WARM — Улучшено: персиковые тона, менее "ржавый", более уютный
+  // 4. SUNSET WARM
   // -------------------------------------------------------
   {
     id: 'sunset-warm',
     name: 'Sunset Warm',
     description: 'Soft warm theme inspired by sunset and cozy tones',
 
-    background: 'bg-[#FFF9F5]', // Очень светлый персик
-    foreground: 'text-[#431407]', // Темный шоколад
-    primary: 'bg-[#FB923C]', // Orange-400
+    background: 'bg-[#FFF9F5]',
+    foreground: 'text-[#431407]',
+    primary: 'bg-[#FB923C]',
     primaryText: 'text-white',
     muted: 'bg-[#FFF1E6]',
     mutedText: 'text-[#9A3412]',
@@ -235,7 +212,7 @@ export const themes: ThemeConfig[] = [
 
     secondary: 'bg-[#FFEDD5]',
     secondaryText: 'text-[#7C2D12]',
-    accent: 'bg-[#F43F5E]', // Rose tone
+    accent: 'bg-[#F43F5E]',
     accentText: 'text-white',
     success: 'bg-[#65A30D]',
     warning: 'bg-[#EA580C]',
@@ -247,16 +224,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#FFF7ED]',
     ring: 'ring-[#FB923C]',
 
-    primaryHover: 'hover:bg-[#F97316]',
-    textHover: 'hover:text-[#C2410C]',
-    borderHover: 'hover:border-[#FDBA74]',
-    ringFocus: 'focus:ring-2 focus:ring-[#FB923C]/50',
     placeholder: 'placeholder:text-[#CA8A04]/50',
     caretColor: 'caret-[#F43F5E]',
 
     cardStyle: 'bg-white/60 backdrop-blur-sm border border-[#FED7AA]',
+    glassPanel: 'bg-[#FFF9F5]/80 backdrop-blur-md border-b border-[#FED7AA]/50',
     elementGlow: 'shadow-[0_0_25px_rgba(251,146,60,0.25)]',
-    transitionStyle: 'transition-all duration-500 ease-in-out',
+    gradient: 'bg-gradient-to-r from-[#FB923C] to-[#F43F5E]',
 
     fontTitle: 'font-serif',
     fontBody: 'font-serif',
@@ -265,21 +239,19 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-2xl',
     shadow: 'shadow-[0_8px_30px_rgba(251,146,60,0.1)]',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 5. OCEAN PROFESSIONAL — Улучшено: серьезный Navy, корпоративный стиль
+  // 5. OCEAN PROFESSIONAL
   // -------------------------------------------------------
   {
     id: 'ocean-pro',
     name: 'Ocean Professional',
     description: 'Deep blues and clean sharp edges for business look',
 
-    background: 'bg-[#0B1120]', // Глубокий морской
+    background: 'bg-[#0B1120]',
     foreground: 'text-[#E2E8F0]',
-    primary: 'bg-[#0EA5E9]', // Sky-500
+    primary: 'bg-[#0EA5E9]',
     primaryText: 'text-white',
     muted: 'bg-[#1E293B]',
     mutedText: 'text-[#94A3B8]',
@@ -299,16 +271,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#0F172A]',
     ring: 'ring-[#0284C7]',
 
-    primaryHover: 'hover:bg-[#0284C7]',
-    textHover: 'hover:text-[#E0F2FE]',
-    borderHover: 'hover:border-[#475569]',
-    ringFocus: 'focus:ring-2 focus:ring-[#0EA5E9]/50',
     placeholder: 'placeholder:text-[#475569]',
     caretColor: 'caret-[#38BDF8]',
 
     cardStyle: 'bg-[#151F32] border border-[#334155] shadow-lg',
+    glassPanel: 'bg-[#0B1120]/80 backdrop-blur-md border-b border-[#334155]/50',
     elementGlow: 'shadow-[0_0_20px_rgba(14,165,233,0.15)]',
-    transitionStyle: 'transition-all duration-200',
+    gradient: 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]',
 
     fontTitle: 'font-sans',
     fontBody: 'font-sans',
@@ -317,12 +286,10 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-md',
     shadow: 'shadow-lg shadow-[#0B1120]/50',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 6. ROYAL CLASSIC — Улучшено: глубокий бордовый, матовое золото, без "кислотности"
+  // 6. ROYAL CLASSIC
   // -------------------------------------------------------
   {
     id: 'royal-classic',
@@ -331,7 +298,7 @@ export const themes: ThemeConfig[] = [
 
     background: 'bg-[#FCFAF8]',
     foreground: 'text-[#3E2723]',
-    primary: 'bg-[#7F1D1D]', // Глубокий красный (Red-900)
+    primary: 'bg-[#7F1D1D]',
     primaryText: 'text-[#FEF2F2]',
     muted: 'bg-[#F5F5F4]',
     mutedText: 'text-[#78716C]',
@@ -339,7 +306,7 @@ export const themes: ThemeConfig[] = [
 
     secondary: 'bg-[#E7E5E4]',
     secondaryText: 'text-[#44403C]',
-    accent: 'bg-[#B45309]', // Amber-700 (темное золото)
+    accent: 'bg-[#B45309]',
     accentText: 'text-white',
     success: 'bg-[#15803D]',
     warning: 'bg-[#A16207]',
@@ -351,16 +318,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#F5F5F4]',
     ring: 'ring-[#7F1D1D]',
 
-    primaryHover: 'hover:bg-[#991B1B]',
-    textHover: 'hover:text-[#7F1D1D]',
-    borderHover: 'hover:border-[#A8A29E]',
-    ringFocus: 'focus:ring-2 focus:ring-[#7F1D1D]/30',
     placeholder: 'placeholder:text-[#A8A29E]',
     caretColor: 'caret-[#B45309]',
 
     cardStyle: 'bg-white/90 backdrop-blur-sm border border-[#E7E5E4] shadow-[0_4px_20px_rgba(0,0,0,0.05)]',
+    glassPanel: 'bg-[#FCFAF8]/90 backdrop-blur-sm border-b border-[#D7CCC8]/50',
     elementGlow: 'shadow-[0_0_25px_rgba(127,29,29,0.15)]',
-    transitionStyle: 'transition-all duration-500',
+    gradient: 'bg-gradient-to-r from-[#7F1D1D] to-[#B45309]',
 
     fontTitle: 'font-serif',
     fontBody: 'font-sans',
@@ -369,21 +333,19 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-sm',
     shadow: 'shadow-xl shadow-[#7F1D1D]/10',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 7. GLASS FROST — Улучшено: более чистый блюр, правильные белые с прозрачностью
+  // 7. GLASS FROST
   // -------------------------------------------------------
   {
     id: 'glass-frost',
     name: 'Glass Frost',
     description: 'Прозрачный стеклянный эффект с мягким свечением и размытием',
 
-    background: 'bg-gradient-to-br from-[#E0E7FF] to-[#F3E8FF]', // Градиент для эффекта стекла
+    background: 'bg-gradient-to-br from-[#E0E7FF] to-[#F3E8FF]',
     foreground: 'text-[#1E1B4B]',
-    primary: 'bg-white/40', // Полупрозрачный
+    primary: 'bg-white/40',
     primaryText: 'text-[#1E1B4B]',
     muted: 'bg-white/20',
     mutedText: 'text-[#6366F1]',
@@ -403,16 +365,13 @@ export const themes: ThemeConfig[] = [
     input: 'bg-white/20',
     ring: 'ring-white',
 
-    primaryHover: 'hover:bg-white/50',
-    textHover: 'hover:text-[#4338CA]',
-    borderHover: 'hover:border-white/80',
-    ringFocus: 'focus:ring-2 focus:ring-white/50',
     placeholder: 'placeholder:text-[#6366F1]/50',
     caretColor: 'caret-[#4F46E5]',
 
     cardStyle: 'bg-white/25 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]',
+    glassPanel: 'bg-white/30 backdrop-blur-xl border-b border-white/40',
     elementGlow: 'shadow-[0_0_30px_rgba(255,255,255,0.6)]',
-    transitionStyle: 'transition-all duration-300',
+    gradient: 'bg-gradient-to-r from-[#818CF8] to-[#C084FC]',
 
     fontTitle: 'font-sans',
     fontBody: 'font-sans',
@@ -421,12 +380,10 @@ export const themes: ThemeConfig[] = [
 
     radiusMedium: 'rounded-2xl',
     shadow: 'shadow-lg',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 8. MONO NOIR — Улучшено: не просто черный, а "дорогой" угольный (Charcoal)
+  // 8. MONO NOIR
   // -------------------------------------------------------
   {
     id: 'mono-noir',
@@ -455,47 +412,42 @@ export const themes: ThemeConfig[] = [
     input: 'bg-[#0A0A0A]',
     ring: 'ring-[#525252]',
 
-    primaryHover: 'hover:bg-[#E5E5E5]',
-    textHover: 'hover:text-white',
-    borderHover: 'hover:border-[#404040]',
-    ringFocus: 'focus:ring-2 focus:ring-white/30',
     placeholder: 'placeholder:text-[#525252]',
     caretColor: 'caret-white',
 
     cardStyle: 'bg-[#0A0A0A] border border-[#262626]',
+    glassPanel: 'bg-[#000000]/80 backdrop-blur-md border-b border-[#262626]',
     elementGlow: 'shadow-[0_0_15px_rgba(255,255,255,0.1)]',
-    transitionStyle: 'transition-colors duration-200',
+    gradient: 'bg-gradient-to-r from-[#FFFFFF] to-[#A3A3A3]',
 
     fontTitle: 'font-sans',
     fontBody: 'font-sans',
     lineHeight: 'leading-normal',
     letterSpacing: 'tracking-widest',
 
-    radiusMedium: 'rounded-none', // Полный квадрат для стиля "брутализм"
+    radiusMedium: 'rounded-none',
     shadow: 'shadow-none',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   },
 
   // -------------------------------------------------------
-  // 9. FLORAL BLOOM — Улучшено: "Пыльная роза", не детский, а изысканный
+  // 9. FLORAL BLOOM
   // -------------------------------------------------------
   {
     id: 'floral-bloom',
     name: 'Floral Bloom',
     description: 'Нежная цветочная тема с пастельными оттенками и мягкой типографикой',
 
-    background: 'bg-[#FFF1F2]', // Rose-50
-    foreground: 'text-[#881337]', // Rose-900
-    primary: 'bg-[#FDA4AF]', // Rose-300
+    background: 'bg-[#FFF1F2]',
+    foreground: 'text-[#881337]',
+    primary: 'bg-[#FDA4AF]',
     primaryText: 'text-[#881337]',
     muted: 'bg-[#FFE4E6]',
     mutedText: 'text-[#9F1239]',
     border: 'border-[#FECDD3]',
 
-    secondary: 'bg-[#FFF0F5]', // Lavender blush
+    secondary: 'bg-[#FFF0F5]',
     secondaryText: 'text-[#831843]',
-    accent: 'bg-[#F43F5E]', // Яркий бутон
+    accent: 'bg-[#F43F5E]',
     accentText: 'text-white',
     success: 'text-[#059669]',
     warning: 'text-[#D97706]',
@@ -507,26 +459,21 @@ export const themes: ThemeConfig[] = [
     input: 'bg-white',
     ring: 'ring-[#FDA4AF]',
 
-    primaryHover: 'hover:bg-[#FB7185]',
-    textHover: 'hover:text-[#BE123C]',
-    borderHover: 'hover:border-[#F43F5E]',
-    ringFocus: 'focus:ring-2 focus:ring-[#FDA4AF]',
     placeholder: 'placeholder:text-[#FDA4AF]',
     caretColor: 'caret-[#E11D48]',
 
     cardStyle: 'bg-white/60 backdrop-blur-sm border border-[#FECDD3] shadow-sm',
+    glassPanel: 'bg-[#FFF1F2]/80 backdrop-blur-md border-b border-[#FECDD3]/50',
     elementGlow: 'shadow-[0_4px_25px_rgba(251,113,133,0.3)]',
-    transitionStyle: 'transition-all duration-300 ease-in-out',
+    gradient: 'bg-gradient-to-r from-[#FDA4AF] to-[#F43F5E]',
 
     fontTitle: 'font-serif',
     fontBody: 'font-sans',
     lineHeight: 'leading-loose',
     letterSpacing: 'tracking-wide',
 
-    radiusMedium: 'rounded-3xl', // Мягкие формы
+    radiusMedium: 'rounded-3xl',
     shadow: 'shadow-[0_10px_30px_-5px_rgba(253,164,175,0.3)]',
-
-    // decorations moved to `lib/decorations.ts` / `DecorationsConfig`
   }
 ]
 

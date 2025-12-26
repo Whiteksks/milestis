@@ -2,13 +2,13 @@
 
 import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
-import { MinimalHeader } from './sections/header/minimal-header'
 import { MinimalHero } from './sections/hero/minimal-hero'
 import { MinimalBio } from './sections/bio/minimal-bio'
 import { MinimalFeaturedWork } from './sections/featured-work/minimal-featured-work'
 import { MinimalVideo } from './sections/video/minimal-video'
 import { MinimalContact } from './sections/contact/minimal-contact'
 import { MinimalFooter } from './sections/footer/minimal-footer'
+import { HeaderMinimal } from './sections/header/minimal-header'
 
 export function MinimalTemplateDesign({
   theme,
@@ -19,7 +19,7 @@ export function MinimalTemplateDesign({
   return (
     <div className={cn('min-h-screen', theme.background, theme.foreground, theme.fontBody)}>
       {sectionVisibility.showHeader && (
-        <MinimalHeader
+        <HeaderMinimal
           theme={theme}
           sectionContent={sectionContent}
           handleAnchorClick={handleAnchorClick}

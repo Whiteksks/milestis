@@ -1,13 +1,17 @@
 'use client'
 
+import { useRef } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
+import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
 export function Canvas() {
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const deviceView = useUiSelector(state => state.deviceView)
   const editorMode = useUiSelector(state => state.editorMode)
   const previewDecorations = useUiSelector(state => state.previewDecorations)
@@ -45,45 +49,55 @@ export function Canvas() {
   ]
 
   const decorationAnimation = themeCustomizations.decorationAnimation || themeDecorations?.animation || 'fade'
+  const backgroundImageUrl = themeCustomizations.customBackground || themeDecorations?.backgroundImage?.url
+  const backgroundImageType = themeCustomizations.backgroundImageType || themeDecorations?.backgroundImage?.type
+  const backgroundImageOpacity = themeCustomizations.backgroundImageOpacity ?? (themeDecorations?.backgroundImage?.opacity || 0.15)
+
   return (
-    <div className="flex-1 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-auto">
+    <div className="flex-1 min-h-0 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-hidden">
       <div
+        ref={viewportRef}
         className={cn(
-          '@container mx-auto transition-all duration-300',
+          '@container mx-auto h-full relative overflow-hidden transition-all duration-300 transform-[translateZ(0)]',
           deviceView === 'mobile' && 'max-w-sm w-full',
           deviceView === 'tablet' && 'w-full max-w-3xl',
           deviceView === 'desktop' && 'w-full max-w-7xl',
-          deviceView === 'fullscreen' && 'w-screen h-[calc(100vh-4rem)] max-w-none fixed left-0 top-16 z-50 bg-white overflow-auto'
+          deviceView === 'fullscreen' && 'w-screen h-[calc(100vh-4rem)] max-w-none fixed left-0 top-16 z-50 bg-white'
         )}
       >
-        <div className={cn(
-          'shadow-2xl overflow-hidden relative',
-          theme.background,
-          theme.foreground,
-          theme.fontBody,
-          theme.lineHeight,
-          theme.letterSpacing,
-          theme.radiusMedium,
-          theme.shadow
-        )}>
-          {(themeCustomizations.customBackground || themeDecorations?.backgroundImage) && (
-            <div 
-              className="absolute inset-0 pointer-events-none"
-              style={{ 
-                backgroundImage: `url(${themeCustomizations.customBackground || themeDecorations?.backgroundImage?.url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: (themeCustomizations.backgroundImageType || themeDecorations?.backgroundImage?.type) === 'fixed' ? 'fixed' : 'scroll',
-                opacity: themeCustomizations.backgroundImageOpacity ?? (themeDecorations?.backgroundImage?.opacity || 0.15)
-              }}
-            />
-          )}
+        <div ref={scrollContainerRef} className="h-full overflow-auto">
+          <CanvasScrollProvider value={scrollContainerRef}>
+            <div className={cn(
+              'shadow-2xl overflow-hidden relative',
+              theme.background,
+              theme.foreground,
+              theme.fontBody,
+              theme.lineHeight,
+              theme.letterSpacing,
+              theme.shadow
+            )}>
+              {backgroundImageUrl && (
+                <div
+                  className={cn(
+                    'inset-0 pointer-events-none',
+                    backgroundImageType === 'fixed' ? 'fixed' : 'absolute'
+                  )}
+                  style={{
+                    backgroundImage: `url(${backgroundImageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    opacity: backgroundImageOpacity,
+                  }}
+                />
+              )}
 
-          <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />
+              <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />
 
-          <div className="relative z-10">
-            {renderTemplate()}
-          </div>
+              <div className="relative z-10">
+                {renderTemplate()}
+              </div>
+            </div>
+          </CanvasScrollProvider>
         </div>
       </div>
     </div>

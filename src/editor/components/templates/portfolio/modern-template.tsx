@@ -1,11 +1,11 @@
 import type { PortfolioTemplateProps } from "@/editor/components/editor/ui/portfolio-template-shell"
-import { ModernHeader } from "./sections/header/modern-header"
 import { ModernParallaxHero } from "./sections/hero/modern-hero"
 import { ModernParallaxBio } from "./sections/bio/modern-bio"
 import { ModernFeaturedWork } from "./sections/featured-work/modern-featured-work"
 import { ModernVideo } from "./sections/video/modern-video"
 import { ModernContact } from "./sections/contact/modern-contact"
 import { ModernFooter } from "./sections/footer/modern-footer"
+import { HeaderGlass } from "./sections/header/glass-header"
 
 export function ModernParallaxTemplate({
   theme,
@@ -16,7 +16,7 @@ export function ModernParallaxTemplate({
   return (
     <>
       {sectionVisibility.showHeader && (
-        <ModernHeader
+        <HeaderGlass
           theme={theme}
           sectionContent={sectionContent}
           handleAnchorClick={handleAnchorClick}

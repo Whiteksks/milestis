@@ -28,8 +28,7 @@ export function ClassicHeader({
       transition={{ duration: 0.6 }}
       className={cn(
         '@container',
-        'backdrop-blur-lg',
-        theme.border,
+        theme.glassPanel,
       )}
     >
       <div className="@lg:px-12 @md:px-8 px-4 @lg:py-4 py-3 flex items-center justify-between max-w-6xl mx-auto">
@@ -149,18 +148,14 @@ export function ClassicHeader({
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="@md:hidden overflow-hidden border-t border-white/10 backdrop-blur-xl"
+              className={cn("@md:hidden overflow-hidden", theme.glassPanel)}
             >
               <motion.div
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
                 exit={{ y: -20 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className={cn(
-                  'px-4 py-4 flex flex-col gap-1',
-                  theme.transitionStyle,
-                  theme.background,
-                )}
+                className="px-4 py-4 flex flex-col gap-1"
               >
                 {(sectionContent.header.links ?? []).map((link, index) => (
                   <motion.div

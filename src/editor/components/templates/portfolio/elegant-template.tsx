@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
-import { ElegantHeader } from './sections/header/elegant-header'
 import { ElegantHero } from './sections/hero/elegant-hero'
 import { ElegantBio } from './sections/bio/elegant-bio'
 import { ElegantFeaturedWork } from './sections/featured-work/elegant-featured-work'
 import { ElegantVideo } from './sections/video/elegant-video'
 import { ElegantContact } from './sections/contact/elegant-contact'
 import { ElegantFooter } from './sections/footer/elegant-footer'
+import { ElegantHeader } from './sections/header/elegant-header'
 
 export function ElegantTemplateDesign({
   theme,

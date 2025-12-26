@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { XIcon, MenuIcon } from 'lucide-react'
+import { useState } from 'react'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { MenuIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface ElegantHeaderProps
@@ -18,36 +18,27 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
     <motion.header
       id="header"
       data-section-id="header"
-      initial={{ opacity: 0, y: -6 }}
+      initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 0.11, 0.23, 1] }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
       className={cn(
-        // Оставим здесь только стили, отвечающие за позиционирование и фон по всей ширине.
-        'sticky top-0 z-40 backdrop-blur-xl',
-        'supports-backdrop-filter:backdrop-blur-2xl',
-        theme.background,
+        'sticky top-0 z-40',
+        theme.glassPanel,
       )}
     >
-      {/* Контейнер для содержимого и нижней линии.
-          Он ограничивает ширину (max-w-6xl), центрирует контент (mx-auto),
-          и теперь именно он имеет нижний border-b. 
-      */}
-      <div 
-        className={cn(
-          'max-w-6xl mx-auto',
-          'border-b border-current/10/40', // Нижняя линия теперь здесь
-          '@lg:px-24 @md:px-16 px-6' // Отступы по бокам для меньших экранов
-        )}
-      >
-        <div className="py-4 flex items-center justify-between">
+      {/* 1. Внешний контейнер (для фона и бордера) - без padding */}
+      <div className="@lg:px-24 @md:px-14 px-6 py-4">
+        
+        {/* 2. Внутренний контейнер (для ограничения ширины и центрирования) */}
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <a
             href="#hero"
             onClick={(e) => handleAnchorClick(e, '#hero')}
-            className="flex items-center gap-3"
+            className="group flex items-center gap-3"
           >
             <h1
               className={cn(
-                '@lg:text-3xl @md:text-2xl text-xl font-light tracking-tight opacity-90',
+                '@lg:text-3xl @md:text-2xl text-xl font-medium tracking-tight',
                 theme.fontTitle,
                 theme.letterSpacing,
               )}
@@ -56,7 +47,7 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
             </h1>
           </a>
 
-          {/* Desktop nav — calm & elegant */}
+          {/* Desktop nav without hover animations */}
           <nav className="hidden @md:flex items-center gap-10">
             {(sectionContent.header.links ?? []).map((link, i) => (
               <a
@@ -64,17 +55,11 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
                 href={link.href}
                 onClick={(e) => handleAnchorClick(e, link.href)}
                 className={cn(
-                  'relative text-[0.78rem] font-light uppercase tracking-[0.14em] opacity-55 hover:opacity-80 transition-opacity duration-300',
+                  'relative text-[0.75rem] uppercase tracking-[0.18em] opacity-60 hover:opacity-100 transition-opacity',
                   theme.letterSpacing,
                 )}
               >
                 {link.label}
-
-                {/* subtle underline, always hidden unless hover */}
-                <span
-                  className="pointer-events-none absolute left-0 -bottom-1 w-full h-px 
-                  bg-current/30 opacity-0 group-hover:opacity-40 transition-opacity duration-300"
-                />
               </a>
             ))}
           </nav>
@@ -87,17 +72,13 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="@md:hidden rounded-full p-2 hover:bg-current/5 transition-all"
             >
-              <motion.div
-                animate={{ rotate: isMenuOpen ? 90 : 0 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-              >
-                {isMenuOpen ? <XIcon /> : <MenuIcon />}
-              </motion.div>
+              {isMenuOpen ? <XIcon /> : <MenuIcon />}
             </Button>
           )}
         </div>
       </div>
 
+      {/* Mobile menu */}
       {hasLinks && (
         <motion.nav
           initial={false}
@@ -105,38 +86,32 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
             height: isMenuOpen ? 'auto' : 0,
             opacity: isMenuOpen ? 1 : 0,
           }}
-          transition={{ duration: 0.45, ease: [0.22, 0.11, 0.23, 1] }}
-          // Убираем border-t отсюда, т.к. он должен быть внутри
-          className="@md:hidden overflow-hidden backdrop-blur-xl"
+          transition={{
+            duration: 0.45,
+            ease: 'easeInOut',
+          }}
+          className={cn("@md:hidden overflow-hidden", theme.glassPanel)}
         >
-          <div 
-             className={cn(
-              // На мобильном меню мы также центрируем контент, но для избежания
-              // двойного border-t, мы добавим его только внутрь этого контейнера.
-              'border-t border-current/10', // Нижняя линия для меню
-              'max-w-6xl mx-auto',
-              '@lg:px-20 @md:px-12 px-6 py-4 flex flex-col gap-0.5',
-              theme.background,
+          <div
+            className={cn(
+              '@lg:px-20 @md:px-12 px-6 py-4 flex flex-col gap-2',
             )}
           >
             {(sectionContent.header.links ?? []).map((link, i) => (
-              <motion.a
+              <a
                 key={i}
                 href={link.href}
                 onClick={(e) => {
                   handleAnchorClick(e, link.href)
                   setIsMenuOpen(false)
                 }}
-                initial={{ opacity: 0, x: -6 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.04 }}
                 className={cn(
-                  'py-2 text-[0.8rem] font-light uppercase tracking-[0.17em] opacity-70 hover:opacity-90 transition-opacity',
+                  'py-2 text-[0.75rem] uppercase tracking-[0.2em] opacity-60 hover:opacity-100 transition-opacity',
                   theme.letterSpacing,
                 )}
               >
                 {link.label}
-              </motion.a>
+              </a>
             ))}
           </div>
         </motion.nav>
