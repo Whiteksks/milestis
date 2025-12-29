@@ -99,7 +99,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*"
+          accept="image/*,image/svg+xml"
           className="hidden"
           onChange={handleFileUpload}
         />

@@ -5,13 +5,16 @@ import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/li
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
+import { getBackgroundLayerProps, resolveBackgroundImage } from '@/editor/lib/background'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
+import { useParallaxLayer } from '@/editor/hooks/use-parallax-layer'
 
 export function Canvas() {
   const viewportRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const viewportBackgroundRef = useRef<HTMLDivElement>(null)
   const deviceView = useUiSelector(state => state.deviceView)
   const editorMode = useUiSelector(state => state.editorMode)
   const previewDecorations = useUiSelector(state => state.previewDecorations)
@@ -49,9 +52,27 @@ export function Canvas() {
   ]
 
   const decorationAnimation = themeCustomizations.decorationAnimation || themeDecorations?.animation || 'fade'
-  const backgroundImageUrl = themeCustomizations.customBackground || themeDecorations?.backgroundImage?.url
-  const backgroundImageType = themeCustomizations.backgroundImageType || themeDecorations?.backgroundImage?.type
-  const backgroundImageOpacity = themeCustomizations.backgroundImageOpacity ?? (themeDecorations?.backgroundImage?.opacity || 0.15)
+  const resolvedBackground = resolveBackgroundImage({
+    decorations: themeDecorations,
+    overrides: {
+      customBackground: themeCustomizations.customBackground,
+      backgroundImageType: themeCustomizations.backgroundImageType,
+      backgroundImageOpacity: themeCustomizations.backgroundImageOpacity,
+    },
+  })
+  const backgroundLayer = getBackgroundLayerProps(resolvedBackground)
+
+  const contentBackgroundClass =
+    backgroundLayer?.placement === 'viewport' ? 'bg-transparent' : theme.background
+
+  useParallaxLayer({
+    enabled: resolvedBackground?.mode === 'parallax',
+    scrollContainerRef,
+    viewportRef,
+    layerRef: viewportBackgroundRef,
+    strength: resolvedBackground?.parallaxStrength ?? 1,
+    scale: resolvedBackground?.parallaxScale ?? 1.12,
+  })
 
   return (
     <div className="flex-1 min-h-0 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-hidden">
@@ -65,30 +86,27 @@ export function Canvas() {
           deviceView === 'fullscreen' && 'w-screen h-[calc(100vh-4rem)] max-w-none fixed left-0 top-16 z-50 bg-white'
         )}
       >
-        <div ref={scrollContainerRef} className="h-full overflow-auto">
+        {backgroundLayer?.placement === 'viewport' && (
+          <div
+            ref={viewportBackgroundRef}
+            className={cn(backgroundLayer.className, 'z-0')}
+            style={backgroundLayer.style}
+          />
+        )}
+
+        <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
           <CanvasScrollProvider value={scrollContainerRef}>
             <div className={cn(
               'shadow-2xl overflow-hidden relative',
-              theme.background,
+              contentBackgroundClass,
               theme.foreground,
               theme.fontBody,
               theme.lineHeight,
               theme.letterSpacing,
               theme.shadow
             )}>
-              {backgroundImageUrl && (
-                <div
-                  className={cn(
-                    'inset-0 pointer-events-none',
-                    backgroundImageType === 'fixed' ? 'fixed' : 'absolute'
-                  )}
-                  style={{
-                    backgroundImage: `url(${backgroundImageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    opacity: backgroundImageOpacity,
-                  }}
-                />
+              {backgroundLayer?.placement === 'content' && (
+                <div className={backgroundLayer.className} style={backgroundLayer.style} />
               )}
 
               <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />

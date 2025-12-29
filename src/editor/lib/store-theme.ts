@@ -7,7 +7,7 @@ export interface ThemeStore {
   frameStyle: FrameStyle
   themeCustomizations: {
     backgroundImageOpacity?: number
-    backgroundImageType?: 'fixed' | 'scroll'
+    backgroundImageType?: 'fixed' | 'scroll' | 'parallax'
     decorationAnimation?: 'none' | 'fade' | 'slide-up' | 'slide-down'
     decorationCount?: number
     customFont?: string

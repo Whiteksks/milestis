@@ -6,6 +6,7 @@ import { ClassicFeaturedWork } from './sections/featured-work/classic-featured-w
 import { ClassicVideo } from './sections/video/classic-video'
 import { ClassicContact } from './sections/contact/classic-contact'
 import { ClassicFooter } from './sections/footer/classic-footer'
+import { BioParallaxFramer } from './sections/bio/bioparallax'
 
 export function ClassicTemplateDesign({
   theme,
@@ -27,12 +28,13 @@ export function ClassicTemplateDesign({
         <ClassicHero theme={theme} sectionContent={sectionContent} />
       )}
 
-      {sectionVisibility.showBio && (
-        <ClassicBio theme={theme} sectionContent={sectionContent} />
-      )}
 
       {sectionVisibility.showFeaturedWork && (
         <ClassicFeaturedWork theme={theme} sectionContent={sectionContent} />
+      )}
+
+      {sectionVisibility.showBio && (
+        <BioParallaxFramer theme={theme} sectionContent={sectionContent} />
       )}
 
       {sectionVisibility.showVideo && (

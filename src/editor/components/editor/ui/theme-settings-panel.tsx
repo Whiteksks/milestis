@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
+import { BACKGROUND_MODE_PRESETS, type BackgroundImageMode } from '@/editor/lib/background'
 import { Plus, Trash2, ImageIcon } from 'lucide-react'
 import { useState, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
@@ -98,6 +99,15 @@ export function ThemeSettingsPanel() {
     themeCustomizations.backgroundImageOpacity ??
     themeDecorations?.backgroundImage?.opacity ??
     0.15
+
+  const backgroundMode: BackgroundImageMode =
+    (themeCustomizations.backgroundImageType ??
+      themeDecorations?.backgroundImage?.type ??
+      'fixed') as BackgroundImageMode
+
+  const backgroundModeOptions = Object.keys(BACKGROUND_MODE_PRESETS) as BackgroundImageMode[]
+  const formatBackgroundModeLabel = (mode: BackgroundImageMode) =>
+    mode.charAt(0).toUpperCase() + mode.slice(1)
 
   return (
     <div className="p-6 max-w-xl mx-auto space-y-8">
@@ -213,17 +223,20 @@ export function ThemeSettingsPanel() {
                 Scroll Behavior
               </Label>
               <Select
-                value={themeCustomizations.backgroundImageType || 'fixed'}
+                value={backgroundMode}
                 onValueChange={(value) =>
-                  updateThemeCustomization({ backgroundImageType: value as 'fixed' | 'scroll' })
+                  updateThemeCustomization({ backgroundImageType: value as BackgroundImageMode })
                 }
               >
                 <SelectTrigger className="h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fixed">Fixed (stays in place)</SelectItem>
-                  <SelectItem value="scroll">Scroll (moves with page)</SelectItem>
+                  {backgroundModeOptions.map((mode) => (
+                    <SelectItem key={mode} value={mode}>
+                      {formatBackgroundModeLabel(mode)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

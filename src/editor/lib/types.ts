@@ -165,7 +165,7 @@ export interface DecorationsConfig {
   backgroundImage?: {
     url: string
     opacity?: number
-    type?: 'fixed' | 'scroll'
+    type?: 'fixed' | 'scroll' | 'parallax'
   }
   animation?: 'none' | 'fade' | 'slide-up' | 'slide-down'
   elements?: DecorationElement[]
