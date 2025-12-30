@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
 import { MenuIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'

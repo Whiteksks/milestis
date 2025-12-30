@@ -2,7 +2,7 @@
 
 import { useUiStore } from '@/editor/lib/store'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { DecorationsSelectorContent } from './decorations-selector-content'
+import { DecorationsSelectorContent } from '../decorations-selector-content'
 
 export function DecorationsModal() {
   const {

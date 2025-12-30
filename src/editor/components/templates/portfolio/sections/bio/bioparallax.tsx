@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'

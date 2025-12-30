@@ -1,7 +1,7 @@
 "use client"
 
 import { useContentStore, useUiStore } from '@/editor/lib/store'
-import { MediaPickerModal } from '@/editor/components/editor/ui/media-picker-modal'
+import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'

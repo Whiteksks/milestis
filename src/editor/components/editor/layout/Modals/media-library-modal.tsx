@@ -15,7 +15,7 @@ import { Upload, Sparkles, X, Check } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { MobileBottomSheet } from './mobile-bottom-sheet'
+import { MobileBottomSheet } from '../mobile/mobile-bottom-sheet'
 
 interface MediaLibraryModalProps {
   mode?: 'select' | 'manage'

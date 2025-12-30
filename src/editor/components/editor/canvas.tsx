@@ -6,10 +6,10 @@ import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
-import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
+import { DecorationsLayer } from '@/editor/components/editor/layout/decorations-layer'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { useCanvasBackground } from '@/editor/hooks/use-canvas-background'
-import { BackgroundLayer } from './ui/background-layer'
+import { BackgroundLayer } from './layout/background-layer'
 import type { DeviceView } from '@/editor/lib/types'
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {

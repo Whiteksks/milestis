@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useContentStore, useUiStore } from '@/editor/lib/store'
-import { MediaPickerModal } from '@/editor/components/editor/ui/media-picker-modal'
+import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { ImageIcon, X } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 

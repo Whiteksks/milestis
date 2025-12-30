@@ -1,7 +1,7 @@
 "use client"
 
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ThemeSettingsPanel } from '../../ui/theme-settings-panel'
+import { ThemeSettingsPanel } from '../../layout/sidebar/theme-settings-panel'
 
 export function ThemeTab() {
   return (

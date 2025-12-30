@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { DecorationsConfig } from './types'
 
-export type BackgroundImageMode = 'fixed' | 'scroll' | 'parallax'
+export type BackgroundImageMode = 'fixed' | 'scroll' | 'parallax' | 'pattern'
 
 export type BackgroundPlacement = 'viewport' | 'content'
 
@@ -9,7 +9,8 @@ export const BACKGROUND_MODE_PRESETS: Record<
   BackgroundImageMode,
   {
     placement: BackgroundPlacement
-    fit: 'cover' | 'contain'
+    fit: string
+    repeat: string
     position: string
     parallaxStrength: number
     parallaxScale: number
@@ -18,6 +19,7 @@ export const BACKGROUND_MODE_PRESETS: Record<
   scroll: {
     placement: 'content',
     fit: 'cover',
+    repeat: 'no-repeat',
     position: 'center',
     parallaxStrength: 0,
     parallaxScale: 1,
@@ -25,6 +27,7 @@ export const BACKGROUND_MODE_PRESETS: Record<
   fixed: {
     placement: 'viewport',
     fit: 'cover',
+    repeat: 'no-repeat',
     position: 'center',
     parallaxStrength: 0,
     parallaxScale: 1,
@@ -32,11 +35,18 @@ export const BACKGROUND_MODE_PRESETS: Record<
   parallax: {
     placement: 'viewport',
     fit: 'cover',
+    repeat: 'no-repeat',
     position: 'center',
-    // Use the full available overscan travel; the hook maps it across the full scroll range.
     parallaxStrength: 1,
-    // Overscan so translating the layer doesn't reveal empty background.
     parallaxScale: 1.25,
+  },
+  pattern: {
+    placement: 'content',
+    fit: 'auto',
+    repeat: 'repeat',
+    position: 'top',
+    parallaxStrength: 0,
+    parallaxScale: 1,
   },
 }
 
@@ -51,7 +61,8 @@ export interface ResolvedBackgroundImage {
   mode: BackgroundImageMode
   placement: BackgroundPlacement
   opacity: number
-  fit: 'cover' | 'contain'
+  fit: string
+  repeat: string
   position: string
   parallaxStrength: number
   parallaxScale: number
@@ -119,6 +130,7 @@ export function resolveBackgroundImage(args: {
     placement: preset.placement,
     opacity,
     fit: preset.fit,
+    repeat: preset.repeat,
     position: preset.position,
     parallaxStrength: preset.parallaxStrength,
     parallaxScale: preset.parallaxScale,
@@ -149,6 +161,7 @@ export function getBackgroundLayerProps(resolved: ResolvedBackgroundImage | null
     style: {
       backgroundImage: toCssBackgroundImageValue(resolved.url),
       backgroundSize: resolved.fit,
+      backgroundRepeat: resolved.repeat,
       backgroundPosition: resolved.position,
       opacity: resolved.opacity,
       transform:

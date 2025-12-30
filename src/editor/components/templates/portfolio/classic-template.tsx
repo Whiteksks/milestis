@@ -1,4 +1,4 @@
-import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { ClassicHeader } from './sections/header/classic-header'
 import { ClassicHero } from './sections/hero/classic-hero'
 import { ClassicBio } from './sections/bio/classic-bio'

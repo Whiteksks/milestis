@@ -1,24 +1,24 @@
 'use client'
 
 import { Canvas } from '@/editor/components/editor/canvas'
-import { EditorHeader } from '@/editor/components/editor/ui/editor-header'
-import { FloatingActions } from '@/editor/components/editor/ui/floating-actions'
-import { TemplateSelectorModal } from '@/editor/components/editor/ui/template-selector-modal'
-import { ThemeSelectorModal } from '@/editor/components/editor/ui/theme-selector-modal'
-import { MediaLibraryModal } from '@/editor/components/editor/ui/media-library-modal'
-import { DecorationsModal } from '@/editor/components/editor/ui/decorations-modal'
-import { SectionsSidebar } from '@/editor/components/editor/ui/sections-sidebar'
-import { MobileBottomNav } from '@/editor/components/editor/ui/mobile-bottom-nav'
-import { MobileBottomSheet } from '@/editor/components/editor/ui/mobile-bottom-sheet'
-import { SettingsContent } from '@/editor/components/editor/ui/settings-content'
-import { ThemeSettingsPanel } from '@/editor/components/editor/ui/theme-settings-panel'
+import { EditorHeader } from '@/editor/components/editor/layout/editor-header'
+import { FloatingActions } from '@/editor/components/editor/layout/floating-actions'
+import { TemplateSelectorModal } from '@/editor/components/editor/layout/template-selector-modal'
+import { ThemeSelectorModal } from '@/editor/components/editor/layout/Modals/theme-selector-modal'
+import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/media-library-modal'
+import { DecorationsModal } from '@/editor/components/editor/layout/Modals/decorations-modal'
+import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
+import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
+import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
+import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
+import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
 import { useState } from 'react'
 import { useUiStore } from '@/editor/lib/store'
 
-import { DecorationsLayer } from '@/editor/components/editor/ui/decorations-layer'
+import { DecorationsLayer } from '@/editor/components/editor/layout/decorations-layer'
 
-import { ThemeSelectorContent } from '@/editor/components/editor/ui/theme-selector-content'
-import { DecorationsSelectorContent } from '@/editor/components/editor/ui/decorations-selector-content'
+import { ThemeSelectorContent } from '@/editor/components/editor/layout/Modals/theme-selector-content'
+import { DecorationsSelectorContent } from '@/editor/components/editor/layout/decorations-selector-content'
 
 export default function EditorPage() {
   const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')

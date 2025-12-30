@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import type { PortfolioTemplateProps } from "@/editor/components/editor/ui/portfolio-template-shell"
+import type { PortfolioTemplateProps } from "@/editor/components/editor/layout/portfolio-template-shell"
 import { cn } from "@/lib/utils"
 
 interface ModernFooterProps extends Pick<PortfolioTemplateProps, "theme" | "sectionContent"> {}

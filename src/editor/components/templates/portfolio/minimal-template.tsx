@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { MinimalHero } from './sections/hero/minimal-hero'
 import { MinimalBio } from './sections/bio/minimal-bio'
 import { MinimalFeaturedWork } from './sections/featured-work/minimal-featured-work'

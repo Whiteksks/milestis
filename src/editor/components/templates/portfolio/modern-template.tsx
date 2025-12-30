@@ -1,4 +1,4 @@
-import type { PortfolioTemplateProps } from "@/editor/components/editor/ui/portfolio-template-shell"
+import type { PortfolioTemplateProps } from "@/editor/components/editor/layout/portfolio-template-shell"
 import { ModernParallaxHero } from "./sections/hero/modern-hero"
 import { ModernParallaxBio } from "./sections/bio/modern-bio"
 import { ModernFeaturedWork } from "./sections/featured-work/modern-featured-work"

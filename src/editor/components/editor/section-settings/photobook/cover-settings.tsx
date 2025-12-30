@@ -1,6 +1,6 @@
 "use client"
 
-import { MediaPickerModal } from '@/editor/components/editor/ui/media-picker-modal'
+import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'

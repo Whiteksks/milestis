@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useContentStore, useUiStore } from '@/editor/lib/store'
-import { MediaPickerModal } from '@/editor/components/editor/ui/media-picker-modal'
+import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { ImagePicker } from '@/editor/components/editor/section-settings/ui/image-picker'
 import { Separator } from '@/components/ui/separator'
 

@@ -31,7 +31,7 @@ const TemplateSplit = dynamic(() => import('@/editor/components/templates/photob
 const TemplateVertical = dynamic(() => import('@/editor/components/templates/photobook/template-vertical').then(m => m.TemplateVertical), { loading: LoadingTemplate })
 
 // Canvas wrappers
-import { PortfolioTemplateShell } from '@/editor/components/editor/ui/portfolio-template-shell'
+import { PortfolioTemplateShell } from '@/editor/components/editor/layout/portfolio-template-shell'
 
 // Section settings panels (Sidebar + SettingsContent)
 import { HeaderSettings } from '@/editor/components/editor/section-settings/portfolio/header-settings'

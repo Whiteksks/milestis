@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/ui/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
 
 interface ClassicHeaderProps
