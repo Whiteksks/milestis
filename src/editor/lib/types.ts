@@ -141,6 +141,7 @@ export interface ThemeCustomDecorations {
   image: string
   opacity: number
   scale?: number
+  responsiveScale?: boolean
   zIndex?: number
 }
 
@@ -154,7 +155,9 @@ export interface DecorationElement {
   }
   image: string
   opacity: number
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | string
   scale?: number
+  responsiveScale?: boolean
   zIndex?: number
 }
 

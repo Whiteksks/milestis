@@ -1,13 +1,14 @@
 "use client"
 
 import { useThemeStore, type ThemeCustomDecorations } from '@/editor/lib/store'
+import { useUiStore } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getDecorations } from '@/editor/lib/decorations'
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
-import { useMemo, useState, MouseEvent } from 'react'
+import { useMemo, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 
 const coerceImageUrl = (value: unknown) => {
@@ -31,8 +32,9 @@ export function DecorationsSettingsPanel() {
     setDecorations,
   } = useThemeStore()
 
+  const { selectedDecorationId, setSelectedDecorationId } = useUiStore()
+
   const themeDecorations = getDecorations(currentTheme)
-  const [selectedDecorationId, setSelectedDecorationId] = useState<string | null>(null)
 
   const decorations = useMemo(() => customDecorations, [customDecorations])
 
@@ -43,6 +45,7 @@ export function DecorationsSettingsPanel() {
       image: '/placeholder.svg?height=150&width=150',
       opacity: 0.15,
       scale: 1,
+      responsiveScale: false,
       zIndex: 5,
     }
 
@@ -51,7 +54,7 @@ export function DecorationsSettingsPanel() {
   }
 
   const handleToggleDecoration = (id: string) => {
-    setSelectedDecorationId((prev) => (prev === id ? null : id))
+    setSelectedDecorationId(selectedDecorationId === id ? null : id)
   }
 
   const createRemoveDecorationHandler = (id: string) => (event: MouseEvent<HTMLButtonElement>) => {
@@ -70,9 +73,15 @@ export function DecorationsSettingsPanel() {
 
     const mapped = (preset.elements || []).map((el: any, i: number) => ({
       id: `preset-${currentTheme}-${i}-${Date.now()}`,
-      position: el.position || {},
+      position: {
+        top: el.position?.top ?? '10%',
+        left: el.position?.left ?? '10%',
+        bottom: undefined,
+        right: undefined,
+      },
       image: coerceImageUrl(el.image) || '/placeholder.svg',
       opacity: el.opacity ?? 0.15,
+      responsiveScale: false,
       zIndex: el.zIndex || 0,
     }))
 
@@ -249,20 +258,6 @@ export function DecorationsSettingsPanel() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Bottom</Label>
-                          <Input
-                            type="text"
-                            value={decoration.position.bottom || ''}
-                            onChange={(e) =>
-                              updateDecoration(decoration.id, {
-                                position: { ...decoration.position, bottom: e.target.value, top: undefined },
-                              })
-                            }
-                            placeholder="-"
-                            className="h-8 rounded-lg border-slate-200 text-xs bg-white"
-                          />
-                        </div>
-                        <div className="space-y-1">
                           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Left</Label>
                           <Input
                             type="text"
@@ -276,21 +271,17 @@ export function DecorationsSettingsPanel() {
                             className="h-8 rounded-lg border-slate-200 text-xs bg-white"
                           />
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Right</Label>
-                          <Input
-                            type="text"
-                            value={decoration.position.right || ''}
-                            onChange={(e) =>
-                              updateDecoration(decoration.id, {
-                                position: { ...decoration.position, right: e.target.value, left: undefined },
-                              })
-                            }
-                            placeholder="-"
-                            className="h-8 rounded-lg border-slate-200 text-xs bg-white"
-                          />
-                        </div>
                       </div>
+
+                      <label className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
+                        <span className="text-[11px] font-medium text-slate-700">Mobile adaptation</span>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(decoration.responsiveScale)}
+                          onChange={(e) => updateDecoration(decoration.id, { responsiveScale: e.target.checked })}
+                          className="h-4 w-4 accent-slate-900"
+                        />
+                      </label>
 
                       <div className="space-y-2">
                         <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Opacity</Label>

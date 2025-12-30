@@ -11,6 +11,7 @@ export interface UiStore {
   isSidebarCollapsed: boolean
   isDecorationsModalOpen: boolean
   previewDecorations?: DecorationsConfig | null
+  selectedDecorationId: string | null
 
   setDeviceView: (view: DeviceView) => void
   setEditorMode: (mode: EditorMode) => void
@@ -22,6 +23,7 @@ export interface UiStore {
   toggleDecorationsModal: () => void
   setPreviewDecorations: (d?: DecorationsConfig | null) => void
   clearPreviewDecorations: () => void
+  setSelectedDecorationId: (id: string | null) => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -34,6 +36,7 @@ export const useUiStore = create<UiStore>((set) => ({
   isSidebarCollapsed: false,
   isDecorationsModalOpen: false,
   previewDecorations: null,
+  selectedDecorationId: null,
 
   setDeviceView: (view) => set({ deviceView: view }),
 
@@ -60,4 +63,6 @@ export const useUiStore = create<UiStore>((set) => ({
   setPreviewDecorations: (d) => set(() => ({ previewDecorations: d ?? null })),
 
   clearPreviewDecorations: () => set(() => ({ previewDecorations: null })),
+
+  setSelectedDecorationId: (id) => set(() => ({ selectedDecorationId: id })),
 }))
