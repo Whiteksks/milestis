@@ -61,6 +61,14 @@ function toCssBackgroundImageValue(input: string): string {
   const value = input.trim()
   if (!value) return 'none'
 
+  // Detect raw SVG markup
+  if (value.startsWith('<svg')) {
+    const encoded = encodeURIComponent(value)
+      .replace(/'/g, '%27')
+      .replace(/"/g, '%22')
+    return `url("data:image/svg+xml;charset=utf-8,${encoded}")`
+  }
+
   const lower = value.toLowerCase()
 
   // Allow full CSS background-image expressions.

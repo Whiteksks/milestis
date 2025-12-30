@@ -9,8 +9,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Check } from 'lucide-react'
-import { useState } from 'react'
+import { Check, Upload } from 'lucide-react'
+import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface MediaPickerModalProps {
@@ -19,9 +19,10 @@ interface MediaPickerModalProps {
 }
 
 export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerModalProps) {
-  const { mediaLibrary } = useContentStore()
+  const { mediaLibrary, addMediaImage } = useContentStore()
   const { isMediaPickerOpen, toggleMediaPicker } = useUiStore()
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isMultiSelect = !!onSelectImages
 
@@ -38,21 +39,61 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
     toggleMediaPicker()
   }
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const url = event.target?.result as string
+        addMediaImage({
+          id: `img-${Date.now()}-${Math.random()}`,
+          url,
+          name: file.name,
+          uploadedAt: new Date(),
+        })
+      }
+      reader.readAsDataURL(file)
+    })
+
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   return (
     <Dialog open={isMediaPickerOpen} onOpenChange={toggleMediaPicker}>
       <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-white/95 backdrop-blur-xl border-slate-100 shadow-2xl p-8 gap-0">
-        <DialogHeader className="pb-6">
-          <DialogTitle className="text-xl font-medium text-slate-900 tracking-tight">Select Image</DialogTitle>
-          <DialogDescription className="text-slate-500">
-            Choose one of your previously uploaded photos.
-          </DialogDescription>
+        <DialogHeader className="pb-6 flex flex-row items-center justify-between">
+          <div>
+            <DialogTitle className="text-xl font-medium text-slate-900 tracking-tight">Select Image</DialogTitle>
+            <DialogDescription className="text-slate-500">
+              Choose one of your previously uploaded photos.
+            </DialogDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 rounded-full"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="h-4 w-4" />
+            Upload
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,image/svg+xml"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
         </DialogHeader>
 
         {/* Scrollable area */}
         <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border border-slate-100 p-4 bg-slate-50/50">
           {mediaLibrary.length === 0 ? (
             <div className="flex items-center justify-center h-40 text-slate-400 text-sm font-medium">
-              No images yet. Upload images first in the Media Library.
+              No images yet. Upload images first.
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
