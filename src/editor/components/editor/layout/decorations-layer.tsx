@@ -46,6 +46,21 @@ const getSizeClass = (size: string | undefined) => {
   }
 }
 
+const getBaseSizePx = (size: string | undefined) => {
+  switch (size) {
+    case 'small':
+      return 100
+    case 'medium':
+      return 150
+    case 'large':
+      return 200
+    case 'xlarge':
+      return 300
+    default:
+      return 160
+  }
+}
+
 export function DecorationsLayer({ decorations, animation }: DecorationsLayerProps) {
   if (!decorations.length) return null
 
@@ -55,7 +70,7 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
     <>
       {decorations.map((decoration, index) => (
         <motion.div
-          key={`decoration-${index}`}
+          key={decoration.id || `decoration-${index}`}
           initial={animationVariants.initial}
           whileInView={{
             ...animationVariants.whileInView,
@@ -63,17 +78,26 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
           }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: index * 0.15 }}
-          className={cn('absolute pointer-events-none', getSizeClass(decoration.size))}
+          className={cn(
+            'absolute pointer-events-none',
+            decoration.scale == null ? getSizeClass(decoration.size) : undefined,
+          )}
           style={{
             top: decoration.position?.top || 'auto',
             bottom: decoration.position?.bottom || 'auto',
             left: decoration.position?.left || 'auto',
             right: decoration.position?.right || 'auto',
             zIndex: decoration.zIndex || 0,
+            ...(decoration.scale != null
+              ? {
+                  width: `${Math.max(16, Math.round(getBaseSizePx(decoration.size) * decoration.scale))}px`,
+                  height: `${Math.max(16, Math.round(getBaseSizePx(decoration.size) * decoration.scale))}px`,
+                }
+              : null),
           }}
         >
           <img
-            src={decoration.image || '/placeholder.svg'}
+            src={typeof decoration.image === 'string' && decoration.image ? decoration.image : '/placeholder.svg'}
             alt=""
             className="w-full h-full object-contain"
           />

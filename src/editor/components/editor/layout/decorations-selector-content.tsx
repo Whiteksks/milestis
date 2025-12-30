@@ -25,11 +25,18 @@ export function DecorationsSelectorContent({ onClose }: DecorationsSelectorConte
     if (!presetId) return
     const preset = getDecorationById(presetId) as any
 
+    const coerceImageUrl = (value: unknown) => {
+      if (typeof value === 'string') return value
+      if (value && typeof value === 'object' && 'url' in value && typeof (value as any).url === 'string') {
+        return (value as any).url
+      }
+      return ''
+    }
+
     const mapped = (preset.elements || []).map((el: any, i: number) => ({
       id: `preset-${presetId}-${i}-${Date.now()}`,
-      type: el.type,
       position: el.position || {},
-      image: el.image || '/placeholder.svg',
+      image: coerceImageUrl(el.image) || '/placeholder.svg',
       opacity: el.opacity ?? 0.15,
       size: el.size,
       zIndex: el.zIndex || 0,

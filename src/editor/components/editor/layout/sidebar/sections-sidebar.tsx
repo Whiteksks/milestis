@@ -4,15 +4,16 @@ import { useUiStore } from '@/editor/lib/store'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { Layers, Paintbrush, PanelRightOpen, PanelLeftClose } from 'lucide-react'
+import { Layers, Paintbrush, Sparkles, PanelRightOpen, PanelLeftClose } from 'lucide-react'
 
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
+import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 
 export function SectionsSidebar() {
   const { isSidebarCollapsed, toggleSidebar, editorMode } = useUiStore()
 
-  const [activeTab, setActiveTab] = useState<'sections' | 'theme'>('sections')
+  const [activeTab, setActiveTab] = useState<'sections' | 'theme' | 'decorations'>('sections')
 
   return (
     <>
@@ -121,15 +122,33 @@ export function SectionsSidebar() {
                     <Paintbrush className="w-4 h-4" /> {/* Иконка для темы */}
                     Theme
                   </motion.button>
+
+                  {/* Decorations */}
+                  <motion.button
+                    key="decorations-tab"
+                    onClick={() => setActiveTab('decorations')}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors relative group',
+                      'border-b-2 -mb-px',
+                      activeTab === 'decorations'
+                        ? 'text-primary border-primary'
+                        : 'text-muted-foreground border-transparent hover:text-foreground'
+                    )}
+                    initial={false}
+                    animate={{
+                      color: activeTab === 'decorations' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+                      borderColor: activeTab === 'decorations' ? 'hsl(var(--primary))' : 'transparent',
+                    }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Decorations
+                  </motion.button>
                 </div>
               </div>
 
               {/* Sections / Theme Tabs content */}
-              {activeTab === 'sections' ? (
-                <SectionsTab />
-              ) : (
-                <ThemeTab />
-              )}
+              {activeTab === 'sections' ? <SectionsTab /> : activeTab === 'theme' ? <ThemeTab /> : <DecorationsTab />}
             </motion.div>
           )}
         </AnimatePresence>

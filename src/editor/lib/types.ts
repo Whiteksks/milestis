@@ -132,7 +132,6 @@ export interface MediaImage {
 
 export interface ThemeCustomDecorations {
   id: string
-  type: 'flower' | 'dove' | 'shapes' | 'bubbles'
   position: {
     top?: string
     bottom?: string
@@ -141,12 +140,12 @@ export interface ThemeCustomDecorations {
   }
   image: string
   opacity: number
-  size: 'small' | 'medium' | 'large' | 'xlarge'
+  scale?: number
   zIndex?: number
 }
 
 export interface DecorationElement {
-  type: 'flower' | 'dove' | 'shapes' | 'bubbles'
+  id?: string
   position?: {
     top?: string
     bottom?: string
@@ -155,7 +154,7 @@ export interface DecorationElement {
   }
   image: string
   opacity: number
-  size?: 'small' | 'medium' | 'large' | 'xlarge' | string
+  scale?: number
   zIndex?: number
 }
 
