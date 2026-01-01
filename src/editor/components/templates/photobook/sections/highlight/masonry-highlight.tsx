@@ -4,6 +4,9 @@ import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
 import { PhotobookSectionContent } from '@/editor/lib/types'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface MasonryHighlightProps {
   sectionContent: PhotobookSectionContent
@@ -53,10 +56,14 @@ export function MasonryHighlight({ sectionContent, theme }: MasonryHighlightProp
               <div className="relative">
                 <div className="absolute -inset-4 bg-primary/5 rounded-4xl -rotate-2" />
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-2xl aspect-4/3">
-                  <img
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
                     src={sectionContent.highlight.images.image}
-                    className="w-full h-full object-cover"
                     alt=""
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
                   />
                 </div>
               </div>

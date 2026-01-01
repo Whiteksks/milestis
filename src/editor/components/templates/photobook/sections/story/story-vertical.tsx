@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryVerticalProps {
   sectionContent: PhotobookSectionContent
@@ -36,12 +39,16 @@ export function StoryVertical({
           className="min-h-screen relative overflow-hidden"
         >
           {/* Background photo */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 relative">
             {item.imageUrl && (
-              <img 
-                src={item.imageUrl} 
-                alt={item.caption || "Story image"} 
-                className="w-full h-full object-cover"
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={item.imageUrl}
+                alt={item.caption || "Story image"}
+                fill
+                sizes="100vw"
+                className="object-cover"
               />
             )}
             <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent" />

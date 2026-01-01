@@ -5,6 +5,17 @@ const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "cdn.shadcnstudio.com", pathname: "/**" },
+      { protocol: "https", hostname: "server.wallpaperalchemy.com", pathname: "/**" },
+      { protocol: "https", hostname: "images.wallpapersden.com", pathname: "/**" },
+      { protocol: "https", hostname: "i.pinimg.com", pathname: "/**" },
+      { protocol: "https", hostname: "firebasestorage.googleapis.com", pathname: "/**" },
+      { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/**" },
+    ],
+  },
   webpack(config) {
     // Ищем правило для изображений
     const imageRule = config.module.rules.find(

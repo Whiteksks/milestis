@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingPolaroidProps {
   sectionContent: PhotobookSectionContent
@@ -32,7 +35,17 @@ export function EndingPolaroid({
       >
         {/* Фото */}
         <div className="aspect-square relative overflow-hidden">
-          {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
+          {imageUrl && (
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="320px"
+              className="object-cover"
+            />
+          )}
         </div>
 
         {/* Подпись от руки */}

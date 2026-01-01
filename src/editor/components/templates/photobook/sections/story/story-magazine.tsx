@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -40,7 +43,17 @@ export function StoryMagazine({
         >
           {/* Background photo */}
           <div className="absolute inset-0 opacity-40">
-            {item.imageUrl && <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />}
+            {item.imageUrl && (
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={item.imageUrl}
+                alt=""
+                fill
+                sizes="100vw"
+                className="object-cover"
+              />
+            )}
           </div>
 
           {/* Content */}

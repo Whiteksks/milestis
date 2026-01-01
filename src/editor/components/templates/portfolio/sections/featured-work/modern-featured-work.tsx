@@ -6,6 +6,9 @@ import type { PortfolioTemplateProps } from "@/editor/components/editor/layout/p
 import { cn } from "@/lib/utils"
 import { getAspectRatioClass } from "@/editor/lib/aspect-ratios"
 import { getFrameStyle } from "@/editor/lib/frame-styles"
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ModernFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, "theme" | "sectionContent"> {}
@@ -130,16 +133,17 @@ export function ModernFeaturedWork({ theme, sectionContent }: ModernFeaturedWork
                       getFrameStyle(project.frameStyle || "soft"),
                       theme.border,
                       "group-hover:brightness-105 transition-all duration-500",
+                      getAspectRatioClass(project.aspectRatio),
                     )}
                   >
-                    <img
+                    <Image
+                      loader={passthroughLoader}
+                      unoptimized
                       src={project.image || "/placeholder.svg?height=500&width=700"}
                       alt={project.title || "Project image"}
-                      className={cn(
-                        // Более выразительный эффект наведения
-                        "w-full h-full object-cover transform group-hover:scale-[1.05] transition-transform duration-700",
-                        getAspectRatioClass(project.aspectRatio), // Сохранена логика
-                      )}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transform group-hover:scale-[1.05] transition-transform duration-700"
                     />
                   </div>
                 </div>

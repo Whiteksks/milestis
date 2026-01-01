@@ -5,6 +5,9 @@ import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/p
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface MinimalBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -22,11 +25,15 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
         <div className="max-w-6xl mx-auto grid @lg:grid-cols-[1fr,2fr] @md:grid-cols-1 gap-16 items-start">
           <div className={cn('relative overflow-hidden', getAspectRatioClass(sectionContent.bio.imageAspectRatio))}>
-            <img
+            <Image
+              loader={passthroughLoader}
+              unoptimized
               src={sectionContent.bio.image || '/placeholder.svg?height=600&width=450'}
               alt={sectionContent.bio.title || 'Profile image'}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className={cn(
-                'w-full h-full object-cover',
+                'object-cover',
                 theme.shadow,
                 getFrameStyle(sectionContent.bio.imageFrameStyle || 'soft'),
               )}

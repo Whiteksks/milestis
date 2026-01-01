@@ -4,6 +4,7 @@ import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 export function FeaturedCard({
   slot,
@@ -15,7 +16,17 @@ export function FeaturedCard({
   const img = slot.images?.[0]
   return (
     <div className="h-full flex flex-col">
-      {img && <img src={img} className="w-full h-2/3 object-cover" />}
+      {img && (
+        <div className="relative w-full h-2/3">
+          <Image
+            src={img}
+            alt={slot.label || ''}
+            fill
+            sizes="(max-width: 768px) 100vw, 480px"
+            className="object-cover"
+          />
+        </div>
+      )}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <h3 className={cn('text-lg font-semibold', theme.fontTitle)}>{slot.label}</h3>
         {slot.caption && (
@@ -45,12 +56,12 @@ export function MasonryImage({
     >
       <div
         className={cn(
-          'overflow-hidden border border-border shadow-lg rounded-3xl',
+          'relative overflow-hidden border border-border shadow-lg rounded-3xl',
           getAspectRatioClass(aspect || 'portrait'),
           getFrameStyle(frame || 'soft'),
         )}
       >
-        <img src={src} className="w-full h-full object-cover" />
+        <Image src={src} alt="" fill sizes="(max-width: 768px) 100vw, 600px" className="object-cover" />
       </div>
     </motion.div>
   )

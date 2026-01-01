@@ -1,12 +1,16 @@
 "use client"
 
-import { useUiStore } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Plus, Palette, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {
-  const { toggleTemplateModal, toggleThemeModal, toggleDecorationsModal } = useUiStore()
+  const { toggleTemplateModal, toggleThemeModal, toggleDecorationsModal } = useUiSelector((state) => ({
+    toggleTemplateModal: state.toggleTemplateModal,
+    toggleThemeModal: state.toggleThemeModal,
+    toggleDecorationsModal: state.toggleDecorationsModal,
+  }))
 
   return (
     <div className="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-50 flex-col gap-2">

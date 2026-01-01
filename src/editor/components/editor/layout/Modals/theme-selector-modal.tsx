@@ -1,6 +1,6 @@
 'use client'
 
-import { useUiStore } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,10 @@ import {
 import { ThemeSelectorContent } from './theme-selector-content'
 
 export function ThemeSelectorModal() {
-  const { isThemeModalOpen, toggleThemeModal } = useUiStore()
+  const { isThemeModalOpen, toggleThemeModal } = useUiSelector((state) => ({
+    isThemeModalOpen: state.isThemeModalOpen,
+    toggleThemeModal: state.toggleThemeModal,
+  }))
 
   return (
     <Dialog open={isThemeModalOpen} onOpenChange={toggleThemeModal}>

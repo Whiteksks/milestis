@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Image from "next/image"
 
 interface Project {
   id: string
@@ -92,10 +93,12 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <Card className="group overflow-hidden rounded-2xl border-border/40 bg-card/90 backdrop-blur-sm shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 hover:scale-[1.02]">
       <div className="relative aspect-16/10 overflow-hidden">
-        <img
+        <Image
           src={project.thumbnail || "/placeholder.svg"}
           alt={project.title}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, 420px"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 

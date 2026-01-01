@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -24,7 +27,17 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
       {/* Background image */}
       {imageUrl && (
         <div className="absolute inset-0">
-          <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
           <div className="absolute inset-0 opacity-85" style={{ backgroundColor: theme.background }} />
         </div>
       )}
@@ -70,7 +83,7 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
           <div className="space-y-8">
             <div className="w-16 h-1" style={{ backgroundColor: theme.foreground }} />
 
-            <p className={cn("text-lg leading-relaxed", theme.fontBody)} style={{ color: theme.foreground }}>"{quote}"</p>
+            <p className={cn("text-lg leading-relaxed", theme.fontBody)} style={{ color: theme.foreground }}>&quot;{quote}&quot;</p>
 
             <div className="pt-4 border-t" style={{ borderColor: theme.border }}>
               <p className="text-xs uppercase tracking-[0.3em]" style={{ color: theme.mutedText }}>{dedication}</p>
@@ -78,11 +91,17 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
 
             {imageUrl && (
               <div className="mt-8 aspect-square w-full max-w-50 overflow-hidden">
-                <img
-                  src={imageUrl}
-                  alt=""
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                />
+                <div className="relative w-full h-full">
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
+                    src={imageUrl}
+                    alt=""
+                    fill
+                    sizes="200px"
+                    className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                  />
+                </div>
               </div>
             )}
           </div>

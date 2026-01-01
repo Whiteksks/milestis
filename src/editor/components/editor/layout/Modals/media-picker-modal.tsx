@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Check, Upload } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface MediaPickerModalProps {
   onSelectImage?: (url: string) => void
@@ -19,8 +20,14 @@ interface MediaPickerModalProps {
 }
 
 export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerModalProps) {
-  const { mediaLibrary, addMediaImage } = useContentStore()
-  const { isMediaPickerOpen, toggleMediaPicker } = useUiStore()
+  const { mediaLibrary, addMediaImage } = useContentSelector((state) => ({
+    mediaLibrary: state.mediaLibrary,
+    addMediaImage: state.addMediaImage,
+  }))
+  const { isMediaPickerOpen, toggleMediaPicker } = useUiSelector((state) => ({
+    isMediaPickerOpen: state.isMediaPickerOpen,
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -122,10 +129,12 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
                       : 'border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-0.5 bg-white'
                   )}
                 >
-                  <img
+                  <Image
                     src={image.url || "/placeholder.svg"}
                     alt={image.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 50vw, 160px"
+                    className="object-cover"
                   />
                   {selectedUrls.includes(image.url) && (
                     <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center backdrop-blur-[1px]">

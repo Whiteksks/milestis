@@ -5,6 +5,9 @@ import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/p
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface MinimalFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -54,11 +57,15 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                         getAspectRatioClass(project.aspectRatio),
                       )}
                     >
-                      <img
+                      <Image
+                        loader={passthroughLoader}
+                        unoptimized
                         src={project.image || '/placeholder.svg?height=600&width=800'}
                         alt={project.title || 'Project image'}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className={cn(
-                          'w-full h-full object-cover hover:scale-105 transition-transform duration-700',
+                          'object-cover hover:scale-105 transition-transform duration-700',
                           theme.shadow,
                           getFrameStyle(project.frameStyle || 'soft'),
                         )}
@@ -139,11 +146,15 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                         getAspectRatioClass(project.aspectRatio),
                       )}
                     >
-                      <img
+                      <Image
+                        loader={passthroughLoader}
+                        unoptimized
                         src={project.image || '/placeholder.svg?height=600&width=800'}
                         alt={project.title || 'Project image'}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className={cn(
-                          'w-full h-full object-cover hover:scale-105 transition-transform duration-700',
+                          'object-cover hover:scale-105 transition-transform duration-700',
                           theme.shadow,
                           getFrameStyle(project.frameStyle || 'soft'),
                         )}

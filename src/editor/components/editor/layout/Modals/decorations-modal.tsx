@@ -1,15 +1,15 @@
 "use client"
 
-import { useUiStore } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { DecorationsSelectorContent } from '../decorations-selector-content'
+import { DecorationsSelectorContent } from '../decorationEdit/decorations-selector-content'
 
 export function DecorationsModal() {
-  const {
-    isDecorationsModalOpen,
-    toggleDecorationsModal,
-    clearPreviewDecorations
-  } = useUiStore()
+  const { isDecorationsModalOpen, toggleDecorationsModal, clearPreviewDecorations } = useUiSelector((state) => ({
+    isDecorationsModalOpen: state.isDecorationsModalOpen,
+    toggleDecorationsModal: state.toggleDecorationsModal,
+    clearPreviewDecorations: state.clearPreviewDecorations,
+  }))
 
   return (
     <Dialog

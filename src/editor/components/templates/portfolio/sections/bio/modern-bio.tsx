@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PortfolioTemplateProps } from "@/editor/components/editor/layout/portfolio-template-shell"
 import { cn } from "@/lib/utils"
 import { getAspectRatioClass } from "@/editor/lib/aspect-ratios"
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ModernParallaxBioProps extends Pick<PortfolioTemplateProps, "theme" | "sectionContent"> {}
 
@@ -38,14 +41,17 @@ export function ModernParallaxBio({ theme, sectionContent }: ModernParallaxBioPr
                 theme.border,
               )}
             >
-              <img
-                src={sectionContent.bio.image || "/placeholder.svg?height=600&width=600"}
-                alt={sectionContent.bio.title || "Profile image"}
-                className={cn(
-                  "w-full object-cover transform scale-[1.02] group-hover:scale-110 transition-transform duration-700",
-                  getAspectRatioClass(sectionContent.bio.imageAspectRatio),
-                )}
-              />
+              <div className={cn('relative w-full overflow-hidden', getAspectRatioClass(sectionContent.bio.imageAspectRatio))}>
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={sectionContent.bio.image || "/placeholder.svg?height=600&width=600"}
+                  alt={sectionContent.bio.title || "Profile image"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover transform scale-[1.02] group-hover:scale-110 transition-transform duration-700"
+                />
+              </div>
             </div>
           </motion.div>
           <motion.div

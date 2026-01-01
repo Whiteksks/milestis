@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingVerticalProps {
   sectionContent: PhotobookSectionContent
@@ -26,11 +29,17 @@ export function EndingVertical({
       {/* Background photo */}
       <div className="absolute inset-0">
         {imageUrl && (
-          <img 
-            src={imageUrl} 
-            alt="Ending background" 
-            className="w-full h-full object-cover"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt="Ending background"
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
         )}
         <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent" />
       </div>

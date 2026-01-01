@@ -1,6 +1,6 @@
 'use client'
 
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,9 @@ import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileBottomSheet } from '../mobile/mobile-bottom-sheet'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface MediaLibraryModalProps {
   mode?: 'select' | 'manage'
@@ -23,8 +26,15 @@ interface MediaLibraryModalProps {
 }
 
 export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibraryModalProps) {
-  const { isMediaLibraryOpen, toggleMediaLibrary } = useUiStore()
-  const { mediaLibrary, addMediaImage, removeMediaImage } = useContentStore()
+  const { isMediaLibraryOpen, toggleMediaLibrary } = useUiSelector((state) => ({
+    isMediaLibraryOpen: state.isMediaLibraryOpen,
+    toggleMediaLibrary: state.toggleMediaLibrary,
+  }))
+  const { mediaLibrary, addMediaImage, removeMediaImage } = useContentSelector((state) => ({
+    mediaLibrary: state.mediaLibrary,
+    addMediaImage: state.addMediaImage,
+    removeMediaImage: state.removeMediaImage,
+  }))
 
   const [urlInput, setUrlInput] = useState('')
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
@@ -163,11 +173,14 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                 )}
                 onClick={() => handleSelectImage(image.url)}
               >
-                <img
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
                   src={image.url}
                   alt={image.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
                 />
 
                 {selectedImageUrl === image.url && mode === 'select' && (

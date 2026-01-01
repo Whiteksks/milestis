@@ -1,22 +1,29 @@
 "use client"
 
-import { useUiStore, useThemeStore } from '@/editor/lib/store'
+import { useUiSelector, useThemeSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { decorationPresets, getDecorationById, themeToPreset } from '@/editor/lib/decorations'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface DecorationsSelectorContentProps {
   onClose?: () => void
 }
 
 export function DecorationsSelectorContent({ onClose }: DecorationsSelectorContentProps) {
-  const {
-    setPreviewDecorations,
-    clearPreviewDecorations
-  } = useUiStore()
+  const { setPreviewDecorations, clearPreviewDecorations } = useUiSelector((state) => ({
+    setPreviewDecorations: state.setPreviewDecorations,
+    clearPreviewDecorations: state.clearPreviewDecorations,
+  }))
 
-  const { setDecorations, updateThemeCustomization, currentTheme } = useThemeStore()
+  const { setDecorations, updateThemeCustomization, currentTheme } = useThemeSelector((state) => ({
+    setDecorations: state.setDecorations,
+    updateThemeCustomization: state.updateThemeCustomization,
+    currentTheme: state.currentTheme,
+  }))
 
   const presets = Object.values(decorationPresets)
   const [selected, setSelected] = useState<string | null>(null)
@@ -95,10 +102,14 @@ export function DecorationsSelectorContent({ onClose }: DecorationsSelectorConte
               onClick={() => setSelected(p.id)}
             >
               <div className="aspect-square bg-slate-50 relative">
-                <img
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
                   src={thumbnail}
                   alt={p.name}
-                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                  fill
+                  sizes="160px"
+                  className="object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-3">
                   <span className="text-white text-xs font-medium truncate w-full tracking-wide">

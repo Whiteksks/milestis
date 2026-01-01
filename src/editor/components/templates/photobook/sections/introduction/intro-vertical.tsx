@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroVerticalProps {
   sectionContent: PhotobookSectionContent
@@ -55,12 +58,27 @@ export function IntroVertical({
         >
           {imageUrl && (
             <div className="w-full aspect-video overflow-hidden rounded-sm">
-              <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="relative w-full h-full">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 60vw"
+                  className="object-cover"
+                />
+              </div>
             </div>
           )}
 
           <div className="space-y-6">
-            <p className={cn("text-lg md:text-xl leading-relaxed font-light", theme.fontBody)} style={{ color: theme.mutedText }}>"{quote}"</p>
+            <p
+              className={cn("text-lg md:text-xl leading-relaxed font-light", theme.fontBody)}
+              style={{ color: theme.mutedText }}
+            >
+              &quot;{quote}&quot;
+            </p>
 
             <div className="flex items-center gap-4">
               <div className="h-px flex-1" style={{ backgroundColor: theme.muted }} />

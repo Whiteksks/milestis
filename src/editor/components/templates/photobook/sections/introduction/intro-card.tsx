@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroCardProps {
   sectionContent: PhotobookSectionContent
@@ -30,8 +33,16 @@ export function IntroCard({ sectionContent, theme }: IntroCardProps) {
         <div className="grid md:grid-cols-5">
           {/* Image side */}
           {imageUrl && (
-            <div className="md:col-span-2 h-64 md:h-auto">
-              <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+            <div className="md:col-span-2 h-64 md:h-auto relative">
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={imageUrl}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover"
+              />
             </div>
           )}
 

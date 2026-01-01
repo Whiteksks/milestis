@@ -1,18 +1,18 @@
 'use client'
 
-import { useUiStore } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
-import { Monitor, Tablet, Smartphone, Image, Eye, Upload } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function EditorHeader() {
-  const {
-    deviceView,
-    setDeviceView,
-    toggleMediaLibrary,
-    editorMode,
-    setEditorMode
-  } = useUiStore()
+  const { deviceView, setDeviceView, toggleMediaLibrary, editorMode, setEditorMode } = useUiSelector((state) => ({
+    deviceView: state.deviceView,
+    setDeviceView: state.setDeviceView,
+    toggleMediaLibrary: state.toggleMediaLibrary,
+    editorMode: state.editorMode,
+    setEditorMode: state.setEditorMode,
+  }))
 
   return (
     <header className="relative h-16 border-b border-slate-100 bg-white/80 backdrop-blur-xl z-50">
@@ -96,7 +96,7 @@ export function EditorHeader() {
             onClick={toggleMediaLibrary}
             className="gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 rounded-full h-9 px-4"
           >
-            <Image className="h-4 w-4" />
+            <ImageIcon className="h-4 w-4" />
             <span className="hidden sm:inline text-xs font-medium">Media</span>
           </Button>
 

@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryTimelineProps {
   sectionContent: PhotobookSectionContent
@@ -72,8 +75,18 @@ export function StoryTimeline({
 
               {/* Image Side */}
               <div className="flex-1 w-full pl-16 md:pl-0">
-                <div className="aspect-3/2 overflow-hidden rounded-sm shadow-md" style={{ boxShadow: theme.shadow }}>
-                  {item.imageUrl && <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />}
+                <div className="aspect-3/2 overflow-hidden rounded-sm shadow-md relative" style={{ boxShadow: theme.shadow }}>
+                  {item.imageUrl && (
+                    <Image
+                      loader={passthroughLoader}
+                      unoptimized
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </motion.div>

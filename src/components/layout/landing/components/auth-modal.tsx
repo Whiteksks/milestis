@@ -69,7 +69,7 @@ export function AuthModal({ children }: AuthModalProps) {
               </div>
               <DialogTitle className="font-serif text-2xl font-semibold">Log in to Milestis</DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Enter your email and we'll send you a magic link
+                Enter your email and we&apos;ll send you a magic link
               </DialogDescription>
             </DialogHeader>
 
@@ -141,12 +141,12 @@ export function AuthModal({ children }: AuthModalProps) {
             </div>
             <h2 className="font-serif text-2xl font-semibold mb-3">Check your email</h2>
             <p className="text-muted-foreground mb-2">
-              We've sent a magic link to your email.
+              We&apos;ve sent a magic link to your email.
               <br />
               Open it to finish signing in.
             </p>
             <p className="text-xs text-muted-foreground/70 mb-8">
-              If you don't see the email, check spam or try again.
+              If you don&apos;t see the email, check spam or try again.
             </p>
 
             <div className="w-full space-y-3">

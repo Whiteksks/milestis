@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightClassicProps {
   sectionContent: PhotobookSectionContent
@@ -35,7 +38,7 @@ export function HighlightClassic({
 
           {quote && (
             <blockquote className="border-l-4 pl-6 py-2" style={{ borderColor: theme.border }}>
-              <p className={cn("italic text-xl font-serif", theme.fontBody)} style={{ color: theme.foreground }}>"{quote}"</p>
+              <p className={cn("italic text-xl font-serif", theme.fontBody)} style={{ color: theme.foreground }}>&quot;{quote}&quot;</p>
             </blockquote>
           )}
         </div>
@@ -45,8 +48,16 @@ export function HighlightClassic({
           <div className="relative">
             {/* Decorative background */}
             <div className="absolute -inset-4 rounded-3xl -rotate-2" style={{ backgroundColor: theme.secondary }} />
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-              <img src={imageUrl || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
+            <div className="relative aspect-4/3 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={imageUrl || "/placeholder.svg"}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
           </div>
         </div>

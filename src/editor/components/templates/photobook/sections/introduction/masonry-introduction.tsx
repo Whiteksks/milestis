@@ -4,6 +4,9 @@ import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
 import { PhotobookSectionContent } from '@/editor/lib/types'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface MasonryIntroductionProps {
   sectionContent: PhotobookSectionContent
@@ -59,11 +62,15 @@ export function MasonryIntroduction({ sectionContent, theme }: MasonryIntroducti
             className="mt-8 flex justify-center"
           >
             <div className="relative p-2 bg-background rounded-xl shadow-xl rotate-1 hover:rotate-0 transition-transform duration-500">
-              <div className="overflow-hidden rounded-lg border bg-slate-100 w-full max-w-xs aspect-4/5">
-                <img
+              <div className="relative overflow-hidden rounded-lg border bg-slate-100 w-full max-w-xs aspect-4/5">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
                   src={sectionContent.introduction.images.image}
-                  className="w-full h-full object-cover"
                   alt=""
+                  fill
+                  sizes="320px"
+                  className="object-cover"
                 />
               </div>
             </div>

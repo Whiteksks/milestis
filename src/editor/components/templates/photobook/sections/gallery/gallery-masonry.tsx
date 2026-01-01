@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryMasonryProps {
   sectionContent: PhotobookSectionContent
@@ -43,7 +46,15 @@ export function GalleryMasonry({
             <div key={colIndex} className="flex-1 flex flex-col gap-4">
               {column.map((img, imgIndex) => (
                 <div key={imgIndex} className={`relative overflow-hidden rounded-sm ${heights[(colIndex + imgIndex) % heights.length]}`}>
-                  <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
+                    src={img}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover hover:scale-105 transition-transform duration-700"
+                  />
                 </div>
               ))}
             </div>

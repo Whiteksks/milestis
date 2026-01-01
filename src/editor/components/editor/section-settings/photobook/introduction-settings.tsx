@@ -5,13 +5,18 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { ImagePicker } from '@/editor/components/editor/section-settings/ui/image-picker'
 import { Separator } from '@/components/ui/separator'
 
 export function PhotobookIntroductionSettings() {
-  const { photobookSectionContent, updatePhotobookSection } = useContentStore()
-  const { toggleMediaPicker } = useUiStore()
+  const { introduction, updatePhotobookSection } = useContentSelector((state) => ({
+    introduction: state.photobookSectionContent.introduction,
+    updatePhotobookSection: state.updatePhotobookSection,
+  }))
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
 
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
   const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
@@ -22,12 +27,12 @@ export function PhotobookIntroductionSettings() {
         onSelectImage={(url) =>
           updatePhotobookSection('introduction', {
             images: {
-              id: photobookSectionContent.introduction.images?.id || 'intro-main',
+              id: introduction.images?.id || 'intro-main',
               image: url,
-              caption: photobookSectionContent.introduction.images?.caption || '',
+              caption: introduction.images?.caption || '',
               imageSettings:
-                photobookSectionContent.introduction.images?.imageSettings?.length
-                  ? photobookSectionContent.introduction.images.imageSettings
+                introduction.images?.imageSettings?.length
+                  ? introduction.images.imageSettings
                   : [{ aspectRatio: 'portrait', frameStyle: 'soft' }],
             },
           })
@@ -50,7 +55,7 @@ export function PhotobookIntroductionSettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Page Title</Label>
               <Input
-                value={photobookSectionContent.introduction.title}
+                value={introduction.title}
                 onChange={(e) => updatePhotobookSection('introduction', { title: e.target.value })}
                 placeholder="Introduction"
                 className={inputStyle}
@@ -60,7 +65,7 @@ export function PhotobookIntroductionSettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Quote</Label>
               <Input
-                value={photobookSectionContent.introduction.quote || ''}
+                value={introduction.quote || ''}
                 onChange={(e) =>
                   updatePhotobookSection('introduction', { quote: e.target.value })
                 }
@@ -72,7 +77,7 @@ export function PhotobookIntroductionSettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Dedication</Label>
               <Textarea
-                value={photobookSectionContent.introduction.dedication || ''}
+                value={introduction.dedication || ''}
                 onChange={(e) =>
                   updatePhotobookSection('introduction', { dedication: e.target.value })
                 }
@@ -92,7 +97,7 @@ export function PhotobookIntroductionSettings() {
           <div className="rounded-xl overflow-hidden border border-dashed border-slate-200 p-1 bg-slate-50/50">
             <ImagePicker
               label=""
-              value={photobookSectionContent.introduction.images}
+              value={introduction.images}
               onChange={(next) =>
                 updatePhotobookSection('introduction', { images: next })
               }

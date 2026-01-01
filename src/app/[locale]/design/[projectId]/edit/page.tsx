@@ -11,19 +11,19 @@ import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/secti
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
 import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
 import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
-import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
 import { useState } from 'react'
-import { useUiStore } from '@/editor/lib/store'
-
-import { DecorationsLayer } from '@/editor/components/editor/layout/decorations-layer'
+import { useUiSelector } from '@/editor/lib/store'
 
 import { ThemeSelectorContent } from '@/editor/components/editor/layout/Modals/theme-selector-content'
-import { DecorationsSelectorContent } from '@/editor/components/editor/layout/decorations-selector-content'
+import { DecorationsSelectorContent } from '@/editor/components/editor/layout/decorationEdit/decorations-selector-content'
 
 export default function EditorPage() {
   const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const { toggleTemplateModal, toggleThemeModal, editorMode } = useUiStore()
+  const { toggleTemplateModal, editorMode } = useUiSelector((state) => ({
+    toggleTemplateModal: state.toggleTemplateModal,
+    editorMode: state.editorMode,
+  }))
 
   const handleMobileTabChange = (tab: 'sections' | 'theme' | 'templates' | 'decorations') => {
     setMobileActiveTab(tab)

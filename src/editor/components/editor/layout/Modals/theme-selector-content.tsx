@@ -1,6 +1,6 @@
 'use client'
 
-import { useThemeStore } from '@/editor/lib/store'
+import { useThemeSelector } from '@/editor/lib/store'
 import { themes } from '@/editor/lib/themes'
 import type { Theme } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,10 @@ interface ThemeSelectorContentProps {
 }
 
 export function ThemeSelectorContent({ onClose }: ThemeSelectorContentProps) {
-  const { currentTheme, setTheme } = useThemeStore()
+  const { currentTheme, setTheme } = useThemeSelector((state) => ({
+    currentTheme: state.currentTheme,
+    setTheme: state.setTheme,
+  }))
 
   const handleSelectTheme = (themeId: Theme) => {
     setTheme(themeId)

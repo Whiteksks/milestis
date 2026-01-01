@@ -1,7 +1,6 @@
 "use client"
 
-import { useThemeStore, type ThemeCustomDecorations } from '@/editor/lib/store'
-import { useUiStore } from '@/editor/lib/store'
+import { useThemeSelector, useUiSelector, type ThemeCustomDecorations } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -30,9 +29,22 @@ export function DecorationsSettingsPanel() {
     removeDecoration,
     resetDecorations,
     setDecorations,
-  } = useThemeStore()
+  } = useThemeSelector((state) => ({
+    currentTheme: state.currentTheme,
+    themeCustomizations: state.themeCustomizations,
+    updateThemeCustomization: state.updateThemeCustomization,
+    customDecorations: state.customDecorations,
+    addDecoration: state.addDecoration,
+    updateDecoration: state.updateDecoration,
+    removeDecoration: state.removeDecoration,
+    resetDecorations: state.resetDecorations,
+    setDecorations: state.setDecorations,
+  }))
 
-  const { selectedDecorationId, setSelectedDecorationId } = useUiStore()
+  const { selectedDecorationId, setSelectedDecorationId } = useUiSelector((state) => ({
+    selectedDecorationId: state.selectedDecorationId,
+    setSelectedDecorationId: state.setSelectedDecorationId,
+  }))
 
   const themeDecorations = getDecorations(currentTheme)
 

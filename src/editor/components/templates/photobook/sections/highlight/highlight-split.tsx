@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightSplitProps {
   sectionContent: PhotobookSectionContent
@@ -44,10 +47,14 @@ export function HighlightSplit({
 
       <div className="w-full md:w-1/2 relative min-h-[50vh] md:min-h-screen order-1 md:order-2">
         {image && (
-          <img 
-            src={image} 
-            alt={title} 
-            className="w-full h-full object-cover"
+          <Image
+            loader={passthroughLoader}
+            unoptimized
+            src={image}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
           />
         )}
         

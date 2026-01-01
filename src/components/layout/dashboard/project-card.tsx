@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Image from "next/image"
 
 interface ProjectCardProps {
   project: {
@@ -33,10 +34,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Card className="group overflow-hidden rounded-2xl border-border/40 bg-card/90 backdrop-blur-sm shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 hover:scale-[1.02]">
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl">
-        <img
+        <Image
           src={project.thumbnail || "/placeholder.svg"}
           alt={project.title}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, 420px"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <DropdownMenu>

@@ -21,7 +21,7 @@ export default function PrivacyPage() {
           <div className="mb-12 rounded-2xl bg-secondary/30 p-6 sm:p-8">
             <p className="text-muted-foreground leading-relaxed">
               At Milestis, we believe your memories belong to you. This policy explains what information we collect, why
-              we need it, and how we keep it safe. We've written this in plain language because we want you to
+              we need it, and how we keep it safe. We&apos;ve written this in plain language because we want you to
               understand exactly how your data is handled.
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                   <li>Photos and content you choose to upload</li>
                 </ul>
                 <p className="mt-4 rounded-lg bg-secondary/30 p-4 text-sm">
-                  We only collect what's necessary to make Milestis work for you.
+                    We only collect what&apos;s necessary to make Milestis work for you.
                 </p>
               </div>
             </section>

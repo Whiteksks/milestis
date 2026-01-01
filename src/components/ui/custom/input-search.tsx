@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { LoaderCircleIcon, SearchIcon } from 'lucide-react'
 
@@ -9,20 +9,29 @@ import { Input } from '@/components/ui/input'
 const InputSearchLoader= () => {
   const [value, setValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (value) {
-      setIsLoading(true)
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current)
+    }
+  }, [])
 
-      const timer = setTimeout(() => {
-        setIsLoading(false)
-      }, 500)
+  const handleChange = (nextValue: string) => {
+    setValue(nextValue)
 
-      return () => clearTimeout(timer)
+    if (timerRef.current) window.clearTimeout(timerRef.current)
+
+    if (!nextValue) {
+      setIsLoading(false)
+      return
     }
 
-    setIsLoading(false)
-  }, [value])
+    setIsLoading(true)
+    timerRef.current = window.setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
+  }
 
   return (
     <div className='w-full max-w-xs space-y-2'>
@@ -35,7 +44,7 @@ const InputSearchLoader= () => {
           type='search'
           placeholder='Type to search...'
           value={value}
-          onChange={e => setValue(e.target.value)}
+          onChange={e => handleChange(e.target.value)}
           className='peer px-9 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none'
         />
         {isLoading && (

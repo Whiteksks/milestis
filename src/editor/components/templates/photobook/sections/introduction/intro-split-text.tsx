@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroSplitTextProps {
   sectionContent: PhotobookSectionContent
@@ -30,11 +33,19 @@ export function IntroSplitText({ sectionContent, theme }: IntroSplitTextProps) {
           style={{ backgroundColor: theme.muted }}
         >
           {imageUrl ? (
-            <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br" style={{ '--tw-gradient-from': theme.background, '--tw-gradient-to': theme.muted } as any} />
+            <div className="w-full h-full bg-linear-to-br" style={{ '--tw-gradient-from': theme.background, '--tw-gradient-to': theme.muted } as any} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
+          <div className="absolute inset-0 bg-linear-to-r from-transparent to-white/20" />
         </motion.div>
 
         {/* Right - Text */}
@@ -50,7 +61,7 @@ export function IntroSplitText({ sectionContent, theme }: IntroSplitTextProps) {
 
             <h2 className={cn("text-3xl md:text-4xl lg:text-5xl font-serif leading-tight", theme.fontTitle)} style={{ color: theme.foreground }}>{title}</h2>
 
-            <p className={cn("text-lg leading-relaxed italic", theme.fontBody)} style={{ color: theme.mutedText }}>"{quote}"</p>
+            <p className={cn("text-lg leading-relaxed italic", theme.fontBody)} style={{ color: theme.mutedText }}>&quot;{quote}&quot;</p>
 
             <div className="pt-6 border-t" style={{ borderColor: theme.border }}>
               <p className="text-sm uppercase tracking-[0.2em]" style={{ color: theme.mutedText }}>{dedication}</p>

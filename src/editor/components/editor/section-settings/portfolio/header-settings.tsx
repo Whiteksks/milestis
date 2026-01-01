@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentStore } from '@/editor/lib/store'
+import { useContentSelector } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,10 @@ import { Trash2, Plus } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 export function HeaderSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
+  const { header, updateSectionContent } = useContentSelector((state) => ({
+    header: state.sectionContent.header,
+    updateSectionContent: state.updateSectionContent,
+  }))
 
   const anchorSections = [
     { id: 'hero', label: 'Hero Section' },
@@ -42,7 +45,7 @@ export function HeaderSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Header Text</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.header.title} 
+            value={header.title} 
             onChange={(e) => updateSectionContent('header', { title: e.target.value })} 
             placeholder="e.g. Your Name"
           />
@@ -57,14 +60,14 @@ export function HeaderSettings() {
         <p className="text-[11px] text-slate-500 font-medium">Items displayed in the navigation bar.</p>
         
         <div className="space-y-3">
-          {sectionContent.header.links.map((link, index) => (
+          {header.links.map((link, index) => (
             <div key={index} className="flex gap-2 items-center p-1.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-slate-200 transition-colors group">
               <Input
                 className={`${inputStyle} flex-1 border-transparent bg-transparent focus:bg-white`}
                 placeholder="Link Label"
                 value={link.label}
                 onChange={(e) => {
-                  const newLinks = [...sectionContent.header.links]
+                  const newLinks = [...header.links]
                   newLinks[index] = { ...link, label: e.target.value }
                   updateSectionContent('header', { links: newLinks })
                 }}
@@ -72,7 +75,7 @@ export function HeaderSettings() {
               <Select
                 value={link.href.replace('#', '')}
                 onValueChange={(value) => {
-                  const newLinks = [...sectionContent.header.links]
+                  const newLinks = [...header.links]
                   newLinks[index] = { ...link, href: `#${value}` }
                   updateSectionContent('header', { links: newLinks })
                 }}
@@ -95,7 +98,7 @@ export function HeaderSettings() {
                 size="icon"
                 className="shrink-0 w-7 h-7 rounded-full text-slate-400 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all opacity-0 group-hover:opacity-100"
                 onClick={() => {
-                  const newLinks = sectionContent.header.links.filter((_, i) => i !== index)
+                  const newLinks = header.links.filter((_, i) => i !== index)
                   updateSectionContent('header', { links: newLinks })
                 }}
               >
@@ -109,7 +112,11 @@ export function HeaderSettings() {
             variant="outline"
             size="sm"
             className="w-full mt-2 h-9 rounded-xl border-dashed border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all text-xs font-medium"
-            onClick={() => updateSectionContent('header', { links: [...sectionContent.header.links, { label: 'New Link', href: '#hero' }] })}
+            onClick={() =>
+              updateSectionContent('header', {
+                links: [...header.links, { label: 'New Link', href: '#hero' }],
+              })
+            }
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Link
           </Button>

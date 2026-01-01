@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverProps {
   sectionContent: PhotobookSectionContent
@@ -30,7 +33,19 @@ export function CoverHeroFullscreen({
         transition={{ duration: 2, ease: "easeOut" }}
         className="absolute inset-0"
       >
-        {imageUrl && <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+        {imageUrl && (
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        )}
       </motion.div>
 
       {/* Soft paper-like overlay */}

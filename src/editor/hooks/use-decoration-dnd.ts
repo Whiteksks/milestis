@@ -24,7 +24,6 @@ export function useDecorationDnd(options: {
   const resetDrag = useCallback(() => {
     dragX.set(0)
     dragY.set(0)
-    setDragConstraints(undefined)
   }, [dragX, dragY])
 
   useEffect(() => {
@@ -95,6 +94,7 @@ export function useDecorationDnd(options: {
     })
 
     resetDrag()
+    setDragConstraints(undefined)
   }, [boundsRef, getSelectedElement, onCommitPercentPosition, resetDrag, selectedDecorationId])
 
   const api = useMemo(

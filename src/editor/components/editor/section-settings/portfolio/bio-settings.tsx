@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -12,8 +12,13 @@ import { Separator } from '@/components/ui/separator'
 import { PortfolioImagePicker } from '@/editor/components/editor/section-settings/ui/portfolio-image-picker'
 
 export function BioSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
-  const { toggleMediaPicker } = useUiStore()
+  const { bio, updateSectionContent } = useContentSelector((state) => ({
+    bio: state.sectionContent.bio,
+    updateSectionContent: state.updateSectionContent,
+  }))
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
 
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
 
@@ -41,7 +46,7 @@ export function BioSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.bio.title} 
+            value={bio.title} 
             onChange={(e) => updateSectionContent('bio', { title: e.target.value })} 
             placeholder="About Me"
           />
@@ -50,7 +55,7 @@ export function BioSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.bio.subtitle || ''} 
+            value={bio.subtitle || ''} 
             onChange={(e) => updateSectionContent('bio', { subtitle: e.target.value })} 
             placeholder="Short subtitle"
           />
@@ -64,9 +69,9 @@ export function BioSettings() {
         <h4 className="text-sm font-medium text-slate-900">Profile Photo</h4>
         <PortfolioImagePicker
           value={{
-            image: sectionContent.bio.image || '',
-            aspectRatio: (sectionContent.bio.imageAspectRatio || 'portrait') as AspectRatio,
-            frameStyle: sectionContent.bio.imageFrameStyle,
+            image: bio.image || '',
+            aspectRatio: (bio.imageAspectRatio || 'portrait') as AspectRatio,
+            frameStyle: bio.imageFrameStyle,
           }}
           onChange={(value) =>
             updateSectionContent('bio', {
@@ -90,7 +95,7 @@ export function BioSettings() {
         <Textarea 
           className="rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs min-h-30 p-3 resize-none" 
           rows={5} 
-          value={sectionContent.bio.description} 
+          value={bio.description} 
           onChange={(e) => updateSectionContent('bio', { description: e.target.value })} 
         />
       </div>
@@ -102,14 +107,14 @@ export function BioSettings() {
         <h4 className="text-sm font-medium text-slate-900">Achievements / Awards</h4>
         <p className="text-[11px] text-slate-500 font-medium">Key milestones, exhibitions, awards.</p>
         <div className="space-y-3">
-          {(sectionContent.bio.achievements || []).map((achievement, index) => (
+          {(bio.achievements || []).map((achievement, index) => (
             <div key={index} className="flex gap-2 items-center p-1.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-slate-200 transition-colors group">
               <Input
                 className={`${inputStyle} flex-1 border-transparent bg-transparent focus:bg-white`}
                 placeholder="New Achievement"
                 value={achievement}
                 onChange={(e) => {
-                  const newAchievements = [...(sectionContent.bio.achievements || [])]
+                  const newAchievements = [...(bio.achievements || [])]
                   newAchievements[index] = e.target.value
                   updateSectionContent('bio', { achievements: newAchievements })
                 }}
@@ -119,7 +124,7 @@ export function BioSettings() {
                 size="icon"
                 className="shrink-0 w-7 h-7 rounded-full text-slate-400 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all opacity-0 group-hover:opacity-100"
                 onClick={() => {
-                  const newAchievements = (sectionContent.bio.achievements || []).filter((_, i) => i !== index)
+                  const newAchievements = (bio.achievements || []).filter((_, i) => i !== index)
                   updateSectionContent('bio', { achievements: newAchievements })
                 }}
               >
@@ -131,9 +136,11 @@ export function BioSettings() {
             variant="outline"
             size="sm"
             className="w-full mt-2 h-9 rounded-xl border-dashed border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all text-xs font-medium"
-            onClick={() => updateSectionContent('bio', { 
-              achievements: [...(sectionContent.bio.achievements || []), ''] 
-            })}
+            onClick={() =>
+              updateSectionContent('bio', {
+                achievements: [...(bio.achievements || []), ''],
+              })
+            }
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Achievement
           </Button>

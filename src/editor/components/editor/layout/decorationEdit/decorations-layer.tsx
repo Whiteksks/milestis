@@ -4,10 +4,13 @@ import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import type { DecorationElement } from '@/editor/lib/types'
 import { useCallback, useMemo, useRef } from 'react'
-import { useThemeStore, useUiStore } from '@/editor/lib/store'
-import { DecorationsDndHandle } from '@/editor/components/editor/layout/decorations-dnd-handle'
+import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
+import { DecorationsDndHandle } from './decorations-dnd-handle'
 import { useDecorationDnd } from '@/editor/hooks/use-decoration-dnd'
-import { DecorationsFloatingMenu } from '@/editor/components/editor/layout/decorations-floating-menu'
+import { DecorationsFloatingMenu } from './decorations-floating-menu'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface DecorationsLayerProps {
   decorations: DecorationElement[]
@@ -70,8 +73,14 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
   const animationVariants = getAnimationVariants(animation)
 
   const boundsRef = useRef<HTMLDivElement>(null)
-  const { selectedDecorationId, deviceView } = useUiStore()
-  const { updateDecoration, removeDecoration } = useThemeStore()
+  const { selectedDecorationId, deviceView } = useUiSelector((state) => ({
+    selectedDecorationId: state.selectedDecorationId,
+    deviceView: state.deviceView,
+  }))
+  const { updateDecoration, removeDecoration } = useThemeSelector((state) => ({
+    updateDecoration: state.updateDecoration,
+    removeDecoration: state.removeDecoration,
+  }))
 
   const responsiveFactor = useMemo(() => {
     switch (deviceView) {
@@ -173,11 +182,17 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
                 : null),
             }}
           >
-            <img
-              src={typeof decoration.image === 'string' && decoration.image ? decoration.image : '/placeholder.svg'}
-              alt=""
-              className="w-full h-full object-contain"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={typeof decoration.image === 'string' && decoration.image ? decoration.image : '/placeholder.svg'}
+                alt=""
+                fill
+                sizes="200px"
+                className="object-contain"
+              />
+            </div>
           </motion.div>
           )
         })}

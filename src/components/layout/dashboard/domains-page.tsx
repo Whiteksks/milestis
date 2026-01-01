@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import Image from "next/image"
 
 interface Project {
   id: string
@@ -67,8 +68,8 @@ export function DomainsPage() {
               className="flex items-center gap-4 rounded-2xl border border-muted-foreground/10 bg-muted/30 p-4 transition-colors hover:bg-muted/50"
             >
               {/* Cover Thumbnail */}
-              <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-muted">
-                <img src={project.cover || "/placeholder.svg"} alt={project.name} className="size-full object-cover" />
+              <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-muted">
+                <Image src={project.cover || "/placeholder.svg"} alt={project.name} fill sizes="56px" className="object-cover" />
               </div>
 
               {/* Project Info */}

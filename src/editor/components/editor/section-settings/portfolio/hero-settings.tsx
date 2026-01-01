@@ -1,12 +1,15 @@
 "use client"
 
-import { useContentStore } from '@/editor/lib/store'
+import { useContentSelector } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
 export function HeroSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
+  const { hero, updateSectionContent } = useContentSelector((state) => ({
+    hero: state.sectionContent.hero,
+    updateSectionContent: state.updateSectionContent,
+  }))
   
   // Общий стиль для Input/Textarea
   const inputStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
@@ -30,7 +33,7 @@ export function HeroSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Main Title</Label>
           <Input 
             className={`${inputStyle} h-11 font-medium text-sm`} 
-            value={sectionContent.hero.title} 
+            value={hero.title} 
             onChange={(e) => updateSectionContent('hero', { title: e.target.value })} 
             placeholder="Your main headline..."
           />
@@ -41,7 +44,7 @@ export function HeroSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
           <Input 
             className={`${inputStyle} h-10`} 
-            value={sectionContent.hero.subtitle} 
+            value={hero.subtitle} 
             onChange={(e) => updateSectionContent('hero', { subtitle: e.target.value })} 
             placeholder="A catchy subtitle"
           />
@@ -51,9 +54,9 @@ export function HeroSettings() {
         <div className="space-y-2">
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Description / Intro</Label>
           <Textarea 
-            className={`${inputStyle} resize-none min-h-[100px] p-3`} 
+            className={`${inputStyle} resize-none min-h-25 p-3`} 
             rows={4} 
-            value={sectionContent.hero.description} 
+            value={hero.description} 
             onChange={(e) => updateSectionContent('hero', { description: e.target.value })} 
             placeholder="Detailed introduction or bio..."
           />

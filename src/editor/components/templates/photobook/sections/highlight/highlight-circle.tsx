@@ -3,6 +3,9 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightCircleProps {
   sectionContent: PhotobookSectionContent
@@ -31,10 +34,14 @@ export function HighlightCircle({ sectionContent, theme }: HighlightCircleProps)
           />
 
           <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 border-white">
-            <img
+            <Image
+              loader={passthroughLoader}
+              unoptimized
               src={imageUrl || "/placeholder.svg"}
               alt={title}
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 288px, 384px"
+              className="object-cover"
             />
           </div>
         </div>
@@ -43,7 +50,7 @@ export function HighlightCircle({ sectionContent, theme }: HighlightCircleProps)
 
         {description && <p className="text-lg text-stone-600 leading-relaxed max-w-2xl mx-auto mb-8">{description}</p>}
 
-        {quote && <p className={cn('italic text-2xl text-amber-800', theme.fontTitle)}>"{quote}"</p>}
+        {quote && <p className={cn('italic text-2xl text-amber-800', theme.fontTitle)}>&quot;{quote}&quot;</p>}
       </div>
     </section>
   )

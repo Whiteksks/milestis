@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroClassicProps {
   sectionContent: PhotobookSectionContent
@@ -31,11 +34,11 @@ export function IntroClassic({ sectionContent, theme }: IntroClassicProps) {
 
           <div className="relative py-6">
             <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 text-6xl font-serif select-none" style={{ color: theme.accent }}>
-              "
+              &quot;
             </span>
             <p className={cn("text-xl md:text-2xl italic font-light leading-relaxed px-8", theme.fontBody)} style={{ color: theme.mutedText }}>{quote}</p>
             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 text-6xl font-serif select-none" style={{ color: theme.accent }}>
-              "
+              &quot;
             </span>
           </div>
 
@@ -55,7 +58,16 @@ export function IntroClassic({ sectionContent, theme }: IntroClassicProps) {
             className="pt-8"
           >
             <div className="relative inline-block">
-              <img src={imageUrl} alt="Introduction" className="max-h-100 object-contain shadow-lg rounded-sm" />
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={imageUrl}
+                alt="Introduction"
+                width={800}
+                height={800}
+                sizes="(max-width: 768px) 80vw, 600px"
+                className="max-h-100 w-auto object-contain shadow-lg rounded-sm"
+              />
             </div>
           </motion.div>
         )}

@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryMinimalProps {
   sectionContent: PhotobookSectionContent
@@ -44,13 +47,17 @@ export function GalleryMinimal({
               transition={{ delay: index * 0.1 }}
               className="aspect-3/4 relative group overflow-hidden"
             >
-              {image && (
-                <img 
-                  src={image} 
-                  alt={`Gallery image ${index + 1}`} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              )}
+                {image && (
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
+                    src={image}
+                    alt={`Gallery image ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
             </motion.div>
           ))}
         </div>

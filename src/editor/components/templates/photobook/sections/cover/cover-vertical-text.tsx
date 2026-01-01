@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverVerticalTextProps {
   sectionContent: PhotobookSectionContent
@@ -26,10 +29,14 @@ export function CoverVerticalText({
     <section className="relative min-h-screen w-full overflow-hidden" style={{ backgroundColor: theme.background }}>
       {/* Photo */}
       {imageUrl && (
-        <img 
-          src={imageUrl} 
-          alt={title} 
-          className="absolute inset-0 w-full h-full object-cover"
+        <Image
+          loader={passthroughLoader}
+          unoptimized
+          src={imageUrl}
+          alt={title}
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
       )}
 

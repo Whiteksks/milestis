@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverProps {
   sectionContent: PhotobookSectionContent
@@ -23,7 +26,17 @@ export function CoverMagazine({ sectionContent, theme }: CoverProps) {
   return (
     <section className="relative min-h-screen w-full overflow-hidden" style={{ backgroundColor: theme.background }}>
       {/* Photo with effect */}
-      {imageUrl && <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+      {imageUrl && (
+        <Image
+          loader={passthroughLoader}
+          unoptimized
+          src={imageUrl}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      )}
 
       {/* Light overlay */}
       <div className="absolute inset-0 bg-linear-to-t from-stone-900/60 via-transparent to-stone-900/30" />

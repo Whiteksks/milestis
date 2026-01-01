@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 const HeroSection = () => {
   return (
@@ -60,11 +61,16 @@ const HeroSection = () => {
       </div>
 
       {/* Image */}
-      <img
-        src='https://cdn.shadcnstudio.com/ss-assets/blocks/marketing/hero/image-19.png'
-        alt='Dishes'
-        className='min-h-67 w-full object-cover'
-      />
+      <div className='relative min-h-67 w-full'>
+        <Image
+          src='https://cdn.shadcnstudio.com/ss-assets/blocks/marketing/hero/image-19.png'
+          alt='Dishes'
+          fill
+          sizes='100vw'
+          className='object-cover'
+          priority
+        />
+      </div>
     </section>
   )
 }

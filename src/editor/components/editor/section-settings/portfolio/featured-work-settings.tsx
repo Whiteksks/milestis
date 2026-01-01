@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -15,8 +15,13 @@ import { Separator } from '@/components/ui/separator'
 import { PortfolioImagePicker } from '@/editor/components/editor/section-settings/ui/portfolio-image-picker'
 
 export function FeaturedWorkSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
-  const { toggleMediaPicker } = useUiStore()
+  const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
+    featuredWork: state.sectionContent.featuredWork,
+    updateSectionContent: state.updateSectionContent,
+  }))
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(null)
   
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
@@ -24,7 +29,7 @@ export function FeaturedWorkSettings() {
 
   const handleImageSelect = (url: string) => {
     if (activeProjectIndex === null) return
-    const newProjects = [...sectionContent.featuredWork.projects]
+    const newProjects = [...featuredWork.projects]
     const project = newProjects[activeProjectIndex]
     if (!project) return
     newProjects[activeProjectIndex] = { ...project, image: url }
@@ -32,7 +37,7 @@ export function FeaturedWorkSettings() {
   }
 
   const applyAspectRatioToAll = (ratio: AspectRatio) => {
-    const updatedProjects = sectionContent.featuredWork.projects.map(project => ({
+    const updatedProjects = featuredWork.projects.map(project => ({
       ...project,
       aspectRatio: ratio
     }))
@@ -59,7 +64,7 @@ export function FeaturedWorkSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.featuredWork.title} 
+            value={featuredWork.title} 
             onChange={(e) => updateSectionContent('featuredWork', { title: e.target.value })} 
             placeholder="My Best Work"
           />
@@ -67,7 +72,7 @@ export function FeaturedWorkSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.featuredWork.subtitle || ''} 
+            value={featuredWork.subtitle || ''} 
             onChange={(e) => updateSectionContent('featuredWork', { subtitle: e.target.value })} 
             placeholder="Portfolio"
           />
@@ -84,7 +89,7 @@ export function FeaturedWorkSettings() {
         <p className="text-[11px] text-slate-500 font-medium">Change aspect ratio for all images at once.</p>
         
         <div className="flex gap-2">
-          <Select onValueChange={applyAspectRatioToAll} defaultValue={sectionContent.featuredWork.projects[0]?.aspectRatio || 'landscape'}>
+          <Select onValueChange={applyAspectRatioToAll} defaultValue={featuredWork.projects[0]?.aspectRatio || 'landscape'}>
             <SelectTrigger className="flex-1 h-9 rounded-xl border-slate-200 bg-white hover:border-slate-300 text-xs shadow-sm">
               <SelectValue placeholder="Select Ratio" />
             </SelectTrigger>
@@ -108,7 +113,7 @@ export function FeaturedWorkSettings() {
       <div className="space-y-4">
         <h4 className="text-sm font-medium text-slate-900">Manage Projects</h4>
         <div className="space-y-4">
-          {sectionContent.featuredWork.projects.map((project, index) => (
+          {featuredWork.projects.map((project, index) => (
             <div key={index} className="p-5 border border-slate-100 rounded-2xl space-y-4 bg-white shadow-sm shadow-slate-900/5 transition-all hover:shadow-md hover:border-slate-200">
               <div className="flex items-start justify-between">
                 <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Project {index + 1}</span>
@@ -117,7 +122,7 @@ export function FeaturedWorkSettings() {
                   size="icon"
                   className="w-6 h-6 shrink-0 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                   onClick={() => {
-                    const newProjects = sectionContent.featuredWork.projects.filter((_, i) => i !== index)
+                    const newProjects = featuredWork.projects.filter((_, i) => i !== index)
                     updateSectionContent('featuredWork', { projects: newProjects })
                   }}
                 >
@@ -132,7 +137,7 @@ export function FeaturedWorkSettings() {
                   placeholder="Project Name"
                   value={project.title}
                   onChange={(e) => {
-                    const newProjects = [...sectionContent.featuredWork.projects]
+                    const newProjects = [...featuredWork.projects]
                     newProjects[index] = { ...project, title: e.target.value }
                     updateSectionContent('featuredWork', { projects: newProjects })
                   }}
@@ -147,7 +152,7 @@ export function FeaturedWorkSettings() {
                   rows={2}
                   value={project.description}
                   onChange={(e) => {
-                    const newProjects = [...sectionContent.featuredWork.projects]
+                    const newProjects = [...featuredWork.projects]
                     newProjects[index] = { ...project, description: e.target.value }
                     updateSectionContent('featuredWork', { projects: newProjects })
                   }}
@@ -163,7 +168,7 @@ export function FeaturedWorkSettings() {
                     frameStyle: project.frameStyle,
                   }}
                   onChange={(value) => {
-                    const newProjects = [...sectionContent.featuredWork.projects]
+                    const newProjects = [...featuredWork.projects]
                     newProjects[index] = {
                       ...project,
                       image: value.image,
@@ -196,7 +201,7 @@ export function FeaturedWorkSettings() {
                 frameStyle: 'soft' as FrameStyle
               }
               updateSectionContent('featuredWork', { 
-                projects: [...sectionContent.featuredWork.projects, newProject] 
+                projects: [...featuredWork.projects, newProject] 
               })
             }}
           >

@@ -9,6 +9,7 @@ import { frameStyles } from "@/editor/lib/frame-styles"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import { ImageIcon, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 export interface PortfolioImagePickerValue {
   image: string
@@ -60,10 +61,12 @@ export function PortfolioImagePicker({
         >
           {current.image ? (
             <>
-              <img
+              <Image
                 src={current.image}
                 alt={label}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                fill
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover transition-transform group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                 <Button

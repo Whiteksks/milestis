@@ -1,6 +1,6 @@
 "use client"
 
-import { useUiStore, useThemeStore } from '@/editor/lib/store'
+import { useUiSelector, useThemeSelector } from '@/editor/lib/store'
 import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
 import type { TemplateId } from '@/editor/lib/types'
 import {
@@ -18,8 +18,14 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileBottomSheet } from './mobile/mobile-bottom-sheet'
 
 export function TemplateSelectorModal() {
-  const { isTemplateModalOpen, toggleTemplateModal, editorMode } = useUiStore()
-  const { setTemplate } = useThemeStore()
+  const { isTemplateModalOpen, toggleTemplateModal, editorMode } = useUiSelector((state) => ({
+    isTemplateModalOpen: state.isTemplateModalOpen,
+    toggleTemplateModal: state.toggleTemplateModal,
+    editorMode: state.editorMode,
+  }))
+  const { setTemplate } = useThemeSelector((state) => ({
+    setTemplate: state.setTemplate,
+  }))
   const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId | null>(null)
   const isMobile = useIsMobile()
 

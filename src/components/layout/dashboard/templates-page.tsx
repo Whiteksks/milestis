@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import Image from "next/image"
 
 interface Template {
   id: string
@@ -170,10 +171,12 @@ export function TemplatesPage() {
               className="group overflow-hidden rounded-3xl border-muted-foreground/10 bg-card/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
             >
               <div className="relative aspect-[3/2] overflow-hidden">
-                <img
+                <Image
                   src={template.image || "/placeholder.svg"}
                   alt={template.name}
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 400px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center gap-3 bg-foreground/60 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
@@ -248,10 +251,12 @@ export function TemplatesPage() {
           {previewTemplate && (
             <>
               <div className="relative aspect-[4/3] bg-muted">
-                <img
+                <Image
                   src={previewTemplate.previewImages[previewIndex] || "/placeholder.svg"}
                   alt={`${previewTemplate.name} preview`}
-                  className="size-full object-cover"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 768px"
+                  className="object-cover"
                 />
                 {/* Preview Navigation Dots */}
                 <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">

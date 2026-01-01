@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { BookOpen, Play } from "lucide-react"
+import Image from "next/image"
 
 const rotatingWords = ["important", "memories", "moments", "love", "family", "stories"]
 
@@ -64,34 +65,50 @@ export function HeroSection() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="aspect-4/5 overflow-hidden rounded-2xl bg-card shadow-lg">
-                    <img
-                      src="/placeholder.svg?height=400&width=320"
-                      alt="Wedding memory"
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=400&width=320"
+                        alt="Wedding memory"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 320px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                   <div className="aspect-square overflow-hidden rounded-2xl bg-card shadow-lg">
-                    <img
-                      src="/placeholder.svg?height=280&width=280"
-                      alt="Birthday celebration"
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=280&width=280"
+                        alt="Birthday celebration"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 280px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="mt-8 space-y-4">
                   <div className="aspect-square overflow-hidden rounded-2xl bg-card shadow-lg">
-                    <img
-                      src="/placeholder.svg?height=280&width=280"
-                      alt="Family portrait"
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=280&width=280"
+                        alt="Family portrait"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 280px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                   <div className="aspect-4/5 overflow-hidden rounded-2xl bg-card shadow-lg">
-                    <img
-                      src="/placeholder.svg?height=400&width=320"
-                      alt="Love story"
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=400&width=320"
+                        alt="Love story"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 320px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

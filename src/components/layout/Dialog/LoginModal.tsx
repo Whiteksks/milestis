@@ -71,7 +71,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   Log in to Milestis
                 </DialogTitle>
                 <DialogDescription>
-                  Enter your email and we’ll send you a magic link
+                  Enter your email and we&apos;ll send you a magic link
                 </DialogDescription>
               </DialogHeader>
 
@@ -148,12 +148,12 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               </h2>
 
             <p className="mt-3 text-muted-foreground">
-                We've sent a magic link to <span className="font-medium text-foreground">{email}</span>. Open it to
+              We&apos;ve sent a magic link to <span className="font-medium text-foreground">{email}</span>. Open it to
                 finish signing in.
               </p>
 
               <p className="mt-4 text-xs text-muted-foreground/70">
-                If you don't see the email, check your spam folder or try again.
+                If you don&apos;t see the email, check your spam folder or try again.
               </p>
 
               <div className="mt-8 w-full space-y-3">

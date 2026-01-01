@@ -1,13 +1,16 @@
 "use client"
 
-import { useContentStore } from '@/editor/lib/store'
+import { useContentSelector } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 
 export function VideoSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
+  const { video, updateSectionContent } = useContentSelector((state) => ({
+    video: state.sectionContent.video,
+    updateSectionContent: state.updateSectionContent,
+  }))
 
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
   const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
@@ -74,7 +77,7 @@ export function VideoSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Section Title</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.video.title} 
+            value={video.title} 
             onChange={(e) => updateSectionContent('video', { title: e.target.value })} 
             placeholder="Watch my latest video"
           />
@@ -83,7 +86,7 @@ export function VideoSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.video.subtitle || ''} 
+            value={video.subtitle || ''} 
             onChange={(e) => updateSectionContent('video', { subtitle: e.target.value })} 
             placeholder="Motion"
           />
@@ -93,7 +96,7 @@ export function VideoSettings() {
           <Textarea 
             className={textareaStyle} 
             rows={3} 
-            value={sectionContent.video.description} 
+            value={video.description} 
             onChange={(e) => updateSectionContent('video', { description: e.target.value })} 
             placeholder="Brief description of the video..."
           />
@@ -110,7 +113,7 @@ export function VideoSettings() {
           <Input 
             className={`${inputStyle} h-10`} 
             placeholder="https://www.youtube.com/watch?v=..." 
-            value={sectionContent.video.videoUrl} 
+            value={video.videoUrl} 
             onChange={(e) => handleVideoUrlChange(e.target.value)} 
           />
           <p className="text-[10px] text-slate-400 mt-1.5 ml-1 leading-relaxed">

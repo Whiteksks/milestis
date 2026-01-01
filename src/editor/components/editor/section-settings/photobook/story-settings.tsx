@@ -5,16 +5,24 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { useState } from 'react'
 import { Plus, Trash2, Image as ImageIcon } from 'lucide-react' // Опционально: можно добавить иконки для UI, если они доступны, иначе оставлю текст
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 export function PhotobookStorySettings() {
-  const { photobookSectionContent, updatePhotobookSection } = useContentStore()
-  const paragraphs = photobookSectionContent.story.paragraphs || []
-  const slots = photobookSectionContent.story.images || []
-  const { toggleMediaPicker } = useUiStore()
+  const { story, updatePhotobookSection } = useContentSelector((state) => ({
+    story: state.photobookSectionContent.story,
+    updatePhotobookSection: state.updatePhotobookSection,
+  }))
+  const paragraphs = story.paragraphs || []
+  const slots = story.images || []
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
   const [activeSlotIndex, setActiveSlotIndex] = useState<number | null>(null)
 
   const updateParagraph = (idx: number, value: string) => {
@@ -154,7 +162,7 @@ export function PhotobookStorySettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Story Title</Label>
               <Input
-                value={photobookSectionContent.story.title || ''}
+                value={story.title || ''}
                 onChange={(e) => handleStoryTitleChange(e.target.value)}
                 placeholder="e.g. Our Trip to Paris"
                 className="h-11 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-lg font-semibold"
@@ -165,7 +173,7 @@ export function PhotobookStorySettings() {
               <div className="space-y-2">
                 <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Date</Label>
                 <Input
-                  value={photobookSectionContent.story.date || ''}
+                  value={story.date || ''}
                   onChange={(e) => handleStoryDateChange(e.target.value)}
                   placeholder="August 12, 2024"
                   className={inputStyle}
@@ -174,7 +182,7 @@ export function PhotobookStorySettings() {
               <div className="space-y-2">
                 <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Location</Label>
                 <Input
-                  value={photobookSectionContent.story.location || ''}
+                  value={story.location || ''}
                   onChange={(e) => handleStoryLocationChange(e.target.value)}
                   placeholder="Paris, France"
                   className={inputStyle}
@@ -276,10 +284,14 @@ export function PhotobookStorySettings() {
                         key={i}
                         className="relative aspect-4/3 overflow-hidden rounded-lg bg-slate-50 border border-slate-100 group/image"
                       >
-                        <img
+                        <Image
+                          loader={passthroughLoader}
+                          unoptimized
                           src={img}
-                          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                           alt=""
+                          fill
+                          sizes="(max-width: 768px) 50vw, 200px"
+                          className="object-cover transition-transform hover:scale-105 duration-500"
                         />
                         <button
                           type="button"

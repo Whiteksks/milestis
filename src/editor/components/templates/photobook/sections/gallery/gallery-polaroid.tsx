@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryPolaroidProps {
   sectionContent: PhotobookSectionContent
@@ -38,7 +41,15 @@ export function GalleryPolaroid({
               style={{ backgroundColor: theme.card }}
             >
               <div className="relative aspect-square overflow-hidden">
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                    <Image
+                      loader={passthroughLoader}
+                      unoptimized
+                      src={img}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      className="object-cover"
+                    />
               </div>
               <p className="mt-4 text-center text-sm font-handwriting" style={{ color: theme.mutedText }}>Moment {index + 1}</p>
             </div>

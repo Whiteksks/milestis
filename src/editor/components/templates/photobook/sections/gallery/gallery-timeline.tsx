@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryTimelineProps {
   sectionContent: PhotobookSectionContent
@@ -37,30 +40,40 @@ export function GalleryTimeline({
         </div>
 
         {/* Main collage layout */}
-        <div className="grid grid-cols-4 grid-rows-3 gap-3 aspect-[4/3]">
+        <div className="grid grid-cols-4 grid-rows-3 gap-3 aspect-4/3">
           {/* Big central photo */}
           <div className="col-span-2 row-span-2 relative overflow-hidden rounded-lg group">
             {mainImage && (
-              <img 
-                src={mainImage} 
-                alt="Main gallery image" 
-                className="w-full h-full object-cover"
-              />
+              <div className="relative h-full w-full">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={mainImage}
+                  alt="Main gallery image"
+                  fill
+                  className="object-cover"
+                />
+              </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
           {/* Right photos */}
           {sideImages.slice(0, 2).map((img, index) => (
             <div key={index} className="relative overflow-hidden rounded-lg group">
               {img && (
-                <img 
-                  src={img} 
-                  alt={`Side gallery image ${index + 1}`} 
-                  className="w-full h-full object-cover"
-                />
+                <div className="relative h-full w-full">
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
+                    src={img}
+                    alt={`Side gallery image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           ))}
 
@@ -68,13 +81,18 @@ export function GalleryTimeline({
           {sideImages.slice(2, 4).map((img, index) => (
             <div key={index} className="relative overflow-hidden rounded-lg group">
               {img && (
-                <img 
-                  src={img} 
-                  alt={`Bottom gallery image ${index + 1}`} 
-                  className="w-full h-full object-cover"
-                />
+                <div className="relative h-full w-full">
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
+                    src={img}
+                    alt={`Bottom gallery image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           ))}
 
@@ -84,13 +102,18 @@ export function GalleryTimeline({
               {bottomImages.slice(0, 4).map((img, index) => (
                 <div key={index} className="relative aspect-square overflow-hidden rounded-lg group">
                   {img && (
-                    <img 
-                      src={img} 
-                      alt={`Extra gallery image ${index + 1}`} 
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        loader={passthroughLoader}
+                        unoptimized
+                        src={img}
+                        alt={`Extra gallery image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               ))}
             </div>

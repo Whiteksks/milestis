@@ -7,6 +7,9 @@ import { ThemeConfig } from '@/editor/lib/themes'
 import { PhotobookSectionContent, PhotobookSlot } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface TimelineStoryProps {
   sectionContent: PhotobookSectionContent
@@ -167,10 +170,14 @@ function TimelineItem({
                     getFrameStyle(slot.imageSettings[i]?.frameStyle || 'none'),
                   )}
                 >
-                  <img
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
                     src={img}
                     alt=""
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
               ))}

@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverPolaroidProps {
   sectionContent: PhotobookSectionContent
@@ -32,7 +35,19 @@ export function CoverPolaroid({
           }}
         >
           <div className="w-72 h-80 sm:w-80 sm:h-96 overflow-hidden">
-            {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
+            {imageUrl && (
+              <div className="relative w-full h-full">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt=""
+                  fill
+                  sizes="320px"
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* Handwritten-style text on polaroid */}

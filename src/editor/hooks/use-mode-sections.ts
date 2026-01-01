@@ -1,29 +1,38 @@
 'use client'
 
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 export function useModeSections() {
-  const { editorMode } = useUiStore()
-  const { 
-    sectionVisibility, 
+  const editorMode = useUiSelector((state) => state.editorMode)
+  const {
+    sectionVisibility,
     toggleSection: togglePortfolio,
     photobookSectionVisibility,
-    togglePhotobookSection: togglePhotobook
-  } = useContentStore()
+    togglePhotobookSection: togglePhotobook,
+  } = useContentSelector((state) => ({
+    sectionVisibility: state.sectionVisibility,
+    toggleSection: state.toggleSection,
+    photobookSectionVisibility: state.photobookSectionVisibility,
+    togglePhotobookSection: state.togglePhotobookSection,
+  }))
 
-  const modeEntry = MODE_REGISTRY[editorMode]
+  const modeEntry = useMemo(() => MODE_REGISTRY[editorMode], [editorMode])
 
   // Map sections with their visibility state
-  const sections = modeEntry.sections.map((section) => ({
-    ...section,
-    visible: modeEntry.getSectionVisible({
-      section,
-      portfolioVisibility: sectionVisibility,
-      photobookVisibility: photobookSectionVisibility,
-    }),
-  }))
+  const sections = useMemo(
+    () =>
+      modeEntry.sections.map((section) => ({
+        ...section,
+        visible: modeEntry.getSectionVisible({
+          section,
+          portfolioVisibility: sectionVisibility,
+          photobookVisibility: photobookSectionVisibility,
+        }),
+      })),
+    [modeEntry, sectionVisibility, photobookSectionVisibility],
+  )
 
   // Unified toggle function
   const toggleVisibility = useCallback((key: string) => {

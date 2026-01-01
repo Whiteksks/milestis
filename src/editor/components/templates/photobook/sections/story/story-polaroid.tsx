@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryPolaroidProps {
   sectionContent: PhotobookSectionContent
@@ -35,7 +38,7 @@ export function StoryPolaroid({
         viewport={{ once: true }}
         className="text-center mb-16 px-8"
       >
-        <span className="text-8xl font-serif opacity-20" style={{ color: theme.mutedText }}>"</span>
+        <span className="text-8xl font-serif opacity-20" style={{ color: theme.mutedText }}>&quot;</span>
         <h2 className={cn("font-serif text-3xl md:text-4xl -mt-8", theme.fontTitle)} style={{ color: theme.foreground }}>{title}</h2>
         <p className="text-sm mt-3" style={{ color: theme.mutedText }}>{location}</p>
       </motion.div>
@@ -54,7 +57,19 @@ export function StoryPolaroid({
             <div className={`relative ${index % 2 === 1 ? "md:col-start-2" : ""}`}>
               <div className="p-4 pb-16 shadow-2xl" style={{ backgroundColor: theme.card }}>
                 <div className="aspect-square overflow-hidden">
-                  {item.imageUrl && <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />}
+                  <div className="relative aspect-square overflow-hidden">
+                    {item.imageUrl && (
+                      <Image
+                        loader={passthroughLoader}
+                        unoptimized
+                        src={item.imageUrl}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
                 </div>
                 <div className="mt-4 text-center">
                   <p className={cn("font-serif italic text-lg", theme.fontBody)} style={{ color: theme.mutedText }}>{item.date}</p>

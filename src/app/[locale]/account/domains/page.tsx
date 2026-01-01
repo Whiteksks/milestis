@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -115,7 +116,13 @@ export default function DomainsSettingsPage() {
             >
               {/* Project Cover */}
               <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                <img src={project.cover || "/placeholder.svg"} alt={project.name} className="size-full object-cover" />
+                <Image
+                  src={project.cover || "/placeholder.svg"}
+                  alt={project.name}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
               </div>
 
               {/* Project Info */}

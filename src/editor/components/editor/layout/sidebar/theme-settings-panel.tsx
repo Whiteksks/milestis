@@ -1,6 +1,6 @@
 "use client"
 
-import { useThemeStore, useUiStore } from '@/editor/lib/store'
+import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -12,13 +12,15 @@ import { ImageIcon, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function ThemeSettingsPanel() {
-  const { 
-    currentTheme, 
-    themeCustomizations, 
-    updateThemeCustomization,
-  } = useThemeStore()
-  
-  const { toggleMediaPicker } = useUiStore()
+  const { currentTheme, themeCustomizations, updateThemeCustomization } = useThemeSelector((state) => ({
+    currentTheme: state.currentTheme,
+    themeCustomizations: state.themeCustomizations,
+    updateThemeCustomization: state.updateThemeCustomization,
+  }))
+
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
 
   const themeDecorations = getDecorations(currentTheme)
 

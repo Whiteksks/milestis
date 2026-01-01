@@ -1,6 +1,6 @@
 "use client"
 
-import { useUiStore } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
@@ -11,7 +11,11 @@ import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-t
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 
 export function SectionsSidebar() {
-  const { isSidebarCollapsed, toggleSidebar, editorMode } = useUiStore()
+  const { isSidebarCollapsed, toggleSidebar, editorMode } = useUiSelector((state) => ({
+    isSidebarCollapsed: state.isSidebarCollapsed,
+    toggleSidebar: state.toggleSidebar,
+    editorMode: state.editorMode,
+  }))
 
   const [activeTab, setActiveTab] = useState<'sections' | 'theme' | 'decorations'>('sections')
 

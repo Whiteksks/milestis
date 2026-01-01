@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverProps {
   sectionContent: PhotobookSectionContent
@@ -46,7 +49,19 @@ export function CoverCirclePortrait({
           <div className="absolute -inset-8 rounded-full border opacity-30" style={{ borderColor: theme.border }} />
 
           <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl ring-4 ring-white" style={{ boxShadow: theme.shadow }}>
-            {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
+            {imageUrl && (
+              <div className="relative w-full h-full">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt=""
+                  fill
+                  sizes="320px"
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* Small decorative element */}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { useUiStore, useContentStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -9,48 +9,61 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useMemo, useCallback } from 'react'
 
 export function SectionsTab() {
-  const { editorMode } = useUiStore()
+  const editorMode = useUiSelector((state) => state.editorMode)
   const {
     sectionVisibility,
     toggleSection,
     photobookSectionVisibility,
-    togglePhotobookSection
-  } = useContentStore()
+    togglePhotobookSection,
+  } = useContentSelector((state) => ({
+    sectionVisibility: state.sectionVisibility,
+    toggleSection: state.toggleSection,
+    photobookSectionVisibility: state.photobookSectionVisibility,
+    togglePhotobookSection: state.togglePhotobookSection,
+  }))
 
-  const modeEntry = MODE_REGISTRY[editorMode]
+  const modeEntry = useMemo(() => MODE_REGISTRY[editorMode], [editorMode])
 
   const [activeSection, setActiveSection] = useState(modeEntry.defaultActiveSectionId)
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
 
-  const sections = modeEntry.sections.map((section) => ({
-    ...section,
-    visible: modeEntry.getSectionVisible({
-      section,
-      portfolioVisibility: sectionVisibility,
-      photobookVisibility: photobookSectionVisibility,
-    }),
-  }))
+  const sections = useMemo(
+    () =>
+      modeEntry.sections.map((section) => ({
+        ...section,
+        visible: modeEntry.getSectionVisible({
+          section,
+          portfolioVisibility: sectionVisibility,
+          photobookVisibility: photobookSectionVisibility,
+        }),
+      })),
+    [modeEntry, sectionVisibility, photobookSectionVisibility],
+  )
 
   useEffect(() => {
     setActiveSection(MODE_REGISTRY[editorMode].defaultActiveSectionId)
   }, [editorMode])
 
-  const toggleVisibility = (key: string) => {
-    MODE_REGISTRY[editorMode].toggleSection({
-      toggleKey: key,
-      portfolioVisibility: sectionVisibility,
-      photobookVisibility: photobookSectionVisibility,
-      togglePortfolio: toggleSection,
-      togglePhotobook: togglePhotobookSection,
-    })
-  }
+  const toggleVisibility = useCallback(
+    (key: string) => {
+      modeEntry.toggleSection({
+        toggleKey: key,
+        portfolioVisibility: sectionVisibility,
+        photobookVisibility: photobookSectionVisibility,
+        togglePortfolio: toggleSection,
+        togglePhotobook: togglePhotobookSection,
+      })
+    },
+    [modeEntry, sectionVisibility, photobookSectionVisibility, toggleSection, togglePhotobookSection],
+  )
 
   const currentSection = sections.find(s => s.id === activeSection)
 
   const renderSettings = () => {
-    const SettingsComponent = MODE_REGISTRY[editorMode].getSettingsComponent(activeSection)
+    const SettingsComponent = modeEntry.getSettingsComponent(activeSection)
     if (!SettingsComponent) return null
     return <SettingsComponent />
   }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentStore } from '@/editor/lib/store'
+import { useContentSelector } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -19,11 +19,14 @@ const iconMap = {
 }
 
 export function FooterSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
+  const { footer, updateSectionContent } = useContentSelector((state) => ({
+    footer: state.sectionContent.footer,
+    updateSectionContent: state.updateSectionContent,
+  }))
   
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
 
-  const socialLinks = sectionContent.footer.socialLinks || []
+  const socialLinks = footer.socialLinks || []
 
   const socialIcons = [
     { id: 'facebook', label: 'Facebook' },
@@ -52,7 +55,7 @@ export function FooterSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Footer Text</Label>
           <Input 
             className={inputStyle} 
-            value={sectionContent.footer.copyright} 
+            value={footer.copyright} 
             onChange={(e) => updateSectionContent('footer', { copyright: e.target.value })} 
             placeholder="© 2025. All rights reserved."
           />

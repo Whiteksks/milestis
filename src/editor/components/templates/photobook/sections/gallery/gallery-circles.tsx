@@ -3,6 +3,9 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 
 interface GalleryCirclesProps {
@@ -34,9 +37,9 @@ export function GalleryCircles({ sectionContent, theme }: GalleryCirclesProps) {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-6 mb-6">
-            <div className="w-20 h-px bg-gradient-to-r from-transparent to-amber-600/60" />
+            <div className="w-20 h-px bg-linear-to-r from-transparent to-amber-600/60" />
             <div className="w-2 h-2 bg-amber-600 rotate-45" />
-            <div className="w-20 h-px bg-gradient-to-l from-transparent to-amber-600/60" />
+            <div className="w-20 h-px bg-linear-to-l from-transparent to-amber-600/60" />
           </div>
           <h2 className={cn('text-4xl md:text-6xl text-amber-50', theme.fontTitle)}>{title}</h2>
           {description && <p className="text-stone-500 mt-4 max-w-md mx-auto">{description}</p>}
@@ -52,27 +55,31 @@ export function GalleryCircles({ sectionContent, theme }: GalleryCirclesProps) {
             return (
               <div key={index} className="group">
                 {/* Внешняя рамка (золотая) */}
-                <div className="bg-gradient-to-br from-amber-700 via-amber-600 to-amber-800 p-1 shadow-2xl">
+                <div className="bg-linear-to-br from-amber-700 via-amber-600 to-amber-800 p-1 shadow-2xl">
                   {/* Внутренняя рамка (тёмная) */}
                   <div className="bg-[#1a1817] p-2">
                     {/* Паспарту (белое) */}
                     <div className="bg-amber-50/90 p-4">
                       <div className={`relative ${aspectClass} overflow-hidden`}>
-                        <img
+                        <Image
+                          loader={passthroughLoader}
+                          unoptimized
                           src={block.image || '/placeholder.svg'}
                           alt=""
-                          className="absolute inset-0 w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                          className="object-cover"
                         />
 
                         {/* Блик на стекле */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Тень под рамкой */}
-                <div className="h-4 mx-4 bg-gradient-to-b from-black/30 to-transparent blur-sm -mt-2" />
+                <div className="h-4 mx-4 bg-linear-to-b from-black/30 to-transparent blur-sm -mt-2" />
               </div>
             )
           })}

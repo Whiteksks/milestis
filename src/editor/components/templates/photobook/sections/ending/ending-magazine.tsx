@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -26,8 +29,20 @@ export function EndingMagazine({
     <section className="min-h-screen relative">
       {/* Фоновое фото */}
       <div className="absolute inset-0">
-        {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        {imageUrl && (
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
       </div>
 
       {/* Контент снизу */}

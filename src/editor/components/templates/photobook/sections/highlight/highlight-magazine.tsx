@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -25,8 +28,20 @@ export function HighlightMagazine({
     <section className="relative min-h-screen">
       {/* Background photo */}
       <div className="absolute inset-0">
-        {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+        {imageUrl && (
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/40" />
       </div>
 
       {/* Magazine-style layout */}
@@ -60,7 +75,7 @@ export function HighlightMagazine({
         {/* Bottom: Description and quote */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-8">
           {description && <p className={cn("text-white/70 max-w-md leading-relaxed text-sm md:text-base", theme.fontBody)}>{description}</p>}
-          {quote && <p className={cn("italic text-lg font-serif text-white/90 max-w-sm text-right", theme.fontBody)}>"{quote}"</p>}
+          {quote && <p className={cn("italic text-lg font-serif text-white/90 max-w-sm text-right", theme.fontBody)}>&quot;{quote}&quot;</p>}
         </div>
       </div>
     </section>

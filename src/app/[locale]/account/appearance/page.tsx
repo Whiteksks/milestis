@@ -52,7 +52,7 @@ export default function AppearanceSettings() {
 
   useEffect(() => {
     setTheme(selectedTheme)
-  }, [selectedTheme])
+  }, [selectedTheme, setTheme])
 
   return (
     <div className="space-y-6">

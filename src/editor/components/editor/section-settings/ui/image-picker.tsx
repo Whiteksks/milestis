@@ -9,6 +9,8 @@ import { frameStyles } from "@/editor/lib/frame-styles"
 import type { AspectRatio, FrameStyle, PhotoBlock } from "@/editor/lib/types"
 import { ImageIcon, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useId } from "react"
+import Image from "next/image"
 
 export interface ImagePickerValue extends PhotoBlock {}
 
@@ -27,8 +29,9 @@ export function ImagePicker({
   showCaption = true,
   onOpenMediaPicker,
 }: ImagePickerProps) {
+  const autoId = useId()
   const current: ImagePickerValue = value ?? {
-    id: "image-" + Date.now(),
+    id: `image-${autoId}`,
     image: "",
     caption: "",
     imageSettings: [{ aspectRatio: "landscape", frameStyle: "soft" }],
@@ -65,7 +68,13 @@ export function ImagePicker({
         >
           {current.image ? (
             <>
-              <img src={current.image} alt={label} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+              <Image
+                src={current.image}
+                alt={label}
+                fill
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover transition-transform group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                 <Button variant="secondary" size="sm" className="rounded-xl shadow-sm bg-white text-slate-900 hover:bg-slate-50 h-8 text-xs font-medium">
                   <Plus className="w-3.5 h-3.5 mr-1.5" /> Change

@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StorySplitProps {
   sectionContent: PhotobookSectionContent
@@ -38,10 +41,14 @@ export function StorySplit({
           {/* Photo side */}
           <div className="w-full md:w-1/2 relative min-h-[50vh] md:min-h-screen">
             {item.imageUrl && (
-              <img 
-                src={item.imageUrl} 
-                alt={item.caption || "Story image"} 
-                className="w-full h-full object-cover"
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={item.imageUrl}
+                alt={item.caption || "Story image"}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
               />
             )}
           </div>

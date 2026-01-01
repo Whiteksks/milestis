@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightPolaroidProps {
   sectionContent: PhotobookSectionContent
@@ -24,14 +27,26 @@ export function HighlightPolaroid({
       <div className="flex flex-col lg:flex-row items-center gap-12 max-w-5xl">
         {/* Large Polaroid card */}
         <div
-          className="p-4 md:p-6 shadow-2xl rotate-[-2deg] hover:rotate-0 transition-transform duration-500"
+          className="p-4 md:p-6 shadow-2xl -rotate-2 hover:rotate-0 transition-transform duration-500"
           style={{ 
             backgroundColor: theme.card,
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.3)" 
           }}
         >
-          <div className="aspect-[4/5] w-72 md:w-96 overflow-hidden">
-            {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
+          <div className="aspect-4/5 w-72 md:w-96 overflow-hidden">
+            {imageUrl && (
+              <div className="relative w-full h-full">
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt=""
+                  fill
+                  sizes="384px"
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
           {/* Handwritten-style caption */}
           <div className="pt-6 pb-2 text-center">
@@ -47,7 +62,7 @@ export function HighlightPolaroid({
 
           {description && <p className={cn("text-lg leading-relaxed", theme.fontBody)} style={{ color: theme.mutedText }}>{description}</p>}
 
-          {quote && <p className={cn("italic text-xl font-serif", theme.fontBody)} style={{ color: theme.foreground }}>"{quote}"</p>}
+          {quote && <p className={cn("italic text-xl font-serif", theme.fontBody)} style={{ color: theme.foreground }}>&quot;{quote}&quot;</p>}
         </div>
       </div>
     </section>

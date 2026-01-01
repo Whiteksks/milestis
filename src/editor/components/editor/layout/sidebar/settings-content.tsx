@@ -4,7 +4,7 @@ import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -21,14 +21,15 @@ export function SettingsContent() {
   const [activeSection, setActiveSection] = useState<string>(defaultActiveSectionId)
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
 
-  useEffect(() => {
-    setActiveSection(defaultActiveSectionId)
-  }, [editorMode, defaultActiveSectionId])
+  const resolvedActiveSection = useMemo(() => {
+    const hasActive = sections.some((s) => s.id === activeSection)
+    return hasActive ? activeSection : defaultActiveSectionId
+  }, [activeSection, defaultActiveSectionId, sections])
 
-  const currentSection = sections.find(s => s.id === activeSection)
+  const currentSection = sections.find(s => s.id === resolvedActiveSection)
 
   const renderSettings = () => {
-    const SettingsComponent = getSettingsComponent(activeSection)
+    const SettingsComponent = getSettingsComponent(resolvedActiveSection)
     if (!SettingsComponent) return null
     return <SettingsComponent />
   }
@@ -68,7 +69,7 @@ export function SettingsContent() {
                   key={section.id}
                   className={cn(
                     "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm text-left hover:bg-slate-50 cursor-pointer",
-                    activeSection === section.id && "bg-slate-100",
+                    resolvedActiveSection === section.id && "bg-slate-100",
                     !section.visible && "text-slate-400"
                   )}
                   onClick={() => {

@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import Image from "next/image"
 
 export type PhotoEffectType = "none" | "vintage" | "watercolor" | "duotone" | "grain" | "sepia"
 
@@ -150,18 +151,13 @@ export function PhotoEffect({ effect, imageUrl, className = "" }: PhotoEffectPro
 
   return (
     <div className={`${className}`} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
-      <img
+      <Image
         src={photoSrc || "/placeholder.svg"}
         alt=""
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: filter || undefined,
-        }}
+        fill
+        sizes="100vw"
+        className="object-cover"
+        style={{ filter: filter || undefined }}
       />
       {overlays}
     </div>

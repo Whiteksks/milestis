@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryClassicProps {
   sectionContent: PhotobookSectionContent
@@ -53,7 +56,17 @@ export function StoryClassic({
             <div className="flex-1 w-full">
               <div className="relative p-4 shadow-lg rotate-1 hover:rotate-0 transition-transform duration-500" style={{ backgroundColor: theme.card }}>
                 <div className="aspect-[4/5] overflow-hidden relative">
-                  {item.imageUrl && <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />}
+                  {item.imageUrl && (
+                    <Image
+                      loader={passthroughLoader}
+                      unoptimized
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -1,13 +1,16 @@
 "use client"
 
-import { useContentStore } from '@/editor/lib/store'
+import { useContentSelector } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 
 export function ContactSettings() {
-  const { sectionContent, updateSectionContent } = useContentStore()
+  const { contact, updateSectionContent } = useContentSelector((state) => ({
+    contact: state.sectionContent.contact,
+    updateSectionContent: state.updateSectionContent,
+  }))
 
   const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
   const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
@@ -29,7 +32,7 @@ export function ContactSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
           <Input
             className={inputStyle}
-            value={sectionContent.contact.title}
+            value={contact.title}
             onChange={(e) => updateSectionContent('contact', { title: e.target.value })}
             placeholder="Get in Touch"
           />
@@ -38,7 +41,7 @@ export function ContactSettings() {
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
           <Input
             className={inputStyle}
-            value={sectionContent.contact.subtitle || ''}
+            value={contact.subtitle || ''}
             onChange={(e) => updateSectionContent('contact', { subtitle: e.target.value })}
             placeholder="Contact"
           />
@@ -48,7 +51,7 @@ export function ContactSettings() {
           <Textarea
             rows={3}
             className={textareaStyle}
-            value={sectionContent.contact.description}
+            value={contact.description}
             onChange={(e) => updateSectionContent('contact', { description: e.target.value })}
             placeholder="Brief description of how to best reach you..."
           />
@@ -65,7 +68,7 @@ export function ContactSettings() {
           <Input
             className={inputStyle}
             type="email"
-            value={sectionContent.contact.email}
+            value={contact.email}
             onChange={(e) => updateSectionContent('contact', { email: e.target.value })}
             placeholder="you@example.com"
           />
@@ -75,7 +78,7 @@ export function ContactSettings() {
           <Input
             className={inputStyle}
             type="tel"
-            value={sectionContent.contact.phone || ''}
+            value={contact.phone || ''}
             onChange={(e) => updateSectionContent('contact', { phone: e.target.value })}
             placeholder="+1 (555) 000-0000"
           />

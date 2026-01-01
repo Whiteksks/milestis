@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightVerticalProps {
   sectionContent: PhotobookSectionContent
@@ -25,11 +28,17 @@ export function HighlightVertical({
       {/* Background photo */}
       <div className="absolute inset-0">
         {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
         )}
         <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/30 to-transparent" />
       </div>
@@ -58,7 +67,7 @@ export function HighlightVertical({
           {description && <p className={cn("text-lg leading-relaxed", theme.fontBody)} style={{ color: theme.mutedText }}>{description}</p>}
 
           {quote && (
-            <p className="italic text-xl font-serif border-l-2 pl-4" style={{ color: theme.foreground, borderColor: theme.accent }}>"{quote}"</p>
+            <p className="italic text-xl font-serif border-l-2 pl-4" style={{ color: theme.foreground, borderColor: theme.accent }}>&quot;{quote}&quot;</p>
           )}
         </div>
       </div>

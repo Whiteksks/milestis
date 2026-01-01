@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingCircleProps {
   sectionContent: PhotobookSectionContent
@@ -32,7 +35,17 @@ export function EndingCircle({ sectionContent, theme }: EndingCircleProps) {
           <div className="absolute inset-0 -m-8 rounded-full border border-amber-200/30" />
 
           <div className="w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden shadow-xl">
-            <img src={imageUrl || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
+            <div className="relative w-full h-full">
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={imageUrl || "/placeholder.svg"}
+                alt=""
+                fill
+                sizes="208px"
+                className="object-cover"
+              />
+            </div>
           </div>
         </motion.div>
 

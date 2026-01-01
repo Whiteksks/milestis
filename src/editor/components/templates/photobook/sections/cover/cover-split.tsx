@@ -3,6 +3,9 @@
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverSplitProps {
   sectionContent: PhotobookSectionContent
@@ -21,10 +24,14 @@ export function CoverSplit({ sectionContent, theme }: CoverSplitProps) {
     <div className="min-h-screen flex">
       <div className="w-1/2 relative">
         {imageUrl && (
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="absolute inset-0 w-full h-full object-cover"
+          <Image
+            loader={passthroughLoader}
+            unoptimized
+            src={imageUrl}
+            alt={title}
+            fill
+            sizes="50vw"
+            className="object-cover"
           />
         )}
       </div>

@@ -5,6 +5,9 @@ import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/p
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ClassicFeaturedWorkProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -44,16 +47,20 @@ export function ClassicFeaturedWork({ theme, sectionContent }: ClassicFeaturedWo
             >
               <div
                 className={cn(
-                  'overflow-hidden mb-4',
+                  'relative overflow-hidden mb-4',
                   theme.muted,
                   getAspectRatioClass(project.aspectRatio),
                   getFrameStyle(project.frameStyle || 'soft'),
                 )}
               >
-                <img
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
                   src={project.image || '/placeholder.svg?height=500&width=700'}
                   alt={project.title || 'Project image'}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <h4

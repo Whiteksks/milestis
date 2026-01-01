@@ -4,25 +4,33 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useContentStore, useUiStore } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { ImageIcon, X } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 export function PhotobookGallerySettings() {
-  const { photobookSectionContent, updatePhotobookSection } = useContentStore()
-  const { toggleMediaPicker } = useUiStore()
+  const { gallery, updatePhotobookSection } = useContentSelector((state) => ({
+    gallery: state.photobookSectionContent.gallery,
+    updatePhotobookSection: state.updatePhotobookSection,
+  }))
+  const { toggleMediaPicker } = useUiSelector((state) => ({
+    toggleMediaPicker: state.toggleMediaPicker,
+  }))
   
   // Функция для удаления изображения
   const removeImage = (indexToRemove: number) => {
-    const current = photobookSectionContent.gallery.images || []
+    const current = gallery.images || []
     const next = current.filter((_, i) => i !== indexToRemove)
     updatePhotobookSection('gallery', { images: next })
   }
 
   // Обработчик для множественного выбора изображений
   const handleSelectImages = (urls: string[]) => {
-    const current = photobookSectionContent.gallery.images || []
+    const current = gallery.images || []
 
     const timestamp = Date.now()
     const nextNew = urls.map((url, index) => ({
@@ -59,7 +67,7 @@ export function PhotobookGallerySettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
               <Input
-                value={photobookSectionContent.gallery.title || ''}
+                value={gallery.title || ''}
                 onChange={(e) => updatePhotobookSection('gallery', { title: e.target.value })}
                 placeholder="Gallery Title"
                 className={inputStyle}
@@ -69,7 +77,7 @@ export function PhotobookGallerySettings() {
             <div className="space-y-2">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Description</Label>
               <Input
-                value={photobookSectionContent.gallery.description || ''}
+                value={gallery.description || ''}
                 onChange={(e) =>
                   updatePhotobookSection('gallery', { description: e.target.value })
                 }
@@ -90,12 +98,16 @@ export function PhotobookGallerySettings() {
             
             {/* Сетка превью */}
             <div className="grid grid-cols-3 gap-2 border border-dashed border-slate-200 rounded-xl p-2 bg-slate-50/50 min-h-17.5">
-              {(photobookSectionContent.gallery.images || []).map((block, index) => (
+              {(gallery.images || []).map((block, index) => (
                 <div key={block.id} className="relative group aspect-square">
-                  <img
+                  <Image
+                    loader={passthroughLoader}
+                    unoptimized
                     src={block.image}
                     alt={`Gallery Image ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg shadow-sm border border-slate-100"
+                    fill
+                    sizes="(max-width: 768px) 33vw, 120px"
+                    className="object-cover rounded-lg shadow-sm border border-slate-100"
                   />
                   {/* Кнопка удаления */}
                   <button

@@ -5,6 +5,9 @@ import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/p
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ClassicBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -21,16 +24,24 @@ export function ClassicBio({ theme, sectionContent }: ClassicBioProps) {
       <div className="@lg:px-12 @md:px-8 px-4 @lg:py-20 @md:py-16 py-12">
         <div className="max-w-4xl mx-auto grid @md:grid-cols-2 grid-cols-1 gap-8 items-center">
           <div>
-            <img
-              src={sectionContent.bio.image || '/placeholder.svg?height=600&width=600'}
-              alt={sectionContent.bio.title || 'Profile image'}
+            <div
               className={cn(
-                'w-full object-cover',
+                'relative w-full overflow-hidden',
                 getAspectRatioClass(sectionContent.bio.imageAspectRatio),
                 theme.shadow,
                 getFrameStyle(sectionContent.bio.imageFrameStyle || 'soft'),
               )}
-            />
+            >
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={sectionContent.bio.image || '/placeholder.svg?height=600&width=600'}
+                alt={sectionContent.bio.title || 'Profile image'}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
           </div>
           <div>
             {sectionContent.bio.subtitle && (

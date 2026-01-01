@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { ExternalLink } from "lucide-react"
+import Image from "next/image"
 
 export function PreviewSection() {
   return (
@@ -12,11 +13,15 @@ export function PreviewSection() {
         <div className="relative overflow-hidden rounded-3xl bg-card shadow-xl">
           {/* Preview mockup */}
           <div className="aspect-16/10 w-full">
-            <img
-              src="/placeholder.svg?height=600&width=960"
-              alt="Milestis memory book preview"
-              className="h-full w-full object-cover"
-            />
+            <div className="relative h-full w-full">
+              <Image
+                src="/placeholder.svg?height=600&width=960"
+                alt="Milestis memory book preview"
+                fill
+                sizes="(max-width: 1024px) 100vw, 960px"
+                className="object-cover"
+              />
+            </div>
           </div>
 
           {/* Overlay gradient */}
