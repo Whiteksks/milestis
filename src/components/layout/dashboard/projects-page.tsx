@@ -169,7 +169,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
         </div>
         <h3 className="text-lg font-medium text-foreground">No projects match your filters</h3>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Try adjusting your search or filter criteria to find what you're looking for.
+          Try adjusting your search or filter criteria to find what you&apos;re looking for.
         </p>
       </div>
     )
@@ -180,7 +180,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
       <div className="mb-4 flex size-20 items-center justify-center rounded-3xl bg-primary/10">
         <FolderOpen className="size-9 text-primary" />
       </div>
-      <h3 className="text-xl font-semibold text-foreground">You haven't created any projects yet</h3>
+      <h3 className="text-xl font-semibold text-foreground">You haven&apos;t created any projects yet</h3>
       <p className="mt-2 max-w-md text-muted-foreground">
         Start by creating your first photobook or portfolio site. It only takes a few minutes!
       </p>

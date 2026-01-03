@@ -22,7 +22,7 @@ export default function TermsPage() {
           {/* Intro */}
           <div className="mb-12 rounded-2xl bg-secondary/30 p-6 sm:p-8">
             <p className="text-muted-foreground leading-relaxed">
-              By using Milestis, you agree to follow a few basic guidelines. We've written these in human language — no
+              By using Milestis, you agree to follow a few basic guidelines. We&apos;ve written these in human language — no
               confusing legal terms. These rules help us create a safe, respectful space for everyone to preserve their
               memories.
             </p>
@@ -46,7 +46,7 @@ export default function TermsPage() {
                   <li>Sharing special moments with family and friends</li>
                 </ul>
                 <p className="mt-4">
-                  Please don't use Milestis for anything harmful, illegal, or that could hurt others. We want this to be
+                  Please don&apos;t use Milestis for anything harmful, illegal, or that could hurt others. We want this to be
                   a positive space for everyone.
                 </p>
               </div>
@@ -64,8 +64,8 @@ export default function TermsPage() {
                 <p>When you upload photos and create memory books:</p>
                 <ul className="ml-4 list-disc space-y-2 marker:text-primary/50">
                   <li>You keep full ownership of everything you create</li>
-                  <li>You're responsible for having the right to use what you upload</li>
-                  <li>Please respect others' privacy in photos you share</li>
+                  <li>You&apos;re responsible for having the right to use what you upload</li>
+                  <li>Please respect others&apos; privacy in photos you share</li>
                 </ul>
                 <p className="mt-4 rounded-lg bg-secondary/30 p-4 text-sm">
                   Your memories, your rules. We just provide the tools to make them beautiful.
@@ -125,7 +125,7 @@ export default function TermsPage() {
                   <li>Features may change as we make Milestis better</li>
                   <li>Occasional maintenance is necessary</li>
                 </ul>
-                <p className="mt-4 text-sm">We'll always try to give you notice when possible.</p>
+                <p className="mt-4 text-sm">We&apos;ll always try to give you notice when possible.</p>
               </div>
             </section>
 
@@ -138,14 +138,14 @@ export default function TermsPage() {
                 <h2 className="font-serif text-xl font-semibold text-foreground">Ending your account</h2>
               </div>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
-                <p>You're free to leave whenever you want:</p>
+                <p>You&apos;re free to leave whenever you want:</p>
                 <ul className="ml-4 list-disc space-y-2 marker:text-primary/50">
                   <li>Delete your account at any time</li>
                   <li>Download your content before you go</li>
                   <li>No hard feelings — we hope you come back</li>
                 </ul>
                 <p className="mt-4 text-sm">
-                  We may also remove accounts that seriously violate these guidelines, but we'll always try to reach out
+                  We may also remove accounts that seriously violate these guidelines, but we&apos;ll always try to reach out
                   first.
                 </p>
               </div>
@@ -161,8 +161,8 @@ export default function TermsPage() {
               </div>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <p>
-                  If we update these terms, we'll let you know in advance. We won't surprise you with major changes —
-                  you'll always have time to review what's new before continuing to use Milestis.
+                  If we update these terms, we&apos;ll let you know in advance. We won&apos;t surprise you with major changes —
+                  you&apos;ll always have time to review what&apos;s new before continuing to use Milestis.
                 </p>
               </div>
             </section>
@@ -172,7 +172,7 @@ export default function TermsPage() {
           <div className="mt-16 rounded-2xl bg-secondary/30 p-6 text-center sm:p-8">
             <p className="text-muted-foreground">
               These terms exist to protect both you and Milestis. <br className="hidden sm:block" />
-              If something isn't clear, just{" "}
+              If something isn&apos;t clear, just{" "}
               <a href="#" className="text-primary underline-offset-4 hover:underline">
                 ask us
               </a>

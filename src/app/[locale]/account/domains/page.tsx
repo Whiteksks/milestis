@@ -84,7 +84,7 @@ export default function DomainsSettingsPage() {
             </div>
             <h3 className="mb-2 text-lg font-medium">No projects yet</h3>
             <p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">
-              You haven't published any projects yet. Create your first project to start sharing with the world.
+              You haven&apos;t published any projects yet. Create your first project to start sharing with the world.
             </p>
             <Button className="rounded-full">
               <Plus className="mr-2 size-4" />

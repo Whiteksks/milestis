@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
@@ -57,15 +57,10 @@ export function DesignCatalogModal() {
   const templateSectionCount = useMemo(() => getModeSectionCount(editorMode), [editorMode])
   const decorations = useMemo(() => Object.values(decorationPresets), [])
 
-  useEffect(() => {
-    if (!isDesignModalOpen) return
-
-    setActiveTag('all')
-
-    setSelectedTemplatesId((prev) => prev ?? currentTemplateId)
-    setSelectedThemeId((prev) => prev ?? currentTheme)
-    setSelectedDecorationPresetId((prev) => prev ?? themeToPreset[currentTheme] ?? null)
-  }, [isDesignModalOpen, currentTemplateId, currentTheme])
+  const effectiveSelectedTemplatesId = selectedTemplatesId ?? currentTemplateId ?? null
+  const effectiveSelectedThemeId = selectedThemeId ?? currentTheme ?? null
+  const effectiveSelectedDecorationPresetId =
+    selectedDecorationPresetId ?? themeToPreset[currentTheme] ?? null
 
   const itemsForSection = useMemo(() => {
     if (designModalSection === 'templates') return templates
@@ -104,6 +99,7 @@ export function DesignCatalogModal() {
 
   const handleClose = () => {
     clearPreviewDecorations()
+    setActiveTag('all')
     closeDesignModal()
   }
 
@@ -114,22 +110,22 @@ export function DesignCatalogModal() {
 
   const applySelected = () => {
     if (designModalSection === 'templates') {
-      if (!selectedTemplatesId) return
-      setTemplate(selectedTemplatesId as TemplateId)
+      if (!effectiveSelectedTemplatesId) return
+      setTemplate(effectiveSelectedTemplatesId as TemplateId)
       handleClose()
       return
     }
 
     if (designModalSection === 'themes') {
-      if (!selectedThemeId) return
-      setTheme(selectedThemeId as Theme)
+      if (!effectiveSelectedThemeId) return
+      setTheme(effectiveSelectedThemeId as Theme)
       handleClose()
       return
     }
 
     if (designModalSection === 'decorations') {
-      if (!selectedDecorationPresetId) return
-      const preset = getDecorationById(selectedDecorationPresetId) as any
+      if (!effectiveSelectedDecorationPresetId) return
+      const preset = getDecorationById(effectiveSelectedDecorationPresetId) as any
 
       const coerceImageUrl = (value: unknown) => {
         if (typeof value === 'string') return value
@@ -140,7 +136,7 @@ export function DesignCatalogModal() {
       }
 
       const mapped = (preset.elements || []).map((el: any, i: number) => ({
-        id: `preset-${selectedDecorationPresetId}-${i}-${Date.now()}`,
+        id: `preset-${effectiveSelectedDecorationPresetId}-${i}-${Date.now()}`,
         position: el.position || {},
         image: coerceImageUrl(el.image) || '/placeholder.svg',
         opacity: el.opacity ?? 0.15,
@@ -163,25 +159,34 @@ export function DesignCatalogModal() {
   }
 
   const isApplyDisabled =
-    (designModalSection === 'templates' && !selectedTemplatesId) ||
-    (designModalSection === 'themes' && !selectedThemeId) ||
-    (designModalSection === 'decorations' && !selectedDecorationPresetId)
+    (designModalSection === 'templates' && !effectiveSelectedTemplatesId) ||
+    (designModalSection === 'themes' && !effectiveSelectedThemeId) ||
+    (designModalSection === 'decorations' && !effectiveSelectedDecorationPresetId)
 
   const selectedLabel = useMemo(() => {
     if (designModalSection === 'templates') {
-      if (!selectedTemplatesId) return null
-      return templates.find((t) => t.id === selectedTemplatesId)?.name ?? selectedTemplatesId
+      if (!effectiveSelectedTemplatesId) return null
+      return (
+        templates.find((t) => t.id === effectiveSelectedTemplatesId)?.name ??
+        effectiveSelectedTemplatesId
+      )
     }
     if (designModalSection === 'themes') {
-      if (!selectedThemeId) return null
-      return themes.find((t) => t.id === selectedThemeId)?.name ?? selectedThemeId
+      if (!effectiveSelectedThemeId) return null
+      return themes.find((t) => t.id === effectiveSelectedThemeId)?.name ?? effectiveSelectedThemeId
     }
     if (designModalSection === 'decorations') {
-      if (!selectedDecorationPresetId) return null
-      return getDecorationName(selectedDecorationPresetId)
+      if (!effectiveSelectedDecorationPresetId) return null
+      return getDecorationName(effectiveSelectedDecorationPresetId)
     }
     return null
-  }, [designModalSection, selectedTemplatesId, selectedThemeId, selectedDecorationPresetId, templates])
+  }, [
+    designModalSection,
+    effectiveSelectedTemplatesId,
+    effectiveSelectedThemeId,
+    effectiveSelectedDecorationPresetId,
+    templates,
+  ])
 
   return (
     <Dialog
@@ -235,20 +240,24 @@ export function DesignCatalogModal() {
               {designModalSection === 'templates' ? (
                 <TemplatesSection
                   items={visibleItems as any}
-                  selectedId={selectedTemplatesId}
+                  selectedId={effectiveSelectedTemplatesId}
                   onSelect={setSelectedTemplatesId}
                   sectionCount={templateSectionCount}
                 />
               ) : null}
 
               {designModalSection === 'themes' ? (
-                <ThemesSection items={visibleItems as any} selectedId={selectedThemeId} onSelect={setSelectedThemeId} />
+                <ThemesSection
+                  items={visibleItems as any}
+                  selectedId={effectiveSelectedThemeId}
+                  onSelect={setSelectedThemeId}
+                />
               ) : null}
 
               {designModalSection === 'decorations' ? (
                 <DecorationsSection
                   items={visibleItems as any}
-                  selectedId={selectedDecorationPresetId}
+                  selectedId={effectiveSelectedDecorationPresetId}
                   onSelect={setSelectedDecorationPresetId}
                   currentTheme={currentTheme}
                 />

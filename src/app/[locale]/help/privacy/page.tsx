@@ -77,7 +77,7 @@ export default function PrivacyPage() {
                 <h2 className="font-serif text-xl font-semibold text-foreground">Photos and personal content</h2>
               </div>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
-                <p>Your photos and memories are precious. Here's how we treat them:</p>
+                <p>Your photos and memories are precious. Here&apos;s how we treat them:</p>
                 <ul className="ml-4 list-disc space-y-2 marker:text-primary/50">
                   <li>You own everything you upload — always</li>
                   <li>Your content is private by default</li>
@@ -85,7 +85,7 @@ export default function PrivacyPage() {
                   <li>Only you decide who can see your memory books</li>
                 </ul>
                 <p className="mt-4 rounded-lg bg-secondary/30 p-4 text-sm">
-                  Your memories stay yours. We're just here to help you preserve them beautifully.
+                  Your memories stay yours. We&apos;re just here to help you preserve them beautifully.
                 </p>
               </div>
             </section>
@@ -118,7 +118,7 @@ export default function PrivacyPage() {
                 <h2 className="font-serif text-xl font-semibold text-foreground">Your control</h2>
               </div>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
-                <p>You're always in control of your data:</p>
+                <p>You&apos;re always in control of your data:</p>
                 <ul className="ml-4 list-disc space-y-2 marker:text-primary/50">
                   <li>Edit or delete your content anytime</li>
                   <li>Download your photos and projects</li>
@@ -138,8 +138,8 @@ export default function PrivacyPage() {
               </div>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <p>
-                  If we make meaningful changes to this policy, we'll let you know through email or a notice in the app.
-                  We won't surprise you with sudden changes to how your data is handled.
+                  If we make meaningful changes to this policy, we&apos;ll let you know through email or a notice in the app.
+                  We won&apos;t surprise you with sudden changes to how your data is handled.
                 </p>
               </div>
             </section>
