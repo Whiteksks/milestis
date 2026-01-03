@@ -6,17 +6,15 @@ import { Plus, Palette, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {
-  const { toggleTemplateModal, toggleThemeModal, toggleDecorationsModal } = useUiSelector((state) => ({
-    toggleTemplateModal: state.toggleTemplateModal,
-    toggleThemeModal: state.toggleThemeModal,
-    toggleDecorationsModal: state.toggleDecorationsModal,
+  const { openDesignModal } = useUiSelector((state) => ({
+    openDesignModal: state.openDesignModal,
   }))
 
   return (
     <div className="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-50 flex-col gap-2">
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button
-          onClick={toggleTemplateModal}
+          onClick={() => openDesignModal('templates')}
           size="lg"
           className="h-12 w-12 rounded-2xl shadow-lg hover:shadow-xl transition-all bg-slate-900 hover:bg-slate-800 backdrop-blur-sm"
           title="Change Template"
@@ -26,7 +24,7 @@ export function FloatingActions() {
       </motion.div>
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button
-          onClick={toggleThemeModal}
+          onClick={() => openDesignModal('themes')}
           size="lg"
           className="h-12 w-12 rounded-2xl shadow-lg hover:shadow-xl transition-all bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200"
           variant="outline"
@@ -37,7 +35,7 @@ export function FloatingActions() {
       </motion.div>
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button
-          onClick={toggleDecorationsModal}
+          onClick={() => openDesignModal('decorations')}
           size="lg"
           className="h-12 w-12 rounded-2xl shadow-lg hover:shadow-xl transition-all bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200"
           variant="outline"

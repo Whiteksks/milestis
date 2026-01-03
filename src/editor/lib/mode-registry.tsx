@@ -120,10 +120,10 @@ export const MODE_REGISTRY: Record<EditorMode, ModeRegistryEntry> = {
   portfolio: {
     label: 'Portfolio',
     templates: [
-      { id: 'classic', name: 'Classic' },
-      { id: 'minimal', name: 'Minimal' },
-      { id: 'elegant', name: 'Elegant' },
-      { id: 'modern', name: 'Modern' },
+      { id: 'classic', name: 'Classic', tags: ['classic', 'elegant'] },
+      { id: 'minimal', name: 'Minimal', tags: ['minimal'] },
+      { id: 'elegant', name: 'Elegant', tags: ['elegant'] },
+      { id: 'modern', name: 'Modern', tags: ['modern'] },
     ],
     sections: [
       { id: 'header', name: 'Header', toggleKey: 'showHeader' },
@@ -174,14 +174,14 @@ export const MODE_REGISTRY: Record<EditorMode, ModeRegistryEntry> = {
   photobook: {
     label: 'Photobook',
     templates: [
-      { id: 'wedding-timeline', name: 'Photobook Timeline' },
-      { id: 'masonry', name: 'Photobook Masonry' },
-      { id: 'photobook-classic', name: 'Photobook Classic' },
-      { id: 'photobook-circle', name: 'Photobook Circle' },
-      { id: 'photobook-magazine', name: 'Photobook Magazine' },
-      { id: 'photobook-polaroid', name: 'Photobook Polaroid' },
-      { id: 'photobook-split', name: 'Photobook Split' },
-      { id: 'photobook-vertical', name: 'Photobook Vertical' },
+      { id: 'wedding-timeline', name: 'Photobook Timeline', tags: ['modern'] },
+      { id: 'masonry', name: 'Photobook Masonry', tags: ['modern'] },
+      { id: 'photobook-classic', name: 'Photobook Classic', tags: ['classic'] },
+      { id: 'photobook-circle', name: 'Photobook Circle', tags: ['modern'] },
+      { id: 'photobook-magazine', name: 'Photobook Magazine', tags: ['elegant'] },
+      { id: 'photobook-polaroid', name: 'Photobook Polaroid', tags: ['classic'] },
+      { id: 'photobook-split', name: 'Photobook Split', tags: ['minimal'] },
+      { id: 'photobook-vertical', name: 'Photobook Vertical', tags: ['minimal'] },
     ],
     sections: [
       { id: 'cover', name: 'Cover', toggleKey: 'showCover' },

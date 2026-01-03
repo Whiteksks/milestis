@@ -3,11 +3,14 @@ import type { Theme } from './types'
 export interface ThemeConfig {
   id: Theme
   name: string
+    tags: ['professional', 'modern'],
   description: string
+  tags?: string[]
 
   // --- ОСНОВНЫЕ ЦВЕТА ---
   background: string
   foreground: string
+    tags: ['classic', 'elegant'],
   primary: string
   primaryText: string
   muted: string
@@ -17,6 +20,7 @@ export interface ThemeConfig {
   // --- ДОПОЛНИТЕЛЬНЫЕ СЕМАНТИЧЕСКИЕ ЦВЕТА ---
   secondary: string           // Дополнительный акцентный цвет
   secondaryText: string
+    tags: ['modern', 'glass'],
   accent: string              // Цвет для выделения или акцента
   accentText: string
   success: string             // Цвет для успешных действий (зеленый)
@@ -25,6 +29,7 @@ export interface ThemeConfig {
   // --- ЦВЕТА КОМПОНЕНТОВ UI ---
   card: string                // Фон карточек, часто отличается от background
   cardForeground: string
+    tags: ['minimal', 'monochrome'],
   popover: string             // Фон всплывающих окон/тултипов
   popoverForeground: string
   input: string               // Фон поля ввода (input)
@@ -33,6 +38,7 @@ export interface ThemeConfig {
   // --- СПЕЦИФИЧНЫЕ СОСТОЯНИЯ ---
   placeholder: string         // placeholder-... (Цвет плейсхолдера)
   caretColor: string          // caret-... (Цвет курсора)
+    tags: ['floral', 'elegant'],
 
   // --- ЭФФЕКТЫ ---
   cardStyle: string           // Полный стиль карточки: bg-color/opac, backdrop-blur, border
@@ -60,6 +66,7 @@ export const themes: ThemeConfig[] = [
     id: 'vellum-vintage',
     name: 'Vellum Vintage',
     description: 'Elegant aged paper with warm contrast and soft serif typography',
+    tags: ['classic', 'elegant'],
 
     background: 'bg-[#F2EFE9]',
     foreground: 'text-[#463C33]',
@@ -107,6 +114,7 @@ export const themes: ThemeConfig[] = [
     id: 'nordic-light',
     name: 'Nordic Light',
     description: 'Minimal clean theme inspired by Scandinavian aesthetics',
+    tags: ['minimal', 'modern'],
 
     background: 'bg-[#F8FAFC]',
     foreground: 'text-[#0F172A]',
@@ -154,6 +162,7 @@ export const themes: ThemeConfig[] = [
     id: 'midnight-neon',
     name: 'Midnight Neon',
     description: 'Dark futuristic theme with neon highlights',
+    tags: ['dark', 'modern'],
 
     background: 'bg-[#030712]',
     foreground: 'text-[#F3F4F6]',
@@ -201,6 +210,7 @@ export const themes: ThemeConfig[] = [
     id: 'sunset-warm',
     name: 'Sunset Warm',
     description: 'Soft warm theme inspired by sunset and cozy tones',
+    tags: ['warm', 'elegant'],
 
     background: 'bg-[#FFF9F5]',
     foreground: 'text-[#431407]',

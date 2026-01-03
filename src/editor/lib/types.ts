@@ -164,6 +164,8 @@ export interface DecorationElement {
 export interface DecorationsConfig {
   id?: string
   name?: string
+  description?: string
+  tags?: string[]
   backgroundImage?: {
     url: string
     opacity?: number

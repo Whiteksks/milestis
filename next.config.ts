@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "server.wallpaperalchemy.com", pathname: "/**" },
       { protocol: "https", hostname: "images.wallpapersden.com", pathname: "/**" },
       { protocol: "https", hostname: "i.pinimg.com", pathname: "/**" },
+      { protocol: "https", hostname: "i.redd.it", pathname: "/**" },
+      { protocol: "https", hostname: "moewalls.com", pathname: "/**" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com", pathname: "/**" },
       { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
       { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/**" },

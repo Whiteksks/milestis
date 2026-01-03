@@ -1,26 +1,31 @@
 import { create } from 'zustand'
 import type { DeviceView, EditorMode, DecorationsConfig } from './types'
 
+export type DesignModalSection = 'templates' | 'themes' | 'decorations'
+
 export interface UiStore {
   deviceView: DeviceView
   editorMode: EditorMode
-  isTemplateModalOpen: boolean
-  isThemeModalOpen: boolean
   isMediaLibraryOpen: boolean
   isMediaPickerOpen: boolean
   isSidebarCollapsed: boolean
-  isDecorationsModalOpen: boolean
+
+  isDesignModalOpen: boolean
+  designModalSection: DesignModalSection
+
   previewDecorations?: DecorationsConfig | null
   selectedDecorationId: string | null
 
   setDeviceView: (view: DeviceView) => void
   setEditorMode: (mode: EditorMode) => void
-  toggleTemplateModal: () => void
-  toggleThemeModal: () => void
   toggleMediaLibrary: () => void
   toggleMediaPicker: () => void
   toggleSidebar: () => void
-  toggleDecorationsModal: () => void
+
+  openDesignModal: (section: DesignModalSection) => void
+  closeDesignModal: () => void
+  setDesignModalSection: (section: DesignModalSection) => void
+
   setPreviewDecorations: (d?: DecorationsConfig | null) => void
   clearPreviewDecorations: () => void
   setSelectedDecorationId: (id: string | null) => void
@@ -29,24 +34,19 @@ export interface UiStore {
 export const useUiStore = create<UiStore>((set) => ({
   deviceView: 'desktop',
   editorMode: 'portfolio',
-  isTemplateModalOpen: false,
-  isThemeModalOpen: false,
   isMediaLibraryOpen: false,
   isMediaPickerOpen: false,
   isSidebarCollapsed: false,
-  isDecorationsModalOpen: false,
+
+  isDesignModalOpen: false,
+  designModalSection: 'templates',
+
   previewDecorations: null,
   selectedDecorationId: null,
 
   setDeviceView: (view) => set({ deviceView: view }),
 
   setEditorMode: (mode) => set({ editorMode: mode }),
-
-  toggleTemplateModal: () =>
-    set((state) => ({ isTemplateModalOpen: !state.isTemplateModalOpen })),
-
-  toggleThemeModal: () =>
-    set((state) => ({ isThemeModalOpen: !state.isThemeModalOpen })),
 
   toggleMediaLibrary: () =>
     set((state) => ({ isMediaLibraryOpen: !state.isMediaLibraryOpen })),
@@ -57,8 +57,15 @@ export const useUiStore = create<UiStore>((set) => ({
   toggleSidebar: () =>
     set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
 
-  toggleDecorationsModal: () =>
-    set((state) => ({ isDecorationsModalOpen: !state.isDecorationsModalOpen })),
+  openDesignModal: (section) =>
+    set(() => ({
+      isDesignModalOpen: true,
+      designModalSection: section,
+    })),
+
+  closeDesignModal: () => set(() => ({ isDesignModalOpen: false })),
+
+  setDesignModalSection: (section) => set(() => ({ designModalSection: section })),
 
   setPreviewDecorations: (d) => set(() => ({ previewDecorations: d ?? null })),
 
