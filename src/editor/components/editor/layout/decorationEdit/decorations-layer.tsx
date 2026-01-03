@@ -215,6 +215,14 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
           <DecorationsFloatingMenu
             scale={selectedDecoration.scale ?? 1}
             onScaleChange={(next) => updateDecoration(selectedDecoration.id!, { scale: next })}
+            opacity={selectedDecoration.opacity ?? 1}
+            onOpacityChange={(next) => updateDecoration(selectedDecoration.id!, { opacity: next })}
+            zIndex={selectedDecoration.zIndex ?? 0}
+            onLayerChange={(direction) => updateDecoration(selectedDecoration.id!, { zIndex: direction === 'front' ? 20 : 5 })}
+            onImageReplace={(file) => {
+              const url = URL.createObjectURL(file)
+              updateDecoration(selectedDecoration.id!, { image: url })
+            }}
             onDelete={() => removeDecoration(selectedDecoration.id!)}
             anchor={selectedDecoration.position}
             x={dragX}
