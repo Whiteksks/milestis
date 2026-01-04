@@ -46,9 +46,10 @@ export function RevealHeader({
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          '@container fixed top-0 left-0 right-0 z-40 transition-shadow duration-300',
+          '@container fixed top-0 left-0 z-40 transition-shadow duration-300',
           hasScrolled && theme.shadow,
         )}
+        style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
       >
         <div
           className={cn(
@@ -171,7 +172,8 @@ export function RevealHeader({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="@container @md:hidden fixed top-16 left-0 right-0 z-30 px-4"
+            className="@container @md:hidden fixed top-16 left-0 z-30 px-4"
+            style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
           >
             <div
               className={cn(

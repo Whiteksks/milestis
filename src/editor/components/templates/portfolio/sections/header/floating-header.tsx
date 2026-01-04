@@ -14,7 +14,7 @@ export function HeaderFloating({ theme, sectionContent, handleAnchorClick }: Flo
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
   return (
-    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
+    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem-var(--canvas-scrollbar-width,0px))] max-w-4xl">
       <div className={cn(
         "rounded-full px-6 h-14 flex items-center justify-between shadow-lg shadow-black/5",
         theme.cardStyle

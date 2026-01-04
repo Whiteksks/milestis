@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 
 interface MinimallHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
@@ -13,13 +12,15 @@ interface MinimallHeaderProps
 export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: MinimallHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
-  const inCanvas = useCanvasScrollContainer() !== null
 
   return (
-    <header className={cn(
-      inCanvas ? 'fixed top-0 w-full z-50' : 'fixed top-0 left-0 right-0 z-50',
-      theme.glassPanel
-    )}>
+    <header
+      className={cn(
+        "fixed top-0 left-0 z-50",
+        theme.glassPanel
+      )}
+      style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
+    >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <a 

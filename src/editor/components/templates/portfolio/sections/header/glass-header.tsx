@@ -14,7 +14,10 @@ export function HeaderGlass({ theme, sectionContent, handleAnchorClick }: GlassH
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
   return (
-    <header className="fixed top-4 left-4 right-4 z-50 @container">
+    <header
+      className="fixed top-4 left-4 z-50 @container"
+      style={{ right: 'calc(1rem + var(--canvas-scrollbar-width, 0px))' }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className={cn(
           "rounded-2xl shadow-lg shadow-black/5",

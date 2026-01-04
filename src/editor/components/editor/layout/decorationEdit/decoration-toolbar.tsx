@@ -92,19 +92,22 @@ export const DecorationToolbar = memo(function DecorationToolbar({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.2 }}
-      className={cn(
-        "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
-        "pointer-events-auto",
-        "bg-white/95 backdrop-blur-md",
-        "border border-slate-200",
-        "shadow-lg shadow-slate-900/10",
-        "rounded-full",
-        "p-1.5",
-        "flex items-center gap-0.5",
-        className,
-      )}
-      onPointerDown={(e) => e.stopPropagation()}
+      className="fixed bottom-6 left-0 z-50 flex justify-center pointer-events-none"
+      style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
     >
+      <div
+        className={cn(
+          "pointer-events-auto",
+          "bg-white/95 backdrop-blur-md",
+          "border border-slate-200",
+          "shadow-lg shadow-slate-900/10",
+          "rounded-full",
+          "p-1.5",
+          "flex items-center gap-0.5",
+          className,
+        )}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
       {/* Flip X */}
       <Button
         type="button"
@@ -281,6 +284,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
           </div>
         </PopoverContent>
       </Popover>
+      </div>
     </motion.div>
   )
 })

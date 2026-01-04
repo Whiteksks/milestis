@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useLayoutEffect, useState } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
@@ -22,6 +22,7 @@ const DEVICE_CLASSES: Record<DeviceView, string> = {
 export function Canvas() {
   const viewportRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
   const { deviceView, editorMode, previewDecorations } = useUiSelector(state => ({
     deviceView: state.deviceView,
@@ -69,6 +70,28 @@ export function Canvas() {
     theme.background
   )
 
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const measure = () => {
+      // In Chrome/Windows the scrollbar takes layout space; on overlay scrollbars this is 0.
+      const width = Math.max(0, container.offsetWidth - container.clientWidth)
+      setScrollbarWidth(prev => (prev === width ? prev : width))
+    }
+
+    measure()
+
+    const resizeObserver = new ResizeObserver(() => measure())
+    resizeObserver.observe(container)
+
+    window.addEventListener('resize', measure)
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
+
   return (
     <div className="flex-1 min-h-0 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-hidden">
       <div
@@ -78,6 +101,7 @@ export function Canvas() {
           DEVICE_CLASSES[deviceView],
           viewportBackgroundClass
         )}
+        style={{ ['--canvas-scrollbar-width' as any]: `${scrollbarWidth}px` }}
       >
         <BackgroundLayer
           config={resolvedBackground}
