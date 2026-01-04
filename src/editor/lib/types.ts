@@ -143,6 +143,12 @@ export interface ThemeCustomDecorations {
   scale?: number
   responsiveScale?: boolean
   zIndex?: number
+  transform?: {
+    flipX?: boolean
+    flipY?: boolean
+  }
+  /** Aspect ratio (width/height), can be computed from image */
+  aspectRatio?: number
 }
 
 export interface DecorationElement {
@@ -159,7 +165,47 @@ export interface DecorationElement {
   scale?: number
   responsiveScale?: boolean
   zIndex?: number
+  transform?: {
+    flipX?: boolean
+    flipY?: boolean
+  }
+  /** Aspect ratio (width/height), can be computed from image */
+  aspectRatio?: number
 }
+
+// Unified editor-side decoration types (used by the optimized decorationEdit/new implementation)
+export interface EditorDecorationPosition {
+  top?: string
+  bottom?: string
+  left?: string
+  right?: string
+}
+
+export interface EditorDecorationTransform {
+  flipX?: boolean
+  flipY?: boolean
+}
+
+/**
+ * Normalized decoration model for the editor UI.
+ * - `id` is always present
+ * - `opacity` is optional (defaults can be applied by UI)
+ */
+export interface EditorDecorationElement {
+  id: string
+  image: string
+  position?: EditorDecorationPosition
+  size?: 'small' | 'medium' | 'large' | 'xlarge'
+  scale?: number
+  opacity?: number
+  zIndex?: number
+  responsiveScale?: boolean
+  transform?: EditorDecorationTransform
+  /** Aspect ratio (width/height), can be computed from image */
+  aspectRatio?: number
+}
+
+export type EditorDecorationUpdatePayload = Partial<Omit<EditorDecorationElement, 'id'>>
 
 export interface DecorationsConfig {
   id?: string

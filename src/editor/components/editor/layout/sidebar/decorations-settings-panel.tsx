@@ -57,7 +57,7 @@ export function DecorationsSettingsPanel() {
       image: '/placeholder.svg?height=150&width=150',
       opacity: 0.15,
       scale: 1,
-      responsiveScale: false,
+      responsiveScale: true,
       zIndex: 5,
     }
 
@@ -93,7 +93,7 @@ export function DecorationsSettingsPanel() {
       },
       image: coerceImageUrl(el.image) || '/placeholder.svg',
       opacity: el.opacity ?? 0.15,
-      responsiveScale: false,
+      responsiveScale: el.responsiveScale ?? true,
       zIndex: el.zIndex || 0,
     }))
 
@@ -243,12 +243,12 @@ export function DecorationsSettingsPanel() {
                         <Input
                           type="number"
                           inputMode="decimal"
-                          min={0.1}
+                          min={0.5}
                           step={0.1}
                           value={decoration.scale ?? 1}
                           onChange={(e) => {
                             const next = Number(e.target.value)
-                            updateDecoration(decoration.id, { scale: Number.isFinite(next) && next > 0 ? next : 1 })
+                            updateDecoration(decoration.id, { scale: Number.isFinite(next) && next >= 0.5 ? next : 1 })
                           }}
                           className="h-8 rounded-lg border-slate-200 text-xs bg-white"
                         />
@@ -287,9 +287,9 @@ export function DecorationsSettingsPanel() {
 
                       <label className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
                         <span className="text-[11px] font-medium text-slate-700">Mobile adaptation</span>
-                        <input
-                          type="checkbox"
-                          checked={Boolean(decoration.responsiveScale)}
+                          <input
+                            type="checkbox"
+                            checked={decoration.responsiveScale !== false}
                           onChange={(e) => updateDecoration(decoration.id, { responsiveScale: e.target.checked })}
                           className="h-4 w-4 accent-slate-900"
                         />
