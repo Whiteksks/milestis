@@ -3,10 +3,10 @@
 import type React from "react"
 
 import { memo, useRef, useCallback } from "react"
-import { motion, type MotionValue, type DragControls } from "framer-motion"
+import { motion, type MotionValue } from "framer-motion"
 import { Move } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { DecorationElement, DragBox } from "./decorationTypes"
+import type { DecorationElement } from "./decorationTypes"
 import { getBaseSizePx } from "./utils"
 
 export interface DecorationHandleProps {
@@ -14,10 +14,7 @@ export interface DecorationHandleProps {
   responsiveFactor?: number
   dragX: MotionValue<number>
   dragY: MotionValue<number>
-  dragControls: DragControls
-  constraints?: DragBox
   onStartDrag: (e: React.PointerEvent, element: HTMLElement) => void
-  onCommitDrag: (element: HTMLElement) => void
 }
 
 export const DecorationHandle = memo(function DecorationHandle({
@@ -25,10 +22,7 @@ export const DecorationHandle = memo(function DecorationHandle({
   responsiveFactor = 1,
   dragX,
   dragY,
-  dragControls,
-  constraints,
   onStartDrag,
-  onCommitDrag,
 }: DecorationHandleProps) {
   const ref = useRef<HTMLButtonElement>(null)
 
@@ -45,10 +39,6 @@ export const DecorationHandle = memo(function DecorationHandle({
     },
     [onStartDrag],
   )
-
-  const handleDragEnd = useCallback(() => {
-    if (ref.current) onCommitDrag(ref.current)
-  }, [onCommitDrag])
 
   return (
     <motion.button
@@ -74,13 +64,6 @@ export const DecorationHandle = memo(function DecorationHandle({
         x: dragX,
         y: dragY,
       }}
-      drag
-      dragControls={dragControls}
-      dragListener={false}
-      dragConstraints={constraints}
-      dragMomentum={false}
-      dragElastic={0}
-      onDragEnd={handleDragEnd}
       onPointerDown={handlePointerDown}
       onContextMenu={(e) => e.preventDefault()}
       aria-label="Drag decoration"

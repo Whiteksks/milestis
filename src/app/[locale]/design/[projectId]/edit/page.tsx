@@ -9,10 +9,12 @@ import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/secti
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
 import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
 import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
+import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
 export default function EditorPage() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const { openDesignModal, editorMode } = useUiSelector((state) => ({
@@ -53,8 +55,10 @@ export default function EditorPage() {
     <div className="h-screen flex flex-col overflow-hidden">
       <EditorHeader />
       <div className="flex flex-1 overflow-hidden relative pb-16 md:pb-0">
-        <Canvas />
-        <SectionsSidebar />
+        <CanvasScrollProvider value={scrollContainerRef}>
+          <Canvas scrollContainerRef={scrollContainerRef} />
+          <SectionsSidebar />
+        </CanvasScrollProvider>
       </div>
       
       {/* Desktop floating actions */}

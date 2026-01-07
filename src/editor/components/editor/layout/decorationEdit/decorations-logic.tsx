@@ -56,7 +56,7 @@ export function DecorationsLayer({
     [selectedId, onUpdate],
   )
 
-  const { dragControls, dragX, dragY, constraints, startDrag, commitDrag } = useDecorationDrag({
+  const { dragX, dragY, startDrag } = useDecorationDrag({
     decorationId: selectedId,
     boundsRef,
     onCommit: handleCommitPosition,
@@ -100,10 +100,7 @@ export function DecorationsLayer({
               responsiveFactor={responsiveFactor}
               dragX={dragX}
               dragY={dragY}
-              dragControls={dragControls}
-              constraints={constraints}
               onStartDrag={startDrag}
-              onCommitDrag={commitDrag}
             />
 
             <DecorationToolbar

@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Private / non-public areas
+Disallow: /account/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /editor/
+Disallow: /api/
+
+# Same restrictions when locale is the first segment (e.g. /en/account/...)
+Disallow: /*/account/
+Disallow: /*/auth/
+Disallow: /*/dashboard/
+Disallow: /*/editor/
+Disallow: /*/api/
+
+Sitemap: https://milestis.com/sitemap.xml

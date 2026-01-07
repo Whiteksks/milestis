@@ -7,7 +7,6 @@ import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-layer'
-import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { useCanvasBackground } from '@/editor/hooks/use-canvas-background'
 import { BackgroundLayer } from './layout/background-layer'
 import type { DeviceView } from '@/editor/lib/types'
@@ -19,9 +18,14 @@ const DEVICE_CLASSES: Record<DeviceView, string> = {
   fullscreen: 'w-screen h-[calc(100vh-4rem)] max-w-none fixed left-0 top-16 z-50 bg-white',
 }
 
-export function Canvas() {
+export function Canvas({
+  scrollContainerRef: externalScrollContainerRef,
+}: {
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>
+}) {
   const viewportRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const internalScrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = externalScrollContainerRef ?? internalScrollContainerRef
   const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
   const { deviceView, editorMode, previewDecorations } = useUiSelector(state => ({
@@ -111,16 +115,18 @@ export function Canvas() {
         />
 
         <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
-          <CanvasScrollProvider value={scrollContainerRef}>
-            <div className={cn(
-              'shadow-2xl overflow-hidden relative',
-              contentBackgroundClass,
-              theme.foreground,
-              theme.fontBody,
-              theme.lineHeight,
-              theme.letterSpacing,
-              theme.shadow
-            )}>
+            <div
+              data-canvas-content-root="true"
+              className={cn(
+                'shadow-2xl overflow-hidden relative',
+                contentBackgroundClass,
+                theme.foreground,
+                theme.fontBody,
+                theme.lineHeight,
+                theme.letterSpacing,
+                theme.shadow
+              )}
+            >
               <BackgroundLayer
                 config={resolvedBackground}
                 placement="content"
@@ -134,7 +140,6 @@ export function Canvas() {
                 {templateNode}
               </div>
             </div>
-          </CanvasScrollProvider>
         </div>
       </div>
     </div>

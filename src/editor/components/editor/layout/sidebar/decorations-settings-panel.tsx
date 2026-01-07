@@ -9,6 +9,9 @@ import { getDecorations } from '@/editor/lib/decorations'
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import { useMemo, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
+import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const coerceImageUrl = (value: unknown) => {
   if (typeof value === 'string') return value
@@ -19,6 +22,7 @@ const coerceImageUrl = (value: unknown) => {
 }
 
 export function DecorationsSettingsPanel() {
+  const canvasScrollRef = useCanvasScrollContainer()
   const {
     currentTheme,
     themeCustomizations,
@@ -51,9 +55,33 @@ export function DecorationsSettingsPanel() {
   const decorations = useMemo(() => customDecorations, [customDecorations])
 
   const handleAddDecoration = () => {
+    const scroller = canvasScrollRef?.current
+    const contentRoot = scroller?.querySelector<HTMLElement>('[data-canvas-content-root="true"]')
+
+    const position = (() => {
+      if (!scroller || !contentRoot) return { top: '10%', left: '10%' }
+      const scrollerRect = scroller.getBoundingClientRect()
+      const contentRect = contentRoot.getBoundingClientRect()
+      if (contentRect.width <= 0 || contentRect.height <= 0) return { top: '10%', left: '10%' }
+
+      const centerClientX = scrollerRect.left + scroller.clientWidth / 2
+      const centerClientY = scrollerRect.top + scroller.clientHeight / 2
+
+      const xInContent = centerClientX - contentRect.left
+      const yInContent = centerClientY - contentRect.top
+
+      const leftPct = clamp((xInContent / contentRect.width) * 90, 0, 100)
+      const topPct = clamp((yInContent / contentRect.height) * 95, 0, 100)
+
+      return {
+        top: `${topPct.toFixed(2)}%`,
+        left: `${leftPct.toFixed(2)}%`,
+      }
+    })()
+
     const newDecoration: ThemeCustomDecorations = {
       id: `decoration-${Date.now()}`,
-      position: { top: '10%', left: '10%' },
+      position,
       image: '/placeholder.svg?height=150&width=150',
       opacity: 0.15,
       scale: 1,
