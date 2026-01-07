@@ -27,9 +27,10 @@ const normalizeAnimation = (animation?: string): 'none' | 'fade' | 'slide-up' | 
 }
 
 export function DecorationsLayer({ decorations, animation }: DecorationsLayerProps) {
-  const { selectedDecorationId, deviceView } = useUiSelector((state) => ({
+  const { selectedDecorationId, deviceView, setSelectedDecorationId } = useUiSelector((state) => ({
     selectedDecorationId: state.selectedDecorationId,
     deviceView: state.deviceView,
+    setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
   const { customDecorations, updateDecoration, removeDecoration } = useThemeSelector((state) => ({
@@ -83,6 +84,7 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
       animation={normalizeAnimation(animation)}
       onUpdate={handleUpdate}
       onRemove={handleRemove}
+      onSelect={(id) => setSelectedDecorationId(id)}
     />
   )
 }

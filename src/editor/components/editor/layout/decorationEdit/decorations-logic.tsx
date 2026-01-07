@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import type { DecorationElement, DecorationUpdatePayload } from "./decorationTypes"
@@ -47,6 +47,24 @@ export function DecorationsLayer({
   const animationVariants = getAnimationVariants(animation)
   const responsiveFactor = getResponsiveFactor(deviceView)
 
+  const [activeDecorationId, setActiveDecorationId] = useState<string | null>(() => {
+    return selectedId ?? decorations[0]?.id ?? null
+  })
+
+  useEffect(() => {
+    if (selectedId) setActiveDecorationId(selectedId)
+  }, [selectedId])
+
+  useEffect(() => {
+    if (!decorations.length) {
+      setActiveDecorationId(null)
+      return
+    }
+    if (!activeDecorationId || !decorations.some((d) => d.id === activeDecorationId)) {
+      setActiveDecorationId(decorations[0]!.id)
+    }
+  }, [decorations, activeDecorationId])
+
   const selectedDecoration = useMemo(() => decorations.find((d) => d.id === selectedId), [decorations, selectedId])
 
   const handleCommitPosition = useCallback(
@@ -72,6 +90,14 @@ export function DecorationsLayer({
     [selectedId, onUpdate],
   )
 
+  const handleCanvasSelect = useCallback(
+    (id: string | null) => {
+      if (id) setActiveDecorationId(id)
+      onSelect?.(id)
+    },
+    [onSelect],
+  )
+
   if (!decorations.length) return null
 
   return (
@@ -87,30 +113,46 @@ export function DecorationsLayer({
             dragY={decoration.id === selectedId ? dragY : undefined}
             animationVariants={animationVariants}
             animationDelay={index * 0.15}
-            onClick={onSelect}
+            onClick={(id) => handleCanvasSelect(id)}
           />
         ))}
       </div>
 
       <AnimatePresence>
         {selectedDecoration && (
-          <>
-            <DecorationHandle
-              decoration={selectedDecoration}
-              responsiveFactor={responsiveFactor}
-              dragX={dragX}
-              dragY={dragY}
-              onStartDrag={startDrag}
-            />
-
-            <DecorationToolbar
-              decoration={selectedDecoration}
-              onUpdate={(updates) => onUpdate(selectedDecoration.id, updates)}
-              onDelete={() => onRemove(selectedDecoration.id)}
-              onImageReplace={handleImageReplace}
-            />
-          </>
+          <DecorationHandle
+            decoration={selectedDecoration}
+            responsiveFactor={responsiveFactor}
+            dragX={dragX}
+            dragY={dragY}
+            onStartDrag={startDrag}
+          />
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        <DecorationToolbar
+          decorations={decorations}
+          activeDecorationId={activeDecorationId}
+          onActiveDecorationChange={(id) => setActiveDecorationId(id)}
+          decoration={selectedDecoration}
+          onUpdate={selectedDecoration ? (updates) => onUpdate(selectedDecoration.id, updates) : undefined}
+          onDelete={selectedDecoration ? () => onRemove(selectedDecoration.id) : undefined}
+          onImageReplace={selectedDecoration ? handleImageReplace : undefined}
+          onCloseSettings={() => handleCanvasSelect(null)}
+          onOpenSettings={() => activeDecorationId && handleCanvasSelect(activeDecorationId)}
+          onSelectDecoration={(id) => handleCanvasSelect(id)}
+          onLocate={
+            selectedDecoration
+              ? () => {
+                  const element = document.querySelector(`[data-decoration-id="${selectedDecoration.id}"]`)
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth", block: "center" })
+                  }
+                }
+              : undefined
+          }
+        />
       </AnimatePresence>
     </>
   )
