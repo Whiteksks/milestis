@@ -3,155 +3,153 @@
 import { useUiSelector } from '@/editor/lib/store'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
 import { Layers, Paintbrush, Sparkles, PanelRightOpen, PanelLeftClose } from 'lucide-react'
 
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 
-export function SectionsSidebar() {
-  const { isSidebarCollapsed, toggleSidebar, editorMode } = useUiSelector((state) => ({
+export type DesktopEditorTab = 'sections' | 'theme' | 'decorations'
+
+export function SectionsSidebar({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: DesktopEditorTab
+  onTabChange: (tab: DesktopEditorTab) => void
+}) {
+  const { isSidebarCollapsed, toggleSidebar, editorMode, setSelectedDecorationId } = useUiSelector((state) => ({
     isSidebarCollapsed: state.isSidebarCollapsed,
     toggleSidebar: state.toggleSidebar,
     editorMode: state.editorMode,
+    setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  const [activeTab, setActiveTab] = useState<'sections' | 'theme' | 'decorations'>('sections')
+  const handleTabChange = (tab: 'sections' | 'theme' | 'decorations') => {
+    onTabChange(tab)
+    setSelectedDecorationId(null)
+  }
 
   return (
     <>
-      {/* Toggle sidebar */}
-      <motion.button
-        onClick={toggleSidebar}
-        initial={false}
-        animate={{
-          y: '-50%'
-        }}
-        //whileHover={{ x: isSidebarCollapsed ? -4 : -10 }}
-        whileTap={{ scale: 0.96 }}
-        className={cn(
-          'hidden md:flex md:absolute md:right-0 md:top-1/2 z-20',
-          'w-10 h-18 items-center justify-center',
-          'rounded-l-xl',
-          'bg-background/70 backdrop-blur-xl',
-          'border border-border/60 border-r-0',
-          'shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12)]',
-          'hover:bg-background/90 hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)]',
-          'transition-all duration-200 ease-out group'
-        )}
-      >
-        <motion.div
-          animate={{ rotate: isSidebarCollapsed ? 0 : 180 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="flex items-center justify-center"
-        >
-          {isSidebarCollapsed ? (
-            <PanelRightOpen className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-          ) : (
-            <PanelLeftClose className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-          )}
-        </motion.div>
-
-        {/* subtle hover glow */}
-        <span className="pointer-events-none absolute inset-0 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="absolute inset-0 rounded-l-xl bg-linear-to-l from-primary/10 to-transparent" />
-        </span>
-      </motion.button>
-
-
       {/* Sidebar */}
       <motion.div
         className={cn(
-          'hidden md:flex flex-col border-l border-slate-200 bg-white shadow-2xl relative'
+          'hidden md:flex flex-col border-l border-border/40 bg-sidebar/10 shadow-lg relative overflow-visible'
         )}
         initial={false}
         animate={{
           width: isSidebarCollapsed ? 0 : 380,
-          opacity: isSidebarCollapsed ? 0 : 1
         }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
       >
+        <motion.button
+          onClick={toggleSidebar}
+          initial={false}
+          whileTap={{ scale: 0.96 }}
+          className={cn(
+            'group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-30',
+            'hidden md:flex items-center justify-center',
+            'w-12 h-16',
+            'rounded-l-xl',
+            'bg-sidebar backdrop-blur-sm',
+            'border border-border/60 border-r-0',
+            'shadow-md',
+            'hover:bg-muted/50',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            'transition-colors duration-200'
+          )}
+        >
+          <motion.div
+            animate={{ rotate: isSidebarCollapsed ? 0 : 180 }}
+            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+          >
+            {isSidebarCollapsed ? (
+              <PanelRightOpen className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            )}
+          </motion.div>
+        </motion.button>
+
         <AnimatePresence>
           {!isSidebarCollapsed && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
               className="flex flex-col h-full"
             >
               {/* Tabs */}
-              <div className="border-b border-border/50"> {/* Легкая, приглушенная граница */}
-                <div className="flex px-4 pt-2"> {/* Добавляем немного отступа сверху */}
-                  {/* Секция "Page Sections" / "Content" */}
-                  <motion.button
-                    key="sections-tab"
-                    onClick={() => setActiveTab('sections')}
+              <div className="border-b border-border/40">
+                <div className="flex gap-1 px-3 pt-3">
+                  {/* Sections Tab */}
+                  <button
+                    onClick={() => handleTabChange('sections')}
                     className={cn(
-                      'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors relative group',
-                      'border-b-2 -mb-px', // -mb-px гарантирует, что активная граница перекрывает нижнюю границу контейнера
+                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
                       activeTab === 'sections'
-                        ? 'text-primary border-primary' // Активный: акцентный цвет и жирная линия
-                        : 'text-muted-foreground border-transparent hover:text-foreground' // Неактивный: приглушенный цвет, прозрачная граница
+                        ? 'text-foreground bg-muted/50'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                     )}
-                    initial={false}
-                    animate={{ 
-                        color: activeTab === 'sections' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
-                        borderColor: activeTab === 'sections' ? 'hsl(var(--primary))' : 'transparent',
-                    }}
-                    transition={{ duration: 0.15 }}
                   >
-                    <Layers className="w-4 h-4" /> {/* Иконка для раздела */}
+                    <Layers className="w-4 h-4" />
                     {editorMode === 'portfolio' ? 'Sections' : 'Content'}
-                  </motion.button>
+                    {activeTab === 'sections' && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      />
+                    )}
+                  </button>
 
-                  {/* Секция "Theme Settings" */}
-                  <motion.button
-                    key="theme-tab"
-                    onClick={() => setActiveTab('theme')}
+                  {/* Theme Tab */}
+                  <button
+                    onClick={() => handleTabChange('theme')}
                     className={cn(
-                      'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors relative group',
-                      'border-b-2 -mb-px',
+                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
                       activeTab === 'theme'
-                        ? 'text-primary border-primary'
-                        : 'text-muted-foreground border-transparent hover:text-foreground'
+                        ? 'text-foreground bg-muted/50'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                     )}
-                    initial={false}
-                    animate={{ 
-                        color: activeTab === 'theme' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
-                        borderColor: activeTab === 'theme' ? 'hsl(var(--primary))' : 'transparent',
-                    }}
-                    transition={{ duration: 0.15 }}
                   >
-                    <Paintbrush className="w-4 h-4" /> {/* Иконка для темы */}
+                    <Paintbrush className="w-4 h-4" />
                     Theme
-                  </motion.button>
-
-                  {/* Decorations */}
-                  <motion.button
-                    key="decorations-tab"
-                    onClick={() => setActiveTab('decorations')}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors relative group',
-                      'border-b-2 -mb-px',
-                      activeTab === 'decorations'
-                        ? 'text-primary border-primary'
-                        : 'text-muted-foreground border-transparent hover:text-foreground'
+                    {activeTab === 'theme' && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      />
                     )}
-                    initial={false}
-                    animate={{
-                      color: activeTab === 'decorations' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
-                      borderColor: activeTab === 'decorations' ? 'hsl(var(--primary))' : 'transparent',
-                    }}
-                    transition={{ duration: 0.15 }}
+                  </button>
+
+                  {/* Decorations Tab */}
+                  <button
+                    onClick={() => handleTabChange('decorations')}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
+                      activeTab === 'decorations'
+                        ? 'text-foreground bg-muted/50'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                    )}
                   >
                     <Sparkles className="w-4 h-4" />
                     Decorations
-                  </motion.button>
+                    {activeTab === 'decorations' && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      />
+                    )}
+                  </button>
                 </div>
               </div>
 
-              {/* Sections / Theme Tabs content */}
+              {/* Tabs content */}
               {activeTab === 'sections' ? <SectionsTab /> : activeTab === 'theme' ? <ThemeTab /> : <DecorationsTab />}
             </motion.div>
           )}

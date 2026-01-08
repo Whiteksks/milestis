@@ -71,9 +71,9 @@ export function SectionsTab() {
   return (
     <>
       {sections.length > 0 && (
-        <div className="border-b border-slate-100 p-6 space-y-4 bg-white/50">
+        <div className="border-b border-border/40 p-6 space-y-4 bg-background/50">
           <div>
-            <Label className="text-[10px] font-semibold text-slate-400 mb-2 block uppercase tracking-wider">
+            <Label className="text-xs font-medium text-muted-foreground mb-2 block">
               Current Section
             </Label>
 
@@ -82,14 +82,14 @@ export function SectionsTab() {
                 <PopoverTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-9/10 justify-between rounded-xl border-slate-200 hover:border-slate-300 hover:bg-white h-11 shadow-sm text-slate-700"
+                    className="w-9/10 justify-between rounded-xl border-border hover:border-border hover:bg-muted/50 h-11 text-foreground"
                   >
                     <span className="truncate font-medium">{currentSection?.name ?? 'Select section'}</span>
-                    <SlidersHorizontal className="ml-2 h-4 w-4 text-slate-400" />
+                    <SlidersHorizontal className="ml-2 h-4 w-4 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-70 p-2 rounded-xl border-slate-100 shadow-xl shadow-slate-900/5" align="start">
+                <PopoverContent className="w-70 p-2 rounded-xl border-border shadow-lg" align="start">
                   <div className="space-y-1">
                     {sections.map(section => (
                       <div
@@ -97,8 +97,8 @@ export function SectionsTab() {
                         className={cn(
                           'flex items-center justify-between rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors',
                           activeSection === section.id 
-                            ? 'bg-slate-100 text-slate-900 font-medium' 
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                            ? 'bg-muted text-foreground font-medium' 
+                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                           !section.visible && 'opacity-60'
                         )}
                         onClick={() => {
@@ -115,10 +115,10 @@ export function SectionsTab() {
                             toggleVisibility(section.toggleKey)
                           }}
                           className={cn(
-                            'ml-2 rounded-md p-1.5 transition-all flex items-center justify-center',
+                            'ml-2 rounded-lg p-1.5 transition-all flex items-center justify-center',
                             section.visible
-                              ? 'text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-sm'
-                              : 'text-slate-300 hover:text-slate-500'
+                              ? 'text-muted-foreground hover:text-foreground hover:bg-background hover:shadow-sm'
+                              : 'text-muted-foreground/50 hover:text-muted-foreground'
                           )}
                         >
                           {section.visible ? (
@@ -140,8 +140,8 @@ export function SectionsTab() {
                 className={cn(
                   'px-3.5 rounded-xl border transition-all h-11 flex items-center justify-center',
                   currentSection?.visible
-                    ? 'border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:border-slate-300 shadow-sm'
-                    : 'border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100'
+                    ? 'border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    : 'border-border bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
                 title={currentSection?.visible ? "Hide Section" : "Show Section"}
               >

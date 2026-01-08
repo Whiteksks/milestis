@@ -18,9 +18,6 @@ export function PhotobookHighlightSettings() {
     toggleMediaPicker: state.toggleMediaPicker,
   }))
 
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-  const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
-
   return (
     <ScrollArea className="h-full">
       <MediaPickerModal
@@ -38,70 +35,51 @@ export function PhotobookHighlightSettings() {
           })
         }
       />
-      <div className="p-6 max-w-lg mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-            Highlight
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 font-medium">Feature a special moment.</p>
+      <div className="px-6 py-5 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium leading-none">Highlight</h3>
+          <p className="text-xs text-muted-foreground">Feature a special moment</p>
         </div>
 
-        {/* Секция 1: Текстовый контент */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Text Content</h4>
+        <div className="space-y-7">
           <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
-              <Input
-                value={highlight.title || ''}
-                onChange={(e) => updatePhotobookSection('highlight', { title: e.target.value })}
-                placeholder="Main Title"
-                className={inputStyle}
-              />
-            </div>
+            <Label className="text-xs font-medium text-muted-foreground">Text</Label>
+            <Input
+              value={highlight.title || ''}
+              onChange={(e) => updatePhotobookSection('highlight', { title: e.target.value })}
+              placeholder="Title"
+              className="h-9 text-xs"
+            />
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Description / Story</Label>
-              <Textarea
-                value={highlight.description || ''}
-                onChange={(e) => updatePhotobookSection('highlight', { description: e.target.value })}
-                placeholder="Tell the story of this moment..."
-                rows={5}
-                className={textareaStyle}
-              />
-            </div>
+            <Textarea
+              value={highlight.description || ''}
+              onChange={(e) => updatePhotobookSection('highlight', { description: e.target.value })}
+              placeholder="Tell the story of this moment..."
+              rows={5}
+              className="text-xs resize-none"
+            />
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Quote</Label>
-              <Input
-                value={highlight.quote || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('highlight', { quote: e.target.value })
-                }
-                placeholder="Short quote or thought"
-                className={`${inputStyle} italic`}
-              />
-            </div>
+            <Input
+              value={highlight.quote || ''}
+              onChange={(e) => updatePhotobookSection('highlight', { quote: e.target.value })}
+              placeholder="Quote (optional)"
+              className="h-9 text-xs italic"
+            />
+          </div>
+
+          <Separator className="bg-border/40" />
+
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-muted-foreground">Image</Label>
+            <ImagePicker
+              label=""
+              value={highlight.images}
+              onChange={(next) => updatePhotobookSection('highlight', { images: next })}
+              onOpenMediaPicker={toggleMediaPicker}
+              showCaption={false}
+            />
           </div>
         </div>
-        
-        <Separator className="bg-slate-100" />
-
-        {/* Секция 2: Изображение */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-slate-900">Image</h4>
-          <ImagePicker
-            label=""
-            value={highlight.images}
-            onChange={(next) =>
-              updatePhotobookSection('highlight', { images: next })
-            }
-            onOpenMediaPicker={toggleMediaPicker}
-            showCaption={false}
-          />
-        </div>
-
       </div>
     </ScrollArea>
   )

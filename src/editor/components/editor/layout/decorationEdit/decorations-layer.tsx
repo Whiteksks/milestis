@@ -54,6 +54,7 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
         responsiveScale: d.responsiveScale,
         transform: d.transform,
         aspectRatio: d.aspectRatio,
+        name: d.name,
       })),
     [decorations],
   )

@@ -10,6 +10,8 @@ import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEd
 import { useCanvasBackground } from '@/editor/hooks/use-canvas-background'
 import { BackgroundLayer } from './layout/background-layer'
 import type { DeviceView } from '@/editor/lib/types'
+import { FloatingToolbar } from '@/editor/components/editor/layout/floating-toolbar'
+import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/decorationEdit/decorations-floating-toolbar'
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
   mobile: 'max-w-sm w-full',
@@ -20,8 +22,10 @@ const DEVICE_CLASSES: Record<DeviceView, string> = {
 
 export function Canvas({
   scrollContainerRef: externalScrollContainerRef,
+  desktopActiveTab,
 }: {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>
+  desktopActiveTab?: 'sections' | 'theme' | 'decorations'
 }) {
   const viewportRef = useRef<HTMLDivElement>(null)
   const internalScrollContainerRef = useRef<HTMLDivElement>(null)
@@ -74,6 +78,28 @@ export function Canvas({
     theme.background
   )
 
+  const floatingToolbarPanels = useMemo(
+    () => ({
+      decorations: (
+        <DecorationsFloatingToolbar
+          decorations={allDecorations}
+          scrollContainerRef={scrollContainerRef}
+        />
+      ),
+      sections: (
+        <div className="h-8 px-2 flex items-center">
+          <span className="text-xs font-medium text-slate-700">Sections</span>
+        </div>
+      ),
+      theme: (
+        <div className="h-8 px-2 flex items-center">
+          <span className="text-xs font-medium text-slate-700">Theme</span>
+        </div>
+      ),
+    }),
+    [allDecorations, scrollContainerRef]
+  )
+
   useLayoutEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
@@ -94,7 +120,7 @@ export function Canvas({
       resizeObserver.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [])
+  }, [scrollContainerRef])
 
   return (
     <div className="flex-1 min-h-0 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-hidden">
@@ -107,6 +133,11 @@ export function Canvas({
         )}
         style={{ ['--canvas-scrollbar-width' as any]: `${scrollbarWidth}px` }}
       >
+        <FloatingToolbar
+          tab={(desktopActiveTab ?? 'sections')}
+          panels={floatingToolbarPanels}
+        />
+
         <BackgroundLayer
           config={resolvedBackground}
           placement="viewport"

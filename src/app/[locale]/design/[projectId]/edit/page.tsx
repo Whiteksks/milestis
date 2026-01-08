@@ -9,12 +9,14 @@ import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/secti
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
 import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
 import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
+import type { DesktopEditorTab } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { useRef, useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
 export default function EditorPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
   const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const { openDesignModal, editorMode } = useUiSelector((state) => ({
@@ -56,8 +58,8 @@ export default function EditorPage() {
       <EditorHeader />
       <div className="flex flex-1 overflow-hidden relative pb-16 md:pb-0">
         <CanvasScrollProvider value={scrollContainerRef}>
-          <Canvas scrollContainerRef={scrollContainerRef} />
-          <SectionsSidebar />
+          <Canvas scrollContainerRef={scrollContainerRef} desktopActiveTab={desktopActiveTab} />
+          <SectionsSidebar activeTab={desktopActiveTab} onTabChange={setDesktopActiveTab} />
         </CanvasScrollProvider>
       </div>
       

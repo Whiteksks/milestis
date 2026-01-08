@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import { AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import type { DecorationElement, DecorationUpdatePayload } from "./decorationTypes"
@@ -8,7 +8,6 @@ import { getResponsiveFactor, loadImageAspectRatio } from "./utils"
 import { useDecorationDrag } from "../../../../hooks/use-decoration-drag"
 import { DraggableDecoration } from "./draggable-decoration"
 import { DecorationHandle } from "./decoration-handle"
-import { DecorationToolbar } from "./decoration-toolbar"
 
 const getAnimationVariants = (animation?: string) => {
   switch (animation) {
@@ -47,24 +46,6 @@ export function DecorationsLayer({
   const animationVariants = getAnimationVariants(animation)
   const responsiveFactor = getResponsiveFactor(deviceView)
 
-  const [activeDecorationId, setActiveDecorationId] = useState<string | null>(() => {
-    return selectedId ?? decorations[0]?.id ?? null
-  })
-
-  useEffect(() => {
-    if (selectedId) setActiveDecorationId(selectedId)
-  }, [selectedId])
-
-  useEffect(() => {
-    if (!decorations.length) {
-      setActiveDecorationId(null)
-      return
-    }
-    if (!activeDecorationId || !decorations.some((d) => d.id === activeDecorationId)) {
-      setActiveDecorationId(decorations[0]!.id)
-    }
-  }, [decorations, activeDecorationId])
-
   const selectedDecoration = useMemo(() => decorations.find((d) => d.id === selectedId), [decorations, selectedId])
 
   const handleCommitPosition = useCallback(
@@ -92,7 +73,6 @@ export function DecorationsLayer({
 
   const handleCanvasSelect = useCallback(
     (id: string | null) => {
-      if (id) setActiveDecorationId(id)
       onSelect?.(id)
     },
     [onSelect],
@@ -130,30 +110,7 @@ export function DecorationsLayer({
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        <DecorationToolbar
-          decorations={decorations}
-          activeDecorationId={activeDecorationId}
-          onActiveDecorationChange={(id) => setActiveDecorationId(id)}
-          decoration={selectedDecoration}
-          onUpdate={selectedDecoration ? (updates) => onUpdate(selectedDecoration.id, updates) : undefined}
-          onDelete={selectedDecoration ? () => onRemove(selectedDecoration.id) : undefined}
-          onImageReplace={selectedDecoration ? handleImageReplace : undefined}
-          onCloseSettings={() => handleCanvasSelect(null)}
-          onOpenSettings={() => activeDecorationId && handleCanvasSelect(activeDecorationId)}
-          onSelectDecoration={(id) => handleCanvasSelect(id)}
-          onLocate={
-            selectedDecoration
-              ? () => {
-                  const element = document.querySelector(`[data-decoration-id="${selectedDecoration.id}"]`)
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth", block: "center" })
-                  }
-                }
-              : undefined
-          }
-        />
-      </AnimatePresence>
+      <AnimatePresence />
     </>
   )
 }

@@ -11,7 +11,6 @@ import { Trash2, Plus, Wand2 } from 'lucide-react'
 import { aspectRatios } from '@/editor/lib/aspect-ratios'
 import type { FrameStyle, AspectRatio } from '@/editor/lib/types'
 import { useState } from 'react'
-import { Separator } from '@/components/ui/separator'
 import { PortfolioImagePicker } from '@/editor/components/editor/section-settings/ui/portfolio-image-picker'
 
 export function FeaturedWorkSettings() {
@@ -23,9 +22,6 @@ export function FeaturedWorkSettings() {
     toggleMediaPicker: state.toggleMediaPicker,
   }))
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(null)
-  
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-  const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
 
   const handleImageSelect = (url: string) => {
     if (activeProjectIndex === null) return
@@ -45,53 +41,41 @@ export function FeaturedWorkSettings() {
   }
 
   return (
-    <div className="p-6 max-w-lg mx-auto space-y-8">
-      {/* Image picker modal for choosing from previously uploaded photos */}
+    <div className="px-6 py-5 space-y-6">
       <MediaPickerModal onSelectImage={handleImageSelect} />
 
-      {/* Общий заголовок настроек */}
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-          Featured Work
-        </h3>
-        <p className="text-[11px] text-slate-500 mt-1 font-medium">Showcase your best projects.</p>
+      <div className="space-y-1">
+        <h3 className="text-sm font-medium leading-none">Featured Work</h3>
+        <p className="text-xs text-muted-foreground">Showcase your best projects</p>
       </div>
 
-      {/* Секция 1: Заголовок Секции */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-medium text-slate-900">Section Title</h4>
-        <div className="space-y-2">
-          <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
-          <Input 
-            className={inputStyle} 
-            value={featuredWork.title} 
-            onChange={(e) => updateSectionContent('featuredWork', { title: e.target.value })} 
-            placeholder="My Best Work"
-          />
-        </div>        <div className="space-y-2">
-          <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
-          <Input 
-            className={inputStyle} 
-            value={featuredWork.subtitle || ''} 
-            onChange={(e) => updateSectionContent('featuredWork', { subtitle: e.target.value })} 
-            placeholder="Portfolio"
-          />
-        </div>      </div>
-
-      <Separator className="bg-slate-100" />
-      
-      {/* Секция 2: Массовое обновление */}
-      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
-        <div className="flex items-center gap-2">
-          <Wand2 className="w-3.5 h-3.5 text-slate-500" />
-          <Label className="text-xs font-semibold text-slate-900">Quick Actions</Label>
+      <div className="space-y-7">
+        <div className="space-y-3">
+          <Label className="text-xs font-medium text-muted-foreground">Section Header</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              className="h-9 text-xs"
+              value={featuredWork.title}
+              onChange={(e) => updateSectionContent('featuredWork', { title: e.target.value })}
+              placeholder="My best work"
+            />
+            <Input
+              className="h-9 text-xs"
+              value={featuredWork.subtitle || ''}
+              onChange={(e) => updateSectionContent('featuredWork', { subtitle: e.target.value })}
+              placeholder="Subtitle"
+            />
+          </div>
         </div>
-        <p className="text-[11px] text-slate-500 font-medium">Change aspect ratio for all images at once.</p>
-        
-        <div className="flex gap-2">
-          <Select onValueChange={applyAspectRatioToAll} defaultValue={featuredWork.projects[0]?.aspectRatio || 'landscape'}>
-            <SelectTrigger className="flex-1 h-9 rounded-xl border-slate-200 bg-white hover:border-slate-300 text-xs shadow-sm">
-              <SelectValue placeholder="Select Ratio" />
+
+        <div className="rounded-xl bg-muted/40 p-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <Wand2 className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">Quick Actions</span>
+          </div>
+          <Select onValueChange={applyAspectRatioToAll}>
+            <SelectTrigger className="h-8 text-xs bg-background">
+              <SelectValue placeholder="Set aspect ratio for all" />
             </SelectTrigger>
             <SelectContent>
               {Object.values(aspectRatios).map((ratio) => (
@@ -101,67 +85,73 @@ export function FeaturedWorkSettings() {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="h-9 rounded-xl border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-white hover:border-slate-300 text-xs font-medium">
-            Apply All
-          </Button>
         </div>
-      </div>
 
-      <Separator className="bg-slate-100" />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <Label className="text-xs font-medium text-muted-foreground">Projects</Label>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => {
+                const newProject = {
+                  title: 'New Project',
+                  description: '',
+                  image: '',
+                  tags: [] as string[],
+                  aspectRatio: 'landscape' as AspectRatio,
+                  frameStyle: 'soft' as FrameStyle,
+                }
+                updateSectionContent('featuredWork', {
+                  projects: [...featuredWork.projects, newProject],
+                })
+              }}
+            >
+              <Plus className="w-3.5 h-3.5 mr-2" /> Add
+            </Button>
+          </div>
 
-      {/* Секция 3: Проекты */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-medium text-slate-900">Manage Projects</h4>
-        <div className="space-y-4">
-          {featuredWork.projects.map((project, index) => (
-            <div key={index} className="p-5 border border-slate-100 rounded-2xl space-y-4 bg-white shadow-sm shadow-slate-900/5 transition-all hover:shadow-md hover:border-slate-200">
-              <div className="flex items-start justify-between">
-                <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Project {index + 1}</span>
+          <div className="space-y-4">
+            {featuredWork.projects.map((project, index) => (
+              <div key={index} className="rounded-xl bg-muted/30 p-3 space-y-4 relative">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-6 h-6 shrink-0 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  className="absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted"
                   onClick={() => {
                     const newProjects = featuredWork.projects.filter((_, i) => i !== index)
                     updateSectionContent('featuredWork', { projects: newProjects })
                   }}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </Button>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
-                <Input
-                  className={inputStyle}
-                  placeholder="Project Name"
-                  value={project.title}
-                  onChange={(e) => {
-                    const newProjects = [...featuredWork.projects]
-                    newProjects[index] = { ...project, title: e.target.value }
-                    updateSectionContent('featuredWork', { projects: newProjects })
-                  }}
-                />
-              </div>
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Description</Label>
-                <Textarea
-                  className={textareaStyle}
-                  placeholder="Brief description..."
-                  rows={2}
-                  value={project.description}
-                  onChange={(e) => {
-                    const newProjects = [...featuredWork.projects]
-                    newProjects[index] = { ...project, description: e.target.value }
-                    updateSectionContent('featuredWork', { projects: newProjects })
-                  }}
-                />
-              </div>
+                <div className="space-y-2 pr-10">
+                  <Input
+                    className="h-8 text-xs font-medium border-0 px-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                    placeholder="Project title"
+                    value={project.title}
+                    onChange={(e) => {
+                      const newProjects = [...featuredWork.projects]
+                      newProjects[index] = { ...project, title: e.target.value }
+                      updateSectionContent('featuredWork', { projects: newProjects })
+                    }}
+                  />
+                  <Textarea
+                    className="min-h-17.5 text-xs resize-none"
+                    placeholder="Short description..."
+                    value={project.description}
+                    onChange={(e) => {
+                      const newProjects = [...featuredWork.projects]
+                      newProjects[index] = { ...project, description: e.target.value }
+                      updateSectionContent('featuredWork', { projects: newProjects })
+                    }}
+                  />
+                </div>
 
-              <div className="pt-2">
                 <PortfolioImagePicker
-                  label="Project Image"
+                  label="Cover Image"
                   value={{
                     image: project.image,
                     aspectRatio: (project.aspectRatio || 'landscape') as AspectRatio,
@@ -183,30 +173,31 @@ export function FeaturedWorkSettings() {
                   }}
                 />
               </div>
-            </div>
-          ))}
-          
-          {/* Кнопка добавления проекта */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full mt-2 h-10 rounded-xl border-dashed border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all text-xs font-medium"
-            onClick={() => {
-              const newProject = {
-                title: 'New Project',
-                description: 'Project description...',
-                image: '', // Пустой, чтобы пользователь добавил свой
-                tags: [] as string[],
-                aspectRatio: 'landscape' as AspectRatio,
-                frameStyle: 'soft' as FrameStyle
-              }
-              updateSectionContent('featuredWork', { 
-                projects: [...featuredWork.projects, newProject] 
-              })
-            }}
-          >
-            <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Project
-          </Button>
+            ))}
+
+            {featuredWork.projects.length === 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full h-9 text-xs border-dashed text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  const newProject = {
+                    title: 'New Project',
+                    description: '',
+                    image: '',
+                    tags: [] as string[],
+                    aspectRatio: 'landscape' as AspectRatio,
+                    frameStyle: 'soft' as FrameStyle,
+                  }
+                  updateSectionContent('featuredWork', {
+                    projects: [...featuredWork.projects, newProject],
+                  })
+                }}
+              >
+                <Plus className="w-3.5 h-3.5 mr-2" /> Add your first project
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

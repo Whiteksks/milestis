@@ -149,6 +149,8 @@ export interface ThemeCustomDecorations {
   }
   /** Aspect ratio (width/height), can be computed from image */
   aspectRatio?: number
+  /** Optional custom name for the decoration */
+  name?: string
 }
 
 export interface DecorationElement {
@@ -171,6 +173,8 @@ export interface DecorationElement {
   }
   /** Aspect ratio (width/height), can be computed from image */
   aspectRatio?: number
+  /** Optional custom name for the decoration */
+  name?: string
 }
 
 // Unified editor-side decoration types (used by the optimized decorationEdit/new implementation)
@@ -203,6 +207,8 @@ export interface EditorDecorationElement {
   transform?: EditorDecorationTransform
   /** Aspect ratio (width/height), can be computed from image */
   aspectRatio?: number
+  /** Optional custom name for the decoration */
+  name?: string
 }
 
 export type EditorDecorationUpdatePayload = Partial<Omit<EditorDecorationElement, 'id'>>

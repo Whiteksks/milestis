@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { useState } from 'react'
-import { Plus, Trash2, Image as ImageIcon } from 'lucide-react' // Опционально: можно добавить иконки для UI, если они доступны, иначе оставлю текст
+import { Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import Image, { type ImageLoader } from 'next/image'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
@@ -121,7 +121,6 @@ export function PhotobookStorySettings() {
     toggleMediaPicker()
   }
 
-
   const handleRemoveSlotClick = (idx: number) => {
     removeSlot(idx)
   }
@@ -147,142 +146,123 @@ export function PhotobookStorySettings() {
     updatePhotobookSection('story', { images: newSlots })
   }
 
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-  const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
-
   return (
-    <ScrollArea className="h-full bg-white">
+    <ScrollArea className="h-full">
       <MediaPickerModal onSelectImage={handleSelectImageFromLibrary} onSelectImages={handleSelectImagesFromLibrary} />
-      
-      <div className="max-w-3xl mx-auto px-6 py-8 space-y-10">
-        
-        {/* Section: Header Info */}
-        <section className="space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Story Title</Label>
-              <Input
-                value={story.title || ''}
-                onChange={(e) => handleStoryTitleChange(e.target.value)}
-                placeholder="e.g. Our Trip to Paris"
-                className="h-11 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-lg font-semibold"
-              />
-            </div>
+      <div className="px-6 py-5 space-y-8">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium leading-none">Story</h3>
+          <p className="text-xs text-muted-foreground">Write text and group photos by moments</p>
+        </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Date</Label>
-                <Input
-                  value={story.date || ''}
-                  onChange={(e) => handleStoryDateChange(e.target.value)}
-                  placeholder="August 12, 2024"
-                  className={inputStyle}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Location</Label>
-                <Input
-                  value={story.location || ''}
-                  onChange={(e) => handleStoryLocationChange(e.target.value)}
-                  placeholder="Paris, France"
-                  className={inputStyle}
-                />
-              </div>
+        <section className="space-y-6">
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-muted-foreground">Header</Label>
+            <Input
+              value={story.title || ''}
+              onChange={(e) => handleStoryTitleChange(e.target.value)}
+              placeholder="Story title"
+              className="h-10 text-sm font-medium"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                value={story.date || ''}
+                onChange={(e) => handleStoryDateChange(e.target.value)}
+                placeholder="Date"
+                className="h-9 text-xs"
+              />
+              <Input
+                value={story.location || ''}
+                onChange={(e) => handleStoryLocationChange(e.target.value)}
+                placeholder="Location"
+                className="h-9 text-xs"
+              />
             </div>
           </div>
         </section>
 
-        <div className="h-px bg-slate-100 w-full" />
+        <div className="h-px bg-border/40 w-full" />
 
-        {/* Section: Text Content */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
             <div className="space-y-1">
-               <h2 className="text-sm font-semibold text-slate-900">Story Text</h2>
-               <p className="text-[11px] text-slate-500 font-medium">Tell us how it happened.</p>
+              <h4 className="text-sm font-medium text-foreground">Text</h4>
+              <p className="text-xs text-muted-foreground">Add paragraphs (empty ones are removed)</p>
             </div>
-            <Button size="sm" variant="ghost" className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium h-8 rounded-lg" onClick={addParagraph}>
-              <Plus className="w-3.5 h-3.5 mr-1.5" /> Paragraph
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={addParagraph}>
+              <Plus className="w-3.5 h-3.5 mr-2" /> Add
             </Button>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-3">
             {paragraphs.map((p, idx) => (
-              <div key={idx} className="relative group">
-                <div className="absolute -left-6 top-3 text-xs text-slate-300 select-none">¶</div>
+              <div key={idx} className="relative">
                 <Textarea
                   value={p}
                   onChange={(e) => handleParagraphChange(idx, e.target.value)}
                   onBlur={() => handleParagraphBlur(idx)}
                   rows={3}
-                  className="rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-sm leading-relaxed min-h-25 resize-none"
+                  className="text-xs resize-none min-h-25"
                   placeholder="Start writing..."
                 />
               </div>
             ))}
             {paragraphs.length === 0 && (
-                <div 
-                    onClick={addParagraph}
-                    className="border border-dashed border-slate-200 rounded-xl p-8 text-center text-slate-400 cursor-pointer hover:border-slate-300 hover:bg-slate-50 transition-all text-xs font-medium"
-                >
-                    Click to add the first paragraph
-                </div>
+              <button
+                type="button"
+                onClick={addParagraph}
+                className="w-full rounded-xl border border-dashed border-border/60 bg-muted/20 px-4 py-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+              >
+                Click to add the first paragraph
+              </button>
             )}
           </div>
         </section>
 
-        <div className="h-px bg-slate-100 w-full" />
+        <div className="h-px bg-border/40 w-full" />
 
-        {/* Section: Visual Moments */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
             <div className="space-y-1">
-              <h2 className="text-sm font-semibold text-slate-900">Moments</h2>
-              <p className="text-[11px] text-slate-500 font-medium">Group photos by events.</p>
+              <h4 className="text-sm font-medium text-foreground">Moments</h4>
+              <p className="text-xs text-muted-foreground">Up to 4 photos per moment</p>
             </div>
-            <Button size="sm" onClick={handleAddSlotClick} className="h-8 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-medium">
-              Add Moment
+            <Button size="sm" onClick={handleAddSlotClick} className="h-8 text-xs">
+              <Plus className="w-3.5 h-3.5 mr-2" /> Add
             </Button>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {slots.map((s, idx) => {
               const canAddMore = (s.images?.length || 0) < 4
 
               return (
-                <div
-                  key={s.id}
-                  className="group relative bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  {/* Заголовок момента */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 mr-4">
-                      <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 block">
-                        Title
-                      </Label>
+                <div key={s.id} className="rounded-xl bg-muted/30 p-3 space-y-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 space-y-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">Title</Label>
                       <Input
                         value={s.label}
                         onChange={(e) => updateSlotLabel(idx, e.target.value)}
-                        className="border-transparent hover:border-slate-200 focus:border-slate-300 px-0 h-auto py-1 text-sm font-semibold shadow-none bg-transparent placeholder:text-slate-300 rounded-md transition-colors"
+                        className="h-9 text-xs"
                         placeholder="Event name..."
                       />
                     </div>
                     <Button
-                      size="sm"
+                      size="icon"
                       variant="ghost"
                       onClick={() => handleRemoveSlotClick(idx)}
-                      className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0 rounded-full"
+                      className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-muted"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
 
-                  {/* Фото 2×2 */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="grid grid-cols-2 gap-3">
                     {(s.images || []).map((img, i) => (
                       <div
                         key={i}
-                        className="relative aspect-4/3 overflow-hidden rounded-lg bg-slate-50 border border-slate-100 group/image"
+                        className="relative aspect-4/3 overflow-hidden rounded-lg border border-border/40 bg-background group"
                       >
                         <Image
                           loader={passthroughLoader}
@@ -291,12 +271,12 @@ export function PhotobookStorySettings() {
                           alt=""
                           fill
                           sizes="(max-width: 768px) 50vw, 200px"
-                          className="object-cover transition-transform hover:scale-105 duration-500"
+                          className="object-cover"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveImageFromSlot(idx, i)}
-                          className="absolute top-1.5 right-1.5 rounded-full bg-white/90 text-slate-500 hover:text-red-500 p-1 opacity-0 group-hover/image:opacity-100 transition-all shadow-sm"
+                          className="absolute right-1.5 top-1.5 rounded-md bg-background/90 border border-border/60 text-muted-foreground p-1 opacity-0 group-hover:opacity-100 transition-colors hover:bg-muted hover:text-foreground"
                           aria-label="Remove photo"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -304,24 +284,24 @@ export function PhotobookStorySettings() {
                       </div>
                     ))}
 
-                    {/* Кнопка добавить фото — только если меньше 4 */}
                     {canAddMore && (
                       <button
+                        type="button"
                         onClick={() => handleAddImageClick(idx)}
-                        className="flex flex-col items-center justify-center aspect-4/3 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="flex flex-col items-center justify-center aspect-4/3 rounded-lg border border-dashed border-border/60 bg-background text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
                       >
-                        <ImageIcon className="w-5 h-5 mb-1 opacity-50" />
+                        <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
                         <span className="text-[10px] font-medium">Add Photo</span>
                       </button>
                     )}
                   </div>
 
-                  {/* Подпись */}
-                  <div className="pt-2 border-t border-slate-100">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Caption</Label>
                     <Input
                       value={s.caption || ''}
                       onChange={(e) => handleSlotCaptionChange(idx, e.target.value)}
-                      className="border-none bg-transparent shadow-none text-xs text-slate-600 placeholder:text-slate-300 px-0 h-auto focus-visible:ring-0"
+                      className="h-9 text-xs"
                       placeholder="Add a caption for this moment..."
                     />
                   </div>
@@ -330,7 +310,7 @@ export function PhotobookStorySettings() {
             })}
 
             {slots.length === 0 && (
-              <div className="text-center py-10 text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 text-xs font-medium">
+              <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 px-4 py-10 text-center text-xs text-muted-foreground">
                 No moments added yet
               </div>
             )}

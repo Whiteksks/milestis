@@ -92,11 +92,11 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Upload button */}
       <div>
-        <Label className="text-xs font-medium text-slate-900 uppercase tracking-wider mb-2 block">Upload Image</Label>
+        <Label className="text-xs font-medium text-foreground mb-2 block">Upload Image</Label>
 
         <Button
           variant="outline"
-          className="w-full h-24 border border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-slate-500 hover:text-slate-900"
+          className="w-full h-24 border border-dashed border-border rounded-2xl bg-muted/30 hover:bg-muted hover:border-border transition-all text-muted-foreground hover:text-foreground"
           onClick={() => fileInputRef.current?.click()}
         >
           <div className="flex flex-col items-center gap-2">
@@ -117,19 +117,19 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
       {/* Add URL */}
       <div>
-        <Label className="text-xs font-medium text-slate-900 uppercase tracking-wider mb-2 block">Add from URL</Label>
+        <Label className="text-xs font-medium text-foreground mb-2 block">Add from URL</Label>
 
         <Input
           placeholder="https://example.com/image.jpg"
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
-          className="rounded-xl border-slate-200 focus-visible:ring-slate-900 h-10"
+          className="rounded-xl border-border focus-visible:ring-ring h-10"
         />
 
         <Button
           onClick={handleAddUrl}
-          className="w-full mt-3 flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-full h-10 shadow-lg shadow-slate-900/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full mt-3 flex items-center justify-center gap-2 bg-foreground hover:bg-foreground/90 text-background rounded-xl h-10 shadow-md transition-all"
         >
           <Sparkles className="h-4 w-4" />
           <span className="text-xs font-medium">Add Image</span>
@@ -140,24 +140,24 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   const galleryArea = (
     <div className="flex-1 min-h-0 flex flex-col mt-2">
-      <Label className="text-xs font-medium text-slate-900 uppercase tracking-wider mb-3 block">
-        Your Library <span className="text-slate-400 ml-1">({mediaLibrary.length})</span>
+      <Label className="text-xs font-medium text-foreground mb-3 block">
+        Your Library <span className="text-muted-foreground ml-1">({mediaLibrary.length})</span>
       </Label>
 
       <div
-        className="flex-1 min-h-0 overflow-y-auto border border-slate-100 rounded-2xl p-4 bg-slate-50/50"
+        className="flex-1 min-h-0 overflow-y-auto border border-border rounded-2xl p-4 bg-muted/30"
         // Управление моментом начала скролла:
         // на мобилке скролл начнётся раньше — ограничиваем высоту
         style={{ maxHeight: isMobile ? '45vh' : undefined }}
       >
         {mediaLibrary.length === 0 ? (
-          <div className="flex items-center justify-center h-40 text-slate-400">
+          <div className="flex items-center justify-center h-40 text-muted-foreground">
             <div className="text-center">
-              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
-                <Upload className="h-5 w-5 text-slate-300" />
+              <div className="h-12 w-12 bg-background rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-border">
+                <Upload className="h-5 w-5 text-muted-foreground/50" />
               </div>
-              <p className="text-sm font-medium text-slate-500">No images yet</p>
-              <p className="text-xs text-slate-400 mt-1">Upload or add via URL</p>
+              <p className="text-sm font-medium text-foreground">No images yet</p>
+              <p className="text-xs text-muted-foreground mt-1">Upload or add via URL</p>
             </div>
           </div>
         ) : (
@@ -168,8 +168,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                 className={cn(
                   'relative group rounded-xl overflow-hidden border cursor-pointer aspect-square transition-all duration-300',
                   selectedImageUrl === image.url
-                    ? 'border-slate-900 ring-2 ring-slate-900 ring-offset-2'
-                    : 'border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-0.5 bg-white'
+                    ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
+                    : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card'
                 )}
                 onClick={() => handleSelectImage(image.url)}
               >
@@ -184,8 +184,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                 />
 
                 {selectedImageUrl === image.url && mode === 'select' && (
-                  <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center backdrop-blur-[1px]">
-                    <div className="bg-slate-900 text-white rounded-full p-2 shadow-lg transform scale-100 transition-transform">
+                  <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
+                    <div className="bg-foreground text-background rounded-full p-2 shadow-lg transform scale-100 transition-transform">
                       <Check className="h-4 w-4" />
                     </div>
                   </div>
@@ -200,8 +200,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                     }}
                     className="
                       absolute top-2 right-2 
-                      bg-white/90 hover:bg-red-50 
-                      text-slate-400 hover:text-red-500
+                      bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20
+                      text-muted-foreground hover:text-red-500
                       rounded-full 
                       p-1.5 
                       shadow-sm
@@ -221,11 +221,11 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   )
 
   const actionsBar = (
-    <div className="hidden md:flex justify-end gap-3 pt-6 border-t border-slate-100 bg-transparent">
+    <div className="hidden md:flex justify-end gap-3 pt-6 border-t border-border/50 bg-transparent">
       <Button 
         variant="ghost" 
         onClick={toggleMediaLibrary}
-        className="rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
+        className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
         {mode === 'select' ? 'Cancel' : 'Close'}
       </Button>
@@ -233,7 +233,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
       {mode === 'select' && selectedImageUrl && (
         <Button 
             onClick={handleConfirmSelection} 
-            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 px-6 transition-all hover:scale-105 active:scale-95"
+            className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all"
         >
           Select Image
         </Button>
@@ -278,12 +278,12 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   // --- DESKTOP: Dialog ---
   return (
     <Dialog open={isMediaLibraryOpen} onOpenChange={toggleMediaLibrary}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-white/95 backdrop-blur-xl border-slate-100 shadow-2xl p-8 gap-0">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-6">
-          <DialogTitle className="text-xl font-medium text-slate-900 tracking-tight">
+          <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">
             Media Library
           </DialogTitle>
-          <DialogDescription className="text-slate-500">
+          <DialogDescription className="text-muted-foreground">
             {mode === 'select'
               ? 'Select an image for your gallery'
               : 'Upload and manage your images'}

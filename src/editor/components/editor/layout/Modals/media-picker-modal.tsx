@@ -69,18 +69,18 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
 
   return (
     <Dialog open={isMediaPickerOpen} onOpenChange={toggleMediaPicker}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-white/95 backdrop-blur-xl border-slate-100 shadow-2xl p-8 gap-0">
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-6 flex flex-row items-center justify-between">
           <div>
-            <DialogTitle className="text-xl font-medium text-slate-900 tracking-tight">Select Image</DialogTitle>
-            <DialogDescription className="text-slate-500">
+            <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">Select Image</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Choose one of your previously uploaded photos.
             </DialogDescription>
           </div>
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-full"
+            className="gap-2 rounded-xl"
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload className="h-4 w-4" />
@@ -97,9 +97,9 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
         </DialogHeader>
 
         {/* Scrollable area */}
-        <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border border-slate-100 p-4 bg-slate-50/50">
+        <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border border-border p-4 bg-muted/30">
           {mediaLibrary.length === 0 ? (
-            <div className="flex items-center justify-center h-40 text-slate-400 text-sm font-medium">
+            <div className="flex items-center justify-center h-40 text-muted-foreground text-sm font-medium">
               No images yet. Upload images first.
             </div>
           ) : (
@@ -125,8 +125,8 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
                   className={cn(
                     'relative aspect-square rounded-xl overflow-hidden border cursor-pointer transition-all duration-300',
                     selectedUrls.includes(image.url)
-                      ? 'border-slate-900 ring-2 ring-slate-900 ring-offset-2'
-                      : 'border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-0.5 bg-white'
+                      ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
+                      : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card'
                   )}
                 >
                   <Image
@@ -137,8 +137,8 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
                     className="object-cover"
                   />
                   {selectedUrls.includes(image.url) && (
-                    <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center backdrop-blur-[1px]">
-                      <div className="bg-slate-900 text-white rounded-full p-2 shadow-lg transform scale-100 transition-transform">
+                    <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
+                      <div className="bg-foreground text-background rounded-full p-2 shadow-lg transform scale-100 transition-transform">
                         <Check className="h-4 w-4" />
                       </div>
                     </div>
@@ -149,18 +149,18 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
           )}
         </div>
 
-        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 mt-0">
+        <div className="flex justify-end gap-3 pt-6 border-t border-border/50 mt-0">
           <Button 
             variant="ghost" 
             onClick={toggleMediaPicker}
-            className="rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
+            className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleConfirm} 
             disabled={selectedUrls.length === 0}
-            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 px-6 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+            className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all disabled:opacity-50"
           >
             {isMultiSelect ? 'Use Selected Images' : 'Use Selected'}
           </Button>

@@ -148,7 +148,7 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
     [dragX, dragY, getScrollPosition],
   )
 
-  const applyAutoScroll = useCallback(() => {
+  const applyAutoScroll = useCallback(function applyAutoScrollLoop() {
     if (!isDraggingRef.current) return
 
     const vx = autoScrollVXRef.current
@@ -171,7 +171,7 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
     // After scroll movement, recompute drag position for the latest pointer.
     updateFromPointer(lastClientXRef.current, lastClientYRef.current)
 
-    autoScrollRafRef.current = requestAnimationFrame(applyAutoScroll)
+    autoScrollRafRef.current = requestAnimationFrame(applyAutoScrollLoop)
   }, [updateFromPointer])
 
   const updateAutoScrollVelocity = useCallback(

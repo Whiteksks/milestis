@@ -17,8 +17,6 @@ export function PhotobookCoverSettings() {
     toggleMediaPicker: state.toggleMediaPicker,
   }))
 
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-
   return (
     <ScrollArea className="h-full">
       <MediaPickerModal
@@ -37,97 +35,71 @@ export function PhotobookCoverSettings() {
         }
       />
 
-      <div className="p-6 max-w-lg mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-            Cover Settings
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 font-medium">Customize the main cover of your photobook.</p>
+      <div className="px-6 py-5 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium leading-none">Cover</h3>
+          <p className="text-xs text-muted-foreground">Customize the main cover of your photobook</p>
         </div>
 
-        {/* Секция 1: Текстовый контент обложки */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Text Content</h4>
+        <div className="space-y-7">
           <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Main Title</Label>
+            <Label className="text-xs font-medium text-muted-foreground">Text</Label>
+            <div className="space-y-3">
               <Input
                 value={cover.title}
                 onChange={(e) => updatePhotobookSection('cover', { title: e.target.value })}
-                placeholder="Photobook Title"
-                className="h-10 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-sm font-semibold"
+                placeholder="Photobook title"
+                className="h-10 text-sm font-medium"
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Subtitle</Label>
-              <Input
-                value={cover.subtitle || ''}
-                onChange={(e) => updatePhotobookSection('cover', { subtitle: e.target.value })}
-                placeholder="Short description"
-                className={inputStyle}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Tagline / Quote</Label>
-              <Input
-                value={cover.tagline || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('cover', { tagline: e.target.value })
-                }
-                placeholder="A short phrase on the cover"
-                className={`${inputStyle} italic`}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  value={cover.subtitle || ''}
+                  onChange={(e) => updatePhotobookSection('cover', { subtitle: e.target.value })}
+                  placeholder="Subtitle"
+                  className="h-9 text-xs"
+                />
+                <Input
+                  value={cover.tagline || ''}
+                  onChange={(e) => updatePhotobookSection('cover', { tagline: e.target.value })}
+                  placeholder="Tagline / quote"
+                  className="h-9 text-xs italic"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <Separator className="bg-slate-100" />
+          <Separator className="bg-border/40" />
 
-        {/* Секция 2: Метаданные */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Metadata</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Date</Label>
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-muted-foreground">Metadata</Label>
+            <div className="grid grid-cols-2 gap-3">
               <Input
                 value={cover.date || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('cover', { date: e.target.value })
-                }
-                placeholder="August 12, 2024"
-                className={inputStyle}
+                onChange={(e) => updatePhotobookSection('cover', { date: e.target.value })}
+                placeholder="Date"
+                className="h-9 text-xs"
               />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Location</Label>
               <Input
                 value={cover.location || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('cover', { location: e.target.value })
-                }
-                placeholder="New York, NY"
-                className={inputStyle}
+                onChange={(e) => updatePhotobookSection('cover', { location: e.target.value })}
+                placeholder="Location"
+                className="h-9 text-xs"
               />
             </div>
           </div>
-        </div>
-        
-        <Separator className="bg-slate-100" />
 
-        {/* Секция 3: Изображение обложки */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-slate-900">Cover Image</h4>
-          <ImagePicker
-            label=""
-            value={cover.images}
-            onChange={(next) =>
-              updatePhotobookSection('cover', { images: next })
-            }
-            onOpenMediaPicker={toggleMediaPicker}
-          />
+          <Separator className="bg-border/40" />
+
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-muted-foreground">Cover Image</Label>
+            <ImagePicker
+              label=""
+              value={cover.images}
+              onChange={(next) => updatePhotobookSection('cover', { images: next })}
+              onOpenMediaPicker={toggleMediaPicker}
+            />
+          </div>
         </div>
       </div>
     </ScrollArea>

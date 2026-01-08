@@ -36,8 +36,8 @@ export function SettingsContent() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm pb-3 border-b border-slate-200">
-        <Label className="text-xs font-medium text-slate-500 mb-2 block uppercase tracking-wide">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-3 border-b border-border/40">
+        <Label className="text-xs font-medium text-muted-foreground mb-2 block">
           Edit Section
         </Label>
         <div className="flex gap-2">
@@ -58,9 +58,9 @@ export function SettingsContent() {
             align="start"
             className={cn(
               "w-64 mt-2",
-              "bg-white shadow-md",
-              "border border-slate-200",
-              "rounded-md",
+              "bg-background shadow-md",
+              "border border-border",
+              "rounded-xl",
             )}
           >
             <div className="space-y-1">
@@ -68,9 +68,9 @@ export function SettingsContent() {
                 <div
                   key={section.id}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm text-left hover:bg-slate-50 cursor-pointer",
-                    resolvedActiveSection === section.id && "bg-slate-100",
-                    !section.visible && "text-slate-400"
+                    "flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm text-left hover:bg-muted/50 cursor-pointer",
+                    resolvedActiveSection === section.id && "bg-muted",
+                    !section.visible && "text-muted-foreground"
                   )}
                   onClick={() => {
                     setActiveSection(section.id)
@@ -86,16 +86,16 @@ export function SettingsContent() {
                       toggleVisibility(section.toggleKey)
                     }}
                     className={cn(
-                      "ml-2 rounded-md p-1 transition-colors flex items-center justify-center",
+                      "ml-2 rounded-lg p-1 transition-colors flex items-center justify-center",
                       section.visible
-                        ? "bg-slate-100 hover:bg-slate-200"
-                        : "bg-slate-50 hover:bg-slate-100"
+                        ? "bg-muted hover:bg-muted/80"
+                        : "bg-muted/50 hover:bg-muted"
                     )}
                   >
                     {section.visible ? (
-                      <Eye className="w-3.5 h-4 text-slate-700" />
+                      <Eye className="w-3.5 h-4 text-foreground" />
                     ) : (
-                      <EyeOff className="w-3.5 h-4 text-slate-400" />
+                      <EyeOff className="w-3.5 h-4 text-muted-foreground" />
                     )}
                   </button>
                 </div>
@@ -107,16 +107,16 @@ export function SettingsContent() {
           <button
             onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
             className={cn(
-              "px-3 rounded-md border transition-colors",
+              "px-3 rounded-xl border transition-colors",
               currentSection?.visible
-                ? "border-slate-300 bg-white hover:bg-slate-50"
-                : "border-slate-300 bg-slate-100 hover:bg-slate-200"
+                ? "border-border bg-background hover:bg-muted/50"
+                : "border-border bg-muted hover:bg-muted/80"
             )}
           >
             {currentSection?.visible ? (
-              <Eye className="w-4 h-4 text-slate-700" />
+              <Eye className="w-4 h-4 text-foreground" />
             ) : (
-              <EyeOff className="w-4 h-4 text-slate-400" />
+              <EyeOff className="w-4 h-4 text-muted-foreground" />
             )}
           </button>
         </div>

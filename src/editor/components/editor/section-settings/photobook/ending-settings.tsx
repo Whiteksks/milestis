@@ -18,9 +18,6 @@ export function PhotobookEndingSettings() {
     toggleMediaPicker: state.toggleMediaPicker,
   }))
 
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-  const textareaStyle = "rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs resize-none"
-
   return (
     <ScrollArea className="h-full">
       <MediaPickerModal
@@ -39,76 +36,52 @@ export function PhotobookEndingSettings() {
         }
       />
 
-      <div className="p-6 max-w-lg mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-            Ending
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 font-medium">A final thought or signature.</p>
+      <div className="px-6 py-5 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium leading-none">Ending</h3>
+          <p className="text-xs text-muted-foreground">A final thought or signature</p>
         </div>
-        
-        {/* Секция 1: Текст и подпись */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Text Content</h4>
+
+        <div className="space-y-7">
           <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Message</Label>
-              <Textarea
-                value={ending.text || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('ending', { text: e.target.value })
-                }
-                placeholder="Thank you for watching..."
-                rows={4}
-                className={textareaStyle}
+            <Label className="text-xs font-medium text-muted-foreground">Message</Label>
+            <Textarea
+              value={ending.text || ''}
+              onChange={(e) => updatePhotobookSection('ending', { text: e.target.value })}
+              placeholder="Thank you for watching..."
+              rows={4}
+              className="text-xs resize-none"
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                value={ending.signature || ''}
+                onChange={(e) => updatePhotobookSection('ending', { signature: e.target.value })}
+                placeholder="Signature"
+                className="h-9 text-xs italic"
+              />
+              <Input
+                value={ending.date || ''}
+                onChange={(e) => updatePhotobookSection('ending', { date: e.target.value })}
+                placeholder="Date"
+                className="h-9 text-xs"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Signature</Label>
-                <Input
-                  value={ending.signature || ''}
-                  onChange={(e) =>
-                    updatePhotobookSection('ending', { signature: e.target.value })
-                  }
-                  placeholder="Your Name"
-                  className={`${inputStyle} italic`}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Date</Label>
-                <Input
-                  value={ending.date || ''}
-                  onChange={(e) =>
-                    updatePhotobookSection('ending', { date: e.target.value })
-                  }
-                  placeholder="December 2025"
-                  className={inputStyle}
-                />
-              </div>
-            </div>
+          <Separator className="bg-border/40" />
+
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-muted-foreground">Decorative Image</Label>
+            <ImagePicker
+              label=""
+              value={ending.images}
+              onChange={(next) => updatePhotobookSection('ending', { images: next })}
+              onOpenMediaPicker={toggleMediaPicker}
+              showCaption={false}
+            />
           </div>
         </div>
-        
-        <Separator className="bg-slate-100" />
-
-        {/* Секция 2: Изображение */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-slate-900">Decorative Image</h4>
-          <ImagePicker
-            label=""
-            value={ending.images}
-            onChange={(next) =>
-                updatePhotobookSection('ending', { images: next })
-            }
-            onOpenMediaPicker={toggleMediaPicker}
-            // В завершении подпись, скорее всего, не нужна
-            showCaption={false} 
-          />
-        </div>
-
       </div>
     </ScrollArea>
   )

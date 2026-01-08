@@ -45,61 +45,52 @@ export function PhotobookGallerySettings() {
     updatePhotobookSection('gallery', { images: next })
   }
 
-  const inputStyle = "h-9 rounded-xl border-slate-200 bg-white focus:ring-slate-900 text-xs"
-
   return (
     <ScrollArea className="h-full">
       <MediaPickerModal onSelectImages={handleSelectImages} />
 
-      <div className="p-6 max-w-lg mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-            Gallery
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 font-medium">Manage your photo collection.</p>
+      <div className="px-6 py-5 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium leading-none">Gallery</h3>
+          <p className="text-xs text-muted-foreground">Manage your photo collection</p>
         </div>
 
-        {/* Секция 1: Текстовый контент */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Text Content</h4>
+        <div className="space-y-7">
           <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Title</Label>
+            <Label className="text-xs font-medium text-muted-foreground">Header</Label>
+            <div className="grid grid-cols-2 gap-3">
               <Input
                 value={gallery.title || ''}
                 onChange={(e) => updatePhotobookSection('gallery', { title: e.target.value })}
-                placeholder="Gallery Title"
-                className={inputStyle}
+                placeholder="Title"
+                className="h-9 text-xs"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 ml-1">Description</Label>
               <Input
                 value={gallery.description || ''}
-                onChange={(e) =>
-                  updatePhotobookSection('gallery', { description: e.target.value })
-                }
-                placeholder="Short description of the section"
-                className={inputStyle}
+                onChange={(e) => updatePhotobookSection('gallery', { description: e.target.value })}
+                placeholder="Description"
+                className="h-9 text-xs"
               />
             </div>
           </div>
-        </div>
 
-        <Separator className="bg-slate-100" />
+          <Separator className="bg-border/40" />
 
-        {/* Секция 2: Управление изображениями */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-900">Images</h4>
-          
           <div className="space-y-3">
-            
-            {/* Сетка превью */}
-            <div className="grid grid-cols-3 gap-2 border border-dashed border-slate-200 rounded-xl p-2 bg-slate-50/50 min-h-17.5">
+            <div className="flex items-center justify-between gap-3">
+              <Label className="text-xs font-medium text-muted-foreground">Images</Label>
+              <Button
+                variant="outline"
+                onClick={() => toggleMediaPicker()}
+                className="h-8 text-xs"
+              >
+                <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 rounded-xl border border-dashed border-border/60 bg-muted/20 p-2 min-h-21">
               {(gallery.images || []).map((block, index) => (
-                <div key={block.id} className="relative group aspect-square">
+                <div key={block.id} className="relative group aspect-square overflow-hidden rounded-lg border border-border/40 bg-background">
                   <Image
                     loader={passthroughLoader}
                     unoptimized
@@ -107,12 +98,11 @@ export function PhotobookGallerySettings() {
                     alt={`Gallery Image ${index + 1}`}
                     fill
                     sizes="(max-width: 768px) 33vw, 120px"
-                    className="object-cover rounded-lg shadow-sm border border-slate-100"
+                    className="object-cover"
                   />
-                  {/* Кнопка удаления */}
                   <button
                     type="button"
-                    className="absolute -top-1.5 -right-1.5 rounded-full bg-white text-slate-400 p-1 opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-slate-100 hover:text-red-500 hover:border-red-100"
+                    className="absolute right-1.5 top-1.5 rounded-md bg-background/90 text-muted-foreground p-1 opacity-0 group-hover:opacity-100 transition-colors border border-border/60 hover:bg-muted hover:text-foreground"
                     onClick={() => removeImage(index)}
                     aria-label="Remove image"
                   >
@@ -120,27 +110,16 @@ export function PhotobookGallerySettings() {
                   </button>
                 </div>
               ))}
-              
-              {/* Кнопка добавления в сетке */}
+
               <button
                 type="button"
-                className="aspect-square w-full rounded-lg border border-dashed border-slate-200 bg-white flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                className="aspect-square w-full rounded-lg border border-dashed border-border/60 bg-background flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
                 onClick={() => toggleMediaPicker()}
               >
-                <ImageIcon className="w-5 h-5 mb-1 opacity-50" /> 
+                <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
                 <span className="text-[10px] font-medium">Add</span>
               </button>
             </div>
-
-            {/* Отдельная кнопка для лучшего UX (если сетка заполнена) */}
-            <Button 
-              variant="outline" 
-              onClick={() => toggleMediaPicker()} 
-              className="w-full h-9 rounded-xl border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-white hover:border-slate-300 text-xs font-medium"
-            >
-               <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add More Photos
-            </Button>
-            
           </div>
         </div>
       </div>

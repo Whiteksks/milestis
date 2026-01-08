@@ -44,35 +44,35 @@ export function ThemeSettingsPanel() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col">
       <MediaPickerModal onSelectImage={(url) => updateThemeCustomization({ customBackground: url })} />
 
       {/* Header */}
-      <div className="p-6 pb-5 flex items-center justify-between">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-border/40">
         <div className="space-y-0.5">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-slate-900">
+          <h3 className="text-sm font-semibold text-foreground">
             Appearance
           </h3>
-          <p className="text-xs text-slate-400">Theme & Background</p>
+          <p className="text-xs text-muted-foreground">Theme & Background</p>
         </div>
         
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="sm" 
           onClick={handleResetToDefault}
-          className="h-8 px-3 text-[10px] uppercase tracking-tight border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-all flex gap-2"
+          className="h-8 px-3 text-xs rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex gap-2"
         >
           <RotateCcw className="w-3 h-3" />
-          Reset to default
+          Reset
         </Button>
       </div>
 
-      <div className="px-6 space-y-5">
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="px-6 pt-4 space-y-5">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           {/* Image Preview Area */}
           <div 
             onClick={() => toggleMediaPicker()}
-            className="group relative aspect-video w-full cursor-pointer overflow-hidden bg-slate-50 flex items-center justify-center border-b border-slate-100"
+            className="group relative aspect-video w-full cursor-pointer overflow-hidden bg-muted/50 flex items-center justify-center border-b border-border/50"
           >
             {backgroundImageUrl ? (
               <>
@@ -80,15 +80,15 @@ export function ThemeSettingsPanel() {
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                   style={{ backgroundImage: `url(${backgroundImageUrl})`, opacity: backgroundOpacity }}
                 />
-                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                  <div className="flex items-center gap-2 rounded-lg bg-white/95 p-1.5 px-3 shadow-lg">
-                    <Plus className="w-3.5 h-3.5 text-slate-900" />
-                    <span className="text-xs font-medium text-slate-900">Change Background</span>
+                <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                  <div className="flex items-center gap-2 rounded-lg bg-background/95 p-1.5 px-3 shadow-lg">
+                    <Plus className="w-3.5 h-3.5 text-foreground" />
+                    <span className="text-xs font-medium text-foreground">Change Background</span>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center gap-2 text-slate-400">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <ImageIcon className="w-5 h-5 stroke-[1.5]" />
                 <span className="text-xs">Select Image</span>
               </div>
@@ -96,13 +96,13 @@ export function ThemeSettingsPanel() {
           </div>
 
           {/* Quick Settings Toolbar */}
-          <div className="flex items-center justify-between p-1 bg-white">
+          <div className="flex items-center justify-between p-1 bg-card">
             <div className="flex items-center flex-1">
               <Select
                 value={backgroundMode}
                 onValueChange={(val) => updateThemeCustomization({ backgroundImageType: val as BackgroundImageMode })}
               >
-                <SelectTrigger className="h-8 border-none shadow-none bg-transparent hover:bg-slate-50 text-xs focus:ring-0 px-2 transition-colors shrink-0 w-auto">
+                <SelectTrigger className="h-8 border-none shadow-none bg-transparent hover:bg-muted/50 text-xs focus:ring-0 px-2 transition-colors shrink-0 w-auto">
                   <SelectValue placeholder="Mode" />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,21 +114,21 @@ export function ThemeSettingsPanel() {
                 </SelectContent>
               </Select>
 
-              <div className="w-px h-4 bg-slate-100 mx-1" />
+              <div className="w-px h-4 bg-border/50 mx-1" />
 
               {/* Opacity Stepper */}
-              <div className="flex items-center gap-0.5 bg-slate-50/50 rounded-md p-0.5">
+              <div className="flex items-center gap-0.5 bg-muted/50 rounded-md p-0.5">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-6 w-6 text-slate-400 hover:bg-white hover:text-slate-900"
+                  className="h-6 w-6 text-muted-foreground hover:bg-background hover:text-foreground"
                   onClick={(e) => { e.stopPropagation(); handleUpdateOpacity(backgroundOpacity - 0.05); }}
                 >
                   <Minus className="w-3 h-3" />
                 </Button>
                 
                 <Input 
-                  className="h-6 w-10 border-none bg-transparent text-xs text-slate-900 text-center focus-visible:ring-0 px-0 shadow-none font-medium"
+                  className="h-6 w-10 border-none bg-transparent text-xs text-foreground text-center focus-visible:ring-0 px-0 shadow-none font-medium"
                   value={`${Math.round(backgroundOpacity * 100)}%`}
                   onChange={(e) => {
                      const val = parseInt(e.target.value.replace('%', ''))
@@ -139,7 +139,7 @@ export function ThemeSettingsPanel() {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-6 w-6 text-slate-400 hover:bg-white hover:text-slate-900"
+                  className="h-6 w-6 text-muted-foreground hover:bg-background hover:text-foreground"
                   onClick={(e) => { e.stopPropagation(); handleUpdateOpacity(backgroundOpacity + 0.05); }}
                 >
                   <Plus className="w-3 h-3" />
@@ -147,12 +147,12 @@ export function ThemeSettingsPanel() {
               </div>
             </div>
 
-            <div className="w-px h-4 bg-slate-100 mx-1" />
+            <div className="w-px h-4 bg-border/50 mx-1" />
 
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 text-slate-400 hover:text-slate-900 hover:bg-slate-50"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50"
               title="Advanced Settings"
             >
               <Settings2 className="w-3.5 h-3.5" />
@@ -161,17 +161,17 @@ export function ThemeSettingsPanel() {
         </div>
 
         {/* Direct Link Section */}
-        <div className="space-y-1.5 px-0.5">
-          <div className="flex items-center gap-2 text-slate-400 ml-1">
+        <div className="space-y-2 px-0.5">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Link2 className="w-3 h-3" />
-            <Label className="text-[10px] uppercase tracking-widest font-medium">Direct Link</Label>
+            <Label className="text-xs font-medium">Direct Link</Label>
           </div>
           <Input
             type="text"
             value={themeCustomizations.customBackground || ''}
             onChange={(e) => updateThemeCustomization({ customBackground: e.target.value })}
             placeholder="Paste image URL..."
-            className="h-9 rounded-xl border-slate-200 bg-transparent focus-visible:ring-slate-900 text-xs transition-all placeholder:text-slate-300 italic shadow-none"
+            className="h-9 rounded-xl border-border bg-background hover:bg-muted/50 focus-visible:ring-ring text-xs transition-all placeholder:text-muted-foreground/50 shadow-none"
           />
         </div>
       </div>
