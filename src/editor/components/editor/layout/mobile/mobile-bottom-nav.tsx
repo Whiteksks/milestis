@@ -5,16 +5,16 @@ import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
 interface MobileBottomNavProps {
-  activeTab: 'sections' | 'theme' | 'templates' | 'decorations'
-  onTabChange: (tab: 'sections' | 'theme' | 'templates' | 'decorations') => void
+  activeTab: 'sections' | 'theme' | 'decorations' | 'design'
+  onTabChange: (tab: 'sections' | 'theme' | 'decorations' | 'design') => void
 }
 
 export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps) {
   const tabs = [
     { id: 'sections' as const, icon: Settings, label: 'Sections' },
-    { id: 'templates' as const, icon: Layers, label: 'Template' },
     { id: 'theme' as const, icon: Palette, label: 'Theme' },
     { id: 'decorations' as const, icon: Sticker, label: 'Decor' },
+    { id: 'design' as const, icon: Layers, label: 'Design' },
   ]
 
   return (

@@ -9,6 +9,8 @@ import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/secti
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
 import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
 import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
+import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
+import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
 import type { DesktopEditorTab } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { useRef, useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
@@ -17,29 +19,34 @@ import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-c
 export default function EditorPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
-  const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'templates' | 'decorations'>('sections')
+  const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'decorations' | 'design'>('sections')
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const { openDesignModal, editorMode } = useUiSelector((state) => ({
+  const { openDesignModal, editorMode, designModalSection, setSelectedDecorationId } = useUiSelector((state) => ({
     openDesignModal: state.openDesignModal,
     editorMode: state.editorMode,
+    designModalSection: state.designModalSection,
+    setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  const handleMobileTabChange = (tab: 'sections' | 'theme' | 'templates' | 'decorations') => {
+  const handleMobileTabChange = (tab: 'sections' | 'theme' | 'decorations' | 'design') => {
     setMobileActiveTab(tab)
 
-    if (tab === 'templates') {
-      setIsBottomSheetOpen(false)
-      openDesignModal('templates')
-      return
+    // If the last action isn't Decorations, drop decoration selection/focus.
+    if (tab !== 'decorations') {
+      setSelectedDecorationId(null)
     }
-    if (tab === 'theme') {
-      setIsBottomSheetOpen(false)
-      openDesignModal('themes')
-      return
+
+    // Keep FloatingToolbar in sync with the last pressed mobile tab.
+    if (tab === 'sections' || tab === 'theme' || tab === 'decorations') {
+      setDesktopActiveTab(tab)
     }
-    if (tab === 'decorations') {
+
+    if (tab === 'design') {
+      // Map the catalog's last section to the closest FloatingToolbar tab.
+      setDesktopActiveTab(designModalSection === 'decorations' ? 'decorations' : 'theme')
       setIsBottomSheetOpen(false)
-      openDesignModal('decorations')
+      // Reopen the Design Catalog on the last-used section.
+      openDesignModal(designModalSection)
       return
     }
 
@@ -50,6 +57,8 @@ export default function EditorPage() {
     if (mobileActiveTab === 'sections') {
       return editorMode === 'photobook' ? 'Photobook Sections' : 'Page Sections'
     }
+    if (mobileActiveTab === 'theme') return 'Theme'
+    if (mobileActiveTab === 'decorations') return 'Decorations'
     return 'Settings'
   }
 
@@ -77,8 +86,11 @@ export default function EditorPage() {
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         title={getSheetTitle()}
+        contentPadding={mobileActiveTab === 'sections'}
       >
         {mobileActiveTab === 'sections' && <SettingsContent />}
+        {mobileActiveTab === 'theme' && <ThemeSettingsPanel />}
+        {mobileActiveTab === 'decorations' && <DecorationsSettingsPanel />}
       </MobileBottomSheet>
 
       {/* Modals */}

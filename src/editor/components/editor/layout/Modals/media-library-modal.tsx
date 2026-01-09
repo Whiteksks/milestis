@@ -248,6 +248,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
         isOpen={isMediaLibraryOpen}
         onClose={toggleMediaLibrary}
         title="Media Library"
+        contentPadding={false}
       >
         <div className="flex flex-col h-full min-h-0">
           {/* Верхняя панель (заголовок внутри bottom sheet) */}

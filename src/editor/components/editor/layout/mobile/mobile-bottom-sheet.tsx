@@ -4,15 +4,25 @@ import { X } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 interface MobileBottomSheetProps {
   isOpen: boolean
   onClose: () => void
   title: string
   children: React.ReactNode
+  contentClassName?: string
+  contentPadding?: boolean
 }
 
-export function MobileBottomSheet({ isOpen, onClose, title, children }: MobileBottomSheetProps) {
+export function MobileBottomSheet({
+  isOpen,
+  onClose,
+  title,
+  children,
+  contentClassName,
+  contentPadding = true,
+}: MobileBottomSheetProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -42,7 +52,7 @@ export function MobileBottomSheet({ isOpen, onClose, title, children }: MobileBo
         </SheetHeader>
 
         <ScrollArea className="overflow-y-auto" style={{ height: 'calc(85vh - 120px)' }}>
-          <div className="p-6">
+          <div className={cn(contentPadding && 'p-6', contentClassName)}>
             {children}
           </div>
         </ScrollArea>
