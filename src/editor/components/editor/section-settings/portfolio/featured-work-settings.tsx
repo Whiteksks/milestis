@@ -10,16 +10,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Trash2, Plus, Wand2 } from 'lucide-react'
 import { aspectRatios } from '@/editor/lib/aspect-ratios'
 import type { FrameStyle, AspectRatio } from '@/editor/lib/types'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { PortfolioImagePicker } from '@/editor/components/editor/section-settings/ui/portfolio-image-picker'
+import { FeaturedWorkHeaderPanel } from './featured-work-panels'
 
 export function FeaturedWorkSettings() {
+  const ownerId = useId()
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
     featuredWork: state.sectionContent.featuredWork,
     updateSectionContent: state.updateSectionContent,
   }))
-  const { toggleMediaPicker } = useUiSelector((state) => ({
-    toggleMediaPicker: state.toggleMediaPicker,
+  const { openMediaPicker } = useUiSelector((state) => ({
+    openMediaPicker: state.openMediaPicker,
   }))
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(null)
 
@@ -42,7 +44,7 @@ export function FeaturedWorkSettings() {
 
   return (
     <div className="px-6 py-5 space-y-6">
-      <MediaPickerModal onSelectImage={handleImageSelect} />
+      <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
 
       <div className="space-y-1">
         <h3 className="text-sm font-medium leading-none">Featured Work</h3>
@@ -50,23 +52,7 @@ export function FeaturedWorkSettings() {
       </div>
 
       <div className="space-y-7">
-        <div className="space-y-3">
-          <Label className="text-xs font-medium text-muted-foreground">Section Header</Label>
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              className="h-9 text-xs"
-              value={featuredWork.title}
-              onChange={(e) => updateSectionContent('featuredWork', { title: e.target.value })}
-              placeholder="My best work"
-            />
-            <Input
-              className="h-9 text-xs"
-              value={featuredWork.subtitle || ''}
-              onChange={(e) => updateSectionContent('featuredWork', { subtitle: e.target.value })}
-              placeholder="Subtitle"
-            />
-          </div>
-        </div>
+        <FeaturedWorkHeaderPanel />
 
         <div className="rounded-xl bg-muted/40 p-3 space-y-2">
           <div className="flex items-center gap-2">
@@ -169,7 +155,7 @@ export function FeaturedWorkSettings() {
                   }}
                   onOpenMediaPicker={() => {
                     setActiveProjectIndex(index)
-                    toggleMediaPicker()
+                    openMediaPicker(ownerId)
                   }}
                 />
               </div>

@@ -2,10 +2,14 @@
 
 import { useContentSelector, useUiSelector } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 export function useModeSections() {
-  const editorMode = useUiSelector((state) => state.editorMode)
+  const { editorMode, activeSectionId, setActiveSectionId } = useUiSelector((state) => ({
+    editorMode: state.editorMode,
+    activeSectionId: state.activeSectionId,
+    setActiveSectionId: state.setActiveSectionId,
+  }))
   const {
     sectionVisibility,
     toggleSection: togglePortfolio,
@@ -45,11 +49,25 @@ export function useModeSections() {
     })
   }, [modeEntry, sectionVisibility, photobookSectionVisibility, togglePortfolio, togglePhotobook])
 
+  const resolvedActiveSectionId = useMemo(() => {
+    if (activeSectionId && sections.some((s) => s.id === activeSectionId)) return activeSectionId
+    return modeEntry.defaultActiveSectionId
+  }, [activeSectionId, modeEntry.defaultActiveSectionId, sections])
+
+  useEffect(() => {
+    if (resolvedActiveSectionId !== activeSectionId) {
+      setActiveSectionId(resolvedActiveSectionId)
+    }
+  }, [activeSectionId, resolvedActiveSectionId, setActiveSectionId])
+
   return {
     editorMode,
     sections,
     toggleVisibility,
     defaultActiveSectionId: modeEntry.defaultActiveSectionId,
-    getSettingsComponent: modeEntry.getSettingsComponent
+    getSettingsComponent: modeEntry.getSettingsComponent,
+    activeSectionId,
+    setActiveSectionId,
+    resolvedActiveSectionId,
   }
 }

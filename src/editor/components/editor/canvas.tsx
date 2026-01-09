@@ -10,8 +10,9 @@ import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEd
 import { useCanvasBackground } from '@/editor/hooks/use-canvas-background'
 import { BackgroundLayer } from './layout/background-layer'
 import type { DeviceView } from '@/editor/lib/types'
-import { FloatingToolbar } from '@/editor/components/editor/layout/floating-toolbar'
-import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/decorationEdit/decorations-floating-toolbar'
+import { FloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/floating-toolbar'
+import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/decorations-floating-toolbar'
+import { SectionsToolbarPanel } from '@/editor/components/editor/layout/FloatingActions/sections-floating-menu'
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
   mobile: 'max-w-sm w-full',
@@ -86,11 +87,7 @@ export function Canvas({
           scrollContainerRef={scrollContainerRef}
         />
       ),
-      sections: (
-        <div className="h-8 px-2 flex items-center">
-          <span className="text-xs font-medium text-slate-700">Sections</span>
-        </div>
-      ),
+      sections: <SectionsToolbarPanel />,
       theme: (
         <div className="h-8 px-2 flex items-center">
           <span className="text-xs font-medium text-slate-700">Theme</span>

@@ -2,7 +2,7 @@
 
 import { Canvas } from '@/editor/components/editor/canvas'
 import { EditorHeader } from '@/editor/components/editor/layout/editor-header'
-import { FloatingActions } from '@/editor/components/editor/layout/floating-actions'
+import { FloatingActions } from '@/editor/components/editor/layout/floating-design-buttons'
 import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/media-library-modal'
 import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/design-catalog-modal'
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'

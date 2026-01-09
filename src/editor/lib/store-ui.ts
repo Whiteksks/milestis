@@ -8,7 +8,10 @@ export interface UiStore {
   editorMode: EditorMode
   isMediaLibraryOpen: boolean
   isMediaPickerOpen: boolean
+  mediaPickerOwnerId: string | null
   isSidebarCollapsed: boolean
+
+  activeSectionId: string | null
 
   isDesignModalOpen: boolean
   designModalSection: DesignModalSection
@@ -18,8 +21,10 @@ export interface UiStore {
 
   setDeviceView: (view: DeviceView) => void
   setEditorMode: (mode: EditorMode) => void
+  setMediaLibraryOpen: (open: boolean) => void
+  openMediaPicker: (ownerId: string) => void
+  closeMediaPicker: () => void
   toggleMediaLibrary: () => void
-  toggleMediaPicker: () => void
   toggleSidebar: () => void
 
   openDesignModal: (section: DesignModalSection) => void
@@ -29,6 +34,8 @@ export interface UiStore {
   setPreviewDecorations: (d?: DecorationsConfig | null) => void
   clearPreviewDecorations: () => void
   setSelectedDecorationId: (id: string | null) => void
+
+  setActiveSectionId: (id: string | null) => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -36,7 +43,10 @@ export const useUiStore = create<UiStore>((set) => ({
   editorMode: 'portfolio',
   isMediaLibraryOpen: false,
   isMediaPickerOpen: false,
+  mediaPickerOwnerId: null,
   isSidebarCollapsed: false,
+
+  activeSectionId: null,
 
   isDesignModalOpen: false,
   designModalSection: 'templates',
@@ -48,11 +58,18 @@ export const useUiStore = create<UiStore>((set) => ({
 
   setEditorMode: (mode) => set({ editorMode: mode }),
 
+  setMediaLibraryOpen: (open) => set(() => ({ isMediaLibraryOpen: open })),
+
+  openMediaPicker: (ownerId) =>
+    set(() => ({
+      isMediaPickerOpen: true,
+      mediaPickerOwnerId: ownerId,
+    })),
+
+  closeMediaPicker: () => set(() => ({ isMediaPickerOpen: false, mediaPickerOwnerId: null })),
+
   toggleMediaLibrary: () =>
     set((state) => ({ isMediaLibraryOpen: !state.isMediaLibraryOpen })),
-
-  toggleMediaPicker: () =>
-    set((state) => ({ isMediaPickerOpen: !state.isMediaPickerOpen })),
 
   toggleSidebar: () =>
     set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
@@ -72,4 +89,6 @@ export const useUiStore = create<UiStore>((set) => ({
   clearPreviewDecorations: () => set(() => ({ previewDecorations: null })),
 
   setSelectedDecorationId: (id) => set(() => ({ selectedDecorationId: id })),
+
+  setActiveSectionId: (id) => set(() => ({ activeSectionId: id })),
 }))

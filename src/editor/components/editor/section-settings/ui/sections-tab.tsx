@@ -1,69 +1,28 @@
 "use client"
 
-import { useEffect, useState } from 'react'
-import { useContentSelector, useUiSelector } from '@/editor/lib/store'
-import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
+import { useState } from 'react'
+import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useMemo, useCallback } from 'react'
+import { useMemo } from 'react'
 
 export function SectionsTab() {
-  const editorMode = useUiSelector((state) => state.editorMode)
-  const {
-    sectionVisibility,
-    toggleSection,
-    photobookSectionVisibility,
-    togglePhotobookSection,
-  } = useContentSelector((state) => ({
-    sectionVisibility: state.sectionVisibility,
-    toggleSection: state.toggleSection,
-    photobookSectionVisibility: state.photobookSectionVisibility,
-    togglePhotobookSection: state.togglePhotobookSection,
-  }))
+  const { editorMode, sections, toggleVisibility, getSettingsComponent, resolvedActiveSectionId, setActiveSectionId } =
+    useModeSections()
 
-  const modeEntry = useMemo(() => MODE_REGISTRY[editorMode], [editorMode])
-
-  const [activeSection, setActiveSection] = useState(modeEntry.defaultActiveSectionId)
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
 
-  const sections = useMemo(
-    () =>
-      modeEntry.sections.map((section) => ({
-        ...section,
-        visible: modeEntry.getSectionVisible({
-          section,
-          portfolioVisibility: sectionVisibility,
-          photobookVisibility: photobookSectionVisibility,
-        }),
-      })),
-    [modeEntry, sectionVisibility, photobookSectionVisibility],
+  const currentSection = useMemo(
+    () => sections.find((s) => s.id === resolvedActiveSectionId),
+    [resolvedActiveSectionId, sections],
   )
-
-  useEffect(() => {
-    setActiveSection(MODE_REGISTRY[editorMode].defaultActiveSectionId)
-  }, [editorMode])
-
-  const toggleVisibility = useCallback(
-    (key: string) => {
-      modeEntry.toggleSection({
-        toggleKey: key,
-        portfolioVisibility: sectionVisibility,
-        photobookVisibility: photobookSectionVisibility,
-        togglePortfolio: toggleSection,
-        togglePhotobook: togglePhotobookSection,
-      })
-    },
-    [modeEntry, sectionVisibility, photobookSectionVisibility, toggleSection, togglePhotobookSection],
-  )
-
-  const currentSection = sections.find(s => s.id === activeSection)
 
   const renderSettings = () => {
-    const SettingsComponent = modeEntry.getSettingsComponent(activeSection)
+    const SettingsComponent = getSettingsComponent(resolvedActiveSectionId)
     if (!SettingsComponent) return null
     return <SettingsComponent />
   }
@@ -96,37 +55,38 @@ export function SectionsTab() {
                         key={section.id}
                         className={cn(
                           'flex items-center justify-between rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors',
-                          activeSection === section.id 
+                          resolvedActiveSectionId === section.id 
                             ? 'bg-muted text-foreground font-medium' 
                             : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                           !section.visible && 'opacity-60'
                         )}
                         onClick={() => {
-                          setActiveSection(section.id)
+                          setActiveSectionId(section.id)
                           setIsSectionPopoverOpen(false)
                         }}
                       >
-                        <span className="truncate">{section.name}</span>
-
-                        <button
-                          type="button"
-                          onClick={e => {
-                            e.stopPropagation()
-                            toggleVisibility(section.toggleKey)
-                          }}
-                          className={cn(
-                            'ml-2 rounded-lg p-1.5 transition-all flex items-center justify-center',
-                            section.visible
-                              ? 'text-muted-foreground hover:text-foreground hover:bg-background hover:shadow-sm'
-                              : 'text-muted-foreground/50 hover:text-muted-foreground'
-                          )}
-                        >
-                          {section.visible ? (
-                            <Eye className="w-3.5 h-3.5" />
-                          ) : (
-                            <EyeOff className="w-3.5 h-3.5" />
-                          )}
-                        </button>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation()
+                              toggleVisibility(section.toggleKey)
+                            }}
+                            className={cn(
+                              'rounded-lg p-1.5 transition-all flex items-center justify-center',
+                              section.visible
+                                ? 'text-muted-foreground hover:text-foreground hover:bg-background hover:shadow-sm'
+                                : 'text-muted-foreground/50 hover:text-muted-foreground'
+                            )}
+                          >
+                            {section.visible ? (
+                              <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                          <span className="truncate">{section.name}</span>
+                        </div>
                       </div>
                     ))}
                   </div>

@@ -5,9 +5,9 @@ import { useCallback, useMemo, useState } from "react"
 import type { DecorationElement as LegacyDecorationElement } from "@/editor/lib/types"
 import { useThemeSelector, useUiSelector } from "@/editor/lib/store"
 
-import type { DecorationElement, DecorationUpdatePayload } from "./decorationTypes"
+import type { DecorationElement, DecorationUpdatePayload } from "../decorationEdit/decorationTypes"
 import { DecorationToolbar } from "./decoration-toolbar"
-import { loadImageAspectRatio } from "./utils"
+import { loadImageAspectRatio } from "../decorationEdit/utils"
 
 export function DecorationsFloatingToolbar({
   decorations,

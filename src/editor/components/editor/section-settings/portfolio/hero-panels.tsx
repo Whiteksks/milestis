@@ -1,0 +1,52 @@
+"use client"
+
+import { useContentSelector } from "@/editor/lib/store"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+
+export function HeroTitlePanel({ dense = false }: { dense?: boolean }) {
+  const { hero, updateSectionContent } = useContentSelector((state) => ({
+    hero: state.sectionContent.hero,
+    updateSectionContent: state.updateSectionContent,
+  }))
+
+  return (
+    <div className="space-y-3">
+      {!dense && <Label className="text-xs font-medium text-muted-foreground">Title</Label>}
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          className="h-9 text-xs"
+          value={hero.title}
+          onChange={(e) => updateSectionContent("hero", { title: e.target.value })}
+          placeholder="Your main headline"
+        />
+        <Input
+          className="h-9 text-xs"
+          value={hero.subtitle}
+          onChange={(e) => updateSectionContent("hero", { subtitle: e.target.value })}
+          placeholder="A catchy subtitle"
+        />
+      </div>
+    </div>
+  )
+}
+
+export function HeroDescriptionPanel({ dense = false }: { dense?: boolean }) {
+  const { hero, updateSectionContent } = useContentSelector((state) => ({
+    hero: state.sectionContent.hero,
+    updateSectionContent: state.updateSectionContent,
+  }))
+
+  return (
+    <div className="space-y-1.5">
+      {!dense && <Label className="text-xs font-medium text-muted-foreground">Description</Label>}
+      <Textarea
+        className="min-h-27.5 text-xs resize-none"
+        value={hero.description}
+        onChange={(e) => updateSectionContent("hero", { description: e.target.value })}
+        placeholder="Detailed introduction..."
+      />
+    </div>
+  )
+}

@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from "react"
-import type { DecorationElement } from "./decorationTypes"
-import { clamp, round2 } from "./utils"
+import type { DecorationElement } from "../components/editor/layout/decorationEdit/decorationTypes"
+import { clamp, round2 } from "../components/editor/layout/decorationEdit/utils"
 
 const MIN_SCALE = 0.5
 const MAX_SCALE = 3

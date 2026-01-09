@@ -15,23 +15,33 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
 interface MediaPickerModalProps {
+  ownerId: string
   onSelectImage?: (url: string) => void
   onSelectImages?: (urls: string[]) => void
 }
 
-export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerModalProps) {
+export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: MediaPickerModalProps) {
   const { mediaLibrary, addMediaImage } = useContentSelector((state) => ({
     mediaLibrary: state.mediaLibrary,
     addMediaImage: state.addMediaImage,
   }))
-  const { isMediaPickerOpen, toggleMediaPicker } = useUiSelector((state) => ({
+  const { isMediaPickerOpen, mediaPickerOwnerId, openMediaPicker, closeMediaPicker } = useUiSelector((state) => ({
     isMediaPickerOpen: state.isMediaPickerOpen,
-    toggleMediaPicker: state.toggleMediaPicker,
+    mediaPickerOwnerId: state.mediaPickerOwnerId,
+    openMediaPicker: state.openMediaPicker,
+    closeMediaPicker: state.closeMediaPicker,
   }))
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isMultiSelect = !!onSelectImages
+
+  const isOpen = isMediaPickerOpen && mediaPickerOwnerId === ownerId
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) openMediaPicker(ownerId)
+    else closeMediaPicker()
+  }
 
   const handleConfirm = () => {
     if (selectedUrls.length > 0) {
@@ -43,7 +53,7 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
     }
 
     setSelectedUrls([])
-    toggleMediaPicker()
+    closeMediaPicker()
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,8 +78,8 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
   }
 
   return (
-    <Dialog open={isMediaPickerOpen} onOpenChange={toggleMediaPicker}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-background/95 backdrop-blur-sm border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-6 flex flex-row items-center justify-between">
           <div>
             <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">Select Image</DialogTitle>
@@ -152,7 +162,7 @@ export function MediaPickerModal({ onSelectImage, onSelectImages }: MediaPickerM
         <div className="flex justify-end gap-3 pt-6 border-t border-border/50 mt-0">
           <Button 
             variant="ghost" 
-            onClick={toggleMediaPicker}
+            onClick={closeMediaPicker}
             className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             Cancel

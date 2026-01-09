@@ -10,16 +10,19 @@ import { getDecorations } from '@/editor/lib/decorations'
 import { BACKGROUND_MODE_PRESETS, type BackgroundImageMode } from '@/editor/lib/background'
 import { ImageIcon, Plus, Minus, RotateCcw, Link2, Settings2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import { useId } from 'react'
 
 export function ThemeSettingsPanel() {
+  const ownerId = useId()
   const { currentTheme, themeCustomizations, updateThemeCustomization } = useThemeSelector((state) => ({
     currentTheme: state.currentTheme,
     themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
   }))
 
-  const { toggleMediaPicker } = useUiSelector((state) => ({
-    toggleMediaPicker: state.toggleMediaPicker,
+  const { openMediaPicker } = useUiSelector((state) => ({
+    openMediaPicker: state.openMediaPicker,
   }))
 
   // Получаем дефолтные настройки темы
@@ -45,7 +48,7 @@ export function ThemeSettingsPanel() {
 
   return (
     <div className="h-full flex flex-col">
-      <MediaPickerModal onSelectImage={(url) => updateThemeCustomization({ customBackground: url })} />
+      <MediaPickerModal ownerId={ownerId} onSelectImage={(url) => updateThemeCustomization({ customBackground: url })} />
 
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-border/40">
@@ -71,14 +74,17 @@ export function ThemeSettingsPanel() {
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           {/* Image Preview Area */}
           <div 
-            onClick={() => toggleMediaPicker()}
+            onClick={() => openMediaPicker(ownerId)}
             className="group relative aspect-video w-full cursor-pointer overflow-hidden bg-muted/50 flex items-center justify-center border-b border-border/50"
           >
             {backgroundImageUrl ? (
               <>
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url(${backgroundImageUrl})`, opacity: backgroundOpacity }}
+                <Image
+                  src={backgroundImageUrl}
+                  alt="Theme Background"
+                  fill
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  style={{ opacity: backgroundOpacity }}
                 />
                 <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                   <div className="flex items-center gap-2 rounded-lg bg-background/95 p-1.5 px-3 shadow-lg">

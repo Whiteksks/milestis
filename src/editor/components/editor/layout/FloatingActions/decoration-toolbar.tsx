@@ -34,9 +34,9 @@ import {
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import type { DecorationElement } from "./decorationTypes"
-import { clamp } from "./utils"
-import { useDecorationToolbar } from "./use-decoration-toolbar"
+import type { DecorationElement } from "../decorationEdit/decorationTypes"
+import { clamp } from "../decorationEdit/utils"
+import { useDecorationToolbar } from "../../../../hooks/use-decoration-toolbar"
 
 function OpacityIcon({ percent }: { percent: number }) {
   const clipTop = clamp(100 - percent, 0, 100)
