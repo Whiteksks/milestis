@@ -4,7 +4,9 @@ import type { ComponentType } from "react"
 import type { LucideIcon } from "lucide-react"
 import {
   AlignLeft,
+  Award,
   Copyright,
+  FolderKanban,
   Link,
   List,
   Mail,
@@ -16,9 +18,9 @@ import {
   Image as ImageIcon,
 } from "lucide-react"
 
-import { BioBiographyPanel, BioPhotoPanel, BioTitlePanel } from "@/editor/components/editor/section-settings/portfolio/bio-panels"
+import { BioAchievementsPanel, BioBiographyPanel, BioPhotoPanel, BioTitlePanel } from "@/editor/components/editor/section-settings/portfolio/bio-panels"
 import { ContactDetailsPanel, ContactHeadingPanel } from "@/editor/components/editor/section-settings/portfolio/contact-panels"
-import { FeaturedWorkAddProjectPanel, FeaturedWorkHeaderPanel } from "@/editor/components/editor/section-settings/portfolio/featured-work-panels"
+import { FeaturedWorkHeaderPanel, FeaturedWorkProjectsPanel } from "@/editor/components/editor/section-settings/portfolio/featured-work-panels"
 import { FooterCopyrightPanel, FooterSocialLinksPanel } from "@/editor/components/editor/section-settings/portfolio/footer-panels"
 import { HeaderBrandPanel, HeaderLinksPanel } from "@/editor/components/editor/section-settings/portfolio/header-panels"
 import { HeroDescriptionPanel, HeroTitlePanel } from "@/editor/components/editor/section-settings/portfolio/hero-panels"
@@ -28,10 +30,12 @@ export type PortfolioSectionQuickActionId =
   | "bio.title"
   | "bio.photo"
   | "bio.bio"
+  | "bio.achievements"
   | "contact.heading"
   | "contact.details"
   | "featuredWork.header"
   | "featuredWork.add"
+  | "featuredWork.project"
   | "footer.copyright"
   | "footer.social"
   | "header.brand"
@@ -57,6 +61,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PortfolioSectionQuickAction[]>>
     { id: "bio.title", title: "Edit title", Icon: Type, Panel: BioTitlePanel },
     { id: "bio.photo", title: "Edit photo", Icon: ImageIcon, Panel: BioPhotoPanel },
     { id: "bio.bio", title: "Edit bio text", Icon: AlignLeft, Panel: BioBiographyPanel },
+    { id: "bio.achievements", title: "Achievements", Icon: Award, Panel: BioAchievementsPanel },
   ],
   hero: [
     { id: "hero.title", title: "Edit title", Icon: Type, Panel: HeroTitlePanel },
@@ -64,7 +69,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PortfolioSectionQuickAction[]>>
   ],
   featuredWork: [
     { id: "featuredWork.header", title: "Header", Icon: Type, Panel: FeaturedWorkHeaderPanel },
-    { id: "featuredWork.add", title: "Add project", Icon: Plus, Panel: FeaturedWorkAddProjectPanel },
+    { id: "featuredWork.project", title: "Edit project", Icon: FolderKanban, Panel: FeaturedWorkProjectsPanel },
   ],
   video: [
     { id: "video.header", title: "Header", Icon: Video, Panel: VideoHeaderPanel },

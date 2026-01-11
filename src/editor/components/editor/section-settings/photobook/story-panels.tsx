@@ -1,83 +1,148 @@
 "use client"
 
-import { useId, useState } from "react"
+import { useEffect, useId, useMemo, useState, useCallback } from "react"
 import Image, { type ImageLoader } from "next/image"
-import { Plus, Trash2, Image as ImageIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, Trash2, Image as ImageIcon } from "lucide-react"
 
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { useContentSelector, useUiSelector } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
-export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
-  const { story, updatePhotobookSection } = useContentSelector((state) => ({
+// --- Shared Hooks & Utils ---
+
+function useStoryData() {
+  return useContentSelector((state) => ({
     story: state.photobookSectionContent.story,
     updatePhotobookSection: state.updatePhotobookSection,
   }))
+}
+
+function useStoryMoments() {
+  const { story, updatePhotobookSection } = useStoryData()
+  const slots = story.images || []
+  const [activeIndex, setActiveIndex] = useState<number>(() => (slots.length ? 0 : -1))
+
+  const normalizedIndex = useMemo(() => {
+    if (!slots.length) return -1
+    return Math.min(Math.max(activeIndex, 0), slots.length - 1)
+  }, [activeIndex, slots.length])
+
+  useEffect(() => {
+    if (!slots.length && activeIndex !== -1) setActiveIndex(-1)
+    else if (slots.length && (activeIndex < 0 || activeIndex >= slots.length)) {
+      setActiveIndex(Math.max(0, slots.length - 1))
+    }
+  }, [slots.length, activeIndex])
+
+  const updateSlots = useCallback((nextSlots: any[]) => {
+    updatePhotobookSection("story", { images: nextSlots })
+  }, [updatePhotobookSection])
+
+  const addSlot = () => {
+    const next = [...slots, { id: `slot-${Date.now()}`, label: "New Moment", images: [], caption: "", imageSettings: [] }]
+    updateSlots(next)
+    setActiveIndex(next.length - 1)
+  }
+
+  const removeSlot = (idx: number) => {
+    const next = slots.filter((_, i) => i !== idx)
+    updateSlots(next)
+    setActiveIndex(prev => Math.min(prev, next.length - 1))
+  }
+
+  const updateSlot = (idx: number, updates: any) => {
+    const next = [...slots]
+    next[idx] = { ...next[idx], ...updates }
+    updateSlots(next)
+  }
+
+  const addImagesToSlot = (idx: number, urls: string[]) => {
+    const slot = slots[idx]
+    if (!slot) return
+    const currentImgs = slot.images || []
+    const toAdd = urls.slice(0, 4 - currentImgs.length)
+    if (!toAdd.length) return
+
+    updateSlot(idx, {
+      images: [...currentImgs, ...toAdd],
+      imageSettings: [...(slot.imageSettings || []), ...toAdd.map(() => ({ aspectRatio: "landscape", frameStyle: "soft" }))]
+    })
+  }
+
+  return { slots, activeIndex: normalizedIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot }
+}
+
+// --- Shared Sub-components ---
+
+function MomentNav({ slots, activeIndex, onChange, onRemove }: any) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => onChange(activeIndex - 1)} disabled={activeIndex <= 0}>
+        <ChevronLeft className="w-4 h-4" />
+      </Button>
+      <Select value={String(activeIndex)} onValueChange={(v) => onChange(parseInt(v, 10))}>
+        <SelectTrigger className="h-8 text-xs rounded-xl w-32">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {slots.map((s: any, i: number) => (
+            <SelectItem key={s.id || i} value={String(i)} className="text-xs">
+              {s.label?.trim() ? s.label : `Moment ${i + 1}`}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => onChange(activeIndex + 1)} disabled={activeIndex >= slots.length - 1}>
+        <ChevronRight className="w-4 h-4" />
+      </Button>
+      <Button variant="ghost" size="icon" onClick={() => onRemove(activeIndex)} className="h-8 w-8 text-muted-foreground hover:text-destructive rounded-xl">
+        <Trash2 className="w-4 h-4" />
+      </Button>
+    </div>
+  )
+}
+
+// --- Main Components ---
+
+export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
+  const { story, updatePhotobookSection } = useStoryData()
+  const update = (fields: any) => updatePhotobookSection("story", fields)
 
   return (
     <div className="space-y-3">
       {!dense && <Label className="text-xs font-medium text-muted-foreground">Header</Label>}
       <Input
         value={story.title || ""}
-        onChange={(e) => updatePhotobookSection("story", { title: e.target.value })}
+        onChange={(e) => update({ title: e.target.value })}
         placeholder="Story title"
         className="h-10 text-sm font-medium"
       />
       <div className="grid grid-cols-2 gap-3">
-        <Input
-          value={story.date || ""}
-          onChange={(e) => updatePhotobookSection("story", { date: e.target.value })}
-          placeholder="Date"
-          className="h-9 text-xs"
-        />
-        <Input
-          value={story.location || ""}
-          onChange={(e) => updatePhotobookSection("story", { location: e.target.value })}
-          placeholder="Location"
-          className="h-9 text-xs"
-        />
+        <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className="h-9 text-xs" />
+        <Input value={story.location || ""} onChange={(e) => update({ location: e.target.value })} placeholder="Location" className="h-9 text-xs" />
       </div>
     </div>
   )
 }
 
 export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
-  const { story, updatePhotobookSection } = useContentSelector((state) => ({
-    story: state.photobookSectionContent.story,
-    updatePhotobookSection: state.updatePhotobookSection,
-  }))
+  const { story, updatePhotobookSection } = useStoryData()
   const paragraphs = story.paragraphs || []
 
-  const addParagraph = () => updatePhotobookSection("story", { paragraphs: [...paragraphs, ""] })
-
-  const updateParagraph = (idx: number, value: string) => {
-    const next = [...paragraphs]
-    next[idx] = value
-    updatePhotobookSection("story", { paragraphs: next })
-  }
-
-  const removeParagraph = (idx: number) => {
-    const filtered = paragraphs.filter((_, i) => i !== idx)
-    updatePhotobookSection("story", { paragraphs: filtered })
-  }
-
-  const handleParagraphBlur = (idx: number) => {
-    const value = paragraphs[idx]
-    if (!value || !value.trim()) removeParagraph(idx)
-  }
+  const updateParagraphs = (next: string[]) => updatePhotobookSection("story", { paragraphs: next })
+  const add = () => updateParagraphs([...paragraphs, ""])
 
   if (dense) {
     return (
       <div className="space-y-3">
-        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={addParagraph}>
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add paragraph
-        </Button>
+        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={add}><Plus className="w-3.5 h-3.5 mr-2" /> Add paragraph</Button>
         <p className="text-[11px] text-muted-foreground">For full text editing, open the section settings.</p>
       </div>
     )
@@ -85,36 +150,29 @@ export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h4 className="text-sm font-medium text-foreground">Text</h4>
+          <h4 className="text-sm font-medium">Text</h4>
           <p className="text-xs text-muted-foreground">Add paragraphs (empty ones are removed)</p>
         </div>
-        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={addParagraph}>
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add
-        </Button>
+        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={add}><Plus className="w-3.5 h-3.5 mr-2" /> Add</Button>
       </div>
-
       <div className="space-y-3">
-        {paragraphs.map((p, idx) => (
-          <div key={idx} className="relative">
-            <Textarea
-              value={p}
-              onChange={(e) => updateParagraph(idx, e.target.value)}
-              onBlur={() => handleParagraphBlur(idx)}
-              rows={3}
-              className="text-xs resize-none min-h-25"
-              placeholder="Start writing..."
-            />
-          </div>
+        {paragraphs.map((p, i) => (
+          <Textarea
+            key={i}
+            value={p}
+            onChange={(e) => {
+              const next = [...paragraphs]; next[i] = e.target.value; updateParagraphs(next)
+            }}
+            onBlur={() => !paragraphs[i]?.trim() && updateParagraphs(paragraphs.filter((_, idx) => idx !== i))}
+            rows={3}
+            className="text-xs resize-none min-h-25"
+            placeholder="Start writing..."
+          />
         ))}
-
-        {paragraphs.length === 0 && (
-          <button
-            type="button"
-            onClick={addParagraph}
-            className="w-full rounded-xl border border-dashed border-border/60 bg-muted/20 px-4 py-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
-          >
+        {!paragraphs.length && (
+          <button onClick={add} className="w-full rounded-xl border border-dashed p-8 text-xs text-muted-foreground hover:bg-muted/30">
             Click to add the first paragraph
           </button>
         )}
@@ -123,202 +181,118 @@ export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
   )
 }
 
-export function StoryMomentsPanel({ dense = false }: { dense?: boolean }) {
+export function StoryMomentsPanel() {
   const ownerId = useId()
-  const { story, updatePhotobookSection } = useContentSelector((state) => ({
-    story: state.photobookSectionContent.story,
-    updatePhotobookSection: state.updatePhotobookSection,
-  }))
-  const slots = story.images || []
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
+  const { slots, activeIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot } = useStoryMoments()
+  const { openMediaPicker } = useUiSelector((s) => ({ openMediaPicker: s.openMediaPicker }))
+  
+  const activeSlot = slots[activeIndex]
 
-  const [activeSlotIndex, setActiveSlotIndex] = useState<number | null>(null)
-
-  const addSlot = () => {
-    const newSlot = { id: `slot-${Date.now()}`, label: "New Moment", images: [], caption: "", imageSettings: [] }
-    updatePhotobookSection("story", { images: [...slots, newSlot] })
-  }
-
-  const removeSlot = (idx: number) => {
-    const next = slots.filter((_, i) => i !== idx)
-    updatePhotobookSection("story", { images: next })
-  }
-
-  const updateSlotLabel = (idx: number, val: string) => {
-    const next = [...slots]
-    next[idx] = { ...next[idx], label: val }
-    updatePhotobookSection("story", { images: next })
-  }
-
-  const handleSlotCaptionChange = (idx: number, value: string) => {
-    const next = [...slots]
-    next[idx] = { ...next[idx], caption: value }
-    updatePhotobookSection("story", { images: next })
-  }
-
-  const addImagesToSlot = (idx: number, urls: string[]) => {
-    const nextSlots = [...slots]
-    const slot = nextSlots[idx]
-    if (!slot) return
-
-    const slotImages = slot.images ? [...slot.images] : []
-    const imgSettings = slot.imageSettings ? [...slot.imageSettings] : []
-
-    const remainingSlots = Math.max(0, 4 - slotImages.length)
-    if (remainingSlots === 0) return
-
-    const toAdd = urls.slice(0, remainingSlots)
-    toAdd.forEach((url) => {
-      slotImages.push(url)
-      imgSettings.push({ aspectRatio: "landscape", frameStyle: "soft" })
-    })
-
-    nextSlots[idx] = { ...slot, images: slotImages, imageSettings: imgSettings }
-    updatePhotobookSection("story", { images: nextSlots })
-  }
-
-  const handleSelectImageFromLibrary = (url: string) => {
-    if (activeSlotIndex === null) return
-    addImagesToSlot(activeSlotIndex, [url])
-  }
-
-  const handleSelectImagesFromLibrary = (urls: string[]) => {
-    if (activeSlotIndex === null || urls.length === 0) return
-    addImagesToSlot(activeSlotIndex, urls)
-  }
-
-  const handleAddImageClick = (idx: number) => {
-    if ((slots[idx].images?.length || 0) >= 4) return
-    setActiveSlotIndex(idx)
-    openMediaPicker(ownerId)
-  }
-
-  const handleRemoveImageFromSlot = (slotIdx: number, imageIdx: number) => {
-    const nextSlots = [...slots]
-    const slot = nextSlots[slotIdx]
-    if (!slot) return
-
-    const images = [...(slot.images || [])]
-    const imageSettings = [...(slot.imageSettings || [])]
-
-    images.splice(imageIdx, 1)
-    imageSettings.splice(imageIdx, 1)
-
-    nextSlots[slotIdx] = { ...slot, images, imageSettings }
-    updatePhotobookSection("story", { images: nextSlots })
-  }
-
-  if (dense) {
-    return (
-      <div className="space-y-3">
-        <MediaPickerModal ownerId={ownerId} onSelectImage={handleSelectImageFromLibrary} onSelectImages={handleSelectImagesFromLibrary} />
-        <Button size="sm" onClick={addSlot} className="h-8 text-xs">
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add moment
-        </Button>
-        <p className="text-[11px] text-muted-foreground">Edit photos inside moments in full settings.</p>
-      </div>
-    )
-  }
 
   return (
     <section className="space-y-4">
-      <MediaPickerModal ownerId={ownerId} onSelectImage={handleSelectImageFromLibrary} onSelectImages={handleSelectImagesFromLibrary} />
-
-      <div className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h4 className="text-sm font-medium text-foreground">Moments</h4>
+      <MediaPickerModal ownerId={ownerId} onSelectImage={(u) => addImagesToSlot(activeIndex, [u])} onSelectImages={(us) => addImagesToSlot(activeIndex, us)} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-sm font-medium">Moments</h4>
           <p className="text-xs text-muted-foreground">Up to 4 photos per moment</p>
         </div>
-        <Button size="sm" onClick={addSlot} className="h-8 text-xs">
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add
-        </Button>
+        <Button size="sm" onClick={addSlot} className="h-8 text-xs"><Plus className="w-3.5 h-3.5 mr-2" /> Add</Button>
       </div>
 
-      <div className="space-y-4">
-        {slots.map((s, idx) => {
-          const canAddMore = (s.images?.length || 0) < 4
-
-          return (
-            <div key={s.id} className="rounded-xl bg-muted/30 p-3 space-y-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 space-y-1.5">
-                  <Label className="text-xs font-medium text-muted-foreground">Title</Label>
-                  <Input
-                    value={s.label}
-                    onChange={(e) => updateSlotLabel(idx, e.target.value)}
-                    className="h-9 text-xs"
-                    placeholder="Event name..."
-                  />
-                </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => removeSlot(idx)}
-                  className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-muted"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+      {slots.length > 0 ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">Moment {activeIndex + 1} / {slots.length}</div>
+            <MomentNav slots={slots} activeIndex={activeIndex} onChange={setActiveIndex} onRemove={removeSlot} />
+          </div>
+          {activeSlot && (
+            <div className="rounded-xl bg-muted/30 p-3 space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">Title</Label>
+                <Input value={activeSlot.label} onChange={(e) => updateSlot(activeIndex, { label: e.target.value })} className="h-9 text-xs" placeholder="Event name..." />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
-                {(s.images || []).map((img, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-4/3 overflow-hidden rounded-lg border border-border/40 bg-background group"
-                  >
-                    <Image
-                      loader={passthroughLoader}
-                      unoptimized
-                      src={img}
-                      alt=""
-                      fill
-                      sizes="(max-width: 768px) 50vw, 200px"
-                      className="object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImageFromSlot(idx, i)}
-                      className="absolute right-1.5 top-1.5 rounded-md bg-background/90 border border-border/60 text-muted-foreground p-1 opacity-0 group-hover:opacity-100 transition-colors hover:bg-muted hover:text-foreground"
-                      aria-label="Remove photo"
+                {activeSlot.images?.map((img: string, i: number) => (
+                  <div key={i} className="relative aspect-4/3 overflow-hidden rounded-lg border group">
+                    <Image loader={passthroughLoader} unoptimized src={img} alt="" fill className="object-cover" />
+                    <button 
+                      onClick={() => updateSlot(activeIndex, { 
+                        images: activeSlot.images.filter((_: any, idx: number) => idx !== i),
+                        imageSettings: activeSlot.imageSettings.filter((_: any, idx: number) => idx !== i)
+                      })} 
+                      className="absolute right-1.5 top-1.5 bg-background/90 p-1 opacity-0 group-hover:opacity-100 rounded-md shadow-sm"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
                 ))}
-
-                {canAddMore && (
-                  <button
-                    type="button"
-                    onClick={() => handleAddImageClick(idx)}
-                    className="flex flex-col items-center justify-center aspect-4/3 rounded-lg border border-dashed border-border/60 bg-background text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
-                  >
+                {activeSlot.images?.length < 4 && (
+                  <button onClick={() => openMediaPicker(ownerId)} className="flex flex-col items-center justify-center aspect-4/3 rounded-lg border border-dashed hover:bg-muted/30">
                     <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
                     <span className="text-[10px] font-medium">Add Photo</span>
                   </button>
                 )}
               </div>
-
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Caption</Label>
-                <Input
-                  value={s.caption || ""}
-                  onChange={(e) => handleSlotCaptionChange(idx, e.target.value)}
-                  className="h-9 text-xs"
-                  placeholder="Add a caption for this moment..."
-                />
+                <Input value={activeSlot.caption || ""} onChange={(e) => updateSlot(activeIndex, { caption: e.target.value })} className="h-9 text-xs" placeholder="Add a caption..." />
               </div>
             </div>
-          )
-        })}
-
-        {slots.length === 0 && (
-          <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 px-4 py-10 text-center text-xs text-muted-foreground">
-            No moments added yet
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed px-4 py-10 text-center text-xs text-muted-foreground">No moments added yet</div>
+      )}
     </section>
+  )
+}
+
+export function StoryMomentEditorPanel({ dense = false }: { dense?: boolean }) {
+  const ownerId = useId()
+  const { slots, activeIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot } = useStoryMoments()
+  const { openMediaPicker } = useUiSelector((s) => ({ openMediaPicker: s.openMediaPicker }))
+
+  if (!slots.length) {
+    return (
+      <div className="space-y-3">
+        {!dense && <Label className="text-xs font-medium text-muted-foreground">Moments</Label>}
+        <Button size="sm" onClick={addSlot} className="h-8 text-xs"><Plus className="w-3.5 h-3.5 mr-2" /> Add first moment</Button>
+      </div>
+    )
+  }
+
+  const activeSlot = slots[activeIndex]
+
+  return (
+    <div className="space-y-3">
+      <MediaPickerModal ownerId={ownerId} onSelectImage={(u) => addImagesToSlot(activeIndex, [u])} onSelectImages={(us) => addImagesToSlot(activeIndex, us)} />
+      <div className="flex items-center justify-between">
+        {!dense && <Label className="text-xs font-medium text-muted-foreground">Moment</Label>}
+        <MomentNav slots={slots} activeIndex={activeIndex} onChange={setActiveIndex} onRemove={removeSlot} />
+      </div>
+
+      {activeSlot && (
+        <div className="space-y-3">
+          <Input className="h-9 text-xs" value={activeSlot.label || ""} onChange={(e) => updateSlot(activeIndex, { label: e.target.value })} placeholder="Moment label" />
+          <Textarea className="min-h-20 text-xs resize-none" value={activeSlot.caption || ""} onChange={(e) => updateSlot(activeIndex, { caption: e.target.value })} placeholder="Caption" />
+          <div className="flex items-center justify-between">
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => openMediaPicker(ownerId)} disabled={activeSlot.images?.length >= 4}>
+              <ImageIcon className="w-3.5 h-3.5 mr-2" /> Photo ({activeSlot.images?.length || 0}/4)
+            </Button>
+            <Button size="sm" className="h-8 text-xs" onClick={addSlot}><Plus className="w-3.5 h-3.5 mr-2" /> Add</Button>
+          </div>
+          {activeSlot.images?.length > 0 && (
+            <div className="flex gap-2">
+              {activeSlot.images.map((src: string, i: number) => (
+                <div key={i} className="relative h-10 w-10 rounded-lg overflow-hidden border">
+                  <Image src={src} alt="" fill className="object-cover" loader={passthroughLoader} unoptimized />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

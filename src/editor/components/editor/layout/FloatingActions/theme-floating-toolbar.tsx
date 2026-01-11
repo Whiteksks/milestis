@@ -1,11 +1,17 @@
 "use client"
 
 import { useId } from "react"
-import { Palette, ImageIcon, RotateCcw } from "lucide-react"
+import { ImageIcon, Palette, Settings2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { useThemeSelector, useUiSelector } from "@/editor/lib/store"
+import { BACKGROUND_MODE_PRESETS, type BackgroundImageMode } from "@/editor/lib/background"
+import { getDecorations } from "@/editor/lib/decorations"
 
 export function ThemeFloatingToolbar() {
   const ownerId = useId()
@@ -15,12 +21,29 @@ export function ThemeFloatingToolbar() {
     openMediaPicker: state.openMediaPicker,
   }))
 
-  const { updateThemeCustomization } = useThemeSelector((state) => ({
+  const { currentTheme, themeCustomizations, updateThemeCustomization } = useThemeSelector((state) => ({
+    currentTheme: state.currentTheme,
+    themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
   }))
 
+  const themeDecorations = getDecorations(currentTheme)
+
+  const backgroundOpacity =
+    themeCustomizations.backgroundImageOpacity ?? themeDecorations?.backgroundImage?.opacity ?? 0.15
+
+  const backgroundMode =
+    (themeCustomizations.backgroundImageType ??
+      themeDecorations?.backgroundImage?.type ??
+      "fixed") as BackgroundImageMode
+
   const iconButtonClassName =
     "h-8 w-8 p-0 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+
+  const handleUpdateOpacity = (value: number) => {
+    const clamped = Math.min(Math.max(value, 0), 1)
+    updateThemeCustomization({ backgroundImageOpacity: parseFloat(clamped.toFixed(2)) })
+  }
 
   const handleResetBackground = () => {
     updateThemeCustomization({
@@ -58,15 +81,70 @@ export function ThemeFloatingToolbar() {
           <ImageIcon className="h-4 w-4" />
         </Button>
 
-        <Button
-          type="button"
-          variant="ghost"
-          className={iconButtonClassName}
-          title="Reset background"
-          onClick={handleResetBackground}
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              className={iconButtonClassName}
+              title="Background settings"
+            >
+              <Settings2 className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="top" sideOffset={10} className="w-72 p-3">
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs">Scroll type</Label>
+                <Select
+                  value={backgroundMode}
+                  onValueChange={(val) =>
+                    updateThemeCustomization({ backgroundImageType: val as BackgroundImageMode })
+                  }
+                >
+                  <SelectTrigger className="h-9 rounded-xl text-xs">
+                    <SelectValue placeholder="Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(BACKGROUND_MODE_PRESETS).map((mode) => (
+                      <SelectItem key={mode} value={mode} className="text-xs">
+                        {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">Image opacity</Label>
+                  <span className="text-xs tabular-nums text-slate-600">
+                    {Math.round(backgroundOpacity * 100)}%
+                  </span>
+                </div>
+                <Slider
+                  value={[Math.round(backgroundOpacity * 100)]}
+                  min={0}
+                  max={100}
+                  step={5}
+                  onValueChange={([v]) => handleUpdateOpacity((v ?? 0) / 100)}
+                />
+              </div>
+
+              <div className="pt-2 border-t border-border/60 flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs rounded-xl"
+                  onClick={handleResetBackground}
+                >
+                  Reset background
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </>
   )
