@@ -25,7 +25,7 @@ export function SettingsMenu() {
   }
 
   return (
-    <div className="h-fit w-56 shrink-0">
+    <div className="h-fit w-full md:w-56 shrink-0">
       <nav className="sticky top-24 rounded-2xl bg-card/60 p-2 backdrop-blur-sm">
         <div className="space-y-1">
           {settingsMenu.map((item) => {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 import { FolderOpen, Home, Settings, HelpCircle, LayoutTemplate, BarChart3, Globe, Heart } from "lucide-react"
 import {
@@ -18,49 +18,35 @@ import {
 
 interface AppSidebarProps {
   activeItem?: string
-  onNavigate?: (item: string) => void
+  locale?: string
 }
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
-  { id: "projects", label: "Projects", icon: FolderOpen },
-  { id: "templates", label: "Templates", icon: LayoutTemplate },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "domains", label: "Domains", icon: Globe },
+  { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
+  { id: "projects", label: "Projects", icon: FolderOpen, href: "/dashboard/projects" },
+  { id: "templates", label: "Templates", icon: LayoutTemplate, href: "/dashboard/templates" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
+  { id: "domains", label: "Domains", icon: Globe, href: "/dashboard/domains" },
 ]
 
 const bottomItems = [
-  { id: "settings", label: "Settings", icon: Settings },
-  { id: "help", label: "Help & Support", icon: HelpCircle },
+  { id: "settings", label: "Settings", icon: Settings, href: "/account" },
+  { id: "help", label: "Help & Support", icon: HelpCircle, href: "/help" },
 ]
 
-export function AppSidebar({ activeItem = "dashboard", onNavigate }: AppSidebarProps) {
-  const router = useRouter()
+function withLocale(locale: string | undefined, href: string) {
+  if (!locale) return href
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) return href
+  return `/${locale}${href}`
+}
 
-  const handleNavigate = (id: string) => {
-    if (id === "help") {
-      router.push("/help")
-      return
-    }
-    
-    if (id === "settings") {
-      router.push("/account")
-      return
-    }
-
-    if (id === "dashboard") {
-      router.push("/dashboard")
-      return
-    }
-
-    onNavigate?.(id)
-  }
+export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps) {
 
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex h-14 items-center gap-3 px-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10">
+        <div className="flex h-14 items-center gap-2 ">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
             <Heart className="size-5 text-primary" />
           </div>
           <span className="text-lg font-bold text-sidebar-foreground truncate group-data-[collapsible=icon]:hidden">
@@ -78,13 +64,15 @@ export function AppSidebar({ activeItem = "dashboard", onNavigate }: AppSidebarP
                 return (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
+                      asChild
                       isActive={activeItem === item.id}
                       tooltip={item.label}
-                        onClick={() => handleNavigate(item.id)}
                       className="rounded-xl transition-all duration-200 hover:scale-[1.02]"
                     >
-                      <Icon className="size-4" />
-                      <span>{item.label}</span>
+                      <Link href={withLocale(locale, item.href)}>
+                        <Icon className="size-4" />
+                        <span className="text-base">{item.label}</span>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
@@ -101,13 +89,15 @@ export function AppSidebar({ activeItem = "dashboard", onNavigate }: AppSidebarP
             return (
               <SidebarMenuItem key={item.id}>
                 <SidebarMenuButton
+                  asChild
                   isActive={activeItem === item.id}
                   tooltip={item.label}
-                  onClick={() => handleNavigate(item.id)}
                   className="rounded-xl transition-all duration-200 hover:scale-[1.02]"
                 >
-                  <Icon className="size-4" />
-                  <span>{item.label}</span>
+                  <Link href={withLocale(locale, item.href)}>
+                    <Icon className="size-4" />
+                    <span className="text-base">{item.label}</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )

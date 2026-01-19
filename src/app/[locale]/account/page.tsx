@@ -1,14 +1,16 @@
 'use client'
 
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function AccountPage() {
   const router = useRouter()
+  const params = useParams<{ locale: string }>()
 
   useEffect(() => {
-    router.replace("/account/profile")
-  }, [router])
+    const locale = params?.locale
+    router.replace(locale ? `/${locale}/account/profile` : "/account/profile")
+  }, [params, router])
   
   return null
 }

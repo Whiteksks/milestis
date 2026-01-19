@@ -22,18 +22,6 @@ import { aspectRatios } from "@/editor/lib/aspect-ratios"
 import { useEffect} from "react"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 
-
-function createBlankFeaturedWorkProject() {
-  return {
-    title: "New Project",
-    description: "",
-    image: "",
-    tags: [] as string[],
-    aspectRatio: "landscape" as AspectRatio,
-    frameStyle: "soft" as FrameStyle,
-  }
-}
-
 export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
     featuredWork: state.sectionContent.featuredWork,
@@ -61,11 +49,7 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
   )
 }
 
-export function FeaturedWorkProjectsPanel({
-  dense = false,
-}: {
-  dense?: boolean
-}) {
+export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   const ownerId = useId()
 
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({

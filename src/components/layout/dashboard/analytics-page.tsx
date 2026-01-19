@@ -16,7 +16,7 @@ export function AnalyticsPage() {
       {/* Coming Soon Card */}
       <Card className="rounded-3xl border-muted-foreground/10 bg-card/80 backdrop-blur-sm">
         <CardContent className="py-16 text-center">
-          <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5">
+          <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/5">
             <BarChart3 className="size-10 text-primary" />
           </div>
           <Badge className="mb-4 rounded-full bg-primary/10 text-primary hover:bg-primary/10">Coming Soon</Badge>
