@@ -1,3 +1,5 @@
+@import './cozy.css';
+
 :root {
   --background: oklch(0.98 0.005 80);
   --foreground: oklch(0.25 0.02 60);

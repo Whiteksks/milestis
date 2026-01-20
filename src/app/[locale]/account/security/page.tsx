@@ -18,15 +18,6 @@ const authMethods = [
     canDisconnect: false,
   },
   {
-    id: "password",
-    name: "Password",
-    description: "Add a password to sign in without email links",
-    icon: Key,
-    isPrimary: false,
-    isConnected: false,
-    canDisconnect: true,
-  },
-  {
     id: "google",
     name: "Google",
     description: "Sign in with your Google account",

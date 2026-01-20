@@ -45,6 +45,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider
             attribute="class"
+            themes={["light", "dark", "cozy"]}
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange

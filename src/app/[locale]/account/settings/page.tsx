@@ -20,6 +20,7 @@ import {
   Download,
   FileText,
   AlertTriangle,
+  Keyboard,
 } from "lucide-react"
 
 export default function AccountSettings() {
@@ -82,23 +83,6 @@ export default function AccountSettings() {
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="dateFormat" className="flex items-center gap-2 text-sm font-medium">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                Date Format
-              </Label>
-              <Select value={dateFormat} onValueChange={setDateFormat}>
-                <SelectTrigger id="dateFormat" className="rounded-xl bg-background/50">
-                  <SelectValue placeholder="Select format" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
-                  <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
-                  <SelectItem value="ymd">YYYY-MM-DD</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -108,47 +92,12 @@ export default function AccountSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Layout className="h-5 w-5 text-primary/70" />
-            Default Behavior
+            Project Behavior
           </CardTitle>
-          <CardDescription>Set defaults for new projects you create</CardDescription>
+          <CardDescription>Configure how you interact with the project editor</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="projectType" className="flex items-center gap-2 text-sm font-medium">
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-                Default Project Type
-              </Label>
-              <Select value={defaultProjectType} onValueChange={setDefaultProjectType}>
-                <SelectTrigger id="projectType" className="rounded-xl bg-background/50">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="photobook">Photobook</SelectItem>
-                  <SelectItem value="portfolio">Portfolio Site</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="template" className="flex items-center gap-2 text-sm font-medium">
-                <Layout className="h-4 w-4 text-muted-foreground" />
-                Default Template
-              </Label>
-              <Select defaultValue="none">
-                <SelectTrigger id="template" className="rounded-xl bg-background/50">
-                  <SelectValue placeholder="Select template" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="none">No default</SelectItem>
-                  <SelectItem value="minimal">Minimal</SelectItem>
-                  <SelectItem value="classic">Classic</SelectItem>
-                  <SelectItem value="modern">Modern</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
+        <CardContent className="space-y-4">
+          {/* Auto-save Toggle */}
           <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
@@ -156,14 +105,28 @@ export default function AccountSettings() {
               </div>
               <div>
                 <p className="font-medium">Auto-save</p>
-                <p className="text-sm text-muted-foreground">Automatically save your work as you edit</p>
+                <p className="text-sm text-muted-foreground">Save changes automatically during editing</p>
               </div>
             </div>
             <Switch checked={autoSave} onCheckedChange={setAutoSave} />
           </div>
 
+          {/* Alt Modifier Toggle */}
+          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Keyboard className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium">Alt-key Shortcuts</p>
+                <p className="text-sm text-muted-foreground">Require Alt modifier for standard shortcuts (e.g., Alt+Ctrl+A)</p>
+              </div>
+            </div>
+            <Switch  />
+          </div>
+
           <p className="text-xs text-muted-foreground">
-            These settings only affect new projects. Existing projects keep their current settings.
+            These preferences apply to your current interaction mode and session.
           </p>
         </CardContent>
       </Card>
