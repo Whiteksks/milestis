@@ -21,17 +21,17 @@ const HeaderAuthButton = () => {
 
   if (user) {
     return (
-      <div className="flex items-center gap-2">
-        <ProfileDropdown
-            trigger={
-              <Button variant='ghost' size='icon' className='size-9.5'>
-                <Avatar className='size-9.5 rounded-md'>
-                  <AvatarImage src='https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png' />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-              </Button>
-            }
-          />
+    <div className="flex items-center gap-2">
+      <ProfileDropdown
+        trigger={
+        <Button variant='ghost' size='icon' className='size-9.5'>
+          <Avatar className='size-9.5 rounded-md'>
+            <AvatarImage src='https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png' />
+            <AvatarFallback>JD</AvatarFallback>
+          </Avatar>
+        </Button>
+          }
+        />
       </div>
     )
   }

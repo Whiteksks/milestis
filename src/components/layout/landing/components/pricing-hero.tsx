@@ -1,6 +1,6 @@
 export function PricingHero() {
   return (
-    <section className="px-6 py-20 md:py-28">
+    <section className="px-6 py-12">
       <div className="container mx-auto max-w-3xl text-center">
         <h1 className="font-serif text-4xl font-medium leading-tight text-foreground md:text-5xl text-balance">
           Simple pricing for meaningful memories

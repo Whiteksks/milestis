@@ -1,4 +1,10 @@
+'use client'
+
+import { useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { MenuIcon } from 'lucide-react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -15,72 +21,137 @@ import {
 } from '@/components/ui/navigation-menu'
 
 import { cn } from '@/lib/utils'
-
 import HeaderAuthButton from './auth-open-button'
 import Logo from '../landing/logo'
 
-export type NavigationSection = {
-  title: string
-  href: string
-}
+const NAVIGATION = [
+  { title: 'Home', href: '/' },
+  { title: 'Examples', href: '/examples' },
+  { title: 'Pricing', href: '/pricing' },
+  { title: 'FAQ', href: '/help/faq' }
+]
 
-type HeaderProps = {
-  navigationData: NavigationSection[]
-  className?: string
-}
+const Header = ({ className }: { className?: string }) => {
+  
+  const pathname = usePathname()
+  const { scrollY } = useScroll()
 
-const Header = ({ navigationData, className }: HeaderProps) => {
+  const normalizedPathname = useMemo(() => {
+    // When using /[locale] routes, pathname is like /ru/pricing, but NAVIGATION hrefs are /pricing
+    const supportedLocales = new Set(['en', 'ru', 'kz'])
+    const parts = pathname.split('/').filter(Boolean)
+    const maybeLocale = parts[0]
+
+    if (maybeLocale && supportedLocales.has(maybeLocale)) {
+      const rest = parts.slice(1)
+      return '/' + rest.join('/')
+    }
+
+    return pathname
+  }, [pathname])
+  
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const lastDirectionChangeY = useRef(0)
+  
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0
+    const scrollDelta = latest - previous
+    const isScrollingDown = scrollDelta > 0
+
+    setIsScrolled(latest > 20)
+
+    if (isScrollingDown) {
+      if (latest > 150) setIsVisible(false)
+      lastDirectionChangeY.current = latest 
+    } else {
+      const distanceScrolledUp = lastDirectionChangeY.current - latest
+      
+      if (distanceScrolledUp > 50 || latest < 10) {
+        setIsVisible(true)
+      }
+    }
+  })
+
+  const isActive = (href: string) =>
+    href === '/' ? normalizedPathname === '/' : normalizedPathname.startsWith(href)
+
   return (
-    <header className={cn('bg-background sticky top-0 z-50 h-16 border-b', className)}>
-      <div className='mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8'>
-        {/* Logo */}
-        <a href='#'>
-          <Logo className='gap-3'/>
-        </a>
+    <motion.header
+      variants={{
+        visible: { y: 0 },
+        hidden: { y: '-100%' },
+      }}
+      animate={isVisible ? 'visible' : 'hidden'}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      style={{ paddingRight: 'var(--removed-body-scroll-bar-size, 0px)' }}
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300',
+        isScrolled 
+          ? 'h-16 bg-background/80 backdrop-blur-lg' 
+          : 'h-16 bg-background border-transparent',
+        className
+      )}
+    >
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="shrink-0">
+          <Logo className="gap-3" />
+        </Link>
 
-        {/* Navigation */}
-        <NavigationMenu className='max-md:hidden'>
-          <NavigationMenuList className='flex-wrap justify-start gap-0'>
-            {navigationData.map(navItem => (
-              <NavigationMenuItem key={navItem.title}>
-                <NavigationMenuLink
-                  href={navItem.href}
-                  className='text-muted-foreground hover:text-primary px-3 py-1.5 text-base! font-medium hover:bg-transparent'
-                >
-                  {navItem.title}
+        {/* Desktop navigation */}
+        <NavigationMenu className="max-md:hidden">
+          <NavigationMenuList className="gap-1">
+            {NAVIGATION.map((item) => (
+              <NavigationMenuItem key={item.title}>
+                <NavigationMenuLink asChild className='relative px-3 py-1.5 text-sm font-medium rounded-md transition-colors'>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      isActive(item.href)
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-primary'
+                    )}
+                  >
+                    {item.title}
+                    {isActive(item.href) && (
+                      <motion.div
+                        layoutId="activeNav"
+                        className="absolute inset-0 bg-secondary -z-10 rounded-md"
+                        transition={{ type: 'spring', duration: 0.5 }}
+                      />
+                    )}
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Login Button */}
-        <div className="max-md:hidden">
+        <div className="flex items-center gap-3">
           <HeaderAuthButton />
-        </div>
-
-        {/* Navigation for small screens */}
-        <div className='flex gap-4 md:hidden'>
-            <HeaderAuthButton />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' size='icon'>
-                <MenuIcon />
-                <span className='sr-only'>Menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className='w-56' align='end'>
-              {navigationData.map((item, index) => (
-                <DropdownMenuItem key={index}>
-                  <a href={item.href}>{item.title}</a>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MenuIcon className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {NAVIGATION.map((item) => (
+                  <DropdownMenuItem key={item.title} asChild>
+                    <Link href={item.href} className={cn(isActive(item.href) && "bg-secondary")}>
+                      {item.title}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   )
 }
 

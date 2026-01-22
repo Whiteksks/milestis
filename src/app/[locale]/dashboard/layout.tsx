@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DashboardHeader title={headerTitle} />
           </div>
 
-          <main className="relative flex-1 overflow-y-auto p-6">{children}</main>
+          <main className="relative flex-1 overflow-y-auto p-2 md:p-4 lg:p-6">{children}</main>
         </div>
       </SidebarInset>
     </SidebarProvider>

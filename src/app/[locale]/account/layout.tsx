@@ -33,7 +33,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
             <DashboardHeader title="Settings" />
           </div>
 
-          <main className="relative flex-1 overflow-y-auto p-6">
+          <main className="relative flex-1 overflow-y-auto p-2 md:p-4 lg:p-6">
             <div className="mx-auto flex max-w-5xl flex-col gap-6 lg:flex-row lg:gap-8">
               
               {/* Меню */}

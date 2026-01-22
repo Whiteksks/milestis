@@ -31,15 +31,15 @@ export function CreditsIndicator({ used, total, resetDate }: CreditsIndicatorPro
               <button className="flex items-center gap-3 rounded-full border border-border/60 bg-card/80 px-4 py-2 shadow-sm transition-all duration-200 hover:bg-accent/50 hover:shadow-md hover:scale-[1.02]">
                 <div className="flex items-center gap-2">
                   <Coins className="size-4 text-primary/70" />
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="hidden md:flex text-sm font-medium text-foreground">
                     {remaining} / {total}
                   </span>
                 </div>
-                <Progress value={percentage} className="h-1.5 w-16" />
+                <Progress value={percentage} className="hidden md:flex h-1.5 w-16" />
               </button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-[220px] rounded-xl">
+          <TooltipContent side="bottom" className="hidden md:flex max-w-55 rounded-xl">
             Credits are used to create and publish photo books. They reset monthly.
           </TooltipContent>
         </Tooltip>

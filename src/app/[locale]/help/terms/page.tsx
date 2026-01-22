@@ -1,4 +1,4 @@
-import { Header } from "@/components/layout/Headers/header2"
+import Header from "@/components/layout/Headers/header"
 import { Footer } from "@/components/layout/landing/components/footer"
 import { BookOpen, Upload, User, CreditCard, Server, XCircle, FileText } from "lucide-react"
 

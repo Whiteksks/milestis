@@ -12,7 +12,7 @@ export function CreateCards() {
       <Card className="group relative overflow-hidden rounded-3xl border-border/40 bg-card/90 backdrop-blur-sm shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:scale-[1.01]">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-primary/15 to-primary/5">
               <BookOpen className="size-7 text-primary" />
             </div>
             <Badge variant="secondary" className="rounded-full text-xs font-normal px-3">
@@ -39,7 +39,7 @@ export function CreateCards() {
       <Card className="group relative overflow-hidden rounded-3xl border-border/40 bg-card/90 backdrop-blur-sm shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:scale-[1.01]">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/40 to-accent/10">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-accent/40 to-accent/10">
               <Layout className="size-7 text-accent-foreground" />
             </div>
           </div>

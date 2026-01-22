@@ -67,7 +67,7 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
                       asChild
                       isActive={activeItem === item.id}
                       tooltip={item.label}
-                      className="rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                      className="rounded-xl transition-all duration-200"
                     >
                       <Link href={withLocale(locale, item.href)}>
                         <Icon className="size-4" />
@@ -92,7 +92,7 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
                   asChild
                   isActive={activeItem === item.id}
                   tooltip={item.label}
-                  className="rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                  className="rounded-xl transition-all duration-200"
                 >
                   <Link href={withLocale(locale, item.href)}>
                     <Icon className="size-4" />

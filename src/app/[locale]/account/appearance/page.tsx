@@ -42,7 +42,7 @@ export default function AppearanceSettings() {
   return (
     <div className="space-y-6">
       <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+        <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0 pb-7">
           <div className="space-y-1.5">
             <CardTitle>Color Theme</CardTitle>
             <CardDescription>Choose how Milestis looks for you</CardDescription>

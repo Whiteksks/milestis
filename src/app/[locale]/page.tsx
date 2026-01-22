@@ -1,23 +1,6 @@
 import {HeroSection} from "@/components/layout/landing/components/hero-section";
 
-const navigationData = [
-  {
-    title: 'Home',
-    href: '/dashboard'
-  },
-  {
-    title: 'Products',
-    href: '/design/id/edit'
-  },
-  {
-    title: 'About Us',
-    href: '/about'
-  },
-  {
-    title: 'Contacts',
-    href: '/contacts'
-  }
-]
+
 import { EmotionalContextSection } from "@/components/layout/landing/components/emotional-context-section";
 import { FinalCTA } from "@/components/layout/landing/components/final-cta";
 import { Footer } from "@/components/layout/landing/components/footer";
@@ -32,7 +15,7 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <Header navigationData={navigationData} />
+      <Header />
       <HeroSection />
       <EmotionalContextSection />
       <HowItWorksSection />

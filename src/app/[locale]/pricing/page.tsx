@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Header } from "@/components/layout/Headers/header2"
+import Header from "@/components/layout/Headers/header"
 import { Footer } from "@/components/layout/landing/components/footer"
 import { PricingHero } from "@/components/layout/landing/components/pricing-hero"
 import { PricingCards } from "@/components/layout/landing/components/pricing-cards"
@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen">
-      <Header activePage="pricing" />
+    <main className="min-h-screen pt-14">
+      <Header />
       <PricingHero />
       <PricingCards />
       <PricingReassurance />

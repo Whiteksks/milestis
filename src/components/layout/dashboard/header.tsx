@@ -22,7 +22,7 @@ export function DashboardHeader({ title = "Dashboard" }: HeaderProps) {
           <SidebarTrigger className="-ml-1 rounded-xl hover:bg-accent/60 transition-colors" />
           <h1 className="text-lg font-semibold text-foreground">{title}</h1>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <CreditsIndicator used={3} total={10} resetDate="Jan 1, 2026" />
           <UserMenu user={user} />
         </div>

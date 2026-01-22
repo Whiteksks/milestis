@@ -117,7 +117,7 @@ export function Canvas({
   }, [scrollContainerRef])
 
   return (
-    <div className="flex-1 min-h-0 bg-slate-100 p-1 md:p-2 lg:p-4 overflow-hidden">
+    <div className="flex-1 min-h-0 bg-background p-1 md:p-2 lg:p-4 overflow-hidden">
       <div
         ref={viewportRef}
         className={cn(

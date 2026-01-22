@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Header } from "@/components/layout/Headers/header2"
+import Header from "@/components/layout/Headers/header"
 import { Footer } from "@/components/layout/landing/components/footer"
 import { FaqHero } from "@/components/layout/supportPage/faq-hero"
 import { FaqContent } from "@/components/layout/supportPage/faq-content"
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function FaqPage() {
   return (
     <main className="min-h-screen">
-      <Header activePage="faq" />
+      <Header />
       <FaqHero />
       <FaqContent />
       <FaqReassurance />

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 
 const settingsMenu = [
   { id: "profile", label: "Profile", navigate: "/account/profile", icon: User },
-  { id: "settings", label: "Account", navigate: "/account/settings", icon: Building }, // Тут был /settings
+  { id: "settings", label: "Account", navigate: "/account/settings", icon: Building },
   { id: "billing", label: "Billing & Credits", navigate: "/account/billing", icon: CreditCard },
   { id: "domains", label: "Domains", navigate: "/account/domains", icon: Globe },
   { id: "appearance", label: "Appearance", navigate: "/account/appearance", icon: Palette },

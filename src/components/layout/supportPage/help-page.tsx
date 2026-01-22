@@ -9,7 +9,6 @@ import {
   Palette,
   Clock,
   MessageCircle,
-  CheckCircle2,
   ChevronRight,
   Sparkles,
   FileText,
@@ -152,26 +151,44 @@ export function HelpPage() {
             {guides.map((guide, index) => (
               <div
                 key={guide.id}
-                className={`group flex cursor-pointer items-center justify-between p-5 transition-colors hover:bg-muted/30 ${
+                className={`group flex flex-col sm:flex-row cursor-pointer items-start sm:items-center justify-between p-5 transition-colors hover:bg-muted/30 ${
                   index === 0 ? "rounded-t-2xl" : ""
                 } ${index === guides.length - 1 ? "rounded-b-2xl" : ""}`}
               >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
+                <div className="flex-1 w-full">
+                  <div className="flex items-start justify-between gap-3 sm:justify-start">
+                    {/* Название */}
                     <h3 className="font-medium text-foreground">{guide.title}</h3>
-                    <Badge variant="secondary" className="rounded-full text-xs font-normal">
+                    
+                    {/* Badge: справа на мобилках, рядом с текстом на ПК */}
+                    <Badge variant="secondary" className="rounded-full text-xs font-normal shrink-0">
                       {guide.category}
                     </Badge>
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">{guide.description}</p>
+                  
+                  {/* Описание */}
+                  <p className="mt-1 text-sm text-muted-foreground pr-6 sm:pr-0">
+                    {guide.description}
+                  </p>
+
+                  {/* Reading time: снизу на мобилках, скрыто для десктопа в этом блоке */}
+                  <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground sm:hidden">
+                    <Clock className="size-3" />
+                    <span>{guide.readTime}</span>
+                    <ChevronRight className="size-5 text-muted-foreground sm:hidden" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
+
+                {/* Правая часть: только для десктопа */}
+                <div className="hidden sm:flex items-center gap-3 ml-4">
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="size-3" />
                     <span>{guide.readTime}</span>
                   </div>
                   <ChevronRight className="size-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </div>
+
+                {/* Иконка стрелочки для мобилок (опционально, позиционируется абсолютно) */}
               </div>
             ))}
           </CardContent>
@@ -192,23 +209,6 @@ export function HelpPage() {
               </p>
             </div>
             <Button className="mt-4 rounded-full px-6 sm:ml-6 sm:mt-0">Contact support</Button>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* System Status */}
-      <section>
-        <Card className="rounded-2xl border-border/50 bg-background/60 shadow-sm backdrop-blur-sm">
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-full bg-emerald-100">
-                <CheckCircle2 className="size-4 text-emerald-600" />
-              </div>
-              <span className="text-sm font-medium text-foreground">All systems operational</span>
-            </div>
-            <Button variant="ghost" size="sm" className="rounded-full text-xs text-muted-foreground">
-              View status page
-            </Button>
           </CardContent>
         </Card>
       </section>
