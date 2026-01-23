@@ -21,8 +21,8 @@ import {
 } from '@/components/ui/navigation-menu'
 
 import { cn } from '@/lib/utils'
-import HeaderAuthButton from './auth-open-button'
-import Logo from '../landing/logo'
+import HeaderAuthButton from './auth/auth-open-button'
+import Logo from './logo'
 
 const NAVIGATION = [
   { title: 'Home', href: '/' },
@@ -37,7 +37,6 @@ const Header = ({ className }: { className?: string }) => {
   const { scrollY } = useScroll()
 
   const normalizedPathname = useMemo(() => {
-    // When using /[locale] routes, pathname is like /ru/pricing, but NAVIGATION hrefs are /pricing
     const supportedLocales = new Set(['en', 'ru', 'kz'])
     const parts = pathname.split('/').filter(Boolean)
     const maybeLocale = parts[0]
@@ -88,7 +87,7 @@ const Header = ({ className }: { className?: string }) => {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300',
         isScrolled 
-          ? 'h-16 bg-background/80 backdrop-blur-lg' 
+          ? 'h-16 bg-background/80 backdrop-blur-sm md:backdrop-blur-md' 
           : 'h-16 bg-background border-transparent',
         className
       )}
@@ -103,7 +102,7 @@ const Header = ({ className }: { className?: string }) => {
           <NavigationMenuList className="gap-1">
             {NAVIGATION.map((item) => (
               <NavigationMenuItem key={item.title}>
-                <NavigationMenuLink asChild className='relative px-3 py-1.5 text-sm font-medium rounded-md transition-colors'>
+                <NavigationMenuLink asChild className='relative px-3 py-1.5 text-base font-medium rounded-md transition-colors'>
                   <Link
                     href={item.href}
                     className={cn(

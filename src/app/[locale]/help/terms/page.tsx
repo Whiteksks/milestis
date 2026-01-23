@@ -1,5 +1,5 @@
-import Header from "@/components/layout/Headers/header"
-import { Footer } from "@/components/layout/landing/components/footer"
+import Header from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 import { BookOpen, Upload, User, CreditCard, Server, XCircle, FileText } from "lucide-react"
 
 export default function TermsPage() {

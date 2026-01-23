@@ -1,59 +1,61 @@
-import type { ComponentType } from 'react'
+import { Sparkles, Music, BookText, Link2, Smartphone, Lock } from "lucide-react"
 
-import { ArrowRightIcon } from 'lucide-react'
+const features = [
+  {
+    icon: Sparkles,
+    title: "Animated memory pages",
+    description: "Gentle animations bring your photos and stories to life",
+  },
+  {
+    icon: Music,
+    title: "Music for atmosphere",
+    description: "Add meaningful songs that set the mood",
+  },
+  {
+    icon: BookText,
+    title: "Story-first layouts",
+    description: "Designed to let your stories shine",
+  },
+  {
+    icon: Link2,
+    title: "Personal shareable links",
+    description: "One link to share with everyone who matters",
+  },
+  {
+    icon: Smartphone,
+    title: "Works everywhere",
+    description: "Beautiful on phone, tablet and desktop",
+  },
+  {
+    icon: Lock,
+    title: "Privacy control",
+    description: "You decide who can see your memories",
+  },
+]
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-
-import { cn } from '@/lib/utils'
-
-type Features = {
-  icon: ComponentType
-  title: string
-  description: string
-  cardBorderColor: string
-  avatarTextColor: string
-  avatarBgColor: string
-}[]
-
-const Features = ({ featuresList }: { featuresList: Features }) => {
+export function FeaturesSection() {
   return (
-    <section className='py-8 sm:py-16 lg:py-24'>
-      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        {/* Header */}
-        <div className='mb-12 space-y-4 sm:mb-16 lg:mb-24'>
-          <h2 className='text-2xl font-semibold md:text-3xl lg:text-4xl'>Discover the Exclusive Perks Today</h2>
-          <p className='text-muted-foreground text-xl'>
-            Explore key features designed to enhance your shopping experience with intuitive navigation, robust
-            security, and seamless functionality.
+    <section className="px-4 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-16 text-center">
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-balance">Made for what matters</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+            Features designed with feelings in mind, not specs
           </p>
-          <Button variant='outline' className='rounded-lg text-base shadow-none has-[>svg]:px-6' size='lg' asChild>
-            <a href='#'>
-              See all features
-              <ArrowRightIcon />
-            </a>
-          </Button>
         </div>
 
-        <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-          {featuresList.map((features, index) => (
-            <Card key={index} className={cn('shadow-none transition-colors duration-300', features.cardBorderColor)}>
-              <CardContent>
-                <Avatar className={cn('mb-6 size-10 rounded-md', features.avatarTextColor)}>
-                  <AvatarFallback className={cn('rounded-md [&>svg]:size-6', features.avatarBgColor)}>
-                    <features.icon />
-                  </AvatarFallback>
-                </Avatar>
-                <h6 className='mb-2 text-lg font-semibold'>{features.title}</h6>
-                <p className='text-muted-foreground'>{features.description}</p>
-              </CardContent>
-            </Card>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <div key={feature.title} className="group rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-accent">
+                <feature.icon className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
   )
 }
-
-export default Features

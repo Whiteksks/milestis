@@ -1,5 +1,5 @@
-import Header from "@/components/layout/Headers/header"
-import { Footer } from "@/components/layout/landing/components/footer"
+import Header from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 import { Shield, Eye, Lock, Settings, Users, RefreshCw } from "lucide-react"
 
 export default function PrivacyPage() {

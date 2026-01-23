@@ -1,15 +1,15 @@
-import {HeroSection} from "@/components/layout/landing/components/hero-section";
+import {HeroSection} from "@/components/layout/landing/hero-section";
 
 
-import { EmotionalContextSection } from "@/components/layout/landing/components/emotional-context-section";
-import { FinalCTA } from "@/components/layout/landing/components/final-cta";
-import { Footer } from "@/components/layout/landing/components/footer";
-import { HowItWorksSection } from "@/components/layout/landing/components/how-it-works-section";
-import { PreviewSection } from "@/components/layout/landing/components/preview-section";
-import { PricingTeaser } from "@/components/layout/landing/components/pricing-teaser";
-import { UseCasesSection } from "@/components/layout/landing/components/use-cases-section";
-import {FeaturesSection} from "@/components/layout/landing/components/features-section";
-import Header from "@/components/layout/Headers/header";
+import { EmotionalContextSection } from "@/components/layout/landing/emotional-context-section";
+import { FinalCTA } from "@/components/layout/landing/final-cta";
+import { Footer } from "@/components/layout/footer";
+import { HowItWorksSection } from "@/components/layout/landing/how-it-works-section";
+import { PreviewSection } from "@/components/layout/landing/preview-section";
+import { PricingTeaser } from "@/components/layout/pricing/pricing-teaser";
+import { UseCasesSection } from "@/components/layout/landing/use-cases-section";
+import {FeaturesSection} from "@/components/layout/landing/features-section";
+import Header from "@/components/layout/header";
 
 export default function Home() {
 

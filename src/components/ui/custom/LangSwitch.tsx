@@ -1,13 +1,14 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/custom/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 
 const LANG_MAP: Record<string, string> = {
   ru: 'Русский',
@@ -16,11 +17,11 @@ const LANG_MAP: Record<string, string> = {
 }
 
 export function LanguageSwitcher() {
-  const pathname = usePathname() // например: /ru/account
+  const pathname = usePathname() 
   const router = useRouter()
 
   const segments = pathname.split('/')
-  const currentLang = segments[1] || 'en' // если нет — дефолт 'en'
+  const currentLang = segments[1] || 'ru'
 
   function changeLang(lang: string) {
     const newSegments = [...segments]
@@ -32,12 +33,15 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">{LANG_MAP[currentLang] || 'Русский'}</Button>
+        <Button variant="outline" className="flex items-center gap-2">
+          {LANG_MAP[currentLang] || 'Русский'}
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => changeLang('ru')}>Русский</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLang('en')}>English</DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLang('kz')}>Қазақша</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLang('en')}>English</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

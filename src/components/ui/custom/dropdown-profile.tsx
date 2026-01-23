@@ -23,7 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '@/components/ui/custom/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from '@/lib/firebase'

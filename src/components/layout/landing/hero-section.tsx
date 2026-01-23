@@ -1,78 +1,125 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
+"use client"
 
-const HeroSection = () => {
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { BookOpen, Play } from "lucide-react"
+import Image from "next/image"
+
+const rotatingWords = ["important", "memories", "moments", "love", "family", "stories"]
+
+export function HeroSection() {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length)
+        setIsAnimating(false)
+      }, 400)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <section className='flex min-h-[calc(100dvh-4rem)] flex-1 flex-col justify-between gap-12 overflow-x-hidden pt-8 sm:gap-16 sm:pt-16 lg:gap-24 lg:pt-24'>
-      {/* Hero Content */}
-      <div className='mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 text-center sm:px-6 lg:px-8'>
-        <div className='bg-muted flex items-center gap-2.5 rounded-full border px-3 py-2'>
-          <Badge className='rounded-full'>AI-Powered</Badge>
-          <span className='text-muted-foreground'>Solution for client-facing businesses</span>
-        </div>
-
-        <h1 className='text-3xl leading-[1.29167] font-bold text-balance sm:text-4xl lg:text-5xl'>
-          Sizzling Summer Delights
-          <br />
-          <span className='relative'>
-            Effortless
-            <svg
-              width='223'
-              height='12'
-              viewBox='0 0 223 12'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-              className='absolute inset-x-0 bottom-0 w-full translate-y-1/2 max-sm:hidden'
-            >
-              <path
-                d='M1.11716 10.428C39.7835 4.97282 75.9074 2.70494 114.894 1.98894C143.706 1.45983 175.684 0.313587 204.212 3.31596C209.925 3.60546 215.144 4.59884 221.535 5.74551'
-                stroke='url(#paint0_linear_10365_68643)'
-                strokeWidth='2'
-                strokeLinecap='round'
-              />
-              <defs>
-                <linearGradient
-                  id='paint0_linear_10365_68643'
-                  x1='18.8541'
-                  y1='3.72033'
-                  x2='42.6487'
-                  y2='66.6308'
-                  gradientUnits='userSpaceOnUse'
+    <section className="relative overflow-hidden px-4 py-20 md:py-32">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Left: Text Content */}
+          <div className="space-y-8">
+            <h1 className="font-serif text-4xl leading-tight tracking-tight md:text-5xl lg:text-6xl text-balance">
+              Milestis is{" "}
+              <span className="relative inline-block min-w-50">
+                <span
+                  className={`inline-block text-primary transition-all duration-400 ${
+                    isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+                  }`}
                 >
-                  <stop stopColor='var(--primary)' />
-                  <stop offset='1' stopColor='var(--primary-foreground)' />
-                </linearGradient>
-              </defs>
-            </svg>
-          </span>{' '}
-          Recipes for Parties!
-        </h1>
+                  {rotatingWords[currentWordIndex]}
+                </span>
+              </span>
+            </h1>
 
-        <p className='text-muted-foreground'>
-          Dive into a world of flavor this summer with our collection of Sizzling Summer Delights!
-          <br />
-          From refreshing appetizers to delightful desserts
-        </p>
+            <p className="max-w-lg text-lg leading-relaxed text-muted-foreground md:text-xl">
+              Create interactive memory books with photos, stories and music — made for families and loved ones.
+            </p>
 
-        <Button size='lg' asChild>
-          <a href='#'>Try It Now</a>
-        </Button>
-      </div>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button size="lg" className="gap-2 rounded-full px-8">
+                <BookOpen className="h-5 w-5" />
+                Create a memory book
+              </Button>
+              <Button variant="outline" size="lg" className="gap-2 rounded-full px-8 bg-transparent">
+                <Play className="h-5 w-5" />
+                View example
+              </Button>
+            </div>
+          </div>
 
-      {/* Image */}
-      <div className='relative min-h-67 w-full'>
-        <Image
-          src='https://cdn.shadcnstudio.com/ss-assets/blocks/marketing/hero/image-19.png'
-          alt='Dishes'
-          fill
-          sizes='100vw'
-          className='object-cover'
-          priority
-        />
+          {/* Right: Visual Preview */}
+          <div className="relative">
+            <div className="relative mx-auto max-w-md lg:max-w-none">
+              {/* Memory book preview cards */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="aspect-4/5 overflow-hidden rounded-2xl bg-card shadow-lg">
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=400&width=320"
+                        alt="Wedding memory"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 320px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-card shadow-lg">
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=280&width=280"
+                        alt="Birthday celebration"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 280px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-8 space-y-4">
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-card shadow-lg">
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=280&width=280"
+                        alt="Family portrait"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 280px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="aspect-4/5 overflow-hidden rounded-2xl bg-card shadow-lg">
+                    <div className="relative h-full w-full">
+                      <Image
+                        src="/placeholder.svg?height=400&width=320"
+                        alt="Love story"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 320px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating decorative elements */}
+              <div className="absolute -right-4 top-1/4 h-16 w-16 rounded-full bg-accent/50 blur-xl" />
+              <div className="absolute -left-8 bottom-1/4 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )
 }
-
-export default HeroSection

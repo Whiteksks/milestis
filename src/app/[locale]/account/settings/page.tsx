@@ -22,12 +22,12 @@ import {
   AlertTriangle,
   Keyboard,
 } from "lucide-react"
+import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
+import { StyleSwitcher } from "@/components/ui/custom/StyleSwitcher"
 
 export default function AccountSettings() {
-  const [language, setLanguage] = useState("en")
   const [timezone, setTimezone] = useState("utc")
   const [dateFormat, setDateFormat] = useState("mdy")
-  const [defaultProjectType, setDefaultProjectType] = useState("photobook")
   const [autoSave, setAutoSave] = useState(true)
   const [notifyPublished, setNotifyPublished] = useState(true)
   const [notifyCredits, setNotifyCredits] = useState(true)
@@ -51,37 +51,7 @@ export default function AccountSettings() {
                 <Globe className="h-4 w-4 text-muted-foreground" />
                 Language
               </Label>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger id="language" className="rounded-xl bg-background/50">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Espanol</SelectItem>
-                  <SelectItem value="fr">Francais</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                  <SelectItem value="ja">Japanese</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="timezone" className="flex items-center gap-2 text-sm font-medium">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                Time Zone
-              </Label>
-              <Select value={timezone} onValueChange={setTimezone}>
-                <SelectTrigger id="timezone" className="rounded-xl bg-background/50">
-                  <SelectValue placeholder="Select timezone" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="utc">UTC (Coordinated Universal Time)</SelectItem>
-                  <SelectItem value="est">EST (Eastern Standard Time)</SelectItem>
-                  <SelectItem value="pst">PST (Pacific Standard Time)</SelectItem>
-                  <SelectItem value="cet">CET (Central European Time)</SelectItem>
-                  <SelectItem value="jst">JST (Japan Standard Time)</SelectItem>
-                </SelectContent>
-              </Select>
+              <LanguageSwitcher/>
             </div>
           </div>
         </CardContent>

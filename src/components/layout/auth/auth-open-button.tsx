@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { getAuth, onAuthStateChanged, User } from "firebase/auth"
 import ProfileDropdown from "@/components/ui/custom/dropdown-profile"
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import AuthDialogController from "../Dialog/AuthDialogController"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import AuthDialogController from "./AuthDialogController"
 
 const HeaderAuthButton = () => {
   const [open, setOpen] = useState(false)

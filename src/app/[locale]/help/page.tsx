@@ -1,4 +1,4 @@
-import Header from "@/components/layout/Headers/header";
+import Header from "@/components/layout/header";
 import { HelpPage } from "@/components/layout/supportPage/help-page";
 
 export default function DesignIndexPage() {
