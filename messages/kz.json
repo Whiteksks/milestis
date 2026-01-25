@@ -1,7 +1,4 @@
 {
-  "HomePage": {
-    "welcome": "<strong>Естелік кітапқа</strong> қош келдіңіз"
-  },
   "ResetPassword": {
     "title": "Құпия сөзді қалпына келтіру",
     "description": "Тіркелгіңіз үшін жаңа құпия сөз енгізіңіз",
@@ -54,5 +51,36 @@
     "getStarted": "Тіркелу",
     "signingUp": "Тіркелу жүріп жатыр...",
     "checkEmailTitle": "Электрондық поштаңызды тексеріңіз"
+  },
+  "firebaseErrors": {
+    "invalidEmail": "Жарамсыз электрондық пошта мекенжайы.",
+    "userDisabled": "Бұл пайдаланушы тіркелгісі өшірілген.",
+    "userNotFound": "Бұл электрондық поштасы бар пайдаланушы табылмады.",
+    "wrongPassword": "Қате құпия сөз.",
+    "emailAlreadyInUse": "Бұл электрондық пошта мекенжайы қолданыста.",
+    "operationNotAllowed": "Операцияға рұқсат етілмеген.",
+    "weakPassword": "Құпия сөз тым әлсіз.",
+    "invalidCredential": "Жарамсыз тіркелгі деректері.",
+    "unknownError": "Белгісіз қате пайда болды. Қайталап көріңіз."
+  },
+  "loginModal": {
+    "title": "Milestis-ке кіру",
+    "description": "Электрондық поштаңызды енгізіңіз, біз сізге сиқырлы сілтеме жібереміз",
+    "emailLabel": "Электрондық пошта мекенжайы",
+    "emailPlaceholder": "you@example.com",
+    "noPasswordRequired": "Құпия сөз қажет емес",
+    "sendButton": "Сиқырлы сілтемені жіберу",
+    "sendingButton": "Жіберу...",
+    "orSeparator": "немесе",
+    "googleButton": "Google-мен жалғастыру",
+    "checkEmailTitle": "Электрондық поштаңызды тексеріңіз",
+    "checkEmailDescription": "Біз {email} мекенжайына сиқырлы сілтеме жібердік. Кіруді аяқтау үшін оны ашыңыз.",
+    "checkEmailSpam": "Егер сіз электрондық поштаны көрмесеңіз, спам қалтаңызды тексеріңіз немесе қайталап көріңіз.",
+    "resendButton": "Электрондық поштаны қайта жіберу",
+    "differentEmailButton": "Басқа электрондық поштаны пайдалану"
+  },
+  "loginPage": {
+    "title": "Қайта оралуыңызбен",
+    "description": "Milestis тіркелгіңізге кіру үшін кіріңіз."
   }
 }

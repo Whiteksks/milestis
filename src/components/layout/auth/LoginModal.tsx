@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Mail, CheckCircle2, ArrowLeft, Sparkles } from "lucide-react"
 import { sendSignInLinkToEmail } from "@/lib/auth"
+import { useTranslations } from "next-intl"
 
 interface LoginModalProps {
   open: boolean
@@ -21,6 +22,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
+  const t = useTranslations()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -36,7 +38,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     if (success) {
       setSent(true)
     } else if (error) {
-      setError(error.message)
+      setError(t(error))
     }
 
     setLoading(false)
@@ -68,20 +70,20 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   <Sparkles className="h-7 w-7 text-primary" />
                 </div>
                 <DialogTitle className="text-2xl font-semibold">
-                  Log in to Milestis
+                  {t("loginModal.title")}
                 </DialogTitle>
                 <DialogDescription>
-                  Enter your email and we&apos;ll send you a magic link
+                  {t("loginModal.description")}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="mt-8 space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
+                  <Label htmlFor="email">{t("loginModal.emailLabel")}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={t("loginModal.emailPlaceholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="h-12 rounded-xl border-border/40 bg-background/50 px-4"
@@ -90,7 +92,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                     <p className="text-xs text-red-500">{error}</p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    No password required
+                    {t("loginModal.noPasswordRequired")}
                   </p>
                 </div>
 
@@ -100,13 +102,13 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   className="h-12 w-full rounded-xl bg-primary font-medium text-primary-foreground shadow-md shadow-primary/20 disabled:opacity-50"
                 >
                   <Mail className="mr-2 h-4 w-4" />
-                  {loading ? "Sending..." : "Send magic link"}
+                  {loading ? t("loginModal.sendingButton") : t("loginModal.sendButton")}
                 </Button>
 
                 <div className="relative flex items-center py-2">
                   <Separator className="flex-1" />
                   <span className="px-4 text-xs text-muted-foreground">
-                    or
+                    {t("loginModal.orSeparator")}
                   </span>
                   <Separator className="flex-1" />
                 </div>
@@ -133,7 +135,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  Continue with Google
+                  {t("loginModal.googleButton")}
                 </Button>
               </div>
             </>
@@ -144,16 +146,15 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               </div>
 
               <h2 className="mt-6 text-2xl font-semibold">
-                Check your email
+                {t("loginModal.checkEmailTitle")}
               </h2>
 
             <p className="mt-3 text-muted-foreground">
-              We&apos;ve sent a magic link to <span className="font-medium text-foreground">{email}</span>. Open it to
-                finish signing in.
-              </p>
+              {t("loginModal.checkEmailDescription", { email })}
+            </p>
 
               <p className="mt-4 text-xs text-muted-foreground/70">
-                If you don&apos;t see the email, check your spam folder or try again.
+                {t("loginModal.checkEmailSpam")}
               </p>
 
               <div className="mt-8 w-full space-y-3">
@@ -163,7 +164,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   className="h-11 w-full rounded-xl bg-primary font-medium text-primary-foreground"
                 >
                   <Mail className="mr-2 h-4 w-4" />
-                  Resend email
+                  {t("loginModal.resendButton")}
                 </Button>
 
                 <Button
@@ -172,7 +173,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   className="h-11 w-full rounded-xl"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Use a different email
+                  {t("loginModal.differentEmailButton")}
                 </Button>
               </div>
             </div>

@@ -1,7 +1,4 @@
 {
-  "HomePage": {
-    "welcome": "Welcome to <strong>Memento Book</strong>"
-  },
   "ResetPassword": {
     "title": "Reset Password",
     "description": "Enter a new password for your account",
@@ -54,5 +51,36 @@
     "getStarted": "Get Started",
     "signingUp": "Signing up...",
     "checkEmailTitle": "Check Your Email"
+  },
+  "firebaseErrors": {
+    "invalidEmail": "Invalid email address.",
+    "userDisabled": "This user account has been disabled.",
+    "userNotFound": "User with this email not found.",
+    "wrongPassword": "Wrong password.",
+    "emailAlreadyInUse": "This email is already in use.",
+    "operationNotAllowed": "Operation not allowed.",
+    "weakPassword": "Password is too weak.",
+    "invalidCredential": "Invalid credential.",
+    "unknownError": "An unknown error occurred. Please try again."
+  },
+  "loginModal": {
+    "title": "Log in to Milestis",
+    "description": "Enter your email and we'll send you a magic link",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "noPasswordRequired": "No password required",
+    "sendButton": "Send magic link",
+    "sendingButton": "Sending...",
+    "orSeparator": "or",
+    "googleButton": "Continue with Google",
+    "checkEmailTitle": "Check your email",
+    "checkEmailDescription": "We've sent a magic link to {email}. Open it to finish signing in.",
+    "checkEmailSpam": "If you don't see the email, check your spam folder or try again.",
+    "resendButton": "Resend email",
+    "differentEmailButton": "Use a different email"
+  },
+  "loginPage": {
+    "title": "Welcome back",
+    "description": "Log in to access your Milestis account."
   }
 }

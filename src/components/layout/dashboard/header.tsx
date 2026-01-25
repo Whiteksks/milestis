@@ -1,8 +1,9 @@
-"use client"
+'use client'
 
 import { CreditsIndicator } from "./credits-indicator"
 import { UserMenu } from "./user-menu"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { ClientOnly } from "@/components/shared/client-only"
 
 interface HeaderProps {
   title?: string
@@ -24,7 +25,9 @@ export function DashboardHeader({ title = "Dashboard" }: HeaderProps) {
         </div>
         <div className="flex items-center gap-2 md:gap-4">
           <CreditsIndicator used={3} total={10} resetDate="Jan 1, 2026" />
-          <UserMenu user={user} />
+          <ClientOnly>
+            <UserMenu user={user} />
+          </ClientOnly>
         </div>
       </header>
     </>

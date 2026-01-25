@@ -1,5 +1,6 @@
 import { auth } from "./firebase";
 import { AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail, signOut } from "firebase/auth";
+import { getFirebaseAuthErrorTranslationKey } from "./firebase-errors";
 
 export const sendSignInLinkToEmail = async (email: string) => {
   const actionCodeSettings = {
@@ -11,7 +12,10 @@ export const sendSignInLinkToEmail = async (email: string) => {
     window.localStorage.setItem('emailForSignIn', email);
     return { success: true, error: null };
   } catch (error) {
-    return { success: false, error: error as AuthError };
+    const authError = error as AuthError;
+    const translationKey = getFirebaseAuthErrorTranslationKey(authError.code);
+    console.log(translationKey);
+    return { success: false, error: translationKey };
   }
 };
 
@@ -20,6 +24,8 @@ export const signOutUser = async () => {
     await signOut(auth)
     return { success: true, error: null }
   } catch (error) {
-    return { success: false, error: error as AuthError }
+    const authError = error as AuthError;
+    const translationKey = getFirebaseAuthErrorTranslationKey(authError.code);
+    return { success: false, error: translationKey };
   }
 }

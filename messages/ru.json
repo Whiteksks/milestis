@@ -1,7 +1,4 @@
 {
-  "HomePage": {
-    "welcome": "Добро пожаловать в <strong>Memento Book</strong>"
-  },
   "ResetPassword": {
     "title": "Сброс пароля",
     "description": "Введите новый пароль для вашей учётной записи",
@@ -54,5 +51,37 @@
     "getStarted": "Зарегистрироваться",
     "signingUp": "Регистрация...",
     "checkEmailTitle": "Проверьте вашу почту"
+  },
+  "firebaseErrors": {
+    "invalidEmail": "Неверный адрес электронной почты.",
+    "userDisabled": "Этот аккаунт был отключен.",
+    "userNotFound": "Пользователь с таким адресом электронной почты не найден.",
+    "wrongPassword": "Неверный пароль.",
+    "emailAlreadyInUse": "Этот адрес электронной почты уже используется.",
+    "operationNotAllowed": "Операция не разрешена.",
+    "weakPassword": "Пароль слишком слабый.",
+    "invalidCredential": "Неверные учетные данные.",
+    "unknownError": "Произошла неизвестная ошибка. Пожалуйста, попробуйте еще раз."
+  },
+  "loginModal": {
+    "title": "Вход в Milestis",
+    "description": "Введите свой email, и мы вышлем вам волшебную ссылку",
+    "emailLabel": "Адрес электронной почты",
+    "emailPlaceholder": "you@example.com",
+    "noPasswordRequired": "Пароль не требуется",
+    "sendButton": "Отправить волшебную ссылку",
+    "sendingButton": "Отправка...",
+    "orSeparator": "или",
+    "googleButton": "Продолжить с Google",
+    "checkEmailTitle": "Проверьте свою почту",
+    "checkEmailDescription": "Мы отправили волшебную ссылку на {email}. Откройте ее, чтобы завершить вход.",
+    "checkEmailSpam": "Если вы не видите письма, проверьте папку со спамом или попробуйте еще раз.",
+    "resendButton": "Отправить письмо повторно",
+    "differentEmailButton": "Использовать другой email"
+  },
+  "loginPage": {
+    "title": "С возвращением",
+    "description": "Войдите, чтобы получить доступ к своему аккаунту Milestis."
+    
   }
 }
