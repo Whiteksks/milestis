@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Check, Sun, Moon, Laptop, Zap } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -38,6 +38,15 @@ export default function AppearanceSettings() {
 
   // Находим текущую активную тему для мобильного превью
   const activeTheme = themes.find((t) => t.id === theme) || themes[0]
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="space-y-6 opacity-0" />
+  }
 
   return (
     <div className="space-y-6">

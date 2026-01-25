@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Mail, CheckCircle2, ArrowLeft, Sparkles, Shield, Zap, Lock } from "lucide-react"
+import Header from "@/components/layout/header"
 
 // Stub function for sending magic link
 async function sendMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
@@ -75,6 +76,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header className="bg-transparent" showAuthButton={false} />
       <div className="flex min-h-screen">
         {/* Left side - Branding & Features */}
         <div className="relative hidden w-1/2 bg-muted lg:flex lg:flex-col lg:justify-between">
@@ -91,7 +93,7 @@ export default function LoginPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
                 <Sparkles className="h-5 w-5 text-background" />
               </div>
-              <span className="text-xl font-semibold text-foreground">YourApp</span>
+              <span className="text-xl font-semibold text-foreground">Milestis</span>
             </div>
           </div>
 
@@ -123,7 +125,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="relative z-10 border-t border-border/50 px-12 py-6">
             <p className="text-sm text-muted-foreground">
-              © 2026 YourApp. Все права защищены.
+              © 2026 Milestis. Все права защищены.
             </p>
           </div>
         </div>
@@ -136,7 +138,7 @@ export default function LoginPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
                 <Sparkles className="h-5 w-5 text-background" />
               </div>
-              <span className="text-xl font-semibold text-foreground">YourApp</span>
+              <span className="text-xl font-semibold text-foreground">Milestis</span>
             </div>
 
             <Card className="border-border/50 shadow-xl shadow-foreground/5">

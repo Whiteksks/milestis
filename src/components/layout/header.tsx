@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { MenuIcon } from 'lucide-react'
@@ -31,7 +31,16 @@ const NAVIGATION = [
   { title: 'FAQ', href: '/help/faq' }
 ]
 
-const Header = ({ className }: { className?: string }) => {
+interface HeaderProps {
+  className?: string
+  showAuthButton?: boolean
+}
+
+const Header = ({
+  className,
+  showAuthButton = true,
+}: HeaderProps) => {
+
   
   const pathname = usePathname()
   const { scrollY } = useScroll()
@@ -75,6 +84,25 @@ const Header = ({ className }: { className?: string }) => {
   const isActive = (href: string) =>
     href === '/' ? normalizedPathname === '/' : normalizedPathname.startsWith(href)
 
+
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  // // В самом return можно обернуть только содержимое или весь header
+  // if (!mounted) {
+  //   // Возвращаем header в базовом состоянии, чтобы он не "прыгал"
+  //   return (
+  //     <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background border-b border-transparent">
+  //       <div className="mx-auto flex h-full max-w-7xl items-center px-4">
+  //         <Logo className="gap-3" />
+  //       </div>
+  //     </header>
+  //   )
+  // }
+
   return (
     <motion.header
       variants={{
@@ -102,51 +130,60 @@ const Header = ({ className }: { className?: string }) => {
           <NavigationMenuList className="gap-1">
             {NAVIGATION.map((item) => (
               <NavigationMenuItem key={item.title}>
-                <NavigationMenuLink asChild className='relative px-3 py-1.5 text-base font-medium rounded-md transition-colors'>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      isActive(item.href)
-                        ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-primary'
-                    )}
-                  >
-                    {item.title}
-                    {isActive(item.href) && (
-                      <motion.div
-                        layoutId="activeNav"
-                        className="absolute inset-0 bg-secondary -z-10 rounded-md"
-                        transition={{ type: 'spring', duration: 0.5 }}
-                      />
-                    )}
-                  </Link>
-                </NavigationMenuLink>
+                {/* Убираем NavigationMenuLink asChild вокруг анимированных ссылок для стабильности */}
+                <Link
+                  href={item.href}
+                  className={cn(
+                    'relative px-3 py-1.5 text-base font-medium rounded-md transition-colors block',
+                    isActive(item.href)
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-primary'
+                  )}
+                >
+                  {item.title}
+                  {/* Анимация фона только после монтажа */}
+                  {mounted && isActive(item.href) && (
+                    <motion.div
+                      layoutId="activeNav"
+                      className="absolute inset-0 bg-secondary -z-10 rounded-md"
+                      transition={{ type: 'spring', duration: 0.5 }}
+                    />
+                  )}
+                </Link>
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
         </NavigationMenu>
 
         <div className="flex items-center gap-3">
-          <HeaderAuthButton />
+          {showAuthButton && <HeaderAuthButton />}
           
           {/* Mobile Menu */}
-          <div className="md:hidden">
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <MenuIcon className="size-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {NAVIGATION.map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <Link href={item.href} className={cn(isActive(item.href) && "bg-secondary")}>
-                      {item.title}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+         <div className="md:hidden">
+            {!mounted ? (
+              // Статичная заглушка кнопки до загрузки JS
+              <Button variant="outline" size="icon">
+                <MenuIcon className="size-5" />
+              </Button>
+            ) : (
+              // Интерактивное меню после монтажа
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <MenuIcon className="size-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {NAVIGATION.map((item) => (
+                    <DropdownMenuItem key={item.title} asChild>
+                      <Link href={item.href} className={cn(isActive(item.href) && "bg-secondary")}>
+                        {item.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>

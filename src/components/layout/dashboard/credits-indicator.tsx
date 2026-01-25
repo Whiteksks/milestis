@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useEffect, useState } from "react"
 
 interface CreditsIndicatorProps {
   used: number
@@ -22,6 +23,22 @@ export function CreditsIndicator({ used, total, resetDate }: CreditsIndicatorPro
   const remaining = total - used
   const percentage = (remaining / total) * 100
 
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-3 rounded-full border border-border/60 bg-card/80 px-4 py-2 opacity-0">
+        <div className="size-4 bg-muted animate-pulse rounded-full" />
+        <div className="h-4 w-12 bg-muted animate-pulse rounded-md" />
+      </div>
+    )
+  }
+  
   return (
     <TooltipProvider>
       <DropdownMenu>
