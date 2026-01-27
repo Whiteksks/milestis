@@ -1,5 +1,6 @@
 "use client"
 
+import { useUserStore } from "@/hooks/useUserStore"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,8 +8,19 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Camera, Globe, Instagram, Palette, MapPin, Info } from "lucide-react"
+import ProfileSettingsSkeleton from "./loading"
 
 export default function ProfileSettings() {
+  // Берём данные пользователя из Zustand
+  const { profile, loading } = useUserStore()
+
+  if (loading) {
+    return <ProfileSettingsSkeleton />
+  }
+
+  const name = profile?.displayName ?? ""
+  const email = profile?.email ?? ""
+
   return (
     <div className="space-y-8">
       {/* Profile Card - Personal Identity */}
@@ -24,7 +36,7 @@ export default function ProfileSettings() {
                 <Avatar className="size-28 rounded-3xl border-4 border-background shadow-xl">
                   <AvatarImage src="/placeholder.svg?height=112&width=112" alt="Profile" />
                   <AvatarFallback className="rounded-3xl text-2xl font-semibold bg-primary/10 text-primary">
-                    AJ
+                    {name.split(" ").map(n => n[0]).join("") || "?"}
                   </AvatarFallback>
                 </Avatar>
                 <button className="absolute inset-0 rounded-3xl bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -34,9 +46,9 @@ export default function ProfileSettings() {
 
               {/* Name and Email */}
               <div className="flex-1 space-y-1 pb-2">
-                <h2 className="text-2xl font-semibold text-foreground">Alex Johnson</h2>
+                <h2 className="text-2xl font-semibold text-foreground">{name}</h2>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-sm">alex@example.com</span>
+                  <span className="text-sm">{email}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
                     Login email
                   </span>
@@ -76,7 +88,7 @@ export default function ProfileSettings() {
                 </Label>
                 <Input
                   id="publicName"
-                  defaultValue="Alex J."
+                  defaultValue={name}
                   placeholder="How you want to be known"
                   className="rounded-xl bg-background/50"
                 />

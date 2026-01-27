@@ -8,19 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Mail, CheckCircle2, ArrowLeft, Sparkles, Shield, Zap, Lock } from "lucide-react"
 import Header from "@/components/layout/header"
-
-// Stub function for sending magic link
-async function sendMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
-  // TODO: Implement real magic link logic
-  // const { success, error } = await sendSignInLinkToEmail(email)
-  console.log("[v0] Sending magic link to:", email)
-  
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  // Stub: always return success for now
-  return { success: true }
-}
+import { sendSignInLinkToEmail } from "@/lib/auth"
 
 // Stub function for Google sign-in
 function handleGoogleSignIn() {
@@ -40,12 +28,12 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { success, error: sendError } = await sendMagicLink(email)
+    const { success, error } = await sendSignInLinkToEmail(email)
 
     if (success) {
       setSent(true)
-    } else if (sendError) {
-      setError(sendError)
+    } else if (error) {
+      setError(error)
     }
 
     setLoading(false)
@@ -125,14 +113,14 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="relative z-10 border-t border-border/50 px-12 py-6">
             <p className="text-sm text-muted-foreground">
-              © 2026 Milestis. Все права защищены.
+              © 2026 Milestis. All rights reserved.
             </p>
           </div>
         </div>
 
         {/* Right side - Login Form */}
         <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2 lg:px-12">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md lg:w-2/3">
             {/* Mobile logo */}
             <div className="mb-8 flex items-center gap-3 lg:hidden">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">

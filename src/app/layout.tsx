@@ -1,5 +1,6 @@
 import './globals.css';
 
+import FirebaseInitializer from '@/lib/firebaseInitializer';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
       <body
         className={`${alice.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} font-sans antialiased`}
       >
+        <FirebaseInitializer />
         {children}
       </body>
     </html>

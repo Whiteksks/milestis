@@ -25,8 +25,9 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
+import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { useUserStore } from '@/hooks/useUserStore'
 
 type Props = {
   trigger: ReactNode
@@ -52,18 +53,12 @@ const menuConfig = [
 ]
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = 'end' }: Props) => {
-  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
 
-  // Следим за изменением авторизации
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-    })
-    return () => unsubscribe()
-  }, [])
+  const { profile, loading } = useUserStore()
 
-  // Выход из аккаунта
+  const email = profile?.email ?? "example@email.com"
+
   const handleLogout = async () => {
     try {
       await signOut(auth)
@@ -74,9 +69,8 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = 'end' }: Props) => {
   }
 
   // Фоллбэк, если пользователь не найден
-  const displayName = user?.displayName || 'Anonymous User'
-  const email = user?.email || 'no-email@example.com'
-  const photoURL = user?.photoURL || 'https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png'
+  const displayName = profile?.displayName || 'Anonymous User'
+  const photoURL = 'https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png'
   const initials = displayName
     .split(' ')
     .map((word) => word[0])

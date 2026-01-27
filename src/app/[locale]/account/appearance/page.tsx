@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTheme } from "next-themes"
+import AppearanceSettingsSkeleton from "./loading"
 
 const themes = [
   {
@@ -45,7 +46,7 @@ export default function AppearanceSettings() {
   }, [])
 
   if (!mounted) {
-    return <div className="space-y-6 opacity-0" />
+    return <AppearanceSettingsSkeleton />
   }
 
   return (
