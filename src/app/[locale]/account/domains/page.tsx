@@ -2,13 +2,6 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -60,27 +53,20 @@ export default function DomainsSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Domains</h2>
-        <p className="mt-1 text-muted-foreground">
-          Share links for your published projects
-        </p>
-      </div>
+    <div className="space-y-12">
 
-      <Card className="border-border/50 bg-card/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Published projects</CardTitle>
-          <CardDescription>
-            Only published projects are available for sharing
-          </CardDescription>
-        </CardHeader>
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Domains</h2>
+          <p className="mt-1 text-muted-foreground">Share links for your published projects</p>
+        </div>
 
-        <CardContent className="space-y-3">
+        <div className="rounded-2xl bg-card shadow-sm">
+          <div className="divide-y divide-border/40">
           {mockProjects.map((project) => (
             <div
               key={project.id}
-              className="relative flex items-center gap-4 rounded-xl border border-border/40 bg-background/50 p-4 transition hover:bg-background/80"
+              className="relative flex items-center gap-4 p-5"
             >
               {/* Mobile share (top-right, icon only) */}
               <div className="absolute right-2 top-2 z-10 sm:hidden">
@@ -190,8 +176,9 @@ export default function DomainsSettingsPage() {
               </div>
             </div>
           ))}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

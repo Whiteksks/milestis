@@ -1,208 +1,149 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import {
-  Globe,
-  Clock,
-  Calendar,
-  BookOpen,
-  Layout,
-  Save,
-  Bell,
-  Mail,
-  CreditCard,
-  RefreshCw,
-  Download,
-  FileText,
-  AlertTriangle,
-  Keyboard,
-} from "lucide-react"
+import { Globe, Layout, Save, Bell, Mail, CreditCard, RefreshCw, Download, FileText, AlertTriangle, Keyboard } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
-import { StyleSwitcher } from "@/components/ui/custom/StyleSwitcher"
 
 export default function AccountSettings() {
-  const [timezone, setTimezone] = useState("utc")
-  const [dateFormat, setDateFormat] = useState("mdy")
   const [autoSave, setAutoSave] = useState(true)
   const [notifyPublished, setNotifyPublished] = useState(true)
   const [notifyCredits, setNotifyCredits] = useState(true)
   const [notifyReset, setNotifyReset] = useState(false)
 
   return (
-    <div className="space-y-6">
-      {/* Account Preferences */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-primary/70" />
-            Account Preferences
-          </CardTitle>
-          <CardDescription>Customize your language and regional settings</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="language" className="flex items-center gap-2 text-sm font-medium">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                Language
-              </Label>
-              <LanguageSwitcher/>
+    <div className="space-y-12">
+
+      {/* Preferences */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Preferences</h2>
+          <p className="mt-1 text-muted-foreground">Language and regional settings</p>
+        </div>
+        <div className="rounded-2xl bg-card p-6 shadow-sm">
+          <div className="space-y-2 max-w-xs">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              Language
+            </Label>
+            <LanguageSwitcher />
+          </div>
+        </div>
+      </section>
+
+      {/* Editor */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Editor</h2>
+          <p className="mt-1 text-muted-foreground">How the project editor behaves</p>
+        </div>
+        <div className="rounded-2xl bg-card shadow-sm">
+          <div className="divide-y divide-border/40">
+            <div className="flex items-center justify-between p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                  <Save className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Auto-save</p>
+                  <p className="text-sm text-muted-foreground">Save changes automatically during editing</p>
+                </div>
+              </div>
+              <Switch checked={autoSave} onCheckedChange={setAutoSave} />
+            </div>
+            <div className="flex items-center justify-between p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                  <Keyboard className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Alt-key Shortcuts</p>
+                  <p className="text-sm text-muted-foreground">Require Alt modifier for standard shortcuts</p>
+                </div>
+              </div>
+              <Switch />
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Default Behavior */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Layout className="h-5 w-5 text-primary/70" />
-            Project Behavior
-          </CardTitle>
-          <CardDescription>Configure how you interact with the project editor</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Auto-save Toggle */}
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Save className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">Auto-save</p>
-                <p className="text-sm text-muted-foreground">Save changes automatically during editing</p>
-              </div>
-            </div>
-            <Switch checked={autoSave} onCheckedChange={setAutoSave} />
-          </div>
-
-          {/* Alt Modifier Toggle */}
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Keyboard className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">Alt-key Shortcuts</p>
-                <p className="text-sm text-muted-foreground">Require Alt modifier for standard shortcuts (e.g., Alt+Ctrl+A)</p>
-              </div>
-            </div>
-            <Switch  />
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            These preferences apply to your current interaction mode and session.
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {/* Notifications */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary/70" />
-            Notifications
-          </CardTitle>
-          <CardDescription>Choose which emails you would like to receive</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-                <Mail className="h-5 w-5 text-green-600" />
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Notifications</h2>
+          <p className="mt-1 text-muted-foreground">Emails you would like to receive</p>
+        </div>
+        <div className="rounded-2xl bg-card shadow-sm">
+          <div className="divide-y divide-border/40">
+            {[
+              { icon: Mail, label: "Project Published", desc: "Get notified when your project goes live", checked: notifyPublished, set: setNotifyPublished },
+              { icon: CreditCard, label: "Credits Usage", desc: "Alerts when credits are running low", checked: notifyCredits, set: setNotifyCredits },
+              { icon: RefreshCw, label: "Monthly Credits Reset", desc: "Reminder when your credits refresh each month", checked: notifyReset, set: setNotifyReset },
+            ].map(({ icon: Icon, label, desc, checked, set }) => (
+              <div key={label} className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{label}</p>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
+                  </div>
+                </div>
+                <Switch checked={checked} onCheckedChange={set} />
               </div>
-              <div>
-                <p className="font-medium">Project Published</p>
-                <p className="text-sm text-muted-foreground">Get notified when your project goes live</p>
-              </div>
-            </div>
-            <Switch checked={notifyPublished} onCheckedChange={setNotifyPublished} />
+            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
-                <CreditCard className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="font-medium">Credits Usage</p>
-                <p className="text-sm text-muted-foreground">Alerts when credits are running low</p>
-              </div>
-            </div>
-            <Switch checked={notifyCredits} onCheckedChange={setNotifyCredits} />
-          </div>
-
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10">
-                <RefreshCw className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-medium">Monthly Credits Reset</p>
-                <p className="text-sm text-muted-foreground">Reminder when your credits refresh each month</p>
-              </div>
-            </div>
-            <Switch checked={notifyReset} onCheckedChange={setNotifyReset} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Data & Export */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5 text-primary/70" />
-            Data & Export
-          </CardTitle>
-          <CardDescription>Download your account information and project data</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-xl bg-transparent">
+      {/* Data */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Data & Export</h2>
+          <p className="mt-1 text-muted-foreground">Download your account information and project data</p>
+        </div>
+        <div className="rounded-2xl bg-card p-6 shadow-sm space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-full bg-transparent">
               <Download className="h-4 w-4" />
               Download Account Data
             </Button>
-            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-xl bg-transparent">
+            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-full bg-transparent">
               <FileText className="h-4 w-4" />
               Export Project Metadata
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Account data includes your profile, preferences, and usage history. Project metadata includes titles, dates,
-            and settings for all your projects.
+            Account data includes your profile, preferences, and usage history.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {/* Danger Zone */}
-      <Card className="rounded-2xl border-border/40 bg-muted/20 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-muted-foreground">
-            <AlertTriangle className="h-5 w-5" />
-            Danger Zone
-          </CardTitle>
-          <CardDescription>Permanent actions that cannot be undone</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl text-muted-foreground">Danger Zone</h2>
+          <p className="mt-1 text-muted-foreground">Permanent actions that cannot be undone</p>
+        </div>
+        <div className="rounded-2xl bg-card p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-medium text-muted-foreground">Delete your account</p>
+              <p className="font-medium">Delete your account</p>
               <p className="text-sm text-muted-foreground">This will permanently remove all your projects and data.</p>
             </div>
             <Button
               variant="outline"
-              className="shrink-0 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
+              className="shrink-0 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
             >
               Delete Account
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
+
     </div>
   )
 }

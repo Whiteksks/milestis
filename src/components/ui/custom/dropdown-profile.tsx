@@ -70,7 +70,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = 'end' }: Props) => {
 
   // Фоллбэк, если пользователь не найден
   const displayName = profile?.displayName || 'Anonymous User'
-  const photoURL = 'https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png'
+  const photoURL = profile?.photoURL || 'https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png'
   const initials = displayName
     .split(' ')
     .map((word) => word[0])

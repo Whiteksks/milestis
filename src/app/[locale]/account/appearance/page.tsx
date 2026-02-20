@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { Check, Sun, Moon, Laptop, Zap } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTheme } from "next-themes"
 import AppearanceSettingsSkeleton from "./loading"
+
 
 const themes = [
   {
@@ -33,6 +33,7 @@ const themes = [
   },
 ]
 
+
 export default function AppearanceSettings() {
   const { theme, setTheme } = useTheme()
   const [highContrast, setHighContrast] = useState(false)
@@ -50,15 +51,15 @@ export default function AppearanceSettings() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0 pb-7">
-          <div className="space-y-1.5">
-            <CardTitle>Color Theme</CardTitle>
-            <CardDescription>Choose how Milestis looks for you</CardDescription>
+    <div className="space-y-12">
+      <section className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="font-serif text-2xl md:text-3xl">Color Theme</h2>
+            <p className="mt-1 text-muted-foreground">Choose how Milestis looks for you</p>
           </div>
           <Select value={theme === 'system' ? 'system' : 'manual'} onValueChange={(v) => v === 'system' ? setTheme('system') : setTheme('light')}>
-            <SelectTrigger className="w-auto bg-muted/50">
+            <SelectTrigger className="w-auto rounded-full bg-secondary border-0">
               <div className="flex items-center gap-2">
                 <Laptop className="h-4 w-4" />
                 <SelectValue placeholder="Syncing" />
@@ -69,9 +70,10 @@ export default function AppearanceSettings() {
               <SelectItem value="system">Sync with System</SelectItem>
             </SelectContent>
           </Select>
-        </CardHeader>
+        </div>
 
-        <CardContent className="space-y-8">
+    
+          <div className="space-y-8">
           {/* Mobile View: One Skeleton + Circles */}
           <div className="flex flex-col items-center gap-6 sm:hidden">
             <div className={`${activeTheme.colors.bg} relative aspect-video w-full overflow-hidden rounded-2xl border p-4 transition-colors duration-500`}>
@@ -141,20 +143,20 @@ export default function AppearanceSettings() {
           <div className="h-px w-full bg-border/40" />
 
           {/* High Contrast Toggle */}
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Zap className="h-5 w-5 text-primary" />
+              <div className="flex size-10 items-center justify-center rounded-xl bg-secondary">
+                <Zap className="size-4 text-primary" />
               </div>
               <div>
-                <Label htmlFor="contrast" className="text-base font-medium">High Contrast</Label>
-                <p className="text-sm text-muted-foreground">Make muted colors more vivid and borders sharper</p>
+                <p className="text-sm font-medium">High Contrast</p>
+                <p className="text-xs text-muted-foreground">Make muted colors more vivid and borders sharper</p>
               </div>
             </div>
             <Switch id="contrast" checked={highContrast} onCheckedChange={setHighContrast} />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   )
 }

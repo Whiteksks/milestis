@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button"
 
 export function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/50 backdrop-blur-sm px-6 py-16">
-      <div className="flex size-16 items-center justify-center rounded-full bg-primary/10">
-        <BookOpen className="size-8 text-primary" />
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex size-14 items-center justify-center rounded-xl bg-secondary">
+        <BookOpen className="size-6 text-primary" />
       </div>
-      <h3 className="mt-4 text-lg font-medium text-foreground">You haven&apos;t created any projects yet</h3>
-      <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
-        Start by creating a photo book to preserve your favorite memories.
+      <h3 className="mt-5 font-serif text-2xl">No projects yet</h3>
+      <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+        Create your first memory book to get started.
       </p>
-      <Button className="mt-6">Create Photobook</Button>
+      <Button className="mt-6 rounded-full px-8">Create Memory Book</Button>
     </div>
   )
 }

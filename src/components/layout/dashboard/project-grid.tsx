@@ -48,7 +48,7 @@ export function ProjectGrid({ showEmpty = false }: ProjectGridProps) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {mockProjects.map((project) => (
         <ProjectCard key={project.id} project={project} />
       ))}

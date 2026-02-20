@@ -1,26 +1,19 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import {
-  Sparkles,
-  CreditCard,
-  Calendar,
-  BookOpen,
-  Globe,
-  Download,
-  CheckCircle2,
-  Clock,
-  ChevronRight,
-  Info,
-} from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Sparkles, BookOpen, Download, Receipt } from "lucide-react"
+import { CreditsCard } from "@/components/layout/settings/credits-card"
+import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
+import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"
 
 export default function BillingSettings() {
-  const creditsUsed = 7
-  const creditsTotal = 10
-  const creditsPercentage = (creditsUsed / creditsTotal) * 100
+  const creditsData = {
+    monthly: { used: 7, total: 10, resetDate: "Jan 1" },
+    bonus: { amount: 5 },
+    purchased: { amount: 12 },
+  }
 
   const usageHistory = [
     { project: "Summer Memories 2024", credits: 2, date: "Dec 15, 2024" },
@@ -35,197 +28,110 @@ export default function BillingSettings() {
   ]
 
   return (
-    <div className="space-y-6">
-      {/* Current Plan */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm overflow-hidden">
-        <div className="h-1.5 bg-linear-to-r from-primary/60 via-primary to-primary/60" />
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-lg">Current Plan</CardTitle>
-              <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary border-0">
-                Free
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <h3 className="font-semibold text-foreground">Free Plan</h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Perfect for trying out Milestis. Create beautiful photo books and share your memories with friends and
-                family.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 pt-2">
-            <Button className="rounded-full gap-2">
-              <Sparkles className="h-4 w-4" />
-              Upgrade Plan
-            </Button>
-            <Button variant="ghost" className="rounded-full text-muted-foreground">
-              View all plans
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-12">
 
-      {/* Monthly Credits - Primary Section */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-              <Sparkles className="h-4 w-4 text-primary" />
-            </div>
-            <CardTitle className="text-lg">Monthly Credits</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          {/* Credits Balance Display */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl font-bold text-foreground">{creditsUsed}</span>
-                <span className="text-xl text-muted-foreground">/ {creditsTotal}</span>
-              </div>
-              <p className="text-sm text-muted-foreground">credits used this month</p>
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1.5">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Resets on Jan 1</span>
-            </div>
-          </div>
+      {/* Plan + Payment */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Your plan</h2>
+          <p className="mt-1 text-muted-foreground">Manage your subscription and payment method</p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <BillingPlanCard
+            planName="Free Plan"
+            planDescription="Perfect for trying out Milestis. Create beautiful memory books and share them with anyone."
+            isPro={false}
+          />
+          <PaymentMethodCard
+            type="Credit Card"
+            last4="4242"
+            expiry="12/26"
+            brand="visa"
+          />
+        </div>
+      </section>
 
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <Progress value={creditsPercentage} className="h-3 rounded-full" />
-            <p className="text-sm text-muted-foreground">{creditsTotal - creditsUsed} credits remaining</p>
-          </div>
+      {/* Credits */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">Credits</h2>
+          <p className="mt-1 text-muted-foreground">Credits are used each time you publish a memory book</p>
+        </div>
+        <CreditsCard
+          monthly={creditsData.monthly}
+          bonus={creditsData.bonus}
+          purchased={creditsData.purchased}
+        />
+      </section>
 
-          {/* Explanation */}
-          <div className="rounded-xl bg-muted/30 p-4 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Credits are used to create and publish photo books. They reset automatically every month.
-            </p>
-            <div className="flex flex-col gap-2 text-sm">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">Photobook creation: 2-3 credits</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">Portfolio site: 1 credit</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* History */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-serif text-2xl md:text-3xl">History</h2>
+          <p className="mt-1 text-muted-foreground">Your recent credit usage and invoices</p>
+        </div>
 
-      {/* Credits Usage */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <CardTitle className="text-lg">Credits Usage</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {usageHistory.map((item, index) => (
-              <div key={index} className="flex items-center justify-between rounded-xl bg-muted/30 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
+        <Tabs defaultValue="credits" className="w-full">
+          <TabsList className="rounded-full bg-muted p-1">
+            <TabsTrigger value="credits" className="rounded-full px-6 text-sm">Credits Usage</TabsTrigger>
+            <TabsTrigger value="billing" className="rounded-full px-6 text-sm">Invoices</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="credits" className="mt-6">
+            {usageHistory.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {usageHistory.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                        <BookOpen className="size-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{item.project}</p>
+                        <p className="text-xs text-muted-foreground">{item.date}</p>
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                      {item.credits} credits
+                    </span>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{item.project}</p>
-                    <p className="text-xs text-muted-foreground">{item.date}</p>
-                  </div>
-                </div>
-                <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary border-0">
-                  {item.credits} credits
-                </Badge>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="py-8 text-center text-muted-foreground">No credit usage history yet.</p>
+            )}
+          </TabsContent>
 
-      {/* Payment Method */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <CardTitle className="text-lg">Payment Method</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-xl bg-muted/30 px-4 py-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-14 items-center justify-center rounded-lg bg-background border border-border/40">
-                <span className="text-xs font-semibold text-muted-foreground">VISA</span>
+          <TabsContent value="billing" className="mt-6">
+            {billingHistory.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {billingHistory.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                        <Receipt className="size-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Invoice {item.amount}</p>
+                        <p className="text-xs text-muted-foreground">{item.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="hidden text-xs text-muted-foreground sm:inline">{item.status}</span>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <Download className="size-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <p className="font-medium text-sm">Visa ending in 4242</p>
-                <p className="text-xs text-muted-foreground">Expires 12/26</p>
-              </div>
-            </div>
-            <Button variant="outline" className="rounded-full bg-transparent">
-              Update
-            </Button>
-          </div>
-          <div className="flex items-start gap-2 mt-4 text-xs text-muted-foreground">
-            <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-            <p>Your payment information is securely stored and encrypted.</p>
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="py-8 text-center text-muted-foreground">No billing history available.</p>
+            )}
+          </TabsContent>
+        </Tabs>
+      </section>
 
-      {/* Billing History */}
-      <Card className="rounded-2xl border-border/40 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <CardTitle className="text-lg">Billing History</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {billingHistory.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between rounded-xl px-4 py-3 hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{item.amount}</p>
-                    <p className="text-xs text-muted-foreground">{item.date}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className="rounded-full border-0 bg-muted text-muted-foreground">
-                    {item.status}
-                  </Badge>
-                  <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
-                    <Download className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
