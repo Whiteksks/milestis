@@ -18,7 +18,7 @@ export function DashboardHeader({ title = "Dashboard" }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-4s z-50 mx-4 flex h-16 items-center justify-between rounded-2xl border border-border/30 bg-card/70 px-6 shadow-lg shadow-black/5 backdrop-blur-xl">
+      <header className="z-50 mx-4 flex h-16 items-center justify-between rounded-2xl border border-border/30 bg-card/70 px-6 shadow-sm backdrop-blur-md">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="-ml-1 rounded-xl hover:bg-accent/60 transition-colors" />
           <h1 className="text-lg font-semibold text-foreground">{title}</h1>

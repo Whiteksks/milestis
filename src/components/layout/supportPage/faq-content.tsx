@@ -63,17 +63,17 @@ export function FaqContent() {
   return (
     <section className="px-6 pb-16 md:pb-24">
       <div className="container mx-auto max-w-3xl">
-        <div className="space-y-10">
+        <div className="space-y-8">
           {faqSections.map((section) => (
             <div key={section.title}>
-              <h2 className="mb-4 font-serif text-lg font-medium text-foreground">{section.title}</h2>
-              <Accordion type="single" collapsible className="w-full">
+              <h2 className="mb-2 font-serif text-2xl font-medium text-foreground">{section.title}</h2>
+              <Accordion type="single" collapsible className="w-full ">
                 {section.items.map((item, index) => (
                   <AccordionItem key={index} value={`${section.title}-${index}`} className="border-border/50">
-                    <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                    <AccordionTrigger className="text-left text-md text-foreground hover:no-underline">
                       {item.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
+                    <AccordionContent className="text-muted-foreground text-md">{item.answer}</AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>

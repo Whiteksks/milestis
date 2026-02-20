@@ -43,7 +43,7 @@ function withLocale(locale: string | undefined, href: string) {
 export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps) {
 
   return (
-    <Sidebar collapsible="icon" variant="floating">
+    <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex h-14 items-center gap-2 ">
           <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
@@ -105,7 +105,6 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
         </SidebarMenu>
       </SidebarFooter>
 
-      <SidebarRail />
     </Sidebar>
   )
 }

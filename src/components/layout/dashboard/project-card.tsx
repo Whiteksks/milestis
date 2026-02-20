@@ -41,7 +41,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const typeInfo = project.type ? typeLabels[project.type] : null
 
   return (
-    <Card className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
+    <div className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
         <Image
           src={project.thumbnail || "/placeholder.svg"}
@@ -105,6 +105,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <p className="truncate text-sm font-medium">{project.title}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">Edited {project.updatedAt}</p>
       </CardContent>
-    </Card>
+    </div>
   )
 }

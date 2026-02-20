@@ -1,16 +1,37 @@
 "use client"
 
+import { useState } from "react"
 import { useUserStore } from "@/hooks/useUserStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
-import { Camera, Globe, Instagram, Palette, MapPin } from "lucide-react"
+import {
+  Camera, MapPin, Link,
+  Instagram, Github, Facebook, Twitter, Linkedin, Youtube, Globe, Twitch,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import ProfileSettingsSkeleton from "./profile-skeleton"
+
+function detectIcon(url: string): LucideIcon {
+  if (!url) return Link
+  const u = url.toLowerCase()
+  if (u.includes("instagram.com")) return Instagram
+  if (u.includes("github.com")) return Github
+  if (u.includes("facebook.com") || u.includes("fb.com")) return Facebook
+  if (u.includes("twitter.com") || u.includes("x.com")) return Twitter
+  if (u.includes("linkedin.com")) return Linkedin
+  if (u.includes("youtube.com") || u.includes("youtu.be")) return Youtube
+  if (u.includes("twitch.tv")) return Twitch
+  if (u.startsWith("http")) return Globe
+  return Link
+}
 
 export default function ProfileSettings() {
   const { profile, loading } = useUserStore()
+  const [bio, setBio] = useState("")
+  const [socialLinks, setSocialLinks] = useState(["", "", "", ""])
 
   if (loading) {
     return <ProfileSettingsSkeleton />
@@ -18,6 +39,25 @@ export default function ProfileSettings() {
 
   const name = profile?.displayName ?? ""
   const email = profile?.email ?? ""
+
+  const updateLink = (index: number, value: string) => {
+    setSocialLinks(prev => prev.map((l, i) => (i === index ? value : l)))
+  }
+  function formatUrl(url: string): string {
+    const trimmed = url.trim()
+    if (!trimmed) return ""
+    // Проверяем, начинается ли строка с протокола или //
+    if (/^(https?:\/\/| \/\/)/i.test(trimmed)) {
+      return trimmed
+    }
+    return `https://${trimmed}`
+  }
+  const handleBlur = (index: number, value: string) => {
+    if (value.trim() !== "") {
+      const formatted = formatUrl(value)
+      updateLink(index, formatted)
+    }
+  }
 
   return (
     <div className="space-y-12">
@@ -91,34 +131,35 @@ export default function ProfileSettings() {
             <Label htmlFor="bio" className="text-sm font-medium">Short Bio</Label>
             <Textarea
               id="bio"
+              value={bio}
+              onChange={e => setBio(e.target.value)}
               placeholder="A few words about yourself or your work..."
               className="rounded-xl resize-none min-h-20"
               maxLength={160}
             />
-            <p className="text-xs text-muted-foreground text-right">0 / 160 characters</p>
+            <p className="text-xs text-muted-foreground text-right">{bio.length} / 160 characters</p>
           </div>
 
           <div className="space-y-3">
             <Label className="text-sm font-medium">Social Links</Label>
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Globe className="size-4 text-primary" />
-                </div>
-                <Input placeholder="https://yourwebsite.com" className="rounded-xl flex-1" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Instagram className="size-4 text-primary" />
-                </div>
-                <Input placeholder="@instagram" className="rounded-xl flex-1" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Palette className="size-4 text-primary" />
-                </div>
-                <Input placeholder="Behance profile URL" className="rounded-xl flex-1" />
-              </div>
+              {socialLinks.map((link, index) => {
+                const Icon = detectIcon(link)
+                return (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary transition-colors">
+                      <Icon className="size-4 text-primary transition-all" />
+                    </div>
+                    <Input
+                      value={link}
+                      onChange={e => updateLink(index, e.target.value)}
+                      onBlur={e => handleBlur(index, e.target.value)}
+                      placeholder={`Link to social ${index + 1}`}
+                      className="rounded-xl flex-1"
+                    />
+                  </div>
+                )
+              })}
             </div>
           </div>
 

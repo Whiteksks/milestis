@@ -35,14 +35,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <SidebarProvider defaultOpen={true}>
       <AppSidebar activeItem={activeItem} locale={locale} />
       <SidebarInset>
-        <div className="relative flex h-screen flex-col overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-50/40 via-background to-rose-50/20" />
+        <div className="relative flex min-h-full flex-col ">
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-50/40 via-background to-rose-50/20 rounded-xl" />
 
-          <div className="relative pt-4">
+          <div className="sticky top-0 z-50 pt-4">
             <DashboardHeader title={headerTitle} />
           </div>
 
-          <main className="relative flex-1 overflow-y-auto p-2 md:p-4 lg:p-6">{children}</main>
+          <main className="relative flex-1 p-4 md:p-6 lg:p-8 ">{children}</main>
         </div>
       </SidebarInset>
     </SidebarProvider>
