@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 const Logo = ({ className }: { className?: string }) => {
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <LogoSvg className='w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32' />
+      <LogoSvg className='w-24 h-auto sm:w-28 sm:h-auto lg:w-32 lg:h-auto' />
     </div>
   )
 }

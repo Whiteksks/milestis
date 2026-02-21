@@ -1,5 +1,4 @@
 import Header from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Shield, Eye, Lock, Settings, Users, RefreshCw } from "lucide-react"
 
 export default function PrivacyPage() {
@@ -44,7 +43,7 @@ export default function PrivacyPage() {
                   <li>Photos and content you choose to upload</li>
                 </ul>
                 <p className="mt-4 rounded-lg bg-secondary/30 p-4 text-sm">
-                    We only collect what&apos;s necessary to make Milestis work for you.
+                  We only collect what&apos;s necessary to make Milestis work for you.
                 </p>
               </div>
             </section>
@@ -157,8 +156,6 @@ export default function PrivacyPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   )
 }

@@ -5,9 +5,8 @@ const Logo = (props: SVGAttributes<SVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 400 200"
+      width="400" height="130"
+      viewBox="20 35 360 110"
       preserveAspectRatio="xMidYMid meet"
       fill="currentColor"
       {...props}

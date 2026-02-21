@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import Header from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { FaqHero } from "@/components/layout/supportPage/faq-hero"
 import { FaqContent } from "@/components/layout/supportPage/faq-content"
 import { FaqReassurance } from "@/components/layout/supportPage/faq-reassurance"
@@ -17,7 +16,6 @@ export default function FaqPage() {
       <FaqHero />
       <FaqContent />
       <FaqReassurance />
-      <Footer />
     </main>
   )
 }

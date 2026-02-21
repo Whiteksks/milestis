@@ -1,5 +1,4 @@
 import Header from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { BookOpen, Upload, User, CreditCard, Server, XCircle, FileText } from "lucide-react"
 
 export default function TermsPage() {
@@ -181,8 +180,6 @@ export default function TermsPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   )
 }

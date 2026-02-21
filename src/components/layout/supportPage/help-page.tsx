@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import {
   Search,
   BookOpen,
@@ -21,6 +22,7 @@ import { Badge } from "@/components/ui/badge"
 const quickHelpCards = [
   {
     id: "first-photobook",
+    href: "/help/articles/getting-started",
     title: "Create your first photobook",
     description: "Learn how to upload photos, arrange layouts, and create a beautiful photobook in minutes.",
     icon: BookOpen,
@@ -28,6 +30,7 @@ const quickHelpCards = [
   },
   {
     id: "credits",
+    href: "/help/articles/how-credits-work",
     title: "How credits work",
     description: "Understand your monthly credits, what they cover, and how to get more when you need them.",
     icon: Coins,
@@ -35,6 +38,7 @@ const quickHelpCards = [
   },
   {
     id: "publish",
+    href: "/help/articles/publish-share",
     title: "Publish & share projects",
     description: "Share your photobooks and portfolios with custom links, or download them for printing.",
     icon: Share2,
@@ -42,6 +46,7 @@ const quickHelpCards = [
   },
   {
     id: "portfolio",
+    href: "/help/articles/customize-portfolio",
     title: "Customize your portfolio",
     description: "Build a stunning portfolio site with your own style, colors, and layout preferences.",
     icon: Palette,
@@ -52,31 +57,51 @@ const quickHelpCards = [
 const guides = [
   {
     id: "getting-started",
+    href: "/help/articles/getting-started",
     title: "Getting started with Milestis",
     description: "Everything you need to know to create your first project.",
     readTime: "5 min read",
     category: "Basics",
   },
   {
-    id: "photo-tips",
-    title: "Tips for better photo layouts",
-    description: "Simple tricks to make your photobooks look professional.",
-    readTime: "3 min read",
+    id: "customize-portfolio",
+    href: "/help/articles/customize-portfolio",
+    title: "Customize your portfolio",
+    description: "Build a stunning portfolio with your own style, colors, and layout preferences.",
+    readTime: "5 min read",
     category: "Design",
   },
   {
     id: "sharing-options",
+    href: "/help/articles/publish-share",
     title: "All the ways to share your work",
-    description: "From private links to public portfolios - find the right option for you.",
+    description: "From private links to custom domains — find the right option for you.",
     readTime: "4 min read",
     category: "Sharing",
   },
   {
     id: "account-billing",
+    href: "/help/articles/account-billing",
     title: "Managing your account & billing",
     description: "How to update your plan, payment methods, and account settings.",
     readTime: "3 min read",
     category: "Account",
+  },
+  {
+    id: "change-email",
+    href: "/help/articles/change-email",
+    title: "How to change your email address",
+    description: "Step-by-step guide to updating your login email, with troubleshooting tips.",
+    readTime: "3 min read",
+    category: "Account",
+  },
+  {
+    id: "how-credits-work",
+    href: "/help/articles/how-credits-work",
+    title: "How credits work",
+    description: "Everything about credits — what they cover, when they refresh, and how to get more.",
+    readTime: "4 min read",
+    category: "Billing",
   },
 ]
 
@@ -117,24 +142,25 @@ export function HelpPage() {
           {quickHelpCards.map((card) => {
             const Icon = card.icon
             return (
-              <Card
-                key={card.id}
-                className="group cursor-pointer rounded-2xl border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
-              >
-                <CardContent className="flex items-start gap-4 p-5">
-                  <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${card.color}`}>
-                    <Icon className="size-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{card.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{card.description}</p>
-                    <Button variant="link" className="mt-2 h-auto p-0 text-sm text-primary">
-                      Learn more
-                      <ChevronRight className="ml-1 size-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <Link key={card.id} href={card.href}>
+                <Card className="group cursor-pointer rounded-2xl border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md">
+                  <CardContent className="flex items-start gap-4 p-5">
+                    <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${card.color}`}>
+                      <Icon className="size-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground">{card.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{card.description}</p>
+                      <Button variant="link" className="mt-2 h-auto p-0 text-sm text-primary" asChild>
+                        <span>
+                          Learn more
+                          <ChevronRight className="ml-1 size-4 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             )
           })}
         </div>
@@ -149,8 +175,9 @@ export function HelpPage() {
         <Card className="rounded-2xl border-border/50 bg-background/80 shadow-sm backdrop-blur-sm">
           <CardContent className="divide-y divide-border/50 p-0">
             {guides.map((guide, index) => (
-              <div
+              <Link
                 key={guide.id}
+                href={guide.href}
                 className={`group flex flex-col sm:flex-row cursor-pointer items-start sm:items-center justify-between p-5 transition-colors hover:bg-muted/30 ${
                   index === 0 ? "rounded-t-2xl" : ""
                 } ${index === guides.length - 1 ? "rounded-b-2xl" : ""}`}
@@ -187,9 +214,7 @@ export function HelpPage() {
                   </div>
                   <ChevronRight className="size-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </div>
-
-                {/* Иконка стрелочки для мобилок (опционально, позиционируется абсолютно) */}
-              </div>
+              </Link>
             ))}
           </CardContent>
         </Card>

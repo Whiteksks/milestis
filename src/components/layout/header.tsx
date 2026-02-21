@@ -28,7 +28,7 @@ const NAVIGATION = [
   { title: 'Home', href: '/' },
   { title: 'Examples', href: '/examples' },
   { title: 'Pricing', href: '/pricing' },
-  { title: 'FAQ', href: '/help/faq' }
+  { title: 'Help Center', href: '/help' }
 ]
 
 interface HeaderProps {

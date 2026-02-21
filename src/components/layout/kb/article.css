@@ -1,0 +1,69 @@
+/**
+ * Typography styles for KB article bodies.
+ * Applied via the .kb-article wrapper in ArticleLayout.
+ */
+
+.kb-article h2 {
+  @apply mt-10 mb-4 text-xl font-semibold text-foreground scroll-mt-24;
+}
+
+.kb-article h3 {
+  @apply mt-7 mb-3 text-base font-semibold text-foreground scroll-mt-24;
+}
+
+.kb-article p {
+  @apply mb-4 leading-7 text-muted-foreground;
+}
+
+.kb-article ul {
+  @apply mb-4 ml-5 list-disc space-y-1.5 text-muted-foreground;
+}
+
+.kb-article ol {
+  @apply mb-4 ml-5 list-decimal space-y-1.5 text-muted-foreground;
+}
+
+.kb-article li {
+  @apply leading-7;
+}
+
+.kb-article strong {
+  @apply font-semibold text-foreground;
+}
+
+.kb-article a {
+  @apply text-primary underline underline-offset-4 hover:text-primary/80 transition-colors;
+}
+
+.kb-article code {
+  @apply rounded bg-muted px-1.5 py-0.5 text-sm font-mono text-foreground;
+}
+
+.kb-article blockquote {
+  @apply my-5 border-l-4 border-primary/30 pl-5 text-muted-foreground italic;
+}
+
+.kb-article hr {
+  @apply my-8 border-border/50;
+}
+
+/* Tip / Note / Warning callouts */
+.kb-callout {
+  @apply my-5 flex gap-3 rounded-xl border border-border/50 bg-muted/40 px-4 py-3.5 text-sm text-foreground;
+}
+
+.kb-callout-icon {
+  @apply mt-0.5 size-5 shrink-0;
+}
+
+.kb-step {
+  @apply relative flex gap-4;
+}
+
+.kb-step-number {
+  @apply flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary mt-0.5;
+}
+
+.kb-step-body {
+  @apply pb-6;
+}
