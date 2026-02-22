@@ -1,7 +1,15 @@
+"use client"
+
 import Link from "next/link"
 import LogoSvg from "@/components/icons/logo"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const FOOTER_LINKS = [
   {
@@ -89,35 +97,38 @@ export function Footer() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
         {/* Top row: brand + columns */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_repeat(5,1fr)]">
+        <div className="grid gap-10 md:grid-cols-4 lg:grid-cols-[1.6fr_repeat(5,1fr)]">
           {/* Brand column */}
-          <div className="flex flex-col gap-5">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <LogoSvg className="h-8 w-auto" />
-            </Link>
-            <p className="max-w-[220px] text-sm leading-6 text-muted-foreground">
-              Create beautiful memory books, photobooks, and portfolios — in minutes.
-            </p>
-            {/* Social icons */}
-            <div className="flex items-center gap-3">
-              {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-                >
-                  {s.icon}
-                </a>
-              ))}
-            </div>
-          </div>
+            <div className="flex flex-col items-center text-center gap-5 sm:items-start sm:text-left">
+              <Link href="/" className="inline-flex items-center gap-2.5">
+                <LogoSvg className="h-8 w-auto" />
+              </Link>
+              
+              {/* Описание: на мобилках можно оставить, но центрируем */}
+              <p className="max-w-[220px] text-sm leading-6 text-muted-foreground">
+                Create beautiful memory books, photobooks, and portfolios — in minutes.
+              </p>
 
-          {/* Link columns */}
+              {/* Social icons: центрируются автоматически благодаря flex и parent container */}
+              <div className="flex items-center gap-3">
+                {SOCIAL_LINKS.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                  >
+                    {s.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          {/* Desktop link columns — hidden on mobile */}
           {FOOTER_LINKS.map((col) => (
-            <div key={col.heading}>
+            <div key={col.heading} className="hidden sm:block">
               <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-foreground">
                 {col.heading}
               </p>
@@ -144,6 +155,39 @@ export function Footer() {
             </div>
           ))}
         </div>
+
+        {/* Mobile accordion columns — visible only on mobile */}
+        <Accordion type="multiple" className="mt-8 sm:hidden">
+          {FOOTER_LINKS.map((col) => (
+            <AccordionItem key={col.heading} value={col.heading} className="border-border/50">
+              <AccordionTrigger className="text-sm font-semibold uppercase tracking-wider text-foreground hover:no-underline">
+                {col.heading}
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-3 pb-1">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                        {"badge" in link && link.badge && (
+                          <Badge
+                            variant="secondary"
+                            className="rounded-full px-1.5 py-0 text-[10px] font-medium"
+                          >
+                            {link.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
 
         <Separator className="my-10" />
 

@@ -144,9 +144,16 @@ const Header = ({
                   {/* Анимация фона только после монтажа */}
                   {mounted && isActive(item.href) && (
                     <motion.div
-                      layoutId="activeNav"
+                      // layoutId здесь не нужен, так как мы не хотим "перетекания"
+                      initial={{ opacity: 0, scale: 0.9, y: 2 }} 
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 1000, // Жесткость пружины
+                        damping: 20,    // Насколько быстро гаснут колебания
+                        duration: 0.3
+                      }}
                       className="absolute inset-0 bg-secondary -z-10 rounded-md"
-                      transition={{ type: 'spring', duration: 0.5 }}
                     />
                   )}
                 </Link>
