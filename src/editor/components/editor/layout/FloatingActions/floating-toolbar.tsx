@@ -38,11 +38,9 @@ export const FloatingToolbar = memo(function FloatingToolbar({
             transition={{ duration: 0.15, ease: "easeOut" }}
             className={cn(
               "pointer-events-auto",
-              "bg-white/55 backdrop-blur-sm",
-              "border border-slate-200",
-              "shadow-lg shadow-slate-900/10",
-              "rounded-full",
-              "p-1.5",
+              "bg-card/75 backdrop-blur-md",
+              "border border-foreground/40",
+              "rounded-full md:p-0.5 mb-14 md:mb-0",
               "flex gap-0",
             )}
             onPointerDown={(e) => e.stopPropagation()}

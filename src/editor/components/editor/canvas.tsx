@@ -117,11 +117,11 @@ export function Canvas({
   }, [scrollContainerRef])
 
   return (
-    <div className="flex-1 min-h-0 bg-background p-1 md:p-2 lg:p-4 overflow-hidden">
+    <div className="flex-1 min-h-0 bg-background p-0 md:p-2 lg:p-4 overflow-hidden">
       <div
         ref={viewportRef}
         className={cn(
-          '@container mx-auto h-full relative overflow-hidden transition-all duration-300 transform-[translateZ(0)]',
+          '@container mx-auto h-full relative overflow-hidden transition-all duration-300 transform-[translateZ(0)] ',
           DEVICE_CLASSES[deviceView],
           viewportBackgroundClass
         )}

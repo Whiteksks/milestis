@@ -35,7 +35,7 @@ export function SectionsSidebar({
       {/* Sidebar */}
       <motion.div
         className={cn(
-          'hidden md:flex flex-col border-l border-border/40 bg-sidebar/10 shadow-lg relative overflow-visible'
+          'hidden md:flex flex-col border-l border-border/60 bg-card/80 shadow-[-4px_0_24px_0_hsl(var(--foreground)/0.07)] relative overflow-visible'
         )}
         initial={false}
         animate={{
@@ -52,10 +52,10 @@ export function SectionsSidebar({
             'hidden md:flex items-center justify-center',
             'w-12 h-16',
             'rounded-l-xl',
-            'bg-sidebar backdrop-blur-sm',
+            'bg-card/95 backdrop-blur-sm',
             'border border-border/60 border-r-0',
-            'shadow-md',
-            'hover:bg-muted/50',
+            'shadow-[-4px_2px_16px_0_hsl(var(--foreground)/0.08)]',
+            'hover:bg-muted/60',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             'transition-colors duration-200'
           )}
@@ -83,69 +83,33 @@ export function SectionsSidebar({
             >
               {/* Tabs */}
               <div className="border-b border-border/40">
-                <div className="flex gap-1 px-3 pt-3">
-                  {/* Sections Tab */}
-                  <button
-                    onClick={() => handleTabChange('sections')}
-                    className={cn(
-                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
-                      activeTab === 'sections'
-                        ? 'text-foreground bg-muted/50'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                    )}
-                  >
-                    <Layers className="w-4 h-4" />
-                    {editorMode === 'portfolio' ? 'Sections' : 'Content'}
-                    {activeTab === 'sections' && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                      />
-                    )}
-                  </button>
-
-                  {/* Theme Tab */}
-                  <button
-                    onClick={() => handleTabChange('theme')}
-                    className={cn(
-                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
-                      activeTab === 'theme'
-                        ? 'text-foreground bg-muted/50'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                    )}
-                  >
-                    <Paintbrush className="w-4 h-4" />
-                    Theme
-                    {activeTab === 'theme' && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                      />
-                    )}
-                  </button>
-
-                  {/* Decorations Tab */}
-                  <button
-                    onClick={() => handleTabChange('decorations')}
-                    className={cn(
-                      'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-xl transition-all relative',
-                      activeTab === 'decorations'
-                        ? 'text-foreground bg-muted/50'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                    )}
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Decorations
-                    {activeTab === 'decorations' && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                      />
-                    )}
-                  </button>
+                <div className="flex justify-center gap-1 px-4 pt-1">
+                  {[
+                    { id: 'sections' as const, icon: Layers, label: editorMode === 'portfolio' ? 'Sections' : 'Content' },
+                    { id: 'theme' as const, icon: Paintbrush, label: 'Theme' },
+                    { id: 'decorations' as const, icon: Sparkles, label: 'Decorations' },
+                  ].map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      onClick={() => handleTabChange(id)}
+                      className={cn(
+                        'relative flex items-center gap-1.5 px-3 py-3 text-sm transition-all',
+                        activeTab === id
+                          ? 'text-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground font-normal'
+                      )}
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      {label}
+                      {activeTab === id && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute bottom-0 left-0 right-0 h-px bg-foreground"
+                          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                        />
+                      )}
+                    </button>
+                  ))}
                 </div>
               </div>
 

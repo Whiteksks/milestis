@@ -38,7 +38,7 @@ export function ThemeFloatingToolbar() {
       "fixed") as BackgroundImageMode
 
   const iconButtonClassName =
-    "h-8 w-8 p-0 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+    "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 
   const handleUpdateOpacity = (value: number) => {
     const clamped = Math.min(Math.max(value, 0), 1)
@@ -92,20 +92,20 @@ export function ThemeFloatingToolbar() {
               <Settings2 className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent side="top" sideOffset={10} className="w-72 p-3">
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Scroll type</Label>
+          <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Scroll type</Label>
                 <Select
                   value={backgroundMode}
                   onValueChange={(val) =>
                     updateThemeCustomization({ backgroundImageType: val as BackgroundImageMode })
                   }
                 >
-                  <SelectTrigger className="h-9 rounded-xl text-xs">
+                  <SelectTrigger className="h-8 rounded-xl text-xs border-border/60">
                     <SelectValue placeholder="Mode" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl">
                     {Object.keys(BACKGROUND_MODE_PRESETS).map((mode) => (
                       <SelectItem key={mode} value={mode} className="text-xs">
                         {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -117,8 +117,8 @@ export function ThemeFloatingToolbar() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Image opacity</Label>
-                  <span className="text-xs tabular-nums text-slate-600">
+                  <Label className="text-xs text-muted-foreground">Image opacity</Label>
+                  <span className="text-xs tabular-nums text-muted-foreground">
                     {Math.round(backgroundOpacity * 100)}%
                   </span>
                 </div>
@@ -131,12 +131,12 @@ export function ThemeFloatingToolbar() {
                 />
               </div>
 
-              <div className="pt-2 border-t border-border/60 flex justify-end">
+              <div className="pt-1 border-t border-border/40 flex justify-end">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="h-8 text-xs rounded-xl"
+                  className="h-8 text-xs rounded-xl text-muted-foreground hover:text-foreground"
                   onClick={handleResetBackground}
                 >
                   Reset background

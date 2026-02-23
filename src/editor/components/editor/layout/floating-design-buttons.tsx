@@ -11,12 +11,12 @@ export function FloatingActions() {
   }))
 
   return (
-    <div className="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-50 flex-col gap-2.5">
+    <div className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-50 flex-col gap-2">
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button
           onClick={() => openDesignModal('templates')}
           size="lg"
-          className="h-12 w-12 rounded-2xl shadow-lg hover:shadow-xl transition-all bg-foreground hover:bg-foreground/90 text-background"
+          className="h-12 w-12 rounded-2xl shadow-md transition-all bg-foreground border border-background/40 hover:bg-foreground/90 text-background"
           title="Change Template"
         >
           <Plus className="h-5 w-5" />
@@ -26,8 +26,7 @@ export function FloatingActions() {
         <Button
           onClick={() => openDesignModal('themes')}
           size="lg"
-          className="h-12 w-12 rounded-2xl shadow-md hover:shadow-lg transition-all bg-background hover:bg-muted text-foreground border border-border"
-          variant="outline"
+          className="h-12 w-12 rounded-2xl shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
           title="Change Theme"
         >
           <Palette className="h-5 w-5" />
@@ -37,8 +36,7 @@ export function FloatingActions() {
         <Button
           onClick={() => openDesignModal('decorations')}
           size="lg"
-          className="h-12 w-12 rounded-2xl shadow-md hover:shadow-lg transition-all bg-background hover:bg-muted text-foreground border border-border"
-          variant="outline"
+          className="h-12 w-12 rounded-2xl shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
           title="Decorations"
         >
           <Sparkles className="h-5 w-5" />

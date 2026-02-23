@@ -15,29 +15,24 @@ export function EditorHeader() {
   }))
 
   return (
-    <header className="relative h-16 border-b border-border/40 bg-background/80 backdrop-blur-xl z-50">
+    <header className="relative h-16 border-b border-border/80 bg-card/95 z-50 shadow-[0_2px_16px_0_hsl(var(--foreground)/0.06)]">
       <div className="h-full flex items-center px-6 justify-between">
         {/* LEFT */}
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col justify-center">
-            <h1 className="text-sm font-semibold text-foreground tracking-tight">
-              Photobook Editor
-            </h1>
-            <p className="text-[10px] text-muted-foreground font-medium">
-              Design your portfolio
-            </p>
-          </div>
+        <div className="flex items-center gap-5">
+          <span className="font-serif text-base font-medium text-foreground tracking-tight select-none">
+            Milestis
+          </span>
 
-          <div className="hidden sm:flex items-center gap-1 p-1 bg-muted/50 rounded-xl">
+          <div className="hidden sm:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setEditorMode('portfolio')}
               className={cn(
-                'h-7 px-4 rounded-lg text-xs font-medium transition-all',
+                'h-6 px-3.5 rounded-full text-xs font-medium transition-all',
                 editorMode === 'portfolio'
                   ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               Portfolio
@@ -47,10 +42,10 @@ export function EditorHeader() {
               size="sm"
               onClick={() => setEditorMode('photobook')}
               className={cn(
-                'h-7 px-4 rounded-lg text-xs font-medium transition-all',
+                'h-6 px-3.5 rounded-full text-xs font-medium transition-all',
                 editorMode === 'photobook'
                   ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               Photobook
@@ -60,7 +55,7 @@ export function EditorHeader() {
 
         {/* CENTER — VIEWPORT */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="hidden md:flex items-center gap-1 p-1 bg-muted/50 rounded-xl">
+          <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
             {[
               { id: 'desktop', icon: Monitor, label: 'Desktop' },
               { id: 'tablet', icon: Tablet, label: 'Tablet' },
@@ -72,66 +67,57 @@ export function EditorHeader() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setDeviceView(id as any)}
+                title={label}
                 className={cn(
-                  'h-7 px-3 rounded-lg transition-all',
+                  'h-6 w-8 p-0 rounded-full transition-all',
                   deviceView === id
                     ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span className="ml-2 hidden lg:inline text-xs font-medium">
-                  {label}
-                </span>
               </Button>
             ))}
           </div>
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"
             size="sm"
             onClick={toggleMediaLibrary}
-            className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl h-9 px-4 transition-all"
+            className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
           >
-            <ImageIcon className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs font-medium">Media</span>
+            <ImageIcon className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline font-medium">Media</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 hidden sm:inline-flex rounded-xl h-9 px-4 transition-all"
+            className="gap-2 text-muted-foreground hover:text-foreground hidden sm:inline-flex rounded-full h-8 px-4 transition-all text-xs font-medium"
           >
-            <Eye className="h-4 w-4" />
-            <span className="text-xs font-medium">Preview</span>
+            <Eye className="h-3.5 w-3.5" />
+            Preview
           </Button>
 
-          <div className="w-px h-4 bg-border/50 mx-1 hidden sm:block" />
+          <div className="w-px h-4 bg-border/40 mx-1 hidden sm:block" />
 
           <Button
             size="sm"
-            className="gap-2 bg-foreground hover:bg-foreground/90 text-background shadow-md hidden sm:inline-flex rounded-xl h-9 px-5 transition-all"
+            className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
           >
-            <Upload className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium">Publish</span>
+            <Upload className="h-3 w-3" />
+            Publish
           </Button>
 
           {/* Mobile */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 sm:hidden rounded-xl text-muted-foreground"
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8 sm:hidden rounded-full text-muted-foreground">
             <Eye className="h-4 w-4" />
           </Button>
-          <Button
-            size="icon"
-            className="h-9 w-9 sm:hidden bg-foreground text-background rounded-xl"
-          >
-            <Upload className="h-4 w-4" />
+          <Button size="icon" className="h-8 w-8 sm:hidden bg-foreground text-background rounded-full shadow-sm">
+            <Upload className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

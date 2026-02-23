@@ -65,7 +65,7 @@ export default function EditorPage() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <EditorHeader />
-      <div className="flex flex-1 overflow-hidden relative pb-16 md:pb-0">
+      <div className="flex flex-1 overflow-hidden relative  md:pb-0">
         <CanvasScrollProvider value={scrollContainerRef}>
           <Canvas scrollContainerRef={scrollContainerRef} desktopActiveTab={desktopActiveTab} />
           <SectionsSidebar activeTab={desktopActiveTab} onTabChange={setDesktopActiveTab} />

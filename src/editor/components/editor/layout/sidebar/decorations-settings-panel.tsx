@@ -147,7 +147,7 @@ export function DecorationsSettingsPanel() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 border-b border-border/40">
+      <div className="px-6 pt-6 pb-4 border-b border-border/60">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-foreground">Decorations</h3>

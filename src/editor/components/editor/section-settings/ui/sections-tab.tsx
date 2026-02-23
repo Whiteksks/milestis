@@ -30,7 +30,7 @@ export function SectionsTab() {
   return (
     <>
       {sections.length > 0 && (
-        <div className="border-b border-border/40 p-6 space-y-4 bg-background/50">
+        <div className="border-b border-border/60 p-6 space-y-4 bg-card/60">
           <div>
             <Label className="text-xs font-medium text-muted-foreground mb-2 block">
               Current Section

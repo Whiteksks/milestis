@@ -110,12 +110,12 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   })
 
   const iconButtonClassName =
-    "h-8 w-8 p-0 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+    "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 
-  const separatorClassName = "mx-1 opacity-80"
+  const separatorClassName = "mx-1.5 h-4 bg-border/60"
 
   return (
-    <div className={cn("flex items-center gap-0", className)}>
+    <div className={cn("flex p-1 gap-0", className)}>
       <AnimatePresence mode="wait" initial={false}>
         {!isExpanded ? (
           <motion.div
@@ -131,10 +131,10 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                   <Button
                     type="button"
                     variant="ghost"
-                    className="h-8 px-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    className="h-8 px-2.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
                   >
                     <span className="text-xs font-medium">
-                      {decoration?.name || 'Выберите декорацию'}
+                      {decoration?.name || 'Select decoration'}
                     </span>
                     <ChevronDown className="ml-1 h-3.5 w-3.5" />
                   </Button>
@@ -200,23 +200,20 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     <Maximize2 className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-72 p-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">Размер</Label>
-                    <span className="text-xs tabular-nums text-slate-600">
+                <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-xs text-muted-foreground">Scale</Label>
+                    <span className="text-xs tabular-nums text-muted-foreground">
                       {scalePercent}%
                     </span>
                   </div>
-
-                  <div className="mt-2">
-                    <Slider
-                      value={[scalePercent]}
-                      min={50}
-                      max={300}
-                      step={5}
-                      onValueChange={([v]) => handleScaleChange(v)}
-                    />
-                  </div>
+                  <Slider
+                    value={[scalePercent]}
+                    min={50}
+                    max={300}
+                    step={5}
+                    onValueChange={([v]) => handleScaleChange(v)}
+                  />
                 </PopoverContent>
               </Popover>
 
@@ -228,23 +225,20 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     <OpacityIcon percent={opacityPercent} />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-72 p-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">Opacity</Label>
-                    <span className="text-xs tabular-nums text-slate-600">
+                <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-xs text-muted-foreground">Opacity</Label>
+                    <span className="text-xs tabular-nums text-muted-foreground">
                       {opacityPercent}%
                     </span>
                   </div>
-
-                  <div className="mt-2">
-                    <Slider
-                      value={[opacityPercent]}
-                      min={10}
-                      max={100}
-                      step={5}
-                      onValueChange={([v]) => handleOpacityChange(v)}
-                    />
-                  </div>
+                  <Slider
+                    value={[opacityPercent]}
+                    min={10}
+                    max={100}
+                    step={5}
+                    onValueChange={([v]) => handleOpacityChange(v)}
+                  />
                 </PopoverContent>
               </Popover>
 
@@ -290,23 +284,21 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-72 p-3">
+                <PopoverContent side="top" sideOffset={10} className="w-68 p-4 rounded-2xl border-border/60 shadow-lg">
                   {/* Decoration Selector */}
-                  <div className="mb-3">
-                    <Label className="text-xs text-slate-500 mb-1.5 block">Декорация</Label>
+                  <div className="mb-4">
+                    <Label className="text-xs text-muted-foreground mb-2 block">Decoration</Label>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between h-9 text-xs font-normal"
+                          className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
                         >
-                          <span>
-                            {decoration?.name || 'Выберите'}
-                          </span>
-                          <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                          <span>{decoration?.name || 'Select'}</span>
+                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-64">
+                      <DropdownMenuContent className="w-60 rounded-xl">
                         <DropdownMenuRadioGroup
                           value={activeDecorationId ?? ""}
                           onValueChange={(v) => v && handleDecorationPick(v)}
@@ -321,16 +313,14 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     </DropdownMenu>
                   </div>
 
-                  <Separator className="my-3" />
+                  <Separator className="mb-4 bg-border/40" />
 
                   {/* Mobile Adaptation */}
-                  <label className="flex items-center justify-between gap-3 py-1.5 cursor-pointer group">
+                  <label className="flex items-center justify-between gap-3 py-1 cursor-pointer">
                     <div>
-                      <div className="text-xs font-medium text-slate-700 group-hover:text-slate-900">
-                        Адаптация для мобильных
-                      </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        Подстроить размер на маленьких экранах
+                      <div className="text-xs font-medium text-foreground">Mobile adaptation</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        Scale down on small screens
                       </div>
                     </div>
                     <Switch
@@ -339,28 +329,28 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     />
                   </label>
 
-                  <Separator className="my-3" />
+                  <Separator className="my-4 bg-border/40" />
 
                   {/* Actions */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-0.5">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full justify-start h-8 text-xs font-normal text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      className="w-full justify-start h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-xl"
                       onClick={onLocate}
                       disabled={!onLocate}
                     >
                       <ChevronDown className="h-3.5 w-3.5 mr-2" />
-                      Найти на холсте
+                      Locate on canvas
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full justify-start h-8 text-xs font-normal text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="w-full justify-start h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
                       onClick={onDelete}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-2" />
-                      Удалить
+                      Delete
                     </Button>
                   </div>
                 </PopoverContent>

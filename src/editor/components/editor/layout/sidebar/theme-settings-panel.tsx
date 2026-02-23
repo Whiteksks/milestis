@@ -51,7 +51,7 @@ export function ThemeSettingsPanel() {
       <MediaPickerModal ownerId={ownerId} onSelectImage={(url) => updateThemeCustomization({ customBackground: url })} />
 
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-border/40">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-border/60">
         <div className="space-y-0.5">
           <h3 className="text-sm font-semibold text-foreground">
             Appearance

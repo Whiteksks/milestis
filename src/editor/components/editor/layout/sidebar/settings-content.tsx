@@ -30,7 +30,7 @@ export function SettingsContent() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-3 border-b border-border/40">
+      <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm pb-3 border-b border-border/60">
         <Label className="text-xs font-medium text-muted-foreground mb-2 block">
           Edit Section
         </Label>
