@@ -143,7 +143,7 @@ export function Canvas({
             <div
               data-canvas-content-root="true"
               className={cn(
-                'shadow-2xl overflow-hidden relative',
+                'shadow-2xl overflow-hidden relative ',
                 contentBackgroundClass,
                 theme.foreground,
                 theme.fontBody,
@@ -164,6 +164,13 @@ export function Canvas({
               <div className="relative z-10">
                 {templateNode}
               </div>
+
+              {/*
+                Bottom spacer — reserves space so floating bars never cover canvas content.
+                Height matches the bar height: ~64px on mobile (MobileBottomNav),
+                ~56px on desktop (FloatingToolbar). pointer-events-none so it's invisible.
+              */}
+              <div className="h-20 md:h-12 pointer-events-none select-none" aria-hidden="true" />
             </div>
         </div>
       </div>

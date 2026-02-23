@@ -86,7 +86,10 @@ export function EditorHeader() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleMediaLibrary}
+            onClick={(e) => {
+              e.currentTarget.blur()
+              toggleMediaLibrary()
+            }}
             className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
           >
             <ImageIcon className="h-3.5 w-3.5" />

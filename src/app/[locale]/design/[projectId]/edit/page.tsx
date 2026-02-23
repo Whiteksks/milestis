@@ -7,7 +7,7 @@ import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/medi
 import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/design-catalog-modal'
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
-import { MobileBottomSheet } from '@/editor/components/editor/layout/mobile/mobile-bottom-sheet'
+import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
 import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
 import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
 import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
@@ -20,7 +20,7 @@ export default function EditorPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
   const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'decorations' | 'design'>('sections')
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { openDesignModal, editorMode, designModalSection, setSelectedDecorationId } = useUiSelector((state) => ({
     openDesignModal: state.openDesignModal,
     editorMode: state.editorMode,
@@ -44,16 +44,16 @@ export default function EditorPage() {
     if (tab === 'design') {
       // Map the catalog's last section to the closest FloatingToolbar tab.
       setDesktopActiveTab(designModalSection === 'decorations' ? 'decorations' : 'theme')
-      setIsBottomSheetOpen(false)
+      setIsDrawerOpen(false)
       // Reopen the Design Catalog on the last-used section.
       openDesignModal(designModalSection)
       return
     }
 
-    setIsBottomSheetOpen(true)
+    setIsDrawerOpen(true)
   }
 
-  const getSheetTitle = () => {
+  const getDrawerTitle = () => {
     if (mobileActiveTab === 'sections') {
       return editorMode === 'photobook' ? 'Photobook Sections' : 'Page Sections'
     }
@@ -69,29 +69,28 @@ export default function EditorPage() {
         <CanvasScrollProvider value={scrollContainerRef}>
           <Canvas scrollContainerRef={scrollContainerRef} desktopActiveTab={desktopActiveTab} />
           <SectionsSidebar activeTab={desktopActiveTab} onTabChange={setDesktopActiveTab} />
+
+          {/* Mobile bottom navigation — inside provider so it can read canvas scroll state */}
+          <MobileBottomNav
+            activeTab={mobileActiveTab}
+            onTabChange={handleMobileTabChange}
+          />
         </CanvasScrollProvider>
       </div>
-      
+
       {/* Desktop floating actions */}
       <FloatingActions />
       
-      {/* Mobile bottom navigation */}
-      <MobileBottomNav 
-        activeTab={mobileActiveTab} 
-        onTabChange={handleMobileTabChange}
-      />
-      
       {/* Mobile bottom sheet */}
-      <MobileBottomSheet
-        isOpen={isBottomSheetOpen}
-        onClose={() => setIsBottomSheetOpen(false)}
-        title={getSheetTitle()}
-        contentPadding={mobileActiveTab === 'sections'}
+      <MobileDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title={getDrawerTitle()}
       >
         {mobileActiveTab === 'sections' && <SettingsContent />}
         {mobileActiveTab === 'theme' && <ThemeSettingsPanel />}
         {mobileActiveTab === 'decorations' && <DecorationsSettingsPanel />}
-      </MobileBottomSheet>
+      </MobileDrawer>
 
       {/* Modals */}
       <DesignCatalogModal />

@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useCallback, useMemo } from "react"
-import { motion, type MotionValue } from "framer-motion"
+import { motion, type MotionValue, type TargetAndTransition } from "framer-motion"
 import Image, { type ImageLoader } from "next/image"
 import { cn } from "@/lib/utils"
 import type { DecorationElement } from "./decorationTypes"
@@ -16,8 +16,8 @@ export interface DraggableDecorationProps {
   dragX?: MotionValue<number>
   dragY?: MotionValue<number>
   animationVariants?: {
-    initial: Record<string, unknown>
-    animate: Record<string, unknown>
+    initial: TargetAndTransition
+    animate: TargetAndTransition
   }
   animationDelay?: number
   onClick?: (id: string) => void

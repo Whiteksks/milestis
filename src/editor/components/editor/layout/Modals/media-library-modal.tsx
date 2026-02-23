@@ -15,7 +15,7 @@ import { Upload, Sparkles, X, Check } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { MobileBottomSheet } from '../mobile/mobile-bottom-sheet'
+import { MobileDrawer } from '../mobile/mobile-drawer'
 import Image, { type ImageLoader } from 'next/image'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
@@ -244,11 +244,10 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   // --- MOBILE: MobileBottomSheet (использует тот же контент) ---
   if (isMobile) {
     return (
-      <MobileBottomSheet
+      <MobileDrawer
         isOpen={isMediaLibraryOpen}
         onClose={toggleMediaLibrary}
         title="Media Library"
-        contentPadding={false}
       >
         <div className="flex flex-col h-full min-h-0">
           {/* Верхняя панель (заголовок внутри bottom sheet) */}
@@ -272,7 +271,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
             {actionsBar}
           </div>
         </div>
-      </MobileBottomSheet>
+      </MobileDrawer>
     )
   }
 
