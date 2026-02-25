@@ -1,16 +1,12 @@
 "use client"
 
-import { useCallback, useMemo } from 'react'
-import type { DecorationElement as LegacyDecorationElement } from '@/editor/lib/types'
-import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
-import {
-  DecorationsLayer as OptimizedDecorationsLayer,
-  type DecorationElement as OptimizedDecorationElement,
-  type DecorationUpdatePayload,
-} from '.'
+import type { DecorationElement } from '@/editor/lib/types'
+import { useUiStore } from '@/editor/lib/store-ui'
+import { useEditorDecorations } from '@/editor/hooks/use-editor-decorations'
+import { DecorationsLayer as OptimizedDecorationsLayer } from '.'
 
 interface DecorationsLayerProps {
-  decorations: LegacyDecorationElement[]
+  decorations: DecorationElement[]
   animation?: 'none' | 'fade' | 'slide-up' | 'slide-down' | string
 }
 
@@ -27,65 +23,19 @@ const normalizeAnimation = (animation?: string): 'none' | 'fade' | 'slide-up' | 
 }
 
 export function DecorationsLayer({ decorations, animation }: DecorationsLayerProps) {
-  const { selectedDecorationId, deviceView, setSelectedDecorationId } = useUiSelector((state) => ({
-    selectedDecorationId: state.selectedDecorationId,
-    deviceView: state.deviceView,
-    setSelectedDecorationId: state.setSelectedDecorationId,
-  }))
-
-  const { customDecorations, updateDecoration, removeDecoration } = useThemeSelector((state) => ({
-    customDecorations: state.customDecorations,
-    updateDecoration: state.updateDecoration,
-    removeDecoration: state.removeDecoration,
-  }))
-
-  const editableIdSet = useMemo(() => new Set(customDecorations.map((d) => d.id)), [customDecorations])
-
-  const optimizedDecorations: OptimizedDecorationElement[] = useMemo(
-    () =>
-      decorations.map((d, index) => ({
-        id: d.id ?? `decoration-${index}`,
-        image: d.image,
-        position: d.position,
-        size: (d.size as OptimizedDecorationElement['size']) ?? undefined,
-        scale: d.scale,
-        opacity: d.opacity,
-        zIndex: d.zIndex,
-        responsiveScale: d.responsiveScale,
-        transform: d.transform,
-        aspectRatio: d.aspectRatio,
-        name: d.name,
-      })),
-    [decorations],
-  )
-
-  const selectedId = selectedDecorationId && editableIdSet.has(selectedDecorationId) ? selectedDecorationId : null
-
-  const handleUpdate = useCallback(
-    (id: string, updates: DecorationUpdatePayload) => {
-      if (!editableIdSet.has(id)) return
-      updateDecoration(id, updates as never)
-    },
-    [editableIdSet, updateDecoration],
-  )
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      if (!editableIdSet.has(id)) return
-      removeDecoration(id)
-    },
-    [editableIdSet, removeDecoration],
-  )
+  const deviceView = useUiStore((s) => s.deviceView)
+  const { normalizedDecorations, selectedId, handleUpdate, handleRemove, handleSelect } =
+    useEditorDecorations(decorations)
 
   return (
     <OptimizedDecorationsLayer
-      decorations={optimizedDecorations}
+      decorations={normalizedDecorations}
       selectedId={selectedId}
       deviceView={deviceView}
       animation={normalizeAnimation(animation)}
       onUpdate={handleUpdate}
       onRemove={handleRemove}
-      onSelect={(id) => setSelectedDecorationId(id)}
+      onSelect={handleSelect}
     />
   )
 }

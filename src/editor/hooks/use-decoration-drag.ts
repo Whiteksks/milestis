@@ -22,12 +22,12 @@ export interface UseDecorationDragReturn {
   commitDrag: (element: HTMLElement) => void
 }
 
+const EDGE_SCROLL_THRESHOLD_PX = 48
+const EDGE_SCROLL_MAX_PX_PER_FRAME = 16
+
 export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDecorationDragOptions): UseDecorationDragReturn {
   const dragX = useMotionValue(0)
   const dragY = useMotionValue(0)
-
-  const EDGE_SCROLL_THRESHOLD_PX = 48
-  const EDGE_SCROLL_MAX_PX_PER_FRAME = 16
 
   const constraintsRef = useRef<DragBox | undefined>(undefined)
   const activeElRef = useRef<HTMLElement | null>(null)

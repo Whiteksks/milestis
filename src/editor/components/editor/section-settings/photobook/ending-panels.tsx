@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
 export function EndingMessagePanel({ dense = false }: { dense?: boolean }) {
@@ -62,9 +62,7 @@ export function EndingImagePanel({ dense = false }: { dense?: boolean }) {
     ending: state.photobookSectionContent.ending,
     updatePhotobookSection: state.updatePhotobookSection,
   }))
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   return (
     <div className="space-y-3">

@@ -1,15 +1,17 @@
 import type {
-  EditorDecorationElement,
-  EditorDecorationPosition,
-  EditorDecorationTransform,
-  EditorDecorationUpdatePayload,
+  DecorationElement as BaseDecorationElement,
+  DecorationPosition,
+  DecorationTransform,
+  DecorationUpdatePayload,
 } from '@/editor/lib/types'
 
-export type DecorationPosition = EditorDecorationPosition
+export type { DecorationPosition, DecorationTransform, DecorationUpdatePayload }
 
-export type DecorationTransform = EditorDecorationTransform
-
-export type DecorationElement = EditorDecorationElement
+/**
+ * Editor-side decoration — identical to the base type but with id guaranteed present.
+ * All editor UI components (toolbar, drag layer) work with this form.
+ */
+export type DecorationElement = BaseDecorationElement & { id: string }
 
 export type DragBox = {
   top: number
@@ -17,5 +19,3 @@ export type DragBox = {
   right: number
   bottom: number
 }
-
-export type DecorationUpdatePayload = EditorDecorationUpdatePayload

@@ -2,10 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react"
 
-import type { DecorationElement as LegacyDecorationElement } from "@/editor/lib/types"
-import { useThemeSelector, useUiSelector } from "@/editor/lib/store"
-
-import type { DecorationElement, DecorationUpdatePayload } from "../decorationEdit/decorationTypes"
+import type { DecorationElement } from "@/editor/lib/types"
+import { useUiStore } from "@/editor/lib/store-ui"
+import { useEditorDecorations } from "@/editor/hooks/use-editor-decorations"
 import { DecorationToolbar } from "./decoration-toolbar"
 import { loadImageAspectRatio } from "../decorationEdit/utils"
 
@@ -13,72 +12,27 @@ export function DecorationsFloatingToolbar({
   decorations,
   scrollContainerRef,
 }: {
-  decorations: LegacyDecorationElement[]
+  decorations: DecorationElement[]
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }) {
-  const { selectedDecorationId, setSelectedDecorationId } = useUiSelector((state) => ({
-    selectedDecorationId: state.selectedDecorationId,
-    setSelectedDecorationId: state.setSelectedDecorationId,
-  }))
-
-  const { customDecorations, updateDecoration, removeDecoration } = useThemeSelector((state) => ({
-    customDecorations: state.customDecorations,
-    updateDecoration: state.updateDecoration,
-    removeDecoration: state.removeDecoration,
-  }))
-
-  const editableIdSet = useMemo(() => new Set(customDecorations.map((d) => d.id)), [customDecorations])
-
-  const toolbarDecorations: DecorationElement[] = useMemo(
-    () =>
-      decorations.map((d, index) => ({
-        id: d.id ?? `decoration-${index}`,
-        image: d.image,
-        position: d.position,
-        size: (d.size as DecorationElement["size"]) ?? undefined,
-        scale: d.scale,
-        opacity: d.opacity,
-        zIndex: d.zIndex,
-        responsiveScale: d.responsiveScale,
-        transform: d.transform,
-        aspectRatio: d.aspectRatio,
-        name: d.name,
-      })),
-    [decorations],
-  )
-
-  const selectedId = selectedDecorationId && editableIdSet.has(selectedDecorationId) ? selectedDecorationId : null
+  const setSelectedDecorationId = useUiStore((s) => s.setSelectedDecorationId)
+  const { normalizedDecorations, selectedId, handleUpdate, handleRemove } =
+    useEditorDecorations(decorations)
 
   const [preferredDecorationId, setPreferredDecorationId] = useState<string | null>(() => {
-    return selectedId ?? toolbarDecorations[0]?.id ?? null
+    return selectedId ?? normalizedDecorations[0]?.id ?? null
   })
 
   const activeDecorationId = useMemo(() => {
     if (selectedId) return selectedId
-    if (!toolbarDecorations.length) return null
-    if (preferredDecorationId && toolbarDecorations.some((d) => d.id === preferredDecorationId)) return preferredDecorationId
-    return toolbarDecorations[0]!.id
-  }, [preferredDecorationId, selectedId, toolbarDecorations])
+    if (!normalizedDecorations.length) return null
+    if (preferredDecorationId && normalizedDecorations.some((d) => d.id === preferredDecorationId)) return preferredDecorationId
+    return normalizedDecorations[0]!.id
+  }, [preferredDecorationId, selectedId, normalizedDecorations])
 
   const selectedDecoration = useMemo(
-    () => toolbarDecorations.find((d) => d.id === selectedId),
-    [selectedId, toolbarDecorations],
-  )
-
-  const handleUpdate = useCallback(
-    (id: string, updates: DecorationUpdatePayload) => {
-      if (!editableIdSet.has(id)) return
-      updateDecoration(id, updates as never)
-    },
-    [editableIdSet, updateDecoration],
-  )
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      if (!editableIdSet.has(id)) return
-      removeDecoration(id)
-    },
-    [editableIdSet, removeDecoration],
+    () => normalizedDecorations.find((d) => d.id === selectedId),
+    [selectedId, normalizedDecorations],
   )
 
   const handleImageReplace = useCallback(
@@ -111,11 +65,11 @@ export function DecorationsFloatingToolbar({
     scroller.scrollTo({ top: Math.max(0, centeredScrollY), behavior: "smooth" })
   }, [scrollContainerRef, selectedDecoration])
 
-  if (!toolbarDecorations.length) return null
+  if (!normalizedDecorations.length) return null
 
   return (
     <DecorationToolbar
-      decorations={toolbarDecorations}
+      decorations={normalizedDecorations}
       activeDecorationId={activeDecorationId}
       onActiveDecorationChange={(id) => setPreferredDecorationId(id)}
       decoration={selectedDecoration}

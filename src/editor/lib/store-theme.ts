@@ -1,25 +1,27 @@
 import { create } from 'zustand'
-import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations } from './types'
+import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, BackgroundImageType, DecorationAnimation } from './types'
+
+export interface ThemeCustomizations {
+  backgroundImageOpacity?: number
+  backgroundImageType?: BackgroundImageType
+  decorationAnimation?: DecorationAnimation
+  decorationCount?: number
+  customFont?: string
+  customBackground?: string
+}
 
 export interface ThemeStore {
   currentTemplateId: TemplateId
   currentTheme: Theme
   frameStyle: FrameStyle
-  themeCustomizations: {
-    backgroundImageOpacity?: number
-    backgroundImageType?: 'fixed' | 'scroll' | 'parallax' | 'pattern'
-    decorationAnimation?: 'none' | 'fade' | 'slide-up' | 'slide-down'
-    decorationCount?: number
-    customFont?: string
-    customBackground?: string
-  }
+  themeCustomizations: ThemeCustomizations
   customDecorations: ThemeCustomDecorations[]
 
   setTemplate: (templateId: TemplateId) => void
   setTheme: (theme: Theme) => void
   setFrameStyle: (style: FrameStyle) => void
   updateThemeCustomization: (
-    customizations: Partial<ThemeStore['themeCustomizations']>,
+    customizations: Partial<ThemeCustomizations>,
   ) => void
   addDecoration: (decoration: ThemeCustomDecorations) => void
   updateDecoration: (id: string, updates: Partial<ThemeCustomDecorations>) => void

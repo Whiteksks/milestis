@@ -63,14 +63,12 @@ export const TEMPLATE_IDS = {
 
 export type TemplateId = (typeof TEMPLATE_IDS)[keyof typeof TEMPLATE_IDS]
 
-export interface SectionVisibility {
-  showHeader: boolean
-  showHero: boolean
-  showBio: boolean
-  showFeaturedWork: boolean
-  showVideo: boolean
-  showContact: boolean
-  showFooter: boolean
+export type BackgroundImageType = 'fixed' | 'scroll' | 'parallax' | 'pattern'
+export type DecorationAnimation = 'none' | 'fade' | 'slide-up' | 'slide-down'
+
+/** Derived automatically from SectionContent — adding a key there adds show<Key> here. */
+export type SectionVisibility = {
+  [K in keyof SectionContent as `show${Capitalize<string & K>}`]: boolean
 }
 
 export interface SectionContent {
@@ -130,88 +128,39 @@ export interface MediaImage {
   uploadedAt: Date
 }
 
-export interface ThemeCustomDecorations {
-  id: string
-  position: {
-    top?: string
-    bottom?: string
-    left?: string
-    right?: string
-  }
-  image: string
-  opacity: number
-  scale?: number
-  responsiveScale?: boolean
-  zIndex?: number
-  transform?: {
-    flipX?: boolean
-    flipY?: boolean
-  }
-  /** Aspect ratio (width/height), can be computed from image */
-  aspectRatio?: number
-  /** Optional custom name for the decoration */
-  name?: string
-}
-
-export interface DecorationElement {
-  id?: string
-  position?: {
-    top?: string
-    bottom?: string
-    left?: string
-    right?: string
-  }
-  image: string
-  opacity: number
-  size?: 'small' | 'medium' | 'large' | 'xlarge' | string
-  scale?: number
-  responsiveScale?: boolean
-  zIndex?: number
-  transform?: {
-    flipX?: boolean
-    flipY?: boolean
-  }
-  /** Aspect ratio (width/height), can be computed from image */
-  aspectRatio?: number
-  /** Optional custom name for the decoration */
-  name?: string
-}
-
-// Unified editor-side decoration types (used by the optimized decorationEdit/new implementation)
-export interface EditorDecorationPosition {
+export interface DecorationPosition {
   top?: string
   bottom?: string
   left?: string
   right?: string
 }
 
-export interface EditorDecorationTransform {
+export interface DecorationTransform {
   flipX?: boolean
   flipY?: boolean
 }
 
-/**
- * Normalized decoration model for the editor UI.
- * - `id` is always present
- * - `opacity` is optional (defaults can be applied by UI)
- */
-export interface EditorDecorationElement {
-  id: string
+/** Single unified decoration model — used in theme presets, DecorationsConfig, and the editor UI. */
+export interface DecorationElement {
+  id?: string
   image: string
-  position?: EditorDecorationPosition
+  position?: DecorationPosition
   size?: 'small' | 'medium' | 'large' | 'xlarge'
   scale?: number
   opacity?: number
   zIndex?: number
   responsiveScale?: boolean
-  transform?: EditorDecorationTransform
+  transform?: DecorationTransform
   /** Aspect ratio (width/height), can be computed from image */
   aspectRatio?: number
   /** Optional custom name for the decoration */
   name?: string
 }
 
-export type EditorDecorationUpdatePayload = Partial<Omit<EditorDecorationElement, 'id'>>
+export type DecorationUpdatePayload = Partial<Omit<DecorationElement, 'id'>>
+
+/** User-added decoration stored in ThemeStore — always has id and opacity. */
+export type ThemeCustomDecorations = DecorationElement & { id: string; opacity: number }
 
 export interface DecorationsConfig {
   id?: string
@@ -221,21 +170,16 @@ export interface DecorationsConfig {
   backgroundImage?: {
     url: string
     opacity?: number
-    type?: 'fixed' | 'scroll' | 'parallax' | 'pattern'
+    type?: BackgroundImageType
   }
-  animation?: 'none' | 'fade' | 'slide-up' | 'slide-down'
+  animation?: DecorationAnimation
   elements?: DecorationElement[]
 }
 
 
-// Visibility model specifically for Photobook sections
-export interface PhotobookSectionVisibility {
-  showCover: boolean
-  showIntroduction: boolean
-  showStory: boolean
-  showGallery: boolean
-  showHighlight: boolean
-  showEnding: boolean
+/** Derived automatically from PhotobookSectionContent — adding a key there adds show<Key> here. */
+export type PhotobookSectionVisibility = {
+  [K in keyof PhotobookSectionContent as `show${Capitalize<string & K>}`]: boolean
 }
 
 export interface PhotobookSlot {

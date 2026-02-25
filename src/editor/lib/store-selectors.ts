@@ -3,13 +3,6 @@ import { useContentStore, type ContentStore } from './store-content'
 import { useThemeStore, type ThemeStore } from './store-theme'
 import { useShallow } from 'zustand/react/shallow'
 
-// Generic typed selector helper
-const createSelectorHook = <S,>() =>
-  <T>(selector: (state: S) => T): T => {
-    // This wrapper exists mainly for type inference and a single import point.
-    throw new Error('createSelectorHook should be specialized per store')
-  }
-
 // UI selectors
 export const useUiSelector = <T,>(selector: (state: UiStore) => T) =>
   useUiStore(useShallow(selector))
@@ -24,11 +17,9 @@ export const useThemeSelector = <T,>(selector: (state: ThemeStore) => T) =>
   useThemeStore(useShallow(selector))
 
 // Convenience hooks for common slices
-export const useDeviceView = () =>
-  useUiSelector((state) => state.deviceView)
-
-export const useEditorMode = () =>
-  useUiSelector((state) => state.editorMode)
+// Primitive scalars — direct store subscriptions are more efficient than useShallow
+export const useDeviceView = () => useUiStore((s) => s.deviceView)
+export const useEditorMode = () => useUiStore((s) => s.editorMode)
 
 export const useSectionVisibility = () =>
   useContentSelector((state) => state.sectionVisibility)

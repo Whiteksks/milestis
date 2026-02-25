@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -45,9 +45,7 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
 
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   const handleImageSelect = (url: string) => {
     updateSectionContent("bio", { image: url })

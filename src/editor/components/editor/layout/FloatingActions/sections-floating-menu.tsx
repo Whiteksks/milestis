@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 
 import { useModeSections } from "@/editor/hooks/use-mode-sections"
-import { useUiSelector } from "@/editor/lib/store"
+import { useUiStore } from "@/editor/lib/store"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -15,9 +15,7 @@ import { getSectionQuickActions } from "@/editor/components/editor/section-setti
 
 export function SectionsToolbarPanel() {
   const { editorMode, sections, toggleVisibility, resolvedActiveSectionId, setActiveSectionId } = useModeSections()
-  const { isMediaPickerOpen } = useUiSelector((state) => ({
-    isMediaPickerOpen: state.isMediaPickerOpen,
-  }))
+  const isMediaPickerOpen = useUiStore((s) => s.isMediaPickerOpen)
 
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
   const [activeQuickActionId, setActiveQuickActionId] = useState<string | null>(null)
@@ -62,11 +60,12 @@ export function SectionsToolbarPanel() {
         <PopoverContent side="top" sideOffset={8} align="start" className="w-56 p-2 rounded-2xl border-border/60 shadow-lg">
           <div className="space-y-0.5">
             {sections.map((section) => (
-              <button
+              <div
                 key={section.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 className={cn(
-                  "w-full flex items-center rounded-xl px-2 py-1.5 text-xs transition-colors",
+                  "w-full flex items-center rounded-xl px-2 py-1.5 text-xs transition-colors cursor-pointer",
                   "hover:bg-muted/60",
                   resolvedActiveSectionId === section.id
                     ? "bg-muted text-foreground font-medium"
@@ -77,6 +76,14 @@ export function SectionsToolbarPanel() {
                   setActiveSectionId(section.id)
                   setIsSectionPopoverOpen(false)
                   setActiveQuickActionId(null)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    setActiveSectionId(section.id)
+                    setIsSectionPopoverOpen(false)
+                    setActiveQuickActionId(null)
+                  }
                 }}
               >
                 <button
@@ -91,7 +98,7 @@ export function SectionsToolbarPanel() {
                   {section.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 </button>
                 <span className="truncate">{section.name}</span>
-              </button>
+              </div>
             ))}
           </div>
         </PopoverContent>

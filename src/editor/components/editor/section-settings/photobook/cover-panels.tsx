@@ -5,7 +5,7 @@ import { ImagePicker } from "@/editor/components/editor/section-settings/ui/imag
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
 export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
@@ -77,9 +77,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
     cover: state.photobookSectionContent.cover,
     updatePhotobookSection: state.updatePhotobookSection,
   }))
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   return (
     <div className="space-y-3">

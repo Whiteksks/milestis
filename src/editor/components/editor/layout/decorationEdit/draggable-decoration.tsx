@@ -75,7 +75,9 @@ export const DraggableDecoration = memo(function DraggableDecoration({
       initial={animationVariants.initial}
       animate={isSelected ? { opacity } : { ...animationVariants.animate, opacity }}
       transition={{ duration: 0.8, delay: animationDelay }}
-      layoutScroll
+      // layoutScroll attaches a scroll listener per element to adjust layout animations.
+      // Only needed when the decoration is selected and being dragged.
+      {...(isSelected ? { layoutScroll: true } : {})}
       className={cn("absolute pointer-events-none")}
       style={{
         top: position?.top || "auto",

@@ -33,21 +33,24 @@ const TemplateVertical = dynamic(() => import('@/editor/components/templates/pho
 // Canvas wrappers
 import { PortfolioTemplateShell } from '@/editor/components/editor/layout/portfolio-template-shell'
 
-// Section settings panels (Sidebar + SettingsContent)
-import { HeaderSettings } from '@/editor/components/editor/section-settings/portfolio/header-settings'
-import { HeroSettings } from '@/editor/components/editor/section-settings/portfolio/hero-settings'
-import { BioSettings } from '@/editor/components/editor/section-settings/portfolio/bio-settings'
-import { FeaturedWorkSettings } from '@/editor/components/editor/section-settings/portfolio/featured-work-settings'
-import { VideoSettings } from '@/editor/components/editor/section-settings/portfolio/video-settings'
-import { ContactSettings } from '@/editor/components/editor/section-settings/portfolio/contact-settings'
-import { FooterSettings } from '@/editor/components/editor/section-settings/portfolio/footer-settings'
+// Section settings panels — lazy loaded so they stay out of the initial editor bundle.
+// They are only needed when a user opens/switches a section in the sidebar.
+const LoadingSettings = () => null
 
-import PhotobookCoverSettings from '@/editor/components/editor/section-settings/photobook/cover-settings'
-import PhotobookIntroductionSettings from '@/editor/components/editor/section-settings/photobook/introduction-settings'
-import PhotobookStorySettings from '@/editor/components/editor/section-settings/photobook/story-settings'
-import PhotobookGallerySettings from '@/editor/components/editor/section-settings/photobook/gallery-settings'
-import PhotobookHighlightSettings from '@/editor/components/editor/section-settings/photobook/highlight-settings'
-import PhotobookEndingSettings from '@/editor/components/editor/section-settings/photobook/ending-settings'
+const HeaderSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/header-settings').then(m => m.HeaderSettings), { loading: LoadingSettings })
+const HeroSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/hero-settings').then(m => m.HeroSettings), { loading: LoadingSettings })
+const BioSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/bio-settings').then(m => m.BioSettings), { loading: LoadingSettings })
+const FeaturedWorkSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/featured-work-settings').then(m => m.FeaturedWorkSettings), { loading: LoadingSettings })
+const VideoSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/video-settings').then(m => m.VideoSettings), { loading: LoadingSettings })
+const ContactSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/contact-settings').then(m => m.ContactSettings), { loading: LoadingSettings })
+const FooterSettings = dynamic(() => import('@/editor/components/editor/section-settings/portfolio/footer-settings').then(m => m.FooterSettings), { loading: LoadingSettings })
+
+const PhotobookCoverSettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/cover-settings'), { loading: LoadingSettings })
+const PhotobookIntroductionSettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/introduction-settings'), { loading: LoadingSettings })
+const PhotobookStorySettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/story-settings'), { loading: LoadingSettings })
+const PhotobookGallerySettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/gallery-settings'), { loading: LoadingSettings })
+const PhotobookHighlightSettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/highlight-settings'), { loading: LoadingSettings })
+const PhotobookEndingSettings = dynamic(() => import('@/editor/components/editor/section-settings/photobook/ending-settings'), { loading: LoadingSettings })
 
 type TemplateDef = {
   id: TemplateId
@@ -57,36 +60,39 @@ type TemplateDef = {
   tags?: string[]
 }
 
-type SectionDef = {
+type SectionDef<K extends string = string> = {
   id: string
   name: string
-  toggleKey: string
+  toggleKey: K
 }
 
-type ModeRegistryEntry = {
+/** All data needed to render the canvas — add new mode fields here. */
+type CanvasRenderArgs = {
+  templateId: TemplateId
+  theme: ThemeConfig
+  frameStyle: FrameStyle
+  photobookSectionContent: PhotobookSectionContent
+  photobookSectionVisibility: PhotobookSectionVisibility
+}
+
+type ModeRegistryEntry<TVisibilityKey extends string> = {
   label: string
   templates: TemplateDef[]
-  sections: SectionDef[]
+  sections: SectionDef<TVisibilityKey>[]
   defaultActiveSectionId: string
 
   getSettingsComponent: (sectionId: string) => React.ComponentType | null
 
-  renderCanvas: (args: {
-    templateId: TemplateId
-    theme: ThemeConfig
-    frameStyle: FrameStyle
-    photobookSectionContent: PhotobookSectionContent
-    photobookSectionVisibility: PhotobookSectionVisibility
-  }) => React.ReactNode
+  renderCanvas: (args: CanvasRenderArgs) => React.ReactNode
 
   getSectionVisible: (args: {
-    section: SectionDef
+    section: SectionDef<TVisibilityKey>
     portfolioVisibility: SectionVisibility
     photobookVisibility: PhotobookSectionVisibility
   }) => boolean
 
   toggleSection: (args: {
-    toggleKey: string
+    toggleKey: TVisibilityKey
     portfolioVisibility: SectionVisibility
     photobookVisibility: PhotobookSectionVisibility
     togglePortfolio: (section: keyof SectionVisibility) => void
@@ -116,7 +122,10 @@ const photobookTemplateComponents: Partial<
   'photobook-vertical': TemplateVertical,
 }
 
-export const MODE_REGISTRY: Record<EditorMode, ModeRegistryEntry> = {
+export const MODE_REGISTRY: {
+  portfolio: ModeRegistryEntry<keyof SectionVisibility>
+  photobook: ModeRegistryEntry<keyof PhotobookSectionVisibility>
+} = {
   portfolio: {
     label: 'Portfolio',
     templates: [
@@ -164,10 +173,10 @@ export const MODE_REGISTRY: Record<EditorMode, ModeRegistryEntry> = {
       return <PortfolioTemplateShell Design={Design} />
     },
     getSectionVisible: ({ section, portfolioVisibility }) => {
-      return Boolean((portfolioVisibility as unknown as Record<string, boolean>)[section.toggleKey])
+      return Boolean(portfolioVisibility[section.toggleKey])
     },
     toggleSection: ({ toggleKey, togglePortfolio }) => {
-      togglePortfolio(toggleKey as keyof SectionVisibility)
+      togglePortfolio(toggleKey)
     },
   },
 
@@ -226,10 +235,10 @@ export const MODE_REGISTRY: Record<EditorMode, ModeRegistryEntry> = {
       )
     },
     getSectionVisible: ({ section, photobookVisibility }) => {
-      return Boolean((photobookVisibility as unknown as Record<string, boolean>)[section.toggleKey])
+      return Boolean(photobookVisibility[section.toggleKey])
     },
     toggleSection: ({ toggleKey, togglePhotobook }) => {
-      togglePhotobook(toggleKey as keyof PhotobookSectionVisibility)
+      togglePhotobook(toggleKey)
     },
   },
 }

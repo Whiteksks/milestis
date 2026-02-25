@@ -1,6 +1,6 @@
 "use client"
 
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -45,9 +45,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
     gallery: state.photobookSectionContent.gallery,
     updatePhotobookSection: state.updatePhotobookSection,
   }))
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   const removeImage = (indexToRemove: number) => {
     const current = gallery.images || []

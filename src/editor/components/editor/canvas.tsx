@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo, useLayoutEffect, useState } from 'react'
+import { useRef, useMemo, useLayoutEffect, useState, memo } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
@@ -14,6 +14,15 @@ import { FloatingToolbar } from '@/editor/components/editor/layout/FloatingActio
 import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/decorations-floating-toolbar'
 import { SectionsToolbarPanel } from '@/editor/components/editor/layout/FloatingActions/sections-floating-menu'
 import { ThemeFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/theme-floating-toolbar'
+
+// Stable panel components — defined outside Canvas so they are never recreated on re-render.
+// SectionsToolbarPanel and ThemeFloatingToolbar have no props that change per Canvas render.
+const StableSectionsPanel = memo(function StableSectionsPanel() {
+  return <SectionsToolbarPanel />
+})
+const StableThemePanel = memo(function StableThemePanel() {
+  return <ThemeFloatingToolbar />
+})
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
   mobile: 'max-w-sm w-full',
@@ -48,8 +57,13 @@ export function Canvas({
     frameStyle: state.frameStyle,
   }))
 
-  const theme = getTheme(currentTheme)
-  const themeDecorations = previewDecorations ?? getDecorations(currentTheme)
+  // Memoize so the theme object reference is stable — prevents templateNode from
+  // re-rendering when unrelated state (e.g. deviceView) changes.
+  const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
+  const themeDecorations = useMemo(
+    () => previewDecorations ?? getDecorations(currentTheme),
+    [previewDecorations, currentTheme],
+  )
   const { photobookSectionContent, photobookSectionVisibility } = useContentSelector(state => ({
     photobookSectionContent: state.photobookSectionContent,
     photobookSectionVisibility: state.photobookSectionVisibility,
@@ -72,7 +86,7 @@ export function Canvas({
     ...customDecorations
   ], [themeDecorations, customDecorations])
 
-  const decorationAnimation = themeCustomizations.decorationAnimation || themeDecorations?.animation || 'fade'
+  const decorationAnimation = themeCustomizations.decorationAnimation ?? themeDecorations?.animation ?? 'fade'
 
   const { resolvedBackground, contentBackgroundClass, viewportBackgroundClass } = useCanvasBackground(
     themeDecorations,
@@ -80,6 +94,8 @@ export function Canvas({
     theme.background
   )
 
+  // Only the decorations panel depends on runtime data; sections and theme panels
+  // are now stable memo components, so this object only updates when decorations change.
   const floatingToolbarPanels = useMemo(
     () => ({
       decorations: (
@@ -88,8 +104,8 @@ export function Canvas({
           scrollContainerRef={scrollContainerRef}
         />
       ),
-      sections: <SectionsToolbarPanel />,
-      theme: <ThemeFloatingToolbar />,
+      sections: <StableSectionsPanel />,
+      theme: <StableThemePanel />,
     }),
     [allDecorations, scrollContainerRef]
   )
@@ -121,7 +137,9 @@ export function Canvas({
       <div
         ref={viewportRef}
         className={cn(
-          '@container mx-auto h-full relative overflow-hidden transition-all duration-300 transform-[translateZ(0)] ',
+          // transition-all would animate every CSS property; restrict to max-width only.
+          // will-change-transform promotes to compositor layer for smooth device-view switching.
+          '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
           DEVICE_CLASSES[deviceView],
           viewportBackgroundClass
         )}
@@ -143,7 +161,9 @@ export function Canvas({
             <div
               data-canvas-content-root="true"
               className={cn(
-                'shadow-2xl overflow-hidden relative ',
+                // shadow-2xl removed: box-shadow on the full-page scroll container forces
+                // a repaint on every scroll frame. Use a ring or border if an outline is needed.
+                'overflow-hidden relative',
                 contentBackgroundClass,
                 theme.foreground,
                 theme.fontBody,

@@ -1,26 +1,22 @@
 'use client'
 
-import { useContentSelector, useUiSelector } from '@/editor/lib/store'
+import { useContentSelector, useUiSelector, useUiStore, useContentStore } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { useCallback, useEffect, useMemo } from 'react'
 
 export function useModeSections() {
-  const { editorMode, activeSectionId, setActiveSectionId } = useUiSelector((state) => ({
+  const { editorMode, activeSectionId } = useUiSelector((state) => ({
     editorMode: state.editorMode,
     activeSectionId: state.activeSectionId,
-    setActiveSectionId: state.setActiveSectionId,
   }))
-  const {
-    sectionVisibility,
-    toggleSection: togglePortfolio,
-    photobookSectionVisibility,
-    togglePhotobookSection: togglePhotobook,
-  } = useContentSelector((state) => ({
+  const setActiveSectionId = useUiStore((s) => s.setActiveSectionId)
+
+  const { sectionVisibility, photobookSectionVisibility } = useContentSelector((state) => ({
     sectionVisibility: state.sectionVisibility,
-    toggleSection: state.toggleSection,
     photobookSectionVisibility: state.photobookSectionVisibility,
-    togglePhotobookSection: state.togglePhotobookSection,
   }))
+  const togglePortfolio = useContentStore((s) => s.toggleSection)
+  const togglePhotobook = useContentStore((s) => s.togglePhotobookSection)
 
   const modeEntry = useMemo(() => MODE_REGISTRY[editorMode], [editorMode])
 
