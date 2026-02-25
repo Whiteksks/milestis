@@ -3,12 +3,21 @@
 import { useMemo, useState } from 'react'
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { themes } from '@/editor/lib/themes'
 import { decorationPresets, getDecorationById, themeToPreset } from '@/editor/lib/decorations'
 import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
 import type { TemplateId, Theme } from '@/editor/lib/types'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/lib/utils'
+import { LayoutTemplate, Palette, Sparkles } from 'lucide-react'
 
 import type { DesignCatalogSection } from './types'
 import { DesignCatalogSidebar } from './design-catalog-sidebar'
@@ -188,6 +197,132 @@ export function DesignCatalogModal() {
     templates,
   ])
 
+  const isMobile = useIsMobile()
+
+  // Shared section content — same JSX for both mobile and desktop
+  const sectionContent = (
+    <>
+      {designModalSection === 'templates' && (
+        <TemplatesSection
+          items={visibleItems as any}
+          selectedId={effectiveSelectedTemplatesId}
+          onSelect={setSelectedTemplatesId}
+          sectionCount={templateSectionCount}
+        />
+      )}
+      {designModalSection === 'themes' && (
+        <ThemesSection
+          items={visibleItems as any}
+          selectedId={effectiveSelectedThemeId}
+          onSelect={setSelectedThemeId}
+        />
+      )}
+      {designModalSection === 'decorations' && (
+        <DecorationsSection
+          items={visibleItems as any}
+          selectedId={effectiveSelectedDecorationPresetId}
+          onSelect={setSelectedDecorationPresetId}
+          currentTheme={currentTheme}
+        />
+      )}
+    </>
+  )
+
+  // ── MOBILE: Drawer ──────────────────────────────────────────────
+  if (isMobile) {
+    const mobileSections = [
+      { id: 'templates' as const, icon: LayoutTemplate, label: 'Templates' },
+      { id: 'themes' as const, icon: Palette, label: 'Themes' },
+      { id: 'decorations' as const, icon: Sparkles, label: 'Decor' },
+    ]
+
+    return (
+      <Drawer
+        open={isDesignModalOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            ;(document.activeElement as HTMLElement | null)?.blur()
+          } else {
+            handleClose()
+          }
+        }}
+      >
+        <DrawerContent className="md:hidden flex flex-col bg-card border-border/60 focus:outline-none">
+          <DrawerTitle className="sr-only">Design Catalog</DrawerTitle>
+          <DrawerDescription className="sr-only">Choose a template, theme, and decorations.</DrawerDescription>
+
+          {/* Section switcher — horizontal tabs */}
+          <div className="shrink-0 px-4 pt-1 pb-0">
+            <div className="flex gap-1">
+              {mobileSections.map(({ id, icon: Icon, label }) => (
+                <button
+                  key={id}
+                  onClick={() => onSectionChange(id)}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    designModalSection === id
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tag filter chips — horizontal scroll, no reflow */}
+          {tagMeta.availableTags.length > 0 && (
+            <div className="shrink-0 px-4 pt-3 pb-1">
+              <div className="flex gap-1.5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                <button
+                  onClick={() => setActiveTag('all')}
+                  className={cn(
+                    'shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                    activeTag === 'all'
+                      ? 'bg-foreground text-background'
+                      : 'bg-muted text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  All ({itemsForSection.length})
+                </button>
+                {tagMeta.availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setActiveTag(tag)}
+                    className={cn(
+                      'shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                      activeTag === tag
+                        ? 'bg-foreground text-background'
+                        : 'bg-muted text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {tag} ({tagMeta.counts.get(tag)})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Scrollable content — overscroll-contain keeps vaul drag working */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+            {sectionContent}
+          </div>
+
+          {/* Sticky footer */}
+          <DesignCatalogFooter
+            selectedLabel={selectedLabel}
+            isApplyDisabled={isApplyDisabled}
+            onCancel={handleClose}
+            onApply={applySelected}
+          />
+        </DrawerContent>
+      </Drawer>
+    )
+  }
+
+  // ── DESKTOP: Dialog ─────────────────────────────────────────────
   return (
     <Dialog
       open={isDesignModalOpen}
@@ -237,31 +372,7 @@ export function DesignCatalogModal() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6">
-              {designModalSection === 'templates' ? (
-                <TemplatesSection
-                  items={visibleItems as any}
-                  selectedId={effectiveSelectedTemplatesId}
-                  onSelect={setSelectedTemplatesId}
-                  sectionCount={templateSectionCount}
-                />
-              ) : null}
-
-              {designModalSection === 'themes' ? (
-                <ThemesSection
-                  items={visibleItems as any}
-                  selectedId={effectiveSelectedThemeId}
-                  onSelect={setSelectedThemeId}
-                />
-              ) : null}
-
-              {designModalSection === 'decorations' ? (
-                <DecorationsSection
-                  items={visibleItems as any}
-                  selectedId={effectiveSelectedDecorationPresetId}
-                  onSelect={setSelectedDecorationPresetId}
-                  currentTheme={currentTheme}
-                />
-              ) : null}
+              {sectionContent}
             </div>
 
             <DesignCatalogFooter

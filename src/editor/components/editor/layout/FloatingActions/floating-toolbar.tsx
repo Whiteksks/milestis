@@ -52,7 +52,7 @@ export const FloatingToolbar = memo(function FloatingToolbar({
                 : mobileDocked
                   ? 8        // mobile docked: +8px closes the gap that opens when nav snaps to y:0
                   : -8,      // floating: lift 8px off the bottom edge
-              borderRadius: (docked || mobileDocked) ? "16px 16px 0 0" : "40px",
+              borderRadius: (docked || mobileDocked) ? "24px 24px 0 0" : "24px",
             }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{

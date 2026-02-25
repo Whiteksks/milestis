@@ -3,14 +3,12 @@ import type { Theme } from './types'
 export interface ThemeConfig {
   id: Theme
   name: string
-    tags: ['professional', 'modern'],
   description: string
   tags?: string[]
 
   // --- ОСНОВНЫЕ ЦВЕТА ---
   background: string
   foreground: string
-    tags: ['classic', 'elegant'],
   primary: string
   primaryText: string
   muted: string
@@ -20,7 +18,6 @@ export interface ThemeConfig {
   // --- ДОПОЛНИТЕЛЬНЫЕ СЕМАНТИЧЕСКИЕ ЦВЕТА ---
   secondary: string           // Дополнительный акцентный цвет
   secondaryText: string
-    tags: ['modern', 'glass'],
   accent: string              // Цвет для выделения или акцента
   accentText: string
   success: string             // Цвет для успешных действий (зеленый)
@@ -29,7 +26,6 @@ export interface ThemeConfig {
   // --- ЦВЕТА КОМПОНЕНТОВ UI ---
   card: string                // Фон карточек, часто отличается от background
   cardForeground: string
-    tags: ['minimal', 'monochrome'],
   popover: string             // Фон всплывающих окон/тултипов
   popoverForeground: string
   input: string               // Фон поля ввода (input)
@@ -38,7 +34,6 @@ export interface ThemeConfig {
   // --- СПЕЦИФИЧНЫЕ СОСТОЯНИЯ ---
   placeholder: string         // placeholder-... (Цвет плейсхолдера)
   caretColor: string          // caret-... (Цвет курсора)
-    tags: ['floral', 'elegant'],
 
   // --- ЭФФЕКТЫ ---
   cardStyle: string           // Полный стиль карточки: bg-color/opac, backdrop-blur, border

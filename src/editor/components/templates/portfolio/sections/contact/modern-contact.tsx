@@ -93,7 +93,6 @@ export function ModernContact({ theme, sectionContent }: ModernContactProps) {
                     theme.border,
                     theme.placeholder,
                     theme.caretColor,
-                    theme.ringFocus
                   )}
                   placeholder="Your name"
                 />
@@ -113,7 +112,6 @@ export function ModernContact({ theme, sectionContent }: ModernContactProps) {
                     theme.border,
                     theme.placeholder,
                     theme.caretColor,
-                    theme.ringFocus
                   )}
                   placeholder={sectionContent.contact.email}
                 />
@@ -133,7 +131,6 @@ export function ModernContact({ theme, sectionContent }: ModernContactProps) {
                     theme.border,
                     theme.placeholder,
                     theme.caretColor,
-                    theme.ringFocus
                   )}
                   placeholder="Your message..."
                 />
@@ -147,7 +144,6 @@ export function ModernContact({ theme, sectionContent }: ModernContactProps) {
                   "w-full py-4 font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group",
                   theme.primary,
                   theme.primaryText,
-                  theme.primaryHover,
                   theme.shadow
                 )}
               >

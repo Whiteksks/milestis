@@ -14,6 +14,7 @@ interface MobileDrawerProps {
   onClose: () => void
   title: string
   children: React.ReactNode
+  minHeight?: string
   contentClassName?: string
 }
 
@@ -22,6 +23,7 @@ export function MobileDrawer({
   onClose,
   title,
   children,
+  minHeight,
   contentClassName,
 }: MobileDrawerProps) {
   return (
@@ -37,7 +39,8 @@ export function MobileDrawer({
         </DrawerHeader>
         <div 
           className={cn(
-            "flex-1 overflow-y-auto overscroll-contain px-4 min-h-120",
+            "flex-1 overflow-y-auto overscroll-contain px-4 min-h-160",
+            minHeight,
             contentClassName
           )}
         >
