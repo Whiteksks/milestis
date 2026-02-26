@@ -57,7 +57,7 @@ export const FloatingToolbar = memo(function FloatingToolbar({
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{
               opacity: { duration: 0.15, ease: "easeOut" },
-              scale: { duration: 0.15, ease: "easeOut" },
+                scale: { duration: 0.15, ease: "easeOut" },
               y: { type: "spring", stiffness: 350, damping: 35 },
               borderRadius: { type: "spring", stiffness: 350, damping: 35 },
             }}

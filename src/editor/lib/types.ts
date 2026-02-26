@@ -46,22 +46,14 @@ export const ASPECT_RATIOS = {
 
 export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
 
-export const TEMPLATE_IDS = {
-  classic: 'classic',
-  minimal: 'minimal',
-  elegant: 'elegant',
-  modern: 'modern',
-  photobookClassic: 'photobook-classic',
-  photobookCircle: 'photobook-circle',
-  photobookMagazine: 'photobook-magazine',
-  photobookPolaroid: 'photobook-polaroid',
-  photobookSplit: 'photobook-split',
-  photobookVertical: 'photobook-vertical',
-  weddingTimeline: 'wedding-timeline',
-  masonry: 'masonry',
-} as const
-
-export type TemplateId = (typeof TEMPLATE_IDS)[keyof typeof TEMPLATE_IDS]
+/** TemplateId is derived automatically from each mode's ID list.
+ *  To add a new template — edit modes/portfolio-ids.ts or modes/photobook-ids.ts.
+ *  Never edit this line directly. */
+export type { PortfolioTemplateId } from './modes/portfolio-ids'
+export type { PhotobookTemplateId }  from './modes/photobook-ids'
+import type { PortfolioTemplateId } from './modes/portfolio-ids'
+import type { PhotobookTemplateId }  from './modes/photobook-ids'
+export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
 
 export type BackgroundImageType = 'fixed' | 'scroll' | 'parallax' | 'pattern'
 export type DecorationAnimation = 'none' | 'fade' | 'slide-up' | 'slide-down'

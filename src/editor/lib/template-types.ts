@@ -1,23 +1,25 @@
 import type { ThemeConfig } from '@/editor/lib/themes'
-import type { 
-  FrameStyle, 
-  SectionContent, 
+import type {
+  FrameStyle,
+  SectionContent,
   SectionVisibility,
   PhotobookSectionContent,
-  PhotobookSectionVisibility
+  PhotobookSectionVisibility,
 } from '@/editor/lib/types'
 
-export interface PortfolioTemplateProps {
+/** Shared base — fields present in every template regardless of mode. */
+export interface BaseTemplateProps {
   theme: ThemeConfig
+  frameStyle: FrameStyle
+}
+
+export interface PortfolioTemplateProps extends BaseTemplateProps {
   sectionVisibility: SectionVisibility
   sectionContent: SectionContent
-  frameStyle: FrameStyle
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
 }
 
-export interface PhotobookTemplateProps {
-  theme: ThemeConfig
+export interface PhotobookTemplateProps extends BaseTemplateProps {
   sectionVisibility: PhotobookSectionVisibility
   sectionContent: PhotobookSectionContent
-  frameStyle: FrameStyle
 }

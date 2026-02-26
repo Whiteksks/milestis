@@ -64,22 +64,19 @@ export function Canvas({
     () => previewDecorations ?? getDecorations(currentTheme),
     [previewDecorations, currentTheme],
   )
-  const { photobookSectionContent, photobookSectionVisibility } = useContentSelector(state => ({
-    photobookSectionContent: state.photobookSectionContent,
-    photobookSectionVisibility: state.photobookSectionVisibility,
-  }))
+  // Each mode's canvasDataSelector subscribes only to its own content slices.
+  // Adding a new mode never causes canvas to re-render on unrelated store changes.
+  const modeEntry = MODE_REGISTRY[editorMode]
+  const modeCanvasData = useContentSelector(modeEntry.canvasDataSelector)
 
   const templateNode = useMemo(() => {
-    const modeEntry = MODE_REGISTRY[editorMode]
-
     return modeEntry.renderCanvas({
       templateId: currentTemplateId,
       theme,
       frameStyle,
-      photobookSectionContent,
-      photobookSectionVisibility,
+      ...modeCanvasData,
     })
-  }, [editorMode, currentTemplateId, theme, frameStyle, photobookSectionContent, photobookSectionVisibility])
+  }, [modeEntry, currentTemplateId, theme, frameStyle, modeCanvasData])
 
   const allDecorations = useMemo(() => [
     ...(themeDecorations?.elements || []),
