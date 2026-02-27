@@ -4,30 +4,8 @@ import { useThemeSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
-
-const DEPTH_OPTIONS: { id: DepthEffect; label: string }[] = [
-  { id: 'none', label: 'None' },
-  { id: 'radial-glow', label: 'Glow' },
-  { id: 'vignette', label: 'Vignette' },
-  { id: 'ambient-blobs', label: 'Blobs' },
-  { id: 'asymmetric-light', label: 'Asymmetric' },
-]
-
-const RAYS_OPTIONS: { id: RayEffect; label: string }[] = [
-  { id: 'none', label: 'None' },
-  { id: 'diagonal-rays', label: 'Diagonal' },
-  { id: 'conic-rays', label: 'Conic' },
-  { id: 'soft-streaks', label: 'Streaks' },
-]
-
-const TEXTURE_OPTIONS: { id: TextureEffect; label: string }[] = [
-  { id: 'none', label: 'None' },
-  { id: 'grain', label: 'Grain' },
-  { id: 'dots', label: 'Dots' },
-  { id: 'lines', label: 'Lines' },
-  { id: 'grid', label: 'Grid' },
-]
+import type { BackgroundLayersTheme, BackgroundScrollMode, DecorativeEffect } from '@/editor/lib/types'
+import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS, DECORATIVE_EFFECTS } from '../background-layers/registry'
 
 function OptionRow<T extends string>({
   label,
@@ -82,6 +60,7 @@ export function ThemeSettingsPanel() {
   const depth = themeCustomizations.depthEffect ?? 'none'
   const rays = themeCustomizations.raysEffect ?? 'none'
   const texture = themeCustomizations.textureEffect ?? 'none'
+  const decorative = themeCustomizations.decorativeEffect ?? 'none'
   const layersTheme = themeCustomizations.backgroundLayersTheme ?? 'dark'
   const scrollMode = themeCustomizations.backgroundScrollMode ?? 'fixed'
 
@@ -90,6 +69,7 @@ export function ThemeSettingsPanel() {
       depthEffect: 'none',
       raysEffect: 'none',
       textureEffect: 'none',
+      decorativeEffect: 'none',
       backgroundLayersTheme: 'dark',
       backgroundScrollMode: 'fixed',
     })
@@ -185,7 +165,7 @@ export function ThemeSettingsPanel() {
           <OptionRow
             label="Depth"
             hint="gradient & glow"
-            options={DEPTH_OPTIONS}
+            options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
             active={depth}
             onChange={(v) => updateThemeCustomization({ depthEffect: v })}
           />
@@ -201,7 +181,7 @@ export function ThemeSettingsPanel() {
           <OptionRow
             label="Rays"
             hint="light streaks"
-            options={RAYS_OPTIONS}
+            options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
             active={rays}
             onChange={(v) => updateThemeCustomization({ raysEffect: v })}
           />
@@ -217,9 +197,25 @@ export function ThemeSettingsPanel() {
           <OptionRow
             label="Texture"
             hint="overlay pattern"
-            options={TEXTURE_OPTIONS}
+            options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
             active={texture}
             onChange={(v) => updateThemeCustomization({ textureEffect: v })}
+          />
+        </div>
+
+        <div className="h-px bg-border/30" />
+
+        {/* Layer 4: Decorative */}
+        <div className="flex items-start gap-3">
+          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center shrink-0 mt-0.5">
+            <span className="text-[9px] font-bold text-muted-foreground">4</span>
+          </div>
+          <OptionRow
+            label="Decorative"
+            hint="shapes & lines"
+            options={[{ id: 'none' as DecorativeEffect, label: 'None' }, ...DECORATIVE_EFFECTS]}
+            active={decorative}
+            onChange={(v) => updateThemeCustomization({ decorativeEffect: v })}
           />
         </div>
 
