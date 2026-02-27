@@ -15,7 +15,7 @@ export function MinimalFooter({ theme, sectionContent }: MinimalFooterProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6 }}
-      className={cn('@container border-t border-current/10', theme.background, theme.foreground)}
+      className={cn('@container border-t border-current/10', theme.foreground)}
     >
       <div className="@lg:px-20 @md:px-12 px-6 py-8 flex flex-col @md:flex-row items-center justify-between gap-4 text-xs opacity-50">
         <p className={cn('tracking-[0.16em]', theme.letterSpacing, theme.fontBody)}>

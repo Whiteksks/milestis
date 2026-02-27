@@ -16,7 +16,7 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
       whileInView={{ opacity: 0.8 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className={cn('@container border-t', theme.border, theme.background, theme.foreground)}
+      className={cn('@container border-t', theme.border, theme.foreground)}
     >
       <div className="@lg:px-16 @md:px-10 px-6 @lg:py-16 @md:py-12 py-10">
         <div className="max-w-7xl mx-auto flex @md:flex-row flex-col @md:justify-between @md:items-center gap-6 text-center @md:text-left">

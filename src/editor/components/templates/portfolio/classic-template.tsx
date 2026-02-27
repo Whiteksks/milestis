@@ -28,14 +28,14 @@ export function ClassicTemplateDesign({
         <ClassicHero theme={theme} sectionContent={sectionContent} />
       )}
 
+      {sectionVisibility.showBio && (
+        <BioParallaxFramer theme={theme} sectionContent={sectionContent} />
+      )}
 
       {sectionVisibility.showFeaturedWork && (
         <ClassicFeaturedWork theme={theme} sectionContent={sectionContent} />
       )}
 
-      {sectionVisibility.showBio && (
-        <BioParallaxFramer theme={theme} sectionContent={sectionContent} />
-      )}
 
       {sectionVisibility.showVideo && (
         <ClassicVideo theme={theme} sectionContent={sectionContent} />

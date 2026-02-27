@@ -15,7 +15,7 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 1, ease: 'easeOut' }}
-      className={cn('@container', theme.background, theme.foreground)}
+      className={cn('@container', theme.foreground)}
     >
       <div className="@lg:px-16 @md:px-10 px-6 @lg:py-48 @md:py-36 py-24">
         <div className="max-w-5xl mx-auto text-center space-y-12">

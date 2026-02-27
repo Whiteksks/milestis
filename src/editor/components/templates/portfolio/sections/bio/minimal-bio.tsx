@@ -20,7 +20,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.8, delay: 0.1 }}
-      className={cn('@container', theme.muted, theme.foreground)}
+      className={cn('@container', theme.foreground)}
     >
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
         <div className="max-w-6xl mx-auto grid @lg:grid-cols-[1fr,2fr] @md:grid-cols-1 gap-16 items-start">

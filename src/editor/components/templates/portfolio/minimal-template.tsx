@@ -17,7 +17,7 @@ export function MinimalTemplateDesign({
   handleAnchorClick,
 }: PortfolioTemplateProps) {
   return (
-    <div className={cn('min-h-screen', theme.background, theme.foreground, theme.fontBody)}>
+    <>
       {sectionVisibility.showHeader && (
         <HeaderMinimal
           theme={theme}
@@ -49,6 +49,6 @@ export function MinimalTemplateDesign({
       {sectionVisibility.showFooter && (
         <MinimalFooter theme={theme} sectionContent={sectionContent} />
       )}
-    </div>
+    </>
   )
 }

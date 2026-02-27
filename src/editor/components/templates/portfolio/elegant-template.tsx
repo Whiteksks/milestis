@@ -15,7 +15,7 @@ export function ElegantTemplateDesign({
   handleAnchorClick,
 }: PortfolioTemplateProps) {
   return (
-    <div className={cn(theme.background, theme.foreground)}>
+    <>
       {sectionVisibility.showHeader && (
         <ElegantHeader
           theme={theme}
@@ -50,7 +50,7 @@ export function ElegantTemplateDesign({
       {sectionVisibility.showFooter && (
         <ElegantFooter theme={theme} sectionContent={sectionContent} />
       )}
-    </div>
+    </>
   )
 }
 

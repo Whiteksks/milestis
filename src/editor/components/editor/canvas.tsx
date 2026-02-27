@@ -7,8 +7,7 @@ import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-layer'
-import { useCanvasBackground } from '@/editor/hooks/use-canvas-background'
-import { BackgroundLayer } from './layout/background-layer'
+import { BackgroundLayers } from './layout/background-layers'
 import type { DeviceView } from '@/editor/lib/types'
 import { FloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/floating-toolbar'
 import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/decorations-floating-toolbar'
@@ -84,12 +83,7 @@ export function Canvas({
   ], [themeDecorations, customDecorations])
 
   const decorationAnimation = themeCustomizations.decorationAnimation ?? themeDecorations?.animation ?? 'fade'
-
-  const { resolvedBackground, contentBackgroundClass, viewportBackgroundClass } = useCanvasBackground(
-    themeDecorations,
-    themeCustomizations,
-    theme.background
-  )
+  const isFixedBg = (themeCustomizations.backgroundScrollMode ?? 'fixed') === 'fixed'
 
   // Only the decorations panel depends on runtime data; sections and theme panels
   // are now stable memo components, so this object only updates when decorations change.
@@ -138,7 +132,7 @@ export function Canvas({
           // will-change-transform promotes to compositor layer for smooth device-view switching.
           '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
           DEVICE_CLASSES[deviceView],
-          viewportBackgroundClass
+          isFixedBg ? theme.background : undefined,
         )}
         style={{ ['--canvas-scrollbar-width' as any]: `${scrollbarWidth}px` }}
       >
@@ -147,12 +141,7 @@ export function Canvas({
           panels={floatingToolbarPanels}
         />
 
-        <BackgroundLayer
-          config={resolvedBackground}
-          placement="viewport"
-          scrollContainerRef={scrollContainerRef}
-          viewportRef={viewportRef}
-        />
+        <BackgroundLayers placement="viewport" />
 
         <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
             <div
@@ -161,7 +150,7 @@ export function Canvas({
                 // shadow-2xl removed: box-shadow on the full-page scroll container forces
                 // a repaint on every scroll frame. Use a ring or border if an outline is needed.
                 'overflow-hidden relative',
-                contentBackgroundClass,
+                isFixedBg ? 'bg-transparent' : theme.background,
                 theme.foreground,
                 theme.fontBody,
                 theme.lineHeight,
@@ -169,13 +158,7 @@ export function Canvas({
                 theme.shadow
               )}
             >
-              <BackgroundLayer
-                config={resolvedBackground}
-                placement="content"
-                scrollContainerRef={scrollContainerRef}
-                viewportRef={viewportRef}
-              />
-
+              <BackgroundLayers placement="content" />
               <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />
 
               <div className="relative z-10">

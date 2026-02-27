@@ -7,7 +7,6 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Vellum Vintage Preset',
     description: 'Soft, classic ornamentation with a paper-like feel.',
     tags: ['classic', 'elegant'],
-    backgroundImage: { url: 'https://moewalls.com/wp-content/uploads/2025/08/elaina-early-morning-wandering-witch-thumb.jpg', opacity: 0.1, type: 'fixed' },
     animation: 'fade',
     elements: []
   },
@@ -48,7 +47,6 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Royal Classic Preset',
     description: 'Elegant, high-contrast details with a premium vibe.',
     tags: ['classic', 'elegant'],
-    backgroundImage: { url: 'https://i.pinimg.com/originals/65/ee/ff/65eeff4c209bf9c7badcd8a688136363.jpg', opacity: 0.05, type: 'fixed' },
     animation: 'fade',
     elements: []
   },
@@ -73,7 +71,6 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Floral Bloom Preset',
     description: 'Light floral patterning — subtle and romantic.',
     tags: ['floral', 'elegant'],
-    backgroundImage: { url: 'https://i.redd.it/u5vjmp6isspe1.png', opacity: 0.1, type: 'scroll' },
     animation: 'fade',
     elements: []
   }

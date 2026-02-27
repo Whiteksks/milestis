@@ -1,13 +1,15 @@
 import { create } from 'zustand'
-import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, BackgroundImageType, DecorationAnimation } from './types'
+import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from './types'
 
 export interface ThemeCustomizations {
-  backgroundImageOpacity?: number
-  backgroundImageType?: BackgroundImageType
   decorationAnimation?: DecorationAnimation
   decorationCount?: number
   customFont?: string
-  customBackground?: string
+  depthEffect?: DepthEffect
+  raysEffect?: RayEffect
+  textureEffect?: TextureEffect
+  backgroundLayersTheme?: BackgroundLayersTheme
+  backgroundScrollMode?: BackgroundScrollMode
 }
 
 export interface ThemeStore {
@@ -35,10 +37,13 @@ export const useThemeStore = create<ThemeStore>((set) => ({
   currentTheme: 'vellum-vintage',
   frameStyle: 'soft',
   themeCustomizations: {
-    backgroundImageOpacity: 0.15,
-    backgroundImageType: 'fixed',
     decorationAnimation: 'fade',
     decorationCount: 3,
+    depthEffect: 'none',
+    raysEffect: 'none',
+    textureEffect: 'none',
+    backgroundLayersTheme: 'dark',
+    backgroundScrollMode: 'fixed',
   },
   customDecorations: [],
 

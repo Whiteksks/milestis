@@ -15,7 +15,7 @@ export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.8 }}
-      className={cn('@container', theme.background, theme.foreground)}
+      className={cn('@container', theme.foreground)}
     >
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-40 @md:py-32 py-24 max-w-6xl mx-auto">
         <div className="space-y-8">

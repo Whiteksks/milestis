@@ -15,7 +15,7 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.8 }}
-      className={cn('@container', theme.muted, theme.foreground)}
+      className={cn('@container', theme.foreground)}
     >
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
         <div className="max-w-5xl mx-auto space-y-12">

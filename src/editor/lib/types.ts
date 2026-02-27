@@ -55,8 +55,13 @@ import type { PortfolioTemplateId } from './modes/portfolio-ids'
 import type { PhotobookTemplateId }  from './modes/photobook-ids'
 export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
 
-export type BackgroundImageType = 'fixed' | 'scroll' | 'parallax' | 'pattern'
 export type DecorationAnimation = 'none' | 'fade' | 'slide-up' | 'slide-down'
+
+export type DepthEffect = 'none' | 'radial-glow' | 'vignette' | 'ambient-blobs' | 'asymmetric-light'
+export type RayEffect = 'none' | 'diagonal-rays' | 'conic-rays' | 'soft-streaks'
+export type TextureEffect = 'none' | 'grain' | 'dots' | 'lines' | 'grid'
+export type BackgroundLayersTheme = 'dark' | 'light'
+export type BackgroundScrollMode = 'fixed' | 'scroll'
 
 /** Derived automatically from SectionContent — adding a key there adds show<Key> here. */
 export type SectionVisibility = {
@@ -159,11 +164,6 @@ export interface DecorationsConfig {
   name?: string
   description?: string
   tags?: string[]
-  backgroundImage?: {
-    url: string
-    opacity?: number
-    type?: BackgroundImageType
-  }
   animation?: DecorationAnimation
   elements?: DecorationElement[]
 }
