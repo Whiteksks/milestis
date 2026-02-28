@@ -53,7 +53,7 @@ export function ElegantFeaturedWork({
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.8, delay: i * 0.1 }}
               >
-                <div className="grid @lg:grid-cols-[3fr,2fr] grid-cols-1 @lg:gap-16 gap-8 items-center">
+                <div className="grid @lg:grid-cols-[2fr,3fr] grid-cols-1 @lg:gap-16 gap-8 items-center">
                   <div
                     className={cn(
                       'relative overflow-hidden group',

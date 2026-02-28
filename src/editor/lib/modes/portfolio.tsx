@@ -28,8 +28,17 @@ const ModernParallaxTemplate = dynamic(
   () => import('@/editor/components/templates/portfolio/modern-template').then(m => m.ModernParallaxTemplate),
   { loading: LoadingTemplate },
 )
-const PlayfulTemplate = dynamic(
-  () => import('@/editor/components/templates/portfolio/playful-template').then(m => m.PlayfulTemplate),
+
+const EditorialTemplateDesign = dynamic(
+  () => import('@/editor/components/templates/portfolio/editorial-template').then(m => m.EditorialTemplateDesign),
+  { loading: LoadingTemplate },
+)
+const GridTemplateDesign = dynamic(
+  () => import('@/editor/components/templates/portfolio/grid-template').then(m => m.GridTemplateDesign),
+  { loading: LoadingTemplate },
+)
+const BentoTemplateDesign = dynamic(
+  () => import('@/editor/components/templates/portfolio/bento-template').then(m => m.BentoTemplateDesign),
   { loading: LoadingTemplate },
 )
 
@@ -70,7 +79,9 @@ const portfolioTemplateComponents: Partial<
   minimal: MinimalTemplateDesign,
   elegant: ElegantTemplateDesign,
   modern: ModernParallaxTemplate,
-  playful: PlayfulTemplate,
+  editorial: EditorialTemplateDesign,
+  grid: GridTemplateDesign,
+  bento: BentoTemplateDesign,
 }
 
 export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
@@ -80,7 +91,9 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
     { id: 'minimal', name: 'Minimal', tags: ['minimal'] },
     { id: 'elegant', name: 'Elegant', tags: ['elegant'] },
     { id: 'modern', name: 'Modern', tags: ['modern'] },
-    { id: 'playful', name: 'Playful', tags: ['playful'] },
+    { id: 'editorial', name: 'Editorial', tags: ['editorial', 'magazine'] },
+    { id: 'grid', name: 'Grid', tags: ['grid', 'structured'] },
+    { id: 'bento', name: 'Bento', tags: ['bento', 'modern'] },
   ],
   sections: [
     { id: 'header', name: 'Header', toggleKey: 'showHeader' },

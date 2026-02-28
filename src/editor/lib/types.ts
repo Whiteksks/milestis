@@ -60,7 +60,6 @@ export type DecorationAnimation = 'none' | 'fade' | 'slide-up' | 'slide-down'
 export type DepthEffect = 'none' | 'radial-glow' | 'vignette' | 'ambient-blobs' | 'asymmetric-light' | 'aurora' | 'horizon'
 export type RayEffect = 'none' | 'diagonal-rays' | 'conic-rays' | 'soft-streaks' | 'lens-flare' | 'caustics' | 'god-rays' | 'prism'
 export type TextureEffect = 'none' | 'grain' | 'dots' | 'lines' | 'grid' | 'halftone' | 'scanlines' | 'diamond-grid' | 'woven'
-export type DecorativeEffect = 'none' | 'floating-circles' | 'corner-frames' | 'flowing-curves' | 'constellation' | 'bokeh'
 export type BackgroundLayersTheme = 'dark' | 'light'
 export type BackgroundScrollMode = 'fixed' | 'scroll'
 
@@ -78,6 +77,9 @@ export interface SectionContent {
     title: string
     subtitle: string
     description: string
+    image?: string
+    imageAspectRatio?: AspectRatio
+    imageFrameStyle?: FrameStyle
   }
   bio: {
     title: string

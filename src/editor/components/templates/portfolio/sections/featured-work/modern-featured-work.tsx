@@ -99,7 +99,7 @@ export function ModernFeaturedWork({ theme, sectionContent }: ModernFeaturedWork
                 }}
                 className={cn(
                   // Упрощенный и более контрастный контейнер — используем цвета темы и glass effect
-                  "grid @lg:grid-cols-2 grid-cols-1 gap-12 items-center rounded-3xl px-8 py-8 @lg:px-12 @lg:py-12 shadow-2xl",
+                  "grid @lg:grid-cols-[2fr,3fr] grid-cols-1 gap-12 items-center rounded-3xl px-8 py-8 @lg:px-12 @lg:py-12 shadow-2xl",
                   "backdrop-blur-md",
                   // theme.background должен содержать базовый bg класс, используем дополнительно opacity
                   theme.background,
@@ -108,12 +108,11 @@ export function ModernFeaturedWork({ theme, sectionContent }: ModernFeaturedWork
                   theme.border,
                   // Небольшой hover-акцент
                   "transition-colors duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.28)]",
-                  !isEven && "@lg:grid-flow-dense",
                 )}
               >
                 
                 {/* Изображение */}
-                <div className={cn("relative group", !isEven && "@lg:col-start-2")}>
+                <div className={cn("relative group")}>
                   {/* Эффект свечения */}
                   <div
                     className={cn(
@@ -149,7 +148,7 @@ export function ModernFeaturedWork({ theme, sectionContent }: ModernFeaturedWork
                 </div>
                 
                 {/* Информация */}
-                <div className={cn(!isEven && "@lg:col-start-1 @lg:row-start-1")}>
+                <div>
                   <motion.div
                     // Более простая анимация текста
                     initial={{ opacity: 0, x: isEven ? 40 : -40 }}

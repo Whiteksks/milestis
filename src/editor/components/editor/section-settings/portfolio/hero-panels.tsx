@@ -1,9 +1,13 @@
 "use client"
 
-import { useContentSelector } from "@/editor/lib/store"
+import { useId } from "react"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import type { AspectRatio } from "@/editor/lib/types"
+import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
+import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 
 export function HeroTitlePanel({ dense = false }: { dense?: boolean }) {
   const { hero, updateSectionContent } = useContentSelector((state) => ({
@@ -46,6 +50,41 @@ export function HeroDescriptionPanel({ dense = false }: { dense?: boolean }) {
         value={hero.description}
         onChange={(e) => updateSectionContent("hero", { description: e.target.value })}
         placeholder="Detailed introduction..."
+      />
+    </div>
+  )
+}
+
+export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
+  const ownerId = useId()
+  const { hero, updateSectionContent } = useContentSelector((state) => ({
+    hero: state.sectionContent.hero,
+    updateSectionContent: state.updateSectionContent,
+  }))
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+
+  return (
+    <div className="space-y-3">
+      <MediaPickerModal
+        ownerId={ownerId}
+        onSelectImage={(url) => updateSectionContent("hero", { image: url })}
+      />
+      {!dense && <Label className="text-xs font-medium text-muted-foreground">Hero Image</Label>}
+      <PortfolioImagePicker
+        label=""
+        value={{
+          image: hero.image || "",
+          aspectRatio: (hero.imageAspectRatio || "landscape") as AspectRatio,
+          frameStyle: hero.imageFrameStyle,
+        }}
+        onChange={(value) =>
+          updateSectionContent("hero", {
+            image: value.image,
+            imageAspectRatio: value.aspectRatio,
+            imageFrameStyle: value.frameStyle,
+          })
+        }
+        onOpenMediaPicker={() => openMediaPicker(ownerId)}
       />
     </div>
   )

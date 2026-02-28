@@ -11,7 +11,7 @@
  */
 
 import type { LayerEffectDef } from './types'
-import type { DepthEffect, RayEffect, TextureEffect, DecorativeEffect } from '@/editor/lib/types'
+import type { DepthEffect, RayEffect, TextureEffect } from '@/editor/lib/types'
 
 // ── Depth ─────────────────────────────────────────────────────────────────
 import { radialGlow }      from './effects/depth/radial-glow'
@@ -39,13 +39,6 @@ import { halftone }    from './effects/texture/halftone'
 import { scanlines }   from './effects/texture/scanlines'
 import { diamondGrid } from './effects/texture/diamond-grid'
 import { woven }       from './effects/texture/woven'
-
-// ── Decorative ────────────────────────────────────────────────────────────
-import { floatingCircles } from './effects/decorative/floating-circles'
-import { cornerFrames }    from './effects/decorative/corner-frames'
-import { flowingCurves }   from './effects/decorative/flowing-curves'
-import { constellation }   from './effects/decorative/constellation'
-import { bokeh }           from './effects/decorative/bokeh'
 
 // ── Exports ───────────────────────────────────────────────────────────────
 
@@ -79,10 +72,4 @@ export const TEXTURE_EFFECTS: LayerEffectDef<TextureEffect>[] = [
   woven,
 ]
 
-export const DECORATIVE_EFFECTS: LayerEffectDef<DecorativeEffect>[] = [
-  floatingCircles,
-  cornerFrames,
-  flowingCurves,
-  constellation,
-  bokeh,
-]
+

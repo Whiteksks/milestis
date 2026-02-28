@@ -25,7 +25,7 @@ const StableThemePanel = memo(function StableThemePanel() {
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
   mobile: 'max-w-sm w-full',
-  tablet: 'w-full max-w-3xl',
+  tablet: 'w-full max-w-4xl',
   desktop: 'w-full max-w-7xl',
   fullscreen: 'w-screen h-[calc(100vh-4rem)] max-w-none fixed left-0 top-16 z-50 bg-white',
 }
@@ -83,7 +83,6 @@ export function Canvas({
   ], [themeDecorations, customDecorations])
 
   const decorationAnimation = themeCustomizations.decorationAnimation ?? themeDecorations?.animation ?? 'fade'
-  const isFixedBg = (themeCustomizations.backgroundScrollMode ?? 'fixed') === 'fixed'
 
   // Only the decorations panel depends on runtime data; sections and theme panels
   // are now stable memo components, so this object only updates when decorations change.
@@ -132,7 +131,9 @@ export function Canvas({
           // will-change-transform promotes to compositor layer for smooth device-view switching.
           '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
           DEVICE_CLASSES[deviceView],
-          isFixedBg ? theme.background : undefined,
+          // Background always lives on the viewport div so decorative layers (z-0 absolute)
+          // remain BEHIND content in both fixed and scroll modes.
+          theme.background,
         )}
         style={{ ['--canvas-scrollbar-width' as any]: `${scrollbarWidth}px` }}
       >
@@ -141,7 +142,11 @@ export function Canvas({
           panels={floatingToolbarPanels}
         />
 
-        <BackgroundLayers placement="viewport" />
+        <BackgroundLayers
+          placement="viewport"
+          scrollContainerRef={scrollContainerRef}
+          viewportRef={viewportRef}
+        />
 
         <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
             <div
@@ -150,7 +155,7 @@ export function Canvas({
                 // shadow-2xl removed: box-shadow on the full-page scroll container forces
                 // a repaint on every scroll frame. Use a ring or border if an outline is needed.
                 'overflow-hidden relative',
-                isFixedBg ? 'bg-transparent' : theme.background,
+                'bg-transparent',
                 theme.foreground,
                 theme.fontBody,
                 theme.lineHeight,
@@ -158,7 +163,6 @@ export function Canvas({
                 theme.shadow
               )}
             >
-              <BackgroundLayers placement="content" />
               <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />
 
               <div className="relative z-10">

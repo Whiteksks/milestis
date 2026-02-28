@@ -1,21 +1,38 @@
 'use client'
 
+import { useRef } from 'react'
 import { useThemeSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
-import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS, DECORATIVE_EFFECTS } from './registry'
+import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from './registry'
+import { useParallaxLayer } from '@/editor/hooks/use-parallax-layer'
 
-/** placement="viewport" → renders only when backgroundScrollMode is "fixed"
- *  placement="content"  → renders only when backgroundScrollMode is "scroll" */
-export function BackgroundLayers({ placement }: { placement: 'viewport' | 'content' }) {
-  const { depth, rays, texture, decorative, isDark, scrollMode, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color } = useThemeSelector((state) => {
+/**
+ * Renders all background visual effects (depth, rays, texture, decorative) always in
+ * the viewport div — so they fill exactly the visible area and are never stretched across
+ * tall page content.
+ *
+ * placement="viewport" → renders effects; in scroll mode applies parallax translate
+ * placement="content"  → no-op (returns null); kept for API compatibility
+ */
+export function BackgroundLayers({
+  placement,
+  scrollContainerRef,
+  viewportRef,
+}: {
+  placement: 'viewport' | 'content'
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>
+  viewportRef?: React.RefObject<HTMLDivElement | null>
+}) {
+  const layerRef = useRef<HTMLDivElement>(null)
+
+  const { depth, rays, texture, isDark, scrollMode, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color } = useThemeSelector((state) => {
     const c = state.themeCustomizations
     const themeConfig = getTheme(state.currentTheme)
     const ec = themeConfig.bgEffectColors
     return {
-      depth:      c.depthEffect      ?? 'none',
-      rays:       c.raysEffect       ?? 'none',
-      texture:    c.textureEffect    ?? 'none',
-      decorative: c.decorativeEffect ?? 'none',
+      depth:   c.depthEffect   ?? 'none',
+      rays:    c.raysEffect    ?? 'none',
+      texture: c.textureEffect ?? 'none',
       isDark:     (c.backgroundLayersTheme ?? 'dark') === 'dark',
       scrollMode: c.backgroundScrollMode ?? 'fixed',
       primaryColor:   ec.primary,
@@ -28,37 +45,42 @@ export function BackgroundLayers({ placement }: { placement: 'viewport' | 'conte
     }
   })
 
-  // Depth/rays/texture follow scrollMode; decoratives ALWAYS rendered in viewport
-  // so they're never stretched by tall scroll-content dimensions
-  const expectedPlacement = scrollMode === 'fixed' ? 'viewport' : 'content'
-  const isViewport = placement === 'viewport'
+  // In scroll mode, translate the layer upward as the user scrolls, creating a parallax
+  // effect that makes the background visibly move relative to the content.
+  // scale: 1.15 oversizes the layer by 15 % so translate never reveals empty edges.
+  // strength: 0.55 uses slightly more than half of the available travel for a gentle feel.
+  useParallaxLayer({
+    enabled: placement === 'viewport' && scrollMode === 'scroll' && !!scrollContainerRef,
+    scrollContainerRef: (scrollContainerRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
+    viewportRef: (viewportRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
+    layerRef,
+    strength: 0.55,
+    scale: 1.15,
+  })
 
-  const shouldRenderLayers = placement === expectedPlacement
-  const shouldRenderDecorative = isViewport && decorative !== 'none'
-
-  if (!shouldRenderLayers && !shouldRenderDecorative) return null
+  // All effects live in viewport placement only — content placement is a no-op.
+  if (placement === 'content') return null
 
   const noLayers = depth === 'none' && rays === 'none' && texture === 'none'
-  if (!shouldRenderDecorative && noLayers) return null
+  if (noLayers) return null
 
-  const activeDepth      = shouldRenderLayers ? DEPTH_EFFECTS.find((e) => e.id === depth) : undefined
-  const activeRays       = shouldRenderLayers ? RAYS_EFFECTS.find((e) => e.id === rays) : undefined
-  const activeTexture    = shouldRenderLayers ? TEXTURE_EFFECTS.find((e) => e.id === texture) : undefined
-  const activeDecorative = shouldRenderDecorative ? DECORATIVE_EFFECTS.find((e) => e.id === decorative) : undefined
+  const activeDepth   = DEPTH_EFFECTS.find((e) => e.id === depth)
+  const activeRays    = RAYS_EFFECTS.find((e) => e.id === rays)
+  const activeTexture = TEXTURE_EFFECTS.find((e) => e.id === texture)
 
   const colors = { isDark, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color }
 
-  // In scroll mode, the decorative viewport layer must sit above the scroll container (z-10).
-  // In fixed mode, z-0 is correct (the background IS the viewport div).
-  const decorativeOnTop = !shouldRenderLayers && shouldRenderDecorative
-  const wrapperZ = decorativeOnTop ? 'z-20' : 'z-0'
-
   return (
-    <div className={`pointer-events-none absolute inset-0 ${wrapperZ} overflow-hidden`} aria-hidden="true">
-      {activeDepth      && <activeDepth.Component      {...colors} />}
-      {activeRays       && <activeRays.Component       {...colors} />}
-      {activeTexture    && <activeTexture.Component    {...colors} />}
-      {activeDecorative && <activeDecorative.Component {...colors} />}
+    // origin-top: useParallaxLayer expects transform-origin at the top so the scale
+    // overscan appears at the bottom and the translate never exposes an empty top edge.
+    <div
+      ref={layerRef}
+      className="pointer-events-none absolute inset-0 z-0 origin-top overflow-hidden"
+      aria-hidden="true"
+    >
+      {activeDepth   && <activeDepth.Component   {...colors} />}
+      {activeRays    && <activeRays.Component    {...colors} />}
+      {activeTexture && <activeTexture.Component {...colors} />}
     </div>
   )
 }

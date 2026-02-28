@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, DecorativeEffect, BackgroundLayersTheme, BackgroundScrollMode } from './types'
+import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from './types'
 
 export interface ThemeCustomizations {
   decorationAnimation?: DecorationAnimation
@@ -8,7 +8,6 @@ export interface ThemeCustomizations {
   depthEffect?: DepthEffect
   raysEffect?: RayEffect
   textureEffect?: TextureEffect
-  decorativeEffect?: DecorativeEffect
   backgroundLayersTheme?: BackgroundLayersTheme
   backgroundScrollMode?: BackgroundScrollMode
 }
@@ -43,7 +42,6 @@ export const useThemeStore = create<ThemeStore>((set) => ({
     depthEffect: 'none',
     raysEffect: 'none',
     textureEffect: 'none',
-    decorativeEffect: 'none',
     backgroundLayersTheme: 'dark',
     backgroundScrollMode: 'fixed',
   },

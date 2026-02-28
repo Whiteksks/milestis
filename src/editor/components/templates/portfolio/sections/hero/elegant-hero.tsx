@@ -3,10 +3,16 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
+import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
+  const heroImage = sectionContent.hero.image
   return (
     <motion.section
       id="hero"
@@ -70,6 +76,34 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
           >
             {sectionContent.hero.description}
           </motion.p>
+
+          {heroImage && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 1.0 }}
+              className="pt-4"
+            >
+              <div
+                className={cn(
+                  'relative w-full overflow-hidden',
+                  getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'landscape'),
+                  getFrameStyle(sectionContent.hero.imageFrameStyle || 'gallery'),
+                )}
+              >
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={heroImage}
+                  alt={sectionContent.hero.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  className="object-cover"
+                />
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.section>

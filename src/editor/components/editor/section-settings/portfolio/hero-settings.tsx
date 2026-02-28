@@ -1,6 +1,6 @@
 "use client"
 
-import { HeroDescriptionPanel, HeroTitlePanel } from './hero-panels'
+import { HeroDescriptionPanel, HeroTitlePanel, HeroImagePanel } from './hero-panels'
 
 export function HeroSettings() {
   return (
@@ -13,6 +13,7 @@ export function HeroSettings() {
       <div className="space-y-6">
         <HeroTitlePanel />
         <HeroDescriptionPanel />
+        <HeroImagePanel />
       </div>
     </div>
   )

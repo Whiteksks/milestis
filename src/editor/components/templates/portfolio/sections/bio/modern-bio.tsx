@@ -21,7 +21,7 @@ export function ModernParallaxBio({ theme, sectionContent }: ModernParallaxBioPr
       className="@container relative"
     >
       <div className="@lg:px-12 @md:px-8 px-4 @lg:py-20 @md:py-16 py-12 max-w-350 mx-auto relative z-10">
-        <div className="grid @md:grid-cols-2 grid-cols-1 gap-12 items-center">
+        <div className="grid @md:grid-cols-[2fr,3fr] grid-cols-1 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -31,13 +31,7 @@ export function ModernParallaxBio({ theme, sectionContent }: ModernParallaxBioPr
           >
             <div
               className={cn(
-                "absolute -inset-4 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700",
-                theme.muted,
-              )}
-            />
-            <div
-              className={cn(
-                "relative overflow-hidden rounded-3xl border shadow-[0_30px_90px_rgba(0,0,0,0.45)] bg-linear-to-b from-background/70 via-background/30 to-background/90 backdrop-blur-xl border-white/5",
+                "relative overflow-hidden rounded-2xl border shadow-lg",
                 theme.border,
               )}
             >
@@ -49,7 +43,7 @@ export function ModernParallaxBio({ theme, sectionContent }: ModernParallaxBioPr
                   alt={sectionContent.bio.title || "Profile image"}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transform scale-[1.02] group-hover:scale-110 transition-transform duration-700"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
             </div>

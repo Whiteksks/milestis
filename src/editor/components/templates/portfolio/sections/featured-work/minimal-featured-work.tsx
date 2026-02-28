@@ -47,7 +47,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="grid @lg:grid-cols-2 grid-cols-1 gap-12 items-center"
+                className="grid @lg:grid-cols-[2fr,3fr] grid-cols-1 gap-12 items-center"
               >
                 {i % 2 === 0 ? (
                   <>
@@ -107,7 +107,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                   </>
                 ) : (
                   <>
-                    <div className="space-y-6 @lg:order-1 order-2">
+                    <div className="space-y-6 @lg:order-2 order-2">
                       <h4
                         className={cn(
                           '@lg:text-4xl @md:text-3xl text-2xl font-light',
@@ -142,7 +142,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                     </div>
                     <div
                       className={cn(
-                        'relative overflow-hidden @lg:order-2 order-1',
+                        'relative overflow-hidden @lg:order-1 order-1',
                         getAspectRatioClass(project.aspectRatio),
                       )}
                     >

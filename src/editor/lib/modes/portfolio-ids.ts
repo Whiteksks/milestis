@@ -5,7 +5,9 @@ export const PORTFOLIO_TEMPLATE_IDS = [
   'minimal',
   'elegant',
   'modern',
-  'playful',
+  'editorial',
+  'grid',
+  'bento',
 ] as const
 
 export type PortfolioTemplateId = (typeof PORTFOLIO_TEMPLATE_IDS)[number]

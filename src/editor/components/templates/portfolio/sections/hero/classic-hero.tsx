@@ -3,10 +3,16 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
+import { getFrameStyle } from '@/editor/lib/frame-styles'
+import Image, { type ImageLoader } from 'next/image'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface ClassicHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ClassicHero({ theme, sectionContent }: ClassicHeroProps) {
+  const heroImage = sectionContent.hero.image
   return (
     <motion.section
       id="hero"
@@ -31,6 +37,34 @@ export function ClassicHero({ theme, sectionContent }: ClassicHeroProps) {
         <p className="@md:text-base text-sm opacity-60 max-w-xl mx-auto">
           {sectionContent.hero.description}
         </p>
+
+        {heroImage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-12 max-w-3xl mx-auto"
+          >
+            <div
+              className={cn(
+                'relative w-full overflow-hidden',
+                getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'landscape'),
+                theme.shadow,
+                getFrameStyle(sectionContent.hero.imageFrameStyle || 'soft'),
+              )}
+            >
+              <Image
+                loader={passthroughLoader}
+                unoptimized
+                src={heroImage}
+                alt={sectionContent.hero.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.section>
   )

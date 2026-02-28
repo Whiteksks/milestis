@@ -4,8 +4,8 @@ import { useThemeSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { BackgroundLayersTheme, BackgroundScrollMode, DecorativeEffect } from '@/editor/lib/types'
-import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS, DECORATIVE_EFFECTS } from '../background-layers/registry'
+import type { BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
+import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
 
 function OptionRow<T extends string>({
   label,
@@ -60,7 +60,6 @@ export function ThemeSettingsPanel() {
   const depth = themeCustomizations.depthEffect ?? 'none'
   const rays = themeCustomizations.raysEffect ?? 'none'
   const texture = themeCustomizations.textureEffect ?? 'none'
-  const decorative = themeCustomizations.decorativeEffect ?? 'none'
   const layersTheme = themeCustomizations.backgroundLayersTheme ?? 'dark'
   const scrollMode = themeCustomizations.backgroundScrollMode ?? 'fixed'
 
@@ -69,7 +68,6 @@ export function ThemeSettingsPanel() {
       depthEffect: 'none',
       raysEffect: 'none',
       textureEffect: 'none',
-      decorativeEffect: 'none',
       backgroundLayersTheme: 'dark',
       backgroundScrollMode: 'fixed',
     })
@@ -200,22 +198,6 @@ export function ThemeSettingsPanel() {
             options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
             active={texture}
             onChange={(v) => updateThemeCustomization({ textureEffect: v })}
-          />
-        </div>
-
-        <div className="h-px bg-border/30" />
-
-        {/* Layer 4: Decorative */}
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[9px] font-bold text-muted-foreground">4</span>
-          </div>
-          <OptionRow
-            label="Decorative"
-            hint="shapes & lines"
-            options={[{ id: 'none' as DecorativeEffect, label: 'None' }, ...DECORATIVE_EFFECTS]}
-            active={decorative}
-            onChange={(v) => updateThemeCustomization({ decorativeEffect: v })}
           />
         </div>
 

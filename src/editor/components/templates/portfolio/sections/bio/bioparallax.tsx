@@ -90,7 +90,7 @@ export function BioParallaxFramer({ theme, sectionContent }: BioParallaxProps) {
       className="@container"
     >
       <div className="@lg:px-12 @md:px-8 px-4 @lg:py-20 @md:py-16 py-12">
-        <div className="max-w-4xl mx-auto grid @md:grid-cols-2 grid-cols-1 gap-8 items-center">
+        <div className="max-w-4xl mx-auto grid @md:grid-cols-[2fr,3fr] grid-cols-1 gap-8 items-center">
           <div>
             <div
               className={cn(
