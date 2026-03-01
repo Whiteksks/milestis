@@ -12,20 +12,12 @@ const LoadingTemplate = () => (
 const LoadingSettings = () => null
 
 // Templates
-const ClassicTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/classic-template').then(m => m.ClassicTemplateDesign),
-  { loading: LoadingTemplate },
-)
 const MinimalTemplateDesign = dynamic(
   () => import('@/editor/components/templates/portfolio/minimal-template').then(m => m.MinimalTemplateDesign),
   { loading: LoadingTemplate },
 )
 const ElegantTemplateDesign = dynamic(
   () => import('@/editor/components/templates/portfolio/elegant-template').then(m => m.ElegantTemplateDesign),
-  { loading: LoadingTemplate },
-)
-const ModernParallaxTemplate = dynamic(
-  () => import('@/editor/components/templates/portfolio/modern-template').then(m => m.ModernParallaxTemplate),
   { loading: LoadingTemplate },
 )
 
@@ -39,6 +31,15 @@ const GridTemplateDesign = dynamic(
 )
 const BentoTemplateDesign = dynamic(
   () => import('@/editor/components/templates/portfolio/bento-template').then(m => m.BentoTemplateDesign),
+  { loading: LoadingTemplate },
+)
+const ShowcaseTemplateDesign = dynamic(
+  () => import('@/editor/components/templates/portfolio/showcase-template').then(m => m.ShowcaseTemplateDesign),
+  { loading: LoadingTemplate },
+)
+
+const LiquidGlassTemplateDesign = dynamic(
+  () => import('@/editor/components/templates/portfolio/liquid-glass-template').then(m => m.LiquidGlassTemplateDesign),
   { loading: LoadingTemplate },
 )
 
@@ -75,25 +76,25 @@ const FooterSettings = dynamic(
 const portfolioTemplateComponents: Partial<
   Record<PortfolioTemplateId, React.ComponentType<PortfolioTemplateProps>>
 > = {
-  classic: ClassicTemplateDesign,
+  editorial: EditorialTemplateDesign,
   minimal: MinimalTemplateDesign,
   elegant: ElegantTemplateDesign,
-  modern: ModernParallaxTemplate,
-  editorial: EditorialTemplateDesign,
   grid: GridTemplateDesign,
   bento: BentoTemplateDesign,
+  showcase: ShowcaseTemplateDesign,
+  'liquid-glass': LiquidGlassTemplateDesign,
 }
 
 export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
   label: 'Portfolio',
   templates: [
-    { id: 'classic', name: 'Classic', tags: ['classic', 'elegant'] },
+    { id: 'editorial', name: 'Editorial', tags: ['editorial', 'magazine'] },
     { id: 'minimal', name: 'Minimal', tags: ['minimal'] },
     { id: 'elegant', name: 'Elegant', tags: ['elegant'] },
-    { id: 'modern', name: 'Modern', tags: ['modern'] },
-    { id: 'editorial', name: 'Editorial', tags: ['editorial', 'magazine'] },
     { id: 'grid', name: 'Grid', tags: ['grid', 'structured'] },
     { id: 'bento', name: 'Bento', tags: ['bento', 'modern'] },
+    { id: 'showcase', name: 'Showcase', tags: ['showcase', 'bold', 'cinematic'] },
+    { id: 'liquid-glass', name: 'Liquid Glass', tags: ['glass', 'modern', 'dark'] },
   ],
   sections: [
     { id: 'header', name: 'Header', toggleKey: 'showHeader' },
@@ -123,8 +124,8 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
     const id = templateId as PortfolioTemplateId
     const Design =
       portfolioTemplateComponents[id] ??
-      portfolioTemplateComponents.classic ??
-      ClassicTemplateDesign
+      portfolioTemplateComponents.editorial ??
+      EditorialTemplateDesign
 
     return <PortfolioTemplateShell Design={Design} />
   },

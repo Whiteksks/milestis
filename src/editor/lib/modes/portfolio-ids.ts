@@ -1,13 +1,13 @@
 /** Single source of truth for portfolio template IDs.
  *  To add a new portfolio template — add its id here. That's all. */
 export const PORTFOLIO_TEMPLATE_IDS = [
-  'classic',
+  'editorial',
   'minimal',
   'elegant',
-  'modern',
-  'editorial',
   'grid',
   'bento',
+  'showcase',
+  'liquid-glass',
 ] as const
 
 export type PortfolioTemplateId = (typeof PORTFOLIO_TEMPLATE_IDS)[number]
