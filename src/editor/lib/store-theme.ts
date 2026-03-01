@@ -3,7 +3,6 @@ import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, DecorationA
 
 export interface ThemeCustomizations {
   decorationAnimation?: DecorationAnimation
-  decorationCount?: number
   customFont?: string
   depthEffect?: DepthEffect
   raysEffect?: RayEffect
@@ -38,7 +37,6 @@ export const useThemeStore = create<ThemeStore>((set) => ({
   frameStyle: 'soft',
   themeCustomizations: {
     decorationAnimation: 'fade',
-    decorationCount: 3,
     depthEffect: 'none',
     raysEffect: 'none',
     textureEffect: 'none',

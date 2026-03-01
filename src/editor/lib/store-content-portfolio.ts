@@ -74,7 +74,6 @@ export interface PortfolioSlice {
   sectionVisibility: SectionVisibility
   sectionContent: SectionContent
   mediaLibrary: MediaImage[]
-  galleryImages: string[]
 
   toggleSection: (section: keyof SectionVisibility) => void
   updateSectionContent: <K extends keyof SectionContent>(
@@ -83,9 +82,6 @@ export interface PortfolioSlice {
   ) => void
   addMediaImage: (image: MediaImage) => void
   removeMediaImage: (id: string) => void
-  setGalleryImages: (images: string[]) => void
-  addGalleryImage: (url: string) => void
-  removeGalleryImage: (index: number) => void
 }
 
 // ─── Slice creator ─────────────────────────────────────────────────────────
@@ -94,7 +90,6 @@ export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioS
   sectionVisibility: defaultPortfolioVisibility,
   sectionContent: defaultPortfolioContent,
   mediaLibrary: [],
-  galleryImages: Array(6).fill('/placeholder.svg?height=500&width=700'),
 
   toggleSection: (section) =>
     set((state) => ({
@@ -117,12 +112,4 @@ export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioS
 
   removeMediaImage: (id) =>
     set((state) => ({ mediaLibrary: state.mediaLibrary.filter((img) => img.id !== id) })),
-
-  setGalleryImages: (images) => set({ galleryImages: images }),
-
-  addGalleryImage: (url) =>
-    set((state) => ({ galleryImages: [...state.galleryImages, url] })),
-
-  removeGalleryImage: (index) =>
-    set((state) => ({ galleryImages: state.galleryImages.filter((_, i) => i !== index) })),
 })
