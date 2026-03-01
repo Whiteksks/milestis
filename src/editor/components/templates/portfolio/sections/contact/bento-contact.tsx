@@ -67,11 +67,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 <p className={cn('@lg:text-lg @md:text-base text-sm font-medium opacity-80 break-all', theme.fontBody)}>
                   {sectionContent.contact.email}
                 </p>
-                {sectionContent.contact.phone && (
-                  <p className={cn('text-xs opacity-40', theme.fontBody)}>
-                    {sectionContent.contact.phone}
-                  </p>
-                )}
+
               </div>
               <div>
                 <a

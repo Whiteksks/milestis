@@ -113,7 +113,6 @@ export interface SectionContent {
     subtitle?: string
     description: string
     email: string
-    phone?: string
   }
   footer: {
     copyright: string

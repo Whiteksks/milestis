@@ -60,7 +60,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
 
               {/* Big heading */}
               <h1 className={cn(
-                '@lg:text-[5.5rem] @md:text-6xl text-5xl font-bold leading-[0.92] tracking-tight',
+                '@lg:text-[5rem] @md:text-6xl text-5xl font-bold leading-[0.92] tracking-tight',
                 theme.fontTitle,
               )}>
                 {sectionContent.hero.title}

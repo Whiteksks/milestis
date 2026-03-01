@@ -123,7 +123,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           transition={{ duration: 0.85, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className={cn(
             'font-black uppercase leading-[0.86] tracking-tighter text-white',
-            '@lg:text-[6rem] @md:text-[4.2rem] text-[2.8rem]',
+            '@lg:text-[5rem] @md:text-[4rem] text-[2.5rem]',
             theme.fontTitle,
           )}
           style={{ textShadow: '0 2px 50px rgba(0,0,0,0.55)' }}

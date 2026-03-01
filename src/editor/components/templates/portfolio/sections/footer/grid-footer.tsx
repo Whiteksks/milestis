@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
 interface GridFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -27,35 +28,25 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
             theme.card,
           )}>
 
-            {/* Name */}
-            <p className={cn('text-sm font-bold opacity-60', theme.fontBody)}>
-              {sectionContent.header.title}
+            {/* Left: copyright */}
+            <p className={cn('text-[10px] uppercase tracking-[0.2em] opacity-25', theme.fontBody)}>
+              © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
 
-            {/* Social links */}
+            {/* Right: social icons */}
             {socialLinks.length > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 {socialLinks.map((link, i) => (
-                  <a
+                  <SocialIconLink
                     key={i}
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      'px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-full border border-current/12 opacity-45 hover:opacity-70 transition-opacity',
-                      theme.fontBody,
-                    )}
-                  >
-                    {link.icon}
-                  </a>
+                    slug={link.icon}
+                    iconSize={15}
+                    className="opacity-40 hover:opacity-75 transition-opacity duration-200"
+                  />
                 ))}
               </div>
             )}
-
-            {/* Copyright */}
-            <p className={cn('text-[10px] opacity-25 shrink-0', theme.fontBody)}>
-              © {new Date().getFullYear()}
-            </p>
 
           </div>
         </div>

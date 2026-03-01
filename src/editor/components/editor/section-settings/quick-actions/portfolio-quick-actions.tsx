@@ -77,7 +77,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PortfolioSectionQuickAction[]>>
   ],
   contact: [
     { id: "contact.heading", title: "Heading", Icon: Type, Panel: ContactHeadingPanel },
-    { id: "contact.details", title: "Email / phone", Icon: Mail, Panel: ContactDetailsPanel },
+    { id: "contact.details", title: "Email", Icon: Mail, Panel: ContactDetailsPanel },
   ],
   footer: [
     { id: "footer.copyright", title: "Copyright", Icon: Copyright, Panel: FooterCopyrightPanel },

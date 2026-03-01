@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
 interface ShowcaseFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
+  const socialLinks = sectionContent.footer.socialLinks ?? []
   return (
     <motion.footer
       id="footer"
@@ -34,44 +36,27 @@ export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
       </div>
 
       <div className="relative @lg:px-20 @md:px-12 px-8 py-14 @md:py-16">
-        <div className="max-w-7xl mx-auto flex flex-col items-center gap-8 text-center">
-          {/* Brand name */}
-          <p
-            className={cn(
-              'text-sm font-bold uppercase tracking-[0.4em] opacity-70',
-              theme.fontTitle,
-            )}
-          >
-            {sectionContent.header.title}
+        <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-center justify-between gap-6">
+          {/* Left: copyright */}
+          <p className={cn('text-[10px] uppercase tracking-[0.15em] opacity-20', theme.fontBody)}>
+            © {new Date().getFullYear()} {sectionContent.footer.copyright}
           </p>
 
-          {/* Nav links */}
-          {(sectionContent.header.links ?? []).length > 0 && (
-            <nav className="flex flex-wrap justify-center gap-6">
-              {(sectionContent.header.links ?? []).map((link, i) => (
-                <a
+          {/* Right: social icons */}
+          {socialLinks.length > 0 && (
+            <div className="flex items-center gap-6">
+              {socialLinks.map((link, i) => (
+                <SocialIconLink
                   key={i}
                   href={link.href}
-                  className={cn(
-                    'text-[10px] uppercase tracking-[0.2em] opacity-30 hover:opacity-70 transition-opacity',
-                    theme.fontBody,
-                  )}
-                >
-                  {link.label}
-                </a>
+                  slug={link.icon}
+                  iconSize={16}
+                  className="opacity-30 hover:opacity-70 transition-opacity duration-200"
+                />
               ))}
-            </nav>
+            </div>
           )}
 
-          {/* Copyright */}
-          <p
-            className={cn(
-              'text-[10px] uppercase tracking-[0.15em] opacity-20',
-              theme.fontBody,
-            )}
-          >
-            © {new Date().getFullYear()} {sectionContent.header.title} — All rights reserved
-          </p>
         </div>
       </div>
     </motion.footer>

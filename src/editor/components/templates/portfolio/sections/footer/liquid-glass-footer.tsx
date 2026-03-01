@@ -3,11 +3,13 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
+import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
 interface LiquidGlassFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterProps) {
   const { primary, secondary, accent2 } = theme.bgEffectColors
+  const socialLinks = sectionContent.footer.socialLinks ?? []
 
   return (
     <footer
@@ -37,7 +39,7 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
           {/* Inner glare */}
           <div className="absolute inset-0 rounded-2xl @md:rounded-3xl pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)' }} />
 
-          {/* Brand + colored dots */}
+          {/* Left: colored dots + copyright */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -50,39 +52,31 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
                 <div key={i} className="w-2 h-2 rounded-full" style={{ background: c, boxShadow: `0 0 5px ${c}` }} />
               ))}
             </div>
-            <p className={cn('text-sm font-bold uppercase tracking-[0.35em] text-white/70', theme.fontTitle)}>
-              {sectionContent.header.title}
+            <p className={cn('text-[10px] uppercase tracking-[0.2em] text-white/30', theme.fontBody)}>
+              © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
           </motion.div>
 
-          {/* Nav links */}
-          {(sectionContent.header.links ?? []).length > 0 && (
-            <nav className="flex flex-wrap justify-center gap-6">
-              {(sectionContent.header.links ?? []).map((link, i) => (
-                <a
+          {/* Right: social icons */}
+          {socialLinks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="flex items-center gap-5"
+            >
+              {socialLinks.map((link, i) => (
+                <SocialIconLink
                   key={i}
                   href={link.href}
-                  className={cn(
-                    'text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white/70 transition-colors',
-                    theme.fontBody,
-                  )}
-                >
-                  {link.label}
-                </a>
+                  slug={link.icon}
+                  iconSize={15}
+                  className="text-white/30 hover:text-white/70 transition-colors duration-200"
+                />
               ))}
-            </nav>
+            </motion.div>
           )}
-
-          {/* Copyright */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className={cn('text-[10px] uppercase tracking-[0.15em] text-white/20', theme.fontBody)}
-          >
-            © {new Date().getFullYear()}
-          </motion.p>
         </div>
       </div>
     </footer>

@@ -47,20 +47,13 @@ export function ContactDetailsPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="space-y-3">
       {!dense && <Label className="text-xs font-medium text-muted-foreground">Contact Details</Label>}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <Input
           className="h-9 text-xs"
           type="email"
           value={contact.email}
           onChange={(e) => updateSectionContent("contact", { email: e.target.value })}
           placeholder="Email"
-        />
-        <Input
-          className="h-9 text-xs"
-          type="tel"
-          value={contact.phone || ""}
-          onChange={(e) => updateSectionContent("contact", { phone: e.target.value })}
-          placeholder="Phone (optional)"
         />
       </div>
     </div>

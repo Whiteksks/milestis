@@ -17,59 +17,57 @@ export const defaultPortfolioVisibility: SectionVisibility = {
 
 export const defaultPortfolioContent: SectionContent = {
   header: {
-    title: 'Amelia & Noah',
+    title: 'Elena Vance',
     links: [
-      { label: 'Story', href: '#hero' },
+      { label: 'Home', href: '#hero' },
       { label: 'About', href: '#bio' },
-      { label: 'Gallery', href: '#work' },
+      { label: 'Works', href: '#work' },
       { label: 'Contact', href: '#contact' },
     ],
   },
   hero: {
-    title: 'Timeless stories, captured in every frame',
-    subtitle: 'Wedding & Lifestyle Photographer',
+    title: 'Visualizing concepts through intentional design',
+    subtitle: 'Visual Artist & Creator',
     description:
-      'Creating elegant, heartfelt imagery that feels like your favorite memory – honest, luminous, and entirely you.',
+      'Crafting minimalist, impactful visuals that bridge the gap between creative vision and meaningful reality. Focused on clarity, aesthetics, and timeless form.',
   },
   bio: {
-    title: 'A storyteller with a camera',
+    title: 'Focusing on the essence of craft',
     subtitle: 'About Me',
     description:
-      'Based in Copenhagen, I document modern love stories with a soft, editorial eye. My approach is calm, observant, and quietly intentional – blending candid moments with thoughtful direction so you can simply be present.\n\nFrom the fleeting in‑between glances to the big, emotional vows, I focus on the details that feel most like you.',
+      'Based in Europe, I specialize in creating cohesive visual narratives for brands and individuals. My approach is rooted in observation and refinement — balancing clean aesthetics with emotional depth.\n\nWhether it’s a digital interface, a photographic series, or a brand identity, I prioritize work that feels honest, intentional, and lasting.',
     image: '',
     imageAspectRatio: 'portrait',
     imageFrameStyle: 'soft',
     achievements: [
-      'Featured in Modern Wedding & White Magazine',
-      'Over 120 weddings documented across Europe',
-      'Known for calm direction and film‑inspired color',
+      'Featured in leading international creative showcases',
+      'Collaborated with diverse clients across 10+ countries',
+      'Expertise in composition, color theory, and visual storytelling',
     ],
   },
   featuredWork: {
-    title: 'Selected stories',
+    title: 'Selected works',
     subtitle: 'Portfolio',
     projects: [],
   },
   video: {
-    title: 'Super 8 wedding highlights',
-    subtitle: 'Motion',
-    description: 'A glimpse into how your day could feel in motion.',
+    title: 'Aesthetics in motion',
+    subtitle: 'Showreel',
+    description: 'A brief exploration of movement, process, and visual rhythm.',
     videoUrl: '',
   },
   contact: {
-    title: "Let's begin your story",
+    title: "Let's bring your idea to life",
     subtitle: 'Get in Touch',
     description:
-      'Share a few details about your day and vision – I personally reply within 2 business days.',
-    email: 'hello@example.com',
-    phone: '+1 (555) 000-0000',
+      'I am always open to new collaborations and creative challenges. Share your vision, and I’ll get back to you within 48 hours.',
+    email: 'hello@elenavance.com',
   },
   footer: {
-    copyright: '© 2024 Amelia Hart Photography. All rights reserved.',
+    copyright: 'Elena Vance. All rights reserved.',
     socialLinks: [],
   },
 }
-
 // ─── Slice interface ───────────────────────────────────────────────────────
 
 export interface PortfolioSlice {
