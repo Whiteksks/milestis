@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-import Image, { type ImageLoader } from 'next/image'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
@@ -13,160 +13,115 @@ interface MinimalFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWorkProps) {
+  const projects = sectionContent.featuredWork.projects ?? []
   return (
-    <motion.section
+    <section
       id="work"
       data-section-id="featured-work"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.8 }}
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
-        <div className="max-w-6xl mx-auto space-y-16">
-          <div className="text-center space-y-3">
-            <p className={cn('text-xs uppercase opacity-40', theme.letterSpacing)}>
-              {sectionContent.featuredWork.subtitle || 'Portfolio'}
-            </p>
-            <h3
-              className={cn(
-                '@lg:text-6xl @md:text-5xl text-4xl font-light',
-                theme.fontTitle,
-              )}
-            >
-              {sectionContent.featuredWork.title}
-            </h3>
-          </div>
+      <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
 
-          <div className="space-y-24">
-            {(sectionContent.featuredWork.projects ?? []).map((project, i) => (
+        {/* Section header — consistent with bio: label left, number right */}
+        <div className="flex items-center justify-between mb-20 border-t border-current/10 pt-8">
+          <motion.p
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
+          >
+            {sectionContent.featuredWork.subtitle || 'Selected Work'}
+          </motion.p>
+          <motion.span
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
+          >
+            03
+          </motion.span>
+        </div>
+
+        {/* Project list — alternating editorial layout */}
+        <div className="space-y-0">
+          {projects.map((project, i) => (
+            <div key={i} className="border-t border-current/10 last:border-b">
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="grid @lg:grid-cols-[2fr,3fr] grid-cols-1 gap-12 items-center"
-              >
-                {i % 2 === 0 ? (
-                  <>
-                    <div
-                      className={cn(
-                        'relative overflow-hidden',
-                        getAspectRatioClass(project.aspectRatio),
-                      )}
-                    >
-                      <Image
-                        loader={passthroughLoader}
-                        unoptimized
-                        src={project.image || '/placeholder.svg?height=600&width=800'}
-                        alt={project.title || 'Project image'}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className={cn(
-                          'object-cover hover:scale-105 transition-transform duration-700',
-                          theme.shadow,
-                          getFrameStyle(project.frameStyle || 'soft'),
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-6">
-                      <h4
-                        className={cn(
-                          '@lg:text-4xl @md:text-3xl text-2xl font-light',
-                          theme.fontTitle,
-                        )}
-                      >
-                        {project.title}
-                      </h4>
-                      <p
-                        className={cn(
-                          '@md:text-base text-sm opacity-60 font-light',
-                          theme.lineHeight,
-                          theme.fontBody,
-                        )}
-                      >
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tags?.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className={cn(
-                              'px-3 py-1 text-xs border border-current/10 opacity-50',
-                              theme.radiusMedium,
-                              theme.letterSpacing,
-                            )}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="space-y-6 @lg:order-2 order-2">
-                      <h4
-                        className={cn(
-                          '@lg:text-4xl @md:text-3xl text-2xl font-light',
-                          theme.fontTitle,
-                        )}
-                      >
-                        {project.title}
-                      </h4>
-                      <p
-                        className={cn(
-                          '@md:text-base text-sm opacity-60 font-light',
-                          theme.lineHeight,
-                          theme.fontBody,
-                        )}
-                      >
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tags?.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className={cn(
-                              'px-3 py-1 text-xs border border-current/10 opacity-50',
-                              theme.radiusMedium,
-                              theme.letterSpacing,
-                            )}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div
-                      className={cn(
-                        'relative overflow-hidden @lg:order-1 order-1',
-                        getAspectRatioClass(project.aspectRatio),
-                      )}
-                    >
-                      <Image
-                        loader={passthroughLoader}
-                        unoptimized
-                        src={project.image || '/placeholder.svg?height=600&width=800'}
-                        alt={project.title || 'Project image'}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className={cn(
-                          'object-cover hover:scale-105 transition-transform duration-700',
-                          theme.shadow,
-                          getFrameStyle(project.frameStyle || 'soft'),
-                        )}
-                      />
-                    </div>
-                  </>
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'flex flex-col @lg:flex-row gap-10 @lg:gap-16 py-12 @md:py-16',
+                  i % 2 === 1 && '@lg:flex-row-reverse',
                 )}
+              >
+                {/* Image — compact fixed width, hover scoped to image only */}
+                {project.image && (
+                  <div className="@lg:w-[42%] w-full shrink-0 group">
+                    <div
+                      className={cn(
+                        'relative overflow-hidden w-full',
+                        getAspectRatioClass(project.aspectRatio || 'landscape'),
+                      )}
+                    >
+                      <Image
+                        loader={passthroughLoader}
+                        unoptimized
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 42vw"
+                        className={cn(
+                          'object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out',
+                          getFrameStyle(project.frameStyle || 'none'),
+                        )}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Content — 2/5 width, stacked vertically with generous spacing */}
+                <div className="@lg:w-2/5 flex flex-col justify-between gap-8">
+                  <div className="space-y-5">
+                    {/* Index above title */}
+                    <span className={cn('block text-[9px] tabular-nums opacity-20', theme.fontBody)}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3
+                      className={cn(
+                        '@lg:text-4xl @md:text-3xl text-2xl font-extralight leading-none tracking-tight',
+                        theme.fontTitle,
+                      )}
+                    >
+                      {project.title}
+                    </h3>
+                    <p className={cn('text-sm opacity-40 font-light leading-relaxed', theme.fontBody)}>
+                      {project.description}
+                    </p>
+                  </div>
+
+                  {/* Tags — bottom of content, kept secondary */}
+                  {(project.tags ?? []).length > 0 && (
+                    <div className="flex flex-wrap gap-x-4 gap-y-2">
+                      {(project.tags ?? []).slice(0, 4).map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className={cn('text-[9px] uppercase tracking-[0.25em] opacity-25', theme.fontBody)}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </motion.div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }

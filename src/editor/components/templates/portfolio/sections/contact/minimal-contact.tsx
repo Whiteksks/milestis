@@ -1,97 +1,129 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
 
 interface MinimalContactProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
   return (
-    <motion.section
+    <section
       id="contact"
       data-section-id="contact"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.8 }}
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
-        <div className="max-w-3xl mx-auto space-y-10">
-          <div className="space-y-3">
-            <p className={cn('text-xs uppercase opacity-40', theme.letterSpacing)}>
-              {sectionContent.contact.subtitle || 'Contact'}
-            </p>
-            <h3
-              className={cn(
-                '@lg:text-5xl @md:text-4xl text-3xl font-light',
-                theme.fontTitle,
-              )}
+      <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
+        {/* Section header */}
+        <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
+          <motion.p
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
+          >
+            {sectionContent.contact.subtitle || 'Contact'}
+          </motion.p>
+          <motion.span
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
+          >
+            05
+          </motion.span>
+        </div>
+
+        <div className="grid @lg:grid-cols-2 grid-cols-1 gap-16 @lg:gap-24">
+          {/* Left: title + email CTA */}
+          <div className="space-y-10">
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight leading-tight', theme.fontTitle)}
             >
               {sectionContent.contact.title}
-            </h3>
+            </motion.h2>
+
             {sectionContent.contact.description && (
-              <p
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: 0.1 }}
+                className={cn('@md:text-base text-sm opacity-45 font-light leading-relaxed', theme.lineHeight, theme.fontBody)}
+              >
+                {sectionContent.contact.description}
+              </motion.p>
+            )}
+
+            {sectionContent.contact.email && (
+              <motion.a
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: 0.15 }}
+                href={`mailto:${sectionContent.contact.email}`}
                 className={cn(
-                  '@md:text-base text-sm opacity-60 font-light',
-                  theme.lineHeight,
+                  'group inline-flex items-start gap-2 border-b border-current/20 pb-1 hover:border-current/60 transition-colors duration-300 break-all',
                   theme.fontBody,
                 )}
               >
-                {sectionContent.contact.description}
-              </p>
+                <span className="text-sm @md:text-base font-light opacity-60 group-hover:opacity-100 transition-opacity">
+                  {sectionContent.contact.email}
+                </span>
+                <ArrowUpRight size={13} className="shrink-0 mt-1 opacity-30 group-hover:opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </motion.a>
             )}
           </div>
 
-          <form className="space-y-4">
-            <div className="grid @md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Name"
-                className={cn(
-                  'w-full px-3 py-2 text-sm bg-transparent border border-current/10 outline-none',
-                  theme.radiusMedium,
-                  theme.fontBody,
-                )}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className={cn(
-                  'w-full px-3 py-2 text-sm bg-transparent border border-current/10 outline-none',
-                  theme.radiusMedium,
-                  theme.fontBody,
-                )}
+          {/* Right: minimal form */}
+          <motion.form
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="space-y-0"
+          >
+            {[{ label: 'Name', type: 'text', placeholder: 'Your name' }, { label: 'Email', type: 'email', placeholder: 'your@email.com' }].map((field) => (
+              <div key={field.label} className="border-b border-current/10 py-4">
+                <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>{field.label}</label>
+                <input
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20', theme.fontBody)}
+                />
+              </div>
+            ))}
+            <div className="border-b border-current/10 py-4">
+              <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>Message</label>
+              <textarea
+                placeholder="Tell me about your project…"
+                rows={4}
+                className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20 resize-none', theme.fontBody)}
               />
             </div>
-            <textarea
-              placeholder="Tell me about your project"
-              className={cn(
-                'w-full px-3 py-2 text-sm bg-transparent border border-current/10 min-h-30 outline-none resize-none',
-                theme.radiusMedium,
-                theme.fontBody,
-              )}
-            />
-            <div className="flex items-center justify-between pt-2">
-              <p className={cn('text-xs opacity-40', theme.fontBody)}>
-                Or email directly at {sectionContent.contact.email}
-              </p>
-              <Button
+            <div className="pt-7">
+              <button
                 type="submit"
                 className={cn(
-                  'px-6 py-2 text-xs uppercase tracking-[0.2em]',
-                  theme.letterSpacing,
+                  'group inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-opacity duration-300 border-b border-current/20 pb-1',
+                  theme.fontBody,
                 )}
               >
                 Send Inquiry
-              </Button>
+                <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </button>
             </div>
-          </form>
+          </motion.form>
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }

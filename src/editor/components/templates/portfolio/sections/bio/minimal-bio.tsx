@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import Image, { type ImageLoader } from 'next/image'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
@@ -12,83 +12,118 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface MinimalBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
+  const { title, subtitle, description, image, imageAspectRatio, imageFrameStyle, achievements } = sectionContent.bio
   return (
-    <motion.section
+    <section
       id="bio"
       data-section-id="bio"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.8, delay: 0.1 }}
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-20 @md:px-12 px-6 @lg:py-32 @md:py-24 py-16">
-        <div className="max-w-6xl mx-auto grid @lg:grid-cols-[1fr,2fr] @md:grid-cols-1 gap-16 items-start">
-          <div className={cn('relative overflow-hidden', getAspectRatioClass(sectionContent.bio.imageAspectRatio))}>
-            <Image
-              loader={passthroughLoader}
-              unoptimized
-              src={sectionContent.bio.image || '/placeholder.svg?height=600&width=450'}
-              alt={sectionContent.bio.title || 'Profile image'}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className={cn(
-                'object-cover',
-                theme.shadow,
-                getFrameStyle(sectionContent.bio.imageFrameStyle || 'soft'),
-              )}
-            />
-          </div>
+      <div className="max-w-3xl mx-auto px-6 @md:px-10 py-20 @md:py-28">
+        {/* Section header row */}
+        <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
+          <motion.p
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
+          >
+            {subtitle || 'About'}
+          </motion.p>
+          <motion.span
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
+          >
+            02
+          </motion.span>
+        </div>
 
-          <div className="@lg:pt-12 space-y-10">
-            <div className="space-y-4">
-              <p className={cn('text-xs uppercase opacity-40', theme.letterSpacing)}>
-                {sectionContent.bio.subtitle || 'About'}
-              </p>
-              <h3
-                className={cn(
-                  '@lg:text-5xl @md:text-4xl text-3xl font-light',
-                  theme.fontTitle,
-                )}
-              >
-                {sectionContent.bio.title}
-              </h3>
-            </div>
-
-            <p
-              className={cn(
-                '@md:text-lg text-base opacity-70 font-light whitespace-pre-line',
-                theme.lineHeight,
-                theme.fontBody,
-              )}
+        {/* Identity block — centered, stacked: photo → name → subtitle */}
+        <div className="flex flex-col items-center text-center gap-5 mb-16">
+          {image && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-              {sectionContent.bio.description}
-            </p>
+              <div className={cn(
+                'relative w-[160px]',
+                getAspectRatioClass(imageAspectRatio || 'portrait'),
+              )}>
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={image}
+                  alt={title || 'Profile'}
+                  fill
+                  sizes="160px"
+                  className={cn('object-cover', getFrameStyle(imageFrameStyle || 'none'))}
+                />
+              </div>
+            </motion.div>
+          )}
 
-            {sectionContent.bio.achievements &&
-              sectionContent.bio.achievements.length > 0 && (
-                <div className="space-y-3 pt-6 border-t border-current/10">
-                  {sectionContent.bio.achievements.map((achievement, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 opacity-60"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-current opacity-40" />
-                      <p
-                        className={cn(
-                          '@md:text-sm text-xs font-light',
-                          theme.fontBody,
-                        )}
-                      >
-                        {achievement}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <div className="space-y-2">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight leading-none tracking-tight', theme.fontTitle)}
+            >
+              {title}
+            </motion.h2>
+            {subtitle && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className={cn('text-[9px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}
+              >
+                {subtitle}
+              </motion.p>
+            )}
           </div>
         </div>
+
+        {/* Description block — centered container, left-aligned text */}
+        <div className="max-w-xl mx-auto space-y-10">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.1 }}
+            className={cn('@md:text-base text-sm opacity-50 font-light leading-relaxed whitespace-pre-line', theme.lineHeight, theme.fontBody)}
+          >
+            {description}
+          </motion.p>
+
+          {achievements && achievements.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="pt-8 border-t border-current/10 space-y-5"
+            >
+              {achievements.map((item, i) => (
+                <div key={i} className="flex items-baseline gap-5">
+                  <span className={cn('text-[9px] tabular-nums opacity-20 shrink-0 w-4', theme.fontBody)}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className={cn('@md:text-sm text-xs font-light opacity-50 leading-relaxed', theme.fontBody)}>{item}</p>
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </div>
       </div>
-    </motion.section>
+    </section>
   )
 }

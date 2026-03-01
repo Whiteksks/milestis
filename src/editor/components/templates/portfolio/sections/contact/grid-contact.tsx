@@ -11,139 +11,146 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
     <motion.section
       id="contact"
       data-section-id="contact"
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6 }}
-      className={cn('@container', theme.foreground)}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className={cn('@container py-16', theme.foreground)}
     >
-      <div className="@lg:px-6 @md:px-5 px-4 py-3">
+      <div className="@lg:px-8 @md:px-6 px-4">
         <div className="max-w-6xl mx-auto">
-
-          {/* ── Row 1: CTA + Email cards ── */}
-          <div className="grid @lg:grid-cols-[7fr,5fr] grid-cols-1 gap-3 mb-3">
-
-            {/* CTA card */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55 }}
-              className={cn(
-                'rounded-2xl border border-current/8 p-8 @lg:p-10 flex flex-col justify-between min-h-[26vh]',
-                theme.card,
-              )}
-            >
-              <p className={cn('text-[10px] uppercase tracking-widest opacity-35 mb-2', theme.fontBody)}>
-                {sectionContent.contact.subtitle || 'Contact'}
-              </p>
-              <h2 className={cn('@lg:text-4xl @md:text-3xl text-2xl font-bold leading-tight', theme.fontTitle)}>
-                {sectionContent.contact.title}
-              </h2>
-              {sectionContent.contact.description && (
-                <p className={cn('text-xs opacity-50 mt-3 max-w-sm leading-relaxed', theme.fontBody)}>
-                  {sectionContent.contact.description}
-                </p>
-              )}
-            </motion.div>
-
-            {/* Email + CTA card */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55, delay: 0.07 }}
-              className={cn(
-                'rounded-2xl border border-current/8 p-8 flex flex-col justify-between min-h-[26vh]',
-                theme.card,
-              )}
-            >
-              <p className={cn('text-[10px] uppercase tracking-widest opacity-35', theme.fontBody)}>
-                Email
-              </p>
-              <div className="space-y-1">
-                <p className={cn('@lg:text-lg @md:text-base text-sm font-medium opacity-75 break-all', theme.fontBody)}>
-                  {sectionContent.contact.email}
-                </p>
-                {sectionContent.contact.phone && (
-                  <p className={cn('text-xs opacity-40', theme.fontBody)}>
-                    {sectionContent.contact.phone}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <a
-                  href={`mailto:${sectionContent.contact.email}`}
-                  className={cn(
-                    'inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-full border border-current/15',
-                    'hover:border-current/40 hover:bg-current/5 transition-all duration-200',
-                    theme.fontBody,
-                  )}
-                >
-                  Write ↗
-                </a>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-current/10 opacity-45">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span className={cn('text-[10px] uppercase tracking-wider', theme.fontBody)}>24h reply</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* ── Row 2: Contact form ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className={cn(
-              'rounded-2xl border border-current/8 overflow-hidden',
-              theme.card,
-            )}
-          >
-            <form className="p-6 @lg:p-8">
-              <div className="grid @md:grid-cols-3 grid-cols-1 gap-3 mb-3">
-                {[
-                  { type: 'text', placeholder: 'Your name' },
-                  { type: 'email', placeholder: 'Email address' },
-                  { type: 'text', placeholder: 'Subject' },
-                ].map((field, i) => (
-                  <input
-                    key={i}
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    className={cn(
-                      'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-xl outline-none',
-                      'focus:border-current/30 transition-colors placeholder:opacity-40',
-                      theme.fontBody,
-                    )}
-                  />
-                ))}
-              </div>
-              <textarea
-                placeholder="Tell me about your project…"
-                rows={4}
+          
+          <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6 items-stretch">
+            
+            {/* ЛЕВАЯ СТОРОНА: Инфо и Контакты */}
+            <div className="flex flex-col gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 className={cn(
-                  'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-xl outline-none',
-                  'focus:border-current/30 transition-colors placeholder:opacity-40 resize-none mb-3',
-                  theme.fontBody,
+                  'flex-1 rounded-3xl border border-current/10 p-8 @lg:p-12 flex flex-col justify-between',
+                  theme.card
                 )}
-              />
-              <div className="flex justify-end">
+              >
+                <div>
+                  <span className={cn('text-[10px] uppercase tracking-[0.2em] opacity-40', theme.fontBody)}>
+                    {sectionContent.contact.subtitle || 'Get in touch'}
+                  </span>
+                  <h2 className={cn('mt-4 @lg:text-5xl text-3xl font-bold leading-tight', theme.fontTitle)}>
+                    {sectionContent.contact.title}
+                  </h2>
+                  {sectionContent.contact.description && (
+                    <p className={cn('mt-6 text-sm opacity-60 leading-relaxed max-w-md', theme.fontBody)}>
+                      {sectionContent.contact.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-12 space-y-6">
+                  <div>
+                    <p className={cn('text-[10px] uppercase tracking-widest opacity-30 mb-2', theme.fontBody)}>Email</p>
+                    <a 
+                      href={`mailto:${sectionContent.contact.email}`}
+                      className={cn('text-xl @lg:text-2xl font-medium hover:opacity-70 transition-opacity', theme.fontBody)}
+                    >
+                      {sectionContent.contact.email}
+                    </a>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span className={cn('text-[10px] font-bold uppercase tracking-wider text-emerald-600/80', theme.fontBody)}>
+                        Available for projects
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* ПРАВАЯ СТОРОНА: Форма */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className={cn(
+                'rounded-3xl border border-current/10 p-8 @lg:p-12',
+                theme.card
+              )}
+            >
+              <form className="h-full flex flex-col">
+                <div className="space-y-4 flex-1">
+                  <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Name</label>
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        className={cn(
+                          'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
+                          theme.fontBody
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Email</label>
+                      <input
+                        type="email"
+                        placeholder="hello@example.com"
+                        className={cn(
+                          'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
+                          theme.fontBody
+                        )}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Subject</label>
+                    <input
+                      type="text"
+                      placeholder="Project Inquiry"
+                      className={cn(
+                        'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
+                        theme.fontBody
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Message</label>
+                    <textarea
+                      placeholder="Tell me more..."
+                      rows={5}
+                      className={cn(
+                        'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20 resize-none',
+                        theme.fontBody
+                      )}
+                    />
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   className={cn(
-                    'px-6 py-2.5 text-xs font-semibold rounded-full border border-current/20',
-                    'hover:bg-current hover:text-current-foreground transition-all duration-200',
+                    'mt-8 w-full py-5 text-sm font-bold rounded-2xl hover:opacity-90 transition-all active:scale-[0.98]',
                     theme.fontBody,
+                    theme.primary,
+                    theme.primaryText
                   )}
                 >
-                  Send message →
+                  Send Message
                 </button>
-              </div>
-            </form>
-          </motion.div>
+              </form>
+            </motion.div>
 
+          </div>
         </div>
       </div>
     </motion.section>

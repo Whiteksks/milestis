@@ -9,54 +9,68 @@ interface ElegantContactProps
 
 export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
   return (
-    <motion.section
+    <section
       id="contact"
-      data-section-id="contact-form"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.9 }}
+      data-section-id="contact"
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-16 @md:px-10 px-6 @lg:py-32 @md:py-24 py-16">
-        <div className="max-w-3xl mx-auto space-y-16">
+      <div className="max-w-3xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
+        <div className="space-y-14">
+          {/* Heading */}
           <div className="text-center space-y-4">
-            <p
-              className={cn(
-                '@md:text-xs text-[10px] uppercase tracking-[0.3em] opacity-40',
-                theme.fontBody,
-              )}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 0.35, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className={cn('text-[10px] uppercase tracking-[0.3em]', theme.fontBody)}
             >
               {sectionContent.contact.subtitle || 'Contact'}
-            </p>
-            <h3
-              className={cn(
-                '@lg:text-6xl @md:text-5xl text-4xl tracking-tight',
-                theme.fontTitle,
-              )}
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className={cn('@lg:text-6xl @md:text-5xl text-4xl font-extralight tracking-tight', theme.fontTitle)}
             >
               {sectionContent.contact.title}
-            </h3>
+            </motion.h2>
             {sectionContent.contact.description && (
-              <p
-                className={cn(
-                  '@md:text-base text-sm opacity-60',
-                  theme.lineHeight,
-                )}
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 0.55, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className={cn('@md:text-base text-sm font-light', theme.lineHeight, theme.fontBody)}
               >
                 {sectionContent.contact.description}
-              </p>
+              </motion.p>
             )}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="w-16 h-px bg-current/20 mx-auto origin-center"
+            />
           </div>
 
-          <form className="space-y-8">
+          {/* Form */}
+          <motion.form
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="space-y-8"
+          >
             <div className="grid @md:grid-cols-2 grid-cols-1 gap-8">
               <input
                 type="text"
                 placeholder="Name"
                 className={cn(
                   'px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
-                  'placeholder:opacity-30 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
+                  'placeholder:opacity-25 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
                   theme.fontBody,
                 )}
               />
@@ -65,7 +79,7 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
                 placeholder="Email"
                 className={cn(
                   'px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
-                  'placeholder:opacity-30 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
+                  'placeholder:opacity-25 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
                   theme.fontBody,
                 )}
               />
@@ -75,36 +89,35 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
               placeholder="Subject"
               className={cn(
                 'w-full px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
-                'placeholder:opacity-30 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
+                'placeholder:opacity-25 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
                 theme.fontBody,
               )}
             />
             <textarea
               placeholder="Message"
-              rows={6}
+              rows={5}
               className={cn(
                 'w-full px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors resize-none',
-                'placeholder:opacity-30 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
+                'placeholder:opacity-25 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest',
                 theme.fontBody,
               )}
             />
-            <div className="pt-6 text-center">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+            <div className="pt-4 text-center">
+              <button
                 type="submit"
                 className={cn(
-                  'px-16 py-5 border border-current/20 hover:bg-current/10 transition-all duration-300',
-                  'text-xs uppercase tracking-[0.3em]',
+                  'px-16 py-4 border border-current/15 hover:border-current/35 hover:bg-current/5 transition-all duration-300',
+                  'text-[10px] uppercase tracking-[0.3em] opacity-60 hover:opacity-100',
                   theme.fontBody,
                 )}
               >
                 Send Message
-              </motion.button>
+              </button>
             </div>
-          </form>
+          </motion.form>
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }
+ 

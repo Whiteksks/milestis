@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-import Image, { type ImageLoader } from 'next/image'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
@@ -14,76 +14,58 @@ interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'secti
 export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
   const heroImage = sectionContent.hero.image
   return (
-    <motion.section
+    <section
       id="hero"
       data-section-id="hero"
-      initial={{ opacity: 0, scale: 0.98 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 1, ease: 'easeOut' }}
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-16 @md:px-10 px-6 @lg:py-48 @md:py-36 py-24">
-        <div className="max-w-5xl mx-auto text-center space-y-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 0.4, y: 0 }}
+      <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 pt-12 pb-16 @md:pb-24 text-center">
+        <div className="space-y-10">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 0.35, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className={cn('text-[10px] uppercase tracking-[0.35em]', theme.fontBody)}
           >
-            <p
-              className={cn(
-                '@md:text-xs text-[10px] uppercase tracking-[0.3em]',
-                theme.fontBody,
-              )}
-            >
-              {sectionContent.hero.subtitle}
-            </p>
-          </motion.div>
+            {sectionContent.hero.subtitle}
+          </motion.p>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className={cn(
-              '@lg:text-[5.5rem] @md:text-7xl text-5xl tracking-tight',
-              theme.fontTitle,
-              theme.lineHeight,
-            )}
+            transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}
           >
             {sectionContent.hero.title}
-          </motion.h2>
+          </motion.h1>
 
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ scaleX: 0, opacity: 0 }}
+            whileInView={{ scaleX: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="w-20 h-px bg-current/30 mx-auto"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="w-16 h-px bg-current/25 mx-auto origin-center"
           />
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 0.7, y: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 0.6, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className={cn(
-              '@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto',
-              theme.lineHeight,
-              theme.fontBody,
-            )}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light', theme.lineHeight, theme.fontBody)}
           >
             {sectionContent.hero.description}
           </motion.p>
 
           {heroImage && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 1.0 }}
-              className="pt-4"
+              transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="pt-6"
             >
               <div
                 className={cn(
@@ -106,6 +88,6 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
           )}
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }
