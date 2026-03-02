@@ -30,7 +30,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
       data-section-id="hero"
       className={cn('@container', theme.foreground)}
     >
-      <div className="@lg:px-6 @md:px-5 px-4 pt-20 @md:pt-24 pb-3">
+      <div className="@lg:px-6 @md:px-5 px-4 pt-20 @md:pt-24 pb-4">
         <div className="max-w-6xl mx-auto">
 
           {/* ── Bento grid: Row 1 ── */}
@@ -83,7 +83,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
               {...fadeUp(0.1)}
               className={cn(
                 '@lg:col-span-5 @md:col-span-2 col-span-1',
-                'relative rounded-3xl border border-current/8 overflow-hidden min-h-[52vh]',
+                'relative rounded-3xl border border-current/8 overflow-hidden min-h-[52vh] flex items-center justify-center',
                 theme.card,
               )}
             >
@@ -92,17 +92,16 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
                   <CroppedImage
                     src={heroImage}
                     alt={sectionContent.hero.title}
-                    aspectRatio={'portrait'}
-                    frameStyle={'none'}
-                    fixedAspectRatio
+                    aspectRatio={sectionContent.hero.imageAspectRatio || 'portrait'}
+                    frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
                     cropData={sectionContent.hero.imageCropData}
                     className="transition-transform duration-700 hover:scale-[1.03]"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 pointer-events-none" />
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center min-h-[52vh]">
+                <div className="w-full h-full flex items-center justify-center min-h-[54vh]">
                   <span className={cn(
                     '@lg:text-8xl @md:text-6xl text-5xl font-bold opacity-[0.06] select-none',
                     theme.fontTitle,

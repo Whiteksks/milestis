@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -10,6 +10,7 @@ import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import type { ImageCropData } from "@/editor/lib/crop-data"
 import { useCrop } from "@/editor/hooks/use-crop"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
+import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
 import { ImageIcon, Plus, Settings2 } from "lucide-react"
 
 export interface PortfolioImagePickerValue {
@@ -49,6 +50,9 @@ export function PortfolioImagePicker({
   const update = (patch: Partial<PortfolioImagePickerValue>) => {
     onChange({ ...value, ...current, ...patch })
   }
+
+  // ── Style picker ────────────────────────────────────────────────────────────
+  const [showStylePicker, setShowStylePicker] = useState(false)
 
   // ── Crop logic ──────────────────────────────────────────────────────────────
   const {
@@ -107,6 +111,13 @@ export function PortfolioImagePicker({
             onApply={handleApplyAndSave}
             onCancel={() => setShowCrop(false)}
           />
+        ) : showStylePicker ? (
+          <InlineStylePanel
+            image={current.image || ""}
+            value={current.frameStyle}
+            onChange={(val) => update({ frameStyle: val })}
+            onBack={() => setShowStylePicker(false)}
+          />
         ) : (
           <>
             {/* Normal Photo Area */}
@@ -150,36 +161,35 @@ export function PortfolioImagePicker({
 
             {/* Settings Bar */}
             <div className="flex items-center gap-1 p-1.5 bg-card border-t border-border/50">
-              <div className="flex flex-1 items-center gap-1">
+              <div className="flex flex-1 items-center gap-1 min-w-0">
                 <Select
                   value={current.aspectRatio}
                   onValueChange={(val) => update({ aspectRatio: val as AspectRatio, cropData: undefined })}
                 >
-                  <SelectTrigger className="h-8 w-full border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
-                    <SelectValue placeholder="Ratio" />
+                  <SelectTrigger className="h-8 w-[72px] shrink-0 border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
+                    <SelectValue>
+                      {({ square: '1:1', portrait: '3:4', landscape: '4:3' } as Record<string, string>)[current.aspectRatio] ?? current.aspectRatio}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(aspectRatios).map((r) => (
-                      <SelectItem key={r.id} value={r.id} className="text-xs">{r.name}</SelectItem>
+                      <SelectItem key={r.id} value={r.id} className="text-xs">
+                        <span className="font-mono mr-1.5 text-muted-foreground">{({ square: '1:1', portrait: '3:4', landscape: '4:3' } as Record<string, string>)[r.id]}</span>
+                        {r.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
 
-                <div className="w-px h-4 bg-border/50" />
+                <div className="w-px h-4 bg-border/50 shrink-0" />
 
-                <Select
-                  value={current.frameStyle}
-                  onValueChange={(val) => update({ frameStyle: val as FrameStyle })}
+                <button
+                  disabled={!current.image}
+                  onClick={() => setShowStylePicker(true)}
+                  className="h-8 flex-1 min-w-0 px-2 text-xs text-left truncate rounded-md transition-colors disabled:opacity-40 disabled:pointer-events-none text-foreground/80 hover:text-foreground hover:bg-muted/50"
                 >
-                  <SelectTrigger className="h-8 w-full border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
-                    <SelectValue placeholder="Style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(frameStyles).map((s) => (
-                      <SelectItem key={s.id} value={s.id} className="text-xs">{s.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {frameStyles[current.frameStyle]?.name ?? "Style"}
+                </button>
               </div>
 
               <Button

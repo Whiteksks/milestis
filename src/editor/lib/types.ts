@@ -25,18 +25,18 @@ export const FRAME_STYLES = {
   none: 'none',
   soft: 'soft',
   organic: 'organic',
-  polaroid: 'polaroid',
-  gallery: 'gallery',
-  film: 'film',
-  shadowSoft: 'shadow-soft',
-  shadowStrong: 'shadow-strong',
   borderThin: 'border-thin',
   borderBold: 'border-bold',
-  roundedXl: 'rounded-xl',
   circle: 'circle',
+  borderDark: 'border-dark',
+  arch: 'arch',
+  newspaper: 'newspaper',
+  diamond: 'diamond',
 } as const
 
 export type FrameStyle = (typeof FRAME_STYLES)[keyof typeof FRAME_STYLES]
+
+export type FrameStyleCategory = 'shape' | 'border'
 
 export const ASPECT_RATIOS = {
   square: 'square',
