@@ -1,0 +1,140 @@
+"use client"
+
+import { useCallback, useState } from "react"
+import Cropper, { type Area } from "react-easy-crop"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+import { Check, X, ZoomIn, RotateCcw } from "lucide-react"
+import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
+import { getCroppedImg } from "@/editor/lib/crop-image"
+
+const ASPECT_RATIO_MAP: Record<AspectRatio, number> = {
+  square: 1,
+  portrait: 3 / 4,
+  landscape: 4 / 3,
+}
+
+interface ImageCropEditorProps {
+  image: string
+  aspectRatio: AspectRatio
+  frameStyle: FrameStyle
+  onApply: (croppedImage: string) => void
+  onCancel: () => void
+}
+
+export function ImageCropEditor({
+  image,
+  aspectRatio,
+  frameStyle,
+  onApply,
+  onCancel,
+}: ImageCropEditorProps) {
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [isApplying, setIsApplying] = useState(false)
+
+  const isCircle = frameStyle === "circle"
+  const aspect = ASPECT_RATIO_MAP[aspectRatio] ?? (4 / 3)
+
+  const handleReset = () => {
+    setZoom(1)
+    setCrop({ x: 0, y: 0 })
+  }
+
+  const onCropComplete = useCallback((_: Area, areaPixels: Area) => {
+    setCroppedAreaPixels(areaPixels)
+  }, [])
+
+  const handleApply = async () => {
+    if (!croppedAreaPixels) return
+    try {
+      setIsApplying(true)
+      const cropped = await getCroppedImg(image, croppedAreaPixels)
+      onApply(cropped)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsApplying(false)
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+      {/* Crop area */}
+      <div className="relative w-full" style={{ height: 220 }}>
+        <Cropper
+          image={image}
+          crop={crop}
+          zoom={zoom}
+          aspect={aspect}
+          cropShape={isCircle ? "round" : "rect"}
+          showGrid={!isCircle}
+          onCropChange={setCrop}
+          onZoomChange={setZoom}
+          onCropComplete={onCropComplete}
+          style={{
+            containerStyle: {
+              borderRadius: 0,
+              background: "hsl(var(--muted))",
+            },
+            cropAreaStyle: {
+              border: "2px solid hsl(var(--primary))",
+              color: "rgba(0,0,0,0.5)",
+            },
+          }}
+        />
+      </div>
+
+      {/* Controls */}
+      <div className="p-3 space-y-3 border-t border-border/50 bg-card">
+        {/* Zoom */}
+        <div className="flex items-center gap-2.5">
+          <ZoomIn className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <Slider
+            min={1}
+            max={3}
+            step={0.01}
+            value={[zoom]}
+            onValueChange={([v]) => setZoom(v)}
+            className="flex-1"
+          />
+          <span className="text-[10px] text-muted-foreground w-7 text-right tabular-nums">
+            {zoom.toFixed(1)}x
+          </span>
+          <button
+            type="button"
+            onClick={handleReset}
+            title="Reset position & zoom"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={onCancel}
+            disabled={isApplying}
+          >
+            <X className="w-3.5 h-3.5 mr-1" />
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={handleApply}
+            disabled={isApplying}
+          >
+            <Check className="w-3.5 h-3.5 mr-1" />
+            {isApplying ? "Applying…" : "Apply"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
