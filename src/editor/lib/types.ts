@@ -197,6 +197,7 @@ export interface PhotoBlock {
   imageSettings: Array<{
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
+    cropData?: import('./crop-data').ImageCropData
   }>
 }
 
