@@ -292,6 +292,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                     aspectRatio:
                       (activeProject.aspectRatio || "landscape") as AspectRatio,
                     frameStyle: activeProject.frameStyle,
+                    cropData: activeProject.cropData,
                   }}
                   onChange={(value) => {
                     const next = [...projects]
@@ -300,6 +301,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                       image: value.image,
                       aspectRatio: value.aspectRatio,
                       frameStyle: value.frameStyle,
+                      cropData: value.cropData,
                     }
                     updateSectionContent("featuredWork", {
                       projects: next,

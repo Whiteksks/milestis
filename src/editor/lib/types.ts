@@ -80,6 +80,7 @@ export interface SectionContent {
     image?: string
     imageAspectRatio?: AspectRatio
     imageFrameStyle?: FrameStyle
+    imageCropData?: import('./crop-data').ImageCropData
   }
   bio: {
     title: string
@@ -88,6 +89,7 @@ export interface SectionContent {
     image?: string
     imageAspectRatio?: AspectRatio
     imageFrameStyle?: FrameStyle
+    imageCropData?: import('./crop-data').ImageCropData
     achievements?: string[]
   }
   featuredWork: {
@@ -100,6 +102,7 @@ export interface SectionContent {
       tags?: string[]
       aspectRatio?: AspectRatio
       frameStyle?: FrameStyle
+      cropData?: import('./crop-data').ImageCropData
     }>
   }
   video: {

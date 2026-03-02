@@ -1,18 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
   const heroImage = sectionContent.hero.image
+  const heroCropData = sectionContent.hero.imageCropData
 
   const descriptionBlock = (
     <div className="space-y-5 max-w-sm">
@@ -89,25 +86,15 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
             transition={{ duration: 1.1, delay: 0.15 }}
             className="flex items-center justify-center @md:pr-10 @lg:pr-20 px-6 @md:px-0 pt-8 @md:pt-28 @lg:pt-32 pb-8 @md:pb-14"
           >
-            {/* Aspect-ratio container — centered both axes */}
-            <div
-              className={cn(
-                'relative w-full overflow-hidden',
-                getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'portrait'),
-                getFrameStyle(sectionContent.hero.imageFrameStyle || 'none'),
-              )}
-            >
-              <Image
-                loader={passthroughLoader}
-                unoptimized
-                src={heroImage}
-                alt={sectionContent.hero.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
-            </div>
+            <CroppedImage
+              src={heroImage}
+              alt={sectionContent.hero.title}
+              aspectRatio={sectionContent.hero.imageAspectRatio || 'portrait'}
+              frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
+              cropData={heroCropData}
+              className="w-full"
+              priority
+            />
           </motion.div>
         )}
       </div>

@@ -76,12 +76,14 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
           image: hero.image || "",
           aspectRatio: (hero.imageAspectRatio || "landscape") as AspectRatio,
           frameStyle: hero.imageFrameStyle,
+          cropData: hero.imageCropData,
         }}
         onChange={(value) =>
           updateSectionContent("hero", {
             image: value.image,
             imageAspectRatio: value.aspectRatio,
             imageFrameStyle: value.frameStyle,
+            imageCropData: value.cropData,
           })
         }
         onOpenMediaPicker={() => openMediaPicker(ownerId)}

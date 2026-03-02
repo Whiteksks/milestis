@@ -60,12 +60,14 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
           image: bio.image || "",
           aspectRatio: (bio.imageAspectRatio || "portrait") as AspectRatio,
           frameStyle: bio.imageFrameStyle,
+          cropData: bio.imageCropData,
         }}
         onChange={(value) =>
           updateSectionContent("bio", {
             image: value.image,
             imageAspectRatio: value.aspectRatio,
             imageFrameStyle: value.frameStyle,
+            imageCropData: value.cropData,
           })
         }
         onOpenMediaPicker={() => openMediaPicker(ownerId)}

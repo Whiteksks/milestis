@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useCallback, useState } from "react"
 import Cropper, { type Area } from "react-easy-crop"
@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Check, X, ZoomIn, RotateCcw } from "lucide-react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
-import { getCroppedImg } from "@/editor/lib/crop-image"
+import type { ImageCropData } from "@/editor/lib/crop-data"
+import { getImageNaturalSize } from "@/editor/lib/crop-data"
 
 const ASPECT_RATIO_MAP: Record<AspectRatio, number> = {
   square: 1,
@@ -15,10 +16,19 @@ const ASPECT_RATIO_MAP: Record<AspectRatio, number> = {
 }
 
 interface ImageCropEditorProps {
+  /** Original (unmodified) image URL — never a previously-cropped blob. */
   image: string
   aspectRatio: AspectRatio
   frameStyle: FrameStyle
-  onApply: (croppedImage: string) => void
+  /** Initial editor state — pass values from a previously saved ImageCropData. */
+  initialEditorX?: number
+  initialEditorY?: number
+  initialZoom?: number
+  /**
+   * Called when the user confirms the crop.
+   * Returns ImageCropData — no canvas / blob is created.
+   */
+  onApply: (cropData: ImageCropData) => void
   onCancel: () => void
 }
 
@@ -26,11 +36,14 @@ export function ImageCropEditor({
   image,
   aspectRatio,
   frameStyle,
+  initialEditorX = 0,
+  initialEditorY = 0,
+  initialZoom = 1,
   onApply,
   onCancel,
 }: ImageCropEditorProps) {
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
+  const [crop, setCrop] = useState({ x: initialEditorX, y: initialEditorY })
+  const [zoom, setZoom] = useState(initialZoom)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [isApplying, setIsApplying] = useState(false)
 
@@ -46,12 +59,25 @@ export function ImageCropEditor({
     setCroppedAreaPixels(areaPixels)
   }, [])
 
+  /**
+   * Build an ImageCropData value from the current crop selection.
+   * No canvas / blob is created — the caller renders the result via
+   * <CroppedImage> which reproduces the crop purely with CSS.
+   */
   const handleApply = async () => {
     if (!croppedAreaPixels) return
     try {
       setIsApplying(true)
-      const cropped = await getCroppedImg(image, croppedAreaPixels)
-      onApply(cropped)
+      const { width: naturalWidth, height: naturalHeight } = await getImageNaturalSize(image)
+      const cropData: ImageCropData = {
+        editorX: crop.x,
+        editorY: crop.y,
+        zoom,
+        area: croppedAreaPixels,
+        naturalWidth,
+        naturalHeight,
+      }
+      onApply(cropData)
     } catch (e) {
       console.error(e)
     } finally {
