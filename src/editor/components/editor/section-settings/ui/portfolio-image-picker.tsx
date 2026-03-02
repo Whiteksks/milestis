@@ -8,11 +8,9 @@ import { aspectRatios } from "@/editor/lib/aspect-ratios"
 import { frameStyles } from "@/editor/lib/frame-styles"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import type { ImageCropData } from "@/editor/lib/crop-data"
-import { getCropWrapperStyle } from "@/editor/lib/crop-data"
 import { useCrop } from "@/editor/hooks/use-crop"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { ImageIcon, Plus, Settings2 } from "lucide-react"
-import { cn } from "@/lib/utils"
 
 export interface PortfolioImagePickerValue {
   /**
@@ -85,13 +83,10 @@ export function PortfolioImagePicker({
     }
   }
 
-  // ── Derived ─────────────────────────────────────────────────────────────────
-  const aspectClass = aspectRatios[current.aspectRatio]?.className ?? "aspect-[4/3]"
-
   return (
     <div className="space-y-2.5">
       {label && (
-        <Label className="text-xs font-medium text-muted-foreground ml-1">
+        <Label className="text-xs font-medium text-muted-foreground">
           {label}
         </Label>
       )}
@@ -117,31 +112,26 @@ export function PortfolioImagePicker({
             {/* Normal Photo Area */}
             <div
               onClick={onOpenMediaPicker}
-              className={cn(
-                "group relative w-full cursor-pointer overflow-hidden bg-muted/50",
-                aspectClass,
-              )}
+              className="group relative w-full h-64 cursor-pointer overflow-hidden bg-muted/50"
             >
               {current.image ? (
                 <>
                   <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105 overflow-hidden">
-                    {value.cropData ? (
-                      <div style={getCropWrapperStyle(value.cropData)}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={current.image}
-                          alt={label}
-                          style={{ width: "100%", height: "100%", objectFit: "fill" }}
-                        />
-                      </div>
-                    ) : (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={current.image}
-                        alt={label}
-                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={current.image}
+                      alt={label}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: value.cropData
+                          ? `${((value.cropData.area.x + value.cropData.area.width / 2) / value.cropData.naturalWidth) * 100}% ${((value.cropData.area.y + value.cropData.area.height / 2) / value.cropData.naturalHeight) * 100}%`
+                          : "center",
+                      }}
+                    />
                   </div>
                   <div className="absolute inset-0 bg-foreground/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 flex items-center justify-center backdrop-blur-[2px]">
                     <div className="flex items-center gap-2 rounded-lg bg-background/90 p-1.5 px-3 shadow-lg">

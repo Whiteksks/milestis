@@ -88,9 +88,9 @@ export const frameStyles: Record<FrameStyle, FrameStyleConfig> = {
   },
   circle: {
     id: 'circle',
-    name: 'Circle',
-    description: 'Perfect circular crop (best for 1:1)',
-    className: 'rounded-full aspect-square object-cover',
+    name: 'Oval / Circle',
+    description: 'Rounded to match aspect ratio — circle for 1:1, oval for portrait/landscape',
+    className: 'rounded-full',
     preview: 'rounded-full'
   }
 }

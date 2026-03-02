@@ -21,7 +21,7 @@ interface CroppedImageProps {
   aspectRatio?: AspectRatio
   frameStyle?: FrameStyle
   /**
-   * Crop data produced by ImageCropEditor / PortfolioImagePicker.
+   * Crop data produced by PortfolioImagePicker.
    * When provided the component renders exactly the cropped region using
    * CSS transforms — no canvas / blob copy is created.
    * When absent the image is rendered with object-fit:cover at full size.

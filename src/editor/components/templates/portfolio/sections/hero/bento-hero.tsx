@@ -1,12 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -92,17 +89,14 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
             >
               {heroImage ? (
                 <>
-                  <Image
-                    loader={passthroughLoader}
-                    unoptimized
+                  <CroppedImage
                     src={heroImage}
                     alt={sectionContent.hero.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 42vw"
-                    className={cn(
-                      'object-cover transition-transform duration-700 hover:scale-[1.03]',
-                      getFrameStyle(sectionContent.hero.imageFrameStyle || 'none'),
-                    )}
+                    aspectRatio={'portrait'}
+                    frameStyle={'none'}
+                    fixedAspectRatio
+                    cropData={sectionContent.hero.imageCropData}
+                    className="transition-transform duration-700 hover:scale-[1.03]"
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />

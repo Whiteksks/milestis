@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface MinimalHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -83,20 +79,13 @@ export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className={cn(
-                'relative w-full overflow-hidden',
-                getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'portrait'),
-                getFrameStyle(sectionContent.hero.imageFrameStyle || 'none'),
-              )}
             >
-              <Image
-                loader={passthroughLoader}
-                unoptimized
+              <CroppedImage
                 src={heroImage}
                 alt={sectionContent.hero.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
+                aspectRatio={sectionContent.hero.imageAspectRatio || 'portrait'}
+                frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
+                cropData={sectionContent.hero.imageCropData}
                 priority
               />
             </motion.div>

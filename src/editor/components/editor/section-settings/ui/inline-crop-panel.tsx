@@ -45,7 +45,7 @@ export function InlineCropPanel({
   image,
   aspectRatio,
   frameStyle,
-  heightPx = 240,
+  heightPx = 256,
   crop,
   zoom,
   isApplying,
@@ -76,7 +76,8 @@ export function InlineCropPanel({
           style={{
             containerStyle: {
               borderRadius: 0,
-              background: "hsl(var(--muted))",
+              background: "radial-gradient(ellipse 70% 60% at 50% 50%, #3a3f46 0%, #242729 50%, #1a1c1e 100%)",
+              overflow: "hidden",
             },
             cropAreaStyle: {
               border: "2px solid hsl(var(--primary))",

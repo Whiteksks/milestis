@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -79,27 +75,21 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
 
             {/* [RIGHT] Photo — large */}
             <div className="@lg:col-span-6 flex justify-center @lg:justify-end">
-              <div className={cn(
-                'relative w-full overflow-hidden rounded-2xl group',
-                'transition-transform duration-500 hover:-translate-y-1',
-                getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'square'),
-              )}>
+              <div className="w-full transition-transform duration-500 hover:-translate-y-1">
                 {heroImage ? (
-                  <Image
-                    loader={passthroughLoader}
-                    unoptimized
+                  <CroppedImage
                     src={heroImage}
                     alt={sectionContent.hero.title || 'Hero Image'}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className={cn(
-                      'object-cover transition-[filter] duration-500 group-hover:brightness-105',
-                      getFrameStyle(sectionContent.hero.imageFrameStyle || 'none'),
-                    )}
+                    aspectRatio={sectionContent.hero.imageAspectRatio || 'square'}
+                    frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
+                    cropData={sectionContent.hero.imageCropData}
                     priority
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-current/[0.03]">
+                  <div className={cn(
+                    'relative w-full overflow-hidden rounded-2xl bg-current/[0.03]',
+                    'aspect-square flex items-center justify-center',
+                  )}>
                     <span className={cn('text-8xl font-bold opacity-[0.06] select-none', theme.fontTitle)}>
                       {initials}
                     </span>

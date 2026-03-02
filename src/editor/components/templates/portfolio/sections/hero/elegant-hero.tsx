@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -67,23 +63,13 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
               transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
               className="pt-6"
             >
-              <div
-                className={cn(
-                  'relative w-full overflow-hidden',
-                  getAspectRatioClass(sectionContent.hero.imageAspectRatio || 'landscape'),
-                  getFrameStyle(sectionContent.hero.imageFrameStyle || 'gallery'),
-                )}
-              >
-                <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={heroImage}
-                  alt={sectionContent.hero.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 80vw"
-                  className="object-cover"
-                />
-              </div>
+              <CroppedImage
+                src={heroImage}
+                alt={sectionContent.hero.title}
+                aspectRatio={sectionContent.hero.imageAspectRatio || 'landscape'}
+                frameStyle={sectionContent.hero.imageFrameStyle || 'gallery'}
+                cropData={sectionContent.hero.imageCropData}
+              />
             </motion.div>
           )}
         </div>
