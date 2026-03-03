@@ -10,6 +10,7 @@ import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import type { ImageCropData } from "@/editor/lib/crop-data"
 import { useCrop } from "@/editor/hooks/use-crop"
 import { buildFrameStylePatch, getFrameStyleRestrictions, getEffectiveAspectRatio } from "@/editor/lib/restrictions/frame-style-restrictions"
+import { type SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
 import { ImageIcon, Plus, Settings2 } from "lucide-react"
@@ -34,6 +35,8 @@ interface PortfolioImagePickerProps {
   value: PortfolioImagePickerValue
   onChange: (value: PortfolioImagePickerValue) => void
   onOpenMediaPicker?: () => void
+  /** Template-level restrictions — hides controls that have no effect in this template. */
+  restrictions?: SectionImageRestrictions
 }
 
 export function PortfolioImagePicker({
@@ -41,6 +44,7 @@ export function PortfolioImagePicker({
   value,
   onChange,
   onOpenMediaPicker,
+  restrictions = {},
 }: PortfolioImagePickerProps) {
   const current = {
     image: value.image || "",
@@ -112,7 +116,7 @@ export function PortfolioImagePicker({
             onApply={handleApplyAndSave}
             onCancel={() => setShowCrop(false)}
           />
-        ) : showStylePicker ? (
+        ) : showStylePicker && !restrictions.hideFrameStyle ? (
           <InlineStylePanel
             image={current.image || ""}
             value={current.frameStyle}
@@ -162,51 +166,61 @@ export function PortfolioImagePicker({
               )}
             </div>
 
-            {/* Settings Bar */}
-            <div className="flex items-center gap-1 p-1.5 bg-card border-t border-border/50">
-              <div className="flex flex-1 items-center gap-1 min-w-0">
-                <Select
-                  value={getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)}
-                  onValueChange={(val) => update({ aspectRatio: val as AspectRatio, cropData: undefined })}
-                  disabled={!!getFrameStyleRestrictions(current.frameStyle).lockedAspectRatio}
-                >
-                  <SelectTrigger className="h-8 w-[72px] shrink-0 border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
-                    <SelectValue>
-                      {RATIO_LABELS[getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)]}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(aspectRatios).map((r) => (
-                      <SelectItem key={r.id} value={r.id} className="text-xs">
-                        <span className="font-mono mr-1.5 text-muted-foreground">{RATIO_LABELS[r.id]}</span>
-                        {r.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {/* Settings Bar — hidden entirely when all controls are restricted */}
+            {!(restrictions.hideAspectRatio && restrictions.hideFrameStyle && restrictions.hideCrop) && (
+              <div className="flex items-center gap-1 p-1.5 bg-card border-t border-border/50">
+                <div className="flex flex-1 items-center gap-1 min-w-0">
+                  {!restrictions.hideAspectRatio && (
+                    <Select
+                      value={getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)}
+                      onValueChange={(val) => update({ aspectRatio: val as AspectRatio, cropData: undefined })}
+                      disabled={!!getFrameStyleRestrictions(current.frameStyle).lockedAspectRatio}
+                    >
+                      <SelectTrigger className="h-8 w-[72px] shrink-0 border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
+                        <SelectValue>
+                          {RATIO_LABELS[getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)]}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(aspectRatios).map((r) => (
+                          <SelectItem key={r.id} value={r.id} className="text-xs">
+                            <span className="font-mono mr-1.5 text-muted-foreground">{RATIO_LABELS[r.id]}</span>
+                            {r.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
 
-                <div className="w-px h-4 bg-border/50 shrink-0" />
+                  {!restrictions.hideAspectRatio && !restrictions.hideFrameStyle && (
+                    <div className="w-px h-4 bg-border/50 shrink-0" />
+                  )}
 
-                <button
-                  disabled={!current.image}
-                  onClick={() => setShowStylePicker(true)}
-                  className="h-8 flex-1 min-w-0 px-2 text-xs text-left truncate rounded-md transition-colors disabled:opacity-40 disabled:pointer-events-none text-foreground/80 hover:text-foreground hover:bg-muted/50"
-                >
-                  {frameStyles[current.frameStyle]?.name ?? "Style"}
-                </button>
+                  {!restrictions.hideFrameStyle && (
+                    <button
+                      disabled={!current.image}
+                      onClick={() => setShowStylePicker(true)}
+                      className="h-8 flex-1 min-w-0 px-2 text-xs text-left truncate rounded-md transition-colors disabled:opacity-40 disabled:pointer-events-none text-foreground/80 hover:text-foreground hover:bg-muted/50"
+                    >
+                      {frameStyles[current.frameStyle]?.name ?? "Style"}
+                    </button>
+                  )}
+                </div>
+
+                {!restrictions.hideCrop && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    title="Crop Image"
+                    disabled={!current.image}
+                    onClick={() => setShowCrop(true)}
+                  >
+                    <Settings2 className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                title="Crop Image"
-                disabled={!current.image}
-                onClick={() => setShowCrop(true)}
-              >
-                <Settings2 className="w-4 h-4" />
-              </Button>
-            </div>
+            )}
           </>
         )}
       </div>

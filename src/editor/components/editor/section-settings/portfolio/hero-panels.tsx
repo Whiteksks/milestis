@@ -2,12 +2,14 @@
 
 import { useId } from "react"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
+import { useThemeStore } from "@/editor/lib/store-theme"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { AspectRatio } from "@/editor/lib/types"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { getTemplateImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 
 export function HeroTitlePanel({ dense = false }: { dense?: boolean }) {
   const { hero, updateSectionContent } = useContentSelector((state) => ({
@@ -62,6 +64,8 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const currentTemplateId = useThemeStore((s) => s.currentTemplateId)
+  const heroRestrictions = getTemplateImageRestrictions(currentTemplateId, 'hero')
 
   return (
     <div className="space-y-3">
@@ -87,6 +91,7 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
           })
         }
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        restrictions={heroRestrictions}
       />
     </div>
   )

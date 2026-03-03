@@ -1,6 +1,7 @@
 "use client"
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
+import { useThemeStore } from "@/editor/lib/store-theme"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,6 +10,7 @@ import { Trash2, Plus } from "lucide-react"
 import type { AspectRatio } from "@/editor/lib/types"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { getTemplateImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { useId } from "react"
 
 export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
@@ -44,8 +46,9 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
     bio: state.sectionContent.bio,
     updateSectionContent: state.updateSectionContent,
   }))
-
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const currentTemplateId = useThemeStore((s) => s.currentTemplateId)
+  const bioRestrictions = getTemplateImageRestrictions(currentTemplateId, 'bio')
 
   const handleImageSelect = (url: string) => {
     updateSectionContent("bio", { image: url })
@@ -71,6 +74,7 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
           })
         }
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        restrictions={bioRestrictions}
       />
     </div>
   )
