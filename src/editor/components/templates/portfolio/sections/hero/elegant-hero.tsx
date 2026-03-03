@@ -67,7 +67,7 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
                 src={heroImage}
                 alt={sectionContent.hero.title}
                 aspectRatio={sectionContent.hero.imageAspectRatio || 'landscape'}
-                frameStyle={sectionContent.hero.imageFrameStyle || 'gallery'}
+                frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
                 cropData={sectionContent.hero.imageCropData}
               />
             </motion.div>

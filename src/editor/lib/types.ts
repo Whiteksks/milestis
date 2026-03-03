@@ -24,9 +24,10 @@ export type EditorMode = (typeof EDITOR_MODES)[keyof typeof EDITOR_MODES]
 export const FRAME_STYLES = {
   none: 'none',
   soft: 'soft',
+  squircle: 'squircle',
   organic: 'organic',
-  borderThin: 'border-thin',
   borderBold: 'border-bold',
+  passepartout: 'passepartout',
   circle: 'circle',
   borderDark: 'border-dark',
   arch: 'arch',

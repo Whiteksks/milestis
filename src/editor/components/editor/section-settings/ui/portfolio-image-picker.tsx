@@ -115,7 +115,9 @@ export function PortfolioImagePicker({
           <InlineStylePanel
             image={current.image || ""}
             value={current.frameStyle}
+            aspectRatio={current.aspectRatio}
             onChange={(val) => update({ frameStyle: val })}
+            onAspectRatioChange={(val) => update({ aspectRatio: val, cropData: undefined })}
             onBack={() => setShowStylePicker(false)}
           />
         ) : (
