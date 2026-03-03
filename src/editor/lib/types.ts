@@ -98,6 +98,7 @@ export interface SectionContent {
     title: string
     subtitle?: string
     projects: Array<{
+      id: string
       title: string
       description: string
       image: string

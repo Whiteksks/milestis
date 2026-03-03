@@ -1,7 +1,6 @@
 "use client"
 
-import { FeaturedWorkHeaderPanel } from "./featured-work-panels"
-import { FeaturedWorkProjectsPanel } from "./featured-work-panels"
+import { FeaturedWorkHeaderPanel, FeaturedWorkProjectsPanel } from "./featured-work-panels"
 
 export function FeaturedWorkSettings() {
 

@@ -3,7 +3,7 @@
 import { useContentSelector, useUiSelector, useUiStore, useContentStore } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import type { ContentStore } from '@/editor/lib/store-content'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 export function useModeSections() {
   const { editorMode, activeSectionId } = useUiSelector((state) => ({
@@ -42,12 +42,6 @@ export function useModeSections() {
     if (activeSectionId && sections.some((s) => s.id === activeSectionId)) return activeSectionId
     return modeEntry.defaultActiveSectionId
   }, [activeSectionId, modeEntry.defaultActiveSectionId, sections])
-
-  useEffect(() => {
-    if (resolvedActiveSectionId !== activeSectionId) {
-      setActiveSectionId(resolvedActiveSectionId)
-    }
-  }, [activeSectionId, resolvedActiveSectionId, setActiveSectionId])
 
   return {
     editorMode,

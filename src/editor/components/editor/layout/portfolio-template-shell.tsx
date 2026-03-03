@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo, useCallback } from 'react'
 import { useContentSelector, useThemeSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -21,9 +22,9 @@ export function PortfolioTemplateShell({ Design }: PortfolioTemplateShellProps) 
     frameStyle: state.frameStyle,
   }))
 
-  const theme = getTheme(currentTheme)
+  const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
 
-  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleAnchorClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault()
       const element = document.getElementById(href.slice(1))
@@ -31,7 +32,7 @@ export function PortfolioTemplateShell({ Design }: PortfolioTemplateShellProps) 
         element.scrollIntoView({ behavior: "smooth", block: "start" })
       }
     }
-  }
+  }, [])
 
   return (
     <Design

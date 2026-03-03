@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Trash2, Wand2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, Trash2, Wand2 } from "lucide-react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { useId, useMemo, useState } from "react"
+import { useCallback, useId, useMemo, useState } from "react"
 
 import {
   Select,
@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select"
 
 import { aspectRatios } from "@/editor/lib/aspect-ratios"
-import { useEffect} from "react"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 
 export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) {
@@ -67,20 +66,6 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
     projects.length ? 0 : -1
   )
 
-  useEffect(() => {
-    if (!projects.length) {
-      if (activeProjectIndex !== -1) setActiveProjectIndex(-1)
-      return
-    }
-    if (activeProjectIndex < 0) {
-      setActiveProjectIndex(0)
-      return
-    }
-    if (activeProjectIndex >= projects.length) {
-      setActiveProjectIndex(projects.length - 1)
-    }
-  }, [activeProjectIndex, projects.length])
-
   const normalizedIndex = useMemo(() => {
     if (!projects.length) return -1
     return Math.min(Math.max(activeProjectIndex, 0), projects.length - 1)
@@ -89,13 +74,18 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   const activeProject =
     normalizedIndex >= 0 ? projects[normalizedIndex] : null
 
+  const updateActiveProject = useCallback(
+    (patch: Partial<(typeof projects)[0]>) => {
+      if (normalizedIndex < 0) return
+      updateSectionContent("featuredWork", {
+        projects: projects.map((p, i) => (i === normalizedIndex ? { ...p, ...patch } : p)),
+      })
+    },
+    [normalizedIndex, projects, updateSectionContent],
+  )
+
   const handleImageSelect = (url: string) => {
-    if (normalizedIndex < 0) return
-    const next = [...projects]
-    const project = next[normalizedIndex]
-    if (!project) return
-    next[normalizedIndex] = { ...project, image: url }
-    updateSectionContent("featuredWork", { projects: next })
+    updateActiveProject({ image: url })
   }
 
   const applyAspectRatioToAll = (ratio: AspectRatio) => {
@@ -108,6 +98,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
     const next = [
       ...projects,
       {
+        id: crypto.randomUUID(),
         title: "New Project",
         description: "",
         image: "",
@@ -198,9 +189,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-xl"
-                  onClick={() =>
-                    setActiveProjectIndex((v) => Math.max(0, v - 1))
-                  }
+                  onClick={() => setActiveProjectIndex(Math.max(0, normalizedIndex - 1))}
                   disabled={normalizedIndex <= 0}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -217,7 +206,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   </SelectTrigger>
                   <SelectContent>
                     {projects.map((p, idx) => (
-                      <SelectItem key={idx} value={String(idx)}>
+                      <SelectItem key={p.id} value={String(idx)}>
                         {p.title?.trim() ? p.title : `Project ${idx + 1}`}
                       </SelectItem>
                     ))}
@@ -229,11 +218,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-xl"
-                  onClick={() =>
-                    setActiveProjectIndex((v) =>
-                      Math.min(projects.length - 1, v + 1)
-                    )
-                  }
+                  onClick={() => setActiveProjectIndex(Math.min(projects.length - 1, normalizedIndex + 1))}
                   disabled={normalizedIndex >= projects.length - 1}
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -258,32 +243,14 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                     className="h-8 text-xs font-medium border-0 px-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/60"
                     value={activeProject.title}
                     placeholder="Project title"
-                    onChange={(e) => {
-                      const next = [...projects]
-                      next[normalizedIndex] = {
-                        ...activeProject,
-                        title: e.target.value,
-                      }
-                      updateSectionContent("featuredWork", {
-                        projects: next,
-                      })
-                    }}
+                    onChange={(e) => updateActiveProject({ title: e.target.value })}
                   />
 
                   <Textarea
                     className="min-h-17.5 text-xs resize-none"
                     value={activeProject.description}
                     placeholder="Short description..."
-                    onChange={(e) => {
-                      const next = [...projects]
-                      next[normalizedIndex] = {
-                        ...activeProject,
-                        description: e.target.value,
-                      }
-                      updateSectionContent("featuredWork", {
-                        projects: next,
-                      })
-                    }}
+                    onChange={(e) => updateActiveProject({ description: e.target.value })}
                   />
                 </div>
 
@@ -296,23 +263,8 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                     frameStyle: activeProject.frameStyle,
                     cropData: activeProject.cropData,
                   }}
-                  onChange={(value) => {
-                    const next = [...projects]
-                    next[normalizedIndex] = {
-                      ...activeProject,
-                      image: value.image,
-                      aspectRatio: value.aspectRatio,
-                      frameStyle: value.frameStyle,
-                      cropData: value.cropData,
-                    }
-                    updateSectionContent("featuredWork", {
-                      projects: next,
-                    })
-                  }}
-                  onOpenMediaPicker={() => {
-                    setActiveProjectIndex(normalizedIndex)
-                    openMediaPicker(ownerId)
-                  }}
+                  onChange={updateActiveProject}
+                  onOpenMediaPicker={() => openMediaPicker(ownerId)}
                   restrictions={featuredWorkRestrictions}
                 />
               </div>
