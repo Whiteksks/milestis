@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
@@ -46,7 +46,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
             >
               <div className={cn(
                 'relative w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2',
-                getAspectRatioClass(sectionContent.bio.imageAspectRatio || 'portrait'),
+                getAspectRatioClass(sectionContent.bio.aspectRatio || 'portrait'),
               )}>
                 <Image
                   loader={passthroughLoader}
@@ -56,7 +56,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
                   fill
                   className={cn(
                     'object-cover rounded-2xl',
-                    getFrameStyle(sectionContent.bio.imageFrameStyle || 'none'),
+                    getFrameStyle(sectionContent.bio.frameStyle || 'none'),
                   )}
                 />
               </div>

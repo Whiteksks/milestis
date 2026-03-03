@@ -1,7 +1,7 @@
 "use client"
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { useThemeStore } from "@/editor/lib/store-theme"
+import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Trash2, Wand2 } from "lucide-react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { getTemplateImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { useId, useMemo, useState } from "react"
 
 import {
@@ -60,8 +59,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   }))
 
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const currentTemplateId = useThemeStore((s) => s.currentTemplateId)
-  const featuredWorkRestrictions = getTemplateImageRestrictions(currentTemplateId, 'featuredWork')
+  const featuredWorkRestrictions = useSectionRestrictions('featuredWork')
 
   const projects = featuredWork.projects ?? []
 
@@ -294,7 +292,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   value={{
                     image: activeProject.image,
                     aspectRatio:
-                      (activeProject.aspectRatio || "landscape") as AspectRatio,
+                      (activeProject.aspectRatio || "square") as AspectRatio,
                     frameStyle: activeProject.frameStyle,
                     cropData: activeProject.cropData,
                   }}

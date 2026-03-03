@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
@@ -66,9 +66,9 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
               <CroppedImage
                 src={heroImage}
                 alt={sectionContent.hero.title}
-                aspectRatio={sectionContent.hero.imageAspectRatio || 'landscape'}
-                frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
-                cropData={sectionContent.hero.imageCropData}
+                aspectRatio={sectionContent.hero.aspectRatio || 'landscape'}
+                frameStyle={sectionContent.hero.frameStyle || 'none'}
+                cropData={sectionContent.hero.cropData}
               />
             </motion.div>
           )}

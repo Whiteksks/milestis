@@ -1,6 +1,6 @@
 'use client'
 
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { BentoHeader } from './sections/header/bento-header'
 import { BentoHero } from './sections/hero/bento-hero'
 import { BentoBio } from './sections/bio/bento-bio'

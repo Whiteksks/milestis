@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 
@@ -49,7 +49,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className={cn(
                   'object-cover transition-transform duration-700 hover:scale-[1.03]',
-                  getFrameStyle(sectionContent.bio.imageFrameStyle || 'none'),
+                  getFrameStyle(sectionContent.bio.frameStyle || 'none'),
                 )}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />

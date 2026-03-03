@@ -155,13 +155,8 @@ export function DesignCatalogModal() {
 
       setDecorations(mapped)
 
-      if (preset.backgroundImage) {
-        updateThemeCustomization({
-          customBackground: preset.backgroundImage.url,
-          backgroundImageOpacity: preset.backgroundImage.opacity,
-          backgroundImageType: preset.backgroundImage.type,
-        })
-      }
+      // backgroundImage from presets is no longer supported — backgrounds are
+      // handled by the depth / rays / texture layer system in ThemeCustomizations.
 
       handleClose()
     }

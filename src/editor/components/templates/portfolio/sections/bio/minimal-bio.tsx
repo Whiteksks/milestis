@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
@@ -12,7 +12,7 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface MinimalBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
-  const { title, subtitle, description, image, imageAspectRatio, imageFrameStyle, achievements } = sectionContent.bio
+  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } = sectionContent.bio
   return (
     <section
       id="bio"
@@ -53,7 +53,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
             >
               <div className={cn(
                 'relative w-[160px]',
-                getAspectRatioClass(imageAspectRatio || 'portrait'),
+                getAspectRatioClass(aspectRatio || 'portrait'),
               )}>
                 <Image
                   loader={passthroughLoader}
@@ -62,7 +62,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
                   alt={title || 'Profile'}
                   fill
                   sizes="160px"
-                  className={cn('object-cover', getFrameStyle(imageFrameStyle || 'none'))}
+                  className={cn('object-cover', getFrameStyle(frameStyle || 'none'))}
                 />
               </div>
             </motion.div>

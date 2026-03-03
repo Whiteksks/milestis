@@ -2,15 +2,12 @@
 
 import { useId } from "react"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { useThemeStore } from "@/editor/lib/store-theme"
+import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import type { AspectRatio } from "@/editor/lib/types"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { getTemplateImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
-
 export function HeroTitlePanel({ dense = false }: { dense?: boolean }) {
   const { hero, updateSectionContent } = useContentSelector((state) => ({
     hero: state.sectionContent.hero,
@@ -64,8 +61,7 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const currentTemplateId = useThemeStore((s) => s.currentTemplateId)
-  const heroRestrictions = getTemplateImageRestrictions(currentTemplateId, 'hero')
+  const heroRestrictions = useSectionRestrictions('hero')
 
   return (
     <div className="space-y-3">
@@ -78,16 +74,16 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
         label=""
         value={{
           image: hero.image || "",
-          aspectRatio: (hero.imageAspectRatio || "landscape") as AspectRatio,
-          frameStyle: hero.imageFrameStyle,
-          cropData: hero.imageCropData,
+          aspectRatio: hero.aspectRatio,
+          frameStyle: hero.frameStyle,
+          cropData: hero.cropData,
         }}
         onChange={(value) =>
           updateSectionContent("hero", {
             image: value.image,
-            imageAspectRatio: value.aspectRatio,
-            imageFrameStyle: value.frameStyle,
-            imageCropData: value.cropData,
+            aspectRatio: value.aspectRatio,
+            frameStyle: value.frameStyle,
+            cropData: value.cropData,
           })
         }
         onOpenMediaPicker={() => openMediaPicker(ownerId)}

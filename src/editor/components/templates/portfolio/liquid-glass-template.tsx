@@ -1,6 +1,6 @@
 'use client'
 
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { LiquidGlassHeader } from './sections/header/liquid-glass-header'
 import { LiquidGlassHero } from './sections/hero/liquid-glass-hero'
 import { LiquidGlassBio } from './sections/bio/liquid-glass-bio'

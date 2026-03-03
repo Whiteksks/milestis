@@ -80,18 +80,18 @@ export interface SectionContent {
     subtitle: string
     description: string
     image?: string
-    imageAspectRatio?: AspectRatio
-    imageFrameStyle?: FrameStyle
-    imageCropData?: import('./crop-data').ImageCropData
+    aspectRatio?: AspectRatio
+    frameStyle?: FrameStyle
+    cropData?: import('./crop-data').ImageCropData
   }
   bio: {
     title: string
     subtitle?: string
     description: string
     image?: string
-    imageAspectRatio?: AspectRatio
-    imageFrameStyle?: FrameStyle
-    imageCropData?: import('./crop-data').ImageCropData
+    aspectRatio?: AspectRatio
+    frameStyle?: FrameStyle
+    cropData?: import('./crop-data').ImageCropData
     achievements?: string[]
   }
   featuredWork: {

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
@@ -96,13 +96,13 @@ export function BioParallaxFramer({ theme, sectionContent }: BioParallaxProps) {
               className={cn(
                 'relative overflow-hidden',
                 theme.shadow,
-                getFrameStyle(sectionContent.bio.imageFrameStyle || 'soft'),
+                getFrameStyle(sectionContent.bio.frameStyle || 'soft'),
               )}
             >
               <motion.img
                 src={sectionContent.bio.image || '/placeholder.svg?height=600&width=600'}
                 alt={sectionContent.bio.title || 'Profile image'}
-                className={cn('w-full object-cover', getAspectRatioClass(sectionContent.bio.imageAspectRatio))}
+                className={cn('w-full object-cover', getAspectRatioClass(sectionContent.bio.aspectRatio))}
                 style={{
                   y,
                   scale: 1.08,

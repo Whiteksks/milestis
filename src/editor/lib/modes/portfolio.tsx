@@ -1,3 +1,4 @@
+import type React from 'react'
 import type { SectionVisibility } from '@/editor/lib/types'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { ModeRegistryEntry } from './types'
@@ -85,6 +86,17 @@ const portfolioTemplateComponents: Partial<
   'liquid-glass': LiquidGlassTemplateDesign,
 }
 
+// Maps section id → settings panel. Add entry here when adding a new section.
+const PORTFOLIO_SETTINGS_MAP: Record<string, React.ComponentType> = {
+  header:       HeaderSettings,
+  hero:         HeroSettings,
+  bio:          BioSettings,
+  featuredWork: FeaturedWorkSettings,
+  video:        VideoSettings,
+  contact:      ContactSettings,
+  footer:       FooterSettings,
+}
+
 export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
   label: 'Portfolio',
   templates: [
@@ -106,18 +118,7 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
     { id: 'footer', name: 'Footer', toggleKey: 'showFooter' },
   ],
   defaultActiveSectionId: 'hero',
-  getSettingsComponent: (sectionId) => {
-    switch (sectionId) {
-      case 'header': return HeaderSettings
-      case 'hero': return HeroSettings
-      case 'bio': return BioSettings
-      case 'featuredWork': return FeaturedWorkSettings
-      case 'video': return VideoSettings
-      case 'contact': return ContactSettings
-      case 'footer': return FooterSettings
-      default: return null
-    }
-  },
+  getSettingsComponent: (sectionId) => PORTFOLIO_SETTINGS_MAP[sectionId] ?? null,
   canvasDataSelector: () => ({}),  // PortfolioTemplateShell reads its own data from the store
 
   renderCanvas: ({ templateId }) => {

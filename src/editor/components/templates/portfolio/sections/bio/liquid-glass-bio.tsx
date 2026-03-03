@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
@@ -12,7 +12,7 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
-  const { title, subtitle, description, image, imageAspectRatio, imageFrameStyle, achievements } = sectionContent.bio
+  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } = sectionContent.bio
   const { primary, secondary, accent2 } = theme.bgEffectColors
 
   return (
@@ -66,7 +66,7 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
             {/* Image panel */}
             {image && (
               <div className="@md:w-64 @lg:w-80 shrink-0 relative overflow-hidden @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl">
-                <div className={cn('relative w-full', getAspectRatioClass(imageAspectRatio || 'portrait'), getFrameStyle(imageFrameStyle || 'none'), '@md:h-full @md:aspect-auto')}>
+                <div className={cn('relative w-full', getAspectRatioClass(aspectRatio || 'portrait'), getFrameStyle(frameStyle || 'none'), '@md:h-full @md:aspect-auto')}>
                   <Image
                     loader={passthroughLoader}
                     unoptimized

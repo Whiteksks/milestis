@@ -30,6 +30,9 @@ export const defaultPortfolioContent: SectionContent = {
     subtitle: 'Visual Artist & Creator',
     description:
       'Crafting minimalist, impactful visuals that bridge the gap between creative vision and meaningful reality. Focused on clarity, aesthetics, and timeless form.',
+    image: '',
+    aspectRatio: 'portrait',
+    frameStyle: 'soft',
   },
   bio: {
     title: 'Focusing on the essence of craft',
@@ -37,8 +40,8 @@ export const defaultPortfolioContent: SectionContent = {
     description:
       'Based in Europe, I specialize in creating cohesive visual narratives for brands and individuals. My approach is rooted in observation and refinement — balancing clean aesthetics with emotional depth.\n\nWhether it’s a digital interface, a photographic series, or a brand identity, I prioritize work that feels honest, intentional, and lasting.',
     image: '',
-    imageAspectRatio: 'portrait',
-    imageFrameStyle: 'soft',
+    aspectRatio: 'portrait',
+    frameStyle: 'soft',
     achievements: [
       'Featured in leading international creative showcases',
       'Collaborated with diverse clients across 10+ countries',

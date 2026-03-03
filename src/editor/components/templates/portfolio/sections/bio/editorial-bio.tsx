@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
@@ -45,9 +45,9 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
             <div
               className={cn(
                 'relative w-48 overflow-hidden bg-neutral-100',
-                getAspectRatioClass(sectionContent.bio.imageAspectRatio || 'portrait'),
+                getAspectRatioClass(sectionContent.bio.aspectRatio || 'portrait'),
                 theme.shadow,
-                getFrameStyle(sectionContent.bio.imageFrameStyle || 'none'),
+                getFrameStyle(sectionContent.bio.frameStyle || 'none'),
               )}
             >
               <Image

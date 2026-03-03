@@ -4,7 +4,8 @@ import { useContentSelector, useThemeSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 
-export type { PortfolioTemplateProps }
+// PortfolioTemplateProps is defined in @/editor/lib/template-types — import from there directly.
+// This file is the runtime shell only.
 
 interface PortfolioTemplateShellProps {
   Design: React.ComponentType<PortfolioTemplateProps>

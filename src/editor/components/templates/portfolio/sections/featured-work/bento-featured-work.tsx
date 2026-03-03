@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
 import { ArrowUpRight } from 'lucide-react'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { FrameStyle } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'

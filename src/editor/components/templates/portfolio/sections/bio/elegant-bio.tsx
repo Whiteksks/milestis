@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 
@@ -20,7 +20,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
           <div className="shrink-0 @lg:sticky @lg:top-32">
             <div className={cn(
               'relative w-[180px] @md:w-[220px] @lg:w-[240px] aspect-[4/5] overflow-hidden shadow-sm', 
-              getFrameStyle(sectionContent.bio.imageFrameStyle || 'soft')
+              getFrameStyle(sectionContent.bio.frameStyle || 'soft')
             )}>
               <Image
                 loader={passthroughLoader}

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
@@ -9,7 +9,7 @@ interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sec
 
 export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
   const heroImage = sectionContent.hero.image
-  const heroCropData = sectionContent.hero.imageCropData
+  const heroCropData = sectionContent.hero.cropData
 
   const descriptionBlock = (
     <div className="space-y-5 max-w-sm">
@@ -89,8 +89,8 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
             <CroppedImage
               src={heroImage}
               alt={sectionContent.hero.title}
-              aspectRatio={sectionContent.hero.imageAspectRatio || 'portrait'}
-              frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
+              aspectRatio={sectionContent.hero.aspectRatio || 'square'}
+              frameStyle={sectionContent.hero.frameStyle || 'none'}
               cropData={heroCropData}
               className="w-full"
               priority

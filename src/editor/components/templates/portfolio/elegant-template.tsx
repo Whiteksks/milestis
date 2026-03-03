@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { ElegantHero } from './sections/hero/elegant-hero'
 import { ElegantBio } from './sections/bio/elegant-bio'
 import { ElegantFeaturedWork } from './sections/featured-work/elegant-featured-work'

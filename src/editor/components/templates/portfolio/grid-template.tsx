@@ -1,6 +1,6 @@
 'use client'
 
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { GridHeader } from './sections/header/grid-header'
 import { GridHero } from './sections/hero/grid-hero'
 import { GridBio } from './sections/bio/grid-bio'

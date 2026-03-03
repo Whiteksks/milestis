@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
@@ -80,9 +80,9 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
                   <CroppedImage
                     src={heroImage}
                     alt={sectionContent.hero.title || 'Hero Image'}
-                    aspectRatio={sectionContent.hero.imageAspectRatio || 'square'}
-                    frameStyle={sectionContent.hero.imageFrameStyle || 'none'}
-                    cropData={sectionContent.hero.imageCropData}
+                    aspectRatio={sectionContent.hero.aspectRatio || 'square'}
+                    frameStyle={sectionContent.hero.frameStyle || 'none'}
+                    cropData={sectionContent.hero.cropData}
                     priority
                   />
                 ) : (

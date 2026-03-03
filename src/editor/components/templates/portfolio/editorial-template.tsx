@@ -1,6 +1,6 @@
 'use client'
 
-import type { PortfolioTemplateProps } from '@/editor/components/editor/layout/portfolio-template-shell'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { EditorialHeader } from './sections/header/editorial-header'
 import { EditorialHero } from './sections/hero/editorial-hero'
 import { EditorialBio } from './sections/bio/editorial-bio'
