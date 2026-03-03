@@ -42,6 +42,14 @@ export const frameStyles: Record<FrameStyle, FrameStyleConfig> = {
     preview: 'rounded-[2rem_0.5rem_2rem_0.5rem]',
     category: 'shape'
   },
+  'organic-b': {
+    id: 'organic-b',
+    name: 'Organic B',
+    description: 'Three large corners, one small notch at bottom-right',
+    className: 'rounded-[2rem_2rem_0.5rem_2rem]',
+    preview: 'rounded-[2rem_2rem_0.5rem_2rem]',
+    category: 'shape'
+  },
   arch: {
     id: 'arch',
     name: 'Arch',

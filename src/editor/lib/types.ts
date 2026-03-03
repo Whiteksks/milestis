@@ -26,6 +26,7 @@ export const FRAME_STYLES = {
   soft: 'soft',
   squircle: 'squircle',
   organic: 'organic',
+  organicB: 'organic-b',
   borderBold: 'border-bold',
   passepartout: 'passepartout',
   circle: 'circle',

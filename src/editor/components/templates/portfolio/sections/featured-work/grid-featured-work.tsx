@@ -54,8 +54,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
             >
               {/* Image Wrapper */}
               <div className={cn(
-                'relative aspect-[3/4] overflow-hidden rounded-xl border border-current/5 bg-muted/5',
-                theme.card
+                'relative aspect-[3/4] overflow-hidden ',
               )}>
                 <Image
                   loader={passthroughLoader}

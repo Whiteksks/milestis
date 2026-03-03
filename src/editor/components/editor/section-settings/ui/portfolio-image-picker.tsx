@@ -4,11 +4,12 @@ import { useRef, useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { aspectRatios } from "@/editor/lib/aspect-ratios"
+import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import { frameStyles } from "@/editor/lib/frame-styles"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import type { ImageCropData } from "@/editor/lib/crop-data"
 import { useCrop } from "@/editor/hooks/use-crop"
+import { buildFrameStylePatch, getFrameStyleRestrictions, getEffectiveAspectRatio } from "@/editor/lib/restrictions/frame-style-restrictions"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
 import { ImageIcon, Plus, Settings2 } from "lucide-react"
@@ -116,7 +117,7 @@ export function PortfolioImagePicker({
             image={current.image || ""}
             value={current.frameStyle}
             aspectRatio={current.aspectRatio}
-            onChange={(val) => update({ frameStyle: val })}
+            onChange={(val) => update(buildFrameStylePatch(val))}
             onAspectRatioChange={(val) => update({ aspectRatio: val, cropData: undefined })}
             onBack={() => setShowStylePicker(false)}
           />
@@ -165,18 +166,19 @@ export function PortfolioImagePicker({
             <div className="flex items-center gap-1 p-1.5 bg-card border-t border-border/50">
               <div className="flex flex-1 items-center gap-1 min-w-0">
                 <Select
-                  value={current.aspectRatio}
+                  value={getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)}
                   onValueChange={(val) => update({ aspectRatio: val as AspectRatio, cropData: undefined })}
+                  disabled={!!getFrameStyleRestrictions(current.frameStyle).lockedAspectRatio}
                 >
                   <SelectTrigger className="h-8 w-[72px] shrink-0 border-none shadow-none bg-transparent hover:bg-muted/50 text-xs px-2 focus:ring-0">
                     <SelectValue>
-                      {({ square: '1:1', portrait: '3:4', landscape: '4:3' } as Record<string, string>)[current.aspectRatio] ?? current.aspectRatio}
+                      {RATIO_LABELS[getEffectiveAspectRatio(current.frameStyle, current.aspectRatio)]}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(aspectRatios).map((r) => (
                       <SelectItem key={r.id} value={r.id} className="text-xs">
-                        <span className="font-mono mr-1.5 text-muted-foreground">{({ square: '1:1', portrait: '3:4', landscape: '4:3' } as Record<string, string>)[r.id]}</span>
+                        <span className="font-mono mr-1.5 text-muted-foreground">{RATIO_LABELS[r.id]}</span>
                         {r.name}
                       </SelectItem>
                     ))}

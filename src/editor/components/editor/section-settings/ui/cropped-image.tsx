@@ -6,13 +6,7 @@ import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import type { ImageCropData } from "@/editor/lib/crop-data"
 import { getCropWrapperStyle } from "@/editor/lib/crop-data"
 import { getFrameStyle } from "@/editor/lib/frame-styles"
-import { getAspectRatioClass } from "@/editor/lib/aspect-ratios"
-
-const ASPECT_RATIO_NUM: Record<AspectRatio, number> = {
-  square: 1,
-  portrait: 3 / 4,
-  landscape: 4 / 3,
-}
+import { getAspectRatioClass, ASPECT_RATIO_NUM } from "@/editor/lib/aspect-ratios"
 
 interface CroppedImageProps {
   /** Original image URL — always the unmodified source, never a cropped blob. */

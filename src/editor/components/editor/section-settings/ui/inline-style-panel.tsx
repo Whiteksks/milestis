@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { frameStyles, FRAME_STYLE_CATEGORIES, type FrameStyleConfig } from "@/editor/lib/frame-styles"
-import { aspectRatios } from "@/editor/lib/aspect-ratios"
+import { getFrameStyleRestrictions } from "@/editor/lib/restrictions/frame-style-restrictions"
+import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import type { FrameStyle, FrameStyleCategory, AspectRatio } from "@/editor/lib/types"
 
 interface InlineStylePanelProps {
@@ -19,12 +20,6 @@ interface InlineStylePanelProps {
 }
 
 type Tab = FrameStyleCategory | "all"
-
-const RATIO_LABELS: Record<AspectRatio, string> = {
-  square: '1:1',
-  portrait: '3:4',
-  landscape: '4:3',
-}
 
 export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspectRatioChange, onBack }: InlineStylePanelProps) {
   const [tab, setTab] = React.useState<Tab>("all")
@@ -56,20 +51,25 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
         </div>
         {/* Aspect ratio switcher */}
         <div className="flex items-center gap-0.5 shrink-0">
-          {(Object.keys(aspectRatios) as AspectRatio[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => onAspectRatioChange(r)}
-              className={cn(
-                "px-2 py-1 rounded text-[11px] font-medium transition-colors",
-                aspectRatio === r
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )}
-            >
-              {RATIO_LABELS[r]}
-            </button>
-          ))}
+          {(() => {
+            const locked = !!getFrameStyleRestrictions(value).lockedAspectRatio
+            return (Object.keys(aspectRatios) as AspectRatio[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => onAspectRatioChange(r)}
+                disabled={locked}
+                className={cn(
+                  "px-2 py-1 rounded text-[11px] font-medium transition-colors",
+                  aspectRatio === r
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                  locked && "opacity-40 pointer-events-none"
+                )}
+              >
+                {RATIO_LABELS[r]}
+              </button>
+            ))
+          })()}
         </div>
       </div>
 
@@ -144,7 +144,7 @@ function StyleCard({ style, image, selected, onSelect }: {
           : "hover:ring-2 hover:ring-muted-foreground/30 hover:ring-offset-1"
       )}>
         <div className={cn(
-          "w-full h-full relative overflow-hidden",
+          "absolute inset-0 overflow-hidden",
           style.className
         )}>
           {image ? (
