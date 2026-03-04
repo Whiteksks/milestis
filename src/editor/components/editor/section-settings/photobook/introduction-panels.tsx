@@ -2,7 +2,8 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { Label } from "@/components/ui/label"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -16,21 +17,21 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Text</Label>}
+    <div className={ps.pbRoot}>
+      {!dense && <PanelLabel>Text</PanelLabel>}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={ps.pbGrid2}>
         <Input
           value={introduction.title}
           onChange={(e) => updatePhotobookSection("introduction", { title: e.target.value })}
           placeholder="Page title"
-          className="h-9 text-xs"
+          className={ps.pbInput}
         />
         <Input
           value={introduction.quote || ""}
           onChange={(e) => updatePhotobookSection("introduction", { quote: e.target.value })}
           placeholder="Quote"
-          className="h-9 text-xs"
+          className={ps.pbInput}
         />
       </div>
 
@@ -39,7 +40,7 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
         onChange={(e) => updatePhotobookSection("introduction", { dedication: e.target.value })}
         placeholder="Dedication..."
         rows={4}
-        className="text-xs resize-none"
+        className={ps.pbTextarea}
       />
     </div>
   )
@@ -56,7 +57,7 @@ export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
+    <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
         onSelectImage={(url) =>
@@ -77,7 +78,7 @@ export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
       {!dense && (
         <>
           <Separator className="bg-border/40" />
-          <Label className="text-xs font-medium text-muted-foreground">Main Image</Label>
+          <PanelLabel>Main Image</PanelLabel>
         </>
       )}
 

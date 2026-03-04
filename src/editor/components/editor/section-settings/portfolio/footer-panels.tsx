@@ -1,11 +1,12 @@
 "use client"
 
 import { useContentSelector } from "@/editor/lib/store"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Plus, Facebook, Instagram, Twitter, Linkedin, Github, Mail } from "lucide-react"
+import { Trash2, Plus, Facebook, Instagram, Twitter, Linkedin, Github, Mail, Link2 } from "lucide-react"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 
 const iconMap = {
   facebook: Facebook,
@@ -32,10 +33,10 @@ export function FooterCopyrightPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-1.5">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Copyright</Label>}
+    <div className={ps.root(dense)}>
+      {!dense && <PanelLabel>Copyright</PanelLabel>}
       <Input
-        className="h-9 text-xs"
+        className={ps.input}
         value={footer.copyright}
         onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })}
         placeholder="© 2026. All rights reserved."
@@ -53,21 +54,21 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
   const socialLinks = footer.socialLinks || []
 
   return (
-    <div className="space-y-3">
-      {!dense && (
-        <div className="flex items-center justify-between gap-3">
-          <Label className="text-xs font-medium text-muted-foreground">Social Links</Label>
+    <div className={ps.root(dense)}>
+      {!dense && socialLinks.length > 0 && (
+        <div className="flex items-center justify-between">
+          <PanelLabel>Social Links</PanelLabel>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-8 text-xs"
+            className={ps.addBtn}
             onClick={() =>
               updateSectionContent("footer", {
                 socialLinks: [...socialLinks, { icon: "instagram", href: "" }],
               })
             }
           >
-            <Plus className="w-3.5 h-3.5 mr-2" /> Add
+            <Plus className="w-3.5 h-3.5 mr-1" /> Add
           </Button>
         </div>
       )}
@@ -76,14 +77,14 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
         <Button
           variant="outline"
           size="sm"
-          className="h-8 text-xs"
+          className="h-7 text-xs"
           onClick={() =>
             updateSectionContent("footer", {
               socialLinks: [...socialLinks, { icon: "instagram", href: "" }],
             })
           }
         >
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add social
+          <Plus className="w-3.5 h-3.5 mr-1" /> Add social
         </Button>
       )}
 
@@ -117,7 +118,7 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
             </Select>
 
             <Input
-              className="flex-1 h-8 text-xs"
+              className={ps.inputFlex}
               placeholder="URL"
               value={link.href}
               onChange={(e) => {
@@ -130,7 +131,7 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted shrink-0"
+              className={ps.deleteBtn}
               onClick={() => {
                 const newLinks = socialLinks.filter((_, i) => i !== index)
                 updateSectionContent("footer", { socialLinks: newLinks })
@@ -142,18 +143,22 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
         ))}
 
         {socialLinks.length === 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-9 text-xs border-dashed text-muted-foreground hover:text-foreground"
+          <button
+            type="button"
             onClick={() =>
               updateSectionContent("footer", {
                 socialLinks: [...socialLinks, { icon: "instagram", href: "" }],
               })
             }
+            className={ps.emptyZone}
           >
-            <Plus className="w-3.5 h-3.5 mr-2" /> Add your first link
-          </Button>
+            <Link2 className={ps.emptyIcon} />
+            {!dense && (
+              <span className={ps.emptyText}>
+                Add social links
+              </span>
+            )}
+          </button>
         )}
       </div>
     </div>

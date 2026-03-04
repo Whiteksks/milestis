@@ -2,7 +2,8 @@
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { Label } from "@/components/ui/label"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -19,20 +20,20 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Header</Label>}
-      <div className="grid grid-cols-2 gap-3">
+    <div className={ps.pbRoot}>
+      {!dense && <PanelLabel>Header</PanelLabel>}
+      <div className={ps.pbGrid2}>
         <Input
           value={gallery.title || ""}
           onChange={(e) => updatePhotobookSection("gallery", { title: e.target.value })}
           placeholder="Title"
-          className="h-9 text-xs"
+          className={ps.pbInput}
         />
         <Input
           value={gallery.description || ""}
           onChange={(e) => updatePhotobookSection("gallery", { description: e.target.value })}
           placeholder="Description"
-          className="h-9 text-xs"
+          className={ps.pbInput}
         />
       </div>
     </div>
@@ -68,14 +69,14 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className={ps.pbRoot}>
       <MediaPickerModal ownerId={ownerId} onSelectImages={handleSelectImages} />
 
       {!dense && (
         <>
           <Separator className="bg-border/40" />
           <div className="flex items-center justify-between gap-3">
-            <Label className="text-xs font-medium text-muted-foreground">Images</Label>
+            <PanelLabel>Images</PanelLabel>
             <Button variant="outline" onClick={() => openMediaPicker(ownerId)} className="h-8 text-xs">
               <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add
             </Button>

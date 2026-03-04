@@ -4,11 +4,12 @@ import { useEffect, useId, useMemo, useState, useCallback } from "react"
 import Image, { type ImageLoader } from "next/image"
 import { ChevronLeft, ChevronRight, Plus, Trash2, Image as ImageIcon } from "lucide-react"
 
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 
 import { useContentSelector, useUiSelector } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
@@ -116,17 +117,17 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   const update = (fields: any) => updatePhotobookSection("story", fields)
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Header</Label>}
+    <div className={ps.pbRoot}>
+      {!dense && <PanelLabel>Header</PanelLabel>}
       <Input
         value={story.title || ""}
         onChange={(e) => update({ title: e.target.value })}
         placeholder="Story title"
-        className="h-10 text-sm font-medium"
+        className={ps.pbInputTitle}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className="h-9 text-xs" />
-        <Input value={story.location || ""} onChange={(e) => update({ location: e.target.value })} placeholder="Location" className="h-9 text-xs" />
+      <div className={ps.pbGrid2}>
+        <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} />
+        <Input value={story.location || ""} onChange={(e) => update({ location: e.target.value })} placeholder="Location" className={ps.pbInput} />
       </div>
     </div>
   )
@@ -209,8 +210,8 @@ export function StoryMomentsPanel() {
           {activeSlot && (
             <div className="rounded-xl bg-muted/30 p-3 space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Title</Label>
-                <Input value={activeSlot.label} onChange={(e) => updateSlot(activeIndex, { label: e.target.value })} className="h-9 text-xs" placeholder="Event name..." />
+                <PanelLabel>Title</PanelLabel>
+                <Input value={activeSlot.label} onChange={(e) => updateSlot(activeIndex, { label: e.target.value })} className={ps.pbInput} placeholder="Event name..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {activeSlot.images?.map((img: string, i: number) => (
@@ -235,8 +236,8 @@ export function StoryMomentsPanel() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Caption</Label>
-                <Input value={activeSlot.caption || ""} onChange={(e) => updateSlot(activeIndex, { caption: e.target.value })} className="h-9 text-xs" placeholder="Add a caption..." />
+                <PanelLabel>Caption</PanelLabel>
+                <Input value={activeSlot.caption || ""} onChange={(e) => updateSlot(activeIndex, { caption: e.target.value })} className={ps.pbInput} placeholder="Add a caption..." />
               </div>
             </div>
           )}

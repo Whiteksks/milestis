@@ -1,9 +1,10 @@
 "use client"
 
 import { useContentSelector } from "@/editor/lib/store"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 
 export function VideoHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { video, updateSectionContent } = useContentSelector((state) => ({
@@ -12,24 +13,24 @@ export function VideoHeaderPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Header</Label>}
-      <div className="grid grid-cols-2 gap-3">
+    <div className={ps.root(dense)}>
+      {!dense && <PanelLabel>Header</PanelLabel>}
+      <div className={ps.grid2(dense)}>
         <Input
-          className="h-9 text-xs"
+          className={ps.input}
           value={video.title}
           onChange={(e) => updateSectionContent("video", { title: e.target.value })}
           placeholder="Title"
         />
         <Input
-          className="h-9 text-xs"
+          className={ps.input}
           value={video.subtitle || ""}
           onChange={(e) => updateSectionContent("video", { subtitle: e.target.value })}
           placeholder="Subtitle"
         />
       </div>
       <Textarea
-        className="min-h-22.5 text-xs resize-none"
+        className={ps.textarea(dense)}
         value={video.description}
         onChange={(e) => updateSectionContent("video", { description: e.target.value })}
         placeholder="Description..."
@@ -80,16 +81,16 @@ export function VideoUrlPanel({ dense = false }: { dense?: boolean }) {
   }
 
   return (
-    <div className="space-y-1.5">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">YouTube URL</Label>}
+    <div className={ps.root(dense)}>
+      {!dense && <PanelLabel>YouTube URL</PanelLabel>}
       <Input
-        className="h-9 text-xs"
+        className={ps.input}
         placeholder="https://www.youtube.com/watch?v=..."
         value={video.videoUrl}
         onChange={(e) => handleVideoUrlChange(e.target.value)}
       />
       {!dense && (
-        <p className="text-[11px] text-muted-foreground">Supports standard YouTube links and youtu.be</p>
+        <p className="text-[11px] text-muted-foreground/60">Supports standard YouTube links and youtu.be</p>
       )}
     </div>
   )

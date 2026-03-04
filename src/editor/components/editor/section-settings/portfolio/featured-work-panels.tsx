@@ -2,8 +2,9 @@
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Plus, Trash2, Wand2 } from "lucide-react"
@@ -29,17 +30,17 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Section Header</Label>}
-      <div className="grid grid-cols-2 gap-3">
+    <div className={ps.root(dense)}>
+      {!dense && <PanelLabel>Section Header</PanelLabel>}
+      <div className={ps.grid2(dense)}>
         <Input
-          className="h-9 text-xs"
+          className={ps.input}
           value={featuredWork.title}
           onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })}
           placeholder="My best work"
         />
         <Input
-          className="h-9 text-xs"
+          className={ps.input}
           value={featuredWork.subtitle || ""}
           onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })}
           placeholder="Subtitle"
@@ -118,7 +119,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className={ps.root(dense)}>
       <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
 
       {/* Quick actions */}
@@ -150,37 +151,39 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
       <div className="space-y-3">
         {!dense && (
           <div className="flex items-center justify-between gap-3">
-            <Label className="text-xs font-medium text-muted-foreground">
-              Projects
-            </Label>
+            <PanelLabel>Projects</PanelLabel>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="h-8 text-xs"
+              className={ps.addBtn}
               onClick={addProject}
             >
-              <Plus className="w-3.5 h-3.5 mr-2" /> Add
+              <Plus className="w-3.5 h-3.5 mr-1" /> Add
             </Button>
           </div>
         )}
 
         {projects.length === 0 ? (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-9 text-xs border-dashed text-muted-foreground hover:text-foreground"
+          <button
+            type="button"
             onClick={addProject}
+            className={ps.emptyZone}
           >
-            <Plus className="w-3.5 h-3.5 mr-2" /> Add your first project
-          </Button>
+            <Wand2 className={ps.emptyIcon} />
+            {!dense && (
+              <span className={ps.emptyText}>
+                Add your first project
+              </span>
+            )}
+          </button>
         ) : (
           <div className="space-y-4">
             {/* Switcher */}
             <div className="flex items-center justify-between gap-2">
               {!dense && (
-                <Label className="text-xs font-medium text-muted-foreground">
-                  Project {normalizedIndex + 1} / {projects.length}
-                </Label>
+                <span className="text-[11px] text-muted-foreground/60 tabular-nums">
+                  {normalizedIndex + 1} / {projects.length}
+                </span>
               )}
 
               <div className="flex items-center gap-1">

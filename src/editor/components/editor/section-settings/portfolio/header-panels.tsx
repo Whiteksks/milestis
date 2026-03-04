@@ -1,11 +1,12 @@
 "use client"
 
 import { useContentSelector } from "@/editor/lib/store"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Plus } from "lucide-react"
+import { Trash2, Plus, Menu } from "lucide-react"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 
 const anchorSections = [
   { id: "hero", label: "Hero Section" },
@@ -22,10 +23,10 @@ export function HeaderBrandPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-1.5">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Brand Title</Label>}
+    <div className={ps.root(dense)}>
+      {!dense && <PanelLabel>Brand Title</PanelLabel>}
       <Input
-        className="h-9 text-xs"
+        className={ps.input}
         value={header.title}
         onChange={(e) => updateSectionContent("header", { title: e.target.value })}
         placeholder="Your brand or name"
@@ -41,21 +42,21 @@ export function HeaderLinksPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && (
-        <div className="flex items-center justify-between gap-3">
-          <Label className="text-xs font-medium text-muted-foreground">Menu Links</Label>
+    <div className={ps.root(dense)}>
+      {!dense && header.links.length > 0 && (
+        <div className="flex items-center justify-between">
+          <PanelLabel>Menu Links</PanelLabel>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-8 text-xs"
+            className={ps.addBtn}
             onClick={() =>
               updateSectionContent("header", {
                 links: [...header.links, { label: "New Link", href: "#hero" }],
               })
             }
           >
-            <Plus className="w-3.5 h-3.5 mr-2" /> Add
+            <Plus className="w-3.5 h-3.5 mr-1" /> Add
           </Button>
         </div>
       )}
@@ -64,14 +65,14 @@ export function HeaderLinksPanel({ dense = false }: { dense?: boolean }) {
         <Button
           variant="outline"
           size="sm"
-          className="h-8 text-xs"
+          className="h-7 text-xs"
           onClick={() =>
             updateSectionContent("header", {
               links: [...header.links, { label: "New Link", href: "#hero" }],
             })
           }
         >
-          <Plus className="w-3.5 h-3.5 mr-2" /> Add link
+          <Plus className="w-3.5 h-3.5 mr-1" /> Add link
         </Button>
       )}
 
@@ -79,7 +80,7 @@ export function HeaderLinksPanel({ dense = false }: { dense?: boolean }) {
         {header.links.map((link, index) => (
           <div key={index} className="flex items-center gap-2">
             <Input
-              className="flex-1 h-8 text-xs"
+              className={ps.inputFlex}
               placeholder="Label"
               value={link.label}
               onChange={(e) => {
@@ -111,7 +112,7 @@ export function HeaderLinksPanel({ dense = false }: { dense?: boolean }) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted shrink-0"
+              className={ps.deleteBtn}
               onClick={() => {
                 const newLinks = header.links.filter((_, i) => i !== index)
                 updateSectionContent("header", { links: newLinks })
@@ -123,18 +124,22 @@ export function HeaderLinksPanel({ dense = false }: { dense?: boolean }) {
         ))}
 
         {header.links.length === 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-9 text-xs border-dashed text-muted-foreground hover:text-foreground"
+          <button
+            type="button"
             onClick={() =>
               updateSectionContent("header", {
                 links: [...header.links, { label: "New Link", href: "#hero" }],
               })
             }
+            className={ps.emptyZone}
           >
-            <Plus className="w-3.5 h-3.5 mr-2" /> Add your first link
-          </Button>
+            <Menu className={ps.emptyIcon} />
+            {!dense && (
+              <span className={ps.emptyText}>
+                Add menu links
+              </span>
+            )}
+          </button>
         )}
       </div>
     </div>

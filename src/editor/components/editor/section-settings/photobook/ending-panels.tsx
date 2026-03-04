@@ -2,7 +2,8 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { Label } from "@/components/ui/label"
+import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -16,14 +17,14 @@ export function EndingMessagePanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Message</Label>}
+    <div className={ps.pbRoot}>
+      {!dense && <PanelLabel>Message</PanelLabel>}
       <Textarea
         value={ending.text || ""}
         onChange={(e) => updatePhotobookSection("ending", { text: e.target.value })}
         placeholder="Thank you for watching..."
         rows={4}
-        className="text-xs resize-none"
+        className={ps.pbTextarea}
       />
     </div>
   )
@@ -36,20 +37,20 @@ export function EndingSignaturePanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-3">
-      {!dense && <Label className="text-xs font-medium text-muted-foreground">Signature</Label>}
-      <div className="grid grid-cols-2 gap-3">
+    <div className={ps.pbRoot}>
+      {!dense && <PanelLabel>Signature</PanelLabel>}
+      <div className={ps.pbGrid2}>
         <Input
           value={ending.signature || ""}
           onChange={(e) => updatePhotobookSection("ending", { signature: e.target.value })}
           placeholder="Signature"
-          className="h-9 text-xs italic"
+          className={ps.pbInputItalic}
         />
         <Input
           value={ending.date || ""}
           onChange={(e) => updatePhotobookSection("ending", { date: e.target.value })}
           placeholder="Date"
-          className="h-9 text-xs"
+          className={ps.pbInput}
         />
       </div>
     </div>
@@ -65,7 +66,7 @@ export function EndingImagePanel({ dense = false }: { dense?: boolean }) {
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   return (
-    <div className="space-y-3">
+    <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
         onSelectImage={(url) =>
@@ -86,7 +87,7 @@ export function EndingImagePanel({ dense = false }: { dense?: boolean }) {
       {!dense && (
         <>
           <Separator className="bg-border/40" />
-          <Label className="text-xs font-medium text-muted-foreground">Decorative Image</Label>
+          <PanelLabel>Decorative Image</PanelLabel>
         </>
       )}
 
