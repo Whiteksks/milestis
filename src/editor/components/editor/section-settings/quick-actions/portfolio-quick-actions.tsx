@@ -23,7 +23,7 @@ import { ContactDetailsPanel, ContactHeadingPanel } from "@/editor/components/ed
 import { FeaturedWorkHeaderPanel, FeaturedWorkProjectsPanel } from "@/editor/components/editor/section-settings/portfolio/featured-work-panels"
 import { FooterCopyrightPanel, FooterSocialLinksPanel } from "@/editor/components/editor/section-settings/portfolio/footer-panels"
 import { HeaderBrandPanel, HeaderLinksPanel } from "@/editor/components/editor/section-settings/portfolio/header-panels"
-import { HeroDescriptionPanel, HeroTitlePanel } from "@/editor/components/editor/section-settings/portfolio/hero-panels"
+import { HeroDescriptionPanel, HeroImagePanel, HeroTitlePanel } from "@/editor/components/editor/section-settings/portfolio/hero-panels"
 import { VideoHeaderPanel, VideoUrlPanel } from "@/editor/components/editor/section-settings/portfolio/video-panels"
 
 export type PortfolioSectionQuickActionId =
@@ -42,6 +42,7 @@ export type PortfolioSectionQuickActionId =
   | "header.links"
   | "hero.title"
   | "hero.description"
+  | "hero.image"
   | "video.header"
   | "video.url"
 
@@ -66,6 +67,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PortfolioSectionQuickAction[]>>
   hero: [
     { id: "hero.title", title: "Edit title", Icon: Type, Panel: HeroTitlePanel },
     { id: "hero.description", title: "Edit description", Icon: AlignLeft, Panel: HeroDescriptionPanel },
+    { id: "hero.image", title: "Hero image", Icon: ImageIcon, Panel: HeroImagePanel },
   ],
   featuredWork: [
     { id: "featuredWork.header", title: "Header", Icon: Type, Panel: FeaturedWorkHeaderPanel },

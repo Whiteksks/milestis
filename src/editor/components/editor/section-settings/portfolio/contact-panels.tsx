@@ -29,12 +29,14 @@ export function ContactHeadingPanel({ dense = false }: { dense?: boolean }) {
           placeholder="Subtitle"
         />
       </div>
-      <Textarea
-        className={ps.textarea(dense)}
-        value={contact.description}
-        onChange={(e) => updateSectionContent("contact", { description: e.target.value })}
-        placeholder="Description text..."
-      />
+      {!dense && (
+        <Textarea
+          className={ps.textarea(dense)}
+          value={contact.description}
+          onChange={(e) => updateSectionContent("contact", { description: e.target.value })}
+          placeholder="Description text..."
+        />
+      )}
     </div>
   )
 }

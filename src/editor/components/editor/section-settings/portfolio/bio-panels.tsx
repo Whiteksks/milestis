@@ -173,7 +173,7 @@ export function BioAchievementsPanel({ dense = false }: { dense?: boolean }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 shrink-0 text-muted-foreground/0 group-hover:text-muted-foreground hover:text-destructive hover:bg-transparent transition-colors"
+                className="h-6 w-6 shrink-0 text-muted-foreground md:text-muted-foreground/0 md:group-hover:text-muted-foreground hover:text-destructive hover:bg-transparent transition-colors"
                 onClick={() => removeAchievement(index)}
               >
                 <Trash2 className="w-3.5 h-3.5" />

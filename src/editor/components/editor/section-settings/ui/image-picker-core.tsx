@@ -14,7 +14,8 @@ import { buildFrameStylePatch, getFrameStyleRestrictions, getEffectiveAspectRati
 import { type SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
-import { ImageIcon, Plus, Settings2 } from "lucide-react"
+import Image from "next/image"
+import { ImageIcon, Plus, Settings2, X } from "lucide-react"
 
 /**
  * Flat value that ImagePickerCore operates on.
@@ -122,33 +123,57 @@ export function ImagePickerCore({
         ) : (
           <>
             {/* Photo area */}
-            <div
-              onClick={onOpenMediaPicker}
-              className="group relative w-full h-64 cursor-pointer overflow-hidden bg-muted/50"
-            >
+            <div className="relative w-full h-64 overflow-hidden bg-muted/50">
               {value.image ? (
                 <>
-                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105 overflow-hidden">
-                    {/* Always show the original photo — crop is applied in the template, not here */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={value.image}
-                      alt={label}
-                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-foreground/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 flex items-center justify-center backdrop-blur-[2px]">
-                    <div className="flex items-center gap-2 rounded-lg bg-background/90 p-1.5 px-3 shadow-lg">
-                      <Plus className="w-3.5 h-3.5 text-foreground" />
-                      <span className="text-xs font-medium text-foreground">Change</span>
-                    </div>
-                  </div>
+                  <Image
+                    src={value.image}
+                    alt={label}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    style={{ filter: "blur(2px)" }}
+                  />
+
+                  {/* Change button — centered pill with backdrop blur */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={onOpenMediaPicker}
+                    className="absolute inset-0 h-auto w-auto flex items-center justify-center rounded-none cursor-pointer hover:bg-transparent"
+                    aria-label="Change image"
+                  >
+                    <span className="flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-sm text-xs font-medium text-foreground/90 hover:bg-background/80 transition-colors">
+                      <Plus className="w-3 h-3" />
+                      Change
+                    </span>
+                  </Button>
+
+                  {/* Delete button — top-right, always visible */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onChange({ image: "", cropData: undefined })
+                    }}
+                    className="absolute right-2 top-2 z-10 h-7 w-7 rounded-full bg-background/60 backdrop-blur-md border border-white/20 shadow-sm text-foreground/70 hover:text-foreground hover:bg-background/80"
+                    aria-label="Remove image"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onOpenMediaPicker}
+                  className="flex flex-col items-center justify-center w-full h-full gap-2 rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                >
                   <ImageIcon className="w-6 h-6 stroke-[1.5]" />
                   <span className="text-xs font-medium">Select Media</span>
-                </div>
+                </Button>
               )}
             </div>
 
@@ -183,13 +208,14 @@ export function ImagePickerCore({
                   )}
 
                   {!restrictions.hideFrameStyle && (
-                    <button
+                    <Button
+                      variant="ghost"
                       disabled={!value.image}
                       onClick={() => setShowStylePicker(true)}
-                      className="h-8 flex-1 min-w-0 px-2 text-xs text-left truncate rounded-md transition-colors disabled:opacity-40 disabled:pointer-events-none text-foreground/80 hover:text-foreground hover:bg-muted/50"
+                      className="h-8 flex-1 min-w-0 px-2 text-xs text-left justify-start truncate rounded-md text-foreground/80 hover:text-foreground hover:bg-muted/50"
                     >
                       {frameStyles[value.frameStyle]?.name ?? "Style"}
-                    </button>
+                    </Button>
                   )}
                 </div>
 

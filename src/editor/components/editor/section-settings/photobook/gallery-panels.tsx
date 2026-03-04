@@ -107,7 +107,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
             />
             <button
               type="button"
-              className="absolute right-1.5 top-1.5 rounded-md bg-background/90 text-muted-foreground p-1 opacity-0 group-hover:opacity-100 transition-colors border border-border/60 hover:bg-muted hover:text-foreground"
+              className="absolute right-1.5 top-1.5 rounded-md bg-background/90 text-muted-foreground p-1 transition-colors border border-border/60 hover:bg-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
               onClick={() => removeImage(index)}
               aria-label="Remove image"
             >

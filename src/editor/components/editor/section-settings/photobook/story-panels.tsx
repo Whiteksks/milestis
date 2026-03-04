@@ -142,9 +142,31 @@ export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
 
   if (dense) {
     return (
-      <div className="space-y-3">
-        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={add}><Plus className="w-3.5 h-3.5 mr-2" /> Add paragraph</Button>
-        <p className="text-[11px] text-muted-foreground">For full text editing, open the section settings.</p>
+      <div className="space-y-2">
+        {paragraphs.map((p, i) => (
+          <Textarea
+            key={i}
+            value={p}
+            onChange={(e) => {
+              const next = [...paragraphs]; next[i] = e.target.value; updateParagraphs(next)
+            }}
+            onBlur={() => !paragraphs[i]?.trim() && updateParagraphs(paragraphs.filter((_, idx) => idx !== i))}
+            rows={2}
+            className="text-xs resize-none"
+            placeholder="Start writing..."
+          />
+        ))}
+        {!paragraphs.length && (
+          <button
+            onClick={add}
+            className="w-full rounded-xl border border-dashed p-4 text-xs text-muted-foreground hover:bg-muted/30"
+          >
+            Click to add the first paragraph
+          </button>
+        )}
+        <Button size="sm" variant="outline" className="h-7 w-full text-xs" onClick={add}>
+          <Plus className="w-3.5 h-3.5 mr-1" /> Add paragraph
+        </Button>
       </div>
     )
   }
@@ -182,7 +204,7 @@ export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
   )
 }
 
-export function StoryMomentsPanel() {
+export function StoryMomentsPanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
   const { slots, activeIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot } = useStoryMoments()
   const { openMediaPicker } = useUiSelector((s) => ({ openMediaPicker: s.openMediaPicker }))
@@ -222,7 +244,7 @@ export function StoryMomentsPanel() {
                         images: activeSlot.images.filter((_: any, idx: number) => idx !== i),
                         imageSettings: activeSlot.imageSettings.filter((_: any, idx: number) => idx !== i)
                       })} 
-                      className="absolute right-1.5 top-1.5 bg-background/90 p-1 opacity-0 group-hover:opacity-100 rounded-md shadow-sm"
+                      className="absolute right-1.5 top-1.5 bg-background/90 p-1 rounded-md shadow-sm md:opacity-0 md:group-hover:opacity-100"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>

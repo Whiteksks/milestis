@@ -149,19 +149,17 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
 
       {/* Projects */}
       <div className="space-y-3">
-        {!dense && (
-          <div className="flex items-center justify-between gap-3">
-            <PanelLabel>Projects</PanelLabel>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={ps.addBtn}
-              onClick={addProject}
-            >
-              <Plus className="w-3.5 h-3.5 mr-1" /> Add
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center justify-between gap-3">
+          {!dense && <PanelLabel>Projects</PanelLabel>}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
+            onClick={addProject}
+          >
+            <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add project" : "Add"}
+          </Button>
+        </div>
 
         {projects.length === 0 ? (
           <button

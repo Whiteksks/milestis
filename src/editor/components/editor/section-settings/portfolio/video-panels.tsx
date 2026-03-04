@@ -29,12 +29,14 @@ export function VideoHeaderPanel({ dense = false }: { dense?: boolean }) {
           placeholder="Subtitle"
         />
       </div>
-      <Textarea
-        className={ps.textarea(dense)}
-        value={video.description}
-        onChange={(e) => updateSectionContent("video", { description: e.target.value })}
-        placeholder="Description..."
-      />
+      {!dense && (
+        <Textarea
+          className={ps.textarea(dense)}
+          value={video.description}
+          onChange={(e) => updateSectionContent("video", { description: e.target.value })}
+          placeholder="Description..."
+        />
+      )}
     </div>
   )
 }
