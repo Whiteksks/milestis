@@ -1,6 +1,7 @@
 'use client'
 
 import { useUiSelector } from '@/editor/lib/store'
+import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -66,7 +67,7 @@ export function EditorHeader() {
                 key={id}
                 variant="ghost"
                 size="sm"
-                onClick={() => setDeviceView(id as any)}
+                onClick={() => setDeviceView(id as DeviceView)}
                 title={label}
                 className={cn(
                   'h-6 w-8 p-0 rounded-full transition-all',

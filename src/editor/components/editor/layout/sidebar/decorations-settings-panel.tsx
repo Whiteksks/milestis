@@ -63,9 +63,9 @@ export function DecorationsSettingsPanel() {
     setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  const themeDecorations = getDecorations(currentTheme)
+  const themeDecorations = useMemo(() => getDecorations(currentTheme), [currentTheme])
 
-  const decorations = useMemo(() => customDecorations, [customDecorations])
+  const decorations = customDecorations
 
   const handleAddDecoration = () => {
     const scroller = canvasScrollRef?.current
@@ -282,10 +282,7 @@ export function DecorationsSettingsPanel() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        createRemoveDecorationHandler(decoration.id)(e)
-                      }}
+                      onClick={createRemoveDecorationHandler(decoration.id)}
                       className="h-8 w-8 p-0 rounded-xl text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-all shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

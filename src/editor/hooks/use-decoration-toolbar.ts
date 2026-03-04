@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect } from "react"
+import { useCallback } from "react"
 import type { DecorationElement } from "../components/editor/layout/decorationEdit/decorationTypes"
 import { clamp, round2 } from "../components/editor/layout/decorationEdit/utils"
 
@@ -20,8 +20,6 @@ export function useDecorationToolbar({
   onActiveDecorationChange,
   onSelectDecoration,
 }: UseDecorationToolbarProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const isExpanded = Boolean(decoration)
 
   const {
@@ -37,25 +35,6 @@ export function useDecorationToolbar({
   const scalePercent = Math.round(clamp(normalizedScale, MIN_SCALE, MAX_SCALE) * 100)
   const opacityPercent = Math.round(clamp(normalizedOpacity, 0, 1) * 100)
   const isFront = zIndex >= 20
-
-  const [scaleText, setScaleText] = useState("100")
-
-  useEffect(() => {
-    setScaleText(String(Math.round(normalizedScale * 100)))
-  }, [normalizedScale])
-
-  const commitScale = useCallback(() => {
-    const raw = scaleText.replace(",", ".").trim()
-    const percent = Number(raw)
-    if (!Number.isFinite(percent)) {
-      setScaleText(String(Math.round(normalizedScale * 100)))
-      return
-    }
-
-    onUpdate?.({
-      scale: round2(clamp(percent / 100, MIN_SCALE, MAX_SCALE)),
-    })
-  }, [scaleText, normalizedScale, onUpdate])
 
   const toggleFlipX = useCallback(() => {
     onUpdate?.({ transform: { ...transform, flipX: !transform?.flipX } })
@@ -110,17 +89,11 @@ export function useDecorationToolbar({
   )
 
   return {
-    fileInputRef,
     isExpanded,
-    normalizedScale,
-    normalizedOpacity,
     scalePercent,
     opacityPercent,
     isFront,
     responsiveScale,
-    scaleText,
-    setScaleText,
-    commitScale,
     toggleFlipX,
     toggleFlipY,
     handleFileChange,

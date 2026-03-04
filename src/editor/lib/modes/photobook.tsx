@@ -4,6 +4,7 @@ import type { ModeRegistryEntry } from './types'
 import { type PhotobookTemplateId } from './photobook-ids'
 
 import dynamic from 'next/dynamic'
+import { PhotobookTemplateShell } from '@/editor/components/editor/layout/photobook-template-shell'
 
 const LoadingTemplate = () => (
   <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
@@ -115,29 +116,17 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
       default: return null
     }
   },
-  canvasDataSelector: (s) => ({
-    photobookSectionContent: s.photobookSectionContent,
-    photobookSectionVisibility: s.photobookSectionVisibility,
-  }),
+  canvasDataSelector: () => ({}),
 
-  renderCanvas: ({ templateId, theme, frameStyle, photobookSectionContent, photobookSectionVisibility }) => {
+  renderCanvas: ({ templateId }) => {
     const id = templateId as PhotobookTemplateId
-    const content = photobookSectionContent!
-    const visibility = photobookSectionVisibility!
 
-    const PhotobookDesign =
+    const Design =
       photobookTemplateComponents[id] ??
       photobookTemplateComponents['wedding-timeline'] ??
       PhotobookTimelineTemplate
 
-    return (
-      <PhotobookDesign
-        theme={theme}
-        sectionVisibility={visibility}
-        sectionContent={content}
-        frameStyle={frameStyle}
-      />
-    )
+    return <PhotobookTemplateShell Design={Design} />
   },
 
   visibilitySelector: (s) => s.photobookSectionVisibility,

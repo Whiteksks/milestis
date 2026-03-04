@@ -53,13 +53,13 @@ export function useCrop({ image, cropData }: UseCropOptions): UseCropReturn {
   // Always reference the original, unmodified image URL
   const originalImageRef = useRef<string>(image)
 
-  const syncImage = (newImage: string) => {
+  const syncImage = useCallback((newImage: string) => {
     originalImageRef.current = newImage
     setCrop({ x: 0, y: 0 })
     setZoom(1)
     setCroppedAreaPixels(null)
     setShowCrop(false)
-  }
+  }, [])
 
   const onCropComplete = useCallback((_: Area, areaPixels: Area) => {
     setCroppedAreaPixels(areaPixels)

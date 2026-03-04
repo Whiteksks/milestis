@@ -40,7 +40,10 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
 
   const handleOpenChange = (open: boolean) => {
     if (open) openMediaPicker(ownerId)
-    else closeMediaPicker()
+    else {
+      setSelectedUrls([])
+      closeMediaPicker()
+    }
   }
 
   const handleConfirm = () => {
@@ -162,7 +165,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         <div className="flex justify-end gap-3 pt-6 border-t border-border/50 mt-0">
           <Button 
             variant="ghost" 
-            onClick={closeMediaPicker}
+            onClick={() => { setSelectedUrls([]); closeMediaPicker() }}
             className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             Cancel

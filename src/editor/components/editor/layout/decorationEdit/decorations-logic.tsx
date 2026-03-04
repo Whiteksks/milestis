@@ -109,8 +109,6 @@ export function DecorationsLayer({
           />
         )}
       </AnimatePresence>
-
-      <AnimatePresence />
     </>
   )
 }

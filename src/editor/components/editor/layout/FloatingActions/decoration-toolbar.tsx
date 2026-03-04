@@ -1,6 +1,6 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -31,12 +31,17 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ScanSearch,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { DecorationElement } from "../decorationEdit/decorationTypes"
 import { clamp } from "../decorationEdit/utils"
 import { useDecorationToolbar } from "../../../../hooks/use-decoration-toolbar"
+
+// Module-level constants — не пересоздаются при каждом рендере
+const ICON_BTN = "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+const SEP = "mx-1.5 h-4 bg-border/60"
 
 function OpacityIcon({ percent }: { percent: number }) {
   const clipTop = clamp(100 - percent, 0, 100)
@@ -55,6 +60,71 @@ function OpacityIcon({ percent }: { percent: number }) {
   )
 }
 
+// Выделен в отдельный компонент — используется и в collapsed, и в "more"-поповере
+interface DecorationPickerProps {
+  decorations: DecorationElement[]
+  activeDecorationId: string | null
+  activeName: string | undefined
+  onPick: (id: string) => void
+  /** compact — кнопка-триггер в стиле collapsed-toolbar */
+  variant: "compact" | "full"
+}
+
+function DecorationPicker({
+  decorations,
+  activeDecorationId,
+  activeName,
+  onPick,
+  variant,
+}: DecorationPickerProps) {
+  const trigger =
+    variant === "compact" ? (
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-8 px-2.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+        aria-label="Select decoration"
+      >
+        <span className="text-xs font-medium">{activeName || "Select decoration"}</span>
+        <ChevronDown className="ml-1 h-3.5 w-3.5" />
+      </Button>
+    ) : (
+      <Button
+        variant="outline"
+        className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
+        aria-label="Select decoration"
+      >
+        <span>{activeName || "Select"}</span>
+        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+      </Button>
+    )
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent
+        side="top"
+        sideOffset={10}
+        className={cn("rounded-xl", variant === "compact" ? "w-64" : "w-60")}
+      >
+        {variant === "compact" && (
+          <DropdownMenuLabel className="text-xs">Decorations</DropdownMenuLabel>
+        )}
+        <DropdownMenuRadioGroup
+          value={activeDecorationId ?? ""}
+          onValueChange={(v) => v && onPick(v)}
+        >
+          {decorations.map((d, i) => (
+            <DropdownMenuRadioItem key={d.id} value={d.id}>
+              {d.name || `Decoration ${i + 1}`}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 export interface DecorationToolbarProps {
   decorations: DecorationElement[]
   activeDecorationId: string | null
@@ -68,7 +138,7 @@ export interface DecorationToolbarProps {
   onCloseSettings: () => void
   onOpenSettings: () => void
   onSelectDecoration?: (id: string) => void
-  onLocate?: () => void // scroll to element
+  onLocate?: () => void // прокрутить к элементу на canvas
   className?: string
 }
 
@@ -86,8 +156,10 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   onLocate,
   className,
 }: DecorationToolbarProps) {
+  // ref живёт в компоненте — он про DOM, не про логику
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const {
-    fileInputRef,
     isExpanded,
     scalePercent,
     opacityPercent,
@@ -109,11 +181,6 @@ export const DecorationToolbar = memo(function DecorationToolbar({
     onSelectDecoration,
   })
 
-  const iconButtonClassName =
-    "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-
-  const separatorClassName = "mx-1.5 h-4 bg-border/60"
-
   return (
     <div className={cn("flex p-1 gap-0", className)}>
       <AnimatePresence mode="wait" initial={false}>
@@ -126,45 +193,26 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             transition={{ duration: 0.14, ease: "easeOut" }}
             className="flex items-center gap-0"
           >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="h-8 px-2.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-                  >
-                    <span className="text-xs font-medium">
-                      {decoration?.name || 'Select decoration'}
-                    </span>
-                    <ChevronDown className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" sideOffset={10} className="w-64">
-                  <DropdownMenuLabel className="text-xs">Decorations</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup
-                    value={activeDecorationId ?? ""}
-                    onValueChange={(v) => v && handleDecorationPick(v)}
-                  >
-                    {decorations.map((d, i) => (
-                      <DropdownMenuRadioItem key={d.id} value={d.id}>
-                        {d.name || `Decoration ${i + 1}`}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <DecorationPicker
+              decorations={decorations}
+              activeDecorationId={activeDecorationId}
+              activeName={decoration?.name}
+              onPick={handleDecorationPick}
+              variant="compact"
+            />
 
-              <Separator orientation="vertical" className={separatorClassName} />
+            <Separator orientation="vertical" className={SEP} />
 
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onOpenSettings}
-                disabled={!activeDecorationId}
-                className={iconButtonClassName}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onOpenSettings}
+              disabled={!activeDecorationId}
+              aria-label="Open decoration settings"
+              className={ICON_BTN}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </motion.div>
         ) : (
           <motion.div
@@ -175,196 +223,172 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             transition={{ duration: 0.14, ease: "easeOut" }}
             className="flex items-center gap-0"
           >
-              {/* flip */}
-              <Button
-                variant="ghost"
-                onClick={toggleFlipX}
-                className={iconButtonClassName}
-              >
-                <FlipHorizontal className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={toggleFlipY}
-                className={iconButtonClassName}
-              >
-                <FlipVertical className="h-4 w-4" />
-              </Button>
+            {/* flip */}
+            <Button
+              variant="ghost"
+              onClick={toggleFlipX}
+              aria-label="Flip horizontal"
+              className={ICON_BTN}
+            >
+              <FlipHorizontal className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={toggleFlipY}
+              aria-label="Flip vertical"
+              className={ICON_BTN}
+            >
+              <FlipVertical className="h-4 w-4" />
+            </Button>
 
-              <Separator orientation="vertical" className={separatorClassName} />
+            <Separator orientation="vertical" className={SEP} />
 
-              {/* scale */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className={iconButtonClassName}>
-                    <Maximize2 className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
-                  <div className="flex items-center justify-between mb-3">
-                    <Label className="text-xs text-muted-foreground">Scale</Label>
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {scalePercent}%
-                    </span>
-                  </div>
-                  <Slider
-                    value={[scalePercent]}
-                    min={50}
-                    max={300}
-                    step={5}
-                    onValueChange={([v]) => handleScaleChange(v)}
+            {/* scale */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" aria-label="Scale" className={ICON_BTN}>
+                  <Maximize2 className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <Label className="text-xs text-muted-foreground">Scale</Label>
+                  <span className="text-xs tabular-nums text-muted-foreground">{scalePercent}%</span>
+                </div>
+                <Slider
+                  value={[scalePercent]}
+                  min={50}
+                  max={300}
+                  step={5}
+                  onValueChange={([v]) => handleScaleChange(v)}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* opacity */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" aria-label="Opacity" className={ICON_BTN}>
+                  <OpacityIcon percent={opacityPercent} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <Label className="text-xs text-muted-foreground">Opacity</Label>
+                  <span className="text-xs tabular-nums text-muted-foreground">{opacityPercent}%</span>
+                </div>
+                <Slider
+                  value={[opacityPercent]}
+                  min={10}
+                  max={100}
+                  step={5}
+                  onValueChange={([v]) => handleOpacityChange(v)}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Separator orientation="vertical" className={SEP} />
+
+            {/* z-index */}
+            <Button
+              variant="ghost"
+              onClick={toggleZIndex}
+              aria-label={isFront ? "Send to back" : "Bring to front"}
+              className={ICON_BTN}
+            >
+              {isFront ? <BringToFront className="h-4 w-4" /> : <SendToBack className="h-4 w-4" />}
+            </Button>
+
+            {/* image replace */}
+            <Button
+              variant="ghost"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Replace image"
+              className={ICON_BTN}
+            >
+              <ImageIcon className="h-4 w-4" />
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleFileChange}
+            />
+
+            {/* more options */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" aria-label="More options" className={ICON_BTN}>
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" sideOffset={10} className="w-72 p-4 rounded-2xl border-border/60 shadow-lg">
+                {/* Decoration Selector — единый источник, тот же DecorationPicker */}
+                <div className="mb-4">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Decoration</Label>
+                  <DecorationPicker
+                    decorations={decorations}
+                    activeDecorationId={activeDecorationId}
+                    activeName={decoration?.name}
+                    onPick={handleDecorationPick}
+                    variant="full"
                   />
-                </PopoverContent>
-              </Popover>
+                </div>
 
+                <Separator className="mb-4 bg-border/40" />
 
-              {/* opacity */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className={iconButtonClassName}>
-                    <OpacityIcon percent={opacityPercent} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
-                  <div className="flex items-center justify-between mb-3">
-                    <Label className="text-xs text-muted-foreground">Opacity</Label>
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {opacityPercent}%
-                    </span>
-                  </div>
-                  <Slider
-                    value={[opacityPercent]}
-                    min={10}
-                    max={100}
-                    step={5}
-                    onValueChange={([v]) => handleOpacityChange(v)}
-                  />
-                </PopoverContent>
-              </Popover>
-
-
-              <Separator orientation="vertical" className={separatorClassName} />
-
-              {/* z */}
-              <Button
-                variant="ghost"
-                onClick={toggleZIndex}
-                className={iconButtonClassName}
-              >
-                {isFront ? (
-                  <BringToFront className="h-4 w-4" />
-                ) : (
-                  <SendToBack className="h-4 w-4" />
-                )}
-              </Button>
-
-
-
-              {/* image */}
-              <Button
-                variant="ghost"
-                onClick={() => fileInputRef.current?.click()}
-                className={iconButtonClassName}
-              >
-                <ImageIcon className="h-4 w-4" />
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleFileChange}
-              />
-
-
-              {/* more */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className={iconButtonClassName}>
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={10} className="w-68 p-4 rounded-2xl border-border/60 shadow-lg">
-                  {/* Decoration Selector */}
-                  <div className="mb-4">
-                    <Label className="text-xs text-muted-foreground mb-2 block">Decoration</Label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
-                        >
-                          <span>{decoration?.name || 'Select'}</span>
-                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-60 rounded-xl">
-                        <DropdownMenuRadioGroup
-                          value={activeDecorationId ?? ""}
-                          onValueChange={(v) => v && handleDecorationPick(v)}
-                        >
-                          {decorations.map((d, i) => (
-                            <DropdownMenuRadioItem key={d.id} value={d.id}>
-                              {d.name || `Decoration ${i + 1}`}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-
-                  <Separator className="mb-4 bg-border/40" />
-
-                  {/* Mobile Adaptation */}
-                  <label className="flex items-center justify-between gap-3 py-1 cursor-pointer">
-                    <div>
-                      <div className="text-xs font-medium text-foreground">Mobile adaptation</div>
-                      <div className="text-[11px] text-muted-foreground mt-0.5">
-                        Scale down on small screens
-                      </div>
+                {/* Mobile Adaptation */}
+                <label className="flex items-center justify-between gap-3 py-1 cursor-pointer">
+                  <div>
+                    <div className="text-xs font-medium text-foreground">Mobile adaptation</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Scale down on small screens
                     </div>
-                    <Switch
-                      checked={Boolean(responsiveScale)}
-                      onCheckedChange={handleResponsiveScaleChange}
-                    />
-                  </label>
-
-                  <Separator className="my-4 bg-border/40" />
-
-                  {/* Actions */}
-                  <div className="space-y-0.5">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-xl"
-                      onClick={onLocate}
-                      disabled={!onLocate}
-                    >
-                      <ChevronDown className="h-3.5 w-3.5 mr-2" />
-                      Locate on canvas
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                      onClick={onDelete}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" />
-                      Delete
-                    </Button>
                   </div>
-                </PopoverContent>
-              </Popover>
+                  <Switch
+                    checked={Boolean(responsiveScale)}
+                    onCheckedChange={handleResponsiveScaleChange}
+                  />
+                </label>
 
-              <Separator orientation="vertical" className={separatorClassName} />
+                <Separator className="my-4 bg-border/40" />
 
-              <Button
-                variant="ghost"
-                onClick={onCloseSettings}
-                className={iconButtonClassName}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+                {/* Actions */}
+                <div className="space-y-0.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-xl"
+                    onClick={onLocate}
+                    disabled={!onLocate}
+                  >
+                    <ScanSearch className="h-3.5 w-3.5 mr-2" />
+                    Locate on canvas
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                    onClick={onDelete}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Separator orientation="vertical" className={SEP} />
+
+            <Button
+              variant="ghost"
+              onClick={onCloseSettings}
+              aria-label="Close settings"
+              className={ICON_BTN}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>

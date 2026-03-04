@@ -72,7 +72,7 @@ export function ImagePickerCore({
         onChange({ cropData: undefined })
       }
     }
-  }, [value.image]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value.image, syncImage, onChange])
 
   const handleApplyAndSave = async () => {
     const cropData = await handleApply()

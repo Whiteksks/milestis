@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { useThemeSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from './registry'
@@ -25,23 +25,23 @@ export function BackgroundLayers({
 }) {
   const layerRef = useRef<HTMLDivElement>(null)
 
-  const { depth, rays, texture, isDark, scrollMode, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color } = useThemeSelector((state) => {
+  // currentTheme is a primitive — no useShallow needed, stable reference
+  const currentTheme = useThemeSelector((state) => state.currentTheme)
+  // getTheme is pure and cheap, but called on every store update when inside a selector.
+  // Moving it outside with useMemo ties the cost to theme changes only.
+  const { primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color } = useMemo(
+    () => getTheme(currentTheme).bgEffectColors,
+    [currentTheme],
+  )
+
+  const { depth, rays, texture, isDark, scrollMode } = useThemeSelector((state) => {
     const c = state.themeCustomizations
-    const themeConfig = getTheme(state.currentTheme)
-    const ec = themeConfig.bgEffectColors
     return {
-      depth:   c.depthEffect   ?? 'none',
-      rays:    c.raysEffect    ?? 'none',
-      texture: c.textureEffect ?? 'none',
+      depth:      c.depthEffect            ?? 'none',
+      rays:       c.raysEffect             ?? 'none',
+      texture:    c.textureEffect          ?? 'none',
       isDark:     (c.backgroundLayersTheme ?? 'dark') === 'dark',
-      scrollMode: c.backgroundScrollMode ?? 'fixed',
-      primaryColor:   ec.primary,
-      secondaryColor: ec.secondary,
-      rayColor:       ec.ray,
-      subtleColor:    ec.subtle,
-      highlightColor: ec.highlight,
-      shadowColor:    ec.shadow,
-      accent2Color:   ec.accent2,
+      scrollMode: c.backgroundScrollMode   ?? 'fixed',
     }
   })
 
