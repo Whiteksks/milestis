@@ -4,6 +4,7 @@ import * as React from "react"
 import { ChevronLeft, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { frameStyles, FRAME_STYLE_CATEGORIES, type FrameStyleConfig } from "@/editor/lib/frame-styles"
 import { getFrameStyleRestrictions } from "@/editor/lib/restrictions/frame-style-restrictions"
@@ -77,18 +78,30 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
       {/* Categories */}
       <ScrollArea className="w-full whitespace-nowrap border-b bg-muted/20">
         <div className="flex p-2 gap-1">
-          <TabButton active={tab === "all"} onClick={() => setTab("all")}>
-            All
-          </TabButton>
-          {FRAME_STYLE_CATEGORIES.map((cat) => (
-            <TabButton 
-              key={cat.id} 
-              active={tab === cat.id} 
-              onClick={() => setTab(cat.id)}
+          <ToggleGroup
+            type="single"
+            value={tab}
+            onValueChange={(v) => { if (v) setTab(v as Tab) }}
+            className="flex gap-1 flex-nowrap"
+          >
+            <ToggleGroupItem
+              value="all"
+              variant="default"
+              className="px-3 py-1.5 h-auto rounded-full text-[11px] font-medium data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground"
             >
-              {cat.label}
-            </TabButton>
-          ))}
+              All
+            </ToggleGroupItem>
+            {FRAME_STYLE_CATEGORIES.map((cat) => (
+              <ToggleGroupItem
+                key={cat.id}
+                value={cat.id}
+                variant="default"
+                className="px-3 py-1.5 h-auto rounded-full text-[11px] font-medium data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground"
+              >
+                {cat.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
         <ScrollBar orientation="horizontal" className="invisible" />
       </ScrollArea>
@@ -108,24 +121,6 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
         </div>
       </ScrollArea>
     </div>
-  )
-}
-
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={onClick}
-      className={cn(
-        "px-3 py-1.5 h-auto rounded-full text-[11px] font-medium",
-        active
-          ? "bg-foreground text-background shadow-sm hover:bg-foreground hover:text-background"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      )}
-    >
-      {children}
-    </Button>
   )
 }
 

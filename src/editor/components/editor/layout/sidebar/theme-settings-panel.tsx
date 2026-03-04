@@ -2,6 +2,8 @@
 
 import { useThemeSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Separator } from '@/components/ui/separator'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
@@ -30,23 +32,23 @@ function OptionRow<T extends string>({
           <span className="text-[10px] text-muted-foreground/40">{hint}</span>
         )}
       </div>
-      <div className="flex flex-wrap gap-1">
+      <ToggleGroup
+        type="single"
+        value={active}
+        onValueChange={(v) => { if (v) onChange(v as T) }}
+        className="flex flex-wrap gap-1"
+      >
         {options.map((opt) => (
-          <button
+          <ToggleGroupItem
             key={opt.id}
-            type="button"
-            onClick={() => onChange(opt.id)}
-            className={cn(
-              'px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-lg transition-all duration-150',
-              active === opt.id
-                ? 'bg-foreground/12 text-foreground border border-foreground/20 shadow-sm'
-                : 'text-foreground/45 hover:text-foreground/70 border border-transparent hover:border-border/40'
-            )}
+            value={opt.id}
+            variant="outline"
+            className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide rounded-lg data-[state=on]:bg-foreground/12 data-[state=on]:text-foreground data-[state=on]:border-foreground/20 data-[state=on]:shadow-sm text-foreground/45 border-transparent hover:text-foreground/70 hover:border-border/40"
           >
             {opt.label}
-          </button>
+          </ToggleGroupItem>
         ))}
-      </div>
+      </ToggleGroup>
     </div>
   )
 }
@@ -100,23 +102,22 @@ export function ThemeSettingsPanel() {
           <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-foreground/50">
             Mode
           </span>
-          <div className="flex rounded-lg border border-border/50 overflow-hidden">
+          <ToggleGroup
+            type="single"
+            value={layersTheme}
+            onValueChange={(v) => { if (v) updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme }) }}
+            className="rounded-lg border border-border/50 overflow-hidden gap-0"
+          >
             {(['dark', 'light'] as BackgroundLayersTheme[]).map((t) => (
-              <button
+              <ToggleGroupItem
                 key={t}
-                type="button"
-                onClick={() => updateThemeCustomization({ backgroundLayersTheme: t })}
-                className={cn(
-                  'px-3 py-1.5 text-[11px] font-medium tracking-wide transition-all duration-150 capitalize',
-                  layersTheme === t
-                    ? 'bg-foreground/10 text-foreground'
-                    : 'text-foreground/40 hover:text-foreground/60 hover:bg-muted/40'
-                )}
+                value={t}
+                className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide capitalize rounded-none border-0 data-[state=on]:bg-foreground/10 data-[state=on]:text-foreground text-foreground/40 hover:text-foreground/60 hover:bg-muted/40"
               >
                 {t}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
 
         {/* Fixed / Scroll scroll-mode toggle */}
@@ -124,26 +125,25 @@ export function ThemeSettingsPanel() {
           <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-foreground/50">
             Scroll
           </span>
-          <div className="flex rounded-lg border border-border/50 overflow-hidden">
+          <ToggleGroup
+            type="single"
+            value={scrollMode}
+            onValueChange={(v) => { if (v) updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode }) }}
+            className="rounded-lg border border-border/50 overflow-hidden gap-0"
+          >
             {(['fixed', 'scroll'] as BackgroundScrollMode[]).map((m) => (
-              <button
+              <ToggleGroupItem
                 key={m}
-                type="button"
-                onClick={() => updateThemeCustomization({ backgroundScrollMode: m })}
-                className={cn(
-                  'px-3 py-1.5 text-[11px] font-medium tracking-wide transition-all duration-150 capitalize',
-                  scrollMode === m
-                    ? 'bg-foreground/10 text-foreground'
-                    : 'text-foreground/40 hover:text-foreground/60 hover:bg-muted/40'
-                )}
+                value={m}
+                className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide capitalize rounded-none border-0 data-[state=on]:bg-foreground/10 data-[state=on]:text-foreground text-foreground/40 hover:text-foreground/60 hover:bg-muted/40"
               >
                 {m}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
 
-        <div className="h-px bg-border/30" />
+        <Separator className="bg-border/30" />
 
         {/* Layer 1 label */}
         <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export function ThemeSettingsPanel() {
           <span className="text-xs text-foreground/60">Base — solid <code className="text-[10px] bg-muted/60 px-1 rounded">--background</code> from theme</span>
         </div>
 
-        <div className="h-px bg-border/30" />
+        <Separator className="bg-border/30" />
 
         {/* Layer 2: Depth */}
         <div className="flex items-start gap-3">
@@ -169,7 +169,7 @@ export function ThemeSettingsPanel() {
           />
         </div>
 
-        <div className="h-px bg-border/30" />
+        <Separator className="bg-border/30" />
 
         {/* Layer 2b: Rays */}
         <div className="flex items-start gap-3">
@@ -185,7 +185,7 @@ export function ThemeSettingsPanel() {
           />
         </div>
 
-        <div className="h-px bg-border/30" />
+        <Separator className="bg-border/30" />
 
         {/* Layer 3: Texture */}
         <div className="flex items-start gap-3">

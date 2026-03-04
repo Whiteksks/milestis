@@ -3,6 +3,8 @@
 import Cropper, { type Area } from "react-easy-crop"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { Separator } from "@/components/ui/separator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Check, X, ZoomIn, RotateCcw } from "lucide-react"
 import type { CSSProperties } from "react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
@@ -132,40 +134,52 @@ export function InlineCropPanel({
           {zoom.toFixed(1)}x
         </span>
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onReset}
-          title="Reset position & zoom"
-          className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onReset}
+              className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Reset position & zoom</TooltipContent>
+        </Tooltip>
 
-        <div className="w-px h-4 bg-border/50 shrink-0" />
+        <Separator orientation="vertical" className="h-4 bg-border/50 shrink-0" />
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 shrink-0"
-          onClick={onCancel}
-          disabled={isApplying}
-          title="Cancel crop"
-        >
-          <X className="w-3.5 h-3.5" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 shrink-0"
+              onClick={onCancel}
+              disabled={isApplying}
+            >
+              <X className="w-3.5 h-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Cancel crop</TooltipContent>
+        </Tooltip>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10 shrink-0"
-          onClick={onApply}
-          disabled={isApplying}
-          title="Apply crop"
-        >
-          <Check className="w-3.5 h-3.5" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10 shrink-0"
+              onClick={onApply}
+              disabled={isApplying}
+            >
+              <Check className="w-3.5 h-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Apply crop</TooltipContent>
+        </Tooltip>
       </div>
     </>
   )

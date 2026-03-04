@@ -3,8 +3,9 @@
 import { useUiSelector } from '@/editor/lib/store'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Separator } from '@/components/ui/separator'
 import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export function EditorHeader() {
   const { deviceView, setDeviceView, toggleMediaLibrary, editorMode, setEditorMode } = useUiSelector((state) => ({
@@ -25,60 +26,53 @@ export function EditorHeader() {
           </span>
 
           <div className="hidden sm:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setEditorMode('portfolio')}
-              className={cn(
-                'h-6 px-3.5 rounded-full text-xs font-medium transition-all',
-                editorMode === 'portfolio'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+            <ToggleGroup
+              type="single"
+              value={editorMode}
+              onValueChange={(v) => { if (v) setEditorMode(v as typeof editorMode) }}
+              className="gap-0"
             >
-              Portfolio
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setEditorMode('photobook')}
-              className={cn(
-                'h-6 px-3.5 rounded-full text-xs font-medium transition-all',
-                editorMode === 'photobook'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Photobook
-            </Button>
+              <ToggleGroupItem
+                value="portfolio"
+                className="h-6 px-3.5 rounded-full text-xs font-medium data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
+              >
+                Portfolio
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="photobook"
+                className="h-6 px-3.5 rounded-full text-xs font-medium data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
+              >
+                Photobook
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </div>
 
         {/* CENTER — VIEWPORT */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
-            {[
-              { id: 'desktop', icon: Monitor, label: 'Desktop' },
-              { id: 'tablet', icon: Tablet, label: 'Tablet' },
-              { id: 'mobile', icon: Smartphone, label: 'Mobile' },
-              { id: 'fullscreen', icon: Monitor, label: 'Full Screen' }
-            ].map(({ id, icon: Icon, label }) => (
-              <Button
-                key={id}
-                variant="ghost"
-                size="sm"
-                onClick={() => setDeviceView(id as DeviceView)}
-                title={label}
-                className={cn(
-                  'h-6 w-8 p-0 rounded-full transition-all',
-                  deviceView === id
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <Icon className="h-3.5 w-3.5" />
-              </Button>
-            ))}
+            <ToggleGroup
+              type="single"
+              value={deviceView}
+              onValueChange={(v) => { if (v) setDeviceView(v as DeviceView) }}
+              className="gap-0"
+            >
+              {[
+                { id: 'desktop', icon: Monitor, label: 'Desktop' },
+                { id: 'tablet', icon: Tablet, label: 'Tablet' },
+                { id: 'mobile', icon: Smartphone, label: 'Mobile' },
+                { id: 'fullscreen', icon: Monitor, label: 'Full Screen' }
+              ].map(({ id, icon: Icon, label }) => (
+                <ToggleGroupItem
+                  key={id}
+                  value={id}
+                  title={label}
+                  className="h-6 w-8 p-0 rounded-full data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
           </div>
         </div>
 
@@ -106,7 +100,7 @@ export function EditorHeader() {
             Preview
           </Button>
 
-          <div className="w-px h-4 bg-border/40 mx-1 hidden sm:block" />
+          <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
 
           <Button
             size="sm"

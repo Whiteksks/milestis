@@ -74,14 +74,15 @@ export function SettingsContent() {
                   }}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={(e) => {
                         e.stopPropagation()
                         toggleVisibility(section.toggleKey)
                       }}
                       className={cn(
-                        "rounded-lg p-1 transition-colors flex items-center justify-center",
+                        "h-7 w-7 rounded-lg transition-colors",
                         section.visible
                           ? "bg-muted hover:bg-muted/80"
                           : "bg-muted/50 hover:bg-muted"
@@ -92,7 +93,7 @@ export function SettingsContent() {
                       ) : (
                         <EyeOff className="w-3.5 h-4 text-muted-foreground" />
                       )}
-                    </button>
+                    </Button>
                     <span className="truncate">{section.name}</span>
                   </div>
                 </div>
@@ -101,10 +102,12 @@ export function SettingsContent() {
           </PopoverContent>
         </Popover>
 
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
             className={cn(
-              "px-3 rounded-xl border transition-colors",
+              "px-3 rounded-xl border h-10 w-10 transition-colors",
               currentSection?.visible
                 ? "border-border bg-background hover:bg-muted/50"
                 : "border-border bg-muted hover:bg-muted/80"
@@ -115,7 +118,7 @@ export function SettingsContent() {
             ) : (
               <EyeOff className="w-4 h-4 text-muted-foreground" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 

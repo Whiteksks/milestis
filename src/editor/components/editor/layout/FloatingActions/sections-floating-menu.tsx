@@ -86,9 +86,10 @@ export function SectionsToolbarPanel() {
                   }
                 }}
               >
-                <button
-                  type="button"
-                  className="p-1 mr-1.5 rounded-md text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 p-0 mr-1.5 rounded-md text-muted-foreground hover:text-foreground shrink-0"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -96,7 +97,7 @@ export function SectionsToolbarPanel() {
                   }}
                 >
                   {section.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                </button>
+                </Button>
                 <span className="truncate">{section.name}</span>
               </div>
             ))}

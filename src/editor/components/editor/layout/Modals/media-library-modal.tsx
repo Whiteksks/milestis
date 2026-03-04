@@ -193,24 +193,18 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
                 {/* Minimal delete button */}
                 {mode === 'manage' && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={(e) => {
                       e.stopPropagation()
                       removeMediaImage(image.id)
                     }}
-                    className="
-                      absolute top-2 right-2 
-                      bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20
-                      text-muted-foreground hover:text-red-500
-                      rounded-full 
-                      p-1.5 
-                      shadow-sm
-                      opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100
-                    "
+                    className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20 text-muted-foreground hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100"
                     aria-label="Delete image"
                   >
                     <X className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}

@@ -1,6 +1,7 @@
 "use client"
 
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import { StoryHeaderPanel, StoryMomentsPanel, StoryTextPanel } from './story-panels'
 
 export function PhotobookStorySettings() {
@@ -14,11 +15,11 @@ export function PhotobookStorySettings() {
 
         <StoryHeaderPanel />
 
-        <div className="h-px bg-border/40 w-full" />
+        <Separator className="bg-border/40" />
 
         <StoryTextPanel />
 
-        <div className="h-px bg-border/40 w-full" />
+        <Separator className="bg-border/40" />
 
         <StoryMomentsPanel />
       </div>

@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { Layers, Paintbrush, Sparkles, PanelRightOpen, PanelLeftClose } from 'lucide-react'
 
@@ -80,20 +81,18 @@ export function SectionsSidebar({
         }}
       >
         {/* Toggle button */}
-        <button
+        <Button
+          variant="ghost"
           onClick={toggleSidebar}
           aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           className={cn(
             'group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-30',
             'hidden md:flex items-center justify-center',
-            'w-12 h-16 rounded-l-xl',
+            'w-12 h-16 rounded-none rounded-l-xl p-0',
             'bg-card/95 border border-border/60 border-r-0',
             'hover:bg-muted/60',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-            'transition-colors duration-200',
           )}
         >
-          {/* rotate-0/rotate-180 — Tailwind-классы, не CSS-значения — работают только в className */}
           <span className={cn('transition-transform duration-200', isSidebarCollapsed ? 'rotate-0' : 'rotate-180')}>
             {isSidebarCollapsed ? (
               <PanelRightOpen className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -101,7 +100,7 @@ export function SectionsSidebar({
               <PanelLeftClose className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
             )}
           </span>
-        </button>
+        </Button>
 
         {/* Content — always mounted, opacity fade only.
             inert исключает весь поддерев из tab-order и дерева доступности

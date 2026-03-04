@@ -4,6 +4,8 @@ import { useRef, useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import { frameStyles } from "@/editor/lib/frame-styles"
@@ -204,7 +206,7 @@ export function ImagePickerCore({
                   )}
 
                   {!restrictions.hideAspectRatio && !restrictions.hideFrameStyle && (
-                    <div className="w-px h-4 bg-border/50 shrink-0" />
+                    <Separator orientation="vertical" className="h-4 bg-border/50 shrink-0" />
                   )}
 
                   {!restrictions.hideFrameStyle && (
@@ -220,16 +222,20 @@ export function ImagePickerCore({
                 </div>
 
                 {!restrictions.hideCrop && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                    title="Crop Image"
-                    disabled={!value.image}
-                    onClick={() => setShowCrop(true)}
-                  >
-                    <Settings2 className="w-4 h-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                        disabled={!value.image}
+                        onClick={() => setShowCrop(true)}
+                      >
+                        <Settings2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Crop Image</TooltipContent>
+                  </Tooltip>
                 )}
               </div>
             )}
