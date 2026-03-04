@@ -54,20 +54,21 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
           {(() => {
             const locked = !!getFrameStyleRestrictions(value).lockedAspectRatio
             return (Object.keys(aspectRatios) as AspectRatio[]).map((r) => (
-              <button
+              <Button
                 key={r}
+                variant="ghost"
+                size="sm"
                 onClick={() => onAspectRatioChange(r)}
                 disabled={locked}
                 className={cn(
-                  "px-2 py-1 rounded text-[11px] font-medium transition-colors",
+                  "px-2 py-1 h-auto text-[11px] font-medium",
                   aspectRatio === r
                     ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  locked && "opacity-40 pointer-events-none"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 {RATIO_LABELS[r]}
-              </button>
+              </Button>
             ))
           })()}
         </div>
@@ -112,17 +113,19 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       className={cn(
-        "px-3 py-1.5 rounded-full text-[11px] font-medium transition-all",
+        "px-3 py-1.5 h-auto rounded-full text-[11px] font-medium",
         active
-          ? "bg-foreground text-background shadow-sm"
+          ? "bg-foreground text-background shadow-sm hover:bg-foreground hover:text-background"
           : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >
       {children}
-    </button>
+    </Button>
   )
 }
 
@@ -133,9 +136,10 @@ function StyleCard({ style, image, selected, onSelect }: {
   onSelect: () => void 
 }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onSelect}
-      className="group flex flex-col gap-2 outline-none"
+      className="group h-auto flex flex-col gap-2 p-0 rounded-none bg-transparent hover:bg-transparent focus-visible:ring-0"
     >
       <div className={cn(
         "relative aspect-square w-full transition-all duration-200",
@@ -171,6 +175,6 @@ function StyleCard({ style, image, selected, onSelect }: {
       )}>
         {style.name}
       </span>
-    </button>
+    </Button>
   )
 }

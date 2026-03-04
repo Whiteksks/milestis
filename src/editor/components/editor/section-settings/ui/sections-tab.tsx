@@ -40,14 +40,14 @@ export function SectionsTab() {
                 <PopoverTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-9/10 justify-between rounded-xl border-border hover:border-border hover:bg-muted/50 h-11 text-foreground"
+                    className="w-8/10 justify-between rounded-xl border-border hover:border-border hover:bg-muted/50 h-11 text-foreground"
                   >
                     <span className="truncate font-medium">{currentSection?.name ?? 'Select section'}</span>
                     <SlidersHorizontal className="ml-2 h-4 w-4 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-70 p-2 rounded-xl border-border shadow-lg" align="start">
+                <PopoverContent className="w-64 p-2 rounded-xl border-border shadow-lg" align="start">
                   <div className="space-y-1">
                     {sections.map(section => (
                       <div
@@ -65,14 +65,16 @@ export function SectionsTab() {
                         }}
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
                             onClick={e => {
                               e.stopPropagation()
                               toggleVisibility(section.toggleKey)
                             }}
                             className={cn(
-                              'rounded-lg p-1.5 transition-all flex items-center justify-center',
+                              'h-6 w-6 rounded-lg',
                               section.visible
                                 ? 'text-muted-foreground hover:text-foreground hover:bg-background hover:shadow-sm'
                                 : 'text-muted-foreground/50 hover:text-muted-foreground'
@@ -83,7 +85,7 @@ export function SectionsTab() {
                             ) : (
                               <EyeOff className="w-3.5 h-3.5" />
                             )}
-                          </button>
+                          </Button>
                           <span className="truncate">{section.name}</span>
                         </div>
                       </div>
@@ -92,15 +94,17 @@ export function SectionsTab() {
                 </PopoverContent>
               </Popover>
 
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() =>
                   currentSection && toggleVisibility(currentSection.toggleKey)
                 }
                 className={cn(
-                  'px-3.5 rounded-xl border transition-all h-11 flex items-center justify-center',
+                  'rounded-xl h-11 w-11',
                   currentSection?.visible
-                    ? 'border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    : 'border-border bg-muted text-muted-foreground hover:bg-muted/80'
+                    ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
                 title={currentSection?.visible ? "Hide Section" : "Show Section"}
               >
@@ -109,7 +113,7 @@ export function SectionsTab() {
                 ) : (
                   <EyeOff className="w-4 h-4" />
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

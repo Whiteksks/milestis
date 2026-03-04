@@ -239,22 +239,28 @@ export function StoryMomentsPanel({ dense = false }: { dense?: boolean }) {
                 {activeSlot.images?.map((img: string, i: number) => (
                   <div key={i} className="relative aspect-4/3 overflow-hidden rounded-lg border group">
                     <Image loader={passthroughLoader} unoptimized src={img} alt="" fill className="object-cover" />
-                    <button 
-                      onClick={() => updateSlot(activeIndex, { 
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => updateSlot(activeIndex, {
                         images: activeSlot.images.filter((_: any, idx: number) => idx !== i),
                         imageSettings: activeSlot.imageSettings.filter((_: any, idx: number) => idx !== i)
-                      })} 
-                      className="absolute right-1.5 top-1.5 bg-background/90 p-1 rounded-md shadow-sm md:opacity-0 md:group-hover:opacity-100"
+                      })}
+                      className="absolute right-1.5 top-1.5 h-6 w-6 bg-background/90 rounded-md shadow-sm md:opacity-0 md:group-hover:opacity-100"
                     >
                       <Trash2 className="w-3 h-3" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
                 {activeSlot.images?.length < 4 && (
-                  <button onClick={() => openMediaPicker(ownerId)} className="flex flex-col items-center justify-center aspect-4/3 rounded-lg border border-dashed hover:bg-muted/30">
+                  <Button
+                    variant="ghost"
+                    onClick={() => openMediaPicker(ownerId)}
+                    className="flex flex-col h-auto items-center justify-center aspect-4/3 rounded-lg border border-dashed hover:bg-muted/30"
+                  >
                     <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
                     <span className="text-[10px] font-medium">Add Photo</span>
-                  </button>
+                  </Button>
                 )}
               </div>
               <div className="space-y-1.5">

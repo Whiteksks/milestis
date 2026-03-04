@@ -132,14 +132,16 @@ export function InlineCropPanel({
           {zoom.toFixed(1)}x
         </span>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={onReset}
           title="Reset position & zoom"
-          className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-        </button>
+        </Button>
 
         <div className="w-px h-4 bg-border/50 shrink-0" />
 

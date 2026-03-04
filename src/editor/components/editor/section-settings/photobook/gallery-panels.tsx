@@ -105,25 +105,26 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
               sizes="(max-width: 768px) 33vw, 120px"
               className="object-cover"
             />
-            <button
-              type="button"
-              className="absolute right-1.5 top-1.5 rounded-md bg-background/90 text-muted-foreground p-1 transition-colors border border-border/60 hover:bg-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1.5 top-1.5 h-6 w-6 rounded-md bg-background/90 text-muted-foreground border border-border/60 hover:bg-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
               onClick={() => removeImage(index)}
               aria-label="Remove image"
             >
               <X className="w-3 h-3" />
-            </button>
+            </Button>
           </div>
         ))}
 
-        <button
-          type="button"
-          className="aspect-square w-full rounded-lg border border-dashed border-border/60 bg-background flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+        <Button
+          variant="ghost"
+          className="aspect-square w-full h-auto rounded-lg border border-dashed border-border/60 bg-background flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40"
           onClick={() => openMediaPicker(ownerId)}
         >
           <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
           <span className="text-[10px] font-medium">Add</span>
-        </button>
+        </Button>
       </div>
     </div>
   )
