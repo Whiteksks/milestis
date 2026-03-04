@@ -29,7 +29,15 @@ export function BackgroundLayers({
   const currentTheme = useThemeSelector((state) => state.currentTheme)
   // getTheme is pure and cheap, but called on every store update when inside a selector.
   // Moving it outside with useMemo ties the cost to theme changes only.
-  const { primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color } = useMemo(
+  const {
+    primary:   primaryColor,
+    secondary: secondaryColor,
+    ray:       rayColor,
+    subtle:    subtleColor,
+    highlight: highlightColor,
+    shadow:    shadowColor,
+    accent2:   accent2Color,
+  } = useMemo(
     () => getTheme(currentTheme).bgEffectColors,
     [currentTheme],
   )

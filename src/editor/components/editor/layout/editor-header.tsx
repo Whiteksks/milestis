@@ -50,7 +50,7 @@ export function EditorHeader() {
 
         {/* CENTER — VIEWPORT */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
+          <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-2xs border border-border/30">
             <ToggleGroup
               type="single"
               value={deviceView}

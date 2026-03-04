@@ -95,6 +95,6 @@ function AsymmetricLight({
 
 export const asymmetricLight: LayerEffectDef<'asymmetric-light'> = {
   id: 'asymmetric-light',
-  label: 'Asymmetric Light',
+  label: 'Asymmetric',
   Component: AsymmetricLight,
 }

@@ -19,7 +19,7 @@ export function FloatingActions() {
             <Button
               onClick={() => openDesignModal('templates')}
               size="lg"
-              className="h-12 w-12 rounded-2xl shadow-md transition-all bg-foreground border border-background/40 hover:bg-foreground/90 text-background"
+              className="h-12 w-12 rounded-xs shadow-md transition-all bg-foreground border border-background/40 hover:bg-foreground/90 text-background"
             >
               <Plus className="h-5 w-5" />
             </Button>
@@ -33,7 +33,7 @@ export function FloatingActions() {
             <Button
               onClick={() => openDesignModal('themes')}
               size="lg"
-              className="h-12 w-12 rounded-2xl shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
+              className="h-12 w-12 rounded-xs shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
             >
               <Palette className="h-5 w-5" />
             </Button>
@@ -47,7 +47,7 @@ export function FloatingActions() {
             <Button
               onClick={() => openDesignModal('decorations')}
               size="lg"
-              className="h-12 w-12 rounded-2xl shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
+              className="h-12 w-12 rounded-xs shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
             >
               <Sparkles className="h-5 w-5" />
             </Button>

@@ -97,7 +97,7 @@ export function ImagePickerCore({
         </Label>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-md border border-border bg-card shadow-sm">
         {showCrop && value.image ? (
           <InlineCropPanel
             image={originalImage}

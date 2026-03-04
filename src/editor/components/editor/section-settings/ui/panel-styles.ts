@@ -10,17 +10,17 @@ export const ps = {
   grid2: (dense: boolean) => (dense ? "grid grid-cols-2 gap-2" : "grid grid-cols-2 gap-2.5"),
 
   /** Standard single-line input */
-  input: "h-8 text-xs",
+  input: "h-9 text-xs rounded-xs",
 
   /** Single-line input that fills a flex row */
-  inputFlex: "flex-1 h-8 text-xs",
+  inputFlex: "flex-1 h-9 text-xs rounded-xs",
 
   /**
    * Textarea with configurable min-height.
    * Pass Tailwind min-h-* classes for dense and normal modes.
    */
   textarea: (dense: boolean, denseH = "min-h-20", normalH = "min-h-24") =>
-    `${dense ? denseH : normalH} text-xs resize-none`,
+    `${dense ? denseH : normalH} text-xs resize-none rounded-xs`,
 
   /** "Add" ghost button used in section header rows */
   addBtn: "h-7 text-xs text-muted-foreground hover:text-foreground px-2",
@@ -47,14 +47,14 @@ export const ps = {
   pbGrid2: "grid grid-cols-2 gap-3",
 
   /** Standard input for photobook panels */
-  pbInput: "h-9 text-xs",
+  pbInput: "h-9 text-xs rounded-xs",
 
   /** Italic input (quotes, taglines, signatures) */
-  pbInputItalic: "h-9 text-xs italic",
+  pbInputItalic: "h-9 text-xs italic rounded-xs",
 
   /** Large title input (cover, story header) */
-  pbInputTitle: "h-10 text-sm font-medium",
+  pbInputTitle: "h-10 text-sm font-medium rounded-xs",
 
   /** Textarea for photobook panels */
-  pbTextarea: "text-xs resize-none",
+  pbTextarea: "text-xs resize-none rounded-xs",
 }

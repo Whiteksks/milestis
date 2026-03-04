@@ -88,7 +88,7 @@ export function SectionsSidebar({
           className={cn(
             'group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-30',
             'hidden md:flex items-center justify-center',
-            'w-12 h-16 rounded-none rounded-l-xl p-0',
+            'w-12 h-16 rounded-none rounded-l-md p-0',
             'bg-card/95 border border-border/60 border-r-0',
             'hover:bg-muted/60',
           )}

@@ -1,54 +1,52 @@
 "use client"
 
+import * as React from 'react'
 import { useThemeSelector } from '@/editor/lib/store'
-import { Button } from '@/components/ui/button'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Separator } from '@/components/ui/separator'
-import { RotateCcw } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import type { BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
+import { 
+  RotateCcw, Sun, Layers, Sparkles, ChevronDown
+} from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { EffectCard } from './example/effect-card'
+import { SegmentedControl } from './example/segmented-control'
 
-function OptionRow<T extends string>({
-  label,
-  hint,
-  options,
-  active,
-  onChange,
-}: {
-  label: string
-  hint?: string
-  options: { id: T; label: string }[]
-  active: T
-  onChange: (v: T) => void
-}) {
+interface CollapsibleSectionProps {
+  title: string
+  icon: React.ElementType
+  children: React.ReactNode
+  defaultOpen?: boolean
+}
+
+function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }: CollapsibleSectionProps) {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+
   return (
-    <div className="space-y-2">
-      <div className="flex items-baseline gap-2">
-        <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-foreground/50">
-          {label}
-        </span>
-        {hint && (
-          <span className="text-[10px] text-muted-foreground/40">{hint}</span>
-        )}
-      </div>
-      <ToggleGroup
-        type="single"
-        value={active}
-        onValueChange={(v) => { if (v) onChange(v as T) }}
-        className="flex flex-wrap gap-1"
+    <div className="border-b border-border/40 last:border-b-0">
+      <Button
+        variant="ghost"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2.5 w-full h-auto px-5 py-3.5 justify-start rounded-none text-xs font-semibold uppercase tracking-widest text-muted-foreground/70 hover:text-foreground/80 hover:bg-transparent"
       >
-        {options.map((opt) => (
-          <ToggleGroupItem
-            key={opt.id}
-            value={opt.id}
-            variant="outline"
-            className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide rounded-lg data-[state=on]:bg-foreground/12 data-[state=on]:text-foreground data-[state=on]:border-foreground/20 data-[state=on]:shadow-sm text-foreground/45 border-transparent hover:text-foreground/70 hover:border-border/40"
-          >
-            {opt.label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+        <Icon className="w-3.5 h-3.5" />
+        <span>{title}</span>
+        <ChevronDown
+          className={cn(
+            "w-3.5 h-3.5 ml-auto transition-transform duration-200",
+            isOpen && "rotate-180"
+          )}
+        />
+      </Button>
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-300 ease-out",
+          isOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="px-5 pb-5 space-y-5">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
@@ -59,11 +57,15 @@ export function ThemeSettingsPanel() {
     updateThemeCustomization: state.updateThemeCustomization,
   }))
 
-  const depth = themeCustomizations.depthEffect ?? 'none'
-  const rays = themeCustomizations.raysEffect ?? 'none'
-  const texture = themeCustomizations.textureEffect ?? 'none'
-  const layersTheme = themeCustomizations.backgroundLayersTheme ?? 'dark'
-  const scrollMode = themeCustomizations.backgroundScrollMode ?? 'fixed'
+  const {
+    depthEffect: depth = 'none',
+    raysEffect: rays = 'none',
+    textureEffect: texture = 'none',
+    backgroundLayersTheme: layersTheme = 'dark',
+    backgroundScrollMode: scrollMode = 'fixed'
+  } = themeCustomizations
+
+  const activeCount = [depth, rays, texture].filter(v => v !== 'none').length
 
   const handleReset = () => {
     updateThemeCustomization({
@@ -76,132 +78,105 @@ export function ThemeSettingsPanel() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-card/40 backdrop-blur-xl overflow-hidden">
 
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-border/60">
-        <div className="space-y-0.5">
-          <h3 className="text-sm font-semibold text-foreground">Background</h3>
-          <p className="text-xs text-muted-foreground">Layer system</p>
+      <div className="px-5 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
+              <Layers className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground tracking-tight">Background</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {activeCount > 0 ? (
+                  <span className="text-primary">{activeCount} effect{activeCount > 1 ? 's' : ''} active</span>
+                ) : (
+                  'No effects applied'
+                )}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleReset}
+            disabled={activeCount === 0}
+            title="Reset all settings"
+            className="h-8 w-8 rounded-xs text-muted-foreground/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-30"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleReset}
-          className="h-8 px-3 text-xs rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex gap-2"
-        >
-          <RotateCcw className="w-3 h-3" />
-          Reset
-        </Button>
       </div>
 
-      <div className="px-6 pt-5 pb-6 space-y-5 overflow-y-auto">
+      {/* Divider */}
+      <div className="h-px bg-border/40 mx-5" />
 
-        {/* Dark / Light + Fixed / Scroll toggles */}
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-foreground/50">
-            Mode
-          </span>
-          <ToggleGroup
-            type="single"
-            value={layersTheme}
-            onValueChange={(v) => { if (v) updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme }) }}
-            className="rounded-lg border border-border/50 overflow-hidden gap-0"
-          >
-            {(['dark', 'light'] as BackgroundLayersTheme[]).map((t) => (
-              <ToggleGroupItem
-                key={t}
-                value={t}
-                className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide capitalize rounded-none border-0 data-[state=on]:bg-foreground/10 data-[state=on]:text-foreground text-foreground/40 hover:text-foreground/60 hover:bg-muted/40"
-              >
-                {t}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
 
-        {/* Fixed / Scroll scroll-mode toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-foreground/50">
-            Scroll
-          </span>
-          <ToggleGroup
-            type="single"
-            value={scrollMode}
-            onValueChange={(v) => { if (v) updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode }) }}
-            className="rounded-lg border border-border/50 overflow-hidden gap-0"
-          >
-            {(['fixed', 'scroll'] as BackgroundScrollMode[]).map((m) => (
-              <ToggleGroupItem
-                key={m}
-                value={m}
-                className="px-3 py-1.5 h-auto text-[11px] font-medium tracking-wide capitalize rounded-none border-0 data-[state=on]:bg-foreground/10 data-[state=on]:text-foreground text-foreground/40 hover:text-foreground/60 hover:bg-muted/40"
-              >
-                {m}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-
-        <Separator className="bg-border/30" />
-
-        {/* Layer 1 label */}
-        <div className="flex items-center gap-3">
-          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center">
-            <span className="text-[9px] font-bold text-muted-foreground">1</span>
+        {/* General Settings */}
+        <CollapsibleSection title="General" icon={Sun}>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-[11px] font-medium text-muted-foreground px-1">Theme</label>
+              <SegmentedControl
+                value={layersTheme}
+                options={[
+                  { id: 'dark', label: 'Dark' },
+                  { id: 'light', label: 'Light' },
+                ]}
+                onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as any })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-medium text-muted-foreground px-1">Scroll</label>
+              <SegmentedControl
+                value={scrollMode}
+                options={[
+                  { id: 'fixed', label: 'Fixed' },
+                  { id: 'scroll', label: 'Scroll' },
+                ]}
+                onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as any })}
+              />
+            </div>
           </div>
-          <span className="text-xs text-foreground/60">Base — solid <code className="text-[10px] bg-muted/60 px-1 rounded">--background</code> from theme</span>
-        </div>
+        </CollapsibleSection>
 
-        <Separator className="bg-border/30" />
-
-        {/* Layer 2: Depth */}
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[9px] font-bold text-muted-foreground">2</span>
-          </div>
-          <OptionRow
+        {/* Effects */}
+        <CollapsibleSection title="Effects" icon={Sparkles}>
+          <EffectCard
             label="Depth"
-            hint="gradient & glow"
+            description='Adds subtle 3D layering and shadow depth.'
+            value={depth}
             options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
-            active={depth}
-            onChange={(v) => updateThemeCustomization({ depthEffect: v })}
+            onChange={(v) => updateThemeCustomization({ depthEffect: v as any })}
           />
-        </div>
 
-        <Separator className="bg-border/30" />
+          <div className="h-px bg-border/20" />
 
-        {/* Layer 2b: Rays */}
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[9px] font-bold text-muted-foreground">2</span>
-          </div>
-          <OptionRow
+          <EffectCard
             label="Rays"
-            hint="light streaks"
+            description='Adds light beams and glow effects.'
+            value={rays}
             options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
-            active={rays}
-            onChange={(v) => updateThemeCustomization({ raysEffect: v })}
+            onChange={(v) => updateThemeCustomization({ raysEffect: v as any })}
           />
-        </div>
 
-        <Separator className="bg-border/30" />
+          <div className="h-px bg-border/20" />
 
-        {/* Layer 3: Texture */}
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-md bg-muted/80 border border-border/50 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[9px] font-bold text-muted-foreground">3</span>
-          </div>
-          <OptionRow
+          <EffectCard
             label="Texture"
-            hint="overlay pattern"
+            description='Adds surface textures.'
+            value={texture}
             options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
-            active={texture}
-            onChange={(v) => updateThemeCustomization({ textureEffect: v })}
+            onChange={(v) => updateThemeCustomization({ textureEffect: v as any })}
           />
-        </div>
-
+        </CollapsibleSection>
       </div>
+
     </div>
   )
 }
