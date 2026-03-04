@@ -6,21 +6,24 @@ import { motion } from 'framer-motion'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import { useScrollAtBottom } from '@/editor/hooks/use-scroll-at-bottom'
 
+type NavTab = 'sections' | 'theme' | 'decorations' | 'design'
+
 interface MobileBottomNavProps {
-  activeTab: 'sections' | 'theme' | 'decorations' | 'design'
-  onTabChange: (tab: 'sections' | 'theme' | 'decorations' | 'design') => void
+  activeTab: NavTab
+  onTabChange: (tab: NavTab) => void
 }
+
+// Модульная константа — не пересоздаётся при каждом рендере
+const TABS: { id: NavTab; icon: React.ElementType; label: string }[] = [
+  { id: 'sections', icon: Layers, label: 'Sections' },
+  { id: 'theme', icon: Paintbrush, label: 'Theme' },
+  { id: 'decorations', icon: Sparkles, label: 'Decor' },
+  { id: 'design', icon: LayoutTemplate, label: 'Design' },
+]
 
 export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps) {
   const scrollRef = useCanvasScrollContainer()
   const atBottom = useScrollAtBottom(scrollRef ?? { current: null }, 8)
-
-  const tabs = [
-    { id: 'sections' as const, icon: Layers, label: 'Sections' },
-    { id: 'theme' as const, icon: Paintbrush, label: 'Theme' },
-    { id: 'decorations' as const, icon: Sparkles, label: 'Decor' },
-    { id: 'design' as const, icon: LayoutTemplate, label: 'Design' },
-  ]
 
   return (
     // Static container — no layout properties animated
@@ -46,10 +49,14 @@ export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps
         }}
       >
         <div className="grid grid-cols-4 h-12">
-          {tabs.map((tab) => (
+          {TABS.map((tab) => (
             <button
               key={tab.id}
+              aria-label={tab.label}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
               onClick={(e) => {
+                // blur() — workaround для iOS: убирает focus-ring после тапа,
+                // иначе кнопка остаётся выделенной до следующего касания экрана
                 e.currentTarget.blur()
                 onTabChange(tab.id)
               }}
@@ -60,7 +67,7 @@ export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps
                   : 'text-muted-foreground'
               )}
             >
-              <tab.icon className="w-[16px] h-[16px]" />
+              <tab.icon className="w-[16px] h-[16px]" aria-hidden="true" />
               <span className="text-[12px] font-medium tracking-tight">
                 {tab.label}
               </span>

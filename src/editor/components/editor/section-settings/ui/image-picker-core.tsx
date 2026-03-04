@@ -62,7 +62,10 @@ export function ImagePickerCore({
     syncImage,
   } = useCrop({ image: value.image, cropData: value.cropData })
 
-  // Reset crop state whenever a new image URL is loaded externally
+  // Reset crop state whenever a new image URL is loaded externally.
+  // onChange намеренно исключён из deps: это внешний коллбэк, который родитель
+  // не всегда оборачивает в useCallback. Включение его сюда вызвало бы
+  // бесконечный цикл: onChange → рендер родителя → новая ссылка → эффект снова.
   const prevImageRef = useRef(value.image)
   useEffect(() => {
     if (value.image !== prevImageRef.current) {
@@ -72,7 +75,8 @@ export function ImagePickerCore({
         onChange({ cropData: undefined })
       }
     }
-  }, [value.image, syncImage, onChange])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value.image, syncImage])
 
   const handleApplyAndSave = async () => {
     const cropData = await handleApply()

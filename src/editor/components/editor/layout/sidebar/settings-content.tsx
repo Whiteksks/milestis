@@ -1,17 +1,16 @@
 'use client'
 
+import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
 export function SettingsContent() {
   const { 
-    editorMode, 
     sections, 
     toggleVisibility, 
     getSettingsComponent,
@@ -20,7 +19,10 @@ export function SettingsContent() {
   } = useModeSections()
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
 
-  const currentSection = sections.find(s => s.id === resolvedActiveSectionId)
+  const currentSection = useMemo(
+    () => sections.find((s) => s.id === resolvedActiveSectionId),
+    [resolvedActiveSectionId, sections],
+  )
 
   const renderSettings = () => {
     const SettingsComponent = getSettingsComponent(resolvedActiveSectionId)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -8,7 +8,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useMemo } from 'react'
 
 export function SectionsTab() {
   const { editorMode, sections, toggleVisibility, getSettingsComponent, resolvedActiveSectionId, setActiveSectionId } =
