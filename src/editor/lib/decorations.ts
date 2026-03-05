@@ -7,7 +7,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Vellum Vintage Preset',
     description: 'Soft, classic ornamentation with a paper-like feel.',
     tags: ['classic', 'elegant'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'nordic-default': {
@@ -15,7 +15,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Nordic Minimal Preset',
     description: 'Clean geometry and calm spacing — minimal & modern.',
     tags: ['minimal', 'modern'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'midnight-default': {
@@ -23,7 +23,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Midnight Neon Preset',
     description: 'Bold accents and lively motion for night-style themes.',
     tags: ['modern', 'dark'],
-    animation: 'slide-up',
+    animation: 'none',
     elements: []
   },
   'sunset-default': {
@@ -31,7 +31,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Sunset Warm Preset',
     description: 'Warm tones and gentle overlays for a cozy look.',
     tags: ['warm', 'elegant'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'ocean-default': {
@@ -39,7 +39,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Ocean Professional Preset',
     description: 'Professional and balanced — great for portfolios.',
     tags: ['professional', 'modern'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'royal-default': {
@@ -47,7 +47,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Royal Classic Preset',
     description: 'Elegant, high-contrast details with a premium vibe.',
     tags: ['classic', 'elegant'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'glass-default': {
@@ -55,7 +55,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Glass Frost Preset',
     description: 'Glossy, airy decoration style for glassy UI themes.',
     tags: ['modern', 'glass'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   },
   'mono-default': {
@@ -71,7 +71,7 @@ export const decorationPresets: Record<string, DecorationsConfig & { id: string;
     name: 'Floral Bloom Preset',
     description: 'Light floral patterning — subtle and romantic.',
     tags: ['floral', 'elegant'],
-    animation: 'fade',
+    animation: 'none',
     elements: []
   }
 }
@@ -96,9 +96,9 @@ export const getDecorations = (themeId?: Theme): DecorationsConfig => {
   return decorationPresets[presetId] || {}
 }
 
-export const getDecorationById = (id?: string): DecorationsConfig | {} => {
-  if (!id) return {}
-  return decorationPresets[id] || {}
+export const getDecorationById = (id?: string): DecorationsConfig | undefined => {
+  if (!id) return undefined
+  return decorationPresets[id]
 }
 
 export default decorationPresets

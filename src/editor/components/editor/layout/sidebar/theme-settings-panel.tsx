@@ -6,6 +6,7 @@ import {
   RotateCcw, Sun, Layers, Sparkles, ChevronDown
 } from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
+import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { EffectCard } from './example/effect-card'
@@ -128,7 +129,7 @@ export function ThemeSettingsPanel() {
                   { id: 'dark', label: 'Dark' },
                   { id: 'light', label: 'Light' },
                 ]}
-                onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as any })}
+                onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme })}
               />
             </div>
             <div className="space-y-2">
@@ -139,7 +140,7 @@ export function ThemeSettingsPanel() {
                   { id: 'fixed', label: 'Fixed' },
                   { id: 'scroll', label: 'Scroll' },
                 ]}
-                onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as any })}
+                onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode })}
               />
             </div>
           </div>
@@ -152,7 +153,7 @@ export function ThemeSettingsPanel() {
             description='Adds subtle 3D layering and shadow depth.'
             value={depth}
             options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ depthEffect: v as any })}
+            onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
           />
 
           <div className="h-px bg-border/20" />
@@ -162,7 +163,7 @@ export function ThemeSettingsPanel() {
             description='Adds light beams and glow effects.'
             value={rays}
             options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ raysEffect: v as any })}
+            onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
           />
 
           <div className="h-px bg-border/20" />
@@ -172,7 +173,7 @@ export function ThemeSettingsPanel() {
             description='Adds surface textures.'
             value={texture}
             options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ textureEffect: v as any })}
+            onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
           />
         </CollapsibleSection>
       </div>

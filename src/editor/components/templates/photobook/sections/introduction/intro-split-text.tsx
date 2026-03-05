@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import type { CSSProperties } from 'react'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
@@ -43,7 +44,7 @@ export function IntroSplitText({ sectionContent, theme }: IntroSplitTextProps) {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-br" style={{ '--tw-gradient-from': theme.background, '--tw-gradient-to': theme.muted } as any} />
+            <div className="w-full h-full bg-linear-to-br" style={{ '--tw-gradient-from': theme.background, '--tw-gradient-to': theme.muted } as CSSProperties} />
           )}
           <div className="absolute inset-0 bg-linear-to-r from-transparent to-white/20" />
         </motion.div>

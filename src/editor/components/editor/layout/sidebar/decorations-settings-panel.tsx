@@ -11,6 +11,7 @@ import { useMemo, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import Image from 'next/image'
+import { decorationAnimationOptions, type DecorationAnimation } from '@/editor/lib/decoration-animations'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -27,8 +28,8 @@ const createDecorationId = (prefix = 'decoration') => {
 
 const coerceImageUrl = (value: unknown) => {
   if (typeof value === 'string') return value
-  if (value && typeof value === 'object' && 'url' in value && typeof (value as any).url === 'string') {
-    return (value as any).url
+  if (value && typeof value === 'object' && 'url' in value && typeof (value as Record<string, unknown>).url === 'string') {
+    return (value as Record<string, unknown>).url as string
   }
   return ''
 }
@@ -188,16 +189,17 @@ export function DecorationsSettingsPanel() {
             <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Animation</Label>
             <Select
               value={themeCustomizations.decorationAnimation || themeDecorations?.animation || 'fade'}
-              onValueChange={(value) => updateThemeCustomization({ decorationAnimation: value as any })}
+              onValueChange={(value) => updateThemeCustomization({ decorationAnimation: value as DecorationAnimation })}
             >
               <SelectTrigger className="h-9 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/40 focus:ring-1 focus:ring-primary/30 text-[12px] transition-all">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-sm border-border/20">
-                <SelectItem value="none" className="text-[12px] rounded-sm">None</SelectItem>
-                <SelectItem value="fade" className="text-[12px] rounded-sm">Fade In</SelectItem>
-                <SelectItem value="slide-up" className="text-[12px] rounded-sm">Slide Up</SelectItem>
-                <SelectItem value="slide-down" className="text-[12px] rounded-sm">Slide Down</SelectItem>
+                {decorationAnimationOptions.map((opt) => (
+                  <SelectItem key={opt.id} value={opt.id} className="text-[12px] rounded-sm">
+                    {opt.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import type { CSSProperties } from 'react'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import { cn } from '@/lib/utils'
@@ -36,7 +37,7 @@ export function GalleryMagazine({
             className="object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-linear-to-t via-transparent to-transparent" style={{ '--tw-gradient-from': theme.background } as any} />
+        <div className="absolute inset-0 bg-linear-to-t via-transparent to-transparent" style={{ '--tw-gradient-from': theme.background } as CSSProperties} />
         <div className="absolute bottom-8 left-8 right-8">
           <h2 className={cn("font-serif text-5xl md:text-7xl", theme.fontTitle)} style={{ color: theme.foreground }}>{title}</h2>
         </div>

@@ -134,12 +134,13 @@ export function DesignCatalogModal() {
 
     if (designModalSection === 'decorations') {
       if (!effectiveSelectedDecorationPresetId) return
-      const preset = getDecorationById(effectiveSelectedDecorationPresetId) as any
+      const preset = getDecorationById(effectiveSelectedDecorationPresetId)
+      if (!preset) return
 
       const coerceImageUrl = (value: unknown) => {
         if (typeof value === 'string') return value
-        if (value && typeof value === 'object' && 'url' in value && typeof (value as any).url === 'string') {
-          return (value as any).url
+        if (value && typeof value === 'object' && 'url' in value && typeof (value as Record<string, unknown>).url === 'string') {
+          return (value as Record<string, unknown>).url as string
         }
         return ''
       }
@@ -199,7 +200,7 @@ export function DesignCatalogModal() {
     <>
       {designModalSection === 'templates' && (
         <TemplatesSection
-          items={visibleItems as any}
+          items={visibleItems as typeof templates}
           selectedId={effectiveSelectedTemplatesId}
           onSelect={setSelectedTemplatesId}
           sectionCount={templateSectionCount}
@@ -207,14 +208,14 @@ export function DesignCatalogModal() {
       )}
       {designModalSection === 'themes' && (
         <ThemesSection
-          items={visibleItems as any}
+          items={visibleItems as typeof themes}
           selectedId={effectiveSelectedThemeId}
           onSelect={setSelectedThemeId}
         />
       )}
       {designModalSection === 'decorations' && (
         <DecorationsSection
-          items={visibleItems as any}
+          items={visibleItems as typeof decorations}
           selectedId={effectiveSelectedDecorationPresetId}
           onSelect={setSelectedDecorationPresetId}
           currentTheme={currentTheme}

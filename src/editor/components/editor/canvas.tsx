@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo, useLayoutEffect, useState, memo } from 'react'
+import { useRef, useMemo, useLayoutEffect, useState, memo, type CSSProperties } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
 import { getDecorations } from '@/editor/lib/decorations'
@@ -135,7 +135,7 @@ export function Canvas({
           // remain BEHIND content in both fixed and scroll modes.
           theme.background,
         )}
-        style={{ ['--canvas-scrollbar-width' as any]: `${scrollbarWidth}px` }}
+        style={{ '--canvas-scrollbar-width': `${scrollbarWidth}px` } as CSSProperties}
       >
         <FloatingToolbar
           tab={(desktopActiveTab ?? 'sections')}

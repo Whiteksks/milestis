@@ -57,7 +57,8 @@ import type { PortfolioTemplateId } from './modes/portfolio-ids'
 import type { PhotobookTemplateId }  from './modes/photobook-ids'
 export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
 
-export type DecorationAnimation = 'none' | 'fade' | 'slide-up' | 'slide-down'
+export type { DecorationAnimation } from './decoration-animations'
+import type { DecorationAnimation } from './decoration-animations'
 
 export type DepthEffect = 'none' | 'radial-glow' | 'vignette' | 'ambient-blobs' | 'asymmetric-light' | 'aurora' | 'horizon'
 export type RayEffect = 'none' | 'diagonal-rays' | 'conic-rays' | 'soft-streaks' | 'lens-flare' | 'caustics' | 'god-rays' | 'prism'

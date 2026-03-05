@@ -1,3 +1,5 @@
+import type { DeviceView } from '@/editor/lib/types'
+
 export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 export const round2 = (value: number) => Math.round(value * 100) / 100
@@ -17,12 +19,12 @@ export const getBaseSizePx = (size: string | undefined): number => {
   }
 }
 
-export const getResponsiveFactor = (deviceView: "mobile" | "tablet" | "desktop" | "fullscreen"): number => {
+export const getResponsiveFactor = (deviceView: DeviceView): number => {
   switch (deviceView) {
     case "mobile":
-      return 0.72
+      return 0.70
     case "tablet":
-      return 0.86
+      return 0.85
     default:
       return 1
   }

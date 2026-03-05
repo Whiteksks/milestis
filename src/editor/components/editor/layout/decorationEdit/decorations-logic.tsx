@@ -4,28 +4,18 @@ import { useCallback, useMemo, useRef } from "react"
 import { AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import type { DecorationElement, DecorationUpdatePayload } from "./decorationTypes"
+import type { DeviceView } from "@/editor/lib/types"
 import { getResponsiveFactor, loadImageAspectRatio } from "./utils"
 import { useDecorationDrag } from "../../../../hooks/use-decoration-drag"
 import { DraggableDecoration } from "./draggable-decoration"
 import { DecorationHandle } from "./decoration-handle"
-
-const getAnimationVariants = (animation?: string) => {
-  switch (animation) {
-    case "slide-up":
-      return { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } }
-    case "slide-down":
-      return { initial: { opacity: 0, y: -30 }, animate: { opacity: 1, y: 0 } }
-    case "fade":
-    default:
-      return { initial: { opacity: 0 }, animate: { opacity: 1 } }
-  }
-}
+import { getDecorationAnimationVariants, type DecorationAnimation } from "@/editor/lib/decoration-animations"
 
 export interface DecorationsLayerProps {
   decorations: DecorationElement[]
   selectedId: string | null
-  deviceView?: "mobile" | "tablet" | "desktop" | "fullscreen"
-  animation?: "none" | "fade" | "slide-up" | "slide-down"
+  deviceView?: DeviceView
+  animation?: DecorationAnimation
   onUpdate: (id: string, updates: DecorationUpdatePayload) => void
   onRemove: (id: string) => void
   onSelect?: (id: string | null) => void
@@ -35,7 +25,7 @@ export interface DecorationsLayerProps {
 export function DecorationsLayer({
   decorations,
   selectedId,
-  deviceView = "desktop",
+  deviceView = "desktop" as DeviceView,
   animation,
   onUpdate,
   onRemove,
@@ -43,7 +33,7 @@ export function DecorationsLayer({
   className,
 }: DecorationsLayerProps) {
   const boundsRef = useRef<HTMLDivElement>(null)
-  const animationVariants = getAnimationVariants(animation)
+  const animationVariants = getDecorationAnimationVariants(animation)
   const responsiveFactor = getResponsiveFactor(deviceView)
 
   const selectedDecoration = useMemo(() => decorations.find((d) => d.id === selectedId), [decorations, selectedId])
