@@ -9,8 +9,8 @@ import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-laye
 import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { EffectCard } from './example/effect-card'
-import { SegmentedControl } from './example/segmented-control'
+import { EffectCard } from './effect-card'
+import { SegmentedControl } from './segmented-control'
 
 interface CollapsibleSectionProps {
   title: string
@@ -156,7 +156,7 @@ export function ThemeSettingsPanel() {
             onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
           />
 
-          <div className="h-px bg-border/20" />
+          <div className="h-px bg-border/20 m-2" />
 
           <EffectCard
             label="Rays"
@@ -166,7 +166,7 @@ export function ThemeSettingsPanel() {
             onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
           />
 
-          <div className="h-px bg-border/20" />
+          <div className="h-px bg-border/20 m-2" />
 
           <EffectCard
             label="Texture"

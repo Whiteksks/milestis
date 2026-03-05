@@ -100,13 +100,13 @@ const PORTFOLIO_SETTINGS_MAP: Record<string, React.ComponentType> = {
 export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
   label: 'Portfolio',
   templates: [
-    { id: 'editorial', name: 'Editorial', tags: ['editorial', 'magazine'] },
-    { id: 'minimal', name: 'Minimal', tags: ['minimal'] },
-    { id: 'elegant', name: 'Elegant', tags: ['elegant'] },
-    { id: 'grid', name: 'Grid', tags: ['grid', 'structured'] },
-    { id: 'bento', name: 'Bento', tags: ['bento', 'modern'] },
-    { id: 'showcase', name: 'Showcase', tags: ['showcase', 'bold', 'cinematic'] },
-    { id: 'liquid-glass', name: 'Liquid Glass', tags: ['glass', 'modern', 'dark'] },
+    { id: 'editorial', name: 'Editorial', tags: ['Classic', "Modern"] },
+    { id: 'minimal', name: 'Minimal', tags: ['Clean', 'Classic'] },
+    { id: 'elegant', name: 'Elegant', tags: ['Clean', 'Classic'] },
+    { id: 'grid', name: 'Grid', tags: ['Structured', 'Clean'] },
+    { id: 'bento', name: 'Bento', tags: ['Structured', 'Modern'] },
+    { id: 'showcase', name: 'Showcase', tags: ['Modern', 'Visual'] },
+    { id: 'liquid-glass', name: 'Liquid Glass', tags: ['Modern', 'Visual'] },
   ],
   sections: [
     { id: 'header', name: 'Header', toggleKey: 'showHeader' },
