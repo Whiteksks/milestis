@@ -3,7 +3,7 @@
 import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Plus, Palette, Sparkles } from 'lucide-react'
+import { Plus, Palette, Sparkles, Layers } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {
@@ -45,15 +45,15 @@ export function FloatingActions() {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <TooltipTrigger asChild>
             <Button
-              onClick={() => openDesignModal('decorations')}
+              onClick={() => openDesignModal('backgrounds')}
               size="lg"
               className="h-12 w-12 rounded-xs shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
             >
-              <Sparkles className="h-5 w-5" />
+              <Layers className="h-5 w-5" />
             </Button>
           </TooltipTrigger>
         </motion.div>
-        <TooltipContent side="right">Decorations</TooltipContent>
+        <TooltipContent side="right">Background</TooltipContent>
       </Tooltip>
     </div>
   )

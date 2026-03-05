@@ -12,17 +12,18 @@ import {
 
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { themes } from '@/editor/lib/themes'
-import { decorationPresets, getDecorationById, themeToPreset } from '@/editor/lib/decorations'
+import { BACKGROUND_PRESETS } from '@/editor/lib/background-presets'
+import type { BackgroundPreset } from '@/editor/lib/background-presets'
 import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
 import type { TemplateId, Theme } from '@/editor/lib/types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { LayoutTemplate, Palette, Sparkles } from 'lucide-react'
+import { LayoutTemplate, Layers, Palette } from 'lucide-react'
 
 import type { DesignCatalogSection } from './types'
 import { DesignCatalogSidebar } from './design-catalog-sidebar'
 import { DesignCatalogFooter } from './design-catalog-footer'
-import { DecorationsSection, ThemesSection, TemplatesSection, getDecorationName } from './sections'
+import { BackgroundsSection, ThemesSection, TemplatesSection } from './sections'
 
 export function DesignCatalogModal() {
   const {
@@ -46,36 +47,32 @@ export function DesignCatalogModal() {
     currentTemplateId,
     setTheme,
     setTemplate,
-    setDecorations,
     updateThemeCustomization,
   } = useThemeSelector((state) => ({
     currentTheme: state.currentTheme,
     currentTemplateId: state.currentTemplateId,
     setTheme: state.setTheme,
     setTemplate: state.setTemplate,
-    setDecorations: state.setDecorations,
     updateThemeCustomization: state.updateThemeCustomization,
   }))
 
   const [activeTag, setActiveTag] = useState<string>('all')
   const [selectedTemplatesId, setSelectedTemplatesId] = useState<string | null>(null)
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null)
-  const [selectedDecorationPresetId, setSelectedDecorationPresetId] = useState<string | null>(null)
+  const [selectedBackgroundId, setSelectedBackgroundId] = useState<string | null>(null)
 
   const templates = useMemo(() => getModeTemplates(editorMode), [editorMode])
   const templateSectionCount = useMemo(() => getModeSectionCount(editorMode), [editorMode])
-  const decorations = useMemo(() => Object.values(decorationPresets), [])
 
   const effectiveSelectedTemplatesId = selectedTemplatesId ?? currentTemplateId ?? null
   const effectiveSelectedThemeId = selectedThemeId ?? currentTheme ?? null
-  const effectiveSelectedDecorationPresetId =
-    selectedDecorationPresetId ?? themeToPreset[currentTheme] ?? null
+  const effectiveSelectedBackgroundId = selectedBackgroundId ?? null
 
   const itemsForSection = useMemo(() => {
     if (designModalSection === 'templates') return templates
     if (designModalSection === 'themes') return themes
-    return decorations
-  }, [designModalSection, templates, decorations])
+    return BACKGROUND_PRESETS
+  }, [designModalSection, templates])
 
   const sectionTitle = useMemo(() => {
     switch (designModalSection) {
@@ -83,8 +80,8 @@ export function DesignCatalogModal() {
         return 'Templates'
       case 'themes':
         return 'Themes'
-      case 'decorations':
-        return 'Decorations'
+      case 'backgrounds':
+        return 'Background Effects'
     }
   }, [designModalSection])
 
@@ -132,32 +129,17 @@ export function DesignCatalogModal() {
       return
     }
 
-    if (designModalSection === 'decorations') {
-      if (!effectiveSelectedDecorationPresetId) return
-      const preset = getDecorationById(effectiveSelectedDecorationPresetId)
+    if (designModalSection === 'backgrounds') {
+      if (!effectiveSelectedBackgroundId) return
+      const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
       if (!preset) return
 
-      const coerceImageUrl = (value: unknown) => {
-        if (typeof value === 'string') return value
-        if (value && typeof value === 'object' && 'url' in value && typeof (value as Record<string, unknown>).url === 'string') {
-          return (value as Record<string, unknown>).url as string
-        }
-        return ''
-      }
-
-      const mapped = (preset.elements || []).map((el: any, i: number) => ({
-        id: `preset-${effectiveSelectedDecorationPresetId}-${i}-${Date.now()}`,
-        position: el.position || {},
-        image: coerceImageUrl(el.image) || '/placeholder.svg',
-        opacity: el.opacity ?? 0.15,
-        size: el.size,
-        zIndex: el.zIndex || 0,
-      }))
-
-      setDecorations(mapped)
-
-      // backgroundImage from presets is no longer supported — backgrounds are
-      // handled by the depth / rays / texture layer system in ThemeCustomizations.
+      updateThemeCustomization({
+        depthEffect: preset.depth,
+        raysEffect: preset.rays,
+        textureEffect: preset.texture,
+        backgroundLayersTheme: preset.theme,
+      })
 
       handleClose()
     }
@@ -166,7 +148,7 @@ export function DesignCatalogModal() {
   const isApplyDisabled =
     (designModalSection === 'templates' && !effectiveSelectedTemplatesId) ||
     (designModalSection === 'themes' && !effectiveSelectedThemeId) ||
-    (designModalSection === 'decorations' && !effectiveSelectedDecorationPresetId)
+    (designModalSection === 'backgrounds' && !effectiveSelectedBackgroundId)
 
   const selectedLabel = useMemo(() => {
     if (designModalSection === 'templates') {
@@ -180,16 +162,16 @@ export function DesignCatalogModal() {
       if (!effectiveSelectedThemeId) return null
       return themes.find((t) => t.id === effectiveSelectedThemeId)?.name ?? effectiveSelectedThemeId
     }
-    if (designModalSection === 'decorations') {
-      if (!effectiveSelectedDecorationPresetId) return null
-      return getDecorationName(effectiveSelectedDecorationPresetId)
+    if (designModalSection === 'backgrounds') {
+      if (!effectiveSelectedBackgroundId) return null
+      return BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)?.name ?? effectiveSelectedBackgroundId
     }
     return null
   }, [
     designModalSection,
     effectiveSelectedTemplatesId,
     effectiveSelectedThemeId,
-    effectiveSelectedDecorationPresetId,
+    effectiveSelectedBackgroundId,
     templates,
   ])
 
@@ -213,12 +195,11 @@ export function DesignCatalogModal() {
           onSelect={setSelectedThemeId}
         />
       )}
-      {designModalSection === 'decorations' && (
-        <DecorationsSection
-          items={visibleItems as typeof decorations}
-          selectedId={effectiveSelectedDecorationPresetId}
-          onSelect={setSelectedDecorationPresetId}
-          currentTheme={currentTheme}
+      {designModalSection === 'backgrounds' && (
+        <BackgroundsSection
+          items={visibleItems as BackgroundPreset[]}
+          selectedId={effectiveSelectedBackgroundId}
+          onSelect={setSelectedBackgroundId}
         />
       )}
     </>
@@ -229,7 +210,7 @@ export function DesignCatalogModal() {
     const mobileSections = [
       { id: 'templates' as const, icon: LayoutTemplate, label: 'Templates' },
       { id: 'themes' as const, icon: Palette, label: 'Themes' },
-      { id: 'decorations' as const, icon: Sparkles, label: 'Decor' },
+      { id: 'backgrounds' as const, icon: Layers, label: 'Background' },
     ]
 
     return (
@@ -245,7 +226,7 @@ export function DesignCatalogModal() {
       >
         <DrawerContent className="md:hidden flex flex-col bg-card border-border/60 focus:outline-none">
           <DrawerTitle className="sr-only">Design Catalog</DrawerTitle>
-          <DrawerDescription className="sr-only">Choose a template, theme, and decorations.</DrawerDescription>
+          <DrawerDescription className="sr-only">Choose a template, theme, and background effects.</DrawerDescription>
 
           {/* Section switcher — horizontal tabs */}
           <div className="shrink-0 px-4 pt-1 pb-0">

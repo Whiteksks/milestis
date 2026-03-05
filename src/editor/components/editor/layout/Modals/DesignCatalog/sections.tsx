@@ -1,23 +1,55 @@
 "use client"
 
-import Image from 'next/image'
-import { Check, LayoutTemplate } from 'lucide-react'
+import { Check, LayoutTemplate, Layers } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { themes } from '@/editor/lib/themes'
-import { decorationPresets, themeToPreset } from '@/editor/lib/decorations'
-import type { Theme } from '@/editor/lib/types'
+import type { BackgroundPreset } from '@/editor/lib/background-presets'
+import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '@/editor/components/editor/layout/background-layers/registry'
+import type { EffectColors } from '@/editor/components/editor/layout/background-layers/types'
+
+// Static color palette used in previews — a generic vibrant dark palette
+const PREVIEW_COLORS: EffectColors = {
+  primaryColor:   '#a855f7',
+  secondaryColor: '#3b82f6',
+  rayColor:       '#c4b5fd',
+  subtleColor:    '#6d28d9',
+  highlightColor: '#ffffff',
+  shadowColor:    '#000000',
+  accent2Color:   '#ec4899',
+}
+
+function BackgroundPreviewMini({ preset }: { preset: BackgroundPreset }) {
+  const DepthComp   = DEPTH_EFFECTS.find((e) => e.id === preset.depth)?.Component
+  const RaysComp    = RAYS_EFFECTS.find((e) => e.id === preset.rays)?.Component
+  const TextureComp = TEXTURE_EFFECTS.find((e) => e.id === preset.texture)?.Component
+
+  const hasAny = DepthComp || RaysComp || TextureComp
+
+  return (
+    <div className="absolute inset-0 bg-zinc-900 overflow-hidden">
+      {hasAny ? (
+        // Scale a 4× larger inner surface down so vw-based effects fill the card
+        <div
+          className="absolute top-0 left-0 origin-top-left"
+          style={{ width: '400%', height: '400%', transform: 'scale(0.25)' }}
+        >
+          <div className="relative w-full h-full">
+            {DepthComp   && <DepthComp   {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
+            {RaysComp    && <RaysComp    {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
+            {TextureComp && <TextureComp {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
+          </div>
+        </div>
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <Layers className="h-8 w-8 text-zinc-600" />
+        </div>
+      )}
+    </div>
+  )
+}
 
 type Templates = Array<{ id: string; name: string }>
-
-type Decorations = Array<{
-  id: string
-  name?: string
-  description?: string
-  tags?: string[]
-  elements?: any[]
-  backgroundImage?: { url: string }
-}>
 
 export function TemplatesSection({
   items,
@@ -119,43 +151,25 @@ export function ThemesSection({
   )
 }
 
-export function DecorationsSection({
+export function BackgroundsSection({
   items,
   selectedId,
   onSelect,
-  currentTheme,
 }: {
-  items: Decorations
+  items: BackgroundPreset[]
   selectedId: string | null
   onSelect: (id: string) => void
-  currentTheme: Theme
 }) {
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center py-12">
-        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-          <LayoutTemplate className="h-5 w-5 text-muted-foreground" />
-        </div>
-        <p className="text-foreground font-medium">No presets found</p>
-        <p className="text-sm text-muted-foreground mt-1">Try a different tag</p>
-      </div>
-    )
-  }
-
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-      {items.map((p) => {
-        const firstEl = p.elements?.[0]
-        const getImgUrl = (img: any) => (typeof img === 'string' ? img : img?.url)
-        const thumbnail = (firstEl && getImgUrl(firstEl.image)) || p.backgroundImage?.url || '/placeholder.svg'
-
-        const isSelected = selectedId === p.id
+      {items.map((preset) => {
+        const isSelected = selectedId === preset.id
 
         return (
           <button
-            key={p.id}
+            key={preset.id}
             type="button"
-            onClick={() => onSelect(p.id)}
+            onClick={() => onSelect(preset.id)}
             className={cn(
               'group relative overflow-hidden rounded-xl border text-left transition-all duration-200 bg-card',
               isSelected
@@ -163,14 +177,8 @@ export function DecorationsSection({
                 : 'border-border hover:border-muted-foreground/40'
             )}
           >
-            <div className="relative aspect-4/3 bg-muted overflow-hidden">
-              <Image
-                src={thumbnail}
-                alt={p.name ?? 'Decoration preset'}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 360px"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+            <div className="relative aspect-4/3 overflow-hidden rounded-t-xl">
+              <BackgroundPreviewMini preset={preset} />
 
               {isSelected ? (
                 <div className="absolute top-2 right-2 z-10">
@@ -179,20 +187,11 @@ export function DecorationsSection({
                   </div>
                 </div>
               ) : null}
-
-              <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-3">
-                <span className="text-xs font-medium text-foreground text-center line-clamp-2">
-                  {p.description ??
-                    (themeToPreset[currentTheme] === p.id
-                      ? 'Matches your current theme preset'
-                      : 'Works with most themes')}
-                </span>
-              </div>
             </div>
 
             <div className="p-3">
-              <h3 className="text-sm font-medium text-card-foreground truncate">{p.name ?? p.id}</h3>
-              <p className="text-xs text-muted-foreground mt-1 truncate">{p.description ?? p.id}</p>
+              <h3 className="text-sm font-medium text-card-foreground truncate">{preset.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1 truncate">{preset.description}</p>
             </div>
           </button>
         )
@@ -201,6 +200,3 @@ export function DecorationsSection({
   )
 }
 
-export function getDecorationName(id: string): string {
-  return decorationPresets[id]?.name ?? id
-}

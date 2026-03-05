@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { DeviceView, EditorMode, DecorationsConfig } from './types'
 
-export type DesignModalSection = 'templates' | 'themes' | 'decorations'
+export type DesignModalSection = 'templates' | 'themes' | 'backgrounds'
 
 export interface UiStore {
   deviceView: DeviceView

@@ -1,4 +1,4 @@
-export type DesignCatalogSection = 'templates' | 'themes' | 'decorations'
+export type DesignCatalogSection = 'templates' | 'themes' | 'backgrounds'
 
 export type TagMeta = {
   availableTags: string[]

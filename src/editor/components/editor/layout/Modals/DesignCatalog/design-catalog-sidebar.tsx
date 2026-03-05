@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Filter, LayoutTemplate, Palette, Sparkles } from 'lucide-react'
+import { Filter, Layers, LayoutTemplate, Palette, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -38,7 +38,7 @@ export function DesignCatalogSidebar({
         <h2 className="text-lg font-semibold text-foreground tracking-tight">Design</h2>
       </div>
       <p className="hidden md:block text-sm text-muted-foreground mt-1 leading-relaxed">
-        Choose template, theme and decorations
+        Choose template, theme and background
       </p>
 
       <div className="flex md:flex-col gap-1 mt-4">
@@ -72,16 +72,16 @@ export function DesignCatalogSidebar({
 
         <button
           type="button"
-          onClick={() => onSectionChange('decorations')}
+          onClick={() => onSectionChange('backgrounds')}
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-            section === 'decorations'
+            section === 'backgrounds'
               ? 'bg-accent text-accent-foreground'
               : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
           )}
         >
-          <Sparkles className="h-4 w-4" />
-          <span>Decorations</span>
+          <Layers className="h-4 w-4" />
+          <span>Background</span>
         </button>
       </div>
 
