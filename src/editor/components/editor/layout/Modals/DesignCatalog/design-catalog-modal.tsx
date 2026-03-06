@@ -18,7 +18,7 @@ import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registr
 import type { TemplateId, Theme } from '@/editor/lib/types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { LayoutTemplate, Layers, Palette } from 'lucide-react'
+import { LayoutTemplate, Palette, WandSparkles } from 'lucide-react'
 
 import type { DesignCatalogSection } from './types'
 import { DesignCatalogSidebar } from './design-catalog-sidebar'
@@ -210,7 +210,7 @@ export function DesignCatalogModal() {
     const mobileSections = [
       { id: 'templates' as const, icon: LayoutTemplate, label: 'Templates' },
       { id: 'themes' as const, icon: Palette, label: 'Themes' },
-      { id: 'backgrounds' as const, icon: Layers, label: 'Background' },
+      { id: 'backgrounds' as const, icon: WandSparkles, label: 'Background' },
     ]
 
     return (

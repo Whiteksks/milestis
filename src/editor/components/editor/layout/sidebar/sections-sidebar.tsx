@@ -5,13 +5,14 @@ import { useUiSelector } from '@/editor/lib/store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import { Layers, Paintbrush, Sparkles, PanelRightOpen, PanelLeftClose } from 'lucide-react'
+import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles } from 'lucide-react'
 
+import type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 
-export type DesktopEditorTab = 'sections' | 'theme' | 'decorations'
+export type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
 
 // Единая константа — spacer и панель анимируются на одно и то же значение
 const SIDEBAR_WIDTH = 380
@@ -37,7 +38,7 @@ export function SectionsSidebar({
   const tabs = useMemo(
     () => [
       { id: 'sections' as const, icon: Layers, label: editorMode === 'portfolio' ? 'Sections' : 'Content' },
-      { id: 'theme' as const, icon: Paintbrush, label: 'Theme' },
+      { id: 'background' as const, icon: WandSparkles, label: 'Background' },
       { id: 'decorations' as const, icon: Sparkles, label: 'Decorations' },
     ],
     [editorMode],
@@ -140,7 +141,7 @@ export function SectionsSidebar({
           </div>
 
           {/* Tab content */}
-          {activeTab === 'sections' ? <SectionsTab /> : activeTab === 'theme' ? <ThemeTab /> : <DecorationsTab />}
+          {activeTab === 'sections' ? <SectionsTab /> : activeTab === 'background' ? <ThemeTab /> : <DecorationsTab />}
         </div>
       </motion.div>
     </>

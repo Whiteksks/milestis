@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getDecorations } from '@/editor/lib/decorations'
-import { Plus, Trash2, Image as ImageIcon, Wand2, RotateCcw } from 'lucide-react'
+import { Plus, Trash2, Image as ImageIcon, RotateCcw, Sparkles } from 'lucide-react'
 import { useMemo, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
@@ -154,7 +154,7 @@ export function DecorationsSettingsPanel() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
-              <Wand2 className="w-4 h-4 text-primary" />
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground tracking-tight">Decorations</h3>
@@ -171,7 +171,7 @@ export function DecorationsSettingsPanel() {
             variant="ghost"
             size="icon"
             onClick={handleResetToPreset}
-            title="Reset to theme preset"
+            title="Reset"
             className="h-8 w-8 rounded-xs text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground"
           >
             <RotateCcw className="w-3.5 h-3.5" />

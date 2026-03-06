@@ -3,10 +3,11 @@
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
+import type { MobileEditorTab } from '@/editor/lib/editor-tabs'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import { useScrollAtBottom } from '@/editor/hooks/use-scroll-at-bottom'
 
-type NavTab = 'sections' | 'theme' | 'decorations' | 'design'
+type NavTab = MobileEditorTab
 
 interface MobileBottomNavProps {
   activeTab: NavTab
@@ -16,7 +17,7 @@ interface MobileBottomNavProps {
 // Модульная константа — не пересоздаётся при каждом рендере
 const TABS: { id: NavTab; icon: React.ElementType; label: string }[] = [
   { id: 'sections', icon: Layers, label: 'Sections' },
-  { id: 'theme', icon: Paintbrush, label: 'Theme' },
+  { id: 'background', icon: Paintbrush, label: 'Background' },
   { id: 'decorations', icon: Sparkles, label: 'Decor' },
   { id: 'design', icon: LayoutTemplate, label: 'Design' },
 ]

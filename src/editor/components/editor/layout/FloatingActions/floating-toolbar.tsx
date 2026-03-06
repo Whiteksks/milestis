@@ -7,7 +7,8 @@ import { useCanvasScrollContainer } from "@/editor/components/editor/canvas-scro
 import { useScrollAtBottom } from "@/editor/hooks/use-scroll-at-bottom"
 import { useIsMobile } from "@/hooks/use-mobile"
 
-export type FloatingToolbarTab = "decorations" | "sections" | "theme"
+import type { FloatingToolbarTab } from '@/editor/lib/editor-tabs'
+export type { FloatingToolbarTab }
 
 export interface FloatingToolbarProps {
   tab: FloatingToolbarTab

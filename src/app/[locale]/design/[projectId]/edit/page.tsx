@@ -8,10 +8,10 @@ import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/des
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
 import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
-import { SettingsContent } from '@/editor/components/editor/layout/sidebar/settings-content'
+import { SettingsContent } from '@/editor/components/editor/layout/mobile/settings-content'
 import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
 import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
-import type { DesktopEditorTab } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
+import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs'
 import { useRef, useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
@@ -19,7 +19,7 @@ import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-c
 export default function EditorPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
-  const [mobileActiveTab, setMobileActiveTab] = useState<'sections' | 'theme' | 'decorations' | 'design'>('sections')
+  const [mobileActiveTab, setMobileActiveTab] = useState<MobileEditorTab>('sections')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { openDesignModal, editorMode, designModalSection, setSelectedDecorationId } = useUiSelector((state) => ({
     openDesignModal: state.openDesignModal,
@@ -28,7 +28,7 @@ export default function EditorPage() {
     setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  const handleMobileTabChange = (tab: 'sections' | 'theme' | 'decorations' | 'design') => {
+  const handleMobileTabChange = (tab: 'sections' | 'background' | 'decorations' | 'design') => {
     setMobileActiveTab(tab)
 
     // If the last action isn't Decorations, drop decoration selection/focus.
@@ -37,13 +37,13 @@ export default function EditorPage() {
     }
 
     // Keep FloatingToolbar in sync with the last pressed mobile tab.
-    if (tab === 'sections' || tab === 'theme' || tab === 'decorations') {
+    if (tab === 'sections' || tab === 'background' || tab === 'decorations') {
       setDesktopActiveTab(tab)
     }
 
     if (tab === 'design') {
       // Map the catalog's last section to the closest FloatingToolbar tab.
-      setDesktopActiveTab(designModalSection === 'decorations' ? 'decorations' : 'theme')
+      setDesktopActiveTab(designModalSection === 'backgrounds' ? 'decorations' : 'background')
       setIsDrawerOpen(false)
       // Reopen the Design Catalog on the last-used section.
       openDesignModal(designModalSection)
@@ -57,7 +57,7 @@ export default function EditorPage() {
     if (mobileActiveTab === 'sections') {
       return editorMode === 'photobook' ? 'Photobook Sections' : 'Page Sections'
     }
-    if (mobileActiveTab === 'theme') return 'Theme'
+    if (mobileActiveTab === 'background') return 'Background'
     if (mobileActiveTab === 'decorations') return 'Decorations'
     return 'Settings'
   }
@@ -88,7 +88,7 @@ export default function EditorPage() {
         title={getDrawerTitle()}
       >
         {mobileActiveTab === 'sections' && <SettingsContent />}
-        {mobileActiveTab === 'theme' && <ThemeSettingsPanel />}
+        {mobileActiveTab === 'background' && <ThemeSettingsPanel />}
         {mobileActiveTab === 'decorations' && <DecorationsSettingsPanel />}
       </MobileDrawer>
 

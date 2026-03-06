@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { useThemeSelector } from '@/editor/lib/store'
 import { 
-  RotateCcw, Sun, Layers, Sparkles, ChevronDown
+  RotateCcw, Sun, Sparkles, ChevronDown,
+  WandSparkles
 } from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
 import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
@@ -86,7 +87,7 @@ export function ThemeSettingsPanel() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
-              <Layers className="w-4 h-4 text-primary" />
+              <WandSparkles className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground tracking-tight">Background</h3>

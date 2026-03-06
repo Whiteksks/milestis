@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
-import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -31,10 +30,6 @@ export function SectionsTab() {
       {sections.length > 0 && (
         <div className="border-b border-border/60 p-6 space-y-4 bg-card/60">
           <div>
-            <Label className="text-xs font-medium text-muted-foreground mb-2 block">
-              Current Section
-            </Label>
-
             <div className="flex gap-2">
               <Popover open={isSectionPopoverOpen} onOpenChange={setIsSectionPopoverOpen}>
                 <PopoverTrigger asChild>

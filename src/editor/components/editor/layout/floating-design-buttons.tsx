@@ -3,7 +3,7 @@
 import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Plus, Palette, Sparkles, Layers } from 'lucide-react'
+import { Plus, Palette, WandSparkles, LayoutTemplate } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {
@@ -21,7 +21,7 @@ export function FloatingActions() {
               size="lg"
               className="h-12 w-12 rounded-xs shadow-md transition-all bg-foreground border border-background/40 hover:bg-foreground/90 text-background"
             >
-              <Plus className="h-5 w-5" />
+              <LayoutTemplate className="h-5 w-5" />
             </Button>
           </TooltipTrigger>
         </motion.div>
@@ -49,7 +49,7 @@ export function FloatingActions() {
               size="lg"
               className="h-12 w-12 rounded-xs shadow-md transition-all bg-card/95 hover:bg-muted text-foreground border border-foreground/40"
             >
-              <Layers className="h-5 w-5" />
+              <WandSparkles className="h-5 w-5" />
             </Button>
           </TooltipTrigger>
         </motion.div>

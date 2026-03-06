@@ -1,6 +1,6 @@
 "use client"
 
-import { Filter, Layers, LayoutTemplate, Palette, Sparkles } from 'lucide-react'
+import { Filter, LayoutTemplate, Palette, Sparkles, WandSparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -80,7 +80,7 @@ export function DesignCatalogSidebar({
               : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
           )}
         >
-          <Layers className="h-4 w-4" />
+          <WandSparkles className="h-4 w-4" />
           <span>Background</span>
         </button>
       </div>

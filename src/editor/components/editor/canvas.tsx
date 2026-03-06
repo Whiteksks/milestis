@@ -35,7 +35,7 @@ export function Canvas({
   desktopActiveTab,
 }: {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>
-  desktopActiveTab?: 'sections' | 'theme' | 'decorations'
+  desktopActiveTab?: import('@/editor/lib/editor-tabs').DesktopEditorTab
 }) {
   const viewportRef = useRef<HTMLDivElement>(null)
   const internalScrollContainerRef = useRef<HTMLDivElement>(null)
@@ -95,7 +95,7 @@ export function Canvas({
         />
       ),
       sections: <StableSectionsPanel />,
-      theme: <StableThemePanel />,
+      background: <StableThemePanel />,
     }),
     [allDecorations, scrollContainerRef]
   )
