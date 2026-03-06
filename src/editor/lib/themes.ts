@@ -71,7 +71,7 @@ export const themes: ThemeConfig[] = [
     id: 'parchment',
     name: 'Parchment',
     description: 'Aged paper warmth with ink-dark type and candlelit accents',
-    tags: ['classic', 'elegant', 'light', 'warm'],
+    tags: ['light', 'warm'],
 
     background: 'bg-[#F5F1EB]',
     foreground: 'text-[#2C2419]',
@@ -129,7 +129,7 @@ export const themes: ThemeConfig[] = [
     id: 'frost',
     name: 'Frost',
     description: 'Ice-cool Scandinavian clarity with steel blue precision',
-    tags: ['minimal', 'modern', 'light', 'cool'],
+    tags: ['light', 'cool', 'minimal'],
 
     background: 'bg-[#F4F7FA]',
     foreground: 'text-[#1A2332]',
@@ -187,7 +187,7 @@ export const themes: ThemeConfig[] = [
     id: 'ember',
     name: 'Ember',
     description: 'Deep charcoal with amber glow and fireside warmth',
-    tags: ['dark', 'warm', 'elegant'],
+    tags: ['dark', 'warm'],
 
     background: 'bg-[#141110]',
     foreground: 'text-[#E8E0D6]',
@@ -245,7 +245,7 @@ export const themes: ThemeConfig[] = [
     id: 'obsidian',
     name: 'Obsidian',
     description: 'Volcanic dark with icy blue edge and surgical precision',
-    tags: ['dark', 'cool', 'modern'],
+    tags: ['dark', 'cool'],
 
     background: 'bg-[#0C0F14]',
     foreground: 'text-[#D6DCE6]',
@@ -303,7 +303,7 @@ export const themes: ThemeConfig[] = [
     id: 'sand',
     name: 'Sand',
     description: 'Sun-bleached desert warmth with terracotta and linen softness',
-    tags: ['warm', 'elegant', 'light'],
+    tags: ['light', 'warm'],
 
     background: 'bg-[#F8F3ED]',
     foreground: 'text-[#33261A]',
@@ -361,7 +361,7 @@ export const themes: ThemeConfig[] = [
     id: 'noir',
     name: 'Noir',
     description: 'Pure black and white with maximum contrast and zero color',
-    tags: ['dark', 'minimal', 'brutalist'],
+    tags: ['dark', 'minimal'],
 
     background: 'bg-[#090909]',
     foreground: 'text-[#EBEBEB]',
@@ -419,7 +419,7 @@ export const themes: ThemeConfig[] = [
     id: 'sage',
     name: 'Sage',
     description: 'Botanical calm with muted greens and organic warmth',
-    tags: ['natural', 'elegant', 'light'],
+    tags: ['light', 'warm'],
 
     background: 'bg-[#F3F5F0]',
     foreground: 'text-[#2A2F24]',
@@ -477,7 +477,7 @@ export const themes: ThemeConfig[] = [
     id: 'dusk',
     name: 'Dusk',
     description: 'Twilight sky depth with indigo richness and starlight accents',
-    tags: ['dark', 'cool', 'elegant'],
+    tags: ['dark', 'cool'],
 
     background: 'bg-[#0E0C16]',
     foreground: 'text-[#D4D0E4]',
@@ -535,7 +535,7 @@ export const themes: ThemeConfig[] = [
     id: 'porcelain',
     name: 'Porcelain',
     description: 'Delicate ceramic softness with blush-gray quiet refinement',
-    tags: ['light', 'soft', 'elegant'],
+    tags: ['light', 'warm'],
 
     background: 'bg-[#F6F4F5]',
     foreground: 'text-[#2D262A]',
@@ -593,7 +593,7 @@ export const themes: ThemeConfig[] = [
     id: 'carbon',
     name: 'Carbon',
     description: 'Matte graphite surface with warm gray tones and quiet luxury',
-    tags: ['dark', 'neutral', 'modern'],
+    tags: ['dark', 'minimal'],
 
     background: 'bg-[#111111]',
     foreground: 'text-[#DDDAD6]',
@@ -640,6 +640,355 @@ export const themes: ThemeConfig[] = [
       highlight: '#E8E2D8',
       shadow: '#060606',
       accent2: '#8A9498',
+    },
+  },
+
+
+  // =====================================================
+  // 11. NEON  (Dark + Cyberpunk)
+  //     Electric accents on void black, futuristic edge.
+  // =====================================================
+  {
+    id: 'neon',
+    name: 'Neon',
+    description: 'Electric cyberpunk with vibrant accents on void black',
+    tags: ['dark', 'cool', 'vibrant'],
+
+    background: 'bg-[#0A0A0F]',
+    foreground: 'text-[#E0E8F0]',
+    primary: 'bg-[#00F5FF]',
+    primaryText: 'text-[#0A0A0F]',
+    muted: 'bg-[#12121A]',
+    mutedText: 'text-[#6B7280]',
+    border: 'border-[#1E1E2E]',
+
+    secondary: 'bg-[#1A1A28]',
+    secondaryText: 'text-[#C8D0DC]',
+    accent: 'bg-[#FF2D92]',
+    accentText: 'text-[#FFFFFF]',
+    success: 'bg-[#00FF88]',
+    warning: 'bg-[#FFB800]',
+
+    card: 'bg-[#0E0E16]',
+    cardForeground: 'text-[#D8E0EC]',
+    popover: 'bg-[#12121A]',
+    popoverForeground: 'text-[#E0E8F0]',
+    input: 'bg-[#0E0E16]',
+    ring: 'ring-[#00F5FF]',
+
+    placeholder: 'placeholder:text-[#4A5060]',
+    caretColor: 'caret-[#FF2D92]',
+
+    cardStyle: 'bg-[#0E0E16]/90 backdrop-blur-md border border-[#1E1E2E] shadow-[0_0_30px_rgba(0,245,255,0.08)]',
+    glassPanel: 'bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-[#00F5FF]/20',
+    elementGlow: 'shadow-[0_0_40px_rgba(0,245,255,0.25)]',
+    gradient: 'bg-gradient-to-r from-[#00F5FF] via-[#7B61FF] to-[#FF2D92]',
+
+    fontTitle: 'font-mono',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-normal',
+    letterSpacing: 'tracking-tight',
+
+    radiusMedium: 'rounded-lg',
+    shadow: 'shadow-[0_8px_32px_-4px_rgba(0,245,255,0.15)]',
+    bgEffectColors: {
+      primary: '#00F5FF',
+      secondary: '#FF2D92',
+      ray: '#1A2A40',
+      subtle: '#1E1E2E',
+      highlight: '#E0FFFF',
+      shadow: '#000008',
+      accent2: '#7B61FF',
+    },
+  },
+
+  // =====================================================
+  // 12. OCEAN  (Dark + Deep Blue)
+  //     Abyssal depths, bioluminescent glow, premium SaaS.
+  // =====================================================
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    description: 'Deep abyssal blue with bioluminescent accents for premium SaaS',
+    tags: ['dark', 'cool'],
+
+    background: 'bg-[#0D1B2A]',
+    foreground: 'text-[#D8E4EE]',
+    primary: 'bg-[#1B9AAA]',
+    primaryText: 'text-[#F0F8FF]',
+    muted: 'bg-[#142536]',
+    mutedText: 'text-[#6A8FA8]',
+    border: 'border-[#1E3448]',
+
+    secondary: 'bg-[#1A3040]',
+    secondaryText: 'text-[#C4D6E4]',
+    accent: 'bg-[#EF6F6C]',
+    accentText: 'text-[#FFFFFF]',
+    success: 'bg-[#3EB489]',
+    warning: 'bg-[#F4A261]',
+
+    card: 'bg-[#102030]',
+    cardForeground: 'text-[#D0E0F0]',
+    popover: 'bg-[#142536]',
+    popoverForeground: 'text-[#D8E4EE]',
+    input: 'bg-[#102030]',
+    ring: 'ring-[#1B9AAA]',
+
+    placeholder: 'placeholder:text-[#4A6A84]',
+    caretColor: 'caret-[#EF6F6C]',
+
+    cardStyle: 'bg-[#102030]/85 backdrop-blur-md border border-[#1E3448] shadow-[0_4px_28px_rgba(0,0,0,0.4)]',
+    glassPanel: 'bg-[#0D1B2A]/80 backdrop-blur-xl border-b border-[#1B9AAA]/20',
+    elementGlow: 'shadow-[0_0_32px_rgba(27,154,170,0.18)]',
+    gradient: 'bg-gradient-to-r from-[#1B9AAA] to-[#3EB489]',
+
+    fontTitle: 'font-sans',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-relaxed',
+    letterSpacing: 'tracking-normal',
+
+    radiusMedium: 'rounded-xl',
+    shadow: 'shadow-[0_8px_40px_-4px_rgba(0,0,0,0.5)]',
+    bgEffectColors: {
+      primary: '#1B9AAA',
+      secondary: '#3EB489',
+      ray: '#1E4060',
+      subtle: '#1E3448',
+      highlight: '#D0F0FF',
+      shadow: '#040A10',
+      accent2: '#EF6F6C',
+    },
+  },
+
+  // =====================================================
+  // 13. MINT  (Light + Cool Green)
+  //     Fresh and clean, health/fintech vibes.
+  // =====================================================
+  {
+    id: 'mint',
+    name: 'Mint',
+    description: 'Fresh mint clarity for health, wellness, and fintech',
+    tags: ['light', 'cool'],
+
+    background: 'bg-[#F0FDF4]',
+    foreground: 'text-[#14352A]',
+    primary: 'bg-[#10B981]',
+    primaryText: 'text-[#FFFFFF]',
+    muted: 'bg-[#E0F5EA]',
+    mutedText: 'text-[#4A7A68]',
+    border: 'border-[#C8ECD8]',
+
+    secondary: 'bg-[#D1FAE5]',
+    secondaryText: 'text-[#14352A]',
+    accent: 'bg-[#064E3B]',
+    accentText: 'text-[#ECFDF5]',
+    success: 'bg-[#059669]',
+    warning: 'bg-[#D97706]',
+
+    card: 'bg-[#F8FDFB]',
+    cardForeground: 'text-[#14352A]',
+    popover: 'bg-[#F8FDFB]',
+    popoverForeground: 'text-[#14352A]',
+    input: 'bg-[#E8F8F0]',
+    ring: 'ring-[#10B981]',
+
+    placeholder: 'placeholder:text-[#7FB8A0]',
+    caretColor: 'caret-[#064E3B]',
+
+    cardStyle: 'bg-[#F8FDFB]/85 backdrop-blur-sm border border-[#D1FAE5] shadow-[0_2px_14px_rgba(20,53,42,0.05)]',
+    glassPanel: 'bg-[#F0FDF4]/85 backdrop-blur-md border-b border-[#C8ECD8]/70',
+    elementGlow: 'shadow-[0_0_26px_rgba(16,185,129,0.14)]',
+    gradient: 'bg-gradient-to-r from-[#10B981] to-[#059669]',
+
+    fontTitle: 'font-sans',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-relaxed',
+    letterSpacing: 'tracking-normal',
+
+    radiusMedium: 'rounded-xl',
+    shadow: 'shadow-[0_4px_18px_rgba(20,53,42,0.06)]',
+    bgEffectColors: {
+      primary: '#10B981',
+      secondary: '#059669',
+      ray: '#A7F3D0',
+      subtle: '#C8ECD8',
+      highlight: '#ECFDF5',
+      shadow: '#0A1A14',
+      accent2: '#6EE7B7',
+    },
+  },
+
+  // =====================================================
+  // 14. AURORA  (Dark + Multi-color Gradient)
+  //     Northern lights, AI/creative products.
+  // =====================================================
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    description: 'Northern lights gradient for AI and creative products',
+    tags: ['dark', 'cool', 'vibrant'],
+
+    background: 'bg-[#0F0F1A]',
+    foreground: 'text-[#E4E8F0]',
+    primary: 'bg-[#7C3AED]',
+    primaryText: 'text-[#FFFFFF]',
+    muted: 'bg-[#161625]',
+    mutedText: 'text-[#7A7E94]',
+    border: 'border-[#252540]',
+
+    secondary: 'bg-[#1E1E35]',
+    secondaryText: 'text-[#C8CCE0]',
+    accent: 'bg-[#06B6D4]',
+    accentText: 'text-[#0F0F1A]',
+    success: 'bg-[#10B981]',
+    warning: 'bg-[#F59E0B]',
+
+    card: 'bg-[#14141F]',
+    cardForeground: 'text-[#DDE0EC]',
+    popover: 'bg-[#161625]',
+    popoverForeground: 'text-[#E4E8F0]',
+    input: 'bg-[#14141F]',
+    ring: 'ring-[#7C3AED]',
+
+    placeholder: 'placeholder:text-[#5A5E74]',
+    caretColor: 'caret-[#06B6D4]',
+
+    cardStyle: 'bg-[#14141F]/85 backdrop-blur-md border border-[#252540] shadow-[0_4px_32px_rgba(124,58,237,0.08)]',
+    glassPanel: 'bg-[#0F0F1A]/80 backdrop-blur-xl border-b border-[#7C3AED]/15',
+    elementGlow: 'shadow-[0_0_40px_rgba(124,58,237,0.20)]',
+    gradient: 'bg-gradient-to-r from-[#7C3AED] via-[#06B6D4] to-[#10B981]',
+
+    fontTitle: 'font-sans',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-normal',
+    letterSpacing: 'tracking-tight',
+
+    radiusMedium: 'rounded-2xl',
+    shadow: 'shadow-[0_8px_48px_-4px_rgba(124,58,237,0.18)]',
+    bgEffectColors: {
+      primary: '#7C3AED',
+      secondary: '#06B6D4',
+      ray: '#2A2050',
+      subtle: '#252540',
+      highlight: '#DDD6FE',
+      shadow: '#08080E',
+      accent2: '#10B981',
+    },
+  },
+
+  // =====================================================
+  // 15. CORAL  (Light + Warm Peach)
+  //     Sunset vibes, lifestyle/beauty.
+  // =====================================================
+  {
+    id: 'coral',
+    name: 'Coral',
+    description: 'Warm coral sunset for lifestyle and beauty brands',
+    tags: ['light', 'warm', 'vibrant'],
+
+    background: 'bg-[#FFF5F5]',
+    foreground: 'text-[#3D1F1F]',
+    primary: 'bg-[#FF6B6B]',
+    primaryText: 'text-[#FFFFFF]',
+    muted: 'bg-[#FFE8E8]',
+    mutedText: 'text-[#A05050]',
+    border: 'border-[#FFD4D4]',
+
+    secondary: 'bg-[#FFDADA]',
+    secondaryText: 'text-[#3D1F1F]',
+    accent: 'bg-[#F59E0B]',
+    accentText: 'text-[#FFFFFF]',
+    success: 'bg-[#34D399]',
+    warning: 'bg-[#FBBF24]',
+
+    card: 'bg-[#FFFAFA]',
+    cardForeground: 'text-[#3D1F1F]',
+    popover: 'bg-[#FFFAFA]',
+    popoverForeground: 'text-[#3D1F1F]',
+    input: 'bg-[#FFEEEE]',
+    ring: 'ring-[#FF6B6B]',
+
+    placeholder: 'placeholder:text-[#D08080]',
+    caretColor: 'caret-[#F59E0B]',
+
+    cardStyle: 'bg-[#FFFAFA]/85 backdrop-blur-sm border border-[#FFDADA] shadow-[0_2px_14px_rgba(61,31,31,0.05)]',
+    glassPanel: 'bg-[#FFF5F5]/85 backdrop-blur-md border-b border-[#FFD4D4]/70',
+    elementGlow: 'shadow-[0_0_26px_rgba(255,107,107,0.16)]',
+    gradient: 'bg-gradient-to-r from-[#FF6B6B] to-[#F59E0B]',
+
+    fontTitle: 'font-serif',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-relaxed',
+    letterSpacing: 'tracking-normal',
+
+    radiusMedium: 'rounded-2xl',
+    shadow: 'shadow-[0_4px_20px_rgba(255,107,107,0.10)]',
+    bgEffectColors: {
+      primary: '#FF6B6B',
+      secondary: '#F59E0B',
+      ray: '#FFB8B8',
+      subtle: '#FFD4D4',
+      highlight: '#FFF0F0',
+      shadow: '#1A0808',
+      accent2: '#FB923C',
+    },
+  },
+
+  // =====================================================
+  // 16. SLATE  (Light + Neutral Cool)
+  //     Modern B2B SaaS, professional and clean.
+  // =====================================================
+  {
+    id: 'slate',
+    name: 'Slate',
+    description: 'Modern B2B SaaS with professional slate-blue tones',
+    tags: ['light', 'cool', 'minimal'],
+
+    background: 'bg-[#F8FAFC]',
+    foreground: 'text-[#1E293B]',
+    primary: 'bg-[#475569]',
+    primaryText: 'text-[#F8FAFC]',
+    muted: 'bg-[#F1F5F9]',
+    mutedText: 'text-[#64748B]',
+    border: 'border-[#E2E8F0]',
+
+    secondary: 'bg-[#E2E8F0]',
+    secondaryText: 'text-[#1E293B]',
+    accent: 'bg-[#6366F1]',
+    accentText: 'text-[#FFFFFF]',
+    success: 'bg-[#22C55E]',
+    warning: 'bg-[#F59E0B]',
+
+    card: 'bg-[#FFFFFF]',
+    cardForeground: 'text-[#1E293B]',
+    popover: 'bg-[#FFFFFF]',
+    popoverForeground: 'text-[#1E293B]',
+    input: 'bg-[#F1F5F9]',
+    ring: 'ring-[#6366F1]',
+
+    placeholder: 'placeholder:text-[#94A3B8]',
+    caretColor: 'caret-[#6366F1]',
+
+    cardStyle: 'bg-[#FFFFFF]/90 backdrop-blur-sm border border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.05)]',
+    glassPanel: 'bg-[#F8FAFC]/90 backdrop-blur-md border-b border-[#E2E8F0]',
+    elementGlow: 'shadow-[0_0_20px_rgba(99,102,241,0.12)]',
+    gradient: 'bg-gradient-to-r from-[#475569] to-[#6366F1]',
+
+    fontTitle: 'font-sans',
+    fontBody: 'font-sans',
+    lineHeight: 'leading-normal',
+    letterSpacing: 'tracking-tight',
+
+    radiusMedium: 'rounded-lg',
+    shadow: 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]',
+    bgEffectColors: {
+      primary: '#475569',
+      secondary: '#6366F1',
+      ray: '#CBD5E1',
+      subtle: '#E2E8F0',
+      highlight: '#F1F5F9',
+      shadow: '#0F172A',
+      accent2: '#818CF8',
     },
   },
 ]

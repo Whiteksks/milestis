@@ -4,6 +4,7 @@ import { Filter, LayoutTemplate, Palette, Sparkles, WandSparkles } from 'lucide-
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
 import type { DesignCatalogSection, TagMeta } from './types'
@@ -32,57 +33,53 @@ export function DesignCatalogSidebar({
   visibleCount,
 }: Props) {
   return (
-    <aside className="w-full md:w-60 shrink-0 border-b md:border-b-0 md:border-r border-border bg-sidebar p-4 md:p-5">
+    <aside className="w-full md:w-60  md:border-r border-border bg-sidebar p-4">
       <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-muted-foreground" />
-        <h2 className="text-lg font-semibold text-foreground tracking-tight">Design</h2>
+        <h2 className="text-xl font-bold text-foreground tracking-tight">Milestis Design</h2>
       </div>
       <p className="hidden md:block text-sm text-muted-foreground mt-1 leading-relaxed">
         Choose template, theme and background
       </p>
 
       <div className="flex md:flex-col gap-1 mt-4">
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => onSectionChange('templates')}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-            section === 'templates'
-              ? 'bg-accent text-accent-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+            'w-full justify-start',
+            section === 'templates' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
           )}
         >
           <LayoutTemplate className="h-4 w-4" />
-          <span>Templates</span>
-        </button>
+          Templates
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => onSectionChange('themes')}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-            section === 'themes'
-              ? 'bg-accent text-accent-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+            'w-full justify-start',
+            section === 'themes' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
           )}
         >
           <Palette className="h-4 w-4" />
-          <span>Themes</span>
-        </button>
+          Themes
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => onSectionChange('backgrounds')}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-            section === 'backgrounds'
-              ? 'bg-accent text-accent-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+            'w-full justify-start',
+            section === 'backgrounds' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
           )}
         >
           <WandSparkles className="h-4 w-4" />
-          <span>Background</span>
-        </button>
+          Background
+        </Button>
       </div>
 
       {tagMeta.availableTags.length > 0 ? (
@@ -100,53 +97,36 @@ export function DesignCatalogSidebar({
               </PopoverTrigger>
               <PopoverContent align="start" className="w-72 p-2">
                 <div className="max-h-72 overflow-auto">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => onTagChange('all')}
                     className={cn(
-                      'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                      activeTag === 'all'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      'w-full justify-start',
+                      activeTag === 'all' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                     )}
                   >
-                    <Sparkles className="h-4 w-4" />
-                    <span>All</span>
-                    <span
-                      className={cn(
-                        'ml-auto text-xs tabular-nums',
-                        activeTag === 'all' ? 'text-accent-foreground/70' : 'text-muted-foreground/60'
-                      )}
-                    >
-                      {totalCount}
-                    </span>
-                  </button>
+                    All
+                    <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{totalCount}</span>
+                  </Button>
 
                   {tagMeta.availableTags.map((tag) => {
                     const isActive = activeTag === tag
                     const count = tagMeta.counts.get(tag) ?? 0
                     return (
-                      <button
+                      <Button
                         key={tag}
                         type="button"
+                        variant="ghost"
                         onClick={() => onTagChange(tag)}
                         className={cn(
-                          'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                          isActive
-                            ? 'bg-accent text-accent-foreground'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                          'w-full justify-start',
+                          isActive && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                         )}
                       >
                         <span className="truncate">{tag}</span>
-                        <span
-                          className={cn(
-                            'ml-auto text-xs tabular-nums',
-                            isActive ? 'text-accent-foreground/70' : 'text-muted-foreground/60'
-                          )}
-                        >
-                          {count}
-                        </span>
-                      </button>
+                        <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{count}</span>
+                      </Button>
                     )
                   })}
                 </div>
@@ -154,57 +134,44 @@ export function DesignCatalogSidebar({
             </Popover>
           </div>
 
-          <nav className="hidden md:flex md:flex-col gap-1 mt-5">
-            <button
-              type="button"
-              onClick={() => onTagChange('all')}
-              className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                activeTag === 'all'
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-              )}
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>All</span>
-              <span
+          <div className="hidden md:block mt-4">
+            <Separator className="mb-3" />
+            <p className="text-xs font-medium text-muted-foreground/70 mb-1 px-1">Filter</p>
+            <nav className="flex flex-col gap-0.5">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onTagChange('all')}
                 className={cn(
-                  'ml-auto text-xs tabular-nums',
-                  activeTag === 'all' ? 'text-accent-foreground/70' : 'text-muted-foreground/60'
+                  'w-full justify-start',
+                  activeTag === 'all' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                 )}
               >
-                {totalCount}
-              </span>
-            </button>
-
-            {tagMeta.availableTags.map((tag) => {
-              const isActive = activeTag === tag
-              const count = tagMeta.counts.get(tag) ?? 0
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => onTagChange(tag)}
-                  className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                  )}
-                >
-                  <span className="truncate">{tag}</span>
-                  <span
+                All
+                <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{totalCount}</span>
+              </Button>
+                
+              {tagMeta.availableTags.map((tag) => {
+                const isActive = activeTag === tag
+                const count = tagMeta.counts.get(tag) ?? 0
+                return (
+                  <Button
+                    key={tag}
+                    type="button"
+                    variant="ghost"
+                    onClick={() => onTagChange(tag)}
                     className={cn(
-                      'ml-auto text-xs tabular-nums',
-                      isActive ? 'text-accent-foreground/70' : 'text-muted-foreground/60'
+                      'w-full justify-start',
+                      isActive && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                     )}
                   >
-                    {count}
-                  </span>
-                </button>
-              )
-            })}
-          </nav>
+                    <span className="truncate">{tag}</span>
+                    <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{count}</span>
+                  </Button>
+                )
+              })}
+            </nav>
+          </div>
         </>
       ) : null}
     </aside>

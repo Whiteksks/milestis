@@ -1,15 +1,16 @@
 export type DeviceView = 'desktop' | 'tablet' | 'mobile' | 'fullscreen'
 
 export const THEMES = {
-  vellumVintage: 'vellum-vintage',
-  nordicLight: 'nordic-light',
-  midnightNeon: 'midnight-neon',
-  sunsetWarm: 'sunset-warm',
-  oceanPro: 'ocean-pro',
-  royalClassic: 'royal-classic',
-  glassmorphism: 'glass-frost',
-  monochromeMinimal: 'mono-noir',
-  floralBloom: 'floral-bloom',
+  parchment: 'parchment',
+  frost: 'frost',
+  ember: 'ember',
+  obsidian: 'obsidian',
+  sand: 'sand',
+  noir: 'noir',
+  sage: 'sage',
+  dusk: 'dusk',
+  porcelain: 'porcelain',
+  carbon: 'carbon',
 } as const
 
 export type Theme = (typeof THEMES)[keyof typeof THEMES]

@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from 'react'                        
 import { Check, LayoutTemplate, Layers } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -7,6 +8,11 @@ import { themes } from '@/editor/lib/themes'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '@/editor/components/editor/layout/background-layers/registry'
 import type { EffectColors } from '@/editor/components/editor/layout/background-layers/types'
+
+// Module-level Maps for O(1) effect lookups — built once, never recreated
+const DEPTH_MAP = new Map(DEPTH_EFFECTS.map((e) => [e.id, e.Component]))
+const RAYS_MAP  = new Map(RAYS_EFFECTS.map((e) => [e.id, e.Component]))
+const TEXTURE_MAP = new Map(TEXTURE_EFFECTS.map((e) => [e.id, e.Component]))
 
 // Static color palette used in previews — a generic vibrant dark palette
 const PREVIEW_COLORS: EffectColors = {
@@ -19,10 +25,10 @@ const PREVIEW_COLORS: EffectColors = {
   accent2Color:   '#ec4899',
 }
 
-function BackgroundPreviewMini({ preset }: { preset: BackgroundPreset }) {
-  const DepthComp   = DEPTH_EFFECTS.find((e) => e.id === preset.depth)?.Component
-  const RaysComp    = RAYS_EFFECTS.find((e) => e.id === preset.rays)?.Component
-  const TextureComp = TEXTURE_EFFECTS.find((e) => e.id === preset.texture)?.Component
+function BackgroundPreviewMiniInner({ preset }: { preset: BackgroundPreset }) {
+  const DepthComp   = DEPTH_MAP.get(preset.depth)
+  const RaysComp    = RAYS_MAP.get(preset.rays)
+  const TextureComp = TEXTURE_MAP.get(preset.texture)
 
   const hasAny = DepthComp || RaysComp || TextureComp
 
@@ -48,6 +54,7 @@ function BackgroundPreviewMini({ preset }: { preset: BackgroundPreset }) {
     </div>
   )
 }
+const BackgroundPreviewMini = memo(BackgroundPreviewMiniInner)
 
 type Templates = Array<{ id: string; name: string }>
 
@@ -72,14 +79,14 @@ export function TemplatesSection({
             type="button"
             onClick={() => onSelect(template.id)}
             className={cn(
-              'group relative overflow-hidden rounded-xl border text-left transition-all duration-200 bg-card',
+              'relative overflow-hidden rounded-xl border text-left transition-colors duration-150 bg-card',
               isSelected
                 ? 'border-primary ring-1 ring-primary'
                 : 'border-border hover:border-muted-foreground/40'
             )}
           >
             <div className="relative aspect-4/3 bg-muted overflow-hidden flex items-center justify-center">
-              <LayoutTemplate className="h-10 w-10 text-muted-foreground transition-transform duration-300 group-hover:scale-110" />
+              <LayoutTemplate className="h-10 w-10 text-muted-foreground" />
               {isSelected ? (
                 <div className="absolute top-2 right-2 z-10">
                   <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
@@ -118,7 +125,7 @@ export function ThemesSection({
             type="button"
             onClick={() => onSelect(theme.id)}
             className={cn(
-              'group relative overflow-hidden rounded-xl border text-left transition-all duration-200 bg-card',
+              'group relative overflow-hidden rounded-xl border text-left transition-colors duration-150 bg-card',
               isSelected
                 ? 'border-primary ring-1 ring-primary'
                 : 'border-border hover:border-muted-foreground/40'
@@ -131,14 +138,20 @@ export function ThemesSection({
 
               <div className={cn('absolute left-3 bottom-3 h-1.5 w-10 rounded-full opacity-80', theme.primary)} />
 
-              {isSelected ? (
-                <div className="absolute top-2 right-2 z-10">
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="h-3.5 w-3.5 text-primary-foreground" />
-                  </div>
+              <div className="absolute right-3 bottom-3 flex gap-1">
+                <div className={cn('w-3 h-3 rounded-full border border-black/10', theme.primary)} />
+                <div className={cn('w-3 h-3 rounded-full border border-black/10', theme.accent)} />
+                <div className={cn('w-3 h-3 rounded-full border border-black/10', theme.secondary)} />
+              </div>
+
+            {isSelected ? (
+              <div className="absolute top-2 right-2 z-10">
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                  <Check className="h-3.5 w-3.5 text-primary-foreground" />
                 </div>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
+          </div>
 
             <div className="p-3">
               <h3 className="text-sm font-medium text-card-foreground truncate">{theme.name}</h3>
@@ -171,7 +184,7 @@ export function BackgroundsSection({
             type="button"
             onClick={() => onSelect(preset.id)}
             className={cn(
-              'group relative overflow-hidden rounded-xl border text-left transition-all duration-200 bg-card',
+              'group relative overflow-hidden rounded-xl border text-left transition-colors duration-150 bg-card',
               isSelected
                 ? 'border-primary ring-1 ring-primary'
                 : 'border-border hover:border-muted-foreground/40'

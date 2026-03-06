@@ -33,7 +33,7 @@ export interface ThemeStore {
 
 export const useThemeStore = create<ThemeStore>((set) => ({
   currentTemplateId: 'editorial',
-  currentTheme: 'vellum-vintage',
+  currentTheme: 'parchment',
   frameStyle: 'soft',
   themeCustomizations: {
     decorationAnimation: 'fade',
