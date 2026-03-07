@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
-import { Info, Lightbulb } from "lucide-react"
+import { Info, Lightbulb, Link } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "How credits work — Milestis Help",
@@ -42,7 +42,7 @@ export default function HowCreditsWorkPage() {
         <Info className="kb-callout-icon text-primary" />
         <span>
           Free accounts receive a limited number of credits per month. Pro and Family plans come
-          with a larger allowance. See the <a href="/pricing">Pricing page</a> for exact numbers.
+          with a larger allowance. See the <Link href="/pricing">Pricing page</Link> for exact numbers.
         </span>
       </div>
 

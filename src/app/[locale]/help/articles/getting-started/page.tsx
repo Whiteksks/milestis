@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Lightbulb } from "lucide-react"
+import Link from "next/link" // Добавили импорт
 
 export const metadata: Metadata = {
   title: "Getting started with Milestis — Milestis Help",
@@ -37,7 +38,7 @@ export default function GettingStartedPage() {
     <ArticleLayout meta={meta} toc={toc} related={related}>
       <h2 id="create-account">Create an account</h2>
       <p>
-        Go to <a href="/">milestis.com</a> and click <strong>Get started free</strong>. You can
+        Go to <Link href="/">milestis.com</Link> and click <strong>Get started free</strong>. You can
         sign up with your Google account, Apple ID, or an email address and password. No credit
         card is required for the free plan.
       </p>
@@ -127,15 +128,15 @@ export default function GettingStartedPage() {
       <p>Now that your first project is live, here are some things to explore:</p>
       <ul>
         <li>
-          <a href="/help/articles/customize-portfolio">Set up your public portfolio</a> to showcase
+          <Link href="/help/articles/customize-portfolio">Set up your public portfolio</Link> to showcase
           your work.
         </li>
         <li>
-          <a href="/help/articles/publish-share">Learn all the sharing options</a> — custom domains,
+          <Link href="/help/articles/publish-share">Learn all the sharing options</Link> — custom domains,
           password protection, and more.
         </li>
         <li>
-          <a href="/help/articles/how-credits-work">Understand how AI credits work</a> so you never
+          <Link href="/help/articles/how-credits-work">Understand how AI credits work</Link> so you never
           run out at the wrong moment.
         </li>
       </ul>

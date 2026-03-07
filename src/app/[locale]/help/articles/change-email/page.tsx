@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "How to change your email — Milestis Help",
@@ -61,6 +62,7 @@ export default function ChangeEmailPage() {
           </div>
         </div>
 
+        {/* ... шаги 2-5 остаются без изменений, там нет текстовых кавычек ... */}
         <div className="kb-step">
           <div className="kb-step-number">2</div>
           <div className="kb-step-body">
@@ -117,19 +119,19 @@ export default function ChangeEmailPage() {
       <div className="kb-callout">
         <AlertCircle className="kb-callout-icon text-amber-500" />
         <span>
-          Check your spam or junk folder if you don&apos;t see the verification email within a
-          couple of minutes.
+          {/* Использование фигурных скобок избавляет от &apos; */}
+          {"Check your spam or junk folder if you don't see the verification email within a couple of minutes."}
         </span>
       </div>
 
       <h2 id="troubleshooting">Troubleshooting</h2>
       <ul>
         <li>
-          <strong>I didn't receive the verification email.</strong> Wait up to 5 minutes, then check
+          <strong>{"I didn't receive the verification email."}</strong> Wait up to 5 minutes, then check
           spam. If still nothing, go back to Settings and re-send the verification.
         </li>
         <li>
-          <strong>The link shows "already used" or "expired".</strong> Request a new verification
+          <strong>{"The link shows \"already used\" or \"expired\"."}</strong> Request a new verification
           link from Settings → Email.
         </li>
         <li>
@@ -137,7 +139,7 @@ export default function ChangeEmailPage() {
           email. Sign in with that address or use a different one.
         </li>
         <li>
-          <strong>I no longer have access to my current email.</strong> Contact support — we can
+          <strong>{"I no longer have access to my current email."}</strong> Contact support — we can
           verify your identity and update the address manually.
         </li>
       </ul>

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, VariantProps } from "class-variance-authority"
-import { PanelLeftIcon } from "lucide-react"
+import { PanelLeftIcon, X } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "./drawer"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -180,30 +181,72 @@ function Sidebar({
     )
   }
 
-  if (isMobile) {
-    return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-        <SheetContent
-          data-sidebar="sidebar"
-          data-slot="sidebar"
-          data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
-          side={side}
+  // if (isMobile) {
+  //   return (
+  //     <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+  //       <SheetContent
+  //         data-sidebar="sidebar"
+  //         data-slot="sidebar"
+  //         data-mobile="true"
+  //         className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+  //         style={
+  //           {
+  //             "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+  //           } as React.CSSProperties
+  //         }
+  //         side={side}
+  //       >
+  //         <SheetHeader className="sr-only">
+  //           <SheetTitle>Sidebar</SheetTitle>
+  //           <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+  //         </SheetHeader>
+  //         <div className="flex h-full w-full flex-col">{children}</div>
+  //       </SheetContent>
+  //     </Sheet>
+  //   )
+  // }
+    if (isMobile) {
+      return (
+        <Drawer
+          open={openMobile}
+          onOpenChange={(isOpen) => {
+            if (isOpen) (document.activeElement as HTMLElement)?.blur()
+            setOpenMobile(isOpen)
+          }}
+          direction="left"
         >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-          </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
-        </SheetContent>
-      </Sheet>
-    )
-  }
+          <DrawerContent
+            data-sidebar="sidebar"
+            data-slot="sidebar"
+            data-mobile="true"
+            
+            className="bg-sidebar text-sidebar-foreground max-w-none rounded-none p-0"
+            style={
+              {
+                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+                width: SIDEBAR_WIDTH_MOBILE,
+              } as React.CSSProperties
+            }
+          >
+          <div className="flex items-center absolute top-0 right-0 justify-end p-4">
+            <Button
+              autoFocus
+              onClick={() => setOpenMobile(false)}
+              variant="ghost"
+              aria-label="Close sidebar"
+            >
+              <X className="size-5 text-muted-foreground" />
+            </Button>
+          </div>
+            <DrawerHeader className="sr-only">
+              <DrawerTitle>Sidebar</DrawerTitle>
+              <DrawerDescription>mobile sidebar</DrawerDescription>
+            </DrawerHeader>
+            <div className="flex h-full w-full flex-col">{children}</div>
+          </DrawerContent>
+        </Drawer>
+      )
+    }
 
   return (
     <div
