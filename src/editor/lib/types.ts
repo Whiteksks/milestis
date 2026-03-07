@@ -52,14 +52,13 @@ export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
 /** TemplateId is derived automatically from each mode's ID list.
  *  To add a new template — edit modes/portfolio-ids.ts or modes/photobook-ids.ts.
  *  Never edit this line directly. */
-export type { PortfolioTemplateId } from './modes/portfolio-ids'
-export type { PhotobookTemplateId }  from './modes/photobook-ids'
 import type { PortfolioTemplateId } from './modes/portfolio-ids'
-import type { PhotobookTemplateId }  from './modes/photobook-ids'
-export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
-
-export type { DecorationAnimation } from './decoration-animations'
+import type { PhotobookTemplateId } from './modes/photobook-ids'
 import type { DecorationAnimation } from './decoration-animations'
+export type { PortfolioTemplateId, PhotobookTemplateId, DecorationAnimation }
+
+// 3. Создаем составной тип
+export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
 
 export type DepthEffect = 'none' | 'radial-glow' | 'vignette' | 'ambient-blobs' | 'asymmetric-light' | 'aurora' | 'horizon'
 export type RayEffect = 'none' | 'diagonal-rays' | 'conic-rays' | 'soft-streaks' | 'lens-flare' | 'caustics' | 'god-rays' | 'prism'

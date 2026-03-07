@@ -30,6 +30,8 @@ export const FloatingToolbar = memo(function FloatingToolbar({
   // Mobile: docks flush on top of MobileBottomNav
   const mobileDocked = atBottom && isMobile
 
+  const targetRadius = (docked || mobileDocked) ? "24px 24px 0 0" : "24px";
+
   return (
     // Static container — fixed to bottom, no layout animation
     <div
@@ -39,12 +41,12 @@ export const FloatingToolbar = memo(function FloatingToolbar({
       )}
       style={{ right: "var(--canvas-scrollbar-width, 0px)" }}
     >
-      {/* AnimatePresence needed for exit animation when tab changes */}
+
       <AnimatePresence mode="wait">
         {panel && (
           <motion.div
             key={tab}
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 10, scale: 0.95, borderRadius: targetRadius }}
             animate={{
               opacity: 1,
               scale: 1,
@@ -53,9 +55,9 @@ export const FloatingToolbar = memo(function FloatingToolbar({
                 : mobileDocked
                   ? 8        // mobile docked: +8px closes the gap that opens when nav snaps to y:0
                   : -8,      // floating: lift 8px off the bottom edge
-              borderRadius: (docked || mobileDocked) ? "24px 24px 0 0" : "24px",
+              borderRadius: targetRadius,
             }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95, borderRadius: targetRadius }}
             transition={{
               opacity: { duration: 0.15, ease: "easeOut" },
                 scale: { duration: 0.15, ease: "easeOut" },

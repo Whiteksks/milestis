@@ -3,7 +3,6 @@
 import { useRef, useMemo, useLayoutEffect, useState, memo, type CSSProperties } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { getTheme } from '@/editor/lib/themes'
-import { getDecorations } from '@/editor/lib/decorations'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-layer'
@@ -59,10 +58,6 @@ export function Canvas({
   // Memoize so the theme object reference is stable — prevents templateNode from
   // re-rendering when unrelated state (e.g. deviceView) changes.
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
-  const themeDecorations = useMemo(
-    () => previewDecorations ?? getDecorations(currentTheme),
-    [previewDecorations, currentTheme],
-  )
   // Each mode's canvasDataSelector subscribes only to its own content slices.
   // Adding a new mode never causes canvas to re-render on unrelated store changes.
   const modeEntry = MODE_REGISTRY[editorMode]
@@ -78,11 +73,11 @@ export function Canvas({
   }, [modeEntry, currentTemplateId, theme, frameStyle, modeCanvasData])
 
   const allDecorations = useMemo(() => [
-    ...(themeDecorations?.elements || []),
+    ...(previewDecorations?.elements || []),
     ...customDecorations
-  ], [themeDecorations, customDecorations])
+  ], [previewDecorations, customDecorations])
 
-  const decorationAnimation = themeCustomizations.decorationAnimation ?? themeDecorations?.animation ?? 'fade'
+  const decorationAnimation = themeCustomizations.decorationAnimation ?? previewDecorations?.animation ?? 'fade'
 
   // Only the decorations panel depends on runtime data; sections and theme panels
   // are now stable memo components, so this object only updates when decorations change.

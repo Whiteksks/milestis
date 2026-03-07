@@ -5,8 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { getDecorations } from '@/editor/lib/decorations'
-import { Plus, Trash2, Image as ImageIcon, RotateCcw, Sparkles } from 'lucide-react'
+import { Plus, Trash2, Image as ImageIcon, Sparkles } from 'lucide-react'
 import { useMemo, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
@@ -38,7 +37,6 @@ export function DecorationsSettingsPanel() {
   const canvasScrollRef = useCanvasScrollContainer()
   
   const {
-    currentTheme,
     themeCustomizations,
     updateThemeCustomization,
     customDecorations,
@@ -48,7 +46,6 @@ export function DecorationsSettingsPanel() {
     resetDecorations,
     setDecorations,
   } = useThemeSelector((state) => ({
-    currentTheme: state.currentTheme,
     themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
     customDecorations: state.customDecorations,
@@ -64,7 +61,6 @@ export function DecorationsSettingsPanel() {
     setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  const themeDecorations = useMemo(() => getDecorations(currentTheme), [currentTheme])
   const decorations = customDecorations
 
   const handleAddDecoration = () => {
@@ -124,29 +120,6 @@ export function DecorationsSettingsPanel() {
     setSelectedDecorationId(null)
   }
 
-  const handleResetToPreset = () => {
-    const preset = getDecorations(currentTheme)
-
-    const mapped = (preset.elements || []).map((el: any, i: number) => ({
-      id: createDecorationId(`preset-${currentTheme}-${i}`),
-      position: {
-        top: el.position?.top ?? '10%',
-        left: el.position?.left ?? '10%',
-        bottom: undefined,
-        right: undefined,
-      },
-      image: coerceImageUrl(el.image) || '/placeholder.svg',
-      opacity: el.opacity ?? 0.15,
-      responsiveScale: el.responsiveScale ?? true,
-      zIndex: el.zIndex || 0,
-      name: `Preset Item ${i + 1}`,
-    }))
-
-    setDecorations(mapped)
-    updateThemeCustomization({ decorationAnimation: preset.animation || 'fade' })
-    setSelectedDecorationId(null)
-  }
-
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -167,15 +140,6 @@ export function DecorationsSettingsPanel() {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleResetToPreset}
-            title="Reset"
-            className="h-8 w-8 rounded-xs text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </Button>
         </div>
       </div>
 
@@ -188,7 +152,7 @@ export function DecorationsSettingsPanel() {
           <div className="flex-1 space-y-2">
             <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Animation</Label>
             <Select
-              value={themeCustomizations.decorationAnimation || themeDecorations?.animation || 'fade'}
+              value={themeCustomizations.decorationAnimation || 'fade'}
               onValueChange={(value) => updateThemeCustomization({ decorationAnimation: value as DecorationAnimation })}
             >
               <SelectTrigger className="h-9 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/40 focus:ring-1 focus:ring-primary/30 text-[12px] transition-all">

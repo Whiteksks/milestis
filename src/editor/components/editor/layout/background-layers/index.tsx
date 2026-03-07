@@ -55,26 +55,28 @@ export function BackgroundLayers({
 
   // In scroll mode, translate the layer upward as the user scrolls, creating a parallax
   // effect that makes the background visibly move relative to the content.
-  // scale: 1.15 oversizes the layer by 15 % so translate never reveals empty edges.
-  // strength: 0.55 uses slightly more than half of the available travel for a gentle feel.
   useParallaxLayer({
     enabled: placement === 'viewport' && scrollMode === 'scroll' && !!scrollContainerRef,
     scrollContainerRef: (scrollContainerRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
     viewportRef: (viewportRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
     layerRef,
-    strength: 0.55,
-    scale: 1.15,
+    strength: 1.5,
+    scale: 1.2,
   })
 
   // All effects live in viewport placement only — content placement is a no-op.
   if (placement === 'content') return null
 
   const noLayers = depth === 'none' && rays === 'none' && texture === 'none'
-  if (noLayers) return null
 
-  const activeDepth   = DEPTH_EFFECTS.find((e) => e.id === depth)
-  const activeRays    = RAYS_EFFECTS.find((e) => e.id === rays)
-  const activeTexture = TEXTURE_EFFECTS.find((e) => e.id === texture)
+  // Always render the wrapper div so layerRef.current is populated as soon as the
+  // component mounts. If we returned null when noLayers=true, layerRef.current would
+  // be null when the parallax effect ran — and since refs are stable objects, adding
+  // an effect later would NOT re-trigger useParallaxLayer (no re-render, no dep change).
+  // The empty div is invisible (pointer-events-none absolute) so there is no visual cost.
+  const activeDepth   = noLayers ? null : DEPTH_EFFECTS.find((e) => e.id === depth)
+  const activeRays    = noLayers ? null : RAYS_EFFECTS.find((e) => e.id === rays)
+  const activeTexture = noLayers ? null : TEXTURE_EFFECTS.find((e) => e.id === texture)
 
   const colors = { isDark, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color }
 
