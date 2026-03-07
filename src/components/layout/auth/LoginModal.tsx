@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Drawer, DrawerContent } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -173,10 +173,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent>
-          <DialogHeader className="sr-only">
-            <DialogTitle>Login Modal</DialogTitle>
-            <DialogDescription>mobile login modal</DialogDescription>
-          </DialogHeader>
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>Login Modal</DrawerTitle>
+            <DrawerDescription>mobile login modal</DrawerDescription>
+          </DrawerHeader>
           {innerContent}
         </DrawerContent>
       </Drawer>
@@ -186,6 +186,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-105 rounded-2xl border-border/30 bg-card p-0 shadow-2xl shadow-black/10">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Login Modal</DialogTitle>
+            <DialogDescription>mobile login modal</DialogDescription>
+          </DialogHeader>
         {innerContent}
       </DialogContent>
     </Dialog>

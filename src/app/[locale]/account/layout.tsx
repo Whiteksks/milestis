@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/layout/dashboard/sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { SettingsMenu } from "@/components/layout/settings/settings-menu"
+import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
 
@@ -33,7 +34,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
             <DashboardHeader title="Settings" />
           </div>
 
-          <main className="relative flex-1 p-4 md:p-6 lg:p-8">
+          <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">
             <div className="mx-auto flex max-w-5xl flex-col gap-6 lg:flex-row lg:gap-8">
               
               {/* Меню */}
@@ -51,6 +52,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
         </div>
       </SidebarInset>
+      <MobileBottomNav activeItem="settings" locale={pathname.split("/").filter(Boolean)[0]} />
     </SidebarProvider>
   )
 }

@@ -220,7 +220,7 @@ function Sidebar({
             data-slot="sidebar"
             data-mobile="true"
             
-            className="bg-sidebar text-sidebar-foreground max-w-none rounded-none p-0"
+            className="bg-sidebar text-sidebar-foreground max-w-none rounded-r-xs p-2"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,

@@ -5,6 +5,7 @@ import { usePathname, useSelectedLayoutSegments } from "next/navigation"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/dashboard/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
+import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
 
 const headerTitles: Record<string, string> = {
   dashboard: "Dashboard",
@@ -42,9 +43,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DashboardHeader title={headerTitle} />
           </div>
 
-          <main className="relative flex-1 p-4 md:p-6 lg:p-8 ">{children}</main>
+          <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">{children}</main>
         </div>
       </SidebarInset>
+      <MobileBottomNav activeItem={activeItem} locale={locale} />
     </SidebarProvider>
   )
 }
