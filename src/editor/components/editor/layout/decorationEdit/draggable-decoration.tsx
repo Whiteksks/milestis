@@ -80,10 +80,10 @@ export const DraggableDecoration = memo(function DraggableDecoration({
       {...(isSelected ? { layoutScroll: true } : {})}
       className={cn("absolute pointer-events-none")}
       style={{
-        top: position?.top || "auto",
-        bottom: position?.bottom || "auto",
-        left: position?.left || "auto",
-        right: position?.right || "auto",
+        top: position?.top ? `calc(${position.top} - ${dimensions.height / 2}px)` : "auto",
+        bottom: "auto",
+        left: position?.left ? `calc(${position.left} - ${dimensions.width / 2}px)` : "auto",
+        right: "auto",
         zIndex,
         x: isSelected ? dragX : 0,
         y: isSelected ? dragY : 0,

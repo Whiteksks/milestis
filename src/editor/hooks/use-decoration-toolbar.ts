@@ -88,6 +88,13 @@ export function useDecorationToolbar({
     [onUpdate],
   )
 
+  const handleAnchorPositionChange = useCallback(
+    (checked: boolean) => {
+      onUpdate?.({ anchorPosition: checked })
+    },
+    [onUpdate],
+  )
+
   return {
     isExpanded,
     scalePercent,

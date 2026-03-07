@@ -55,10 +55,10 @@ export const DecorationHandle = memo(function DecorationHandle({
         "transition-colors",
       )}
       style={{
-        top: position?.top || "auto",
-        bottom: position?.bottom || "auto",
-        left: position?.left || "auto",
-        right: position?.right || "auto",
+        top: position?.top ? `calc(${position.top} - ${height / 2}px)` : "auto",
+        bottom: "auto",
+        left: position?.left ? `calc(${position.left} - ${width / 2}px)` : "auto",
+        right: "auto",
         width,
         height,
         x: dragX,

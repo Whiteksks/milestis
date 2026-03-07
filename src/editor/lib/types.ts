@@ -161,6 +161,20 @@ export interface DecorationElement {
   aspectRatio?: number
   /** Optional custom name for the decoration */
   name?: string
+  /**
+   * When set, `position` is interpreted as a percentage relative to this section's
+   * bounding box (identified by `data-section-id` attribute) rather than the canvas
+   * root. This keeps the decoration visually anchored to the section across device
+   * views even when section heights differ between breakpoints.
+   */
+  sectionId?: string
+  /**
+   * When true the stored `top`/`left` percentages refer to the CENTER of the
+   * element rather than its top-left corner.  Render applies
+   * `calc(X% - size/2)` so the center stays proportionally anchored even
+   * when the canvas narrows on mobile.  Experimental.
+   */
+  anchorPosition?: boolean
 }
 
 export type DecorationUpdatePayload = Partial<Omit<DecorationElement, 'id'>>

@@ -11,8 +11,8 @@ export interface UseDecorationDragOptions {
   decorationId: string | null
   /** Bounds container for drag constraints */
   boundsRef: RefObject<HTMLElement | null>
-  /** Callback to commit position as percentages */
-  onCommit: (position: DecorationPosition) => void
+  /** Callback to commit position as percentages, optionally with the detected section anchor. */
+  onCommit: (position: DecorationPosition, sectionId?: string) => void
 }
 
 export interface UseDecorationDragReturn {
@@ -241,21 +241,41 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
       const containerRect = container.getBoundingClientRect()
       const elRect = element.getBoundingClientRect()
 
-      const maxLeft = Math.max(0, containerRect.width - elRect.width)
-      const maxTop = Math.max(0, containerRect.height - elRect.height)
+      // Detect section the decoration was dropped onto (metadata only).
+      const contentRoot = container.parentElement
+      let detectedSectionId: string | undefined
 
-      const leftPx = clamp(elRect.left - containerRect.left, 0, maxLeft)
-      const topPx = clamp(elRect.top - containerRect.top, 0, maxTop)
+      if (contentRoot) {
+        const rawTop = elRect.top - containerRect.top
+        const sections = contentRoot.querySelectorAll<HTMLElement>('[data-section-id]')
+        for (const section of sections) {
+          const sectionRect = section.getBoundingClientRect()
+          const sectionTop = sectionRect.top - containerRect.top
+          const sectionBottom = sectionRect.bottom - containerRect.top
+          if (rawTop >= sectionTop - 1 && rawTop < sectionBottom) {
+            detectedSectionId = section.dataset.sectionId
+            break
+          }
+        }
+      }
 
-      const leftPct = containerRect.width > 0 ? (leftPx / containerRect.width) * 100 : 0
-      const topPct = containerRect.height > 0 ? (topPx / containerRect.height) * 100 : 0
-
-      onCommit({
-        top: `${topPct.toFixed(2)}%`,
-        left: `${leftPct.toFixed(2)}%`,
-        bottom: undefined,
-        right: undefined,
-      })
+      // Store the CENTER of the element as canvas-root %.
+      // DraggableDecoration renders with calc(X% - size/2), so the visual
+      // center stays at the stored percentage across all canvas widths.
+      const rawLeft = elRect.left - containerRect.left
+      const rawTop = elRect.top - containerRect.top
+      const centerLeftPct =
+        containerRect.width > 0
+          ? ((rawLeft + elRect.width / 2) / containerRect.width) * 100
+          : 0
+      const centerTopPct =
+        containerRect.height > 0
+          ? ((rawTop + elRect.height / 2) / containerRect.height) * 100
+          : 0
+      onCommit(
+        { top: `${centerTopPct.toFixed(2)}%`, left: `${centerLeftPct.toFixed(2)}%`, bottom: undefined, right: undefined },
+        detectedSectionId,
+      )
 
       dragX.set(0)
       dragY.set(0)
