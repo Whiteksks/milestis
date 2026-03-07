@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import Image from 'next/image'
 import { decorationAnimationOptions, type DecorationAnimation } from '@/editor/lib/decoration-animations'
+import { loadImageAspectRatio } from '@/editor/components/editor/layout/decorationEdit/utils'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -67,11 +68,15 @@ export function DecorationsSettingsPanel() {
   const decorations = customDecorations
 
   const handleQuickPlacement = useCallback(
-    (urls: string[]) => {
+    async (urls: string[]) => {
       if (!urls.length || !decorations.length) return
-      decorations.forEach((decoration, index) => {
-        updateDecoration(decoration.id, { image: urls[index % urls.length] })
-      })
+      await Promise.all(
+        decorations.map(async (decoration, index) => {
+          const url = urls[index % urls.length]
+          const aspectRatio = await loadImageAspectRatio(url)
+          updateDecoration(decoration.id, { image: url, aspectRatio })
+        }),
+      )
     },
     [decorations, updateDecoration],
   )

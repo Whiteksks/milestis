@@ -86,7 +86,7 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
           transition={{ duration: 0.9, delay: 0.3 }}
           className={cn(
             'leading-[0.88] uppercase font-black',
-            '@lg:text-[7rem] @md:text-[5rem] text-[2.8rem]',
+            '@lg:text-[6rem] @md:text-[4.5rem] text-[2.8rem]',
             heroImage ? 'text-white' : '',
             theme.fontTitle,
           )}

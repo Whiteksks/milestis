@@ -7,7 +7,7 @@ import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel
 import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Plus, Trash2, Wand2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, Shuffle, Trash2, Wand2 } from "lucide-react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { useCallback, useId, useMemo, useState } from "react"
@@ -52,6 +52,7 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
 
 export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   const ownerId = useId()
+  const quickPlacementOwnerId = useId()
 
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
     featuredWork: state.sectionContent.featuredWork,
@@ -89,6 +90,16 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
     updateActiveProject({ image: url })
   }
 
+  const handleQuickPlacement = useCallback(
+    (urls: string[]) => {
+      if (!urls.length || !projects.length) return
+      updateSectionContent("featuredWork", {
+        projects: projects.map((p, i) => ({ ...p, image: urls[i % urls.length] })),
+      })
+    },
+    [projects, updateSectionContent],
+  )
+
   const applyAspectRatioToAll = (ratio: AspectRatio) => {
     updateSectionContent("featuredWork", {
       projects: projects.map((p) => ({ ...p, aspectRatio: ratio })),
@@ -121,6 +132,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   return (
     <div className={ps.root(dense)}>
       <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
+      <MediaPickerModal ownerId={quickPlacementOwnerId} onSelectImages={handleQuickPlacement} />
 
       {/* Quick actions */}
       {!dense && (
@@ -144,6 +156,17 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
               ))}
             </SelectContent>
           </Select>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-8 text-xs"
+            onClick={() => openMediaPicker(quickPlacementOwnerId)}
+            disabled={projects.length === 0}
+          >
+            <Shuffle className="w-3.5 h-3.5 mr-1.5" />
+            Quick Placement
+          </Button>
         </div>
       )}
 
