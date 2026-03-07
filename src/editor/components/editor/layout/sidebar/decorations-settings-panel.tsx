@@ -1,12 +1,13 @@
 "use client"
 
-import { useThemeSelector, useUiSelector, type ThemeCustomDecorations } from '@/editor/lib/store'
+import { useThemeSelector, useUiSelector, useUiStore, type ThemeCustomDecorations } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Image as ImageIcon, Sparkles } from 'lucide-react'
-import { useMemo, MouseEvent } from 'react'
+import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
+import { Plus, Trash2, Image as ImageIcon, Sparkles, Shuffle } from 'lucide-react'
+import { useMemo, useCallback, useId, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import Image from 'next/image'
@@ -35,6 +36,8 @@ const coerceImageUrl = (value: unknown) => {
 
 export function DecorationsSettingsPanel() {
   const canvasScrollRef = useCanvasScrollContainer()
+  const quickPlacementOwnerId = useId()
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   
   const {
     themeCustomizations,
@@ -62,6 +65,16 @@ export function DecorationsSettingsPanel() {
   }))
 
   const decorations = customDecorations
+
+  const handleQuickPlacement = useCallback(
+    (urls: string[]) => {
+      if (!urls.length || !decorations.length) return
+      decorations.forEach((decoration, index) => {
+        updateDecoration(decoration.id, { image: urls[index % urls.length] })
+      })
+    },
+    [decorations, updateDecoration],
+  )
 
   const handleAddDecoration = () => {
     const scroller = canvasScrollRef?.current
@@ -122,6 +135,7 @@ export function DecorationsSettingsPanel() {
 
   return (
     <div className="h-full flex flex-col">
+      <MediaPickerModal ownerId={quickPlacementOwnerId} onSelectImages={handleQuickPlacement} />
       {/* Header */}
       <div className="px-5 pb-4">
         <div className="flex items-center justify-between">
@@ -176,6 +190,18 @@ export function DecorationsSettingsPanel() {
             Add New
           </Button>
         </div>
+
+        {decorations.length > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => openMediaPicker(quickPlacementOwnerId)}
+            className="w-full h-9 text-[12px] font-medium rounded-sm border-border/30 hover:bg-muted/40 transition-colors"
+          >
+            <Shuffle className="w-3.5 h-3.5 mr-1.5" />
+            Quick Placement
+          </Button>
+        )}
 
         {/* Decoration List */}
         <div className="space-y-3">

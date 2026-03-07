@@ -8,7 +8,6 @@ const MAX_SCALE = 3
 export interface UseDecorationToolbarProps {
   decoration?: DecorationElement
   onUpdate?: (updates: Partial<DecorationElement>) => void
-  onImageReplace?: (file: File) => void
   onActiveDecorationChange: (id: string) => void
   onSelectDecoration?: (id: string) => void
 }
@@ -16,7 +15,6 @@ export interface UseDecorationToolbarProps {
 export function useDecorationToolbar({
   decoration,
   onUpdate,
-  onImageReplace,
   onActiveDecorationChange,
   onSelectDecoration,
 }: UseDecorationToolbarProps) {
@@ -43,15 +41,6 @@ export function useDecorationToolbar({
   const toggleFlipY = useCallback(() => {
     onUpdate?.({ transform: { ...transform, flipY: !transform?.flipY } })
   }, [transform, onUpdate])
-
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (file) onImageReplace?.(file)
-      e.currentTarget.value = ""
-    },
-    [onImageReplace],
-  )
 
   const handleDecorationPick = useCallback(
     (id: string) => {
@@ -88,13 +77,6 @@ export function useDecorationToolbar({
     [onUpdate],
   )
 
-  const handleAnchorPositionChange = useCallback(
-    (checked: boolean) => {
-      onUpdate?.({ anchorPosition: checked })
-    },
-    [onUpdate],
-  )
-
   return {
     isExpanded,
     scalePercent,
@@ -103,7 +85,6 @@ export function useDecorationToolbar({
     responsiveScale,
     toggleFlipX,
     toggleFlipY,
-    handleFileChange,
     handleDecorationPick,
     handleScaleChange,
     handleOpacityChange,

@@ -35,10 +35,9 @@ export function DecorationsFloatingToolbar({
     [selectedId, normalizedDecorations],
   )
 
-  const handleImageReplace = useCallback(
-    async (file: File) => {
+  const handleImageSelect = useCallback(
+    async (url: string) => {
       if (!selectedId) return
-      const url = URL.createObjectURL(file)
       const aspectRatio = await loadImageAspectRatio(url)
       handleUpdate(selectedId, { image: url, aspectRatio })
     },
@@ -75,7 +74,7 @@ export function DecorationsFloatingToolbar({
       decoration={selectedDecoration}
       onUpdate={selectedDecoration ? (updates) => handleUpdate(selectedDecoration.id, updates) : undefined}
       onDelete={selectedDecoration ? () => handleRemove(selectedDecoration.id) : undefined}
-      onImageReplace={selectedDecoration ? handleImageReplace : undefined}
+      onImageSelect={selectedDecoration ? handleImageSelect : undefined}
       onCloseSettings={() => setSelectedDecorationId(null)}
       onOpenSettings={() => activeDecorationId && setSelectedDecorationId(activeDecorationId)}
       onSelectDecoration={(id) => setSelectedDecorationId(id)}

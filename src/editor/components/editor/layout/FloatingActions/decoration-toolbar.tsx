@@ -1,9 +1,11 @@
 "use client"
 
-import { memo, useRef } from "react"
+import { memo, useId } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
+import { MediaPickerModal } from "../Modals/media-picker-modal"
+import { useUiStore } from "@/editor/lib/store"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
@@ -133,7 +135,7 @@ export interface DecorationToolbarProps {
   decoration?: DecorationElement
   onUpdate?: (updates: Partial<DecorationElement>) => void
   onDelete?: () => void
-  onImageReplace?: (file: File) => void
+  onImageSelect?: (url: string) => void
 
   onCloseSettings: () => void
   onOpenSettings: () => void
@@ -149,15 +151,16 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   decoration,
   onUpdate,
   onDelete,
-  onImageReplace,
+  onImageSelect,
   onCloseSettings,
   onOpenSettings,
   onSelectDecoration,
   onLocate,
   className,
 }: DecorationToolbarProps) {
-  // ref живёт в компоненте — он про DOM, не про логику
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fallbackOwnerId = useId()
+  const ownerId = decoration?.id ?? fallbackOwnerId
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   const {
     isExpanded,
@@ -167,7 +170,6 @@ export const DecorationToolbar = memo(function DecorationToolbar({
     responsiveScale,
     toggleFlipX,
     toggleFlipY,
-    handleFileChange,
     handleDecorationPick,
     handleScaleChange,
     handleOpacityChange,
@@ -176,7 +178,6 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   } = useDecorationToolbar({
     decoration,
     onUpdate,
-    onImageReplace,
     onActiveDecorationChange,
     onSelectDecoration,
   })
@@ -300,21 +301,15 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             </Button>
 
             {/* image replace */}
+            <MediaPickerModal ownerId={ownerId} onSelectImage={onImageSelect} />
             <Button
               variant="ghost"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => openMediaPicker(ownerId)}
               aria-label="Replace image"
               className={ICON_BTN}
             >
               <ImageIcon className="h-4 w-4" />
             </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleFileChange}
-            />
 
             {/* more options */}
             <Popover>
