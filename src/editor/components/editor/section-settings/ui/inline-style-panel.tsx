@@ -10,6 +10,7 @@ import { frameStyles, FRAME_STYLE_CATEGORIES, type FrameStyleConfig } from "@/ed
 import { getFrameStyleRestrictions } from "@/editor/lib/restrictions/frame-style-restrictions"
 import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import type { FrameStyle, FrameStyleCategory, AspectRatio } from "@/editor/lib/types"
+import Image from "next/image"
 
 interface InlineStylePanelProps {
   image: string
@@ -147,7 +148,7 @@ function StyleCard({ style, image, selected, onSelect }: {
           style.className
         )}>
           {image ? (
-            <img
+            <Image
               src={image}
               alt={style.name}
               className="w-full h-full object-cover"

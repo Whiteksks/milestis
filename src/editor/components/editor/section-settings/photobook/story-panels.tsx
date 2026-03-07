@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useId, useMemo, useState, useCallback } from "react"
+import { useId, useMemo, useState, useCallback } from "react"
 import Image, { type ImageLoader } from "next/image"
 import { ChevronLeft, ChevronRight, Plus, Trash2, Image as ImageIcon } from "lucide-react"
 
@@ -34,13 +34,6 @@ function useStoryMoments() {
     if (!slots.length) return -1
     return Math.min(Math.max(activeIndex, 0), slots.length - 1)
   }, [activeIndex, slots.length])
-
-  useEffect(() => {
-    if (!slots.length && activeIndex !== -1) setActiveIndex(-1)
-    else if (slots.length && (activeIndex < 0 || activeIndex >= slots.length)) {
-      setActiveIndex(Math.max(0, slots.length - 1))
-    }
-  }, [slots.length, activeIndex])
 
   const updateSlots = useCallback((nextSlots: any[]) => {
     updatePhotobookSection("story", { images: nextSlots })

@@ -1,11 +1,12 @@
 "use client"
 
-import { memo } from 'react'                        
+import { memo, createElement } from 'react'
 import { Check, LayoutTemplate, Layers } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { themes } from '@/editor/lib/themes'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
+import type { DepthEffect, RayEffect, TextureEffect } from '@/editor/lib/types'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '@/editor/components/editor/layout/background-layers/registry'
 import type { EffectColors } from '@/editor/components/editor/layout/background-layers/types'
 
@@ -25,12 +26,26 @@ const PREVIEW_COLORS: EffectColors = {
   accent2Color:   '#ec4899',
 }
 
-function BackgroundPreviewMiniInner({ preset }: { preset: BackgroundPreset }) {
-  const DepthComp   = DEPTH_MAP.get(preset.depth)
-  const RaysComp    = RAYS_MAP.get(preset.rays)
-  const TextureComp = TEXTURE_MAP.get(preset.texture)
+// Stable module-level wrappers — avoid creating components during render (react-hooks/static-components)
+type EffectPreviewProps = EffectColors & { isDark: boolean; id: string }
 
-  const hasAny = DepthComp || RaysComp || TextureComp
+const DepthEffectPreview = memo(function DepthEffectPreview({ id, ...rest }: EffectPreviewProps) {
+  const Comp = DEPTH_MAP.get(id as DepthEffect)
+  return Comp ? createElement(Comp, rest) : null
+})
+
+const RaysEffectPreview = memo(function RaysEffectPreview({ id, ...rest }: EffectPreviewProps) {
+  const Comp = RAYS_MAP.get(id as RayEffect)
+  return Comp ? createElement(Comp, rest) : null
+})
+
+const TextureEffectPreview = memo(function TextureEffectPreview({ id, ...rest }: EffectPreviewProps) {
+  const Comp = TEXTURE_MAP.get(id as TextureEffect)
+  return Comp ? createElement(Comp, rest) : null
+})
+
+function BackgroundPreviewMiniInner({ preset }: { preset: BackgroundPreset }) {
+  const hasAny = DEPTH_MAP.has(preset.depth) || RAYS_MAP.has(preset.rays) || TEXTURE_MAP.has(preset.texture)
 
   return (
     <div className="absolute inset-0 bg-zinc-900 overflow-hidden">
@@ -41,9 +56,9 @@ function BackgroundPreviewMiniInner({ preset }: { preset: BackgroundPreset }) {
           style={{ width: '400%', height: '400%', transform: 'scale(0.25)' }}
         >
           <div className="relative w-full h-full">
-            {DepthComp   && <DepthComp   {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
-            {RaysComp    && <RaysComp    {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
-            {TextureComp && <TextureComp {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />}
+            <DepthEffectPreview   id={preset.depth}   {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />
+            <RaysEffectPreview    id={preset.rays}    {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />
+            <TextureEffectPreview id={preset.texture} {...PREVIEW_COLORS} isDark={preset.theme === 'dark'} />
           </div>
         </div>
       ) : (

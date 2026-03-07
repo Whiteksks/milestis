@@ -305,7 +305,6 @@ export function DesignCatalogModal() {
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
     templateSectionCount,
-    templates,
     isPreviewMode,
     setTemplate,
     setTheme,

@@ -62,7 +62,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   const featuredWorkRestrictions = useSectionRestrictions('featuredWork')
 
-  const projects = featuredWork.projects ?? []
+  const projects = useMemo(() => featuredWork.projects ?? [], [featuredWork.projects])
 
   const [activeProjectIndex, setActiveProjectIndex] = useState<number>(() =>
     projects.length ? 0 : -1
