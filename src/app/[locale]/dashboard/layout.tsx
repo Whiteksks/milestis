@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="relative flex min-h-full flex-col ">
           <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-50/40 via-background to-rose-50/20 rounded-xl" />
 
-          <div className="sticky top-0 z-50 pt-4">
+          <div className="md:sticky top-0 z-50 pt-4">
             <DashboardHeader title={headerTitle} />
           </div>
 

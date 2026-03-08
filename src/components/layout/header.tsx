@@ -25,7 +25,7 @@ import HeaderAuthButton from './auth/auth-open-button'
 import Logo from './logo'
 
 const NAVIGATION = [
-  { title: 'Home', href: '/' },
+  { title: 'About', href: '/' },
   { title: 'Examples', href: '/examples' },
   { title: 'Pricing', href: '/pricing' },
   { title: 'Help Center', href: '/help' }

@@ -29,6 +29,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import PromoCard, { MenuItem, MenuSection } from "./menu-card"
+import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 
 interface MobileBottomNavProps {
   activeItem?: string
@@ -66,10 +67,6 @@ const helpLinks = [
 
 export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBottomNavProps) {
   const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    if (open) (document.activeElement as HTMLElement)?.blur()
-  }, [open])
 
   return (
     <>
@@ -115,13 +112,7 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
       </nav>
 
       {/* More drawer */}
-      <Drawer open={open} onOpenChange={setOpen} direction="bottom">
-        <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="sr-only">
-            <DrawerTitle>Menu</DrawerTitle>
-            <DrawerDescription>mobile menu</DrawerDescription>
-        </DrawerHeader>
-
+      <MobileDrawer open={open} onOpenChange={setOpen}>
         <div className="flex-1 overflow-y-auto p-4 mt-2">
             {/* Баннер апгрейда */}
             <PromoCard
@@ -168,8 +159,7 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
             ))}
             </MenuSection>
         </div>
-        </DrawerContent>
-      </Drawer>
+        </MobileDrawer>
     </>
   )
 }

@@ -9,12 +9,6 @@ interface HeaderProps {
 }
 
 export function DashboardHeader({ title = "Dashboard" }: HeaderProps) {
-  const user = {
-    name: "Alex Johnson",
-    email: "alex@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-  }
-
   return (
     <>
       <header className="z-50 mx-4 flex h-16 items-center justify-between rounded-2xl border border-border/30 bg-card/70 px-6 shadow-sm backdrop-blur-md">
@@ -24,7 +18,7 @@ export function DashboardHeader({ title = "Dashboard" }: HeaderProps) {
         </div>
         <div className="flex items-center gap-2 md:gap-4">
           <ClientOnly>
-            <UserMenu user={user} />
+            <UserMenu />
           </ClientOnly>
         </div>
       </header>

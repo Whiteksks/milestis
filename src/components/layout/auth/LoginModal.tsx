@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,8 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
+  const menuRef = useRef<HTMLDivElement>(null)
+  
   const t = useTranslations()
   const isMobile = useIsMobile()
   const [email, setEmail] = useState("")
@@ -172,12 +174,19 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
-        <DrawerContent>
+          <DrawerContent
+            onOpenAutoFocus={(e) => {
+              e.preventDefault()
+              menuRef.current?.focus()
+            }}
+          >
           <DrawerHeader className="sr-only">
             <DrawerTitle>Login Modal</DrawerTitle>
             <DrawerDescription>mobile login modal</DrawerDescription>
           </DrawerHeader>
-          {innerContent}
+          <div ref={menuRef} tabIndex={-1} className="pb-4 px-2 outline-none">
+            {innerContent}
+          </div>
         </DrawerContent>
       </Drawer>
     )

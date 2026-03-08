@@ -19,7 +19,7 @@ const HeaderAuthButton = () => {
     return () => unsubscribe()
   }, [])
 
-  if (user) {
+  if (!user) {
     return (
     <div className="flex items-center gap-2">
       <ProfileDropdown
