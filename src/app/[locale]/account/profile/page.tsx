@@ -1,20 +1,18 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { ref as storageRef, uploadBytesResumable } from "firebase/storage"
+import { useEffect, useState } from "react"
 import { useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user-profile"
-import { auth, storage } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  Camera, MapPin, Link, Loader2,
+  MapPin, Link,
   Instagram, Github, Facebook, Twitter, Linkedin, Youtube, Globe, Twitch,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { UserAvatar } from "@/components/shared/user-avatar"
 import ProfileSettingsSkeleton from "./profile-skeleton"
 
 const AVATAR_MAX_BYTES = 10 * 1024 * 1024 // 10 MB — Cloud Function handles the resize
@@ -44,9 +42,6 @@ export default function ProfileSettings() {
   const [editName, setEditName] = useState("")
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
-  const [avatarUploading, setAvatarUploading] = useState(false)
-  const [avatarError, setAvatarError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!profile) return
@@ -80,44 +75,6 @@ export default function ProfileSettings() {
     } finally {
       setEditSaving(false)
     }
-  }
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    // Reset input so the same file can be re-selected after an error
-    e.target.value = ""
-    if (!file) return
-
-    const uid = auth.currentUser?.uid
-    if (!uid) return
-
-    if (file.size > AVATAR_MAX_BYTES) {
-      setAvatarError("Image must be smaller than 10 MB")
-      return
-    }
-
-    const ext = file.name.split(".").pop() ?? "jpg"
-    // Cloud Function triggers on: avatars/{uid}/original.{ext}
-    const path = `avatars/${uid}/original.${ext}`
-    const fileRef = storageRef(storage, path)
-
-    setAvatarUploading(true)
-    setAvatarError(null)
-
-    const task = uploadBytesResumable(fileRef, file, { contentType: file.type })
-    task.on(
-      "state_changed",
-      null,
-      (err) => {
-        setAvatarError(err.message)
-        setAvatarUploading(false)
-      },
-      () => {
-        // Upload done — Cloud Function will resize and update photoURL in Firestore.
-        // The Firestore listener in the app will update the store automatically.
-        setAvatarUploading(false)
-      }
-    )
   }
 
   if (loading) {
@@ -177,12 +134,7 @@ export default function ProfileSettings() {
         <div className="rounded-2xl bg-card p-6 shadow-sm">
           {editing ? (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <Avatar className="size-20 rounded-2xl shrink-0">
-                <AvatarImage src={profile?.photoURL ?? "/placeholder.svg?height=80&width=80"} alt="Profile" />
-                <AvatarFallback className="rounded-2xl text-xl font-semibold bg-secondary text-primary">
-                  {editName.split(" ").map(n => n[0]).join("") || "?"}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar shape="square" size="lg" />
 
               <div className="flex-1 min-w-0 space-y-3">
                 <div className="space-y-1">
@@ -208,32 +160,7 @@ export default function ProfileSettings() {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* Avatar with upload overlay */}
-              <div className="relative group shrink-0">
-                <Avatar className="size-25 rounded-2xl">
-                  <AvatarImage src={profile?.photoURL ?? "/placeholder.svg?height=80&width=80"} alt="Profile" />
-                  <AvatarFallback className="rounded-2xl text-xl font-semibold bg-secondary text-primary">
-                    {displayName.split(" ").map(n => n[0]).join("") || "?"}
-                  </AvatarFallback>
-                </Avatar>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={avatarUploading}
-                  className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 disabled:cursor-not-allowed"
-                >
-                  {avatarUploading
-                    ? <Loader2 className="size-5 text-background animate-spin" />
-                    : <Camera className="size-5 text-background" />
-                  }
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </div>
+              <UserAvatar shape="square" size="xl" uploadable />
 
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-lg leading-tight truncate">{displayName || "Your name"}</p>
@@ -241,8 +168,6 @@ export default function ProfileSettings() {
                   <span className="text-sm text-muted-foreground">{email}</span>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Login email</span>
                 </div>
-                {avatarUploading && <p className="text-xs text-muted-foreground mt-1">Uploading photo...</p>}
-                {avatarError && <p className="text-xs text-destructive mt-1">{avatarError}</p>}
               </div>
 
               <Button variant="outline" size="sm" className="rounded-full px-5 shrink-0" onClick={handleEditOpen}>

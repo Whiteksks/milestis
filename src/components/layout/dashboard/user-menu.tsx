@@ -7,7 +7,6 @@ import {
   User, CreditCard, Settings, LogOut, 
   HelpCircle, LayoutDashboard, Crown 
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +18,7 @@ import { useUserStore } from "@/hooks/useUserStore"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
+import { UserAvatar } from "@/components/shared/user-avatar"
 
 // Конфигурация тарифов
 const PLAN_CONFIG: Record<string, { label: string; className: string }> = {
@@ -43,7 +43,7 @@ export function UserMenu() {
   const { profile } = useUserStore()
 
   // Данные пользователя
-  const { displayName = "User", email = "", photoURL = "" } = profile || {}
+  const { displayName = " ", email = " " } = profile || {}
   const planTier = profile?.subscription?.planTier
   const plan = planTier ? PLAN_CONFIG[planTier] : null
 
@@ -57,29 +57,12 @@ export function UserMenu() {
     }
   }
 
-  // Инициалы из displayName (первые буквы каждого слова, макс. 2)
-  const initials = (displayName ?? "U")
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase()
-
-  // Общий компонент аватара
-  const UserAvatar = ({ className }: { className?: string }) => (
-    <Avatar className={cn("size-8", className)}>
-      <AvatarImage src={photoURL ?? ''} alt='avatar'/>
-      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-        {initials}
-      </AvatarFallback>
-    </Avatar>
-  )
 
   const menuBody = (
     <div className="flex flex-col">
       {/* Profile Header */}
       <div className="flex items-center gap-3 px-4 py-4">
-        <UserAvatar className="size-10" />
+        <UserAvatar size="md" />
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate text-sm font-semibold leading-none">{displayName}</span>
           <span className="truncate text-xs text-muted-foreground">{email}</span>
@@ -153,7 +136,7 @@ export function UserMenu() {
       <MobileDrawer 
         open={open} 
         onOpenChange={setOpen} 
-        trigger={<UserAvatar />}
+        trigger={<UserAvatar size="sm" />}
       >
         {menuBody}
       </MobileDrawer>
@@ -164,7 +147,7 @@ export function UserMenu() {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="group flex items-center gap-2.5 rounded-xl p-1.5 outline-none transition-colors hover:bg-accent/50">
-          <UserAvatar />
+          <UserAvatar size="sm" />
           <div className="hidden flex-col items-start md:flex">
             <span className="text-sm font-medium leading-none group-hover:text-foreground">{displayName}</span>
             <span className="text-[11px] text-muted-foreground">{email}</span>

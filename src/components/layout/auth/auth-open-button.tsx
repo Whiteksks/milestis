@@ -6,6 +6,7 @@ import ProfileDropdown from "@/components/layout/auth/dropdown-profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import AuthDialogController from "./AuthDialogController"
 import { useUserStore } from "@/hooks/useUserStore"
+import { UserAvatar } from "@/components/shared/user-avatar"
 
 const HeaderAuthButton = () => {
   const [open, setOpen] = useState(false)
@@ -20,12 +21,7 @@ const HeaderAuthButton = () => {
         <ProfileDropdown
           trigger={
             <Button variant='ghost' size='icon' className='size-9.5'>
-              <Avatar className='size-9.5 rounded-md'>
-                <AvatarImage src={profile.photoURL ?? ''} alt='avatar' />
-                <AvatarFallback>
-                  {(profile.displayName ?? 'U').slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar size="sm" shape="circle"/>
             </Button>
           }
         />
