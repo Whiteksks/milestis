@@ -1,31 +1,30 @@
-import { doc, serverTimestamp, setDoc } from "firebase/firestore"
-import { updateEmail, updateProfile } from "firebase/auth"
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore"
+import { updateProfile, verifyBeforeUpdateEmail } from "firebase/auth"
 import { auth, db } from "@/lib/firebase"
+import type { UserProfileTemplate, UserSettings } from "@/lib/user-update.dto"
 
 export interface UserProfileUpdate {
   displayName?: string
-  profileTemplate?: {
-    name?: string
-    location?: string
-    bio?: string
-    sociallinks?: {
-      link1?: string
-      link2?: string
-      link3?: string
-      link4?: string
-    }
-  }
+  profileTemplate?: UserProfileTemplate
   settings?: {
-    language?: "ru" | "en" | "kz"
-    notifications?: {
-      project_updates?: boolean
-      project_reminders?: boolean
-      project_milestones?: boolean
-      whats_new?: boolean
-      personalized_recommendations?: boolean
-      seasonal_specials?: boolean
+    language?: UserSettings["language"]
+    notifications?: Partial<UserSettings["notifications"]>
+  }
+}
+
+// Recursively removes undefined values so Firestore never receives them.
+// Uses constructor check to avoid recursing into FieldValue / Timestamp etc.
+function stripUndefined(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === undefined) continue
+    if (value !== null && typeof value === "object" && value.constructor === Object) {
+      result[key] = stripUndefined(value)
+    } else {
+      result[key] = value
     }
   }
+  return result
 }
 
 export async function saveUserProfile(update: UserProfileUpdate): Promise<void> {
@@ -42,7 +41,7 @@ export async function saveUserProfile(update: UserProfileUpdate): Promise<void> 
     updatedAt: serverTimestamp(),
   }
 
-  await setDoc(userRef, payload, { merge: true })
+  await updateDoc(userRef, stripUndefined(payload))
 
   if (typeof update.displayName === "string" && update.displayName !== user.displayName) {
     await updateProfile(user, { displayName: update.displayName })
@@ -55,15 +54,9 @@ export async function changeUserEmail(newEmail: string): Promise<void> {
     throw new Error("User is not authenticated")
   }
 
-  await updateEmail(user, newEmail)
-
-  const userRef = doc(db, "users", user.uid)
-  await setDoc(
-    userRef,
-    {
-      email: newEmail,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  )
+  // Отправляет письмо подтверждения на новый адрес.
+  // Email в Firebase Auth и Firestore изменится только после того,
+  // как пользователь кликнет по ссылке. Обновление Firestore должно
+  // происходить через Cloud Function триггер onUserUpdated, а не здесь.
+  await verifyBeforeUpdateEmail(user, newEmail)
 }

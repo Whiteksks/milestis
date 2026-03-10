@@ -14,14 +14,12 @@ import {
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerTrigger } from '@/components/ui/drawer'
 
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { Button } from '../button'
-import { MobileDrawer } from './mobile-drawer'
+import { MobileDrawer } from '../../ui/custom/mobile-drawer'
 
 // 1. Структура данных меню
 const MENU_GROUPS = [

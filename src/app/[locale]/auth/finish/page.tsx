@@ -33,8 +33,18 @@ export default function FinishPage() {
 
   const completeSignIn = async (userEmail: string) => {
     try {
-      await signInWithEmailLink(auth, userEmail, window.location.href);
+      const credential = await signInWithEmailLink(auth, userEmail, window.location.href);
       window.localStorage.removeItem('emailForSignIn');
+
+      const idToken = await credential.user.getIdToken();
+      const createUserUrl = process.env.NEXT_PUBLIC_CREATEUSER_URL!;
+      await fetch(createUserUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
       setStatus('success');
       setTimeout(() => router.push('/'), 2000);
     } catch (err: any) {

@@ -1,33 +1,36 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Mail, Chrome, Shield } from "lucide-react"
+import { Check, Mail, Chrome } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-
-const authMethods = [
-  {
-    id: "email",
-    name: "Email (Magic Link)",
-    description: "Sign in securely using a magic link sent to your email",
-    icon: Mail,
-    isPrimary: true,
-    isConnected: true,
-    userEmail: "alex@example.com",
-    canDisconnect: false,
-  },
-  {
-    id: "google",
-    name: "Google",
-    description: "Sign in with your Google account",
-    icon: Chrome,
-    isPrimary: false,
-    isConnected: false,
-    canDisconnect: true,
-  },
-]
+import { useUserStore } from "@/hooks/useUserStore"
 
 export default function SecuritySettings() {
+  const { profile } = useUserStore()
+  const userEmail = profile?.email ?? ""
+
+  const authMethods = [
+    {
+      id: "email",
+      name: "Email (Magic Link)",
+      description: "Sign in securely using a magic link sent to your email",
+      icon: Mail,
+      isPrimary: true,
+      isConnected: true,
+      userEmail,
+      canDisconnect: false,
+    },
+    {
+      id: "google",
+      name: "Google",
+      description: "Sign in with your Google account",
+      icon: Chrome,
+      isPrimary: false,
+      isConnected: false,
+      canDisconnect: true,
+    },
+  ]
+
   const [methods, setMethods] = useState(authMethods)
 
   const toggleConnection = (id: string) => {

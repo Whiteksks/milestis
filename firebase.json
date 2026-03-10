@@ -1,9 +1,12 @@
 {
   "firestore": {
     "database": "(default)",
-    "location": "europe-west3",
+    "location": "europe-west4",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "functions": [
     {

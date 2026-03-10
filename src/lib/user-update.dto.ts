@@ -7,7 +7,7 @@ export interface UserProfileTemplate {
     link2?: string;
     link3?: string;
     link4?: string;
-  }
+  };
 }
 
 export interface UserSettings {
@@ -20,12 +20,51 @@ export interface UserSettings {
     personalized_recommendations: boolean;
     seasonal_specials: boolean;
   };
-};
+}
+
+export interface UserSubscriptionFeatures {
+  maxProjects: number;
+  maxStorageBytes: number;
+  canRemoveBranding: boolean;
+  highQualityExport: boolean;
+  prioritySupport: boolean;
+}
+
+export interface UserSubscription {
+  planId: string;
+  planTier: "free" | "basic" | "pro" | "pro_plus";
+  status: "active" | "trialing" | "past_due" | "canceled";
+  gracePeriodEnd?: Date | null;
+  trialEnd?: Date | null;
+  currentPeriodStart?: Date;
+  currentPeriodEnd?: Date;
+  cancelAtPeriodEnd?: boolean;
+  features: UserSubscriptionFeatures;
+}
+
+export interface UserBalance {
+  total: number;
+  purchased: number;
+  subscription: number;
+  bonus: number;
+}
+
+export interface UserStats {
+  totalProjects: number;
+  projectsPublished: number;
+  projectsInProgress: number;
+  storageUsedBytes: number;
+  totalCreditsSpent: number;
+}
 
 export interface UserDocument {
+  uid: string;
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
   profileTemplate: UserProfileTemplate;
-  settings: UserSettings; 
+  settings: UserSettings;
+  subscription: UserSubscription;
+  balance: UserBalance;
+  stats: UserStats;
 }

@@ -45,12 +45,10 @@ export default function FirebaseInitializer() {
               stats: data.stats,
             })
           } else {
-            setProfile({
-              uid: user.uid,
-              displayName: user.displayName ?? 'Без имени',
-              email: user.email ?? null,
-              photoURL: user.photoURL ?? null,
-            })
+            // Документ ещё не существует — это переходное состояние между
+            // регистрацией и созданием документа через createUser cloud function.
+            // Оставляем loading: true, onSnapshot сработает снова при создании.
+            setLoading(true)
           }
         },
         (err) => {

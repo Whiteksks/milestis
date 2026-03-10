@@ -1,35 +1,32 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { getAuth, onAuthStateChanged, User } from "firebase/auth"
-import ProfileDropdown from "@/components/ui/custom/dropdown-profile"
+import ProfileDropdown from "@/components/layout/auth/dropdown-profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import AuthDialogController from "./AuthDialogController"
+import { useUserStore } from "@/hooks/useUserStore"
 
 const HeaderAuthButton = () => {
   const [open, setOpen] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const { profile, loading } = useUserStore()
 
-  useEffect(() => {
-    const auth = getAuth()
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-    })
-    return () => unsubscribe()
-  }, [])
+  // Пока данные грузятся — ничего не показываем во избежание мерцания
+  if (loading) return null
 
-  if (!user) {
+  if (profile) {
     return (
-    <div className="flex items-center gap-2">
-      <ProfileDropdown
-        trigger={
-        <Button variant='ghost' size='icon' className='size-9.5'>
-          <Avatar className='size-9.5 rounded-md'>
-            <AvatarImage src='https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png' />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-        </Button>
+      <div className="flex items-center gap-2">
+        <ProfileDropdown
+          trigger={
+            <Button variant='ghost' size='icon' className='size-9.5'>
+              <Avatar className='size-9.5 rounded-md'>
+                <AvatarImage src={profile.photoURL ?? ''} alt='avatar' />
+                <AvatarFallback>
+                  {(profile.displayName ?? 'U').slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
           }
         />
       </div>

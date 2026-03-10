@@ -1,17 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Globe, Layout, Save, Bell, Mail, CreditCard, RefreshCw, Download, FileText, AlertTriangle, Keyboard } from "lucide-react"
+import { Globe, Save, Mail, CreditCard, RefreshCw, Download, FileText, Keyboard } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
+import { useUserStore } from "@/hooks/useUserStore"
+import { saveUserProfile } from "@/lib/user-profile"
 
 export default function AccountSettings() {
+  const { profile } = useUserStore()
   const [autoSave, setAutoSave] = useState(true)
   const [notifyPublished, setNotifyPublished] = useState(true)
   const [notifyCredits, setNotifyCredits] = useState(true)
   const [notifyReset, setNotifyReset] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  // Инициализируем переключатели уведомлений из Firebase
+  useEffect(() => {
+    if (!profile?.settings?.notifications) return
+    const n = profile.settings.notifications
+    setNotifyPublished(n.project_updates ?? true)
+    setNotifyCredits(n.whats_new ?? true)
+    setNotifyReset(n.project_reminders ?? false)
+  }, [profile?.uid])
+
+  const handleSaveNotifications = async () => {
+    setSaving(true)
+    try {
+      await saveUserProfile({
+        settings: {
+          notifications: {
+            project_updates: notifyPublished,
+            whats_new: notifyCredits,
+            project_reminders: notifyReset,
+          },
+        },
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="space-y-12">
@@ -96,6 +126,11 @@ export default function AccountSettings() {
               </div>
             ))}
           </div>
+        </div>
+        <div className="flex justify-end">
+          <Button className="rounded-full px-8" onClick={handleSaveNotifications} disabled={saving}>
+            {saving ? "Saving..." : "Save Notifications"}
+          </Button>
         </div>
       </section>
 

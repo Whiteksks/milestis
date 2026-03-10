@@ -57,12 +57,20 @@ export function UserMenu() {
     }
   }
 
+  // Инициалы из displayName (первые буквы каждого слова, макс. 2)
+  const initials = (displayName ?? "U")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
+
   // Общий компонент аватара
   const UserAvatar = ({ className }: { className?: string }) => (
     <Avatar className={cn("size-8", className)}>
-      <AvatarImage src='' alt='avatar'/>
+      <AvatarImage src={photoURL ?? ''} alt='avatar'/>
       <AvatarFallback className="text-xs bg-primary/10 text-primary">
-        User
+        {initials}
       </AvatarFallback>
     </Avatar>
   )
@@ -159,7 +167,7 @@ export function UserMenu() {
           <UserAvatar />
           <div className="hidden flex-col items-start md:flex">
             <span className="text-sm font-medium leading-none group-hover:text-foreground">{displayName}</span>
-            <span className="text-[11px] text-muted-foreground">email@gmail.com</span>
+            <span className="text-[11px] text-muted-foreground">{email}</span>
           </div>
         </button>
       </DropdownMenuTrigger>

@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Avatars ─────────────────────────────────────────────────────────────
+    // Users upload the original here; Cloud Function processes and moves it to
+    // users/{uid}/avatar/avatar.webp. Write is allowed only for the owner.
+    match /avatars/{uid}/{fileName} {
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 10 * 1024 * 1024   // max 10 MB
+                   && request.resource.contentType.matches('image/.*');
+      // No read needed — the CF reads via Admin SDK and stores the download URL
+      allow read: if false;
+    }
+
+    // ── Processed avatars ────────────────────────────────────────────────────
+    // Resized avatar.webp is written by the Cloud Function (Admin SDK) and
+    // served via a signed download URL stored in Firestore — no direct read
+    // rule needed. Owner can delete their own file.
+    match /users/{uid}/avatar/{fileName} {
+      allow read: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ── Project images ───────────────────────────────────────────────────────
+    // Path: users/{uid}/projects/{projectId}/images/{imageId}/original.{ext}
+    // Owner uploads the original; Cloud Function processes it.
+    match /users/{uid}/projects/{projectId}/images/{imageId}/{fileName} {
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 100 * 1024 * 1024  // max 100 MB
+                   && request.resource.contentType.matches('image/.*');
+      allow read: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
