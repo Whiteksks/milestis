@@ -69,14 +69,18 @@ export interface PhotobookProjectContent {
 
 export interface PortfolioProject extends ProjectMeta {
   mode: 'portfolio'
-  theme: ProjectThemeData
-  content: PortfolioProjectContent
+  /** Absent on freshly-created projects — editor uses store defaults until first save. */
+  theme?: ProjectThemeData
+  /** Absent on freshly-created projects — editor uses store defaults until first save. */
+  content?: PortfolioProjectContent
 }
 
 export interface PhotobookProject extends ProjectMeta {
   mode: 'photobook'
-  theme: ProjectThemeData
-  content: PhotobookProjectContent
+  /** Absent on freshly-created projects — editor uses store defaults until first save. */
+  theme?: ProjectThemeData
+  /** Absent on freshly-created projects — editor uses store defaults until first save. */
+  content?: PhotobookProjectContent
 }
 
 /** The union type used everywhere in the app when referring to a project. */
