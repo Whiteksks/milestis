@@ -1,13 +1,23 @@
 'use client'
 
+import { useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2 } from 'lucide-react'
+import { saveProject } from '@/lib/save-project'
 
-export function EditorHeader() {
+interface EditorHeaderProps {
+  projectId: string
+}
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error'
+
+export function EditorHeader({ projectId }: EditorHeaderProps) {
+  const [saveState, setSaveState] = useState<SaveState>('idle')
+
   const { deviceView, setDeviceView, toggleMediaLibrary, editorMode, setEditorMode } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
@@ -15,6 +25,19 @@ export function EditorHeader() {
     editorMode: state.editorMode,
     setEditorMode: state.setEditorMode,
   }))
+
+  async function handleSave() {
+    if (saveState === 'saving') return
+    setSaveState('saving')
+    try {
+      await saveProject(projectId)
+      setSaveState('saved')
+      setTimeout(() => setSaveState('idle'), 2000)
+    } catch {
+      setSaveState('error')
+      setTimeout(() => setSaveState('idle'), 2500)
+    }
+  }
 
   return (
     <header className="relative h-16 border-b border-border/80 bg-card/95 z-50 shadow-[0_2px_16px_0_hsl(var(--foreground)/0.06)]">
@@ -104,6 +127,32 @@ export function EditorHeader() {
 
           <Button
             size="sm"
+            variant="ghost"
+            onClick={handleSave}
+            disabled={saveState === 'saving'}
+            className={[
+              "gap-2 hidden sm:inline-flex rounded-full h-8 px-4 transition-all text-xs font-medium",
+              saveState === 'saved'
+                ? "text-emerald-600 hover:text-emerald-600"
+                : saveState === 'error'
+                ? "text-destructive hover:text-destructive"
+                : "text-muted-foreground hover:text-foreground"
+            ].join(' ')}
+          >
+            {saveState === 'saving' ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : saveState === 'saved' ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved' : saveState === 'error' ? 'Error' : 'Save'}
+          </Button>
+
+          <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
+
+          <Button
+            size="sm"
             className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
           >
             <Upload className="h-3 w-3" />
@@ -111,11 +160,20 @@ export function EditorHeader() {
           </Button>
 
           {/* Mobile */}
-          <Button variant="ghost" size="icon" className="h-8 w-8 sm:hidden rounded-full text-muted-foreground">
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button size="icon" className="h-8 w-8 sm:hidden bg-foreground text-background rounded-full shadow-sm">
-            <Upload className="h-3.5 w-3.5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSave}
+            disabled={saveState === 'saving'}
+            className="h-8 w-8 sm:hidden rounded-full text-muted-foreground"
+          >
+            {saveState === 'saving' ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : saveState === 'saved' ? (
+              <Check className="h-4 w-4 text-emerald-600" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </div>

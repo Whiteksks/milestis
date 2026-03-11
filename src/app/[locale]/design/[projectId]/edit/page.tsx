@@ -19,6 +19,8 @@ import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/th
 import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
 import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs'
 import { useUiSelector } from '@/editor/lib/store'
+import { useContentStore } from '@/editor/lib/store-content'
+import { useThemeStore } from '@/editor/lib/store-theme'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
 type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
@@ -63,6 +65,33 @@ export default function EditorPage() {
         }
 
         setEditorMode(project.mode)
+
+        // Rehydrate theme store
+        if (project.theme) {
+          useThemeStore.setState({
+            currentTemplateId: project.theme.currentTemplateId,
+            currentTheme: project.theme.currentTheme,
+            frameStyle: project.theme.frameStyle,
+            themeCustomizations: project.theme.themeCustomizations,
+            customDecorations: project.theme.customDecorations ?? [],
+          })
+        }
+
+        // Rehydrate content store
+        if (project.content) {
+          if (project.mode === 'portfolio') {
+            useContentStore.setState({
+              sectionVisibility: project.content.sectionVisibility,
+              sectionContent: project.content.sectionContent,
+            })
+          } else {
+            useContentStore.setState({
+              photobookSectionVisibility: project.content.sectionVisibility,
+              photobookSectionContent: project.content.sectionContent,
+            })
+          }
+        }
+
         setLoadState('ready')
       } catch {
         if (!cancelled) setLoadState('error')
@@ -152,7 +181,7 @@ export default function EditorPage() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <EditorHeader />
+      <EditorHeader projectId={projectId} />
       <div className="flex flex-1 overflow-hidden relative  md:pb-0">
         <CanvasScrollProvider value={scrollContainerRef}>
           <Canvas scrollContainerRef={scrollContainerRef} desktopActiveTab={desktopActiveTab} />
