@@ -61,6 +61,12 @@
     "operationNotAllowed": "Operation not allowed.",
     "weakPassword": "Password is too weak.",
     "invalidCredential": "Invalid credential.",
+    "providerAlreadyLinked": "This sign-in method is already linked to your account.",
+    "credentialAlreadyInUse": "This account is already linked to a different user.",
+    "requiresRecentLogin": "This action requires a recent sign-in. Please sign in again and retry.",
+    "noSuchProvider": "This sign-in method is not linked to your account.",
+    "popupClosedByUser": "The sign-in popup was closed before completing.",
+    "popupBlocked": "Sign-in popup was blocked by your browser. Please allow popups and try again.",
     "unknownError": "An unknown error occurred. Please try again."
   },
   "loginModal": {

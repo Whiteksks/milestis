@@ -16,7 +16,19 @@ export const getFirebaseAuthErrorTranslationKey = (errorCode: string): string =>
     case 'auth/weak-password':
       return 'firebaseErrors.weakPassword';
     case 'auth/invalid-credential':
-        return 'firebaseErrors.invalidCredential'
+      return 'firebaseErrors.invalidCredential'
+    case 'auth/provider-already-linked':
+      return 'firebaseErrors.providerAlreadyLinked'
+    case 'auth/credential-already-in-use':
+      return 'firebaseErrors.credentialAlreadyInUse'
+    case 'auth/requires-recent-login':
+      return 'firebaseErrors.requiresRecentLogin'
+    case 'auth/no-such-provider':
+      return 'firebaseErrors.noSuchProvider'
+    case 'auth/popup-closed-by-user':
+      return 'firebaseErrors.popupClosedByUser'
+    case 'auth/popup-blocked':
+      return 'firebaseErrors.popupBlocked'
     default:
       return 'firebaseErrors.unknownError';
   }

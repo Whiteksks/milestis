@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { isSignInWithEmailLink, onAuthStateChanged, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { completeLinkWithEmailLink, LINKING_EMAIL_KEY } from '@/lib/auth-security';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
@@ -11,7 +12,7 @@ import { CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
 export default function FinishPage() {
   const router = useRouter();
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'needsEmail'>('loading');
+  const [status, setStatus] = useState<'loading' | 'link-success' | 'success' | 'error' | 'needsEmail'>('loading');
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -22,13 +23,36 @@ export default function FinishPage() {
       return;
     }
 
-    const savedEmail = window.localStorage.getItem('emailForSignIn');
+    // ?flow=link is embedded in the URL by sendEmailLinkForLinking so this
+    // signal survives cross-device opens (unlike localStorage).
+    const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
 
-    if (savedEmail) {
-      completeSignIn(savedEmail);
-    } else {
-      setStatus('needsEmail');
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+
+      // ── Same device: user is signed in and localStorage has the email ──
+      const linkingEmail = window.localStorage.getItem(LINKING_EMAIL_KEY);
+      if (user && linkingEmail) {
+        completeLinkEmail(linkingEmail);
+        return;
+      }
+
+      // ── Cross-device linking: URL says it's a link flow but no localStorage ──
+      // Ask the user to type their email; completeLinkEmail / completeSignIn
+      // will be called from handleManualEmailSubmit with the correct branch.
+      if (isLinkingFlow && !linkingEmail) {
+        setStatus('needsEmail');
+        return;
+      }
+
+      // ── Normal sign-in ──
+      const signInEmail = window.localStorage.getItem('emailForSignIn');
+      if (signInEmail) {
+        completeSignIn(signInEmail);
+      } else {
+        setStatus('needsEmail');
+      }
+    });
   }, []);
 
   const completeSignIn = async (userEmail: string) => {
@@ -46,9 +70,21 @@ export default function FinishPage() {
       });
 
       setStatus('success');
-      setTimeout(() => router.push('/'), 2000);
+      const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
+      setTimeout(() => router.push(isLinkingFlow ? '/account/security' : '/'), 2000);
     } catch (err: any) {
       setError(err.message);
+      setStatus('error');
+    }
+  };
+
+  const completeLinkEmail = async (userEmail: string) => {
+    const { success, error } = await completeLinkWithEmailLink(userEmail);
+    if (success) {
+      setStatus('link-success');
+      setTimeout(() => router.push('/account/security'), 2000);
+    } else {
+      setError(error ?? 'An error occurred while linking.');
       setStatus('error');
     }
   };
@@ -59,7 +95,16 @@ export default function FinishPage() {
       return;
     }
     setStatus('loading');
-    await completeSignIn(email);
+    const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
+    if (isLinkingFlow && auth.currentUser) {
+      // Same-device edge case: localStorage was cleared but user is still signed in
+      await completeLinkEmail(email);
+    } else {
+      // Cross-device or normal sign-in:
+      //   completeSignIn will redirect to /account/security when isLinkingFlow is true
+      //   so the user lands on security settings where they can add email again.
+      await completeSignIn(email);
+    }
   };
 
   // LOADING
@@ -119,7 +164,23 @@ export default function FinishPage() {
     );
   }
 
-  // SUCCESS
+  // LINK SUCCESS — email was linked to an existing account (Google-first user)
+  if (status === 'link-success') {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-center p-6">
+        <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+        <h1 className="text-2xl font-semibold mb-2">Email успешно добавлен</h1>
+        <p className="text-muted-foreground mb-6">
+          Перенаправляем в настройки безопасности...
+        </p>
+        <Button onClick={() => router.push('/account/security')}>
+          Перейти
+        </Button>
+      </div>
+    );
+  }
+
+  // SUCCESS — normal sign-in
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center p-6">
       <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />

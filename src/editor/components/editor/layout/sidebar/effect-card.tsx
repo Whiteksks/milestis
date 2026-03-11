@@ -46,7 +46,7 @@ export function EffectCard({ label, description, value, options, onChange }: Eff
               onClick={() => onChange(opt.id)}
               title={opt.description}
               className={cn(
-                "relative h-9 rounded-2xs text-[11px] font-medium tracking-wide",
+                "relative h-9 rounded-xs text-[11px] font-medium tracking-wide",
                 "transition-all duration-200 ease-out",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 isActive

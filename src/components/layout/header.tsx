@@ -153,7 +153,7 @@ const Header = ({
                         damping: 20,    // Насколько быстро гаснут колебания
                         duration: 0.3
                       }}
-                      className="absolute inset-0 bg-secondary -z-10 rounded-md"
+                      className="absolute inset-0 bg-secondary -z-10 rounded-full"
                     />
                   )}
                 </Link>
