@@ -5,5 +5,13 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    match /projects/{projectId} {
+      // Only the owner can read or write their own project
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      // Allow creation — the server (Admin SDK) writes ownerId, but client can also create
+      // through the Cloud Function, so direct client writes are blocked for create.
+      // Reading newly-created doc: ownerId is already set by the Cloud Function.
+    }
   }
 }

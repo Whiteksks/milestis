@@ -1,5 +1,11 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { doc, getDoc } from 'firebase/firestore'
+import { useShallow } from 'zustand/react/shallow'
+import { db } from '@/lib/firebase'
+import { useUserStore } from '@/hooks/useUserStore'
 import { Canvas } from '@/editor/components/editor/canvas'
 import { EditorHeader } from '@/editor/components/editor/layout/editor-header'
 import { FloatingActions } from '@/editor/components/editor/layout/floating-design-buttons'
@@ -12,11 +18,61 @@ import { SettingsContent } from '@/editor/components/editor/layout/mobile/settin
 import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
 import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
 import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs'
-import { useRef, useState } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
+type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
+
 export default function EditorPage() {
+  const params = useParams()
+  const router = useRouter()
+  const projectId = params.projectId as string
+  const locale = params.locale as string
+
+  const { profile, loading: userLoading } = useUserStore(
+    useShallow((s) => ({ profile: s.profile, loading: s.loading }))
+  )
+
+  const setEditorMode = useUiSelector((state) => state.setEditorMode)
+
+  const [loadState, setLoadState] = useState<LoadState>('loading')
+
+  useEffect(() => {
+    if (userLoading) return
+    if (!profile) {
+      router.replace(`/${locale}/auth`)
+      return
+    }
+
+    let cancelled = false
+
+    async function loadProject() {
+      try {
+        const snap = await getDoc(doc(db, 'projects', projectId))
+        if (cancelled) return
+
+        if (!snap.exists()) {
+          setLoadState('not-found')
+          return
+        }
+
+        const project = snap.data()
+        if (project.ownerId !== profile!.uid) {
+          setLoadState('forbidden')
+          return
+        }
+
+        setEditorMode(project.mode)
+        setLoadState('ready')
+      } catch {
+        if (!cancelled) setLoadState('error')
+      }
+    }
+
+    loadProject()
+    return () => { cancelled = true }
+  }, [projectId, profile, userLoading, locale, router, setEditorMode])
+
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileEditorTab>('sections')
@@ -27,6 +83,38 @@ export default function EditorPage() {
     designModalSection: state.designModalSection,
     setSelectedDecorationId: state.setSelectedDecorationId,
   }))
+
+  if (loadState === 'loading') {
+    return (
+      <div className="h-screen flex items-center justify-center text-muted-foreground text-sm">
+        Loading project…
+      </div>
+    )
+  }
+
+  if (loadState === 'not-found') {
+    return (
+      <div className="h-screen flex items-center justify-center text-muted-foreground text-sm">
+        Project not found.
+      </div>
+    )
+  }
+
+  if (loadState === 'forbidden') {
+    return (
+      <div className="h-screen flex items-center justify-center text-muted-foreground text-sm">
+        You don&apos;t have access to this project.
+      </div>
+    )
+  }
+
+  if (loadState === 'error') {
+    return (
+      <div className="h-screen flex items-center justify-center text-muted-foreground text-sm">
+        Failed to load project. Please try again.
+      </div>
+    )
+  }
 
   const handleMobileTabChange = (tab: 'sections' | 'background' | 'decorations' | 'design') => {
     setMobileActiveTab(tab)

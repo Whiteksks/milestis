@@ -6,5 +6,6 @@ setGlobalOptions({
 
 import {createUser} from "./users/createUser";
 import {resizeAvatar, resizeProjectImage} from "./storage";
+import {createProject} from "./projects/createProject";
 
-export {createUser, resizeAvatar, resizeProjectImage};
+export {createUser, resizeAvatar, resizeProjectImage, createProject};

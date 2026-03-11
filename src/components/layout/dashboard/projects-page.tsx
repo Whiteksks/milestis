@@ -1,22 +1,15 @@
 ﻿"use client"
 
 import { useState } from "react"
-import { Plus, Search, BookOpen, Layout, FolderOpen } from "lucide-react"
+import { Plus, Search, BookOpen, Layout } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"
 import { EmptyState } from "@/components/layout/dashboard/empty-state"
-
-const mockProjects = [
-  { id: "1", title: "Summer Vacation 2024", type: "photobook" as const, status: "published" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "2 hours ago" },
-  { id: "2", title: "Wedding Album", type: "photobook" as const, status: "draft" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "Yesterday" },
-  { id: "3", title: "Photography Portfolio", type: "site" as const, status: "published" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "3 days ago" },
-  { id: "4", title: "Family Memories", type: "photobook" as const, status: "published" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "1 week ago" },
-  { id: "5", title: "Travel Blog", type: "site" as const, status: "draft" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "2 weeks ago" },
-  { id: "6", title: "Baby's First Year", type: "photobook" as const, status: "published" as const, thumbnail: "/placeholder.svg?height=200&width=320", updatedAt: "1 month ago" },
-]
+import { useProjects } from "@/hooks/useProjects"
 
 function NoResults() {
   return (
@@ -31,18 +24,24 @@ function NoResults() {
 }
 
 export function ProjectsPage() {
+  const { projects, loading } = useProjects()
   const [activeTab, setActiveTab] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredProjects = mockProjects.filter((p) => {
-    const matchesTab = activeTab === "all" || (activeTab === "photobooks" && p.type === "photobook") || (activeTab === "sites" && p.type === "site")
-    const matchesStatus = statusFilter === "all" || p.status === statusFilter
-    const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProjects = projects.filter((p) => {
+    const matchesTab =
+      activeTab === "all" ||
+      (activeTab === "photobooks" && p.mode === "photobook") ||
+      (activeTab === "portfolios" && p.mode === "portfolio")
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "draft" && !p.isPublished && p.status !== "archived") ||
+      (statusFilter === "published" && p.isPublished) ||
+      (statusFilter === "archived" && p.status === "archived")
+    const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesTab && matchesStatus && matchesSearch
   })
-
-  const hasActiveFilters = activeTab !== "all" || statusFilter !== "all" || searchQuery !== ""
 
   return (
     <div className="mx-auto max-w-6xl space-y-10">
@@ -56,7 +55,7 @@ export function ProjectsPage() {
         <div className="flex gap-2">
           <Button variant="outline" className="rounded-full bg-transparent">
             <Layout className="mr-2 size-4" />
-            Create Site
+            Create Portfolio
           </Button>
           <Button className="rounded-full">
             <BookOpen className="mr-2 size-4" />
@@ -65,14 +64,14 @@ export function ProjectsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      {mockProjects.length > 0 && (
+      {/* Filters — shown only when projects exist or loading */}
+      {(loading || projects.length > 0) && (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="rounded-full bg-muted p-1">
               <TabsTrigger value="all" className="rounded-full px-5">All</TabsTrigger>
               <TabsTrigger value="photobooks" className="rounded-full px-5">Photobooks</TabsTrigger>
-              <TabsTrigger value="sites" className="rounded-full px-5">Sites</TabsTrigger>
+              <TabsTrigger value="portfolios" className="rounded-full px-5">Portfolios</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -94,6 +93,7 @@ export function ProjectsPage() {
                 <SelectItem value="all" className="rounded-lg">All Status</SelectItem>
                 <SelectItem value="draft" className="rounded-lg">Draft</SelectItem>
                 <SelectItem value="published" className="rounded-lg">Published</SelectItem>
+                <SelectItem value="archived" className="rounded-lg">Archived</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -101,7 +101,19 @@ export function ProjectsPage() {
       )}
 
       {/* Grid */}
-      {mockProjects.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="overflow-hidden rounded-2xl">
+              <Skeleton className="aspect-[16/10] w-full rounded-t-2xl rounded-b-none" />
+              <div className="p-3 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : projects.length === 0 ? (
         <EmptyState />
       ) : filteredProjects.length === 0 ? (
         <NoResults />

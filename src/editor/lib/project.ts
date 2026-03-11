@@ -7,7 +7,7 @@
  * loading.
  *
  * Firestore path (planned):
- *   users/{userId}/projects/{projectId}
+ *   projects/{projectId}
  */
 
 import type {
@@ -29,7 +29,7 @@ export interface ProjectMeta {
   /** Firestore document ID */
   id: string
   /** UID of the owning user (Firebase Auth) */
-  userId: string
+  ownerId: string
   /** Human-readable project name set by the user */
   name: string
   /** Determines which content/template set this project uses. Immutable after creation. */
