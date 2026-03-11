@@ -1,6 +1,11 @@
-"use client"
+﻿"use client"
 
-import { useContentSelector, useUiSelector } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
+import { useUiStore } from '@/editor/lib/store-ui'
+import { useUserStore } from '@/hooks/useUserStore'
+import { useProjectImages, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
+import { storage } from '@/lib/firebase'
+import { ref as storageRef, uploadBytes } from 'firebase/storage'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Check, Upload } from 'lucide-react'
+import { Check, Upload, Loader2 } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -20,22 +25,37 @@ interface MediaPickerModalProps {
   onSelectImages?: (urls: string[]) => void
 }
 
+interface UploadingEntry {
+  id: string
+  name: string
+  previewUrl: string
+}
+
+function getDisplayUrl(img: ProjectImageDoc): string {
+  return img.urls?.thumb ?? img.urls?.middle ?? img.urls?.full ?? ''
+}
+
+function getSelectUrl(img: ProjectImageDoc): string {
+  return img.urls?.full ?? img.urls?.middle ?? ''
+}
+
 export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: MediaPickerModalProps) {
-  const { mediaLibrary, addMediaImage } = useContentSelector((state) => ({
-    mediaLibrary: state.mediaLibrary,
-    addMediaImage: state.addMediaImage,
-  }))
   const { isMediaPickerOpen, mediaPickerOwnerId, openMediaPicker, closeMediaPicker } = useUiSelector((state) => ({
     isMediaPickerOpen: state.isMediaPickerOpen,
     mediaPickerOwnerId: state.mediaPickerOwnerId,
     openMediaPicker: state.openMediaPicker,
     closeMediaPicker: state.closeMediaPicker,
   }))
+
+  const projectId = useUiStore((s) => s.projectId)
+  const uid = useUserStore((s) => s.profile?.uid)
+  const firestoreImages = useProjectImages()
+
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
+  const [uploading, setUploading] = useState<UploadingEntry[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isMultiSelect = !!onSelectImages
-
   const isOpen = isMediaPickerOpen && mediaPickerOwnerId === ownerId
 
   const handleOpenChange = (open: boolean) => {
@@ -54,40 +74,50 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         onSelectImage(selectedUrls[0])
       }
     }
-
     setSelectedUrls([])
     closeMediaPicker()
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (!files) return
-
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const url = event.target?.result as string
-        addMediaImage({
-          id: `img-${Date.now()}-${Math.random()}`,
-          url,
-          name: file.name,
-          uploadedAt: new Date(),
-        })
-      }
-      reader.readAsDataURL(file)
-    })
-
+    if (!files || !uid || !projectId) return
+    const filesArray = Array.from(files)
     if (fileInputRef.current) fileInputRef.current.value = ''
+
+    await Promise.all(
+      filesArray.map(async (file) => {
+        const imageId = crypto.randomUUID()
+        const previewUrl = URL.createObjectURL(file)
+        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl }])
+        try {
+          const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+          await uploadBytes(
+            storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
+            file,
+          )
+        } catch (err) {
+          console.error('Upload failed:', err)
+        } finally {
+          setUploading((prev) => prev.filter((u) => u.id !== imageId))
+          URL.revokeObjectURL(previewUrl)
+        }
+      }),
+    )
   }
+
+  const allImages = firestoreImages
+  const isEmpty = allImages.length === 0 && uploading.length === 0
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[80vh] flex flex-col bg-background/95 backdrop-blur-sm border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-6 flex flex-row items-center justify-between">
           <div>
-            <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">Select Image</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">
+              Select Image
+            </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Choose one of your previously uploaded photos.
+              Choose from your uploaded images or upload a new one.
             </DialogDescription>
           </div>
           <Button
@@ -109,69 +139,87 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
           />
         </DialogHeader>
 
-        {/* Scrollable area */}
         <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border border-border p-4 bg-muted/30">
-          {mediaLibrary.length === 0 ? (
+          {isEmpty ? (
             <div className="flex items-center justify-center h-40 text-muted-foreground text-sm font-medium">
               No images yet. Upload images first.
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {mediaLibrary.map((image) => (
-                <button
-                  key={image.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedUrls((prev) => {
-                      // В режиме одиночного выбора просто заменяем текущее значение
-                      if (!isMultiSelect) {
-                        return [image.url]
-                      }
-
-                      // В мульти-режиме переключаем выбранность
-                      if (prev.includes(image.url)) {
-                        return prev.filter((u) => u !== image.url)
-                      }
-                      return [...prev, image.url]
-                    })
-                  }}
-                  className={cn(
-                    'relative aspect-square rounded-xl overflow-hidden border cursor-pointer transition-all duration-300',
-                    selectedUrls.includes(image.url)
-                      ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
-                      : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card'
-                  )}
+              {/* Uploading placeholders */}
+              {uploading.map((u) => (
+                <div
+                  key={u.id}
+                  className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40"
                 >
                   <Image
-                    src={image.url || "/placeholder.svg"}
-                    alt={image.name}
+                    src={u.previewUrl}
+                    alt={u.name}
                     fill
-                    sizes="(max-width: 768px) 50vw, 160px"
-                    className="object-cover"
+                    unoptimized
+                    sizes="160px"
+                    className="object-cover opacity-50"
                   />
-                  {selectedUrls.includes(image.url) && (
-                    <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
-                      <div className="bg-foreground text-background rounded-full p-2 shadow-lg transform scale-100 transition-transform">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                  )}
-                </button>
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[2px]">
+                    <Loader2 className="h-6 w-6 text-foreground/70 animate-spin" />
+                  </div>
+                </div>
               ))}
+
+              {/* Firestore images */}
+              {allImages.map((image) => {
+                const displayUrl = getDisplayUrl(image)
+                const selectUrl = getSelectUrl(image)
+                return (
+                  <button
+                    key={image.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedUrls((prev) => {
+                        if (!isMultiSelect) return [selectUrl]
+                        if (prev.includes(selectUrl)) return prev.filter((u) => u !== selectUrl)
+                        return [...prev, selectUrl]
+                      })
+                    }}
+                    className={cn(
+                      'relative aspect-square rounded-xl overflow-hidden border cursor-pointer transition-all duration-300',
+                      selectedUrls.includes(selectUrl)
+                        ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
+                        : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card',
+                    )}
+                  >
+                    <Image
+                      src={displayUrl || '/placeholder.svg'}
+                      alt={image.meta?.originalName ?? image.name ?? 'image'}
+                      fill
+                      unoptimized
+                      sizes="(max-width: 768px) 50vw, 160px"
+                      className="object-cover"
+                    />
+                    {selectedUrls.includes(selectUrl) && (
+                      <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
+                        <div className="bg-foreground text-background rounded-full p-2 shadow-lg">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           )}
         </div>
 
         <div className="flex justify-end gap-3 pt-6 border-t border-border/50 mt-0">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => { setSelectedUrls([]); closeMediaPicker() }}
             className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleConfirm} 
+          <Button
+            onClick={handleConfirm}
             disabled={selectedUrls.length === 0}
             className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all disabled:opacity-50"
           >
@@ -182,3 +230,4 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
     </Dialog>
   )
 }
+

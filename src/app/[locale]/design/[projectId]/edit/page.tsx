@@ -36,6 +36,7 @@ export default function EditorPage() {
   )
 
   const setEditorMode = useUiSelector((state) => state.setEditorMode)
+  const setProjectId = useUiSelector((state) => state.setProjectId)
 
   const [loadState, setLoadState] = useState<LoadState>('loading')
 
@@ -65,8 +66,7 @@ export default function EditorPage() {
         }
 
         setEditorMode(project.mode)
-
-        // Rehydrate theme store
+        setProjectId(projectId)
         if (project.theme) {
           useThemeStore.setState({
             currentTemplateId: project.theme.currentTemplateId,
@@ -99,8 +99,8 @@ export default function EditorPage() {
     }
 
     loadProject()
-    return () => { cancelled = true }
-  }, [projectId, profile, userLoading, locale, router, setEditorMode])
+    return () => { cancelled = true; setProjectId(null) }
+  }, [projectId, profile, userLoading, locale, router, setEditorMode, setProjectId])
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')

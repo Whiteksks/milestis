@@ -1,6 +1,12 @@
-'use client'
+﻿'use client'
 
-import { useContentSelector, useUiSelector } from '@/editor/lib/store'
+import { useUiSelector } from '@/editor/lib/store'
+import { useUiStore } from '@/editor/lib/store-ui'
+import { useUserStore } from '@/hooks/useUserStore'
+import { useProjectImages, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
+import { db, storage } from '@/lib/firebase'
+import { ref as storageRef, uploadBytes } from 'firebase/storage'
+import { addDoc, deleteDoc, doc, collection, serverTimestamp } from 'firebase/firestore'
 import {
   Dialog,
   DialogContent,
@@ -11,18 +17,30 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, Sparkles, X, Check } from 'lucide-react'
+import { Upload, Sparkles, X, Check, Loader2 } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileDrawer } from '../mobile/mobile-drawer'
-import Image, { type ImageLoader } from 'next/image'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import Image from 'next/image'
 
 interface MediaLibraryModalProps {
   mode?: 'select' | 'manage'
   onSelectImage?: (url: string) => void
+}
+
+interface UploadingEntry {
+  id: string
+  name: string
+  previewUrl: string
+}
+
+function getDisplayUrl(img: ProjectImageDoc): string {
+  return img.urls?.thumb ?? img.urls?.middle ?? img.urls?.full ?? ''
+}
+
+function getSelectUrl(img: ProjectImageDoc): string {
+  return img.urls?.full ?? img.urls?.middle ?? ''
 }
 
 export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibraryModalProps) {
@@ -30,49 +48,62 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     isMediaLibraryOpen: state.isMediaLibraryOpen,
     toggleMediaLibrary: state.toggleMediaLibrary,
   }))
-  const { mediaLibrary, addMediaImage, removeMediaImage } = useContentSelector((state) => ({
-    mediaLibrary: state.mediaLibrary,
-    addMediaImage: state.addMediaImage,
-    removeMediaImage: state.removeMediaImage,
-  }))
+
+  const projectId = useUiStore((s) => s.projectId)
+  const uid = useUserStore((s) => s.profile?.uid)
+  const firestoreImages = useProjectImages()
 
   const [urlInput, setUrlInput] = useState('')
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
+  const [uploading, setUploading] = useState<UploadingEntry[]>([])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const isMobile = useIsMobile()
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (!files) return
-
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const url = event.target?.result as string
-        addMediaImage({
-          id: `img-${Date.now()}-${Math.random()}`,
-          url,
-          name: file.name,
-          uploadedAt: new Date(),
-        })
-      }
-      reader.readAsDataURL(file)
-    })
-
+    if (!files || !uid || !projectId) return
+    const filesArray = Array.from(files)
     if (fileInputRef.current) fileInputRef.current.value = ''
+
+    await Promise.all(
+      filesArray.map(async (file) => {
+        const imageId = crypto.randomUUID()
+        const previewUrl = URL.createObjectURL(file)
+        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl }])
+        try {
+          const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+          await uploadBytes(
+            storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
+            file,
+          )
+          // Cloud Function creates the Firestore doc в†’ onSnapshot picks it up automatically
+        } catch (err) {
+          console.error('Upload failed:', err)
+        } finally {
+          setUploading((prev) => prev.filter((u) => u.id !== imageId))
+          URL.revokeObjectURL(previewUrl)
+        }
+      }),
+    )
   }
 
-  const handleAddUrl = () => {
-    if (!urlInput.trim()) return
-
-    addMediaImage({
-      id: `img-${Date.now()}-${Math.random()}`,
-      url: urlInput,
-      name: 'External Image',
-      uploadedAt: new Date(),
-    })
+  const handleAddUrl = async () => {
+    if (!urlInput.trim() || !uid || !projectId) return
+    const url = urlInput.trim()
     setUrlInput('')
+    await addDoc(collection(db, 'images'), {
+      ownerId: uid,
+      projectId,
+      type: 'url',
+      urls: { full: url },
+      name: 'External Image',
+      createdAt: serverTimestamp(),
+    })
+  }
+
+  const handleDelete = async (imageId: string) => {
+    await deleteDoc(doc(db, 'images', imageId))
   }
 
   const handleSelectImage = (url: string) => {
@@ -87,13 +118,13 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     }
   }
 
-  // --- Контент (без обвязки Dialog / BottomSheet) ---
+  const totalCount = firestoreImages.length + uploading.length
+
+  // --- Upload row ---
   const uploadRow = (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Upload button */}
       <div>
         <Label className="text-xs font-medium text-foreground mb-2 block">Upload Image</Label>
-
         <Button
           variant="outline"
           className="w-full h-24 border border-dashed border-border rounded-2xl bg-muted/30 hover:bg-muted hover:border-border transition-all text-muted-foreground hover:text-foreground"
@@ -104,7 +135,6 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
             <span className="text-xs font-medium">Click to upload</span>
           </div>
         </Button>
-
         <input
           ref={fileInputRef}
           type="file"
@@ -115,10 +145,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
         />
       </div>
 
-      {/* Add URL */}
       <div>
         <Label className="text-xs font-medium text-foreground mb-2 block">Add from URL</Label>
-
         <Input
           placeholder="https://example.com/image.jpg"
           value={urlInput}
@@ -126,7 +154,6 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
           className="rounded-xl border-border focus-visible:ring-ring h-10"
         />
-
         <Button
           onClick={handleAddUrl}
           className="w-full mt-3 flex items-center justify-center gap-2 bg-foreground hover:bg-foreground/90 text-background rounded-xl h-10 shadow-md transition-all"
@@ -141,16 +168,14 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   const galleryArea = (
     <div className="flex-1 min-h-0 flex flex-col mt-2">
       <Label className="text-xs font-medium text-foreground mb-3 block">
-        Your Library <span className="text-muted-foreground ml-1">({mediaLibrary.length})</span>
+        Your Library <span className="text-muted-foreground ml-1">({totalCount})</span>
       </Label>
 
       <div
         className="flex-1 min-h-0 overflow-y-auto border border-border rounded-2xl p-4 bg-muted/30"
-        // Управление моментом начала скролла:
-        // на мобилке скролл начнётся раньше — ограничиваем высоту
         style={{ maxHeight: isMobile ? '45vh' : undefined }}
       >
-        {mediaLibrary.length === 0 ? (
+        {totalCount === 0 ? (
           <div className="flex items-center justify-center h-40 text-muted-foreground">
             <div className="text-center">
               <div className="h-12 w-12 bg-background rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-border">
@@ -162,52 +187,75 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {mediaLibrary.map((image) => (
+            {/* Uploading placeholders */}
+            {uploading.map((u) => (
               <div
-                key={image.id}
-                className={cn(
-                  'relative group rounded-xl overflow-hidden border cursor-pointer aspect-square transition-all duration-300',
-                  selectedImageUrl === image.url
-                    ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
-                    : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card'
-                )}
-                onClick={() => handleSelectImage(image.url)}
+                key={u.id}
+                className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40 flex items-center justify-center"
               >
                 <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={image.url}
-                  alt={image.name}
+                  src={u.previewUrl}
+                  alt={u.name}
                   fill
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="object-cover"
+                  unoptimized
+                  sizes="160px"
+                  className="object-cover opacity-50"
                 />
-
-                {selectedImageUrl === image.url && mode === 'select' && (
-                  <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
-                    <div className="bg-foreground text-background rounded-full p-2 shadow-lg transform scale-100 transition-transform">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Minimal delete button */}
-                {mode === 'manage' && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      removeMediaImage(image.id)
-                    }}
-                    className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20 text-muted-foreground hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100"
-                    aria-label="Delete image"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                )}
+                <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[2px]">
+                  <Loader2 className="h-6 w-6 text-foreground/70 animate-spin" />
+                </div>
               </div>
             ))}
+
+            {/* Firestore images */}
+            {firestoreImages.map((image) => {
+              const displayUrl = getDisplayUrl(image)
+              const selectUrl = getSelectUrl(image)
+              return (
+                <div
+                  key={image.id}
+                  className={cn(
+                    'relative group rounded-xl overflow-hidden border cursor-pointer aspect-square transition-all duration-300',
+                    selectedImageUrl === selectUrl
+                      ? 'border-ring ring-2 ring-ring ring-offset-2 ring-offset-background'
+                      : 'border-border hover:border-ring/50 hover:shadow-md hover:-translate-y-0.5 bg-card',
+                  )}
+                  onClick={() => handleSelectImage(selectUrl)}
+                >
+                  <Image
+                    src={displayUrl || '/placeholder.svg'}
+                    alt={image.meta?.originalName ?? image.name ?? 'image'}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover"
+                  />
+
+                  {selectedImageUrl === selectUrl && mode === 'select' && (
+                    <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
+                      <div className="bg-foreground text-background rounded-full p-2 shadow-lg">
+                        <Check className="h-4 w-4" />
+                      </div>
+                    </div>
+                  )}
+
+                  {mode === 'manage' && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDelete(image.id)
+                      }}
+                      className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20 text-muted-foreground hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100"
+                      aria-label="Delete image"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -216,8 +264,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   const actionsBar = (
     <div className="hidden md:flex justify-end gap-3 pt-6 border-t border-border/50 bg-transparent">
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         onClick={toggleMediaLibrary}
         className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
@@ -225,9 +273,9 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
       </Button>
 
       {mode === 'select' && selectedImageUrl && (
-        <Button 
-            onClick={handleConfirmSelection} 
-            className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all"
+        <Button
+          onClick={handleConfirmSelection}
+          className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all"
         >
           Select Image
         </Button>
@@ -235,41 +283,30 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     </div>
   )
 
-  // --- MOBILE: MobileBottomSheet (использует тот же контент) ---
   if (isMobile) {
     return (
-      <MobileDrawer
-        isOpen={isMediaLibraryOpen}
-        onClose={toggleMediaLibrary}
-        title="Media Library"
-      >
+      <MobileDrawer isOpen={isMediaLibraryOpen} onClose={toggleMediaLibrary} title="Media Library">
         <div className="flex flex-col h-full min-h-0">
-          {/* Верхняя панель (заголовок внутри bottom sheet) */}
           <div className="px-4 pb-2 border-b">
             <div className="text-lg font-semibold">Media Library</div>
             <div className="text-sm text-muted-foreground">
-              {mode === 'select' ? 'Выберите изображение для галереи' : 'Загрузите или управляйте изображениями'}
+              {mode === 'select'
+                ? 'Select an image for your gallery'
+                : 'Upload and manage your images'}
             </div>
           </div>
-
-          {/* Контент: загрузка + галерея */}
           <div className="pt-4 overflow-auto flex-1 min-h-0">
             <div className="flex flex-col gap-4">
               {uploadRow}
               {galleryArea}
             </div>
           </div>
-
-          {/* Закреплённые кнопки внизу */}
-          <div>
-            {actionsBar}
-          </div>
+          <div>{actionsBar}</div>
         </div>
       </MobileDrawer>
     )
   }
 
-  // --- DESKTOP: Dialog ---
   return (
     <Dialog open={isMediaLibraryOpen} onOpenChange={toggleMediaLibrary}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
@@ -284,15 +321,14 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           </DialogDescription>
         </DialogHeader>
 
-        {/* MAIN CONTENT */}
         <div className="flex flex-col gap-6 flex-1 min-h-0 px-0">
           {uploadRow}
           {galleryArea}
         </div>
 
-        {/* Bottom buttons */}
         <div className="px-0">{actionsBar}</div>
       </DialogContent>
     </Dialog>
   )
 }
+

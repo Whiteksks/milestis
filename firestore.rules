@@ -13,5 +13,14 @@ service cloud.firestore {
       // through the Cloud Function, so direct client writes are blocked for create.
       // Reading newly-created doc: ownerId is already set by the Cloud Function.
     }
+
+    match /images/{imageId} {
+      // Owner can read and delete their own images
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      // Client can create URL-type images directly (uploaded images are created by the Cloud Function via Admin SDK)
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.ownerId
+                    && request.resource.data.type == 'url';
+    }
   }
 }

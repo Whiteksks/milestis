@@ -36,6 +36,9 @@ export interface UiStore {
   setSelectedDecorationId: (id: string | null) => void
 
   setActiveSectionId: (id: string | null) => void
+
+  projectId: string | null
+  setProjectId: (id: string | null) => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -53,6 +56,8 @@ export const useUiStore = create<UiStore>((set) => ({
 
   previewDecorations: null,
   selectedDecorationId: null,
+
+  projectId: null,
 
   setDeviceView: (view) => set({ deviceView: view }),
 
@@ -91,4 +96,6 @@ export const useUiStore = create<UiStore>((set) => ({
   setSelectedDecorationId: (id) => set(() => ({ selectedDecorationId: id })),
 
   setActiveSectionId: (id) => set(() => ({ activeSectionId: id })),
+
+  setProjectId: (id) => set(() => ({ projectId: id })),
 }))
