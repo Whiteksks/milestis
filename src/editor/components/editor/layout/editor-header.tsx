@@ -33,7 +33,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       await saveProject(projectId)
       setSaveState('saved')
       setTimeout(() => setSaveState('idle'), 2000)
-    } catch {
+    } catch (err) {
+      console.error('[Save] Failed to save project:', err)
       setSaveState('error')
       setTimeout(() => setSaveState('idle'), 2500)
     }

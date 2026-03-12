@@ -1,6 +1,5 @@
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type {
-  FrameStyle,
   SectionContent,
   SectionVisibility,
   PhotobookSectionContent,
@@ -10,7 +9,6 @@ import type {
 /** Shared base — fields present in every template regardless of mode. */
 export interface BaseTemplateProps {
   theme: ThemeConfig
-  frameStyle: FrameStyle
 }
 
 export interface PortfolioTemplateProps extends BaseTemplateProps {

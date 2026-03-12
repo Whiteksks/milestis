@@ -2,16 +2,15 @@
 
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, FrameStyle } from '@/editor/lib/types'
+import { PhotobookSectionContent } from '@/editor/lib/types'
 import { PhotoBlockUI } from '../photoblock-ui'
 
 interface TimelineGalleryProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  frameStyle: FrameStyle
 }
 
-export function TimelineGallery({ sectionContent, theme, frameStyle }: TimelineGalleryProps) {
+export function TimelineGallery({ sectionContent, theme }: TimelineGalleryProps) {
   if (!sectionContent.gallery.images || sectionContent.gallery.images.length === 0) {
     return null
   }
@@ -35,7 +34,7 @@ export function TimelineGallery({ sectionContent, theme, frameStyle }: TimelineG
               key={block.id}
               block={block}
               fallbackAspect="square"
-              fallbackFrame={frameStyle}
+              fallbackFrame="soft"
             />
           ))}
         </div>

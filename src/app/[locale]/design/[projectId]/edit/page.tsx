@@ -71,7 +71,6 @@ export default function EditorPage() {
           useThemeStore.setState({
             currentTemplateId: project.theme.currentTemplateId,
             currentTheme: project.theme.currentTheme,
-            frameStyle: project.theme.frameStyle,
             themeCustomizations: project.theme.themeCustomizations,
             customDecorations: project.theme.customDecorations ?? [],
           })

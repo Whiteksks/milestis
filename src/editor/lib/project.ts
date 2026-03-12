@@ -13,7 +13,6 @@
 import type {
   EditorMode,
   Theme,
-  FrameStyle,
   TemplateId,
   SectionContent,
   SectionVisibility,
@@ -43,7 +42,6 @@ export interface ProjectMeta {
 export interface ProjectThemeData {
   currentTemplateId: TemplateId
   currentTheme: Theme
-  frameStyle: FrameStyle
   themeCustomizations: ThemeCustomizations
   customDecorations: ThemeCustomDecorations[]
 }

@@ -13,7 +13,6 @@ export function PhotobookTimelineTemplate({
   theme,
   sectionVisibility,
   sectionContent,
-  frameStyle: _frameStyle, // currently unused, per-image frame styles from slots are used
 }: PhotobookTemplateProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +29,6 @@ export function PhotobookTimelineTemplate({
           <TimelineIntroduction
             sectionContent={sectionContent}
             theme={theme}
-            frameStyle={_frameStyle}
           />
         )}
 
@@ -44,7 +42,6 @@ export function PhotobookTimelineTemplate({
           <TimelineGallery
             sectionContent={sectionContent}
             theme={theme}
-            frameStyle={_frameStyle}
           />
         )}
 
@@ -53,7 +50,6 @@ export function PhotobookTimelineTemplate({
           <TimelineHighlight
             sectionContent={sectionContent}
             theme={theme}
-            frameStyle={_frameStyle}
           />
         )}
 
@@ -62,7 +58,6 @@ export function PhotobookTimelineTemplate({
           <TimelineEnding
             sectionContent={sectionContent}
             theme={theme}
-            frameStyle={_frameStyle}
           />
         )}
       </main>

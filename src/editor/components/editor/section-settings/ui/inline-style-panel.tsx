@@ -151,7 +151,9 @@ function StyleCard({ style, image, selected, onSelect }: {
             <Image
               src={image}
               alt={style.name}
-              className="w-full h-full object-cover"
+              fill
+              unoptimized
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full bg-muted" />

@@ -47,12 +47,11 @@ export function Canvas({
     previewDecorations: state.previewDecorations,
   }))
 
-  const { currentTemplateId, currentTheme, customDecorations, themeCustomizations, frameStyle } = useThemeSelector(state => ({
+  const { currentTemplateId, currentTheme, customDecorations, themeCustomizations } = useThemeSelector(state => ({
     currentTemplateId: state.currentTemplateId,
     currentTheme: state.currentTheme,
     customDecorations: state.customDecorations,
     themeCustomizations: state.themeCustomizations,
-    frameStyle: state.frameStyle,
   }))
 
   // Memoize so the theme object reference is stable — prevents templateNode from
@@ -67,10 +66,9 @@ export function Canvas({
     return modeEntry.renderCanvas({
       templateId: currentTemplateId,
       theme,
-      frameStyle,
       ...modeCanvasData,
     })
-  }, [modeEntry, currentTemplateId, theme, frameStyle, modeCanvasData])
+  }, [modeEntry, currentTemplateId, theme, modeCanvasData])
 
   const allDecorations = useMemo(() => [
     ...(previewDecorations?.elements || []),

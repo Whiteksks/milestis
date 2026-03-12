@@ -1,6 +1,5 @@
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type {
-  FrameStyle,
   PhotobookSectionContent,
   PhotobookSectionVisibility,
   TemplateId,
@@ -28,7 +27,6 @@ export type SectionDef<K extends string = string> = {
 export type CanvasRenderArgs = {
   templateId: TemplateId
   theme: ThemeConfig
-  frameStyle: FrameStyle
   // Photobook-specific — always present when photobook mode is active
   photobookSectionContent?: PhotobookSectionContent
   photobookSectionVisibility?: PhotobookSectionVisibility

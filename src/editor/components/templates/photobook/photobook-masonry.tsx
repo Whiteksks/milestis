@@ -12,7 +12,6 @@ export default function PhotobookMasonryTemplate({
   theme,
   sectionVisibility,
   sectionContent,
-  frameStyle: _frameStyle,
 }: PhotobookTemplateProps) {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

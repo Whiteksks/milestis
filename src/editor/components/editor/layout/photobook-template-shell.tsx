@@ -15,9 +15,8 @@ export function PhotobookTemplateShell({ Design }: PhotobookTemplateShellProps) 
     photobookSectionContent: state.photobookSectionContent,
   }))
 
-  const { currentTheme, frameStyle } = useThemeSelector((state) => ({
+  const { currentTheme } = useThemeSelector((state) => ({
     currentTheme: state.currentTheme,
-    frameStyle: state.frameStyle,
   }))
 
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
@@ -27,7 +26,6 @@ export function PhotobookTemplateShell({ Design }: PhotobookTemplateShellProps) 
       theme={theme}
       sectionVisibility={photobookSectionVisibility}
       sectionContent={photobookSectionContent}
-      frameStyle={frameStyle}
     />
   )
 }

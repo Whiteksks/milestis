@@ -3,16 +3,15 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, FrameStyle } from '@/editor/lib/types'
+import { PhotobookSectionContent } from '@/editor/lib/types'
 import { PhotoBlockUI } from '../photoblock-ui'
 
 interface TimelineHighlightProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  frameStyle: FrameStyle
 }
 
-export function TimelineHighlight({ sectionContent, theme, frameStyle }: TimelineHighlightProps) {
+export function TimelineHighlight({ sectionContent, theme }: TimelineHighlightProps) {
   return (
     <section className="py-24 bg-muted/10 border-y border-border relative">
       <div className="container mx-auto px-4 max-w-5xl">
@@ -62,7 +61,7 @@ export function TimelineHighlight({ sectionContent, theme, frameStyle }: Timelin
                     block={sectionContent.highlight.images}
                     fallbackAspect="landscape"
                     fallbackFrame={frameStyle}
-                  />
+                  />"soft"
                 </div>
               </div>
             )}

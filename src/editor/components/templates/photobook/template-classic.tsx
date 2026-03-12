@@ -13,7 +13,6 @@ export function TemplateClassic({
   theme,
   sectionVisibility,
   sectionContent,
-  frameStyle: _frameStyle,
 }: PhotobookTemplateProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 

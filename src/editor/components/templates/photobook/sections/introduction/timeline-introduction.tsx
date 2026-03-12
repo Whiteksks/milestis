@@ -3,16 +3,15 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, FrameStyle } from '@/editor/lib/types'
+import { PhotobookSectionContent } from '@/editor/lib/types'
 import { PhotoBlockUI } from '../photoblock-ui'
 
 interface TimelineIntroductionProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  frameStyle: FrameStyle
 }
 
-export function TimelineIntroduction({ sectionContent, theme, frameStyle }: TimelineIntroductionProps) {
+export function TimelineIntroduction({ sectionContent, theme }: TimelineIntroductionProps) {
   return (
     <section className="relative py-20 bg-background overflow-hidden">
       {/* Vertical line connecting from top */}
@@ -66,7 +65,7 @@ export function TimelineIntroduction({ sectionContent, theme, frameStyle }: Time
                 <PhotoBlockUI
                   block={sectionContent.introduction.images}
                   fallbackAspect="landscape"
-                  fallbackFrame={frameStyle}
+                  fallbackFrame="soft"
                 />
               </div>
             </motion.div>

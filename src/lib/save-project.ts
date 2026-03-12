@@ -4,6 +4,14 @@ import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
 import { useUiStore } from '@/editor/lib/store-ui'
 
+/**
+ * Firestore rejects documents containing `undefined` values.
+ * JSON round-trip strips them since JSON.stringify omits undefined keys.
+ */
+function stripUndefined<T>(val: T): T {
+  return JSON.parse(JSON.stringify(val)) as T
+}
+
 export async function saveProject(projectId: string): Promise<void> {
   const {
     sectionVisibility,
@@ -15,7 +23,6 @@ export async function saveProject(projectId: string): Promise<void> {
   const {
     currentTemplateId,
     currentTheme,
-    frameStyle,
     themeCustomizations,
     customDecorations,
   } = useThemeStore.getState()
@@ -25,7 +32,6 @@ export async function saveProject(projectId: string): Promise<void> {
   const theme = {
     currentTemplateId,
     currentTheme,
-    frameStyle,
     themeCustomizations,
     customDecorations,
   }
@@ -36,8 +42,8 @@ export async function saveProject(projectId: string): Promise<void> {
       : { sectionVisibility: photobookSectionVisibility, sectionContent: photobookSectionContent }
 
   await updateDoc(doc(db, 'projects', projectId), {
-    theme,
-    content,
+    theme: stripUndefined(theme),
+    content: stripUndefined(content),
     updatedAt: serverTimestamp(),
   })
 }

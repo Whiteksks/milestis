@@ -4,16 +4,15 @@ import { motion } from 'framer-motion'
 import { Heart, CircleDot } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeConfig } from '@/editor/lib/themes'
-import { PhotobookSectionContent, FrameStyle } from '@/editor/lib/types'
+import { PhotobookSectionContent } from '@/editor/lib/types'
 import { PhotoBlockUI } from '../photoblock-ui'
 
 interface TimelineEndingProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  frameStyle: FrameStyle
 }
 
-export function TimelineEnding({ sectionContent, theme, frameStyle }: TimelineEndingProps) {
+export function TimelineEnding({ sectionContent, theme }: TimelineEndingProps) {
   return (
     <section className="py-32 bg-background relative overflow-hidden">
       {/* Timeline ending line */}
@@ -68,7 +67,7 @@ export function TimelineEnding({ sectionContent, theme, frameStyle }: TimelineEn
               <PhotoBlockUI
                 block={sectionContent.ending.images}
                 fallbackAspect="portrait"
-                fallbackFrame={frameStyle}
+                fallbackFrame="soft"
               />
             </div>
           </motion.div>

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { FrameStyle, Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from './types'
+import type { Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from './types'
 
 export interface ThemeCustomizations {
   decorationAnimation?: DecorationAnimation
@@ -14,13 +14,11 @@ export interface ThemeCustomizations {
 export interface ThemeStore {
   currentTemplateId: TemplateId
   currentTheme: Theme
-  frameStyle: FrameStyle
   themeCustomizations: ThemeCustomizations
   customDecorations: ThemeCustomDecorations[]
 
   setTemplate: (templateId: TemplateId) => void
   setTheme: (theme: Theme) => void
-  setFrameStyle: (style: FrameStyle) => void
   updateThemeCustomization: (
     customizations: Partial<ThemeCustomizations>,
   ) => void
@@ -34,7 +32,6 @@ export interface ThemeStore {
 export const useThemeStore = create<ThemeStore>((set) => ({
   currentTemplateId: 'editorial',
   currentTheme: 'parchment',
-  frameStyle: 'soft',
   themeCustomizations: {
     decorationAnimation: 'fade',
     depthEffect: 'none',
@@ -48,8 +45,6 @@ export const useThemeStore = create<ThemeStore>((set) => ({
   setTemplate: (templateId) => set({ currentTemplateId: templateId }),
 
   setTheme: (theme) => set({ currentTheme: theme }),
-
-  setFrameStyle: (style) => set({ frameStyle: style }),
 
   updateThemeCustomization: (customizations) =>
     set((state) => ({
