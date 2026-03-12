@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2 } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2, ChevronRight } from 'lucide-react'
 import { saveProject } from '@/lib/save-project'
+import { renameProject } from '@/lib/rename-project'
 
 interface EditorHeaderProps {
   projectId: string
@@ -18,11 +19,31 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
 
-  const { deviceView, setDeviceView, toggleMediaLibrary } = useUiSelector((state) => ({
+  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
     toggleMediaLibrary: state.toggleMediaLibrary,
+    projectName: state.projectName,
+    setProjectName: state.setProjectName,
   }))
+
+  const [localName, setLocalName] = useState(projectName ?? '')
+
+  useEffect(() => {
+    setLocalName(projectName ?? '')
+  }, [projectName])
+
+  async function handleRename() {
+    const trimmed = localName.trim()
+    if (!trimmed) { setLocalName(projectName ?? ''); return }
+    if (trimmed === projectName) return
+    try {
+      await renameProject(projectId, trimmed)
+      setProjectName(trimmed)
+    } catch {
+      setLocalName(projectName ?? '')
+    }
+  }
 
   async function handleSave() {
     if (saveState === 'saving') return
@@ -42,10 +63,22 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     <header className="relative h-16 border-b border-border/80 bg-card/95 z-50 shadow-[0_2px_16px_0_hsl(var(--foreground)/0.06)]">
       <div className="h-full flex items-center px-6 justify-between">
         {/* LEFT */}
-        <div className="flex items-center gap-5">
-          <span className="font-serif text-base font-medium text-foreground tracking-tight select-none">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="font-serif text-base font-medium text-foreground tracking-tight select-none shrink-0">
             Milestis
           </span>
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+          <input
+            value={localName}
+            onChange={(e) => setLocalName(e.target.value)}
+            onBlur={handleRename}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur()
+              if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }
+            }}
+            placeholder="Untitled"
+            className="min-w-0 w-36 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 rounded-md border border-transparent hover:border-border/50 focus:border-border focus:bg-muted/30 focus:outline-none transition-colors truncate"
+          />
         </div>
 
         {/* CENTER — VIEWPORT */}

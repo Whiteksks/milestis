@@ -83,6 +83,19 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
 
+  const thumbnail = (
+    <TemplatePreview
+      themeId={project.preview?.themeId}
+      templateId={project.preview?.templateId}
+      heroImageUrl={project.preview?.heroImageUrl}
+      title={project.preview?.title}
+      subtitle={project.preview?.subtitle}
+      date={project.preview?.date}
+      aspectRatio={project.preview?.aspectRatio}
+      frameStyle={project.preview?.frameStyle}
+    />
+  )
+
   async function handleSoftDelete() {
     setBusy(true)
     try {
@@ -123,18 +136,7 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
         <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 opacity-80 hover:opacity-100 transition-opacity">
           {/* Thumbnail */}
           <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-            <div className="absolute inset-0">
-              <TemplatePreview
-                themeId={project.preview?.themeId}
-                templateId={project.preview?.templateId}
-                heroImageUrl={project.preview?.heroImageUrl}
-                title={project.preview?.title}
-                subtitle={project.preview?.subtitle}
-                date={project.preview?.date}
-                aspectRatio={project.preview?.aspectRatio}
-                frameStyle={project.preview?.frameStyle}
-              />
-            </div>
+            <div className="absolute inset-0">{thumbnail}</div>
             {/* Overlay */}
             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <Button
@@ -209,18 +211,7 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
     <div className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
       {/* Thumbnail area */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-        <div className="absolute inset-0">
-          <TemplatePreview
-            themeId={project.preview?.themeId}
-            templateId={project.preview?.templateId}
-            heroImageUrl={project.preview?.heroImageUrl}
-            title={project.preview?.title}
-            subtitle={project.preview?.subtitle}
-            date={project.preview?.date}
-            aspectRatio={project.preview?.aspectRatio}
-            frameStyle={project.preview?.frameStyle}
-          />
-        </div>
+        <div className="absolute inset-0">{thumbnail}</div>
 
         {/* Hover action overlay */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">

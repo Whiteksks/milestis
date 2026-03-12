@@ -11,7 +11,7 @@ interface ProjectGridProps {
 }
 
 export function ProjectGrid({ limit }: ProjectGridProps) {
-  const { projects, loading } = useProjects()
+  const { activeProjects, loading } = useProjects()
 
   if (loading) {
     return (
@@ -29,11 +29,12 @@ export function ProjectGrid({ limit }: ProjectGridProps) {
     )
   }
 
-  const displayed = limit ? projects.slice(0, limit) : projects
+  const displayed = limit ? activeProjects.slice(0, limit) : activeProjects
 
   if (displayed.length === 0) {
     return <EmptyState />
   }
+
 
   return (
     <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
