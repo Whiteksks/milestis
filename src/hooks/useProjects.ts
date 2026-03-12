@@ -8,9 +8,11 @@ export interface DashboardProject {
   id: string
   name: string
   mode: 'portfolio' | 'photobook'
-  status: 'active' | 'archived'
+  status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
   updatedAt: Date
+  deletedAt?: Date
+  purgeAt?: Date
 }
 
 export function useProjects() {
@@ -47,6 +49,8 @@ export function useProjects() {
             status: data.status,
             isPublished: data.isPublished ?? false,
             updatedAt: data.updatedAt?.toDate() ?? new Date(),
+            deletedAt: data.deletedAt?.toDate(),
+            purgeAt: data.purgeAt?.toDate(),
           }
         })
         // Sort by updatedAt descending on the client — avoids composite index
@@ -63,5 +67,8 @@ export function useProjects() {
     return unsub
   }, [uid, userLoading])
 
-  return { projects, loading }
+  const activeProjects = projects.filter((p) => p.status !== 'deleted')
+  const trashedProjects = projects.filter((p) => p.status === 'deleted')
+
+  return { projects, activeProjects, trashedProjects, loading }
 }

@@ -1,7 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore";
 
 export type ProjectMode = "portfolio" | "photobook";
-export type ProjectStatus = "active" | "archived";
+export type ProjectStatus = "active" | "archived" | "deleted";
 
 /**
  * Shape of the Firestore document written at creation time.
@@ -22,6 +22,16 @@ export interface ProjectMetadata {
   template?: {
     id: string;
   };  // Optional template reference for future use
+  /** Set when the user moves a project to the trash. */
+  deletedAt?: FieldValue;
+  /**
+   * Precomputed date when the project will be permanently purged.
+   * Rule: if deletedAt.day < 10  → purgeAt = 1st of next month
+   *       if deletedAt.day >= 10 → purgeAt = 1st of month after next
+   * Example: deleted Jan 5  → purge Feb 1
+   *          deleted Jan 20 → purge Mar 1
+   */
+  purgeAt?: FieldValue;
 }
 
 /** Payload the client sends to the createProject Cloud Function. */

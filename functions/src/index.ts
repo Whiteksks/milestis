@@ -7,5 +7,7 @@ setGlobalOptions({
 import {createUser} from "./users/createUser";
 import {resizeAvatar, resizeProjectImage} from "./storage";
 import {createProject} from "./projects/createProject";
+import {forceDeleteProject} from "./projects/forceDeleteProject";
+import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 
-export {createUser, resizeAvatar, resizeProjectImage, createProject};
+export {createUser, resizeAvatar, resizeProjectImage, createProject, forceDeleteProject, purgeDeletedProjects};

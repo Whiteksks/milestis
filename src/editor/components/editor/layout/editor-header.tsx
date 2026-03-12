@@ -18,12 +18,10 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
 
-  const { deviceView, setDeviceView, toggleMediaLibrary, editorMode, setEditorMode } = useUiSelector((state) => ({
+  const { deviceView, setDeviceView, toggleMediaLibrary } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
     toggleMediaLibrary: state.toggleMediaLibrary,
-    editorMode: state.editorMode,
-    setEditorMode: state.setEditorMode,
   }))
 
   async function handleSave() {
@@ -48,28 +46,6 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           <span className="font-serif text-base font-medium text-foreground tracking-tight select-none">
             Milestis
           </span>
-
-          <div className="hidden sm:flex items-center gap-0.5 p-1 bg-muted/40 rounded-full border border-border/30">
-            <ToggleGroup
-              type="single"
-              value={editorMode}
-              onValueChange={(v) => { if (v) setEditorMode(v as typeof editorMode) }}
-              className="gap-0"
-            >
-              <ToggleGroupItem
-                value="portfolio"
-                className="h-6 px-3.5 rounded-full text-xs font-medium data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
-              >
-                Portfolio
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="photobook"
-                className="h-6 px-3.5 rounded-full text-xs font-medium data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
-              >
-                Photobook
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
         </div>
 
         {/* CENTER — VIEWPORT */}

@@ -1,7 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, BookOpen, Layout } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye, BookOpen, Layout, RotateCcw, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import {
@@ -11,7 +12,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import type { DashboardProject } from "@/hooks/useProjects"
+import { softDeleteProject } from "@/lib/delete-project"
+import { restoreProject } from "@/lib/restore-project"
+import { forceDeleteProject } from "@/lib/force-delete-project-api"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -35,6 +47,10 @@ function deriveDisplayStatus(project: DashboardProject): "draft" | "published" |
   return "draft"
 }
 
+function formatPurgeDate(date: Date): string {
+  return date.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })
+}
+
 const modeConfig = {
   portfolio: { icon: Layout, label: "Portfolio" },
   photobook: { icon: BookOpen, label: "Photobook" },
@@ -50,22 +66,139 @@ const statusStyles = {
 
 interface ProjectCardProps {
   project: DashboardProject
+  /** If true, renders the trash variant (restore + permanent delete) */
+  trash?: boolean
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, trash = false }: ProjectCardProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
+
+  const [busy, setBusy] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
 
+  async function handleSoftDelete() {
+    setBusy(true)
+    try {
+      await softDeleteProject(project.id)
+    } catch (err) {
+      console.error('[ProjectCard] Failed to move to trash:', err)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleRestore() {
+    setBusy(true)
+    try {
+      await restoreProject(project.id)
+    } catch (err) {
+      console.error('[ProjectCard] Failed to restore project:', err)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleForceDelete() {
+    setBusy(true)
+    try {
+      await forceDeleteProject(project.id)
+    } catch (err) {
+      console.error('[ProjectCard] Failed to permanently delete project:', err)
+    } finally {
+      setBusy(false)
+      setConfirmOpen(false)
+    }
+  }
+
+  if (trash) {
+    return (
+      <>
+        <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 opacity-80 hover:opacity-100 transition-opacity">
+          {/* Thumbnail */}
+          <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <modeInfo.icon className="size-10 text-muted-foreground/20" />
+            </div>
+            {/* Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="rounded-full shadow-md"
+                disabled={busy}
+                onClick={handleRestore}
+              >
+                <RotateCcw className="mr-1.5 size-3.5" />
+                Restore
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="rounded-full shadow-md"
+                disabled={busy}
+                onClick={() => setConfirmOpen(true)}
+              >
+                <Trash2 className="mr-1.5 size-3.5" />
+                Delete
+              </Button>
+            </div>
+            {/* Mode badge */}
+            <div className="absolute bottom-2 left-2">
+              <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
+                <modeInfo.icon className="size-3" />
+                {modeInfo.label}
+              </span>
+            </div>
+          </div>
+          <CardContent className="p-3">
+            <p className="truncate text-sm font-medium">{project.name}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+              {project.purgeAt
+                ? `Deletes permanently on ${formatPurgeDate(project.purgeAt)}`
+                : "Pending purge"}
+            </p>
+          </CardContent>
+        </div>
+
+        {/* Confirm permanent delete dialog */}
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent className="rounded-2xl sm:max-w-md">
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10">
+                  <AlertTriangle className="size-5 text-destructive" />
+                </div>
+                <DialogTitle>Permanently delete project?</DialogTitle>
+              </div>
+              <DialogDescription className="pt-1">
+                <strong>{project.name}</strong> and all its uploaded images will be deleted forever.
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" className="rounded-full" onClick={() => setConfirmOpen(false)} disabled={busy}>
+                Cancel
+              </Button>
+              <Button variant="destructive" className="rounded-full" onClick={handleForceDelete} disabled={busy}>
+                {busy ? "Deleting…" : "Delete forever"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    )
+  }
+
   return (
     <div className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
       {/* Thumbnail area */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-        {/* Placeholder until thumbnails are implemented */}
         <div className="absolute inset-0 flex items-center justify-center">
           <modeInfo.icon className="size-10 text-muted-foreground/30" />
         </div>
@@ -99,8 +232,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 <Edit className="mr-2 size-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer rounded-lg" variant="destructive">
-                <Trash2 className="mr-2 size-4" /> Delete
+              <DropdownMenuItem
+                className="cursor-pointer rounded-lg"
+                variant="destructive"
+                disabled={busy}
+                onClick={handleSoftDelete}
+              >
+                <Trash2 className="mr-2 size-4" /> Move to Trash
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
