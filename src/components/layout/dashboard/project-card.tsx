@@ -25,6 +25,7 @@ import { softDeleteProject } from "@/lib/delete-project"
 import { restoreProject } from "@/lib/restore-project"
 import { forceDeleteProject } from "@/lib/force-delete-project-api"
 import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
+import { toastProject } from "@/lib/toast"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -99,9 +100,7 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
   async function handleSoftDelete() {
     setBusy(true)
     try {
-      await softDeleteProject(project.id)
-    } catch (err) {
-      console.error('[ProjectCard] Failed to move to trash:', err)
+      await toastProject.delete(softDeleteProject(project.id))
     } finally {
       setBusy(false)
     }
@@ -110,9 +109,7 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
   async function handleRestore() {
     setBusy(true)
     try {
-      await restoreProject(project.id)
-    } catch (err) {
-      console.error('[ProjectCard] Failed to restore project:', err)
+      await toastProject.restore(restoreProject(project.id))
     } finally {
       setBusy(false)
     }
@@ -121,9 +118,7 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
   async function handleForceDelete() {
     setBusy(true)
     try {
-      await forceDeleteProject(project.id)
-    } catch (err) {
-      console.error('[ProjectCard] Failed to permanently delete project:', err)
+      await toastProject.forceDelete(forceDeleteProject(project.id))
     } finally {
       setBusy(false)
       setConfirmOpen(false)
@@ -219,10 +214,12 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
             <Edit className="mr-1.5 size-3.5" />
             Edit
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-full shadow-md">
-            <Eye className="mr-1.5 size-3.5" />
-            View
-          </Button>
+          {project.isPublished && (
+            <Button variant="secondary" size="sm" className="rounded-full shadow-md">
+              <Eye className="mr-1.5 size-3.5" />
+              View
+            </Button>
+          )}
         </div>
 
         {/* More menu */}
@@ -235,9 +232,11 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl">
-              <DropdownMenuItem className="cursor-pointer rounded-lg">
-                <Eye className="mr-2 size-4" /> View
-              </DropdownMenuItem>
+              {project.isPublished && (
+                <DropdownMenuItem className="cursor-pointer rounded-lg">
+                  <Eye className="mr-2 size-4" /> View
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
                 <Edit className="mr-2 size-4" /> Edit
               </DropdownMenuItem>

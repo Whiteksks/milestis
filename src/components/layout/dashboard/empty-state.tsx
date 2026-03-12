@@ -1,9 +1,13 @@
 "use client"
 
-import { BookOpen } from "lucide-react"
+import { BookOpen, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useCreateProject } from "@/hooks/useCreateProject"
 
 export function EmptyState() {
+  const { handleCreate, loadingMode } = useCreateProject()
+  const loading = loadingMode === "photobook"
+
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="flex size-14 items-center justify-center rounded-xl bg-secondary">
@@ -13,7 +17,10 @@ export function EmptyState() {
       <p className="mt-2 max-w-xs text-sm text-muted-foreground">
         Create your first memory book to get started.
       </p>
-      <Button className="mt-6 rounded-full px-8">Create Memory Book</Button>
+      <Button className="mt-6 rounded-full px-8 gap-2" disabled={loading} onClick={() => handleCreate("photobook")}>
+        {loading && <Loader2 className="size-4 animate-spin" />}
+        Create Memory Book
+      </Button>
     </div>
   )
 }

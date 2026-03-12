@@ -30,5 +30,4 @@ export const useSectionContent = () =>
 export const useThemeBasics = () =>
   useThemeSelector((state) => ({
     currentTheme: state.currentTheme,
-    frameStyle: state.frameStyle,
   }))

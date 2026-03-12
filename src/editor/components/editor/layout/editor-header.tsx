@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { useUiSelector } from '@/editor/lib/store'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2, ChevronRight } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2, ChevronRight, Home } from 'lucide-react'
 import { saveProject } from '@/lib/save-project'
 import { renameProject } from '@/lib/rename-project'
 
@@ -18,6 +19,9 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
+  const params = useParams()
+  const router = useRouter()
+  const locale = params.locale as string
 
   const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName } = useUiSelector((state) => ({
     deviceView: state.deviceView,
@@ -64,6 +68,15 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       <div className="h-full flex items-center px-6 justify-between">
         {/* LEFT */}
         <div className="flex items-center gap-2 min-w-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push(`/${locale}/dashboard`)}
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0"
+            title="Back to Dashboard"
+          >
+            <Home className="h-3.5 w-3.5" />
+          </Button>
           <span className="font-serif text-base font-medium text-foreground tracking-tight select-none shrink-0">
             Milestis
           </span>

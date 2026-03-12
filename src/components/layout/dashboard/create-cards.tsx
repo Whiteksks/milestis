@@ -1,21 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter, useParams } from "next/navigation"
 import { BookOpen, Layout, Sparkles, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { createProject } from "@/lib/create-project-api"
+import { useCreateProject } from "@/hooks/useCreateProject"
 
 type ProjectMode = "portfolio" | "photobook"
-
-const adjectives = ["golden", "summer", "bright", "quiet", "fresh", "warm", "misty", "tender", "vivid", "calm", "gentle", "secret", "serene", "radiant", "timeless"]
-const nouns = ["memories", "journey", "story", "moments", "chapter", "escape", "lens", "voyage", "canvas", "light", "bloom", "horizon", "portrait", "archive", "collection"]
-
-function randomProjectName(): string {
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]
-  const noun = nouns[Math.floor(Math.random() * nouns.length)]
-  return `${adj} ${noun}`
-}
 
 const cards: { mode: ProjectMode; icon: typeof BookOpen; title: string; description: string; badge: string | null; secondary: string }[] = [
   {
@@ -37,23 +26,7 @@ const cards: { mode: ProjectMode; icon: typeof BookOpen; title: string; descript
 ]
 
 export function CreateCards() {
-  const router = useRouter()
-  const params = useParams()
-  const locale = params.locale as string
-
-  const [loadingMode, setLoadingMode] = useState<ProjectMode | null>(null)
-
-  async function handleCreate(mode: ProjectMode) {
-    if (loadingMode) return
-    setLoadingMode(mode)
-    try {
-      const projectId = await createProject(randomProjectName(), mode)
-      router.push(`/${locale}/design/${projectId}/edit`)
-    } catch (err) {
-      console.error('[CreateCards] Failed to create project:', err)
-      setLoadingMode(null)
-    }
-  }
+  const { handleCreate, loadingMode } = useCreateProject()
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

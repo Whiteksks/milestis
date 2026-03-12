@@ -3,8 +3,9 @@
 import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react"
 import { useWindowVirtualizer } from "@tanstack/react-virtual"
 import type { DashboardProject } from "@/hooks/useProjects"
-import { Plus, Search, BookOpen, Layout, Trash2 } from "lucide-react"
+import { Search, BookOpen, Layout, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useCreateProject } from "@/hooks/useCreateProject"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -98,6 +99,7 @@ function TrashEmpty() {
 
 export function ProjectsPage() {
   const { activeProjects, trashedProjects, loading } = useProjects()
+  const { handleCreate, loadingMode } = useCreateProject()
   const [view, setView] = useState<"active" | "trash">("active")
   const [activeTab, setActiveTab] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -135,12 +137,21 @@ export function ProjectsPage() {
         <div className="flex gap-2">
           {view === "active" && (
             <>
-              <Button variant="outline" className="rounded-full bg-transparent">
-                <Layout className="mr-2 size-4" />
+              <Button
+                variant="outline"
+                className="rounded-full bg-transparent gap-2"
+                disabled={!!loadingMode}
+                onClick={() => handleCreate("portfolio")}
+              >
+                {loadingMode === "portfolio" ? <Loader2 className="size-4 animate-spin" /> : <Layout className="size-4" />}
                 Create Portfolio
               </Button>
-              <Button className="rounded-full">
-                <BookOpen className="mr-2 size-4" />
+              <Button
+                className="rounded-full gap-2"
+                disabled={!!loadingMode}
+                onClick={() => handleCreate("photobook")}
+              >
+                {loadingMode === "photobook" ? <Loader2 className="size-4 animate-spin" /> : <BookOpen className="size-4" />}
                 Create Photobook
               </Button>
             </>

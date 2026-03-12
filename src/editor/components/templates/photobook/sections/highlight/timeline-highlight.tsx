@@ -60,8 +60,8 @@ export function TimelineHighlight({ sectionContent, theme }: TimelineHighlightPr
                   <PhotoBlockUI
                     block={sectionContent.highlight.images}
                     fallbackAspect="landscape"
-                    fallbackFrame={frameStyle}
-                  />"soft"
+                    fallbackFrame="soft"
+                  />
                 </div>
               </div>
             )}

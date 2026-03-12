@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
+import { Toaster } from '@/components/ui/sonner';
 
 export default async function RootLayout({
   children,
@@ -24,6 +25,7 @@ export default async function RootLayout({
         disableTransitionOnChange
       >
         {children}
+        <Toaster position="bottom-right" richColors closeButton />
       </ThemeProvider>
     </NextIntlClientProvider>
   );
