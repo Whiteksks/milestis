@@ -21,7 +21,7 @@ import Image from 'next/image'
 
 interface MediaPickerModalProps {
   ownerId: string
-  onSelectImage?: (url: string) => void
+  onSelectImage?: (url: string, thumbUrl?: string) => void
   onSelectImages?: (urls: string[]) => void
 }
 
@@ -71,7 +71,10 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
       if (isMultiSelect && onSelectImages) {
         onSelectImages(selectedUrls)
       } else if (!isMultiSelect && onSelectImage) {
-        onSelectImage(selectedUrls[0])
+        const selectedFullUrl = selectedUrls[0]
+        const selectedImage = firestoreImages.find((img) => getSelectUrl(img) === selectedFullUrl)
+        const thumbUrl = selectedImage ? getDisplayUrl(selectedImage) : undefined
+        onSelectImage(selectedFullUrl, thumbUrl)
       }
     }
     setSelectedUrls([])

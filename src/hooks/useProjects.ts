@@ -13,6 +13,16 @@ export interface DashboardProject {
   updatedAt: Date
   deletedAt?: Date
   purgeAt?: Date
+  preview?: {
+    themeId: string
+    templateId: string
+    heroImageUrl?: string
+    title?: string
+    subtitle?: string
+    date?: string
+    aspectRatio?: string
+    frameStyle?: string
+  }
 }
 
 export function useProjects() {
@@ -51,6 +61,7 @@ export function useProjects() {
             updatedAt: data.updatedAt?.toDate() ?? new Date(),
             deletedAt: data.deletedAt?.toDate(),
             purgeAt: data.purgeAt?.toDate(),
+            preview: data.preview ?? undefined,
           }
         })
         // Sort by updatedAt descending on the client — avoids composite index

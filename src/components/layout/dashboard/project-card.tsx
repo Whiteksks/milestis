@@ -24,6 +24,7 @@ import type { DashboardProject } from "@/hooks/useProjects"
 import { softDeleteProject } from "@/lib/delete-project"
 import { restoreProject } from "@/lib/restore-project"
 import { forceDeleteProject } from "@/lib/force-delete-project-api"
+import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -122,8 +123,17 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
         <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 opacity-80 hover:opacity-100 transition-opacity">
           {/* Thumbnail */}
           <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <modeInfo.icon className="size-10 text-muted-foreground/20" />
+            <div className="absolute inset-0">
+              <TemplatePreview
+                themeId={project.preview?.themeId}
+                templateId={project.preview?.templateId}
+                heroImageUrl={project.preview?.heroImageUrl}
+                title={project.preview?.title}
+                subtitle={project.preview?.subtitle}
+                date={project.preview?.date}
+                aspectRatio={project.preview?.aspectRatio}
+                frameStyle={project.preview?.frameStyle}
+              />
             </div>
             {/* Overlay */}
             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
@@ -199,8 +209,17 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
     <div className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
       {/* Thumbnail area */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <modeInfo.icon className="size-10 text-muted-foreground/30" />
+        <div className="absolute inset-0">
+          <TemplatePreview
+            themeId={project.preview?.themeId}
+            templateId={project.preview?.templateId}
+            heroImageUrl={project.preview?.heroImageUrl}
+            title={project.preview?.title}
+            subtitle={project.preview?.subtitle}
+            date={project.preview?.date}
+            aspectRatio={project.preview?.aspectRatio}
+            frameStyle={project.preview?.frameStyle}
+          />
         </div>
 
         {/* Hover action overlay */}

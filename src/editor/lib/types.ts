@@ -81,6 +81,7 @@ export interface SectionContent {
     subtitle: string
     description: string
     image?: string
+    heroThumb?: string
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
     cropData?: import('./crop-data').ImageCropData
@@ -211,6 +212,7 @@ export interface PhotobookSlot {
 export interface PhotoBlock {
   id: string
   image: string
+  thumbUrl?: string
   caption?: string
   imageSettings: Array<{
     aspectRatio?: AspectRatio

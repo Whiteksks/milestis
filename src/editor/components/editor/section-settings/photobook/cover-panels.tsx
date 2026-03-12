@@ -84,11 +84,12 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
     <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url) =>
+        onSelectImage={(url, thumbUrl) =>
           updatePhotobookSection("cover", {
             images: {
               id: cover.images?.id || "cover-main",
               image: url,
+              thumbUrl,
               caption: cover.images?.caption || "",
               imageSettings:
                 cover.images?.imageSettings?.length

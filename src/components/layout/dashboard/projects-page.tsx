@@ -1,6 +1,8 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react"
+import { useWindowVirtualizer } from "@tanstack/react-virtual"
+import type { DashboardProject } from "@/hooks/useProjects"
 import { Plus, Search, BookOpen, Layout, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +12,65 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"
 import { EmptyState } from "@/components/layout/dashboard/empty-state"
 import { useProjects } from "@/hooks/useProjects"
+
+// ─── Virtual grid ─────────────────────────────────────────────────────────────
+
+function VirtualProjectGrid({ projects, trash = false }: { projects: DashboardProject[]; trash?: boolean }) {
+  const parentRef = useRef<HTMLDivElement>(null)
+  const [scrollMargin, setScrollMargin] = useState(0)
+  const [cols, setCols] = useState(2)
+
+  useLayoutEffect(() => {
+    setScrollMargin(parentRef.current?.offsetTop ?? 0)
+  }, [])
+
+  useEffect(() => {
+    const el = parentRef.current
+    if (!el) return
+    const obs = new ResizeObserver(([entry]) => {
+      setCols(entry.contentRect.width >= 1024 ? 3 : 2)
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  const rows = useMemo(() => {
+    const result: DashboardProject[][] = []
+    for (let i = 0; i < projects.length; i += cols) {
+      result.push(projects.slice(i, i + cols))
+    }
+    return result
+  }, [projects, cols])
+
+  const virtualizer = useWindowVirtualizer({
+    count: rows.length,
+    estimateSize: () => 300,
+    overscan: 3,
+    scrollMargin,
+  })
+
+  return (
+    <div ref={parentRef}>
+      <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        {virtualizer.getVirtualItems().map((virtualRow) => (
+          <div
+            key={virtualRow.key}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
+            className="absolute top-0 left-0 w-full"
+            style={{ transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)` }}
+          >
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 pb-4">
+              {rows[virtualRow.index].map((project) => (
+                <ProjectCard key={project.id} project={project} trash={trash} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function NoResults() {
   return (
@@ -178,22 +239,14 @@ export function ProjectsPage() {
         filteredTrash.length === 0 ? (
           <TrashEmpty />
         ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            {filteredTrash.map((project) => (
-              <ProjectCard key={project.id} project={project} trash />
-            ))}
-          </div>
+          <VirtualProjectGrid projects={filteredTrash} trash />
         )
       ) : activeProjects.length === 0 ? (
         <EmptyState />
       ) : filteredActive.length === 0 ? (
         <NoResults />
       ) : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-          {filteredActive.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        <VirtualProjectGrid projects={filteredActive} />
       )}
 
     </div>

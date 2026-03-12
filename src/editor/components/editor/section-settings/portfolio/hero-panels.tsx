@@ -69,7 +69,7 @@ export function HeroImagePanel({ dense = false }: { dense?: boolean }) {
     <div className={ps.root(dense)}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url) => updateSectionContent("hero", { image: url })}
+        onSelectImage={(url, thumbUrl) => updateSectionContent("hero", { image: url, heroThumb: thumbUrl })}
       />
       {!dense && <PanelLabel>Hero Image</PanelLabel>}
       <PortfolioImagePicker
