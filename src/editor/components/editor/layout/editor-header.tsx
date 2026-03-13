@@ -40,6 +40,11 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     setLocalName(projectName ?? '')
   }, [projectName])
 
+  // When new changes arrive after a save, reset the check icon back to upload icon
+  useEffect(() => {
+    if (isDirty && saveState === 'saved') setSaveState('idle')
+  }, [isDirty, saveState])
+
   async function handleRename() {
     const trimmed = localName.trim()
     if (!trimmed) { setLocalName(projectName ?? ''); return }
@@ -63,7 +68,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     } catch (err) {
       console.error('[Save] Failed to save project:', err)
       setSaveState('error')
-      setTimeout(() => setSaveState('idle'), 2500)
+      setTimeout(() => setSaveState('idle'), 2000)
     }
   }
 
@@ -71,6 +76,19 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     await autoSave()
     router.push(`/${locale}/dashboard`)
   }
+
+  // Ctrl+S / Cmd+S — triggers full visual animation
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        handleSave()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <header className="relative h-16 border-b border-border/80 bg-card/95 z-50 shadow-[0_2px_16px_0_hsl(var(--foreground)/0.06)]">
@@ -84,12 +102,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0"
             title="Back to Dashboard"
           >
-            <Home className="h-3.5 w-3.5" />
+            <Home className="size-4" />
           </Button>
           <span className="font-serif text-base font-medium text-foreground tracking-tight select-none shrink-0">
             Milestis
           </span>
-          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+          <ChevronRight className="size-4 text-muted-foreground/50 shrink-0" />
           <input
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
@@ -99,41 +117,40 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }
             }}
             placeholder="Untitled"
-            className="min-w-0 w-36 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 rounded-md border border-transparent hover:border-border/50 focus:border-border focus:bg-muted/30 focus:outline-none transition-colors truncate"
+            className="min-w-0 w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border  focus:outline-none transition-colors truncate"
           />
-          {/* Inline save icon — visible only when dirty/saving/saved */}
+          {/* Inline save icon — always visible, color reflects save state */}
           <Button
             variant="ghost"
-            size="icon"
+            size="lg"
             onClick={handleSave}
             disabled={saveState === 'saving'}
             title="Save (Ctrl+S)"
             className={[
-              'h-6 w-6 rounded-full transition-all shrink-0',
-              saveState === 'idle' && !isDirty ? 'invisible pointer-events-none' : '',
+              'h-8 w-6 rounded-full transition-colors shrink-0',
               saveState === 'saved' ? 'text-emerald-500 hover:text-emerald-500' :
               saveState === 'error' ? 'text-destructive hover:text-destructive' :
-              'text-muted-foreground hover:text-foreground',
+              'text-muted-foreground/70 hover:text-foreground',
             ].join(' ')}
           >
             {saveState === 'saving' ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : saveState === 'saved' ? (
-              <Check className="h-3 w-3" />
+              <Check className="size-4" />
             ) : (
-              <CloudUpload className="h-3 w-3" />
+              <CloudUpload className="size-4.5" />
             )}
           </Button>
         </div>
 
         {/* CENTER — VIEWPORT */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-2xs border border-border/30">
+          <div className="hidden md:flex items-center gap-0.5 p-1 bg-muted/40 rounded-lg border border-border/30">
             <ToggleGroup
               type="single"
               value={deviceView}
               onValueChange={(v) => { if (v) setDeviceView(v as DeviceView) }}
-              className="gap-0"
+              className="gap-2"
             >
               {[
                 { id: 'desktop', icon: Monitor, label: 'Desktop' },
@@ -145,9 +162,9 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   key={id}
                   value={id}
                   title={label}
-                  className="h-6 w-8 p-0 rounded-full data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm data-[state=off]:text-muted-foreground hover:text-foreground border-0"
+                  className="h-6 w-6 !rounded-lg data-[state=on]:bg-accent/80 text-muted-foreground hover:text-foreground data-[state=on]:text-foreground"
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="size-4" />
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
