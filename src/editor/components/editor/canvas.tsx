@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useMemo, useLayoutEffect, useState, memo, type CSSProperties } from 'react'
+import { useRef, useMemo, useLayoutEffect, useState, useEffect, memo, type CSSProperties } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
+import { useUiStore } from '@/editor/lib/store-ui'
 import { getTheme } from '@/editor/lib/themes'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import { cn } from '@/lib/utils'
@@ -12,6 +13,7 @@ import { FloatingToolbar } from '@/editor/components/editor/layout/FloatingActio
 import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/decorations-floating-toolbar'
 import { SectionsToolbarPanel } from '@/editor/components/editor/layout/FloatingActions/sections-floating-menu'
 import { ThemeFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/theme-floating-toolbar'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 // Stable panel components — defined outside Canvas so they are never recreated on re-render.
 // SectionsToolbarPanel and ThemeFloatingToolbar have no props that change per Canvas render.
@@ -23,6 +25,9 @@ const StableThemePanel = memo(function StableThemePanel() {
 })
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
+  // 'mobile' preview on desktop: constrain to phone width for realistic preview.
+  // On a real mobile device (isMobile=true) the canvas uses w-full without a max-width
+  // cap so it fills the screen rather than being narrower than the actual device.
   mobile: 'max-w-sm w-full',
   tablet: 'w-full max-w-4xl',
   desktop: 'w-full max-w-7xl',
@@ -40,6 +45,19 @@ export function Canvas({
   const internalScrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = externalScrollContainerRef ?? internalScrollContainerRef
   const [scrollbarWidth, setScrollbarWidth] = useState(0)
+
+  const isMobile = useIsMobile()
+  const setDeviceView = useUiStore((s) => s.setDeviceView)
+
+  // On a real mobile device, auto-switch deviceView to 'mobile' on first load.
+  // This ensures responsiveScale decorations apply the correct scale factor,
+  // and prevents the canvas from being narrower than the actual screen.
+  useEffect(() => {
+    if (isMobile === true) {
+      setDeviceView('mobile')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile])
 
   const { deviceView, editorMode, previewDecorations } = useUiSelector(state => ({
     deviceView: state.deviceView,
@@ -123,7 +141,9 @@ export function Canvas({
           // transition-all would animate every CSS property; restrict to max-width only.
           // will-change-transform promotes to compositor layer for smooth device-view switching.
           '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
-          DEVICE_CLASSES[deviceView],
+          // On a real mobile device in 'mobile' view: fill the full screen width.
+          // On desktop in 'mobile' preview: use max-w-sm to simulate phone dimensions.
+          deviceView === 'mobile' && isMobile === true ? 'w-full' : DEVICE_CLASSES[deviceView],
           // Background always lives on the viewport div so decorative layers (z-0 absolute)
           // remain BEHIND content in both fixed and scroll modes.
           theme.background,

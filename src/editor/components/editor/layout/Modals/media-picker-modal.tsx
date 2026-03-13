@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Check, Upload, Loader2 } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
@@ -64,16 +64,29 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
   const [uploading, setUploading] = useState<UploadingEntry[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const isMultiSelect = !!onSelectImages
-  const isOpen = isMediaPickerOpen && mediaPickerOwnerId === ownerId
-
+  // Blur the trigger button when the drawer opens to prevent aria-hidden warning
+  // (Vaul sets aria-hidden on the background while a focused element remains there)
   const handleOpenChange = (open: boolean) => {
-    if (open) openMediaPicker(ownerId)
-    else {
+    if (open) {
+      openMediaPicker(ownerId);
+      (document.activeElement as HTMLElement)?.blur()
+    } else {
       setSelectedUrls([])
       closeMediaPicker()
     }
   }
+
+  const isMultiSelect = !!onSelectImages
+  const isOpen = isMediaPickerOpen && mediaPickerOwnerId === ownerId
+
+  // Blur the focused trigger element the moment the drawer opens.
+  // Vaul (shadcn Drawer) sets aria-hidden on the background container — if the
+  // trigger button still holds focus at that point the browser emits a warning.
+  useEffect(() => {
+    if (isOpen && isMobile) {
+      ;(document.activeElement as HTMLElement)?.blur()
+    }
+  }, [isOpen, isMobile])
 
   const handleConfirm = () => {
     if (selectedUrls.length > 0) {

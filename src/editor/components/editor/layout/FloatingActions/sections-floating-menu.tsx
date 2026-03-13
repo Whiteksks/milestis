@@ -57,7 +57,7 @@ export function SectionsToolbarPanel() {
             <ChevronDown className="w-3 h-3 shrink-0" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent side="top" sideOffset={8} align="start" className="w-56 p-2 rounded-2xl border-border/60 shadow-lg">
+        <PopoverContent side="top" sideOffset={8} align="start" className="w-56 p-2 rounded-2xl border-border/60 shadow-lg m-1">
           <div className="space-y-0.5">
             {sections.map((section) => (
               <div
@@ -129,7 +129,7 @@ export function SectionsToolbarPanel() {
                     <action.Icon className="w-3.5 h-3.5" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent side="top" sideOffset={8} align="start" className="w-80 p-4 rounded-2xl border-border/60 shadow-lg">
+                <PopoverContent side="top" sideOffset={8} align="center" className="w-80 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                   <action.Panel dense />
                 </PopoverContent>
               </Popover>

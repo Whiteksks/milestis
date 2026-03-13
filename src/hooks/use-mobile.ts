@@ -15,5 +15,6 @@ export function useIsMobile() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return !!isMobile
+  // Returns undefined until mounted — consumers should treat undefined as "not yet known"
+  return isMobile
 }

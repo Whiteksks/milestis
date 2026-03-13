@@ -46,32 +46,29 @@ export const FloatingToolbar = memo(function FloatingToolbar({
         {panel && (
           <motion.div
             key={tab}
-            initial={{ opacity: 0, y: 10, scale: 0.95, borderRadius: targetRadius }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{
               opacity: 1,
-              scale: 1,
               y: docked
-                ? 0          // desktop: flush with viewport bottom
+                ? 0
                 : mobileDocked
-                  ? 8        // mobile docked: +8px closes the gap that opens when nav snaps to y:0
-                  : -8,      // floating: lift 8px off the bottom edge
-              borderRadius: targetRadius,
+                  ? 8
+                  : -8,
             }}
-            exit={{ opacity: 0, y: 10, scale: 0.95, borderRadius: targetRadius }}
+            exit={{ opacity: 0, y: 16 }}
             transition={{
-              opacity: { duration: 0.15, ease: "easeOut" },
-                scale: { duration: 0.15, ease: "easeOut" },
-              y: { type: "spring", stiffness: 350, damping: 35 },
-              borderRadius: { type: "spring", stiffness: 350, damping: 35 },
+              opacity: { duration: 0.12, ease: "easeOut"},
+                y: { type: "spring", stiffness: 300, damping: 30, mass: 0.8 },
             }}
+            style={{ borderRadius: targetRadius }}
             className={cn(
               "pointer-events-auto",
               "bg-card/75 backdrop-blur-md",
               "border border-foreground/40",
-              // Remove bottom border when docked on mobile so it merges seamlessly with nav
               mobileDocked && "border-b-0",
               "md:p-0.5 mb-14 md:mb-0",
               "flex gap-0",
+              "transform-gpu will-change-transform will-change-opacity"
             )}
             onPointerDown={(e) => e.stopPropagation()}
           >

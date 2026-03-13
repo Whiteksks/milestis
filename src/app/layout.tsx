@@ -40,6 +40,7 @@ export default async function RootLayout({
     <html lang={locale ?? 'ru'} suppressHydrationWarning>
       <body
         className={`${alice.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} font-sans antialiased`}
+        suppressHydrationWarning
       >
         <FirebaseInitializer />
         {children}

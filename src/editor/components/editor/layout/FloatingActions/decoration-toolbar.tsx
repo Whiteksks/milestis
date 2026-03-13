@@ -269,7 +269,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                   <Maximize2 className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 <div className="flex items-center justify-between mb-3">
                   <Label className="text-xs text-muted-foreground">Scale</Label>
                   <span className="text-xs tabular-nums text-muted-foreground">{scalePercent}%</span>
@@ -291,7 +291,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                   <OpacityIcon percent={opacityPercent} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg">
+              <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 <div className="flex items-center justify-between mb-3">
                   <Label className="text-xs text-muted-foreground">Opacity</Label>
                   <span className="text-xs tabular-nums text-muted-foreground">{opacityPercent}%</span>
@@ -336,7 +336,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent side="top" sideOffset={10} className="w-72 p-4 rounded-2xl border-border/60 shadow-lg">
+              <PopoverContent side="top" sideOffset={10} className="w-72 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 {/* Decoration Selector — единый источник, тот же DecorationPicker */}
                 <div className="mb-4">
                   <Label className="text-xs text-muted-foreground mb-2 block">Decoration</Label>
