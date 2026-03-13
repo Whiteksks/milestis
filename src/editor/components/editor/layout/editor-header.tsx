@@ -7,9 +7,10 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Save, Check, Loader2, ChevronRight, Home } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Check, Loader2, ChevronRight, Home, CloudUpload } from 'lucide-react'
 import { saveProject } from '@/lib/save-project'
 import { renameProject } from '@/lib/rename-project'
+import { useAutoSave } from '@/hooks/useAutoSave'
 
 interface EditorHeaderProps {
   projectId: string
@@ -22,13 +23,15 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
+  const { save: autoSave, isDirty } = useAutoSave(projectId)
 
-  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName } = useUiSelector((state) => ({
+  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
     toggleMediaLibrary: state.toggleMediaLibrary,
     projectName: state.projectName,
     setProjectName: state.setProjectName,
+    markClean: state.markClean,
   }))
 
   const [localName, setLocalName] = useState(projectName ?? '')
@@ -54,6 +57,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     setSaveState('saving')
     try {
       await saveProject(projectId)
+      markClean()
       setSaveState('saved')
       setTimeout(() => setSaveState('idle'), 2000)
     } catch (err) {
@@ -61,6 +65,11 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       setSaveState('error')
       setTimeout(() => setSaveState('idle'), 2500)
     }
+  }
+
+  async function handleHomeClick() {
+    await autoSave()
+    router.push(`/${locale}/dashboard`)
   }
 
   return (
@@ -71,7 +80,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push(`/${locale}/dashboard`)}
+            onClick={handleHomeClick}
             className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0"
             title="Back to Dashboard"
           >
@@ -92,6 +101,29 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             placeholder="Untitled"
             className="min-w-0 w-36 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 rounded-md border border-transparent hover:border-border/50 focus:border-border focus:bg-muted/30 focus:outline-none transition-colors truncate"
           />
+          {/* Inline save icon — visible only when dirty/saving/saved */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSave}
+            disabled={saveState === 'saving'}
+            title="Save (Ctrl+S)"
+            className={[
+              'h-6 w-6 rounded-full transition-all shrink-0',
+              saveState === 'idle' && !isDirty ? 'invisible pointer-events-none' : '',
+              saveState === 'saved' ? 'text-emerald-500 hover:text-emerald-500' :
+              saveState === 'error' ? 'text-destructive hover:text-destructive' :
+              'text-muted-foreground hover:text-foreground',
+            ].join(' ')}
+          >
+            {saveState === 'saving' ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : saveState === 'saved' ? (
+              <Check className="h-3 w-3" />
+            ) : (
+              <CloudUpload className="h-3 w-3" />
+            )}
+          </Button>
         </div>
 
         {/* CENTER — VIEWPORT */}
@@ -150,53 +182,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
           <Button
             size="sm"
-            variant="ghost"
-            onClick={handleSave}
-            disabled={saveState === 'saving'}
-            className={[
-              "gap-2 hidden sm:inline-flex rounded-full h-8 px-4 transition-all text-xs font-medium",
-              saveState === 'saved'
-                ? "text-emerald-600 hover:text-emerald-600"
-                : saveState === 'error'
-                ? "text-destructive hover:text-destructive"
-                : "text-muted-foreground hover:text-foreground"
-            ].join(' ')}
-          >
-            {saveState === 'saving' ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : saveState === 'saved' ? (
-              <Check className="h-3.5 w-3.5" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
-            {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved' : saveState === 'error' ? 'Error' : 'Save'}
-          </Button>
-
-          <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
-
-          <Button
-            size="sm"
             className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
           >
             <Upload className="h-3 w-3" />
             Publish
-          </Button>
-
-          {/* Mobile */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSave}
-            disabled={saveState === 'saving'}
-            className="h-8 w-8 sm:hidden rounded-full text-muted-foreground"
-          >
-            {saveState === 'saving' ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : saveState === 'saved' ? (
-              <Check className="h-4 w-4 text-emerald-600" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
           </Button>
         </div>
       </div>
