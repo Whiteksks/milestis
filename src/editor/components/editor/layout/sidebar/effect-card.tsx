@@ -14,9 +14,17 @@ interface EffectCardProps {
   value: string
   options: EffectOption[]
   onChange: (value: string) => void
+  columns?: 2 | 3 | 4 | 5
 }
 
-export function EffectCard({ label, description, value, options, onChange }: EffectCardProps) {
+const COLS: Record<number, string> = {
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+  5: 'grid-cols-5',
+}
+
+export function EffectCard({ label, description, value, options, onChange, columns = 3 }: EffectCardProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-start gap-2.5 px-1">
@@ -35,7 +43,7 @@ export function EffectCard({ label, description, value, options, onChange }: Eff
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className={cn('grid gap-1.5', COLS[columns])}>
         {options.map((opt) => {
           const isActive = value === opt.id
           const isNone = opt.id === "none"

@@ -29,6 +29,7 @@ import {
   FlipVertical,
   Maximize2,
   MoreVertical,
+  Plus,
   Trash2,
   ChevronDown,
   ChevronLeft,
@@ -141,6 +142,7 @@ export interface DecorationToolbarProps {
   onOpenSettings: () => void
   onSelectDecoration?: (id: string) => void
   onLocate?: () => void // прокрутить к элементу на canvas
+  onAddDecoration?: () => void
   className?: string
 }
 
@@ -156,6 +158,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   onOpenSettings,
   onSelectDecoration,
   onLocate,
+  onAddDecoration,
   className,
 }: DecorationToolbarProps) {
   const fallbackOwnerId = useId()
@@ -194,6 +197,21 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             transition={{ duration: 0.14, ease: "easeOut" }}
             className="flex items-center gap-0"
           >
+            {/* Add decoration */}
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onAddDecoration}
+              aria-label="Add decoration"
+              title="Add decoration"
+              className={ICON_BTN}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+
+            <Separator orientation="vertical" className={SEP} />
+
+            {/* Active decoration picker */}
             <DecorationPicker
               decorations={decorations}
               activeDecorationId={activeDecorationId}
