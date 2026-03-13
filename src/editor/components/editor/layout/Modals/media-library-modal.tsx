@@ -4,9 +4,10 @@ import { useUiSelector } from '@/editor/lib/store'
 import { useUiStore } from '@/editor/lib/store-ui'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useProjectImages, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
-import { db, storage } from '@/lib/firebase'
+import { storage } from '@/lib/firebase'
 import { ref as storageRef, uploadBytes } from 'firebase/storage'
-import { addDoc, deleteDoc, doc, collection, serverTimestamp } from 'firebase/firestore'
+import { deleteDoc, doc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import {
   Dialog,
   DialogContent,
@@ -15,9 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Upload, Sparkles, X, Check, Loader2 } from 'lucide-react'
+import { Upload, X, Check, Loader2, Images } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -53,7 +52,6 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   const uid = useUserStore((s) => s.profile?.uid)
   const firestoreImages = useProjectImages()
 
-  const [urlInput, setUrlInput] = useState('')
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState<UploadingEntry[]>([])
 
@@ -77,7 +75,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
             storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
             file,
           )
-          // Cloud Function creates the Firestore doc в†’ onSnapshot picks it up automatically
+
         } catch (err) {
           console.error('Upload failed:', err)
         } finally {
@@ -86,20 +84,6 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
         }
       }),
     )
-  }
-
-  const handleAddUrl = async () => {
-    if (!urlInput.trim() || !uid || !projectId) return
-    const url = urlInput.trim()
-    setUrlInput('')
-    await addDoc(collection(db, 'images'), {
-      ownerId: uid,
-      projectId,
-      type: 'url',
-      urls: { full: url },
-      name: 'External Image',
-      createdAt: serverTimestamp(),
-    })
   }
 
   const handleDelete = async (imageId: string) => {
@@ -120,78 +104,75 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   const totalCount = firestoreImages.length + uploading.length
 
-  // --- Upload row ---
-  const uploadRow = (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <Label className="text-xs font-medium text-foreground mb-2 block">Upload Image</Label>
-        <Button
-          variant="outline"
-          className="w-full h-24 border border-dashed border-border rounded-2xl bg-muted/30 hover:bg-muted hover:border-border transition-all text-muted-foreground hover:text-foreground"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="h-5 w-5" />
-            <span className="text-xs font-medium">Click to upload</span>
-          </div>
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*,image/svg+xml"
-          className="hidden"
-          onChange={handleFileUpload}
-        />
-      </div>
-
-      <div>
-        <Label className="text-xs font-medium text-foreground mb-2 block">Add from URL</Label>
-        <Input
-          placeholder="https://example.com/image.jpg"
-          value={urlInput}
-          onChange={(e) => setUrlInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
-          className="rounded-xl border-border focus-visible:ring-ring h-10"
-        />
-        <Button
-          onClick={handleAddUrl}
-          className="w-full mt-3 flex items-center justify-center gap-2 bg-foreground hover:bg-foreground/90 text-background rounded-xl h-10 shadow-md transition-all"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span className="text-xs font-medium">Add Image</span>
-        </Button>
-      </div>
-    </div>
+  const uploadInput = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      multiple
+      accept="image/*,image/svg+xml"
+      className="hidden"
+      onChange={handleFileUpload}
+    />
   )
 
-  const galleryArea = (
-    <div className="flex-1 min-h-0 flex flex-col mt-2">
-      <Label className="text-xs font-medium text-foreground mb-3 block">
-        Your Library <span className="text-muted-foreground ml-1">({totalCount})</span>
-      </Label>
+  const galleryContent = (
+    <div className="flex-1 min-h-0 flex flex-col">
+      {/* Toolbar row */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Images className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Library</span>
+          {totalCount > 0 && (
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full tabular-nums">
+              {totalCount}
+            </span>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 rounded-xl h-8 text-xs"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload className="h-3.5 w-3.5" />
+          Upload
+        </Button>
+        {uploadInput}
+      </div>
 
-      <div
-        className="flex-1 min-h-0 overflow-y-auto border border-border rounded-2xl p-4 bg-muted/30"
-        style={{ maxHeight: isMobile ? '45vh' : undefined }}
-      >
+      {/* Grid area */}
+      <div className="flex-1 min-h-0 overflow-y-auto border border-border rounded-2xl p-4 bg-muted/30">
         {totalCount === 0 ? (
-          <div className="flex items-center justify-center h-40 text-muted-foreground">
-            <div className="text-center">
-              <div className="h-12 w-12 bg-background rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-border">
-                <Upload className="h-5 w-5 text-muted-foreground/50" />
-              </div>
-              <p className="text-sm font-medium text-foreground">No images yet</p>
-              <p className="text-xs text-muted-foreground mt-1">Upload or add via URL</p>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center justify-center w-full h-48 gap-3 rounded-xl border-2 border-dashed border-border/60 bg-transparent text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/30 transition-all cursor-pointer"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted border border-border">
+              <Upload className="h-5 w-5" />
             </div>
-          </div>
+            <div className="text-center">
+              <p className="text-sm font-medium">Upload your first image</p>
+              <p className="text-xs text-muted-foreground mt-0.5">PNG, JPG, SVG supported</p>
+            </div>
+          </button>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {/* Upload tile always first */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="aspect-square rounded-xl border-2 border-dashed border-border/50 bg-transparent flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/30 transition-all cursor-pointer"
+            >
+              <Upload className="h-5 w-5" />
+              <span className="text-[11px] font-medium">Upload</span>
+            </button>
+
             {/* Uploading placeholders */}
             {uploading.map((u) => (
               <div
                 key={u.id}
-                className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40 flex items-center justify-center"
+                className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40"
               >
                 <Image
                   src={u.previewUrl}
@@ -263,7 +244,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   )
 
   const actionsBar = (
-    <div className="hidden md:flex justify-end gap-3 pt-6 border-t border-border/50 bg-transparent">
+    <div className="flex justify-end gap-3 pt-5 border-t border-border/50">
       <Button
         variant="ghost"
         onClick={toggleMediaLibrary}
@@ -286,22 +267,27 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   if (isMobile) {
     return (
       <MobileDrawer isOpen={isMediaLibraryOpen} onClose={toggleMediaLibrary} title="Media Library">
-        <div className="flex flex-col h-full min-h-0">
-          <div className="px-4 pb-2 border-b">
-            <div className="text-lg font-semibold">Media Library</div>
-            <div className="text-sm text-muted-foreground">
-              {mode === 'select'
-                ? 'Select an image for your gallery'
-                : 'Upload and manage your images'}
-            </div>
+        <div className="flex flex-col gap-4 pb-6">
+          {galleryContent}
+          <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleMediaLibrary}
+              className="rounded-xl text-muted-foreground hover:text-foreground"
+            >
+              {mode === 'select' ? 'Cancel' : 'Close'}
+            </Button>
+            {mode === 'select' && selectedImageUrl && (
+              <Button
+                size="sm"
+                onClick={handleConfirmSelection}
+                className="rounded-xl bg-foreground text-background"
+              >
+                Select Image
+              </Button>
+            )}
           </div>
-          <div className="pt-4 overflow-auto flex-1 min-h-0">
-            <div className="flex flex-col gap-4">
-              {uploadRow}
-              {galleryArea}
-            </div>
-          </div>
-          <div>{actionsBar}</div>
         </div>
       </MobileDrawer>
     )
@@ -310,23 +296,19 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   return (
     <Dialog open={isMediaLibraryOpen} onOpenChange={toggleMediaLibrary}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
-        <DialogHeader className="pb-6">
+        <DialogHeader className="pb-5">
           <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">
             Media Library
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {mode === 'select'
-              ? 'Select an image for your gallery'
-              : 'Upload and manage your images'}
+            {mode === 'select' ? 'Select an image for your project' : 'Upload and manage your project images'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6 flex-1 min-h-0 px-0">
-          {uploadRow}
-          {galleryArea}
+        <div className="flex flex-col flex-1 min-h-0">
+          {galleryContent}
+          {actionsBar}
         </div>
-
-        <div className="px-0">{actionsBar}</div>
       </DialogContent>
     </Dialog>
   )

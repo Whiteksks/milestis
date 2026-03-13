@@ -11,6 +11,7 @@ import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Check, Lo
 import { saveProject } from '@/lib/save-project'
 import { renameProject } from '@/lib/rename-project'
 import { useAutoSave } from '@/hooks/useAutoSave'
+import { toastProject } from '@/lib/toast'
 
 interface EditorHeaderProps {
   projectId: string
@@ -50,7 +51,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     if (!trimmed) { setLocalName(projectName ?? ''); return }
     if (trimmed === projectName) return
     try {
-      await renameProject(projectId, trimmed)
+      await toastProject.rename(renameProject(projectId, trimmed))
       setProjectName(trimmed)
     } catch {
       setLocalName(projectName ?? '')

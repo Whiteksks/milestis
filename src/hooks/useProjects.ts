@@ -8,7 +8,7 @@ export interface DashboardProject {
   id: string
   name: string
   mode: 'portfolio' | 'photobook'
-  status: 'active' | 'archived' | 'deleted'
+  status: 'active' | 'deleted'
   isPublished: boolean
   updatedAt: Date
   deletedAt?: Date

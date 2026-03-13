@@ -21,6 +21,8 @@ import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs
 import { useUiSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
+import { defaultPortfolioContent, defaultPortfolioVisibility } from '@/editor/lib/store-content-portfolio'
+import { defaultPhotobookContent, defaultPhotobookVisibility } from '@/editor/lib/store-content-photobook'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 
 type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
@@ -76,6 +78,21 @@ export default function EditorPage() {
             themeCustomizations: project.theme.themeCustomizations,
             customDecorations: project.theme.customDecorations ?? [],
           })
+        } else {
+          // New project — reset theme to defaults so previous project's theme doesn't bleed in
+          useThemeStore.setState({
+            currentTemplateId: 'editorial',
+            currentTheme: 'parchment',
+            themeCustomizations: {
+              decorationAnimation: 'fade',
+              depthEffect: 'none',
+              raysEffect: 'none',
+              textureEffect: 'none',
+              backgroundLayersTheme: 'dark',
+              backgroundScrollMode: 'fixed',
+            },
+            customDecorations: [],
+          })
         }
 
         // Rehydrate content store
@@ -89,6 +106,19 @@ export default function EditorPage() {
             useContentStore.setState({
               photobookSectionVisibility: project.content.sectionVisibility,
               photobookSectionContent: project.content.sectionContent,
+            })
+          }
+        } else {
+          // New project — reset content to defaults
+          if (project.mode === 'portfolio') {
+            useContentStore.setState({
+              sectionVisibility: defaultPortfolioVisibility,
+              sectionContent: defaultPortfolioContent,
+            })
+          } else {
+            useContentStore.setState({
+              photobookSectionVisibility: defaultPhotobookVisibility,
+              photobookSectionContent: defaultPhotobookContent,
             })
           }
         }

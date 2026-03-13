@@ -112,9 +112,8 @@ export function ProjectsPage() {
       (activeTab === "portfolios" && p.mode === "portfolio")
     const matchesStatus =
       statusFilter === "all" ||
-      (statusFilter === "draft" && !p.isPublished && p.status !== "archived") ||
-      (statusFilter === "published" && p.isPublished) ||
-      (statusFilter === "archived" && p.status === "archived")
+      (statusFilter === "draft" && !p.isPublished) ||
+      (statusFilter === "published" && p.isPublished)
     const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesTab && matchesStatus && matchesSearch
   })
@@ -205,7 +204,6 @@ export function ProjectsPage() {
                   <SelectItem value="all" className="rounded-lg">All Status</SelectItem>
                   <SelectItem value="draft" className="rounded-lg">Draft</SelectItem>
                   <SelectItem value="published" className="rounded-lg">Published</SelectItem>
-                  <SelectItem value="archived" className="rounded-lg">Archived</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -43,8 +43,7 @@ function formatRelativeDate(date: Date): string {
   return `${Math.floor(days / 30)}mo ago`
 }
 
-function deriveDisplayStatus(project: DashboardProject): "draft" | "published" | "archived" {
-  if (project.status === "archived") return "archived"
+function deriveDisplayStatus(project: DashboardProject): "draft" | "published" {
   if (project.isPublished) return "published"
   return "draft"
 }
@@ -61,7 +60,6 @@ const modeConfig = {
 const statusStyles = {
   draft: "bg-muted text-muted-foreground",
   published: "bg-primary/10 text-primary",
-  archived: "bg-secondary text-secondary-foreground",
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
