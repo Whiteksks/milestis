@@ -105,6 +105,40 @@ export const toastStorage = {
   },
 }
 
+// ─── User / Profile ────────────────────────────────────────────────────────
+
+export const toastUser = {
+  /** Save public profile fields (bio, location, social links…). */
+  saveProfile<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Saving profile…",
+      success: "Profile saved",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to save profile",
+    })
+  },
+
+  /** Update display name. */
+  saveName<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Saving…",
+      success: "Name updated",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to update name",
+    })
+  },
+
+  /** Save account settings (notifications, preferences…). */
+  saveSettings<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Saving…",
+      success: "Settings saved",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to save settings",
+    })
+  },
+}
+
 // ─── Generic helpers ───────────────────────────────────────────────────────
 
 /** Re-export raw toast so you can still call toast.success() etc. anywhere. */

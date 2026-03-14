@@ -1,12 +1,12 @@
 ﻿"use client"
 
 import { useUiSelector } from '@/editor/lib/store'
-import { useUiStore } from '@/editor/lib/store-ui'
-import { useUserStore } from '@/hooks/useUserStore'
-import { useProjectImages, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
+import {
+  getProjectImageDisplayUrl,
+  getProjectImageSelectUrl,
+  useProjectMediaLibrary,
+} from '@/editor/hooks/use-project-images'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { storage } from '@/lib/firebase'
-import { ref as storageRef, uploadBytes } from 'firebase/storage'
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Check, Upload, Loader2 } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
@@ -33,46 +33,30 @@ interface MediaPickerModalProps {
   onSelectImages?: (urls: string[]) => void
 }
 
-interface UploadingEntry {
-  id: string
-  name: string
-  previewUrl: string
-}
-
-function getDisplayUrl(img: ProjectImageDoc): string {
-  return img.urls?.thumb ?? img.urls?.middle ?? img.urls?.full ?? ''
-}
-
-function getSelectUrl(img: ProjectImageDoc): string {
-  return img.urls?.full ?? img.urls?.middle ?? ''
-}
-
 export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: MediaPickerModalProps) {
-  const { isMediaPickerOpen, mediaPickerOwnerId, openMediaPicker, closeMediaPicker } = useUiSelector((state) => ({
+  const { isMediaPickerOpen, mediaPickerOwnerId, closeMediaPicker } = useUiSelector((state) => ({
     isMediaPickerOpen: state.isMediaPickerOpen,
     mediaPickerOwnerId: state.mediaPickerOwnerId,
-    openMediaPicker: state.openMediaPicker,
     closeMediaPicker: state.closeMediaPicker,
   }))
 
-  const projectId = useUiStore((s) => s.projectId)
-  const uid = useUserStore((s) => s.profile?.uid)
-  const firestoreImages = useProjectImages()
+  const { fileInputRef, images, pendingUploads, handleFileUpload } = useProjectMediaLibrary()
   const isMobile = useIsMobile()
 
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
-  const [uploading, setUploading] = useState<UploadingEntry[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const closePicker = () => {
+    setSelectedUrls([])
+    closeMediaPicker()
+  }
 
   // Blur the trigger button when the drawer opens to prevent aria-hidden warning
   // (Vaul sets aria-hidden on the background while a focused element remains there)
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      openMediaPicker(ownerId);
       (document.activeElement as HTMLElement)?.blur()
     } else {
-      setSelectedUrls([])
-      closeMediaPicker()
+      closePicker()
     }
   }
 
@@ -94,44 +78,16 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         onSelectImages(selectedUrls)
       } else if (!isMultiSelect && onSelectImage) {
         const selectedFullUrl = selectedUrls[0]
-        const selectedImage = firestoreImages.find((img) => getSelectUrl(img) === selectedFullUrl)
-        const thumbUrl = selectedImage ? getDisplayUrl(selectedImage) : undefined
+        const selectedImage = images.find((img) => getProjectImageSelectUrl(img) === selectedFullUrl)
+        const thumbUrl = selectedImage ? getProjectImageDisplayUrl(selectedImage) : undefined
         onSelectImage(selectedFullUrl, thumbUrl)
       }
     }
-    setSelectedUrls([])
-    closeMediaPicker()
+    closePicker()
   }
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || !uid || !projectId) return
-    const filesArray = Array.from(files)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-
-    await Promise.all(
-      filesArray.map(async (file) => {
-        const imageId = crypto.randomUUID()
-        const previewUrl = URL.createObjectURL(file)
-        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl }])
-        try {
-          const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-          await uploadBytes(
-            storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
-            file,
-          )
-        } catch (err) {
-          console.error('Upload failed:', err)
-        } finally {
-          setUploading((prev) => prev.filter((u) => u.id !== imageId))
-          URL.revokeObjectURL(previewUrl)
-        }
-      }),
-    )
-  }
-
-  const allImages = firestoreImages
-  const isEmpty = allImages.length === 0 && uploading.length === 0
+  const allImages = images
+  const isEmpty = allImages.length === 0 && pendingUploads.length === 0
 
   const imageGrid = (
     <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain rounded-2xl border border-border p-4 bg-muted/30">
@@ -141,8 +97,9 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         </div>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {/* Uploading placeholders */}
-          {uploading.map((u) => (
+          {/* Uploading placeholders — hide any whose imageId is already in Firestore
+               to prevent duplicate keys and the flash they cause */}
+          {pendingUploads.map((u) => (
             <div
               key={u.id}
               className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40"
@@ -163,8 +120,8 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
 
           {/* Firestore images */}
           {allImages.map((image) => {
-            const displayUrl = getDisplayUrl(image)
-            const selectUrl = getSelectUrl(image)
+            const displayUrl = getProjectImageDisplayUrl(image)
+            const selectUrl = getProjectImageSelectUrl(image)
             return (
               <button
                 key={image.id}
@@ -189,7 +146,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
                   fill
                   unoptimized
                   sizes="(max-width: 768px) 33vw, 160px"
-                  className="object-cover"
+                  className="object-cover transition-opacity duration-300"
                 />
                 {selectedUrls.includes(selectUrl) && (
                   <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center backdrop-blur-[1px]">
@@ -210,7 +167,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
     <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
       <Button
         variant="ghost"
-        onClick={() => { setSelectedUrls([]); closeMediaPicker() }}
+        onClick={closePicker}
         className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
         Cancel

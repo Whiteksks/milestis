@@ -8,6 +8,7 @@ import { Globe, Save, Mail, CreditCard, RefreshCw, Download, FileText, Keyboard 
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user-profile"
+import { toastUser } from "@/lib/toast"
 
 export default function AccountSettings() {
   const { profile } = useUserStore()
@@ -29,15 +30,17 @@ export default function AccountSettings() {
   const handleSaveNotifications = async () => {
     setSaving(true)
     try {
-      await saveUserProfile({
-        settings: {
-          notifications: {
-            project_updates: notifyPublished,
-            whats_new: notifyCredits,
-            project_reminders: notifyReset,
+      await toastUser.saveSettings(
+        saveUserProfile({
+          settings: {
+            notifications: {
+              project_updates: notifyPublished,
+              whats_new: notifyCredits,
+              project_reminders: notifyReset,
+            },
           },
-        },
-      })
+        })
+      )
     } finally {
       setSaving(false)
     }

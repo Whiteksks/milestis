@@ -7,36 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  MapPin, Link,
-  Instagram, Github, Facebook, Twitter, Linkedin, Youtube, Globe, Twitch,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { MapPin } from "lucide-react"
 import { UserAvatar } from "@/components/shared/user-avatar"
 import ProfileSettingsSkeleton from "./profile-skeleton"
-
-const AVATAR_MAX_BYTES = 10 * 1024 * 1024 // 10 MB — Cloud Function handles the resize
-
-function detectIcon(url: string): LucideIcon {
-  if (!url) return Link
-  const u = url.toLowerCase()
-  if (u.includes("instagram.com")) return Instagram
-  if (u.includes("github.com")) return Github
-  if (u.includes("facebook.com") || u.includes("fb.com")) return Facebook
-  if (u.includes("twitter.com") || u.includes("x.com")) return Twitter
-  if (u.includes("linkedin.com")) return Linkedin
-  if (u.includes("youtube.com") || u.includes("youtu.be")) return Youtube
-  if (u.includes("twitch.tv")) return Twitch
-  if (u.startsWith("http")) return Globe
-  return Link
-}
+import { SocialLinksEditor, type SocialLinksTuple } from "@/components/shared/social-links-editor"
+import { toastUser } from "@/lib/toast"
 
 export default function ProfileSettings() {
   const { profile, loading } = useUserStore()
   const [publicName, setPublicName] = useState("")
   const [location, setLocation] = useState("")
   const [bio, setBio] = useState("")
-  const [socialLinks, setSocialLinks] = useState(["", "", "", ""])
+  const [socialLinks, setSocialLinks] = useState<SocialLinksTuple>(["" , "", "", ""])
   const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editName, setEditName] = useState("")
@@ -53,7 +35,7 @@ export default function ProfileSettings() {
       profile.profileTemplate?.sociallinks?.link2 ?? "",
       profile.profileTemplate?.sociallinks?.link3 ?? "",
       profile.profileTemplate?.sociallinks?.link4 ?? "",
-    ])
+    ] as SocialLinksTuple)
   }, [profile?.uid])
 
   const handleEditOpen = () => {
@@ -67,7 +49,7 @@ export default function ProfileSettings() {
     setEditError(null)
     try {
       if (editName !== (profile?.displayName ?? "")) {
-        await saveUserProfile({ displayName: editName })
+        await toastUser.saveName(saveUserProfile({ displayName: editName }))
       }
       setEditing(false)
     } catch (err: any) {
@@ -84,39 +66,24 @@ export default function ProfileSettings() {
   const displayName = profile?.displayName ?? ""
   const email = profile?.email ?? ""
 
-  const updateLink = (index: number, value: string) => {
-    setSocialLinks(prev => prev.map((l, i) => (i === index ? value : l)))
-  }
-
-  function formatUrl(url: string): string {
-    const trimmed = url.trim()
-    if (!trimmed) return ""
-    if (/^(https?:\/\/|\/\/)/i.test(trimmed)) return trimmed
-    return `https://${trimmed}`
-  }
-
-  const handleBlur = (index: number, value: string) => {
-    if (value.trim() !== "") {
-      updateLink(index, formatUrl(value))
-    }
-  }
-
   const handleSave = async () => {
     setSaving(true)
     try {
-      await saveUserProfile({
-        profileTemplate: {
-          name: publicName || undefined,
-          location: location || undefined,
-          bio: bio || undefined,
-          sociallinks: {
-            link1: socialLinks[0] || undefined,
-            link2: socialLinks[1] || undefined,
-            link3: socialLinks[2] || undefined,
-            link4: socialLinks[3] || undefined,
+      await toastUser.saveProfile(
+        saveUserProfile({
+          profileTemplate: {
+            name: publicName || undefined,
+            location: location || undefined,
+            bio: bio || undefined,
+            sociallinks: {
+              link1: socialLinks[0] || undefined,
+              link2: socialLinks[1] || undefined,
+              link3: socialLinks[2] || undefined,
+              link4: socialLinks[3] || undefined,
+            },
           },
-        },
-      })
+        })
+      )
     } finally {
       setSaving(false)
     }
@@ -229,25 +196,7 @@ export default function ProfileSettings() {
 
           <div className="space-y-3">
             <Label className="text-sm font-medium">Social Links</Label>
-            <div className="space-y-3">
-              {socialLinks.map((link, index) => {
-                const Icon = detectIcon(link)
-                return (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary transition-colors">
-                      <Icon className="size-4 text-primary transition-all" />
-                    </div>
-                    <Input
-                      value={link}
-                      onChange={e => updateLink(index, e.target.value)}
-                      onBlur={e => handleBlur(index, e.target.value)}
-                      placeholder={`Link to social ${index + 1}`}
-                      className="rounded-xl flex-1"
-                    />
-                  </div>
-                )
-              })}
-            </div>
+            <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
           </div>
 
           <div className="flex justify-end pt-2">

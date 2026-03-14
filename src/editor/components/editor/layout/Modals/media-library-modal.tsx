@@ -1,11 +1,11 @@
 ﻿'use client'
 
 import { useUiSelector } from '@/editor/lib/store'
-import { useUiStore } from '@/editor/lib/store-ui'
-import { useUserStore } from '@/hooks/useUserStore'
-import { useProjectImages, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
-import { storage } from '@/lib/firebase'
-import { ref as storageRef, uploadBytes } from 'firebase/storage'
+import {
+  getProjectImageDisplayUrl,
+  getProjectImageSelectUrl,
+  useProjectMediaLibrary,
+} from '@/editor/hooks/use-project-images'
 import { deleteDoc, doc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import {
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Upload, X, Check, Loader2, Images } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileDrawer } from '../mobile/mobile-drawer'
@@ -28,63 +28,15 @@ interface MediaLibraryModalProps {
   onSelectImage?: (url: string) => void
 }
 
-interface UploadingEntry {
-  id: string
-  name: string
-  previewUrl: string
-}
-
-function getDisplayUrl(img: ProjectImageDoc): string {
-  return img.urls?.thumb ?? img.urls?.middle ?? img.urls?.full ?? ''
-}
-
-function getSelectUrl(img: ProjectImageDoc): string {
-  return img.urls?.full ?? img.urls?.middle ?? ''
-}
-
 export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibraryModalProps) {
-  const { isMediaLibraryOpen, toggleMediaLibrary } = useUiSelector((state) => ({
+  const { isMediaLibraryOpen, setMediaLibraryOpen } = useUiSelector((state) => ({
     isMediaLibraryOpen: state.isMediaLibraryOpen,
-    toggleMediaLibrary: state.toggleMediaLibrary,
+    setMediaLibraryOpen: state.setMediaLibraryOpen,
   }))
 
-  const projectId = useUiStore((s) => s.projectId)
-  const uid = useUserStore((s) => s.profile?.uid)
-  const firestoreImages = useProjectImages()
-
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
-  const [uploading, setUploading] = useState<UploadingEntry[]>([])
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { fileInputRef, images, pendingUploads, totalCount, handleFileUpload } = useProjectMediaLibrary()
   const isMobile = useIsMobile()
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || !uid || !projectId) return
-    const filesArray = Array.from(files)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-
-    await Promise.all(
-      filesArray.map(async (file) => {
-        const imageId = crypto.randomUUID()
-        const previewUrl = URL.createObjectURL(file)
-        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl }])
-        try {
-          const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-          await uploadBytes(
-            storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
-            file,
-          )
-
-        } catch (err) {
-          console.error('Upload failed:', err)
-        } finally {
-          setUploading((prev) => prev.filter((u) => u.id !== imageId))
-          URL.revokeObjectURL(previewUrl)
-        }
-      }),
-    )
-  }
 
   const handleDelete = async (imageId: string) => {
     await deleteDoc(doc(db, 'images', imageId))
@@ -94,15 +46,17 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     if (mode === 'select') setSelectedImageUrl(url)
   }
 
+  const closeMediaLibrary = () => {
+    setSelectedImageUrl(null)
+    setMediaLibraryOpen(false)
+  }
+
   const handleConfirmSelection = () => {
     if (selectedImageUrl && onSelectImage) {
       onSelectImage(selectedImageUrl)
-      setSelectedImageUrl(null)
-      toggleMediaLibrary()
+      closeMediaLibrary()
     }
   }
-
-  const totalCount = firestoreImages.length + uploading.length
 
   const uploadInput = (
     <input
@@ -168,8 +122,9 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
               <span className="text-[11px] font-medium">Upload</span>
             </button>
 
-            {/* Uploading placeholders */}
-            {uploading.map((u) => (
+            {/* Uploading placeholders — hide any whose imageId is already in Firestore
+                 to prevent duplicate keys and the flash they cause */}
+            {pendingUploads.map((u) => (
               <div
                 key={u.id}
                 className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40"
@@ -189,9 +144,9 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
             ))}
 
             {/* Firestore images */}
-            {firestoreImages.map((image) => {
-              const displayUrl = getDisplayUrl(image)
-              const selectUrl = getSelectUrl(image)
+            {images.map((image) => {
+              const displayUrl = getProjectImageDisplayUrl(image)
+              const selectUrl = getProjectImageSelectUrl(image)
               return (
                 <div
                   key={image.id}
@@ -209,7 +164,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                     fill
                     unoptimized
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover"
+                    className="object-cover transition-opacity duration-300"
                   />
 
                   {selectedImageUrl === selectUrl && mode === 'select' && (
@@ -247,7 +202,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
     <div className="flex justify-end gap-3 pt-5 border-t border-border/50">
       <Button
         variant="ghost"
-        onClick={toggleMediaLibrary}
+        onClick={closeMediaLibrary}
         className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
         {mode === 'select' ? 'Cancel' : 'Close'}
@@ -266,14 +221,14 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   if (isMobile) {
     return (
-      <MobileDrawer isOpen={isMediaLibraryOpen} onClose={toggleMediaLibrary} title="Media Library">
+      <MobileDrawer isOpen={isMediaLibraryOpen} onClose={closeMediaLibrary} title="Media Library">
         <div className="flex flex-col gap-4 pb-6">
           {galleryContent}
           <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
             <Button
               variant="ghost"
               size="sm"
-              onClick={toggleMediaLibrary}
+              onClick={closeMediaLibrary}
               className="rounded-xl text-muted-foreground hover:text-foreground"
             >
               {mode === 'select' ? 'Cancel' : 'Close'}
@@ -294,7 +249,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   }
 
   return (
-    <Dialog open={isMediaLibraryOpen} onOpenChange={toggleMediaLibrary}>
+    <Dialog open={isMediaLibraryOpen} onOpenChange={setMediaLibraryOpen}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-5">
           <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">

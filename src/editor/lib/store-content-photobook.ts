@@ -23,7 +23,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     tagline: 'The story of a single day that changed everything',
     images: {
       id: 'cover-main',
-      image: '/placeholder.jpg',
+      image: '',
       caption: 'The defining shot of our day',
       imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
     },
@@ -34,7 +34,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     dedication: 'Dedicated to our parents and friends who stood by our side.',
     images: {
       id: 'intro-1',
-      image: '/placeholder.jpg',
+      image: '',
       caption: 'The morning before the most anticipated day.',
       imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
     },
@@ -51,14 +51,14 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
       {
         id: 'story-morning',
         label: 'Bridal Preparation',
-        images: ['/placeholder.jpg'],
+        images: [''],
         caption: 'Moments of tender, anticipatory preparation.',
         imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
       },
       {
         id: 'story-ceremony',
         label: 'The Ceremony',
-        images: ['/placeholder.jpg'],
+        images: [''],
         caption: 'The exact moment we exchanged our vows.',
         imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
       },
@@ -70,7 +70,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     images: [
       {
         id: 'gallery-1',
-        image: '/placeholder.jpg',
+        image: '',
         caption: 'Just us and the rhythm of the night.',
         imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
       },
@@ -82,7 +82,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     quote: 'In this very moment, time seemed to stand still.',
     images: {
       id: 'highlight-main',
-      image: '/placeholder.jpg',
+      image: '',
       caption: 'Lost in the moment, surrounded by music.',
       imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
     },
@@ -94,7 +94,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     signature: 'With love, Emily and James',
     images: {
       id: 'ending-detail',
-      image: '/placeholder.jpg',
+      image: '',
       caption: 'The rings that sealed our commitment.',
       imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
     },

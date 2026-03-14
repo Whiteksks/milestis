@@ -33,8 +33,8 @@ export default function EditorPage() {
   const projectId = params.projectId as string
   const locale = params.locale as string
 
-  const { profile, loading: userLoading } = useUserStore(
-    useShallow((s) => ({ profile: s.profile, loading: s.loading }))
+  const { uid, loading: userLoading } = useUserStore(
+    useShallow((s) => ({ uid: s.profile?.uid ?? null, loading: s.loading }))
   )
 
   const setEditorMode = useUiSelector((state) => state.setEditorMode)
@@ -45,7 +45,7 @@ export default function EditorPage() {
 
   useEffect(() => {
     if (userLoading) return
-    if (!profile) {
+    if (!uid) {
       router.replace(`/${locale}/auth`)
       return
     }
@@ -63,7 +63,7 @@ export default function EditorPage() {
         }
 
         const project = snap.data()
-        if (project.ownerId !== profile!.uid) {
+        if (project.ownerId !== uid) {
           setLoadState('forbidden')
           return
         }
@@ -131,7 +131,7 @@ export default function EditorPage() {
 
     loadProject()
     return () => { cancelled = true; setProjectId(null); setProjectName(null) }
-  }, [projectId, profile, userLoading, locale, router, setEditorMode, setProjectId, setProjectName])
+  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName])
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
