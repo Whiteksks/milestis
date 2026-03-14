@@ -12,7 +12,7 @@ import { db } from './firebase'
  *   deleted Jan 5  → purge Feb 1
  *   deleted Jan 20 → purge Mar 1
  */
-function computePurgeAt(deletedAt: Date): Date {
+export function computePurgeAt(deletedAt: Date): Date {
   const day = deletedAt.getDate()
   const month = deletedAt.getMonth() // 0-indexed
   const year = deletedAt.getFullYear()

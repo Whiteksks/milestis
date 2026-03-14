@@ -43,7 +43,10 @@ export function useAutoSave(projectId: string) {
     if (savingRef.current || !useUiStore.getState().isDirty) return
     savingRef.current = true
     try {
-      await saveProject(projectId)
+      await saveProject(projectId, {
+        updateDashboardMeta: false,
+        updateTimestamp: false,
+      })
       markClean()
     } catch {
       // Silent — data stays in Zustand memory, user can retry via Save button

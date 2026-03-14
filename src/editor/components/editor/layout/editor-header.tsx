@@ -74,7 +74,16 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }
 
   async function handleHomeClick() {
-    await autoSave()
+    if (isDirty) {
+      try {
+        await saveProject(projectId)
+        markClean()
+      } catch {
+        // Keep navigation behavior unchanged if save fails.
+      }
+    } else {
+      await autoSave()
+    }
     router.push(`/${locale}/dashboard`)
   }
 

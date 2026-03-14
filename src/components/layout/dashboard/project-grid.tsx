@@ -1,6 +1,6 @@
 "use client"
 
-import { useProjects } from "@/hooks/useProjects"
+import { useRecentProjectsQuery } from "@/hooks/useProjectsQuery"
 import { ProjectCard } from "./project-card"
 import { EmptyState } from "./empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,7 +11,7 @@ interface ProjectGridProps {
 }
 
 export function ProjectGrid({ limit }: ProjectGridProps) {
-  const { activeProjects, loading } = useProjects()
+  const { projects, loading } = useRecentProjectsQuery(limit ?? 4)
 
   if (loading) {
     return (
@@ -29,7 +29,7 @@ export function ProjectGrid({ limit }: ProjectGridProps) {
     )
   }
 
-  const displayed = limit ? activeProjects.slice(0, limit) : activeProjects
+  const displayed = projects
 
   if (displayed.length === 0) {
     return <EmptyState />

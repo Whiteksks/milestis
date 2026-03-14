@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { memo, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { MoreHorizontal, Edit, Trash2, Eye, BookOpen, Layout, RotateCcw, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -20,12 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { DashboardProject } from "@/hooks/useProjects"
-import { softDeleteProject } from "@/lib/delete-project"
-import { restoreProject } from "@/lib/restore-project"
-import { forceDeleteProject } from "@/lib/force-delete-project-api"
+import type { DashboardProject } from "@/hooks/useProjectsQuery"
+import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
-import { toastProject } from "@/lib/toast"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -70,57 +67,57 @@ interface ProjectCardProps {
   trash?: boolean
 }
 
-export function ProjectCard({ project, trash = false }: ProjectCardProps) {
+function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
 
-  const [busy, setBusy] = useState(false)
+  const softDeleteMutation = useSoftDeleteMutation()
+  const restoreMutation = useRestoreMutation()
+  const forceDeleteMutation = useForceDeleteMutation()
+  const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
 
-  const thumbnail = (
-    <TemplatePreview
-      themeId={project.preview?.themeId}
-      templateId={project.preview?.templateId}
-      heroImageUrl={project.preview?.heroImageUrl}
-      title={project.preview?.title}
-      subtitle={project.preview?.subtitle}
-      date={project.preview?.date}
-      aspectRatio={project.preview?.aspectRatio}
-      frameStyle={project.preview?.frameStyle}
-    />
+  const thumbnail = useMemo(
+    () => (
+      <TemplatePreview
+        themeId={project.preview?.themeId}
+        templateId={project.preview?.templateId}
+        heroImageUrl={project.preview?.heroImageUrl}
+        title={project.preview?.title}
+        subtitle={project.preview?.subtitle}
+        date={project.preview?.date}
+        aspectRatio={project.preview?.aspectRatio}
+        frameStyle={project.preview?.frameStyle}
+      />
+    ),
+    [
+      project.preview?.themeId,
+      project.preview?.templateId,
+      project.preview?.heroImageUrl,
+      project.preview?.title,
+      project.preview?.subtitle,
+      project.preview?.date,
+      project.preview?.aspectRatio,
+      project.preview?.frameStyle,
+    ]
   )
 
-  async function handleSoftDelete() {
-    setBusy(true)
-    try {
-      await toastProject.delete(softDeleteProject(project.id))
-    } finally {
-      setBusy(false)
-    }
+  function handleSoftDelete() {
+    softDeleteMutation.mutate(project.id)
   }
 
-  async function handleRestore() {
-    setBusy(true)
-    try {
-      await toastProject.restore(restoreProject(project.id))
-    } finally {
-      setBusy(false)
-    }
+  function handleRestore() {
+    restoreMutation.mutate(project.id)
   }
 
-  async function handleForceDelete() {
-    setBusy(true)
-    try {
-      await toastProject.forceDelete(forceDeleteProject(project.id))
-    } finally {
-      setBusy(false)
-      setConfirmOpen(false)
-    }
+  function handleForceDelete() {
+    setConfirmOpen(false)
+    forceDeleteMutation.mutate(project.id)
   }
 
   if (trash) {
@@ -270,4 +267,6 @@ export function ProjectCard({ project, trash = false }: ProjectCardProps) {
     </div>
   )
 }
+
+export const ProjectCard = memo(ProjectCardInner)
 

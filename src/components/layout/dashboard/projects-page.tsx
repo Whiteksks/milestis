@@ -2,7 +2,7 @@
 
 import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react"
 import { useWindowVirtualizer } from "@tanstack/react-virtual"
-import type { DashboardProject } from "@/hooks/useProjects"
+import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { Search, BookOpen, Layout, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCreateProject } from "@/hooks/useCreateProject"
@@ -12,11 +12,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"
 import { EmptyState } from "@/components/layout/dashboard/empty-state"
-import { useProjects } from "@/hooks/useProjects"
+import { useActiveProjectsQuery, useTrashedProjectsQuery } from "@/hooks/useProjectsQuery"
 
 // ─── Virtual grid ─────────────────────────────────────────────────────────────
 
-function VirtualProjectGrid({ projects, trash = false }: { projects: DashboardProject[]; trash?: boolean }) {
+function VirtualProjectGrid({
+  projects,
+  trash = false,
+}: {
+  projects: DashboardProject[]
+  trash?: boolean
+}) {
   const parentRef = useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
   const [cols, setCols] = useState(2)
@@ -63,7 +69,11 @@ function VirtualProjectGrid({ projects, trash = false }: { projects: DashboardPr
           >
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 pb-4">
               {rows[virtualRow.index].map((project) => (
-                <ProjectCard key={project.id} project={project} trash={trash} />
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  trash={trash}
+                />
               ))}
             </div>
           </div>
@@ -98,31 +108,37 @@ function TrashEmpty() {
 }
 
 export function ProjectsPage() {
-  const { activeProjects, trashedProjects, loading } = useProjects()
-  const { handleCreate, loadingMode } = useCreateProject()
   const [view, setView] = useState<"active" | "trash">("active")
+  const { data: activeProjects = [], isLoading } = useActiveProjectsQuery()
+  const { data: trashedProjects = [], isLoading: trashLoading } = useTrashedProjectsQuery({ enabled: view === 'trash' })
+  const { handleCreate, loadingMode } = useCreateProject()
   const [activeTab, setActiveTab] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredActive = activeProjects.filter((p) => {
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "photobooks" && p.mode === "photobook") ||
-      (activeTab === "portfolios" && p.mode === "portfolio")
-    const matchesStatus =
-      statusFilter === "all" ||
-      (statusFilter === "draft" && !p.isPublished) ||
-      (statusFilter === "published" && p.isPublished)
-    const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesTab && matchesStatus && matchesSearch
-  })
-
-  const filteredTrash = trashedProjects.filter((p) =>
-    !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredActive = useMemo(
+    () =>
+      activeProjects.filter((p) => {
+        const matchesTab =
+          activeTab === "all" ||
+          (activeTab === "photobooks" && p.mode === "photobook") ||
+          (activeTab === "portfolios" && p.mode === "portfolio")
+        const matchesStatus =
+          statusFilter === "all" ||
+          (statusFilter === "draft" && !p.isPublished) ||
+          (statusFilter === "published" && p.isPublished)
+        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesTab && matchesStatus && matchesSearch
+      }),
+    [activeProjects, activeTab, statusFilter, searchQuery]
   )
 
-  const showActiveFilters = view === "active" && (loading || activeProjects.length > 0)
+  const filteredTrash = useMemo(
+    () => trashedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [trashedProjects, searchQuery]
+  )
+
+  const showActiveFilters = view === "active" && (isLoading || activeProjects.length > 0)
 
   return (
     <div className="mx-auto max-w-6xl space-y-10">
@@ -166,11 +182,6 @@ export function ProjectsPage() {
             <TabsTrigger value="trash" className="rounded-full px-5 gap-2">
               <Trash2 className="size-3.5" />
               Trash
-              {trashedProjects.length > 0 && (
-                <span className="ml-1 flex size-4 items-center justify-center rounded-full bg-destructive/15 text-[10px] font-bold text-destructive">
-                  {trashedProjects.length}
-                </span>
-              )}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -232,7 +243,7 @@ export function ProjectsPage() {
       )}
 
       {/* Grid */}
-      {loading ? (
+      {isLoading || (view === "trash" && trashLoading) ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="overflow-hidden rounded-2xl">
@@ -248,14 +259,17 @@ export function ProjectsPage() {
         filteredTrash.length === 0 ? (
           <TrashEmpty />
         ) : (
-          <VirtualProjectGrid projects={filteredTrash} trash />
+          <VirtualProjectGrid
+            projects={filteredTrash}
+            trash
+          />
         )
       ) : activeProjects.length === 0 ? (
         <EmptyState />
       ) : filteredActive.length === 0 ? (
         <NoResults />
       ) : (
-        <VirtualProjectGrid projects={filteredActive} />
+          <VirtualProjectGrid projects={filteredActive} />
       )}
 
     </div>
