@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useUserStore } from '@/hooks/useUserStore'
+import { saveUserProfile } from '@/lib/user'
 
 const LANG_MAP: Record<string, string> = {
   ru: 'Русский',
@@ -44,6 +45,8 @@ export function LanguageSwitcher() {
     const newSegments = [...segments]
     newSegments[1] = lang
     router.push(newSegments.join('/'))
+    // Persist language preference to Firestore in the background.
+    saveUserProfile({ settings: { language: lang as 'ru' | 'en' | 'kz' } }).catch(console.error)
   }
 
   return (

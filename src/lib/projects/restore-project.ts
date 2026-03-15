@@ -1,5 +1,5 @@
 import { doc, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore'
-import { db } from './firebase'
+import { db } from '../firebase/firebase'
 
 /**
  * Restores a project from the trash back to active status.

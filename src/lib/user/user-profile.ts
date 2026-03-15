@@ -1,7 +1,7 @@
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore"
 import { updateProfile, verifyBeforeUpdateEmail } from "firebase/auth"
-import { auth, db } from "@/lib/firebase"
-import type { UserProfileTemplate, UserSettings } from "@/lib/user-update.dto"
+import { auth, db } from "@/lib/firebase/firebase"
+import type { UserProfileTemplate, UserSettings } from "@/lib/user/user-update.dto"
 
 export interface UserProfileUpdate {
   displayName?: string
@@ -34,11 +34,23 @@ export async function saveUserProfile(update: UserProfileUpdate): Promise<void> 
   }
 
   const userRef = doc(db, "users", user.uid)
-  const payload = {
-    ...(typeof update.displayName === "string" ? { displayName: update.displayName } : {}),
-    ...(update.profileTemplate ? { profileTemplate: update.profileTemplate } : {}),
-    ...(update.settings ? { settings: update.settings } : {}),
-    updatedAt: serverTimestamp(),
+
+  // Use dot-notation keys for nested fields so Firestore merges them
+  // instead of overwriting the entire `settings` or `profileTemplate` object.
+  const payload: Record<string, unknown> = { updatedAt: serverTimestamp() }
+
+  if (typeof update.displayName === "string") {
+    payload.displayName = update.displayName
+  }
+  if (update.profileTemplate) {
+    // profileTemplate is always saved as a whole from the profile page
+    payload.profileTemplate = update.profileTemplate
+  }
+  if (update.settings?.language !== undefined) {
+    payload["settings.language"] = update.settings.language
+  }
+  if (update.settings?.notifications !== undefined) {
+    payload["settings.notifications"] = update.settings.notifications
   }
 
   await updateDoc(userRef, stripUndefined(payload))

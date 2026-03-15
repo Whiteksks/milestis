@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { auth, db } from '@/lib/firebase'
+import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
 
 export default function FirebaseInitializer() {

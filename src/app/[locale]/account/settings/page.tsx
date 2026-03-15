@@ -1,14 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Globe, Bell, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
-import { saveUserProfile } from "@/lib/user-profile"
+import { saveUserProfile } from "@/lib/user"
 import { toastUser } from "@/lib/toast"
 
 const notificationItems = [
@@ -54,7 +53,6 @@ type NotificationKey = typeof notificationItems[number]["key"]
 
 export default function AccountSettings() {
   const { profile } = useUserStore()
-  const pathname = usePathname()
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     project_updates: true,
     project_reminders: false,
@@ -82,11 +80,10 @@ export default function AccountSettings() {
     setNotifications((prev) => ({ ...prev, [key]: value }))
 
   const handleSaveSettings = async () => {
-    const currentLang = (pathname.split('/')[1] ?? 'en') as 'ru' | 'en' | 'kz'
     setSaving(true)
     try {
       await toastUser.saveSettings(
-        saveUserProfile({ settings: { language: currentLang, notifications } })
+        saveUserProfile({ settings: { notifications } })
       )
     } finally {
       setSaving(false)

@@ -1,10 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
-import { softDeleteProject, computePurgeAt } from '@/lib/delete-project'
-import { restoreProject } from '@/lib/restore-project'
-import { forceDeleteProject } from '@/lib/force-delete-project-api'
-import { renameProject } from '@/lib/rename-project'
+import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject } from '@/lib/projects'
 import { toastProject } from '@/lib/toast'
 
 function useUid() {

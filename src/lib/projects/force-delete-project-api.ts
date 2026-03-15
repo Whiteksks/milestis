@@ -1,4 +1,4 @@
-import { auth } from "./firebase"
+import { auth } from "../firebase/firebase"
 
 export class DeleteProjectError extends Error {
   constructor(public readonly code: string, message: string) {

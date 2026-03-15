@@ -2,7 +2,7 @@
 
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
-import { makeQueryClient } from '@/lib/query-client'
+import { makeQueryClient } from '@/lib/firebase'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const clientRef = useRef<QueryClient | null>(null)

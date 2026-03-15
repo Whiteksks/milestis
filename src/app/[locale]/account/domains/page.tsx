@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,44 +12,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Copy, ExternalLink, Share2, Globe, BookOpen, Layout, Check } from "lucide-react"
+import { useActiveProjectsQuery } from "@/hooks/useProjectsQuery"
+import type { DashboardProject } from "@/hooks/useProjectsQuery"
 
-interface Project {
-  id: string
-  name: string
-  type: "photobook" | "portfolio"
-  cover: string
-  domain: string
+const BASE_DOMAIN = "milestis.app"
+
+function getProjectDomain(project: DashboardProject): string {
+  return `${project.id}.${BASE_DOMAIN}`
 }
 
-const mockProjects: Project[] = [
-  {
-    id: "1",
-    name: "Summer Memories 2024",
-    type: "photobook",
-    cover: "/placeholder.svg?height=80&width=120",
-    domain: "summer2024.milestis.app",
-  },
-  {
-    id: "2",
-    name: "Wedding book",
-    type: "photobook",
-    cover: "/placeholder.svg?height=80&width=120",
-    domain: "weddingbook.milestis.app",
-  },
-]
+function getProjectLink(project: DashboardProject): string {
+  return `https://${getProjectDomain(project)}`
+}
 
 export default function DomainsSettingsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const { data: allProjects = [], isLoading } = useActiveProjectsQuery()
 
-  const handleCopyLink = (project: Project) => {
-    const link = `https://${project.domain}`
-    navigator.clipboard.writeText(link)
+  const publishedProjects = allProjects.filter((p) => p.isPublished)
+
+  const handleCopyLink = (project: DashboardProject) => {
+    navigator.clipboard.writeText(getProjectLink(project))
     setCopiedId(project.id)
     setTimeout(() => setCopiedId(null), 2000)
-  }
-
-  const getProjectLink = (project: Project) => {
-    return `https://${project.domain}`
   }
 
   return (
@@ -62,8 +47,28 @@ export default function DomainsSettingsPage() {
         </div>
 
         <div className="rounded-2xl bg-card shadow-sm">
-          <div className="divide-y divide-border/40">
-          {mockProjects.map((project) => (
+          {isLoading ? (
+            <div className="divide-y divide-border/40">
+              {[1, 2].map((i) => (
+                <div key={i} className="flex items-center gap-4 p-5">
+                  <Skeleton className="size-16 shrink-0 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : publishedProjects.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-12 text-center">
+              <Globe className="size-8 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">No published projects yet.</p>
+              <p className="text-xs text-muted-foreground">Publish a project to see its link here.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border/40">
+              {publishedProjects.map((project) => (
             <div
               key={project.id}
               className="relative flex items-center gap-4 p-5"
@@ -93,13 +98,23 @@ export default function DomainsSettingsPage() {
 
               {/* Cover */}
               <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                <Image
-                  src={project.cover}
-                  alt={project.name}
-                  fill
-                  sizes="64px"
-                  className="object-cover"
-                />
+                {project.preview?.heroImageUrl ? (
+                  <Image
+                    src={project.preview.heroImageUrl}
+                    alt={project.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center">
+                    {project.mode === "photobook" ? (
+                      <BookOpen className="size-5 text-muted-foreground/40" />
+                    ) : (
+                      <Layout className="size-5 text-muted-foreground/40" />
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Info */}
@@ -109,20 +124,20 @@ export default function DomainsSettingsPage() {
                 </div>
 
                 <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                  {project.type === "photobook" ? (
+                  {project.mode === "photobook" ? (
                     <BookOpen className="size-3.5" />
                   ) : (
                     <Layout className="size-3.5" />
                   )}
                   <span>
-                    {project.type === "photobook" ? "Photobook" : "Portfolio"}
+                    {project.mode === "photobook" ? "Photobook" : "Portfolio"}
                   </span>
                 </div>
 
                 <div className="mt-2 flex min-w-0 items-center gap-2 text-sm">
                   <Globe className="size-3.5 text-primary" />
                   <span className="truncate font-medium text-primary">
-                    {project.domain}
+                    {getProjectDomain(project)}
                   </span>
                 </div>
               </div>
@@ -175,8 +190,9 @@ export default function DomainsSettingsPage() {
                 </DropdownMenu>
               </div>
             </div>
-          ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

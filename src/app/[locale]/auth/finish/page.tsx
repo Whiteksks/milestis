@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { isSignInWithEmailLink, onAuthStateChanged, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { completeLinkWithEmailLink, LINKING_EMAIL_KEY } from '@/lib/auth-security';
+import { completeLinkWithEmailLink, LINKING_EMAIL_KEY } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, AlertTriangle, Loader } from 'lucide-react';

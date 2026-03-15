@@ -1,5 +1,5 @@
 import { doc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore'
-import { db } from './firebase'
+import { db } from '../firebase/firebase'
 
 /**
  * Computes the purge date based on when the project was deleted.

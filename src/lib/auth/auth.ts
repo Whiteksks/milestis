@@ -1,6 +1,6 @@
-import { auth } from "./firebase";
+import { auth } from "../firebase/firebase";
 import { AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail, signOut } from "firebase/auth";
-import { getFirebaseAuthErrorTranslationKey } from "./firebase-errors";
+import { getFirebaseAuthErrorTranslationKey } from "../firebase/firebase-errors";
 
 export const sendSignInLinkToEmail = async (email: string) => {
   const actionCodeSettings = {

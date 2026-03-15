@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { useUiStore } from '@/editor/lib/store-ui'
 import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
-import { saveProject } from '@/lib/save-project'
+import { saveProject } from '@/lib/projects'
 
 /**
  * Auto-save hook for the editor.

@@ -1,31 +1,34 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles, BookOpen, Download, Receipt } from "lucide-react"
+import { BookOpen, Receipt } from "lucide-react"
 import { CreditsCard } from "@/components/layout/settings/credits-card"
 import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
 import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useBilling } from "@/hooks/useBilling"
 
 export default function BillingSettings() {
-  const creditsData = {
-    monthly: { used: 7, total: 10, resetDate: "Jan 1" },
-    bonus: { amount: 5 },
-    purchased: { amount: 12 },
+  const { loading, creditsData, planName, planDesc, isPro } = useBilling()
+
+  if (loading) {
+    return (
+      <div className="space-y-12">
+        <section className="space-y-6">
+          <Skeleton className="h-8 w-32" />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Skeleton className="h-48 rounded-2xl" />
+            <Skeleton className="h-48 rounded-2xl" />
+          </div>
+        </section>
+        <section className="space-y-6">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-56 rounded-2xl" />
+        </section>
+      </div>
+    )
   }
-
-  const usageHistory = [
-    { project: "Summer Memories 2024", credits: 2, date: "Dec 15, 2024" },
-    { project: "Family Reunion Book", credits: 3, date: "Dec 8, 2024" },
-    { project: "Travel Adventures", credits: 2, date: "Nov 28, 2024" },
-  ]
-
-  const billingHistory = [
-    { date: "Dec 1, 2024", amount: "$0.00", status: "Free Plan" },
-    { date: "Nov 1, 2024", amount: "$0.00", status: "Free Plan" },
-    { date: "Oct 1, 2024", amount: "$0.00", status: "Free Plan" },
-  ]
 
   return (
     <div className="space-y-12">
@@ -38,9 +41,9 @@ export default function BillingSettings() {
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <BillingPlanCard
-            planName="Free Plan"
-            planDescription="Perfect for trying out Milestis. Create beautiful memory books and share them with anyone."
-            isPro={false}
+            planName={planName}
+            planDescription={planDesc}
+            isPro={isPro}
           />
           <PaymentMethodCard
             type="Credit Card"
@@ -57,11 +60,15 @@ export default function BillingSettings() {
           <h2 className="font-serif text-2xl md:text-3xl">Credits</h2>
           <p className="mt-1 text-muted-foreground">Credits are used each time you publish a memory book</p>
         </div>
-        <CreditsCard
-          monthly={creditsData.monthly}
-          bonus={creditsData.bonus}
-          purchased={creditsData.purchased}
-        />
+        {creditsData ? (
+          <CreditsCard
+            monthly={creditsData.monthly}
+            bonus={creditsData.bonus}
+            purchased={creditsData.purchased}
+          />
+        ) : (
+          <p className="py-8 text-center text-muted-foreground">Credits information unavailable.</p>
+        )}
       </section>
 
       {/* History */}
@@ -78,60 +85,14 @@ export default function BillingSettings() {
           </TabsList>
 
           <TabsContent value="credits" className="mt-6">
-            {usageHistory.length > 0 ? (
-              <div className="divide-y divide-border/40">
-                {usageHistory.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                        <BookOpen className="size-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{item.project}</p>
-                        <p className="text-xs text-muted-foreground">{item.date}</p>
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                      {item.credits} credits
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="py-8 text-center text-muted-foreground">No credit usage history yet.</p>
-            )}
+            <p className="py-8 text-center text-muted-foreground">No credit usage history yet.</p>
           </TabsContent>
 
           <TabsContent value="billing" className="mt-6">
-            {billingHistory.length > 0 ? (
-              <div className="divide-y divide-border/40">
-                {billingHistory.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                        <Receipt className="size-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Invoice {item.amount}</p>
-                        <p className="text-xs text-muted-foreground">{item.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="hidden text-xs text-muted-foreground sm:inline">{item.status}</span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                        <Download className="size-4 text-muted-foreground" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="py-8 text-center text-muted-foreground">No billing history available.</p>
-            )}
+            <p className="py-8 text-center text-muted-foreground">No billing history available.</p>
           </TabsContent>
         </Tabs>
       </section>
-
     </div>
   )
 }

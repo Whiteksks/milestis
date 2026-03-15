@@ -1,6 +1,6 @@
 import './globals.css';
 
-import FirebaseInitializer from '@/lib/firebaseInitializer';
+import { FirebaseInitializer } from '@/lib/firebase';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 

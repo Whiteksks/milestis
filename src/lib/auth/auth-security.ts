@@ -1,4 +1,4 @@
-import { auth } from "./firebase"
+import { auth } from "../firebase/firebase"
 import {
   AuthError,
   EmailAuthProvider,
@@ -8,7 +8,7 @@ import {
   sendSignInLinkToEmail as firebaseSendSignInLinkToEmail,
   unlink,
 } from "firebase/auth"
-import { getFirebaseAuthErrorTranslationKey } from "./firebase-errors"
+import { getFirebaseAuthErrorTranslationKey } from "../firebase/firebase-errors"
 
 export const GOOGLE_PROVIDER_ID = GoogleAuthProvider.PROVIDER_ID // "google.com"
 export const EMAIL_PROVIDER_ID = EmailAuthProvider.PROVIDER_ID  // "password"

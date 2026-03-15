@@ -13,7 +13,7 @@ import {
   linkGoogleAccount,
   unlinkGoogleAccount,
   sendEmailLinkForLinking,
-} from "@/lib/auth-security"
+} from "@/lib/auth"
 
 export default function SecuritySettings() {
   const t = useTranslations()

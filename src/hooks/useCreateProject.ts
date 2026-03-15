@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
-import { createProject } from "@/lib/create-project-api"
+import { createProject } from "@/lib/projects"
 import { toastProject } from "@/lib/toast"
 import { projectKeys } from "@/hooks/useProjectsQuery"
 import { useUserStore } from "@/hooks/useUserStore"

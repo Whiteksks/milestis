@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useUserStore } from "@/hooks/useUserStore"
-import { saveUserProfile } from "@/lib/user-profile"
+import { saveUserProfile } from "@/lib/user"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

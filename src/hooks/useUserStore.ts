@@ -6,7 +6,7 @@ import type {
   UserSubscription,
   UserBalance,
   UserStats,
-} from '@/lib/user-update.dto';
+} from '@/lib/user';
 
 interface UserProfile {
   uid: string | null;
