@@ -1,45 +1,92 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Globe, Save, Mail, CreditCard, RefreshCw, Download, FileText, Keyboard } from "lucide-react"
+import { Globe, Bell, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user-profile"
 import { toastUser } from "@/lib/toast"
 
+const notificationItems = [
+  {
+    key: "project_updates" as const,
+    icon: RefreshCw,
+    label: "Project Updates",
+    desc: "Get notified when your published project status changes",
+  },
+  {
+    key: "project_reminders" as const,
+    icon: Clock,
+    label: "Project Reminders",
+    desc: "Reminders to continue working on unfinished projects",
+  },
+  {
+    key: "project_milestones" as const,
+    icon: Trophy,
+    label: "Project Milestones",
+    desc: "Celebrate when your projects reach new view or share counts",
+  },
+  {
+    key: "whats_new" as const,
+    icon: Newspaper,
+    label: "What's New",
+    desc: "Feature announcements and platform updates",
+  },
+  {
+    key: "personalized_recommendations" as const,
+    icon: Lightbulb,
+    label: "Personalized Recommendations",
+    desc: "Tips and template suggestions tailored to your work",
+  },
+  {
+    key: "seasonal_specials" as const,
+    icon: Sparkles,
+    label: "Seasonal Specials",
+    desc: "Holiday themes, limited-time offers and special collections",
+  },
+] as const
+
+type NotificationKey = typeof notificationItems[number]["key"]
+
 export default function AccountSettings() {
   const { profile } = useUserStore()
-  const [autoSave, setAutoSave] = useState(true)
-  const [notifyPublished, setNotifyPublished] = useState(true)
-  const [notifyCredits, setNotifyCredits] = useState(true)
-  const [notifyReset, setNotifyReset] = useState(false)
+  const pathname = usePathname()
+  const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
+    project_updates: true,
+    project_reminders: false,
+    project_milestones: true,
+    whats_new: true,
+    personalized_recommendations: true,
+    seasonal_specials: false,
+  })
   const [saving, setSaving] = useState(false)
 
-  // Инициализируем переключатели уведомлений из Firebase
   useEffect(() => {
     if (!profile?.settings?.notifications) return
     const n = profile.settings.notifications
-    setNotifyPublished(n.project_updates ?? true)
-    setNotifyCredits(n.whats_new ?? true)
-    setNotifyReset(n.project_reminders ?? false)
+    setNotifications({
+      project_updates: n.project_updates ?? true,
+      project_reminders: n.project_reminders ?? false,
+      project_milestones: n.project_milestones ?? true,
+      whats_new: n.whats_new ?? true,
+      personalized_recommendations: n.personalized_recommendations ?? true,
+      seasonal_specials: n.seasonal_specials ?? false,
+    })
   }, [profile?.uid])
 
-  const handleSaveNotifications = async () => {
+  const toggle = (key: NotificationKey, value: boolean) =>
+    setNotifications((prev) => ({ ...prev, [key]: value }))
+
+  const handleSaveSettings = async () => {
+    const currentLang = (pathname.split('/')[1] ?? 'en') as 'ru' | 'en' | 'kz'
     setSaving(true)
     try {
       await toastUser.saveSettings(
-        saveUserProfile({
-          settings: {
-            notifications: {
-              project_updates: notifyPublished,
-              whats_new: notifyCredits,
-              project_reminders: notifyReset,
-            },
-          },
-        })
+        saveUserProfile({ settings: { language: currentLang, notifications } })
       )
     } finally {
       setSaving(false)
@@ -49,90 +96,82 @@ export default function AccountSettings() {
   return (
     <div className="space-y-12">
 
-      {/* Preferences */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Preferences</h2>
-          <p className="mt-1 text-muted-foreground">Language and regional settings</p>
+      {/* Language */}
+      <section className="max-w-4xl space-y-6">
+        <div className="space-y-1 px-1">
+          <h2 className="font-serif text-2xl tracking-tight text-foreground">Preferences</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage your language and regional interface settings.
+          </p>
         </div>
-        <div className="rounded-2xl bg-card p-6 shadow-sm">
-          <div className="space-y-2 max-w-xs">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <Globe className="h-4 w-4 text-muted-foreground" />
-              Language
-            </Label>
-            <LanguageSwitcher />
+
+        {/* Карточка настройки */}
+        <div className="group rounded-xl border border-border/50 bg-card p-5 shadow-sm transition-all hover:border-border/80">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            
+            {/* Левая часть: Иконка и Текст (занимает всё свободное место) */}
+            <div className="flex flex-1 items-start gap-4">
+              <div className="mt-1 hidden rounded-md border border-border/50 p-2 shadow-sm sm:block">
+                <Globe className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[15px] font-semibold tracking-tight">
+                  Interface Language
+                </Label>
+                <p className="max-w-[440px] text-xs leading-relaxed text-muted-foreground">
+                  Select the language used for menus and system notifications. 
+                  <span className="ml-1 text-primary/70 font-medium italic">
+                    Note: This won't translate your project data.
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Правая часть: Компактный Switcher */}
+            <div className="w-full sm:w-auto sm:min-w-[180px]">
+              <div className="[&_button]:h-9 [&_button]:w-full [&_button]:justify-between [&_button]:px-3 [&_button]:text-sm">
+                <LanguageSwitcher />
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
-
-      {/* Editor */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Editor</h2>
-          <p className="mt-1 text-muted-foreground">How the project editor behaves</p>
-        </div>
-        <div className="rounded-2xl bg-card shadow-sm">
-          <div className="divide-y divide-border/40">
-            <div className="flex items-center justify-between p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Save className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Auto-save</p>
-                  <p className="text-sm text-muted-foreground">Save changes automatically during editing</p>
-                </div>
-              </div>
-              <Switch checked={autoSave} onCheckedChange={setAutoSave} />
-            </div>
-            <div className="flex items-center justify-between p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Keyboard className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Alt-key Shortcuts</p>
-                  <p className="text-sm text-muted-foreground">Require Alt modifier for standard shortcuts</p>
-                </div>
-              </div>
-              <Switch />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Notifications */}
+      {/* Notifications - Обновленный блок (2 колонки) */}
       <section className="space-y-6">
         <div>
           <h2 className="font-serif text-2xl md:text-3xl">Notifications</h2>
           <p className="mt-1 text-muted-foreground">Emails you would like to receive</p>
         </div>
-        <div className="rounded-2xl bg-card shadow-sm">
-          <div className="divide-y divide-border/40">
-            {[
-              { icon: Mail, label: "Project Published", desc: "Get notified when your project goes live", checked: notifyPublished, set: setNotifyPublished },
-              { icon: CreditCard, label: "Credits Usage", desc: "Alerts when credits are running low", checked: notifyCredits, set: setNotifyCredits },
-              { icon: RefreshCw, label: "Monthly Credits Reset", desc: "Reminder when your credits refresh each month", checked: notifyReset, set: setNotifyReset },
-            ].map(({ icon: Icon, label, desc, checked, set }) => (
-              <div key={label} className="flex items-center justify-between p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{label}</p>
-                    <p className="text-sm text-muted-foreground">{desc}</p>
-                  </div>
+        
+        {/* Здесь мы используем grid для создания 2 колонок на экранах md и больше */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {notificationItems.map(({ key, icon: Icon, label, desc }) => (
+            <div 
+              key={key} 
+              className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-card shadow-sm border border-border/40 hover:border-border transition-colors"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                  <Icon className="h-5 w-5 text-primary" />
                 </div>
-                <Switch checked={checked} onCheckedChange={set} />
+                <div className="flex flex-col gap-1 mt-0.5">
+                  <p className="font-medium leading-none">{label}</p>
+                  <p className="text-sm text-muted-foreground leading-snug">{desc}</p>
+                </div>
               </div>
-            ))}
-          </div>
+              <Switch
+                className="mt-1 shrink-0"
+                checked={notifications[key]}
+                onCheckedChange={(v) => toggle(key, v)}
+              />
+            </div>
+          ))}
         </div>
+        
         <div className="flex justify-end">
-          <Button className="rounded-full px-8" onClick={handleSaveNotifications} disabled={saving}>
-            {saving ? "Saving..." : "Save Notifications"}
+          <Button className="rounded-full px-8" onClick={handleSaveSettings} disabled={saving}>
+            {saving ? "Saving…" : "Save Settings"}
           </Button>
         </div>
       </section>

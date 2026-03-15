@@ -4,6 +4,7 @@ import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
 import { softDeleteProject, computePurgeAt } from '@/lib/delete-project'
 import { restoreProject } from '@/lib/restore-project'
 import { forceDeleteProject } from '@/lib/force-delete-project-api'
+import { renameProject } from '@/lib/rename-project'
 import { toastProject } from '@/lib/toast'
 
 function useUid() {
@@ -146,6 +147,40 @@ export function useForceDeleteMutation() {
     },
     onSettled: () => {
       if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.all(uid) })
+    },
+  })
+}
+
+// ─── Rename ────────────────────────────────────────────────────────────────
+
+export function useRenameMutation() {
+  const queryClient = useQueryClient()
+  const uid = useUid()
+
+  return useMutation({
+    mutationFn: async ({ projectId, name }: { projectId: string; name: string }) => {
+      const promise = renameProject(projectId, name)
+      toastProject.rename(promise)
+      await promise
+    },
+    onMutate: async ({ projectId, name }) => {
+      if (!uid) return
+      await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
+
+      const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
+      queryClient.setQueryData<DashboardProject[]>(
+        projectKeys.active(uid),
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, name } : p) ?? [],
+      )
+      return { prevActive }
+    },
+    onError: (_err, _vars, context) => {
+      if (!uid || !context) return
+      if (context.prevActive !== undefined)
+        queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
+    },
+    onSettled: () => {
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
     },
   })
 }

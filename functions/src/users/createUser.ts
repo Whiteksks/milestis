@@ -42,7 +42,6 @@ export const createUser = onRequest(
         photoURL: picture,
         profileTemplate: {},
         settings: {
-          language: "ru",
           notifications: {
             project_updates: true,
             project_reminders: true,

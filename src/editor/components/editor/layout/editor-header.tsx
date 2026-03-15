@@ -8,10 +8,13 @@ import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
 import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Check, Loader2, ChevronRight, Home, CloudUpload } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/save-project'
-import { renameProject } from '@/lib/rename-project'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { toastProject } from '@/lib/toast'
+import { projectKeys } from '@/hooks/useProjectsQuery'
+import { useUserStore } from '@/hooks/useUserStore'
+import { useRenameMutation } from '@/hooks/useProjectMutations'
 
 interface EditorHeaderProps {
   projectId: string
@@ -24,7 +27,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
+  const queryClient = useQueryClient()
+  const uid = useUserStore((s) => s.profile?.uid ?? null)
   const { save: autoSave, isDirty } = useAutoSave(projectId)
+  const renameMutation = useRenameMutation()
 
   const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean } = useUiSelector((state) => ({
     deviceView: state.deviceView,
@@ -50,12 +56,17 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     const trimmed = localName.trim()
     if (!trimmed) { setLocalName(projectName ?? ''); return }
     if (trimmed === projectName) return
-    try {
-      await toastProject.rename(renameProject(projectId, trimmed))
-      setProjectName(trimmed)
-    } catch {
-      setLocalName(projectName ?? '')
-    }
+    renameMutation.mutate(
+      { projectId, name: trimmed },
+      {
+        onSuccess: () => setProjectName(trimmed),
+        onError: () => setLocalName(projectName ?? ''),
+      }
+    )
+  }
+
+  function invalidateProjectsCache() {
+    if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
   }
 
   async function handleSave() {
@@ -65,6 +76,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       await saveProject(projectId)
       markClean()
       setSaveState('saved')
+      invalidateProjectsCache()
       setTimeout(() => setSaveState('idle'), 2000)
     } catch (err) {
       console.error('[Save] Failed to save project:', err)
@@ -78,6 +90,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       try {
         await saveProject(projectId)
         markClean()
+        invalidateProjectsCache()
       } catch {
         // Keep navigation behavior unchanged if save fails.
       }

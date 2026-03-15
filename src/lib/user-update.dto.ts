@@ -11,7 +11,7 @@ export interface UserProfileTemplate {
 }
 
 export interface UserSettings {
-  language: "ru" | "en" | "kz";
+  language?: "ru" | "en" | "kz";
   notifications: {
     project_updates: boolean;
     project_reminders: boolean;

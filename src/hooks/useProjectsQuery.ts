@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
@@ -88,13 +88,27 @@ function useUidAndLoading() {
   })))
 }
 
+// ─── Query options factories ───────────────────────────────────────────────
+// Shared between hooks and prefetchQuery calls.
+
+export function getActiveProjectsQueryOptions(uid: string) {
+  return {
+    queryKey: projectKeys.active(uid),
+    queryFn: () => fetchProjectsByStatus(uid, 'active'),
+  } as const
+}
+
+/** Prefetch active projects into the query cache. No-op if data is still fresh. */
+export function prefetchActiveProjects(queryClient: QueryClient, uid: string) {
+  return queryClient.prefetchQuery(getActiveProjectsQueryOptions(uid))
+}
+
 // ─── Queries ───────────────────────────────────────────────────────────────
 
 export function useActiveProjectsQuery() {
   const { uid, userLoading } = useUidAndLoading()
   const result = useQuery({
-    queryKey: projectKeys.active(uid ?? ''),
-    queryFn: () => fetchProjectsByStatus(uid!, 'active'),
+    ...getActiveProjectsQueryOptions(uid ?? ''),
     enabled: !userLoading && !!uid,
   })
   // While Firebase auth is still resolving, show loading state
