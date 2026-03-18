@@ -2,19 +2,21 @@
 
 import { User, CreditCard, Palette, Shield, Building, Globe } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 
 const settingsMenu = [
-  { id: "profile", label: "Profile", navigate: "/account/profile", icon: User },
-  { id: "settings", label: "Account", navigate: "/account/settings", icon: Building },
-  { id: "billing", label: "Billing & Credits", navigate: "/account/billing", icon: CreditCard },
-  { id: "domains", label: "Domains", navigate: "/account/domains", icon: Globe },
-  { id: "appearance", label: "Appearance", navigate: "/account/appearance", icon: Palette },
-  { id: "security", label: "Security", navigate: "/account/security", icon: Shield },
+  { id: "profile", labelKey: "account.menu.profile", navigate: "/account/profile", icon: User },
+  { id: "settings", labelKey: "account.menu.account", navigate: "/account/settings", icon: Building },
+  { id: "billing", labelKey: "account.menu.billing", navigate: "/account/billing", icon: CreditCard },
+  { id: "domains", labelKey: "account.menu.domains", navigate: "/account/domains", icon: Globe },
+  { id: "appearance", labelKey: "account.menu.appearance", navigate: "/account/appearance", icon: Palette },
+  { id: "security", labelKey: "account.menu.security", navigate: "/account/security", icon: Shield },
 ]
 
 export function SettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations()
 
   const getIsActive = (itemPath: string) => {
     return pathname === itemPath || pathname.endsWith(itemPath)
@@ -43,7 +45,7 @@ export function SettingsMenu() {
                 }`}
               >
                 <Icon className="size-4" />
-                {item.label}
+                {t(item.labelKey)}
               </button>
             )
           })}

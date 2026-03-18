@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { 
@@ -21,23 +22,24 @@ import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { UserAvatar } from "@/components/shared/user-avatar"
 
 // Конфигурация тарифов
-const PLAN_CONFIG: Record<string, { label: string; className: string }> = {
-  free:     { label: "Free",  className: "bg-muted text-muted-foreground" },
-  basic:    { label: "Basic", className: "bg-muted text-muted-foreground" },
-  pro:      { label: "Pro",   className: "bg-primary/10 text-primary" },
-  pro_plus: { label: "Pro+",  className: "bg-primary/10 text-primary" },
+const PLAN_CONFIG: Record<string, { labelKey: string; className: string }> = {
+  free:     { labelKey: "plans.free",  className: "bg-muted text-muted-foreground" },
+  basic:    { labelKey: "plans.basic", className: "bg-muted text-muted-foreground" },
+  pro:      { labelKey: "plans.pro",   className: "bg-primary/10 text-primary" },
+  pro_plus: { labelKey: "plans.proPlus",  className: "bg-primary/10 text-primary" },
 }
 
 // Конфигурация навигации
 const MAIN_NAV_ITEMS = [
-  { href: "/dashboard",       icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/account/profile", icon: User,            label: "Profile" },
-  { href: "/account/billing", icon: CreditCard,      label: "Billing" },
-  { href: "/account",         icon: Settings,        label: "Settings" },
+  { href: "/dashboard",       icon: LayoutDashboard, labelKey: "nav.dashboard" },
+  { href: "/account/profile", icon: User,            labelKey: "nav.profile" },
+  { href: "/account/billing", icon: CreditCard,      labelKey: "nav.billing" },
+  { href: "/account",         icon: Settings,        labelKey: "nav.settings" },
 ]
 
 export function UserMenu() {
   const [open, setOpen] = useState(false)
+  const t = useTranslations()
   const isMobile = useIsMobile()
   const router = useRouter()
   const { profile } = useUserStore()
@@ -69,7 +71,7 @@ export function UserMenu() {
         </div>
         {plan && (
           <span className={cn("ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", plan.className)}>
-            {plan.label}
+            {t(plan.labelKey)}
           </span>
         )}
       </div>
@@ -86,7 +88,7 @@ export function UserMenu() {
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
           >
             <item.icon className="size-4 text-muted-foreground" />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         ))}
       </nav>
@@ -101,7 +103,7 @@ export function UserMenu() {
           className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <HelpCircle className="size-4" />
-          Help & Support
+          {t('nav.helpSupport')}
         </Link>
         
         {(!planTier || planTier === "free") && (
@@ -111,7 +113,7 @@ export function UserMenu() {
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
           >
             <Crown className="size-4" />
-            Upgrade Plan
+            {t('nav.upgradePlan')}
           </Link>
         )}
       </nav>
@@ -120,12 +122,12 @@ export function UserMenu() {
 
       {/* Logout */}
       <div className="p-1.5">
-        <button
+          <button
           onClick={handleLogout}
           className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/5 hover:text-destructive"
         >
           <LogOut className="size-4" />
-          Log out
+          {t('nav.logOut')}
         </button>
       </div>
     </div>

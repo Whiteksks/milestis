@@ -1,20 +1,4 @@
-// ================= ENUMS =================
-
-export type TransactionCategory = 'billing' | 'credit';
-
-export type TransactionStatus =
-  | 'pending'
-  | 'completed'
-  | 'declined'
-  | 'refunded'
-  | 'chargeback'
-  | 'chargeback_won';
-
-export type Currency = 'KZT' | 'USD' | 'EUR' | 'RUB';
-
-export type Direction = 'in' | 'out';
-
-// ================= COMMON =================
+// --- ENUMS ---
 
 export interface BalanceSnapshot {
   total: number;
@@ -23,111 +7,95 @@ export interface BalanceSnapshot {
   bonus: number;
 }
 
-interface BaseTransaction {
-  version: number;
+export interface SpendMetadata {
+  projectId: string;
+  action: 'publish' | 'renew' | 'highlight'; 
+  projectNameSnapshot: string; 
+  ipAddress?: string; // Полезно для отслеживания фрода (мультиаккаунтов)
+}
+export interface PurchaseMetadata {
+  paddlePriceId: string;
+  paddleProductId: string;
+  promocodeApplied?: string;
+}
+export interface RefundMetadata {
+  reason: string;
+  supportTicketId?: string;
+  issuedByAdminId?: string;
+}
+export type DefaultMetadata = Record<string, unknown>;
 
-  tid: string;
-  uid: string;
-
-  createdAt: string;      // ISO
-  processedAt?: string;   // ISO (когда подтверждено / обновлено)
-
-  status: TransactionStatus;
-  direction: Direction;
-
-  category: TransactionCategory;
-
-  idempotencyKey: string;
-  isManual: boolean;
-
-  termsVersion: number;
-  clientIpCountry: string;
-  balanceSnapshot: BalanceSnapshot;
+// Типы транзакций в вашей БД
+export enum TransactionType {
+  PADDLE_PAYMENT = 'PADDLE_PAYMENT',     // Реальные деньги прошли через Paddle
+  CREDIT_PURCHASE = 'CREDIT_PURCHASE',   // Начисление кредитов за покупку
+  CREDIT_SPEND = 'CREDIT_SPEND',         // Списание кредитов за услуги сайта
+  CREDIT_REFUND = 'CREDIT_REFUND',       // Возврат кредитов (например, при ошибке)
 }
 
-// ================= BILLING (FIAT) =================
-
-export type BillingType =
-  | 'buy_credits'
-  | 'subscription_purchase'
-  | 'subscription_renewal'
-  | 'subscription_change'
-  | 'refund'
-  | 'chargeback';
-
-export interface BillingTransaction extends BaseTransaction {
-  category: 'billing';
-  type: BillingType;
-
-  // Деньги храним в минимальных единицах (тиыны / центы)
-  currency: Currency;
-  currencyAmountMinor: number;
-
-  // Если транзакция связана с предыдущей (refund / chargeback)
-  originalTransactionId?: string;
-
-  metadata: {
-    provider: 'cloudpayments' | 'kaspi' | 'admin_panel';
-
-    cpTransactionId?: string;
-    cpInvoiceId?: string;
-
-    cardLastFour?: string;
-    cardType?: string;
-    cardExpDate?: string;
-    issuerBankCountry?: string;
-
-    packId?: string;
-    planId?: string;
-    promoCode?: string;
-
-    declinedReason?: string;
-    errorCode?: string;
-  };
+// Актуальные статусы транзакций из API Paddle Billing
+export enum PaddleTransactionStatus {
+  COMPLETED = 'completed',
+  BILLED = 'billed',
+  PAST_DUE = 'past_due',
+  CANCELED = 'canceled',
+  REFUNDED = 'refunded',
 }
 
-// ================= CREDIT (INTERNAL ECONOMY) =================
+// --- ИНТЕРФЕЙСЫ ---
 
-export type CreditType =
-  | 'spend'               // публикация
-  | 'grant'               // начисление (покупка, подписка, бонус)
-  | 'expire'              // сгорание
-  | 'compensation'        // компенсация
-  | 'admin_adjustment'    // ручная правка
-  | 'usage_refund';       // возврат за неудачную операцию
-
-export interface CreditTransaction extends BaseTransaction {
-  category: 'credit';
-  type: CreditType;
-
-  // Всегда положительное число
-  amount: number;
-
-  // Никогда нет валюты
-  currency?: never;
-  currencyAmountMinor?: never;
-
-  // Связь с биллингом (если начисление после оплаты)
-  relatedBillingId?: string;
-
-  metadata: {
-    projectId?: string;
-    projectTitle?: string;
-
-    itemType?: 'photobook' | 'portfolio';
-
-    promoCode?: string;
-    referralUserId?: string;
-
-    adminId?: string;
-    supportTicketId?: string;
-
-    reason?: string; // общее текстовое пояснение
-  };
+/**
+ * 1. Базовый интерфейс для ЛЮБОЙ транзакции в вашей БД.
+ */
+export interface ITransactionBase {
+  id: string;             // Внутренний ID транзакции в вашей БД (UUID/ObjectId)
+  userId: string;         // ID пользователя в вашей системе
+  type: TransactionType;  // Тип операции
+  createdAt: Date;        // Дата создания записи
 }
 
-// ================= UNION =================
+/**
+ * 2. Финансовая транзакция (Эквайринг Paddle).
+ * Содержит только реальные поля, которые приходят в вебхуках Paddle (transaction.completed).
+ */
+export interface IPaddleMonetaryTransaction extends ITransactionBase {
+  type: TransactionType.PADDLE_PAYMENT;
+  
+  // КРИТИЧНО: ID события вебхука (начинается с evt_...). 
+  // По нему вы проверяете, не обрабатывали ли вы этот платеж ранее.
+  paddleEventId: string;       
+  
+  // Уникальный ID самой транзакции в Paddle (начинается с txn_...)
+  paddleTransactionId: string; 
+  
+  // ID покупателя в Paddle (начинается с ctm_...)
+  paddleCustomerId?: string;   
+  
+  amount: string;              // Сумма (в API Paddle суммы часто приходят строками, например "15.00", чтобы избежать потери точности float)
+  currency: string;            // Код валюты (USD, EUR)
+  status: PaddleTransactionStatus; 
 
-export type Transaction =
-  | BillingTransaction
-  | CreditTransaction;
+  // Ссылка на внутреннюю транзакцию начисления кредитов, 
+  // чтобы вы могли легко найти, какие именно кредиты были выданы за эти деньги.
+  relatedCreditTransactionId?: string; 
+}
+
+/**
+ * 3. Кредитная транзакция (Ваша внутренняя экономика).
+ * Описывает движение ваших виртуальных кредитов.
+ */
+export interface ICreditTransaction extends ITransactionBase {
+  type: TransactionType.CREDIT_PURCHASE | TransactionType.CREDIT_SPEND | TransactionType.CREDIT_REFUND;
+  
+  // Количество кредитов (положительное при покупке/возврате, отрицательное при трате)
+  creditAmount: number; 
+  
+  // Снапшот баланса ПОСЛЕ транзакции. 
+  // Жизненно важно для аудита, если баланс вдруг "поедет" из-за race conditions.
+  balanceAfter: BalanceSnapshot; 
+  
+  // Метаданные для аналитики (например, projectId, action)
+  metadata: SpendMetadata | PurchaseMetadata | RefundMetadata | DefaultMetadata;  
+  // Если кредиты получены за реальные деньги, здесь хранится ID из БД (от IPaddleMonetaryTransaction)
+  linkedMonetaryTransactionId?: string; 
+}

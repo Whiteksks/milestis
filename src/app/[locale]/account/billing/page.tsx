@@ -8,8 +8,10 @@ import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
 import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useBilling } from "@/hooks/useBilling"
+import { useTranslations } from "next-intl"
 
 export default function BillingSettings() {
+  const t = useTranslations("account.billing")
   const { loading, creditsData, planName, planDesc, isPro } = useBilling()
 
   if (loading) {
@@ -36,8 +38,8 @@ export default function BillingSettings() {
       {/* Plan + Payment */}
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Your plan</h2>
-          <p className="mt-1 text-muted-foreground">Manage your subscription and payment method</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t("plan.title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("plan.description")}</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <BillingPlanCard
@@ -46,7 +48,7 @@ export default function BillingSettings() {
             isPro={isPro}
           />
           <PaymentMethodCard
-            type="Credit Card"
+            type={t("payment.type.creditCard")}
             last4="4242"
             expiry="12/26"
             brand="visa"
@@ -57,8 +59,8 @@ export default function BillingSettings() {
       {/* Credits */}
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Credits</h2>
-          <p className="mt-1 text-muted-foreground">Credits are used each time you publish a memory book</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t("credits.title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("credits.description")}</p>
         </div>
         {creditsData ? (
           <CreditsCard
@@ -67,29 +69,29 @@ export default function BillingSettings() {
             purchased={creditsData.purchased}
           />
         ) : (
-          <p className="py-8 text-center text-muted-foreground">Credits information unavailable.</p>
+          <p className="py-8 text-center text-muted-foreground">{t("credits.unavailable")}</p>
         )}
       </section>
 
       {/* History */}
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">History</h2>
-          <p className="mt-1 text-muted-foreground">Your recent credit usage and invoices</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t("history.title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("history.description")}</p>
         </div>
 
         <Tabs defaultValue="credits" className="w-full">
-          <TabsList className="rounded-full bg-muted p-1">
-            <TabsTrigger value="credits" className="rounded-full px-6 text-sm">Credits Usage</TabsTrigger>
-            <TabsTrigger value="billing" className="rounded-full px-6 text-sm">Invoices</TabsTrigger>
+            <TabsList className="rounded-full bg-muted p-1">
+            <TabsTrigger value="credits" className="rounded-full px-6 text-sm">{t("tabs.credits")}</TabsTrigger>
+            <TabsTrigger value="billing" className="rounded-full px-6 text-sm">{t("tabs.invoices")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="credits" className="mt-6">
-            <p className="py-8 text-center text-muted-foreground">No credit usage history yet.</p>
+            <p className="py-8 text-center text-muted-foreground">{t("history.noCredits")}</p>
           </TabsContent>
 
           <TabsContent value="billing" className="mt-6">
-            <p className="py-8 text-center text-muted-foreground">No billing history available.</p>
+            <p className="py-8 text-center text-muted-foreground">{t("history.noInvoices")}</p>
           </TabsContent>
         </Tabs>
       </section>

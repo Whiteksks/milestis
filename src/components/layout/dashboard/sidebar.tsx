@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 import { FolderOpen, Home, Settings, HelpCircle, LayoutTemplate, BarChart3, Globe, Heart } from "lucide-react"
 import {
@@ -21,16 +22,16 @@ interface AppSidebarProps {
 }
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
-  { id: "projects", label: "Projects", icon: FolderOpen, href: "/dashboard/projects" },
-  { id: "templates", label: "Templates", icon: LayoutTemplate, href: "/dashboard/templates" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-  { id: "domains", label: "Domains", icon: Globe, href: "/dashboard/domains" },
+  { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
+  { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
+  { id: "templates", labelKey: "nav.templates", icon: LayoutTemplate, href: "/dashboard/templates" },
+  { id: "analytics", labelKey: "nav.analytics", icon: BarChart3, href: "/dashboard/analytics" },
+  { id: "domains", labelKey: "nav.domains", icon: Globe, href: "/dashboard/domains" },
 ]
 
 const bottomItems = [
-  { id: "settings", label: "Settings", icon: Settings, href: "/account" },
-  { id: "help", label: "Help & Support", icon: HelpCircle, href: "/help" },
+  { id: "settings", labelKey: "nav.settings", icon: Settings, href: "/account" },
+  { id: "help", labelKey: "nav.helpSupport", icon: HelpCircle, href: "/help" },
 ]
 
 function withLocale(locale: string | undefined, href: string) {
@@ -40,6 +41,7 @@ function withLocale(locale: string | undefined, href: string) {
 }
 
 export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps) {
+  const t = useTranslations()
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -65,12 +67,12 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
                     <SidebarMenuButton
                       asChild
                       isActive={activeItem === item.id}
-                      tooltip={item.label}
+                      tooltip={t(item.labelKey)}
                       className="rounded-xl transition-all duration-200"
                     >
                       <Link href={withLocale(locale, item.href)}>
                         <Icon className="size-4" />
-                        <span className="text-base">{item.label}</span>
+                        <span className="text-base">{t(item.labelKey)}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -90,12 +92,12 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
                 <SidebarMenuButton
                   asChild
                   isActive={activeItem === item.id}
-                  tooltip={item.label}
+                  tooltip={t(item.labelKey)}
                   className="rounded-xl transition-all duration-200"
                 >
                   <Link href={withLocale(locale, item.href)}>
                     <Icon className="size-4" />
-                    <span className="text-base">{item.label}</span>
+                    <span className="text-base">{t(item.labelKey)}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

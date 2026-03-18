@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"
 import { EmptyState } from "@/components/layout/dashboard/empty-state"
 import { useActiveProjectsQuery, useTrashedProjectsQuery } from "@/hooks/useProjectsQuery"
+import { useTranslations } from "next-intl"
 
 // ─── Virtual grid ─────────────────────────────────────────────────────────────
 
@@ -108,6 +109,7 @@ function TrashEmpty() {
 }
 
 export function ProjectsPage() {
+  const t = useTranslations()
   const [view, setView] = useState<"active" | "trash">("active")
   const { data: activeProjects = [], isLoading } = useActiveProjectsQuery()
   const { data: trashedProjects = [], isLoading: trashLoading } = useTrashedProjectsQuery({ enabled: view === 'trash' })
@@ -146,8 +148,8 @@ export function ProjectsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl">Projects</h1>
-          <p className="mt-1 text-muted-foreground">All your photo books and portfolio sites in one place</p>
+          <h1 className="font-serif text-2xl md:text-3xl">{t('projects.title')}</h1>
+          <p className="mt-1 text-muted-foreground">{t('projects.description')}</p>
         </div>
         <div className="flex gap-2">
           {view === "active" && (
@@ -159,7 +161,7 @@ export function ProjectsPage() {
                 onClick={() => handleCreate("portfolio")}
               >
                 {loadingMode === "portfolio" ? <Loader2 className="size-4 animate-spin" /> : <Layout className="size-4" />}
-                Create Portfolio
+                {t('projects.createPortfolio')}
               </Button>
               <Button
                 className="rounded-full gap-2"
@@ -167,7 +169,7 @@ export function ProjectsPage() {
                 onClick={() => handleCreate("photobook")}
               >
                 {loadingMode === "photobook" ? <Loader2 className="size-4 animate-spin" /> : <BookOpen className="size-4" />}
-                Create Photobook
+                {t('projects.createPhotobook')}
               </Button>
             </>
           )}
@@ -178,22 +180,22 @@ export function ProjectsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={view} onValueChange={(v) => setView(v as "active" | "trash")}>
           <TabsList className="rounded-full bg-muted p-1">
-            <TabsTrigger value="active" className="rounded-full px-5">Active</TabsTrigger>
-            <TabsTrigger value="trash" className="rounded-full px-5 gap-2">
-              <Trash2 className="size-3.5" />
-              Trash
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger value="active" className="rounded-full px-5">{t('projects.tabs.active')}</TabsTrigger>
+              <TabsTrigger value="trash" className="rounded-full px-5 gap-2">
+                <Trash2 className="size-3.5" />
+                {t('projects.tabs.trash')}
+              </TabsTrigger>
+            </TabsList>
         </Tabs>
 
         {/* Active-only type/status filters */}
         {showActiveFilters && (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="rounded-full bg-muted p-1">
-                <TabsTrigger value="all" className="rounded-full px-4">All</TabsTrigger>
-                <TabsTrigger value="photobooks" className="rounded-full px-4">Photobooks</TabsTrigger>
-                <TabsTrigger value="portfolios" className="rounded-full px-4">Portfolios</TabsTrigger>
+                <TabsList className="rounded-full bg-muted p-1">
+                <TabsTrigger value="all" className="rounded-full px-4">{t('projects.filters.all')}</TabsTrigger>
+                <TabsTrigger value="photobooks" className="rounded-full px-4">{t('projects.filters.photobooks')}</TabsTrigger>
+                <TabsTrigger value="portfolios" className="rounded-full px-4">{t('projects.filters.portfolios')}</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -201,7 +203,7 @@ export function ProjectsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search..."
+                  placeholder={t('projects.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-44 rounded-full pl-9"
@@ -209,12 +211,12 @@ export function ProjectsPage() {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-32 rounded-full">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder={t('projects.statusPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="all" className="rounded-lg">All Status</SelectItem>
-                  <SelectItem value="draft" className="rounded-lg">Draft</SelectItem>
-                  <SelectItem value="published" className="rounded-lg">Published</SelectItem>
+                  <SelectItem value="all" className="rounded-lg">{t('projects.status.all')}</SelectItem>
+                  <SelectItem value="draft" className="rounded-lg">{t('projects.status.draft')}</SelectItem>
+                  <SelectItem value="published" className="rounded-lg">{t('projects.status.published')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -225,8 +227,8 @@ export function ProjectsPage() {
         {view === "trash" && trashedProjects.length > 0 && (
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search trash..."
+                <Input
+                  placeholder={t('projects.searchTrashPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-44 rounded-full pl-9"
@@ -237,9 +239,7 @@ export function ProjectsPage() {
 
       {/* Trash notice */}
       {view === "trash" && trashedProjects.length > 0 && (
-        <p className="text-sm text-muted-foreground">
-          Projects in trash are permanently deleted on the 1st of the scheduled month. You can restore them at any time before that.
-        </p>
+        <p className="text-sm text-muted-foreground">{t('projects.trashNotice')}</p>
       )}
 
       {/* Grid */}

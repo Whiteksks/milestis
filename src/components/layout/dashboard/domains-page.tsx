@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 interface Project {
   id: string
@@ -33,13 +34,15 @@ export function DomainsPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
+  const t = useTranslations()
+
   return (
     <div className="mx-auto max-w-6xl space-y-10">
 
       {/* Header */}
       <div>
-        <h1 className="font-serif text-2xl md:text-3xl">Domains</h1>
-        <p className="mt-1 text-muted-foreground">Manage and share your published projects</p>
+        <h1 className="font-serif text-2xl md:text-3xl">{t('domains.title')}</h1>
+        <p className="mt-1 text-muted-foreground">{t('domains.description')}</p>
       </div>
 
       {/* Project list */}
@@ -61,16 +64,16 @@ export function DomainsPage() {
                     <span className="truncate font-medium">{project.name}</span>
                     <span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
                       <TypeIcon className="size-3" />
-                      {project.type === "photobook" ? "Photobook" : "Site"}
+                      {project.type === "photobook" ? t('templates.type.photobook') : t('templates.type.site')}
                     </span>
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       isPublished ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
                     }`}>
-                      {isPublished ? "Published" : "Draft"}
+                      {isPublished ? t('project.status.published') : t('project.status.draft')}
                     </span>
                   </div>
                   <p className="mt-1 truncate text-sm text-muted-foreground">
-                    {isPublished ? project.domain : "Not published yet"}
+                    {isPublished ? project.domain : t('domains.notPublished')}
                   </p>
                 </div>
 
@@ -79,8 +82,8 @@ export function DomainsPage() {
                   {isPublished && (
                     <Button size="sm" variant="ghost" className="rounded-full" onClick={() => handleCopy(project)}>
                       {copiedId === project.id
-                        ? <><Check className="mr-1.5 size-3.5 text-emerald-600" /> Copied</>
-                        : <><Copy className="mr-1.5 size-3.5" /> Copy link</>
+                        ? <><Check className="mr-1.5 size-3.5 text-emerald-600" /> {t('domains.copied')}</>
+                        : <><Copy className="mr-1.5 size-3.5" /> {t('domains.copyLink')}</>
                       }
                     </Button>
                   )}
@@ -94,16 +97,16 @@ export function DomainsPage() {
                       {isPublished && (
                         <>
                           <DropdownMenuItem className="rounded-lg">
-                            <Copy className="mr-2 size-4" /> Copy link
+                            <Copy className="mr-2 size-4" /> {t('domains.copyLink')}
                           </DropdownMenuItem>
                           <DropdownMenuItem className="rounded-lg">
-                            <ExternalLink className="mr-2 size-4" /> Open project
+                            <ExternalLink className="mr-2 size-4" /> {t('domains.openProject')}
                           </DropdownMenuItem>
                         </>
                       )}
                       <DropdownMenuItem className="rounded-lg">
                         <Globe className="mr-2 size-4" />
-                        {isPublished ? "Domain settings" : "Publish project"}
+                        {isPublished ? t('domains.domainSettings') : t('domains.publishProject')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -117,8 +120,8 @@ export function DomainsPage() {
               <div className="flex size-12 items-center justify-center rounded-xl bg-secondary">
                 <Globe className="size-5 text-primary" />
               </div>
-              <h3 className="mt-4 font-serif text-xl">No projects yet</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Create a photobook or portfolio to get started</p>
+              <h3 className="mt-4 font-serif text-xl">{t('emptyState.noProjects')}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t('domains.createPrompt')}</p>
             </div>
           )}
         </div>
@@ -131,10 +134,8 @@ export function DomainsPage() {
           <Globe className="size-4 text-primary" />
         </div>
         <div>
-          <p className="font-medium">About Milestis domains</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            All published projects get a free milestis.app subdomain. Custom domains are coming soon.
-          </p>
+          <p className="font-medium">{t('domains.aboutTitle')}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{t('domains.aboutDescription')}</p>
         </div>
         </CardContent>
       </Card>

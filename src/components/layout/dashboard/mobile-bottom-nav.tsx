@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import {
   Home,
   FolderOpen,
@@ -43,30 +44,31 @@ function withLocale(locale: string | undefined, href: string) {
 }
 
 const mainNavItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
-  { id: "projects", label: "Projects", icon: FolderOpen, href: "/dashboard/projects" },
-  { id: "templates", label: "Templates", icon: LayoutTemplate, href: "/dashboard/templates" },
-  { id: "plan", label: "Upgrade", icon: Crown, href: "/pricing" },
+  { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
+  { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
+  { id: "templates", labelKey: "nav.templates", icon: LayoutTemplate, href: "/dashboard/templates" },
+  { id: "plan", labelKey: "nav.upgrade", icon: Crown, href: "/pricing" },
 ]
 
 const extraNavItems = [
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-  { id: "domains", label: "Domains", icon: Globe, href: "/dashboard/domains" },
+  { id: "analytics", labelKey: "nav.analytics", icon: BarChart3, href: "/dashboard/analytics" },
+  { id: "domains", labelKey: "nav.domains", icon: Globe, href: "/dashboard/domains" },
 ]
 
 const settingsLinks = [
-  { label: "Profile", href: "/account/profile", icon: User },
-  { label: "Billing", href: "/account/billing", icon: CreditCard },
-  { label: "Security", href: "/account/security", icon: Shield },
+  { labelKey: "nav.profile", href: "/account/profile", icon: User },
+  { labelKey: "nav.billing", href: "/account/billing", icon: CreditCard },
+  { labelKey: "nav.security", href: "/account/security", icon: Shield },
 ]
 
 const helpLinks = [
-  { label: "Help Center", href: "/help", icon: FileText },
-  { label: "Contact Support", href: "/help/contact", icon: MessageCircle },
+  { labelKey: "nav.helpCenter", href: "/help", icon: FileText },
+  { labelKey: "nav.contactSupport", href: "/help/contact", icon: MessageCircle },
 ]
 
 export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBottomNavProps) {
   const [open, setOpen] = useState(false)
+  const t = useTranslations()
 
   return (
     <>
@@ -94,7 +96,7 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
               >
                 <Icon className="size-5 shrink-0" />
               </div>
-              <span className="text-[10px] font-medium truncate">{item.label}</span>
+                <span className="text-[10px] font-medium truncate">{t(item.labelKey)}</span>
             </Link>
           )
         })}
@@ -107,7 +109,7 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
           <div className="flex items-center justify-center size-8 rounded-xl">
             <MoreHorizontal className="size-5 shrink-0" />
           </div>
-          <span className="text-[10px] font-medium">More</span>
+          <span className="text-[10px] font-medium">{t('nav.more')}</span>
         </button>
       </nav>
 
@@ -116,46 +118,48 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
         <div className="flex-1 overflow-y-auto p-4 mt-2">
             {/* Баннер апгрейда */}
             <PromoCard
-            title="Pro Plan"
-            description="Unlock analytics, custom domains, and unlimited projects."
-            ctaText="View All Plans"
+            title={t('promo.proPlanTitle')}
+            description={t('promo.proPlanDescription')}
+            ctaText={t('promo.viewAllPlans')}
             href={withLocale(locale, "/pricing")}
             onClick={() => setOpen(false)}
             />
 
             {/* Управление */}
-            <MenuSection title="Management">
+            <MenuSection title={t('nav.management')}>
             <MenuItem
-                label="Published Domains"
-                icon={Globe}
-                href={withLocale(locale, "/dashboard/domains")}
-                onClick={() => setOpen(false)}
+              label={t('nav.publishedDomains')}
+              icon={Globe}
+              href={withLocale(locale, "/dashboard/domains")}
+              onClick={() => setOpen(false)}
             />
             </MenuSection>
 
             {/* Настройки */}
-            <MenuSection title="Account">
+            <MenuSection title={t('nav.account')}>
             {settingsLinks.map((link, i) => (
-                <MenuItem
-                key={link.href}
-                {...link}
-                href={withLocale(locale, link.href)}
-                onClick={() => setOpen(false)}
-                showBorder={i !== settingsLinks.length - 1}
-                />
+              <MenuItem
+              key={link.href}
+              label={t(link.labelKey)}
+              icon={link.icon}
+              href={withLocale(locale, link.href)}
+              onClick={() => setOpen(false)}
+              showBorder={i !== settingsLinks.length - 1}
+              />
             ))}
             </MenuSection>
 
             {/* Поддержка */}
-            <MenuSection title="Support">
+            <MenuSection title={t('nav.support')}>
             {helpLinks.map((link, i) => (
-                <MenuItem
-                key={link.href}
-                {...link}
-                href={withLocale(locale, link.href)}
-                onClick={() => setOpen(false)}
-                showBorder={i !== helpLinks.length - 1}
-                />
+              <MenuItem
+              key={link.href}
+              label={t(link.labelKey)}
+              icon={link.icon}
+              href={withLocale(locale, link.href)}
+              onClick={() => setOpen(false)}
+              showBorder={i !== helpLinks.length - 1}
+              />
             ))}
             </MenuSection>
         </div>

@@ -23,21 +23,22 @@ import {
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
+import { useTranslations } from "next-intl"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-function formatRelativeDate(date: Date): string {
+function formatRelativeDate(date: Date, t: (key: string, vars?: Record<string, any>) => string): string {
   const diff = Date.now() - date.getTime()
   const minutes = Math.floor(diff / 60_000)
-  if (minutes < 1) return "Just now"
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 1) return t('time.justNow')
+  if (minutes < 60) return t('time.minutesAgo', { n: minutes })
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 24) return t('time.hoursAgo', { n: hours })
   const days = Math.floor(hours / 24)
-  if (days < 7) return `${days}d ago`
+  if (days < 7) return t('time.daysAgo', { n: days })
   const weeks = Math.floor(days / 7)
-  if (weeks < 5) return `${weeks}w ago`
-  return `${Math.floor(days / 30)}mo ago`
+  if (weeks < 5) return t('time.weeksAgo', { n: weeks })
+  return t('time.monthsAgo', { n: Math.floor(days / 30) })
 }
 
 function deriveDisplayStatus(project: DashboardProject): "draft" | "published" {
@@ -50,8 +51,8 @@ function formatPurgeDate(date: Date): string {
 }
 
 const modeConfig = {
-  portfolio: { icon: Layout, label: "Portfolio" },
-  photobook: { icon: BookOpen, label: "Photobook" },
+  portfolio: { icon: Layout, labelKey: "project.mode.portfolio" },
+  photobook: { icon: BookOpen, labelKey: "project.mode.photobook" },
 }
 
 const statusStyles = {
@@ -76,6 +77,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   const restoreMutation = useRestoreMutation()
   const forceDeleteMutation = useForceDeleteMutation()
   const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending
+    const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
@@ -154,7 +156,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             <div className="absolute bottom-2 left-2">
               <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
                 <modeInfo.icon className="size-3" />
-                {modeInfo.label}
+                {t(modeInfo.labelKey)}
               </span>
             </div>
           </div>
@@ -162,8 +164,8 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             <p className="truncate text-sm font-medium">{project.name}</p>
             <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
               {project.purgeAt
-                ? `Deletes permanently on ${formatPurgeDate(project.purgeAt)}`
-                : "Pending purge"}
+                ? t('project.deletesOn', { date: formatPurgeDate(project.purgeAt) })
+                : t('project.pendingPurge')}
             </p>
           </CardContent>
         </div>
@@ -176,19 +178,18 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
                 <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10">
                   <AlertTriangle className="size-5 text-destructive" />
                 </div>
-                <DialogTitle>Permanently delete project?</DialogTitle>
+                <DialogTitle>{t('project.confirmDeleteTitle')}</DialogTitle>
               </div>
               <DialogDescription className="pt-1">
-                <strong>{project.name}</strong> and all its uploaded images will be deleted forever.
-                This action cannot be undone.
+                {t('project.confirmDeleteDescription', { name: project.name })}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" className="rounded-full" onClick={() => setConfirmOpen(false)} disabled={busy}>
-                Cancel
+                {t('project.cancel')}
               </Button>
               <Button variant="destructive" className="rounded-full" onClick={handleForceDelete} disabled={busy}>
-                {busy ? "Deleting…" : "Delete forever"}
+                {busy ? t('project.deleting') : t('project.deleteForever')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -207,12 +208,12 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
         <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <Button size="sm" className="rounded-full shadow-md" onClick={() => router.push(editUrl)}>
             <Edit className="mr-1.5 size-3.5" />
-            Edit
+            {t('project.edit')}
           </Button>
           {project.isPublished && (
             <Button variant="secondary" size="sm" className="rounded-full shadow-md">
               <Eye className="mr-1.5 size-3.5" />
-              View
+              {t('project.view')}
             </Button>
           )}
         </div>
@@ -223,17 +224,17 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="size-8 rounded-full shadow-md">
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t('project.openMenu')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl">
               {project.isPublished && (
                 <DropdownMenuItem className="cursor-pointer rounded-lg">
-                  <Eye className="mr-2 size-4" /> View
+                  <Eye className="mr-2 size-4" /> {t('project.view')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
-                <Edit className="mr-2 size-4" /> Edit
+                <Edit className="mr-2 size-4" /> {t('project.edit')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -242,27 +243,28 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
                 disabled={busy}
                 onClick={handleSoftDelete}
               >
-                <Trash2 className="mr-2 size-4" /> Move to Trash
+                <Trash2 className="mr-2 size-4" /> {t('project.moveToTrash')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
         {/* Bottom badges */}
-        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
           <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
             <modeInfo.icon className="size-3" />
-            {modeInfo.label}
+            {t(modeInfo.labelKey)}
           </span>
           <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[displayStatus]}`}>
             {displayStatus}
+            {t(`project.status.${displayStatus}`)}
           </span>
         </div>
       </div>
 
       <CardContent className="p-3">
         <p className="truncate text-sm font-medium">{project.name}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">Edited {formatRelativeDate(project.updatedAt)}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
     </div>
   )

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 interface Template {
   id: string
@@ -28,12 +29,12 @@ const templates: Template[] = [
 ]
 
 const categories = [
-  { id: "all", label: "All" },
-  { id: "photobooks", label: "Photobooks" },
-  { id: "sites", label: "Portfolio Sites" },
-  { id: "weddings", label: "Weddings" },
-  { id: "birthdays", label: "Birthdays" },
-  { id: "minimal", label: "Minimal" },
+  { id: "all", labelKey: "templates.categories.all" },
+  { id: "photobooks", labelKey: "templates.categories.photobooks" },
+  { id: "sites", labelKey: "templates.categories.sites" },
+  { id: "weddings", labelKey: "templates.categories.weddings" },
+  { id: "birthdays", labelKey: "templates.categories.birthdays" },
+  { id: "minimal", labelKey: "templates.categories.minimal" },
 ]
 
 export function TemplatesPage() {
@@ -41,6 +42,7 @@ export function TemplatesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null)
   const [previewIndex, setPreviewIndex] = useState(0)
+  const t = useTranslations()
 
   const filteredTemplates = templates.filter((t) => {
     const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -55,8 +57,8 @@ export function TemplatesPage() {
 
       {/* Header */}
       <div>
-        <h1 className="font-serif text-2xl md:text-3xl">Templates</h1>
-        <p className="mt-1 text-muted-foreground">Choose a preset to start your photo book or portfolio</p>
+        <h1 className="font-serif text-2xl md:text-3xl">{t('templates.title')}</h1>
+        <p className="mt-1 text-muted-foreground">{t('templates.description')}</p>
       </div>
 
       {/* Filters row */}
@@ -72,7 +74,7 @@ export function TemplatesPage() {
                   : "bg-card text-muted-foreground shadow-sm hover:text-foreground"
               }`}
             >
-              {cat.label}
+              {t(cat.labelKey)}
             </button>
           ))}
         </div>
@@ -80,7 +82,7 @@ export function TemplatesPage() {
         <div className="relative w-full shrink-0 sm:w-56">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search templates"
+            placeholder={t('templates.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="rounded-full pl-10"
@@ -113,11 +115,11 @@ export function TemplatesPage() {
                     onClick={() => { setPreviewTemplate(template); setPreviewIndex(0) }}
                   >
                     <Eye className="mr-1.5 size-3.5" />
-                    Preview
+                      {t('templates.preview')}
                   </Button>
                   <Button size="sm" className="rounded-full">
                     <Sparkles className="mr-1.5 size-3.5" />
-                    Use
+                      {t('templates.use')}
                   </Button>
                 </div>
               </div>
@@ -127,8 +129,8 @@ export function TemplatesPage() {
                   <h3 className="font-medium">{template.name}</h3>
                   <span className="flex shrink-0 items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
                     {template.type === "photobook"
-                      ? <><BookOpen className="size-3" /> Photobook</>
-                      : <><Layout className="size-3" /> Site</>
+                      ? <><BookOpen className="size-3" /> {t('templates.type.photobook')}</>
+                      : <><Layout className="size-3" /> {t('templates.type.site')}</>
                     }
                   </span>
                 </div>
@@ -142,14 +144,14 @@ export function TemplatesPage() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-secondary">
             <LayoutTemplate className="size-5 text-primary" />
           </div>
-          <h3 className="mt-4 font-serif text-xl">No templates found</h3>
-          <p className="mt-2 text-sm text-muted-foreground">Try adjusting your search or filter</p>
+          <h3 className="mt-4 font-serif text-xl">{t('templates.noTemplatesFound')}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{t('templates.tryAdjusting')}</p>
           <Button
             variant="outline"
             className="mt-6 rounded-full bg-transparent"
             onClick={() => { setActiveCategory("all"); setSearchQuery("") }}
           >
-            Clear filters
+            {t('templates.clearFilters')}
           </Button>
         </div>
       )}
@@ -187,15 +189,15 @@ export function TemplatesPage() {
                       <p className="mt-1 text-sm text-muted-foreground">{previewTemplate.description}</p>
                     </div>
                     <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-medium">
-                      {previewTemplate.type === "photobook" ? "Photobook" : "Portfolio Site"}
+                      {previewTemplate.type === "photobook" ? t('templates.type.photobook') : t('templates.type.portfolioSite')}
                     </span>
                   </div>
                 </DialogHeader>
                 <div className="mt-6 flex justify-end gap-3">
-                  <Button variant="outline" className="rounded-full bg-transparent" onClick={() => setPreviewTemplate(null)}>Close</Button>
+                  <Button variant="outline" className="rounded-full bg-transparent" onClick={() => setPreviewTemplate(null)}>{t('templates.close')}</Button>
                   <Button className="rounded-full">
                     <Sparkles className="mr-2 size-4" />
-                    Use this template
+                    {t('templates.useThis')}
                   </Button>
                 </div>
               </div>

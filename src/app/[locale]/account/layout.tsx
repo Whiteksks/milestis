@@ -7,6 +7,7 @@ import { SettingsMenu } from "@/components/layout/settings/settings-menu"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
+import { useTranslations } from "next-intl"
 
 const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
@@ -31,7 +32,8 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-50/40 via-background to-rose-50/20 rounded-xl" />
 
           <div className="md:sticky top-0 z-50 pt-4">
-            <DashboardHeader title="Settings" />
+            {/** localized header title */}
+            <DashboardHeader title={useTranslations()('nav.settings')} />
           </div>
 
           <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">

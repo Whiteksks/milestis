@@ -16,7 +16,8 @@ import {
 } from "@/lib/auth"
 
 export default function SecuritySettings() {
-  const t = useTranslations()
+  const t = useTranslations("account.security")
+  const g = useTranslations()
 
   const [providers, setProviders] = useState<string[]>([])
 
@@ -83,8 +84,8 @@ export default function SecuritySettings() {
 
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Sign-in Methods</h2>
-          <p className="mt-1 text-muted-foreground">Manage how you access your Milestis account</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t("signIn.title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("signIn.description")}</p>
         </div>
 
         <div className="rounded-2xl bg-card shadow-sm">
@@ -98,9 +99,9 @@ export default function SecuritySettings() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">Email (Magic Link)</span>
+                    <span className="font-medium">{t("email.title")}</span>
                     {isEmailLinked && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Primary</span>
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{t("email.primary")}</span>
                     )}
                     {isEmailLinked && (
                       <span className="flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600">
@@ -108,7 +109,7 @@ export default function SecuritySettings() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">Sign in securely using a magic link sent to your email</p>
+                  <p className="text-sm text-muted-foreground">{t("email.description")}</p>
                   {isEmailLinked && userEmail && (
                     <p className="text-sm font-medium">{userEmail}</p>
                   )}
@@ -117,7 +118,7 @@ export default function SecuritySettings() {
                     <div className="mt-3 flex items-center gap-2">
                       <Input
                         type="email"
-                        placeholder="your@email.com"
+                        placeholder={t("email.placeholder")}
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSendEmailLink()}
@@ -129,20 +130,20 @@ export default function SecuritySettings() {
                         onClick={handleSendEmailLink}
                         disabled={emailLoading || !emailInput}
                       >
-                        {emailLoading ? "Sending…" : "Send link"}
+                        {emailLoading ? t("email.sending") : t("email.sendButton")}
                       </Button>
                     </div>
                   )}
                   {!isEmailLinked && emailLinkSent && (
-                    <p className="text-sm text-green-600 mt-2">Check your inbox — a magic link was sent.</p>
+                    <p className="text-sm text-green-600 mt-2">{t("email.checkInbox")}</p>
                   )}
-                  {emailError && <p className="text-sm text-destructive mt-1">{emailError}</p>}
+                  {emailError && <p className="text-sm text-destructive mt-1">{g(emailError)}</p>}
                 </div>
               </div>
               <div className="shrink-0">
                 {isEmailLinked && (
                   <Button variant="ghost" size="sm" className="rounded-full" disabled>
-                    Always enabled
+                    {t("email.alwaysEnabled")}
                   </Button>
                 )}
               </div>
@@ -156,7 +157,7 @@ export default function SecuritySettings() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">Google</span>
+                    <span className="font-medium">{t("google.title")}</span>
                     {/* Show Primary badge when Google is the only sign-in method */}
                     {isGoogleLinked && !isEmailLinked && (
                       <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Primary</span>
@@ -167,13 +168,13 @@ export default function SecuritySettings() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">Sign in with your Google account</p>
+                  <p className="text-sm text-muted-foreground">{t("google.description")}</p>
                   {isGoogleLinked && !canDisconnectGoogle && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Add email access first before disconnecting Google.
+                      {t("google.cannotDisconnectNote")}
                     </p>
                   )}
-                  {googleError && <p className="text-sm text-destructive mt-1">{googleError}</p>}
+                  {googleError && <p className="text-sm text-destructive mt-1">{g(googleError)}</p>}
                 </div>
               </div>
               <div className="shrink-0">
@@ -185,7 +186,7 @@ export default function SecuritySettings() {
                     onClick={handleDisconnectGoogle}
                     disabled={googleLoading || !canDisconnectGoogle}
                   >
-                    {googleLoading ? "…" : "Disconnect"}
+                    {googleLoading ? "…" : t("google.disconnect")}
                   </Button>
                 ) : (
                   <Button
@@ -195,7 +196,7 @@ export default function SecuritySettings() {
                     onClick={handleConnectGoogle}
                     disabled={googleLoading}
                   >
-                    {googleLoading ? "…" : "Connect Google"}
+                    {googleLoading ? "…" : t("google.connect")}
                   </Button>
                 )}
               </div>
@@ -204,9 +205,7 @@ export default function SecuritySettings() {
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground px-1">
-          Your Magic Link email will always remain the primary way to recover your account.
-        </p>
+        <p className="text-sm text-muted-foreground px-1">{t("note.recoveryPrimary")}</p>
       </section>
 
     </div>

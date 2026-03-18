@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sparkles, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface BillingPlanCardProps {
   planName: string
@@ -13,6 +14,7 @@ export function BillingPlanCard({
   planDescription = "Perfect for trying out Milestis. Create beautiful photo books and share your memories.",
   isPro = false,
 }: BillingPlanCardProps) {
+  const t = useTranslations("account.billing.plan")
   return (
     <div className={cn(
       "group rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md",
@@ -32,15 +34,15 @@ export function BillingPlanCard({
         {!isPro ? (
           <Button className="rounded-full gap-2 px-6" size="sm">
             <Sparkles className="size-3.5" />
-            Upgrade to Pro
+            {t("upgrade")}
           </Button>
         ) : (
           <Button variant="outline" className="rounded-full px-6" size="sm">
-            Manage Subscription
+            {t("manage")}
           </Button>
         )}
         <Button variant="ghost" size="sm" className="rounded-full px-6 text-muted-foreground hover:text-foreground">
-          Compare plans
+          {t("compare")}
         </Button>
       </div>
     </div>

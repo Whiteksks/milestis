@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { CreditCard, MoreHorizontal } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface PaymentMethodProps {
   type: string
@@ -14,14 +15,15 @@ export function PaymentMethodCard({
   expiry = "12/24",
   brand = "visa",
 }: PaymentMethodProps) {
+  const t = useTranslations("account.billing.payment")
   return (
     <div className="group rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md">
       <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-accent">
         <CreditCard className="h-6 w-6 text-primary" />
       </div>
 
-      <h3 className="font-serif text-xl font-semibold">Payment Method</h3>
-      <p className="mt-2 text-sm text-muted-foreground">Used for plan upgrades and credit purchases</p>
+      <h3 className="font-serif text-xl font-semibold">{t("title")}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{t("description")}</p>
 
       <div className="mt-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -30,7 +32,7 @@ export function PaymentMethodCard({
           </div>
           <div>
             <p className="text-sm font-medium">•••• {last4}</p>
-            <p className="text-xs text-muted-foreground">Expires {expiry}</p>
+            <p className="text-xs text-muted-foreground">{t("expires", { expiry })}</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">

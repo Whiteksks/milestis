@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ import { SocialLinksEditor, type SocialLinksTuple } from "@/components/shared/so
 import { toastUser } from "@/lib/toast"
 
 export default function ProfileSettings() {
+  const t = useTranslations()
   const { profile, loading } = useUserStore()
   const [publicName, setPublicName] = useState("")
   const [location, setLocation] = useState("")
@@ -94,8 +96,8 @@ export default function ProfileSettings() {
       {/* Identity */}
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Profile</h2>
-          <p className="mt-1 text-muted-foreground">How you appear inside Milestis</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t('account.profile.title')}</h2>
+          <p className="mt-1 text-muted-foreground">{t('account.profile.subtitle')}</p>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-sm">
@@ -105,7 +107,7 @@ export default function ProfileSettings() {
 
               <div className="flex-1 min-w-0 space-y-3">
                 <div className="space-y-1">
-                  <Label htmlFor="editName" className="text-xs text-muted-foreground">Display name</Label>
+                  <Label htmlFor="editName" className="text-xs text-muted-foreground">{t('account.profile.displayNameLabel')}</Label>
                   <Input
                     id="editName"
                     value={editName}
@@ -118,10 +120,10 @@ export default function ProfileSettings() {
 
               <div className="flex gap-2 shrink-0">
                 <Button variant="outline" size="sm" className="rounded-full px-4" onClick={() => setEditing(false)} disabled={editSaving}>
-                  Cancel
+                  {t('account.profile.cancel')}
                 </Button>
                 <Button size="sm" className="rounded-full px-4" onClick={handleEditSave} disabled={editSaving}>
-                  {editSaving ? "Saving..." : "Save"}
+                  {editSaving ? t('account.profile.saving') : t('account.profile.save')}
                 </Button>
               </div>
             </div>
@@ -130,15 +132,15 @@ export default function ProfileSettings() {
               <UserAvatar shape="square" size="xl" uploadable />
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-lg leading-tight truncate">{displayName || "Your name"}</p>
+                <p className="font-semibold text-lg leading-tight truncate">{displayName || t('account.profile.yourName')}</p>
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   <span className="text-sm text-muted-foreground">{email}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Login email</span>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{t('account.profile.loginEmail')}</span>
                 </div>
               </div>
 
               <Button variant="outline" size="sm" className="rounded-full px-5 shrink-0" onClick={handleEditOpen}>
-                Edit
+                {t('account.profile.editButton')}
               </Button>
             </div>
           )}
@@ -148,50 +150,50 @@ export default function ProfileSettings() {
       {/* Public profile */}
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Public Profile</h2>
-          <p className="mt-1 text-muted-foreground">Shown on shared links and your public portfolio</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t('account.publicProfile.title')}</h2>
+          <p className="mt-1 text-muted-foreground">{t('account.publicProfile.subtitle')}</p>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-sm space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="publicName" className="text-sm font-medium">Public Name</Label>
+              <Label htmlFor="publicName" className="text-sm font-medium">{t('account.publicProfile.publicNameLabel')}</Label>
               <Input
                 id="publicName"
                 value={publicName}
                 onChange={e => setPublicName(e.target.value)}
-                placeholder="How you want to be known"
+                placeholder={t('account.publicProfile.publicNamePlaceholder')}
                 className="rounded-xl"
               />
-              <p className="text-xs text-muted-foreground">Can differ from your account name</p>
+              <p className="text-xs text-muted-foreground">{t('account.publicProfile.canDiffer')}</p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
                 <MapPin className="size-4 text-muted-foreground" />
-                Location
+                {t('account.publicProfile.locationLabel')}
               </Label>
               <Input
                 id="location"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
-                placeholder="City, Country (optional)"
+                placeholder={t('account.publicProfile.locationPlaceholder')}
                 className="rounded-xl"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio" className="text-sm font-medium">Short Bio</Label>
+            <Label htmlFor="bio" className="text-sm font-medium">{t('account.publicProfile.bioLabel')}</Label>
             <Textarea
               id="bio"
               value={bio}
               onChange={e => setBio(e.target.value)}
-              placeholder="A few words about yourself or your work..."
+              placeholder={t('account.publicProfile.bioPlaceholder')}
               className="rounded-xl resize-none min-h-20"
               maxLength={160}
             />
-            <p className="text-xs text-muted-foreground text-right">{bio.length} / 160 characters</p>
+            <p className="text-xs text-muted-foreground text-right">{bio.length} / 160 {t('account.publicProfile.characters')}</p>
           </div>
 
           <div className="space-y-3">
@@ -201,7 +203,7 @@ export default function ProfileSettings() {
 
           <div className="flex justify-end pt-2">
             <Button className="rounded-full px-8" onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t('account.profile.saving') : t('account.profile.saveChanges')}
             </Button>
           </div>
         </div>

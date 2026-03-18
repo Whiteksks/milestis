@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Copy, ExternalLink, Share2, Globe, BookOpen, Layout, Check } from "lucide-react"
 import { useActiveProjectsQuery } from "@/hooks/useProjectsQuery"
+import { useTranslations } from "next-intl"
+import { useTranslations as useGlobalT } from "next-intl"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
 
 const BASE_DOMAIN = "milestis.app"
@@ -26,6 +28,8 @@ function getProjectLink(project: DashboardProject): string {
 }
 
 export default function DomainsSettingsPage() {
+  const t = useTranslations("account.domains")
+  const g = useGlobalT()
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const { data: allProjects = [], isLoading } = useActiveProjectsQuery()
 
@@ -42,8 +46,8 @@ export default function DomainsSettingsPage() {
 
       <section className="space-y-6">
         <div>
-          <h2 className="font-serif text-2xl md:text-3xl">Domains</h2>
-          <p className="mt-1 text-muted-foreground">Share links for your published projects</p>
+          <h2 className="font-serif text-2xl md:text-3xl">{t("title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("description")}</p>
         </div>
 
         <div className="rounded-2xl bg-card shadow-sm">
@@ -63,8 +67,8 @@ export default function DomainsSettingsPage() {
           ) : publishedProjects.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-12 text-center">
               <Globe className="size-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">No published projects yet.</p>
-              <p className="text-xs text-muted-foreground">Publish a project to see its link here.</p>
+              <p className="text-sm text-muted-foreground">{t("noPublished")}</p>
+              <p className="text-xs text-muted-foreground">{t("publishPrompt")}</p>
             </div>
           ) : (
             <div className="divide-y divide-border/40">
@@ -130,7 +134,7 @@ export default function DomainsSettingsPage() {
                     <Layout className="size-3.5" />
                   )}
                   <span>
-                    {project.mode === "photobook" ? "Photobook" : "Portfolio"}
+                    {project.mode === "photobook" ? g("project.mode.photobook") : g("project.mode.portfolio")}
                   </span>
                 </div>
 
@@ -153,12 +157,12 @@ export default function DomainsSettingsPage() {
                   {copiedId === project.id ? (
                     <>
                       <Check className="mr-1.5 size-3.5 text-green-600" />
-                      Copied
+                      {t("copied")}
                     </>
                   ) : (
                     <>
                       <Copy className="mr-1.5 size-3.5" />
-                      Copy link
+                      {t("copyLink")}
                     </>
                   )}
                 </Button>
@@ -173,18 +177,18 @@ export default function DomainsSettingsPage() {
                   <DropdownMenuContent align="end" className="w-48 rounded-xl">
                     <DropdownMenuItem onClick={() => handleCopyLink(project)}>
                       <Copy className="mr-2 size-4" />
-                      Copy link
+                      {t("copyLink")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => window.open(getProjectLink(project), "_blank")}
                     >
                       <ExternalLink className="mr-2 size-4" />
-                      Open project
+                      {t("openProject")}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <Share2 className="mr-2 size-4" />
-                      Share via link
+                      {t("shareVia")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

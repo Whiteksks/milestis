@@ -1,5 +1,6 @@
 import { Progress } from "@/components/ui/progress"
 import { Sparkles, Gift, ShoppingBag } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface CreditsBreakdownProps {
   monthly: { used: number; total: number; resetDate: string };
@@ -8,6 +9,7 @@ interface CreditsBreakdownProps {
 }
 
 export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps) {
+  const t = useTranslations("account.billing.credits")
   const totalCredits = (monthly.total - monthly.used) + bonus.amount + purchased.amount
   const monthlyRemaining = monthly.total - monthly.used
   const monthlyPercentage = (monthly.used / monthly.total) * 100
@@ -15,23 +17,24 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
   const types = [
     {
       icon: Sparkles,
-      label: "Monthly",
+      labelKey: "items.monthly.label",
       value: monthlyRemaining,
-      sub: `of ${monthly.total} · resets ${monthly.resetDate}`,
+      subKey: "items.monthly.sub",
+      subVars: { total: monthly.total, resetDate: monthly.resetDate },
       progress: monthlyPercentage,
     },
     {
       icon: Gift,
-      label: "Bonus",
+      labelKey: "items.bonus.label",
       value: bonus.amount,
-      sub: "No expiration",
+      subKey: "items.bonus.sub",
       progress: null,
     },
     {
       icon: ShoppingBag,
-      label: "Purchased",
+      labelKey: "items.purchased.label",
       value: purchased.amount,
-      sub: "Valid forever",
+      subKey: "items.purchased.sub",
       progress: null,
     },
   ]
@@ -50,27 +53,25 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
       {/* Breakdown */}
       <div className="space-y-5">
         {types.map((type) => (
-          <div key={type.label} className="flex items-center gap-4">
+          <div key={type.labelKey} className="flex items-center gap-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
               <type.icon className="size-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{type.label}</span>
+                <span className="text-sm font-medium">{t(type.labelKey)}</span>
                 <span className="text-sm font-semibold tabular-nums">{type.value}</span>
               </div>
               {type.progress !== null && (
                 <Progress value={type.progress} className="mt-1.5 h-1.5" />
               )}
-              <p className="mt-0.5 text-xs text-muted-foreground">{type.sub}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{type.subVars ? t(type.subKey, type.subVars) : t(type.subKey)}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <p className="mt-6 text-xs text-muted-foreground">
-        Used in order: Bonus → Monthly → Purchased
-      </p>
+      <p className="mt-6 text-xs text-muted-foreground">{t("usedOrder")}</p>
     </div>
   )
 }
