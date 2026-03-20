@@ -2,22 +2,6 @@ import { FieldValue } from "firebase-admin/firestore";
 
 export type FirestoreDate = string | FieldValue;
 
-export type CloudPaymentsPaymentStatus =
-  | "success"
-  | "failed"
-  | "pending"
-  | "canceled"
-  | string;
-
-export interface UserPrivateBilling {
-  token: string;
-  subscriptionId: string;
-  customerId: string;
-  lastPaymentStatus: CloudPaymentsPaymentStatus;
-  retryCount: number;
-  lastErrorCode: string | null;
-}
-
 export interface UserPrivateRecentLogin {
   ip: string;
   date: FirestoreDate;
@@ -66,7 +50,6 @@ export interface UserPrivateSystem {
 }
 
 export interface UserPrivateDocument {
-  billing?: UserPrivateBilling;
   security: UserPrivateSecurity;
   integrations?: UserPrivateIntegrations;
   marketing?: UserPrivateMarketing;

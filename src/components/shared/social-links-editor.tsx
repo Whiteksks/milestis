@@ -2,12 +2,20 @@
 
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
-import {
-  Instagram, Github, Facebook, Twitter, Linkedin,
-  Youtube, Globe, Link, Mail, Twitch,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
-
+import { 
+  FaInstagram, 
+  FaGithub, 
+  FaFacebook, 
+  FaXTwitter,
+  FaYoutube, 
+  FaGlobe, 
+  FaLink, 
+  FaEnvelope, 
+  FaTwitch, 
+  FaLinkedin,
+  FaPixiv,
+} from "react-icons/fa6"
+import { IconType } from 'react-icons/lib'
 // ─── Slug detection ─────────────────────────────────────────────────────────
 
 /** Derives a platform slug from a raw URL string. */
@@ -22,26 +30,28 @@ export function detectSocialSlug(url: string): string {
   if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube'
   if (u.includes('twitch.tv')) return 'twitch'
   if (u.includes('mailto:') || (!u.includes('/') && u.includes('@'))) return 'email'
+  if (u.includes('pixiv.net')) return 'pixiv'
   if (u.startsWith('http')) return 'website'
   return 'link'
 }
 
-const SLUG_ICONS: Record<string, LucideIcon> = {
-  instagram: Instagram,
-  github: Github,
-  facebook: Facebook,
-  twitter: Twitter,
-  linkedin: Linkedin,
-  youtube: Youtube,
-  twitch: Twitch,
-  email: Mail,
-  website: Globe,
-  link: Link,
+const SLUG_ICONS: Record<string, IconType > = {
+  instagram: FaInstagram,
+  github: FaGithub,
+  facebook: FaFacebook,
+  twitter: FaXTwitter,
+  linkedin: FaLinkedin,
+  youtube: FaYoutube,
+  twitch: FaTwitch,
+  email: FaEnvelope,
+  website: FaGlobe,
+  link: FaLink,
+  pixiv: FaPixiv,
 }
 
 /** Returns the LucideIcon for a raw URL. */
-export function getLinkIcon(url: string): LucideIcon {
-  return SLUG_ICONS[detectSocialSlug(url)] ?? Link
+export function getLinkIcon(url: string): IconType  {
+  return SLUG_ICONS[detectSocialSlug(url)] ?? FaLink
 }
 
 /** Normalises a pasted URL — adds https:// prefix when missing. */

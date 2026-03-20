@@ -1,10 +1,8 @@
-import Header from "@/components/layout/header"
 import { BookOpen, Upload, User, CreditCard, Server, XCircle, FileText } from "lucide-react"
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
 
       <main className="px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-3xl">

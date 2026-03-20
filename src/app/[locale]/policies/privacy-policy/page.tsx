@@ -1,10 +1,8 @@
-import Header from "@/components/layout/header"
 import { Shield, Eye, Lock, Settings, Users, RefreshCw } from "lucide-react"
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
 
       <main className="px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-3xl">

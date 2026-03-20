@@ -16,7 +16,6 @@ import {
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList
 } from '@/components/ui/navigation-menu'
 
@@ -25,7 +24,7 @@ import HeaderAuthButton from './auth/auth-open-button'
 import Logo from './logo'
 
 const NAVIGATION = [
-  { title: 'About', href: '/' },
+  { title: 'Features', href: '/features' },
   { title: 'Examples', href: '/examples' },
   { title: 'Pricing', href: '/pricing' },
   { title: 'Help Center', href: '/help' }
