@@ -68,15 +68,20 @@ export default function EditorPage() {
           return
         }
 
+        // Load heavy editor data (theme + content) from the subcollection
+        const contentSnap = await getDoc(doc(db, 'projects', projectId, 'data', 'content'))
+        if (cancelled) return
+        const editorData = contentSnap.exists() ? contentSnap.data() : null
+
         setEditorMode(project.mode)
         setProjectId(projectId)
         setProjectName(project.name)
-        if (project.theme) {
+        if (editorData?.theme) {
           useThemeStore.setState({
-            currentTemplateId: project.theme.currentTemplateId,
-            currentTheme: project.theme.currentTheme,
-            themeCustomizations: project.theme.themeCustomizations,
-            customDecorations: project.theme.customDecorations ?? [],
+            currentTemplateId: editorData.theme.currentTemplateId,
+            currentTheme: editorData.theme.currentTheme,
+            themeCustomizations: editorData.theme.themeCustomizations,
+            customDecorations: editorData.theme.customDecorations ?? [],
           })
         } else {
           // New project — reset theme to defaults so previous project's theme doesn't bleed in
@@ -96,16 +101,16 @@ export default function EditorPage() {
         }
 
         // Rehydrate content store
-        if (project.content) {
+        if (editorData?.content) {
           if (project.mode === 'portfolio') {
             useContentStore.setState({
-              sectionVisibility: project.content.sectionVisibility,
-              sectionContent: project.content.sectionContent,
+              sectionVisibility: editorData.content.sectionVisibility,
+              sectionContent: editorData.content.sectionContent,
             })
           } else {
             useContentStore.setState({
-              photobookSectionVisibility: project.content.sectionVisibility,
-              photobookSectionContent: project.content.sectionContent,
+              photobookSectionVisibility: editorData.content.sectionVisibility,
+              photobookSectionContent: editorData.content.sectionContent,
             })
           }
         } else {

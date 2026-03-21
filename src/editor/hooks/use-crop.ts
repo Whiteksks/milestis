@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { Area } from "react-easy-crop"
 import type { ImageCropData } from "@/editor/lib/crop-data"
 import { getImageNaturalSize } from "@/editor/lib/crop-data"
@@ -52,14 +52,26 @@ export function useCrop({ image, cropData }: UseCropOptions): UseCropReturn {
 
   // Always reference the original, unmodified image URL
   const originalImageRef = useRef<string>(image)
+  // Cache natural dimensions so handleApply doesn't need an async image load
+  const naturalSizeRef = useRef<{ width: number; height: number } | null>(null)
 
   const syncImage = useCallback((newImage: string) => {
     originalImageRef.current = newImage
+    naturalSizeRef.current = null  // invalidate dimensions cache for new image
     setCrop({ x: 0, y: 0 })
     setZoom(1)
     setCroppedAreaPixels(null)
     setShowCrop(false)
   }, [])
+
+  // Eagerly preload natural dimensions as soon as the crop panel opens,
+  // so handleApply can resolve synchronously from the cache.
+  useEffect(() => {
+    if (!showCrop || !originalImageRef.current || naturalSizeRef.current) return
+    getImageNaturalSize(originalImageRef.current)
+      .then((size) => { naturalSizeRef.current = size })
+      .catch(() => {})
+  }, [showCrop])
 
   const onCropComplete = useCallback((_: Area, areaPixels: Area) => {
     setCroppedAreaPixels(areaPixels)
@@ -75,14 +87,16 @@ export function useCrop({ image, cropData }: UseCropOptions): UseCropReturn {
     try {
       setIsApplying(true)
       const src = originalImageRef.current || image
-      const { width: naturalWidth, height: naturalHeight } = await getImageNaturalSize(src)
+      // Use the pre-loaded size if available (populated when crop panel opened)
+      const size = naturalSizeRef.current ?? await getImageNaturalSize(src)
+      naturalSizeRef.current = size  // cache for subsequent calls
       return {
         editorX: crop.x,
         editorY: crop.y,
         zoom,
         area: croppedAreaPixels,
-        naturalWidth,
-        naturalHeight,
+        naturalWidth: size.width,
+        naturalHeight: size.height,
       }
     } catch (e) {
       console.error(e)

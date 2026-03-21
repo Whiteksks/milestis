@@ -1,4 +1,4 @@
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/firebase'
 import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
@@ -54,10 +54,7 @@ export async function saveProject(
       ? sectionContent.hero.heroThumb
       : photobookSectionContent.cover.images?.thumbUrl
 
-  const payload: Record<string, unknown> = {
-    theme: stripUndefined(theme),
-    content: stripUndefined(content),
-  }
+  const payload: Record<string, unknown> = {}
 
   if (updateDashboardMeta) {
     const preview: Record<string, string> = {
@@ -93,5 +90,15 @@ export async function saveProject(
     payload.updatedAt = serverTimestamp()
   }
 
-  await updateDoc(doc(db, 'projects', projectId), payload)
+  // Write theme + content to subcollection — keeps main doc lean for dashboard queries
+  const contentDocRef = doc(db, 'projects', projectId, 'data', 'content')
+  await setDoc(contentDocRef, {
+    theme: stripUndefined(theme),
+    content: stripUndefined(content),
+  }, { merge: true })
+
+  // Only update the main doc when there is something to write (preview or timestamp)
+  if (Object.keys(payload).length > 0) {
+    await updateDoc(doc(db, 'projects', projectId), payload)
+  }
 }

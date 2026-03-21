@@ -12,6 +12,12 @@ service cloud.firestore {
       // Allow creation — the server (Admin SDK) writes ownerId, but client can also create
       // through the Cloud Function, so direct client writes are blocked for create.
       // Reading newly-created doc: ownerId is already set by the Cloud Function.
+
+      // Editor content subcollection — checked against parent project ownership
+      match /data/{docId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+      }
     }
 
     match /images/{imageId} {

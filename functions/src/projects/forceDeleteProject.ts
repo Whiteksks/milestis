@@ -1,5 +1,6 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
@@ -108,15 +109,25 @@ export const forceDeleteProject = onRequest(
         logger.info(`[forceDeleteProject] Deleted ${imagesSnap.size} image doc(s) for ${projectId}.`);
       }
 
-      // 2. Delete all Storage files for this project
+      // 2. Delete editor content subcollection document
+      const contentRef = projectRef.collection("data").doc("content");
+      await contentRef.delete();
+
+      // 3. Delete all Storage files for this project
       const storage = getStorage();
       await storage.bucket().deleteFiles({
         prefix: `users/${uid}/projects/${projectId}/`,
       });
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);
 
-      // 3. Delete the project document
-      await projectRef.delete();
+      // 4. Delete the project document and decrement user counter atomically
+      const userRef = db.collection("users").doc(uid);
+      const deleteBatch = db.batch();
+      deleteBatch.delete(projectRef);
+      deleteBatch.update(userRef, {
+        "stats.totalProjects": FieldValue.increment(-1),
+      });
+      await deleteBatch.commit();
       logger.info(`[forceDeleteProject] Project ${projectId} permanently deleted by user ${uid}.`);
 
       res.status(200).json({ success: true });

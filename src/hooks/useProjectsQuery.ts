@@ -91,10 +91,13 @@ function useUidAndLoading() {
 // ─── Query options factories ───────────────────────────────────────────────
 // Shared between hooks and prefetchQuery calls.
 
+const STALE_TIME = 5 * 60 * 1000 // 5 minutes
+
 export function getActiveProjectsQueryOptions(uid: string) {
   return {
     queryKey: projectKeys.active(uid),
     queryFn: () => fetchProjectsByStatus(uid, 'active'),
+    staleTime: STALE_TIME,
   } as const
 }
 
@@ -121,6 +124,7 @@ export function useTrashedProjectsQuery({ enabled: extraEnabled = true }: { enab
     queryKey: projectKeys.deleted(uid ?? ''),
     queryFn: () => fetchProjectsByStatus(uid!, 'deleted'),
     enabled: !userLoading && !!uid && extraEnabled,
+    staleTime: STALE_TIME,
   })
   return { ...result, isLoading: userLoading || result.isLoading }
 }

@@ -6,7 +6,6 @@ import { FinalCTA } from "@/components/layout/landing/final-cta";
 import { Footer } from "@/components/layout/footer";
 import { HowItWorksSection } from "@/components/layout/landing/how-it-works-section";
 import { PreviewSection } from "@/components/layout/landing/preview-section";
-import { PricingTeaser } from "@/components/layout/pricing/pricing-teaser";
 import { UseCasesSection } from "@/components/layout/landing/use-cases-section";
 import {FeaturesSection} from "@/components/layout/landing/features-section";
 import Header from "@/components/layout/header";
@@ -22,7 +21,6 @@ export default function Home() {
       <FeaturesSection />
       <UseCasesSection />
       <PreviewSection />
-      <PricingTeaser />
       <FinalCTA />
       <Footer />
     </div>

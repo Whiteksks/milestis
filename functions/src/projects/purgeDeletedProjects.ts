@@ -1,6 +1,6 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
-import { Timestamp } from "firebase-admin/firestore";
+import { Timestamp, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 
@@ -62,7 +62,15 @@ export const purgeDeletedProjects = onSchedule(
           );
         }
 
-        // 2. Delete all Storage files under the project folder
+        // 2. Delete editor content subcollection document
+        const contentRef = db
+          .collection("projects")
+          .doc(projectId)
+          .collection("data")
+          .doc("content");
+        await contentRef.delete();
+
+        // 3. Delete all Storage files under the project folder
         await bucket.deleteFiles({
           prefix: `users/${ownerId}/projects/${projectId}/`,
         });
@@ -77,8 +85,14 @@ export const purgeDeletedProjects = onSchedule(
         // Continue purging other projects even if one fails
       }
 
-      // 3. Delete the project document itself
-      await projectDoc.ref.delete();
+      // 4. Delete the project document and decrement user counter atomically
+      const userRef = db.collection("users").doc(ownerId);
+      const deleteBatch = db.batch();
+      deleteBatch.delete(projectDoc.ref);
+      deleteBatch.update(userRef, {
+        "stats.totalProjects": FieldValue.increment(-1),
+      });
+      await deleteBatch.commit();
       logger.info(`[purgeDeletedProjects] Deleted project document ${projectId}.`);
     }
 
