@@ -6,7 +6,11 @@ export class PublishProjectError extends Error {
   }
 }
 
-export async function publishProject(projectId: string): Promise<void> {
+export async function publishProject(
+  projectId: string,
+  slug: string,
+  accessToken?: string,
+): Promise<void> {
   const user = auth.currentUser
   if (!user) throw new PublishProjectError("UNAUTHORIZED", "Not authenticated")
 
@@ -17,7 +21,11 @@ export async function publishProject(projectId: string): Promise<void> {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-    body: JSON.stringify({ projectId }),
+    body: JSON.stringify({
+      projectId,
+      slug,
+      ...(accessToken ? { accessToken } : {}),
+    }),
   })
 
   const data = await res.json()

@@ -21,9 +21,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
-import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, usePublishMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
+import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
 import { useTranslations } from "next-intl"
+import { PublishModal } from "@/editor/components/modals/publish-modal"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -76,17 +77,21 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   const softDeleteMutation = useSoftDeleteMutation()
   const restoreMutation = useRestoreMutation()
   const forceDeleteMutation = useForceDeleteMutation()
-  const publishMutation = usePublishMutation()
   const unpublishMutation = useUnpublishMutation()
   const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending
-    || publishMutation.isPending || unpublishMutation.isPending
-    const t = useTranslations()
+    || unpublishMutation.isPending
+  const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [publishModalOpen, setPublishModalOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
-  const viewUrl = `https://${project.id}.milestis.site`
+  const viewUrl = project.publishedSlug
+    ? project.mode === 'portfolio'
+      ? `https://${project.publishedSlug}.milestis.site`
+      : null  // photobook link has token — only shareable from the modal at publish time
+    : null
 
   const thumbnail = useMemo(
     () => (
@@ -127,7 +132,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   }
 
   function handlePublish() {
-    publishMutation.mutate(project.id)
+    setPublishModalOpen(true)
   }
 
   function handleUnpublish() {
@@ -222,7 +227,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             <Edit className="mr-1.5 size-3.5" />
             {t('project.edit')}
           </Button>
-          {project.isPublished && (
+          {project.isPublished && viewUrl && (
             <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={() => window.open(viewUrl, '_blank')}>
               <Eye className="mr-1.5 size-3.5" />
               {t('project.view')}
@@ -242,9 +247,11 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             <DropdownMenuContent align="end" className="rounded-xl">
               {project.isPublished ? (
                 <>
-                  <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
-                    <Eye className="mr-2 size-4" /> {t('project.view')}
-                  </DropdownMenuItem>
+                  {viewUrl && (
+                    <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
+                      <Eye className="mr-2 size-4" /> {t('project.view')}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
                     <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
                   </DropdownMenuItem>
@@ -286,6 +293,13 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
         <p className="truncate text-sm font-medium">{project.name}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
+
+      <PublishModal
+        open={publishModalOpen}
+        onOpenChange={setPublishModalOpen}
+        projectId={project.id}
+        mode={project.mode}
+      />
     </div>
   )
 }

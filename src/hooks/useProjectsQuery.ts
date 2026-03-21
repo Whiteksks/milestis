@@ -12,6 +12,7 @@ export interface DashboardProject {
   mode: 'portfolio' | 'photobook'
   status: 'active' | 'deleted'
   isPublished: boolean
+  publishedSlug?: string | null
   updatedAt: Date
   deletedAt?: Date
   purgeAt?: Date
@@ -58,6 +59,7 @@ export function mapProjectDoc(data: Record<string, any>, id: string): DashboardP
     mode: data.mode,
     status: data.status,
     isPublished: data.isPublished ?? false,
+    publishedSlug: data.publishedSlug ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),
     deletedAt: data.deletedAt?.toDate(),
     purgeAt: data.purgeAt?.toDate(),

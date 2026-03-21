@@ -14,8 +14,9 @@ import { useAutoSave } from '@/hooks/useAutoSave'
 import { toastProject } from '@/lib/toast'
 import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
-import { useRenameMutation, usePublishMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
+import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { PublishModal } from '@/editor/components/modals/publish-modal'
 
 interface EditorHeaderProps {
   projectId: string
@@ -25,6 +26,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
@@ -32,10 +34,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const uid = useUserStore((s) => s.profile?.uid ?? null)
   const { save: autoSave, isDirty } = useAutoSave(projectId)
   const renameMutation = useRenameMutation()
-  const publishMutation = usePublishMutation()
   const unpublishMutation = useUnpublishMutation()
 
-  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean, isPublished, setIsPublished } = useUiSelector((state) => ({
+  const {
+    deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean,
+    isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode,
+  } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
     toggleMediaLibrary: state.toggleMediaLibrary,
@@ -44,6 +48,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     markClean: state.markClean,
     isPublished: state.isPublished,
     setIsPublished: state.setIsPublished,
+    clearPublishedInfo: state.clearPublishedInfo,
+    publishedSlug: state.publishedSlug,
+    publishedAccessToken: state.publishedAccessToken,
+    editorMode: state.editorMode,
   }))
 
   const [localName, setLocalName] = useState(projectName ?? '')
@@ -90,7 +98,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     }
   }
 
-  async function handlePublish() {
+  async function handleOpenPublishModal() {
+    // Auto-save before opening the publish modal
     if (isDirty) {
       setSaveState('saving')
       try {
@@ -106,11 +115,16 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         return
       }
     }
-    publishMutation.mutate(projectId, { onSuccess: () => setIsPublished(true) })
+    setIsPublishModalOpen(true)
   }
 
   function handleUnpublish() {
-    unpublishMutation.mutate(projectId, { onSuccess: () => setIsPublished(false) })
+    unpublishMutation.mutate(projectId, {
+      onSuccess: () => {
+        setIsPublished(false)
+        clearPublishedInfo()
+      },
+    })
   }
 
   async function handleHomeClick() {
@@ -267,10 +281,20 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => window.open(`https://${projectId}.milestis.site`, '_blank')}>
-                  <Globe className="size-4" />
-                  View site
-                </DropdownMenuItem>
+                {publishedSlug && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      const url =
+                        editorMode === 'portfolio'
+                          ? `https://${publishedSlug}.milestis.site`
+                          : `https://milestis.site/${publishedSlug}?token=${publishedAccessToken ?? ''}`
+                      window.open(url, '_blank')
+                    }}
+                  >
+                    <Globe className="size-4" />
+                    View site
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
                   <EyeOff className="size-4" />
                   Unpublish
@@ -280,20 +304,23 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           ) : (
             <Button
               size="sm"
-              onClick={handlePublish}
-              disabled={publishMutation.isPending || saveState === 'saving'}
+              onClick={handleOpenPublishModal}
+              disabled={saveState === 'saving'}
               className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
             >
-              {publishMutation.isPending ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Globe className="h-3 w-3" />
-              )}
-              {publishMutation.isPending ? 'Publishing...' : 'Publish'}
+              <Globe className="h-3 w-3" />
+              Publish
             </Button>
           )}
         </div>
       </div>
+
+      <PublishModal
+        open={isPublishModalOpen}
+        onOpenChange={setIsPublishModalOpen}
+        projectId={projectId}
+        mode={editorMode as 'portfolio' | 'photobook'}
+      />
     </header>
   )
 }

@@ -3,6 +3,7 @@ import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
+import { createHash } from "crypto";
 import { db } from "../lib/firebaseAdmin";
 
 const ERROR = {
@@ -14,8 +15,12 @@ const ERROR = {
   FORBIDDEN:                "FORBIDDEN",
   PROJECT_NOT_ACTIVE:       "PROJECT_NOT_ACTIVE",
   NO_CONTENT:               "NO_CONTENT",
+  SLUG_TAKEN:               "SLUG_TAKEN",
   INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
 } as const;
+
+// Slug: 3-63 chars, lowercase alphanumeric + hyphens, no leading/trailing hyphen
+const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
 
 /**
  * Extracts the GCS storage path from a Firebase Storage download URL.
@@ -87,7 +92,7 @@ export const publishProject = onRequest(
     timeoutSeconds: 300,
     memory: "512MiB",
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.app$/],
+    cors: [/localhost/, /milestis\.com$/, /milestis\.site$/],
   },
   async (req, res) => {
     // ── Method guard ──────────────────────────────────────────────────────
@@ -113,9 +118,20 @@ export const publishProject = onRequest(
     }
 
     // ── Payload ───────────────────────────────────────────────────────────
-    const { projectId } = req.body as Record<string, unknown>;
+    const { projectId, slug, accessToken } = req.body as Record<string, unknown>;
+
     if (typeof projectId !== "string" || !projectId.trim()) {
       res.status(400).json({ error: ERROR.INVALID_PAYLOAD, message: "projectId must be a non-empty string." });
+      return;
+    }
+
+    if (
+      typeof slug !== "string" ||
+      slug.length < 3 ||
+      slug.length > 63 ||
+      !SLUG_REGEX.test(slug)
+    ) {
+      res.status(400).json({ error: ERROR.INVALID_PAYLOAD, message: "slug must be 3-63 lowercase alphanumeric characters or hyphens, not starting or ending with a hyphen." });
       return;
     }
 
@@ -140,6 +156,30 @@ export const publishProject = onRequest(
       return;
     }
 
+    // ── Slug uniqueness check (portfolio only) ────────────────────────────
+    if (projectData.mode === "portfolio") {
+      const slugSnap = await db
+        .collection("published_projects")
+        .where("slug", "==", slug)
+        .limit(2)
+        .get();
+      const takenByOther = slugSnap.docs.some((doc) => doc.id !== projectId);
+      if (takenByOther) {
+        res.status(409).json({ error: ERROR.SLUG_TAKEN, message: "This slug is already taken by another portfolio." });
+        return;
+      }
+    }
+
+    // ── AccessToken validation (photobook only) ───────────────────────────
+    let hashedToken: string | undefined;
+    if (projectData.mode === "photobook") {
+      if (typeof accessToken !== "string" || !accessToken.trim()) {
+        res.status(400).json({ error: ERROR.INVALID_PAYLOAD, message: "accessToken is required for photobook projects." });
+        return;
+      }
+      hashedToken = createHash("sha256").update(accessToken).digest("hex");
+    }
+
     // ── Load editor content ───────────────────────────────────────────────
     const contentSnap = await projectRef.collection("data").doc("content").get();
     if (!contentSnap.exists) {
@@ -157,7 +197,6 @@ export const publishProject = onRequest(
       const rawPayload = {
         theme:   editorData.theme   ?? null,
         content: editorData.content ?? null,
-        preview: projectData.preview ?? null,
       };
       let payloadJson = JSON.stringify(rawPayload);
 
@@ -195,18 +234,23 @@ export const publishProject = onRequest(
       const publishedRef = db.collection("published_projects").doc(projectId);
       const batch = db.batch();
 
-      batch.set(publishedRef, {
+      const publishedData: Record<string, unknown> = {
         ownerId:     uid,
+        slug,
         name:        projectData.name,
         mode:        projectData.mode,
         theme:       processedPayload.theme,
         content:     processedPayload.content,
-        preview:     processedPayload.preview,
         publishedAt: FieldValue.serverTimestamp(),
-      });
+      };
+      if (hashedToken) {
+        publishedData.accessToken = hashedToken;
+      }
+      batch.set(publishedRef, publishedData);
 
       batch.update(projectRef, {
         isPublished: true,
+        publishedSlug: slug,
         updatedAt:   FieldValue.serverTimestamp(),
       });
 

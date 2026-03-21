@@ -184,27 +184,33 @@ export function useRenameMutation() {
 
 // ─── Publish ──────────────────────────────────────────────────────────────────────
 
+export type PublishVariables = {
+  projectId: string
+  slug: string
+  accessToken?: string
+}
+
 export function usePublishMutation() {
   const queryClient = useQueryClient()
   const uid = useUid()
 
   return useMutation({
-    mutationFn: async (projectId: string) => {
-      const promise = publishProject(projectId)
+    mutationFn: async ({ projectId, slug, accessToken }: PublishVariables) => {
+      const promise = publishProject(projectId, slug, accessToken)
       toastProject.publish(promise)
       await promise
     },
-    onMutate: async (projectId) => {
+    onMutate: async ({ projectId, slug }) => {
       if (!uid) return
       await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
       const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
       queryClient.setQueryData<DashboardProject[]>(
         projectKeys.active(uid),
-        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: true } : p) ?? [],
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: true, publishedSlug: slug } : p) ?? [],
       )
       return { prevActive }
     },
-    onError: (_err, _id, context) => {
+    onError: (_err, _vars, context) => {
       if (!uid || !context) return
       if (context.prevActive !== undefined)
         queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
@@ -233,7 +239,7 @@ export function useUnpublishMutation() {
       const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
       queryClient.setQueryData<DashboardProject[]>(
         projectKeys.active(uid),
-        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false } : p) ?? [],
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false, publishedSlug: null } : p) ?? [],
       )
       return { prevActive }
     },

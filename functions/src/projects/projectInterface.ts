@@ -3,6 +3,19 @@ import { FieldValue } from "firebase-admin/firestore";
 export type ProjectMode = "portfolio" | "photobook";
 export type ProjectStatus = "active" | "archived" | "deleted";
 
+/** Shape written to `published_projects/{projectId}` */
+export interface PublishedProjectData {
+  ownerId: string;
+  slug: string;
+  name: string;
+  mode: ProjectMode;
+  /** SHA-256 hex of the plain-text token. Portfolio projects do not have one. */
+  accessToken?: string;
+  theme: Record<string, unknown> | null;
+  content: Record<string, unknown> | null;
+  publishedAt: FieldValue;
+}
+
 /**
  * Shape of the Firestore document written at creation time.
  * theme and content are absent — the editor writes them on first save.

@@ -30,7 +30,7 @@ export const unpublishProject = onRequest(
     concurrency: 10,
     timeoutSeconds: 120,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.app$/],
+    cors: [/localhost/, /milestis\.com$/, /milestis\.site$/],
   },
   async (req, res) => {
     // ── Method guard ──────────────────────────────────────────────────────
@@ -87,6 +87,7 @@ export const unpublishProject = onRequest(
       batch.delete(publishedRef);
       batch.update(projectRef, {
         isPublished: false,
+        publishedSlug: FieldValue.delete(),
         updatedAt:   FieldValue.serverTimestamp(),
       });
       await batch.commit();

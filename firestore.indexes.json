@@ -24,6 +24,13 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "purgeAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "published_projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "slug", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
