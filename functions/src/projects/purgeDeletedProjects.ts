@@ -70,9 +70,13 @@ export const purgeDeletedProjects = onSchedule(
           .doc("content");
         await contentRef.delete();
 
-        // 3. Delete all Storage files under the project folder
+        // 3. Delete all private Storage files
         await bucket.deleteFiles({
           prefix: `users/${ownerId}/projects/${projectId}/`,
+        });
+        // 4. Delete public Storage files (if the project was ever published)
+        await bucket.deleteFiles({
+          prefix: `public/${projectId}/`,
         });
         logger.info(
           `[purgeDeletedProjects] Deleted Storage files for project ${projectId}.`
@@ -85,10 +89,12 @@ export const purgeDeletedProjects = onSchedule(
         // Continue purging other projects even if one fails
       }
 
-      // 4. Delete the project document and decrement user counter atomically
+      // 5. Delete project doc + published snapshot + decrement user counter
       const userRef = db.collection("users").doc(ownerId);
+      const publishedRef = db.collection("published_projects").doc(projectId);
       const deleteBatch = db.batch();
       deleteBatch.delete(projectDoc.ref);
+      deleteBatch.delete(publishedRef);  // no-op if project was never published
       deleteBatch.update(userRef, {
         "stats.totalProjects": FieldValue.increment(-1),
       });

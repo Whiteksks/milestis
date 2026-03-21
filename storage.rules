@@ -36,6 +36,12 @@ service firebase.storage {
     }
 
     // Deny everything else
+    // Published project files — publicly readable, only written by Cloud Functions via Admin SDK
+    match /public/{projectId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

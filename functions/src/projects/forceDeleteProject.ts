@@ -113,17 +113,23 @@ export const forceDeleteProject = onRequest(
       const contentRef = projectRef.collection("data").doc("content");
       await contentRef.delete();
 
-      // 3. Delete all Storage files for this project
+      // 3. Delete all private Storage files for this project
       const storage = getStorage();
       await storage.bucket().deleteFiles({
         prefix: `users/${uid}/projects/${projectId}/`,
       });
+      // 4. Delete public Storage files (if the project was ever published)
+      await storage.bucket().deleteFiles({
+        prefix: `public/${projectId}/`,
+      });
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);
 
-      // 4. Delete the project document and decrement user counter atomically
+      // 5. Delete project doc + published snapshot + decrement user counter
       const userRef = db.collection("users").doc(uid);
+      const publishedRef = db.collection("published_projects").doc(projectId);
       const deleteBatch = db.batch();
       deleteBatch.delete(projectRef);
+      deleteBatch.delete(publishedRef);  // no-op if project was never published
       deleteBatch.update(userRef, {
         "stats.totalProjects": FieldValue.increment(-1),
       });

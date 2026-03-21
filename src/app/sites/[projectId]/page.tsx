@@ -9,17 +9,14 @@ interface Props {
 // ─── Данные проекта из Firestore (серверная сторона) ──────────────────────
 
 async function getPublishedProject(projectId: string) {
-  const snap = await adminDb.doc(`projects/${projectId}`).get()
+  const snap = await adminDb.doc(`published_projects/${projectId}`).get()
 
   if (!snap.exists) return null
 
   const data = snap.data()!
 
-  // Только опубликованные проекты доступны публично
-  if (!data.isPublished || data.status !== "active") return null
-
   return {
-    id: snap.id,
+    id: projectId,
     name: data.name as string,
     mode: data.mode as "portfolio" | "photobook",
     content: data.content ?? null,
