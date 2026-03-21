@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,14 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,10 +28,13 @@ import {
   X,
   Copy,
   ExternalLink,
+  Link2,
+  ShieldCheck,
 } from 'lucide-react'
 import { usePublishModal } from '@/hooks/usePublishModal'
 import { usePublishMutation } from '@/hooks/useProjectMutations'
 import { useUiSelector } from '@/editor/lib/store'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface PublishModalProps {
   open: boolean
@@ -39,129 +50,83 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
   }))
 
   const publishMutation = usePublishMutation()
-  const { slug, handleSlugChange, slugStatus, accessToken, portfolioUrl, photobookUrl, canPublish } =
-    usePublishModal(projectId, mode)
-
-  const publicUrl = mode === 'portfolio' ? portfolioUrl : photobookUrl
-
-  const handleCopy = useCallback((text: string) => {
-    navigator.clipboard.writeText(text).catch(() => {})
-  }, [])
+  const modalData = usePublishModal(projectId, mode)
+  const isMobile = useIsMobile()
 
   function handlePublish() {
-    if (!canPublish) return
+    if (!modalData.canPublish) return
     publishMutation.mutate(
-      { projectId, slug, accessToken: mode === 'photobook' ? accessToken : undefined },
+      { projectId, slug: modalData.slug, accessToken: mode === 'photobook' ? modalData.accessToken : undefined },
       {
         onSuccess: () => {
           setIsPublished(true)
-          setPublishedInfo(slug, mode === 'photobook' ? accessToken : undefined)
+          setPublishedInfo(modalData.slug, mode === 'photobook' ? modalData.accessToken : undefined)
           onOpenChange(false)
         },
       },
     )
   }
 
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="px-4 pb-2 min-h-80">
+          <DrawerHeader className="px-0 pt-2 pb-0 text-left">
+            <DrawerTitle className="flex items-center gap-2 text-base text-center">
+              {mode === 'portfolio' ? <Globe className="size-4 text-primary" /> : <Lock className="size-4 text-primary" />}
+              {mode === 'portfolio' ? 'Publish Portfolio' : 'Publish Photobook'}
+            </DrawerTitle>
+            <DrawerDescription className="text-xs sr-only">
+              {mode === 'portfolio'
+                ? 'Publicly available at a custom subdomain.'
+                : 'Only accessible with the generated link.'}
+            </DrawerDescription>
+          </DrawerHeader>
+          <PublishForm mode={mode} data={modalData} />
+          <DrawerFooter className="px-0 pt-2">
+            <Button
+              onClick={handlePublish}
+              disabled={!modalData.canPublish || publishMutation.isPending}
+              className="gap-2 w-full"
+            >
+              <PublishButtonIcon isPending={publishMutation.isPending} hasUrl={!!modalData.portfolioUrl || !!modalData.photobookUrl} />
+              {publishMutation.isPending ? 'Publishing...' : 'Publish'}
+            </Button>
+            <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={publishMutation.isPending} className="w-full">
+              Cancel
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    )
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {mode === 'portfolio' ? (
-              <Globe className="size-4 text-primary" />
-            ) : (
-              <Lock className="size-4 text-primary" />
-            )}
+      <DialogContent className="sm:max-w-xl gap-4">
+        <DialogHeader className="gap-1">
+          <DialogTitle className="flex items-center gap-2 text-base">
+            {mode === 'portfolio' ? <Globe className="size-4 text-primary" /> : <Lock className="size-4 text-primary" />}
             {mode === 'portfolio' ? 'Publish Portfolio' : 'Publish Photobook'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs">
             {mode === 'portfolio'
-              ? 'Your portfolio will be publicly available at a custom subdomain.'
-              : 'Your photobook will only be accessible with the generated link.'}
+              ? 'Publicly available at a custom subdomain.'
+              : 'Only accessible with the generated link.'}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-2">
-          {/* Slug input */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">
-              {mode === 'portfolio' ? 'Subdomain' : 'Link name'}
-            </Label>
-            <div className="flex items-center gap-2">
-              {mode === 'portfolio' && (
-                <span className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
-                  https://
-                </span>
-              )}
-              <div className="relative flex-1">
-                <Input
-                  id="slug"
-                  value={slug}
-                  onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder={mode === 'portfolio' ? 'john-portfolio' : 'summer-trip'}
-                  className="pr-8"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <SlugStatusIcon status={slugStatus} />
-                </div>
-              </div>
-              {mode === 'portfolio' && (
-                <span className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
-                  .milestis.site
-                </span>
-              )}
-            </div>
-            <SlugStatusMessage status={slugStatus} mode={mode} />
-          </div>
-
-          {/* URL preview */}
-          {publicUrl && (
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">
-                {mode === 'portfolio' ? 'Your portfolio URL' : 'Share link (keep it private)'}
-              </Label>
-              <div className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2">
-                <span className="flex-1 text-xs font-mono text-foreground/80 truncate select-all">
-                  {publicUrl}
-                </span>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={() => handleCopy(publicUrl)}
-                  title="Copy link"
-                >
-                  <Copy className="size-3" />
-                </Button>
-              </div>
-
-              {mode === 'photobook' && (
-                <p className="text-xs text-muted-foreground">
-                  Anyone with this link and token can view your photobook. Store it safely.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-
+        <PublishForm mode={mode} data={modalData} />
         <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={publishMutation.isPending}>
+          <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} disabled={publishMutation.isPending}>
             Cancel
           </Button>
           <Button
+            size="sm"
             onClick={handlePublish}
-            disabled={!canPublish || publishMutation.isPending}
+            disabled={!modalData.canPublish || publishMutation.isPending}
             className="gap-2"
           >
-            {publishMutation.isPending ? (
-              <Loader2 className="size-3 animate-spin" />
-            ) : publicUrl ? (
-              <ExternalLink className="size-3" />
-            ) : (
-              <Globe className="size-3" />
-            )}
+            <PublishButtonIcon isPending={publishMutation.isPending} hasUrl={!!modalData.portfolioUrl || !!modalData.photobookUrl} />
             {publishMutation.isPending ? 'Publishing...' : 'Publish'}
           </Button>
         </DialogFooter>
@@ -169,8 +134,81 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
     </Dialog>
   )
 }
+export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; data: any }) {
+  const { slug, handleSlugChange, slugStatus } = data
+  const maxLength = 24
 
-// ─── Small helper components ──────────────────────────────────────────────────
+  return (
+    <div className="space-y-4 py-2">
+      {/* SECTION 1: CONFIGURATION */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-1">
+          <Label htmlFor="slug" className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] flex items-center gap-2">
+            {mode === 'portfolio' ? <Globe className="size-3.5 text-primary/60" /> : <Link2 className="size-3.5 text-primary/60" />}
+            {mode === 'portfolio' ? 'Subdomain Settings' : 'Link Identifier'}
+          </Label>
+          <span className={`text-[10px] font-mono font-medium ${slug.length >= maxLength ? 'text-destructive' : 'text-muted-foreground/40'}`}>
+            {slug.length}<span className="opacity-50">/{maxLength}</span>
+          </span>
+        </div>
+
+        <div className="group relative flex items-center rounded-2xl border border-border/50 bg-muted/5 shadow-sm focus-within:ring-[5px] focus-within:ring-primary/5 focus-within:border-primary/30 transition-all duration-300 overflow-hidden w-full">
+          
+          {/* Левая часть (Префикс) */}
+          <div className="flex items-center px-4 h-13 bg-muted/30 border-r border-border/40 text-muted-foreground/70 text-sm font-medium select-none shrink-0 italic font-serif">
+            {mode === 'portfolio' ? 'https://' : 'https://milestis.site/'}
+          </div>
+          
+          <div className="relative flex-1 min-w-0 flex items-center bg-background/50">
+            <Input
+              id="slug"
+              value={slug}
+              onChange={(e) => e.target.value.length <= maxLength && handleSlugChange(e.target.value)}
+              placeholder={mode === 'portfolio' ? 'unique-name' : 'moment-2026'}
+              className="h-13 border-0 bg-transparent px-4 text-base font-medium placeholder:text-muted-foreground/20 focus-visible:ring-0 w-full truncate"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 shrink-0 pl-2">
+               <SlugStatusIcon status={slugStatus} />
+            </div>
+          </div>
+
+          {/* Правая часть (только для портфолио) */}
+          {mode === 'portfolio' && (
+            <div className="flex items-center px-4 h-13 bg-muted/30 border-l border-border/40 text-muted-foreground/70 text-sm font-medium select-none shrink-0 tracking-tight">
+              .milestis.site
+            </div>
+          )}
+        </div>
+        
+        <div className="px-1 min-h-[20px]">
+           <SlugStatusMessage status={slugStatus} mode={mode} />
+        </div>
+      </div>
+
+      {/* POLICY FOOTER */}
+      <div className="flex items-start gap-3 p-4 rounded-2xl bg-primary/[0.02] border border-primary/5 shadow-inner">
+        <div className="p-1.5 rounded-lg bg-background border border-border/40">
+          <ShieldCheck className="w-3.5 h-3.5 text-primary/70" />
+        </div>
+        <p className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
+          {mode === 'photobook' 
+            ? "Privacy First: This link is encrypted and hidden from search engines. Only people with the direct URL can see your photos."
+            : "Global Access: Your site will be optimized for fast loading worldwide. You can update your content or domain at any time."
+          }
+        </p>
+      </div>
+    </div>
+  )
+}
+function PublishButtonIcon({ isPending, hasUrl }: { isPending: boolean; hasUrl: boolean }) {
+  if (isPending) return <Loader2 className="size-3 animate-spin" />
+  if (hasUrl) return <ExternalLink className="size-3" />
+  return <Globe className="size-3" />
+}
+
+// ─── Small helpers ────────────────────────────────────────────────────────────
 
 function SlugStatusIcon({ status }: { status: ReturnType<typeof usePublishModal>['slugStatus'] }) {
   if (status === 'checking') return <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
@@ -190,11 +228,7 @@ function SlugStatusMessage({
   if (status === 'taken')
     return <p className="text-xs text-destructive">This subdomain is already taken.</p>
   if (status === 'invalid')
-    return (
-      <p className="text-xs text-destructive">
-        Use only lowercase letters, numbers, and hyphens (3–63 chars).
-      </p>
-    )
+    return <p className="text-xs text-destructive">Lowercase letters, numbers, hyphens (3–24 chars).</p>
   if (status === 'available' && mode === 'portfolio')
     return <p className="text-xs text-emerald-600 dark:text-emerald-400">Subdomain is available!</p>
   return null

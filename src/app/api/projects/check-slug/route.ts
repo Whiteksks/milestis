@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { adminDb } from "@/lib/firebase/admin"
+import { db } from "@/lib/firebase/firebase"
+import { collection, query, where, limit, getDocs } from "firebase/firestore"
 
 // Portfolio slugs must be globally unique (they become subdomains).
 // Photobook slugs have no uniqueness requirement (access token provides isolation).
+// 63 chars = DNS RFC 1035 hard limit for a single label.
 
 const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/
 
@@ -16,11 +18,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const snap = await adminDb
-      .collection("published_projects")
-      .where("slug", "==", slug)
-      .limit(2)
-      .get()
+    const snap = await getDocs(
+      query(collection(db, "published_projects"), where("slug", "==", slug), limit(2)),
+    )
 
     const takenByOther = snap.docs.some((doc) => doc.id !== excludeProjectId)
     return NextResponse.json({ available: !takenByOther })

@@ -269,15 +269,15 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   size="sm"
                   variant="secondary"
                   disabled={unpublishMutation.isPending}
-                  className="gap-2 shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                  className="gap-1.5 shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium text-emerald-600 dark:text-emerald-400"
                 >
                   {unpublishMutation.isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <Globe className="h-3 w-3" />
                   )}
-                  Published
-                  <ChevronDown className="h-3 w-3 ml-0.5" />
+                  <span className="hidden sm:inline">Published</span>
+                  <ChevronDown className="h-3 w-3 hidden sm:inline" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -306,10 +306,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               size="sm"
               onClick={handleOpenPublishModal}
               disabled={saveState === 'saving'}
-              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
             >
               <Globe className="h-3 w-3" />
-              Publish
+              <span className="hidden sm:inline">Publish</span>
             </Button>
           )}
         </div>
