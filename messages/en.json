@@ -160,7 +160,9 @@
       "draft": "Draft",
       "published": "Published"
     },
-    "edited": "Edited"
+    "edited": "Edited",
+    "publish": "Publish",
+    "unpublish": "Unpublish"
   },
   "projects": {
     "title": "Projects",

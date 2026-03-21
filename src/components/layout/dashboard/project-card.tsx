@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, BookOpen, Layout, RotateCcw, AlertTriangle } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, Globe, BookOpen, Layout, RotateCcw, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import {
@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
-import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation } from "@/hooks/useProjectMutations"
+import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, usePublishMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
 import { useTranslations } from "next-intl"
 
@@ -76,13 +76,17 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   const softDeleteMutation = useSoftDeleteMutation()
   const restoreMutation = useRestoreMutation()
   const forceDeleteMutation = useForceDeleteMutation()
+  const publishMutation = usePublishMutation()
+  const unpublishMutation = useUnpublishMutation()
   const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending
+    || publishMutation.isPending || unpublishMutation.isPending
     const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
+  const viewUrl = `https://${project.id}.milestis.site`
 
   const thumbnail = useMemo(
     () => (
@@ -120,6 +124,14 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
   function handleForceDelete() {
     setConfirmOpen(false)
     forceDeleteMutation.mutate(project.id)
+  }
+
+  function handlePublish() {
+    publishMutation.mutate(project.id)
+  }
+
+  function handleUnpublish() {
+    unpublishMutation.mutate(project.id)
   }
 
   if (trash) {
@@ -211,7 +223,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
             {t('project.edit')}
           </Button>
           {project.isPublished && (
-            <Button variant="secondary" size="sm" className="rounded-full shadow-md">
+            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={() => window.open(viewUrl, '_blank')}>
               <Eye className="mr-1.5 size-3.5" />
               {t('project.view')}
             </Button>
@@ -228,9 +240,18 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl">
-              {project.isPublished && (
-                <DropdownMenuItem className="cursor-pointer rounded-lg">
-                  <Eye className="mr-2 size-4" /> {t('project.view')}
+              {project.isPublished ? (
+                <>
+                  <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
+                    <Eye className="mr-2 size-4" /> {t('project.view')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
+                    <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handlePublish}>
+                  <Globe className="mr-2 size-4" /> {t('project.publish')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>

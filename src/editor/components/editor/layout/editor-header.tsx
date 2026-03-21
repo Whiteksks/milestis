@@ -7,14 +7,15 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Upload, Check, Loader2, ChevronRight, Home, CloudUpload } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { toastProject } from '@/lib/toast'
 import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
-import { useRenameMutation } from '@/hooks/useProjectMutations'
+import { useRenameMutation, usePublishMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 interface EditorHeaderProps {
   projectId: string
@@ -31,14 +32,18 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const uid = useUserStore((s) => s.profile?.uid ?? null)
   const { save: autoSave, isDirty } = useAutoSave(projectId)
   const renameMutation = useRenameMutation()
+  const publishMutation = usePublishMutation()
+  const unpublishMutation = useUnpublishMutation()
 
-  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean } = useUiSelector((state) => ({
+  const { deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean, isPublished, setIsPublished } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
     toggleMediaLibrary: state.toggleMediaLibrary,
     projectName: state.projectName,
     setProjectName: state.setProjectName,
     markClean: state.markClean,
+    isPublished: state.isPublished,
+    setIsPublished: state.setIsPublished,
   }))
 
   const [localName, setLocalName] = useState(projectName ?? '')
@@ -83,6 +88,29 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       setSaveState('error')
       setTimeout(() => setSaveState('idle'), 2000)
     }
+  }
+
+  async function handlePublish() {
+    if (isDirty) {
+      setSaveState('saving')
+      try {
+        await saveProject(projectId)
+        markClean()
+        setSaveState('saved')
+        invalidateProjectsCache()
+        setTimeout(() => setSaveState('idle'), 2000)
+      } catch (err) {
+        console.error('[Publish] Save before publish failed:', err)
+        setSaveState('error')
+        setTimeout(() => setSaveState('idle'), 2000)
+        return
+      }
+    }
+    publishMutation.mutate(projectId, { onSuccess: () => setIsPublished(true) })
+  }
+
+  function handleUnpublish() {
+    unpublishMutation.mutate(projectId, { onSuccess: () => setIsPublished(false) })
   }
 
   async function handleHomeClick() {
@@ -220,13 +248,50 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
           <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
 
-          <Button
-            size="sm"
-            className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
-          >
-            <Upload className="h-3 w-3" />
-            Publish
-          </Button>
+          {isPublished ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={unpublishMutation.isPending}
+                  className="gap-2 shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                >
+                  {unpublishMutation.isPending ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Globe className="h-3 w-3" />
+                  )}
+                  Published
+                  <ChevronDown className="h-3 w-3 ml-0.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => window.open(`https://${projectId}.milestis.site`, '_blank')}>
+                  <Globe className="size-4" />
+                  View site
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
+                  <EyeOff className="size-4" />
+                  Unpublish
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handlePublish}
+              disabled={publishMutation.isPending || saveState === 'saving'}
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm hidden sm:inline-flex rounded-full h-8 px-5 transition-all text-xs font-medium"
+            >
+              {publishMutation.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Globe className="h-3 w-3" />
+              )}
+              {publishMutation.isPending ? 'Publishing...' : 'Publish'}
+            </Button>
+          )}
         </div>
       </div>
     </header>

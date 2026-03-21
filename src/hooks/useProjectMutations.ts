@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
-import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject } from '@/lib/projects'
+import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject, publishProject, unpublishProject } from '@/lib/projects'
 import { toastProject } from '@/lib/toast'
 
 function useUid() {
@@ -172,6 +172,72 @@ export function useRenameMutation() {
       return { prevActive }
     },
     onError: (_err, _vars, context) => {
+      if (!uid || !context) return
+      if (context.prevActive !== undefined)
+        queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
+    },
+    onSettled: () => {
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+    },
+  })
+}
+
+// ─── Publish ──────────────────────────────────────────────────────────────────────
+
+export function usePublishMutation() {
+  const queryClient = useQueryClient()
+  const uid = useUid()
+
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const promise = publishProject(projectId)
+      toastProject.publish(promise)
+      await promise
+    },
+    onMutate: async (projectId) => {
+      if (!uid) return
+      await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
+      const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
+      queryClient.setQueryData<DashboardProject[]>(
+        projectKeys.active(uid),
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: true } : p) ?? [],
+      )
+      return { prevActive }
+    },
+    onError: (_err, _id, context) => {
+      if (!uid || !context) return
+      if (context.prevActive !== undefined)
+        queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
+    },
+    onSettled: () => {
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+    },
+  })
+}
+
+// ─── Unpublish ──────────────────────────────────────────────────────────────
+
+export function useUnpublishMutation() {
+  const queryClient = useQueryClient()
+  const uid = useUid()
+
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const promise = unpublishProject(projectId)
+      toastProject.unpublish(promise)
+      await promise
+    },
+    onMutate: async (projectId) => {
+      if (!uid) return
+      await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
+      const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
+      queryClient.setQueryData<DashboardProject[]>(
+        projectKeys.active(uid),
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false } : p) ?? [],
+      )
+      return { prevActive }
+    },
+    onError: (_err, _id, context) => {
       if (!uid || !context) return
       if (context.prevActive !== undefined)
         queryClient.setQueryData(projectKeys.active(uid), context.prevActive)

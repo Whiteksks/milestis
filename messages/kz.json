@@ -88,5 +88,18 @@
   "loginPage": {
     "title": "Қайта оралуыңызбен",
     "description": "Milestis тіркелгіңізге кіру үшін кіріңіз."
+  },
+  "project": {
+    "edit": "Өңдеу",
+    "view": "Қарау",
+    "openMenu": "Мәзірді ашу",
+    "moveToTrash": "Себетке жылжыту",
+    "status": {
+      "draft": "Жоба",
+      "published": "Жарияланған"
+    },
+    "edited": "Өзгертілді",
+    "publish": "Жариялау",
+    "unpublish": "Жариялауды алу"
   }
 }

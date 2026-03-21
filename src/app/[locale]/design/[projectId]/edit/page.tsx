@@ -40,6 +40,7 @@ export default function EditorPage() {
   const setEditorMode = useUiSelector((state) => state.setEditorMode)
   const setProjectId = useUiSelector((state) => state.setProjectId)
   const setProjectName = useUiSelector((state) => state.setProjectName)
+  const setIsPublished = useUiSelector((state) => state.setIsPublished)
 
   const [loadState, setLoadState] = useState<LoadState>('loading')
 
@@ -76,6 +77,7 @@ export default function EditorPage() {
         setEditorMode(project.mode)
         setProjectId(projectId)
         setProjectName(project.name)
+        setIsPublished(project.isPublished ?? false)
         if (editorData?.theme) {
           useThemeStore.setState({
             currentTemplateId: editorData.theme.currentTemplateId,
@@ -135,8 +137,8 @@ export default function EditorPage() {
     }
 
     loadProject()
-    return () => { cancelled = true; setProjectId(null); setProjectName(null) }
-  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName])
+    return () => { cancelled = true; setProjectId(null); setProjectName(null); setIsPublished(false) }
+  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName, setIsPublished])
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')

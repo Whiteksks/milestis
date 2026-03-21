@@ -75,6 +75,26 @@ export const toastProject = {
         err instanceof Error ? err.message : "Failed to rename project",
     })
   },
+
+  /** Publish project — copies files and creates public snapshot. */
+  publish<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Publishing…",
+      success: "Project published!",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to publish project",
+    })
+  },
+
+  /** Unpublish project — removes public snapshot. */
+  unpublish<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Unpublishing…",
+      success: "Project unpublished",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to unpublish project",
+    })
+  },
 }
 
 // ─── Storage / Upload ──────────────────────────────────────────────────────

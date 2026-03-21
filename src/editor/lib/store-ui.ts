@@ -43,6 +43,9 @@ export interface UiStore {
   projectName: string | null
   setProjectName: (name: string | null) => void
 
+  isPublished: boolean
+  setIsPublished: (v: boolean) => void
+
   isDirty: boolean
   markDirty: () => void
   markClean: () => void
@@ -66,6 +69,7 @@ export const useUiStore = create<UiStore>((set) => ({
 
   projectId: null,
   projectName: null,
+  isPublished: false,
   isDirty: false,
 
   setDeviceView: (view) => set({ deviceView: view }),
@@ -108,6 +112,7 @@ export const useUiStore = create<UiStore>((set) => ({
 
   setProjectId: (id) => set(() => ({ projectId: id })),
   setProjectName: (name) => set(() => ({ projectName: name })),
+  setIsPublished: (v) => set(() => ({ isPublished: v })),
 
   markDirty: () => set(() => ({ isDirty: true })),
   markClean: () => set(() => ({ isDirty: false })),
