@@ -58,15 +58,12 @@ export const adminManualAdjustment = onCall(
 				idempotencyKey: data.idempotencyKey,
 				category: "credit",
 				direction,
-				termsVersion: 1,
-				clientIpCountry: (request.rawRequest.header("cf-ipcountry") ?? "unknown").toString(),
-				isManual: true,
 				credit: {
 					type: "admin_adjustment",
 					amount: absAmount,
 					creditBucket: direction === "in" ? data.bucket : undefined,
 					lot: direction === "in" ? { expiresAtMillis: data.expiresAtMillis } : undefined,
-					metadata: {
+					meta: {
 						adminId: adminUid,
 						supportTicketId: data.supportTicketId,
 						reason: data.reason ?? "manual_adjustment",

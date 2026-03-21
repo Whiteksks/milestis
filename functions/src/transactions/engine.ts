@@ -2,11 +2,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import { db } from "../lib/firebaseAdmin";
 import type {
 	BalanceSnapshot,
-	BillingTransaction,
-	CreditTransaction,
 	Transaction,
 	TransactionCategory,
-	TransactionStatus,
 	Currency,
 	Direction,
 	BillingType,
@@ -34,39 +31,31 @@ export class TransactionEngineError extends Error {
 export type ProcessTransactionInput = {
 	uid: string;
 	idempotencyKey: string;
+	createdAtIso?: string;
 
 	category: TransactionCategory;
-	status?: TransactionStatus;
 	direction: Direction;
 
-	createdAtIso?: string;
-	processedAtIso?: string;
-
-	termsVersion: number;
-	clientIpCountry: string;
-	isManual: boolean;
-
-	// Billing
+	// Billing (real-money event)
 	billing?: {
 		type: BillingType;
 		currency: Currency;
-		currencyAmountMinor: number;
-		originalTransactionId?: string;
-		metadata: BillingTransaction["metadata"];
+		amountMinor: number;
+		refundedTxId?: string;
+		meta?: Record<string, unknown>;
 	};
 
-	// Credit
+	// Credit (virtual economy)
 	credit?: {
 		type: CreditType;
 		amount: number; // always positive
-		relatedBillingId?: string;
+		billingTid?: string;
 		creditBucket?: BalanceBucket; // required for direction=in
 		lot?: {
-			expiresAtMillis?: number; // if omitted: non-expiring for purchased, otherwise non-expiring
+			expiresAtMillis?: number;
 		};
-		// expire specific lot
 		expireLotPath?: string;
-		metadata: CreditTransaction["metadata"];
+		meta?: Record<string, unknown>;
 	};
 };
 
@@ -266,9 +255,6 @@ export async function processTransaction(
 	const idemRef = db.collection(IDEMPOTENCY_COLLECTION).doc(idemId);
 
 	const createdAtIso = input.createdAtIso ?? nowIso();
-	const processedAtIso = input.processedAtIso;
-	const status: TransactionStatus = input.status ?? "completed";
-	const version = 1;
 
 	return await db.runTransaction(async (tx) => {
 		const idemSnap = await tx.get(idemRef);
@@ -424,10 +410,10 @@ export async function processTransaction(
 					"billing payload is required",
 				);
 			}
-			if (!Number.isFinite(billing.currencyAmountMinor)) {
+			if (!Number.isFinite(billing.amountMinor)) {
 				throw new TransactionEngineError(
 					"invalid_argument",
-					"billing.currencyAmountMinor must be a number",
+					"billing.amountMinor must be a number",
 				);
 			}
 			// Billing itself doesn't change credits; snapshot stays current.
@@ -440,45 +426,33 @@ export async function processTransaction(
 		if (input.category === "billing") {
 			const billing = input.billing!;
 			txDoc = {
-				version,
 				tid,
 				uid: input.uid,
 				createdAt: createdAtIso,
-				processedAt: processedAtIso ?? nowIso(),
-				status,
 				direction: input.direction,
 				category: "billing",
 				type: billing.type,
 				idempotencyKey: input.idempotencyKey,
-				isManual: input.isManual,
-				termsVersion: input.termsVersion,
-				clientIpCountry: input.clientIpCountry,
 				balanceSnapshot,
 				currency: billing.currency,
-				currencyAmountMinor: billing.currencyAmountMinor,
-				originalTransactionId: billing.originalTransactionId,
-				metadata: billing.metadata,
+				amountMinor: billing.amountMinor,
+				refundedTxId: billing.refundedTxId,
+				meta: billing.meta,
 			};
 		} else {
 			const credit = input.credit!;
 			txDoc = {
-				version,
 				tid,
 				uid: input.uid,
 				createdAt: createdAtIso,
-				processedAt: processedAtIso ?? nowIso(),
-				status,
 				direction: input.direction,
 				category: "credit",
 				type: credit.type,
 				idempotencyKey: input.idempotencyKey,
-				isManual: input.isManual,
-				termsVersion: input.termsVersion,
-				clientIpCountry: input.clientIpCountry,
 				balanceSnapshot,
 				amount: credit.amount,
-				relatedBillingId: credit.relatedBillingId,
-				metadata: credit.metadata,
+				billingTid: credit.billingTid,
+				meta: credit.meta,
 			};
 		}
 
@@ -490,10 +464,9 @@ export async function processTransaction(
 			createdAt: FieldValue.serverTimestamp(),
 		});
 
-		// Update user snapshot
+		// Update user balance snapshot
 		const userUpdates: Record<string, unknown> = {
 			balance: balanceSnapshot,
-			"metadata.lastLoginAt": FieldValue.serverTimestamp(),
 		};
 		if (input.category === "credit" && input.direction === "out") {
 			userUpdates["stats.totalCreditsSpent"] = FieldValue.increment(

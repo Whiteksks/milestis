@@ -12,4 +12,13 @@ import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 import {publishProject} from "./projects/publishProject";
 import {unpublishProject} from "./projects/unpublishProject";
 
-export {createUser, resizeAvatar, resizeProjectImage, createProject, forceDeleteProject, purgeDeletedProjects, publishProject, unpublishProject};
+export {
+	createUser,
+	resizeAvatar,
+	resizeProjectImage,
+	createProject,
+	forceDeleteProject,
+	purgeDeletedProjects,
+	publishProject,
+	unpublishProject,
+};

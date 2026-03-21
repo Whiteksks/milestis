@@ -69,13 +69,10 @@ export const createPhotobook = onCall(
 				idempotencyKey: data.idempotencyKey,
 				category: "credit",
 				direction: "out",
-				termsVersion: 1,
-				clientIpCountry: (request.rawRequest.header("cf-ipcountry") ?? "unknown").toString(),
-				isManual: false,
 				credit: {
 					type: "spend",
 					amount: cost,
-					metadata: {
+					meta: {
 						projectId: data.projectId,
 						projectTitle: data.projectTitle,
 						itemType: "photobook",

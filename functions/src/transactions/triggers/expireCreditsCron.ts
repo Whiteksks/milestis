@@ -54,14 +54,11 @@ export const expireCreditsCron = onSchedule(
 					idempotencyKey: idem,
 					category: "credit",
 					direction: "out",
-					termsVersion: 1,
-					clientIpCountry: "system",
-					isManual: false,
 					credit: {
 						type: "expire",
 						amount: remaining,
 						expireLotPath: doc.ref.path,
-						metadata: {
+						meta: {
 							reason: "credits_expired",
 						},
 					},

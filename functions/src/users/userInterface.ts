@@ -5,14 +5,14 @@ export type SubscriptionTier = "free" | "basic" | "pro" | "pro_plus";
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "paused" | "canceled";
 
 export interface UserSubscription {
-  priceId: string; // paddle price id
+  priceId?: string; // paddle price id (absent for free tier)
   planTier: SubscriptionTier; // free/basic/pro/pro_plus
   status: SubscriptionStatus;
-  nextBillDate: FieldValue;
+  nextBillDate?: FieldValue;
   cancelAtPeriodEnd?: boolean;
   hadTrial?: boolean;
-  currency: string;
-  amount: number; // in cents
+  currency?: string;
+  amount?: number; // in cents
   features: SubscriptionFeatures;
 }
 

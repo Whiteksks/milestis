@@ -52,7 +52,6 @@ export const createUser = onRequest(
           },
         },
         subscription: {
-          planId: "free",
           planTier: "free",
           status: "active",
           features: {
