@@ -44,6 +44,10 @@ const TemplateVertical = dynamic(
   () => import('@/editor/components/templates/photobook/template-vertical').then(m => m.TemplateVertical),
   { loading: LoadingTemplate },
 )
+const TemplateMemoirDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-memoir').then(m => m.TemplateMemoirDesign),
+  { loading: LoadingTemplate },
+)
 
 // Section settings panels
 const PhotobookCoverSettings = dynamic(
@@ -82,6 +86,7 @@ const photobookTemplateComponents: Partial<
   'photobook-polaroid': TemplatePolaroid,
   'photobook-split': TemplateSplit,
   'photobook-vertical': TemplateVertical,
+  'photobook-memoir': TemplateMemoirDesign,
 }
 
 export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> = {
@@ -95,6 +100,7 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
     { id: 'photobook-polaroid', name: 'Photobook Polaroid', tags: ['classic'] },
     { id: 'photobook-split', name: 'Photobook Split', tags: ['minimal'] },
     { id: 'photobook-vertical', name: 'Photobook Vertical', tags: ['minimal'] },
+    { id: 'photobook-memoir', name: 'Memoir', tags: ['editorial', 'minimal'] },
   ],
   sections: [
     { id: 'cover', name: 'Cover', toggleKey: 'showCover' },

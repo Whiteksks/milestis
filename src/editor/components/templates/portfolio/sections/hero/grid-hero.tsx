@@ -1,13 +1,15 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
-interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function GridHero({ theme, sectionContent }: GridHeroProps) {
+export function GridHero({ theme, sectionContent, disableAnimations = false }: GridHeroProps) {
   const heroImage = sectionContent.hero.image
   const initials = sectionContent.hero.title
     ? sectionContent.hero.title
@@ -19,6 +21,7 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
     : '?'
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -102,5 +105,6 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
         </motion.div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

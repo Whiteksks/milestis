@@ -9,6 +9,7 @@ export const PHOTOBOOK_TEMPLATE_IDS = [
   'photobook-polaroid',
   'photobook-split',
   'photobook-vertical',
+  'photobook-memoir',
 ] as const
 
 export type PhotobookTemplateId = (typeof PHOTOBOOK_TEMPLATE_IDS)[number]

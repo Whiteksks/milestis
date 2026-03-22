@@ -1,15 +1,18 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
-interface MinimalHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface MinimalHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
+export function MinimalHero({ theme, sectionContent, disableAnimations = false }: MinimalHeroProps) {
   const heroImage = sectionContent.hero.image
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -93,5 +96,6 @@ export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
         </div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

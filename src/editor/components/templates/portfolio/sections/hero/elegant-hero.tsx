@@ -1,15 +1,18 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
-interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
+export function ElegantHero({ theme, sectionContent, disableAnimations = false }: ElegantHeroProps) {
   const heroImage = sectionContent.hero.image
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -75,5 +78,6 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
         </div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

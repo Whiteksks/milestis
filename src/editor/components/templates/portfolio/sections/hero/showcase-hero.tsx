@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -8,12 +8,15 @@ import { cn } from '@/lib/utils'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
-interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
+export function ShowcaseHero({ theme, sectionContent, disableAnimations = false }: ShowcaseHeroProps) {
   const heroImage = sectionContent.hero.image
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -127,5 +130,6 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
         </motion.div>
       </motion.div>
     </section>
+    </MotionConfig>
   )
 }

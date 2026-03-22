@@ -1,11 +1,13 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
-interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -13,7 +15,7 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
 })
 
-export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
+export function BentoHero({ theme, sectionContent, disableAnimations = false }: BentoHeroProps) {
   const heroImage = sectionContent.hero.image
   const initials = sectionContent.hero.title
     ? sectionContent.hero.title
@@ -25,6 +27,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
     : '?'
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -116,5 +119,6 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
         </div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

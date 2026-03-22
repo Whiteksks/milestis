@@ -1,14 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
+import { getTheme } from '@/editor/lib/themes'
+import type { SectionContent } from '@/editor/lib/types'
+import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
 import { previewTheme, type PreviewColors } from './theme-extract'
-import { EditorialHeroPreview } from './portfolio-preview/editorial-hero-preview'
-import { MinimalHeroPreview } from './portfolio-preview/minimal-hero-preview'
-import { ElegantHeroPreview } from './portfolio-preview/elegant-hero-preview'
-import { GridHeroPreview } from './portfolio-preview/grid-hero-preview'
-import { BentoHeroPreview } from './portfolio-preview/bento-hero-preview'
-import { ShowcaseHeroPreview } from './portfolio-preview/showcase-hero-preview'
-import { LiquidGlassHeroPreview } from './portfolio-preview/liquid-glass-hero-preview'
+import { ScaledWrapper } from './scaled-wrapper'
+import { PORTFOLIO_PREVIEW_REGISTRY } from './template-registry'
 import { CoverSplitPreview } from './photobook-preview/cover-split-preview'
 import { CoverTimelinePreview } from './photobook-preview/cover-timeline-preview'
 import { CoverMasonryPreview } from './photobook-preview/cover-masonry-preview'
@@ -28,6 +26,27 @@ function Fallback({ c }: { c: PC }) {
   )
 }
 
+// ─── sectionContent builder ───────────────────────────────────────────────────
+
+function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio, frameStyle }: {
+  title?: string
+  subtitle?: string
+  heroImageUrl?: string
+  aspectRatio?: string
+  frameStyle?: string
+}): SectionContent {
+  return {
+    hero: {
+      title: title ?? 'Your Name',
+      subtitle: subtitle ?? 'Photographer',
+      description: 'Photography that tells the story behind the frame.',
+      image: heroImageUrl,
+      aspectRatio: (aspectRatio as AspectRatio) ?? 'portrait',
+      frameStyle: (frameStyle as FrameStyle) ?? 'none',
+    },
+  } as SectionContent
+}
+
 // ─── Dispatcher ───────────────────────────────────────────────────────────────
 
 interface TemplatePreviewProps {
@@ -39,22 +58,28 @@ interface TemplatePreviewProps {
   date?: string
   aspectRatio?: string
   frameStyle?: string
+  /** Zoom multiplier for the scaled wrapper. Default 3. Use 4 for smaller cards. */
+  zoom?: number
 }
 
-export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subtitle, date, aspectRatio, frameStyle }: TemplatePreviewProps) {
+export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subtitle, date, aspectRatio, frameStyle, zoom = 3 }: TemplatePreviewProps) {
   const c = previewTheme(themeId ?? 'parchment')
   const img = heroImageUrl || undefined
 
+  // Portfolio templates — resolved from registry
+  const HeroComponent = PORTFOLIO_PREVIEW_REGISTRY[templateId ?? '']
+  if (HeroComponent) {
+    const theme = getTheme(themeId ?? 'parchment')
+    const sectionContent = buildPreviewSectionContent({ title, subtitle, heroImageUrl: img, aspectRatio, frameStyle })
+    return (
+      <ScaledWrapper zoom={zoom} background={theme.background}>
+        <HeroComponent theme={theme} sectionContent={sectionContent} disableAnimations />
+      </ScaledWrapper>
+    )
+  }
+
+  // Photobook templates
   switch (templateId) {
-    // Portfolio
-    case 'editorial':          return <EditorialHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} aspectRatio={aspectRatio} frameStyle={frameStyle} />
-    case 'minimal':            return <MinimalHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} aspectRatio={aspectRatio} frameStyle={frameStyle} />
-    case 'elegant':            return <ElegantHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} aspectRatio={aspectRatio} frameStyle={frameStyle} />
-    case 'grid':               return <GridHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} aspectRatio={aspectRatio} frameStyle={frameStyle} />
-    case 'bento':              return <BentoHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} aspectRatio={aspectRatio} frameStyle={frameStyle} />
-    case 'showcase':           return <ShowcaseHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'liquid-glass':       return <LiquidGlassHeroPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    // Photobook
     case 'wedding-timeline':   return <CoverTimelinePreview themeId={themeId} title={title} subtitle={subtitle || date} heroImageUrl={img} />
     case 'masonry':            return <CoverMasonryPreview themeId={themeId} title={title} subtitle={subtitle || date} heroImageUrl={img} />
     case 'photobook-classic':  return <CoverHeroFullscreenPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
@@ -66,3 +91,4 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
     default:                   return <Fallback c={c} />
   }
 }
+

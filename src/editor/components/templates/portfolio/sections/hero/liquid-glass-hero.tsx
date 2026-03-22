@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -8,13 +8,16 @@ import { cn } from '@/lib/utils'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
-interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps) {
+export function LiquidGlassHero({ theme, sectionContent, disableAnimations = false }: LiquidGlassHeroProps) {
   const heroImage = sectionContent.hero.image
   const { primary, secondary, accent2, highlight } = theme.bgEffectColors
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -206,5 +209,6 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
         </div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

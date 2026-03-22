@@ -1,13 +1,15 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
-interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
+  disableAnimations?: boolean
+}
 
-export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
+export function EditorialHero({ theme, sectionContent, disableAnimations = false }: EditorialHeroProps) {
   const heroImage = sectionContent.hero.image
   const heroCropData = sectionContent.hero.cropData
 
@@ -29,6 +31,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
   )
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <motion.section
       id="hero"
       data-section-id="hero"
@@ -109,5 +112,6 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
         <div className="max-w-7xl mx-auto border-t border-current/10" />
       </div>
     </motion.section>
+    </MotionConfig>
   )
 }
