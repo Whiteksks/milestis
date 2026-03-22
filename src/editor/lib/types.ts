@@ -66,6 +66,10 @@ export type TextureEffect = 'none' | 'grain' | 'dots' | 'lines' | 'grid' | 'half
 export type BackgroundLayersTheme = 'dark' | 'light'
 export type BackgroundScrollMode = 'fixed' | 'scroll'
 
+/** Photobook-specific decorative overlays */
+export type PhotobookTexture = 'none' | 'vignette' | 'matte' | 'warmth' | 'silver' | 'linen' | 'haze' | 'grain' | 'canvas' | 'velvet' | 'dust' | 'parchment' 
+export type PhotobookMood = 'none' | 'warm' | 'cool' | 'muted' | 'fade' | 'golden' | 'noir' | 'vibrant' | 'dreamy' | 'earthy'
+
 /** Derived automatically from SectionContent — adding a key there adds show<Key> here. */
 export type SectionVisibility = {
   [K in keyof SectionContent as `show${Capitalize<string & K>}`]: boolean

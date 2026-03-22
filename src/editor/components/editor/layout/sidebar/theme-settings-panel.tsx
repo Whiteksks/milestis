@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from 'react'
-import { useThemeSelector } from '@/editor/lib/store'
+import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { 
   RotateCcw, Sun, Sparkles, ChevronDown,
-  WandSparkles
+  WandSparkles, Layers
 } from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
-import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/lib/types'
+import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '@/editor/lib/types'
+import { MOOD_OPTIONS, TEXTURE_OPTIONS } from '@/editor/components/editor/layout/background-layers/overlays/registry'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { EffectCard } from './effect-card'
@@ -59,24 +60,35 @@ export function ThemeSettingsPanel() {
     updateThemeCustomization: state.updateThemeCustomization,
   }))
 
+  const editorMode = useUiSelector((state) => state.editorMode)
+  const isPhotobook = editorMode === 'photobook'
+
   const {
     depthEffect: depth = 'none',
     raysEffect: rays = 'none',
     textureEffect: texture = 'none',
     backgroundLayersTheme: layersTheme = 'dark',
-    backgroundScrollMode: scrollMode = 'fixed'
+    backgroundScrollMode: scrollMode = 'fixed',
+    photobookTexture = 'none',
+    photobookMood = 'none',
   } = themeCustomizations
 
-  const activeCount = [depth, rays, texture].filter(v => v !== 'none').length
+  const activeCount = isPhotobook
+    ? [photobookTexture, photobookMood].filter(v => v !== 'none').length
+    : [depth, rays, texture].filter(v => v !== 'none').length
 
   const handleReset = () => {
-    updateThemeCustomization({
-      depthEffect: 'none',
-      raysEffect: 'none',
-      textureEffect: 'none',
-      backgroundLayersTheme: 'dark',
-      backgroundScrollMode: 'fixed',
-    })
+    if (isPhotobook) {
+      updateThemeCustomization({ photobookTexture: 'none', photobookMood: 'none' })
+    } else {
+      updateThemeCustomization({
+        depthEffect: 'none',
+        raysEffect: 'none',
+        textureEffect: 'none',
+        backgroundLayersTheme: 'dark',
+        backgroundScrollMode: 'fixed',
+      })
+    }
   }
 
   return (
@@ -87,15 +99,17 @@ export function ThemeSettingsPanel() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
-              <WandSparkles className="w-4 h-4 text-primary" />
+              {isPhotobook ? <Layers className="w-4 h-4 text-primary" /> : <WandSparkles className="w-4 h-4 text-primary" />}
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-foreground tracking-tight">Background</h3>
+              <h3 className="text-sm font-semibold text-foreground tracking-tight">
+                {isPhotobook ? 'Mood & Texture' : 'Background'}
+              </h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {activeCount > 0 ? (
                   <span className="text-primary">{activeCount} effect{activeCount > 1 ? 's' : ''} active</span>
                 ) : (
-                  'No effects applied'
+                  isPhotobook ? 'No overlays applied' : 'No effects applied'
                 )}
               </p>
             </div>
@@ -119,66 +133,99 @@ export function ThemeSettingsPanel() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
 
-        {/* General Settings */}
-        <CollapsibleSection title="General" icon={Sun}>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <label className="text-[11px] font-medium text-muted-foreground px-1">Theme</label>
-              <SegmentedControl
-                value={layersTheme}
-                options={[
-                  { id: 'dark', label: 'Dark' },
-                  { id: 'light', label: 'Light' },
-                ]}
-                onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme })}
+        {isPhotobook ? (
+          /* ── PHOTOBOOK MODE ─────────────────────────────────── */
+          <>
+            <CollapsibleSection title="Mood" icon={Sun}>
+              <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+                Applies a colour cast over the entire photobook, giving photos a unified tone.
+              </p>
+              <EffectCard
+                label="Colour Mood"
+                description="Colour grade applied to all photos in the book."
+                value={photobookMood}
+                options={MOOD_OPTIONS}
+                onChange={(v) => updateThemeCustomization({ photobookMood: v as PhotobookMood })}
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[11px] font-medium text-muted-foreground px-1">Scroll</label>
-              <SegmentedControl
-                value={scrollMode}
-                options={[
-                  { id: 'fixed', label: 'Fixed' },
-                  { id: 'scroll', label: 'Scroll' },
-                ]}
-                onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode })}
+            </CollapsibleSection>
+
+            <CollapsibleSection title="Photo Overlay" icon={Sparkles}>
+              <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+                Applies a photographic overlay to enhance mood and depth.
+              </p>
+              <EffectCard
+                label="Overlay"
+                description="Photographic overlay applied across the entire book."
+                value={photobookTexture}
+                options={TEXTURE_OPTIONS}
+                onChange={(v) => updateThemeCustomization({ photobookTexture: v as PhotobookTexture })}
               />
-            </div>
-          </div>
-        </CollapsibleSection>
+            </CollapsibleSection>
+          </>
+        ) : (
+          /* ── PORTFOLIO MODE ─────────────────────────────────── */
+          <>
+            {/* General Settings */}
+            <CollapsibleSection title="General" icon={Sun}>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-medium text-muted-foreground px-1">Theme</label>
+                  <SegmentedControl
+                    value={layersTheme}
+                    options={[
+                      { id: 'dark', label: 'Dark' },
+                      { id: 'light', label: 'Light' },
+                    ]}
+                    onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-medium text-muted-foreground px-1">Scroll</label>
+                  <SegmentedControl
+                    value={scrollMode}
+                    options={[
+                      { id: 'fixed', label: 'Fixed' },
+                      { id: 'scroll', label: 'Scroll' },
+                    ]}
+                    onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode })}
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
 
-        {/* Effects */}
-        <CollapsibleSection title="Effects" icon={Sparkles}>
-          <EffectCard
-            label="Depth"
-            description='Adds subtle 3D layering and shadow depth.'
-            value={depth}
-            options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
-          />
+            {/* Effects */}
+            <CollapsibleSection title="Effects" icon={Sparkles}>
+              <EffectCard
+                label="Depth"
+                description='Adds subtle 3D layering and shadow depth.'
+                value={depth}
+                options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
+                onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
+              />
 
-          <div className="h-px bg-border/20 m-2" />
+              <div className="h-px bg-border/20 m-2" />
 
-          <EffectCard
-            label="Rays"
-            description='Adds light beams and glow effects.'
-            value={rays}
-            options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
-          />
+              <EffectCard
+                label="Rays"
+                description='Adds light beams and glow effects.'
+                value={rays}
+                options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
+                onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
+              />
 
-          <div className="h-px bg-border/20 m-2" />
+              <div className="h-px bg-border/20 m-2" />
 
-          <EffectCard
-            label="Texture"
-            description='Adds surface textures.'
-            value={texture}
-            options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
-            onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
-          />
-        </CollapsibleSection>
+              <EffectCard
+                label="Texture"
+                description='Adds surface textures.'
+                value={texture}
+                options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
+                onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
+              />
+            </CollapsibleSection>
+          </>
+        )}
       </div>
-
     </div>
   )
 }
