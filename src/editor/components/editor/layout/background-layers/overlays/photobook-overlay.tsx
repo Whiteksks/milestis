@@ -126,6 +126,14 @@ const TEXTURES: Record<Exclude<PhotobookTexture, 'none'>, React.CSSProperties> =
   },
 }
 
+// ─── Public helper ─────────────────────────────────────────────────────────
+
+/** Returns the inline style object for a given texture, or null for 'none'. */
+export function getTextureStyle(texture: PhotobookTexture): React.CSSProperties | null {
+  if (texture === 'none') return null
+  return TEXTURES[texture]
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────
 
 interface PhotobookOverlayProps {

@@ -1,11 +1,13 @@
 "use client"
 
-import { Filter, LayoutTemplate, Palette, Sparkles, WandSparkles } from 'lucide-react'
+import { Filter, LayoutTemplate, Palette } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import type { EditorMode } from '@/editor/lib/types'
+import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
 
 import type { DesignCatalogSection, TagMeta } from './types'
 
@@ -20,6 +22,7 @@ type Props = {
 
   totalCount: number
   visibleCount: number
+  editorMode?: EditorMode
 }
 
 export function DesignCatalogSidebar({
@@ -31,7 +34,9 @@ export function DesignCatalogSidebar({
   activeTagLabel,
   totalCount,
   visibleCount,
+  editorMode,
 }: Props) {
+  const modeConfig = editorMode ? getModeUiConfig(editorMode) : null
   return (
     <aside className="w-full md:w-60  md:border-r border-border bg-sidebar p-4">
       <div className="flex items-center gap-2">
@@ -77,8 +82,10 @@ export function DesignCatalogSidebar({
             section === 'backgrounds' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
           )}
         >
-          <WandSparkles className="h-4 w-4" />
-          Background
+          {modeConfig
+            ? <modeConfig.backgroundIcon className="h-4 w-4" />
+            : null}
+          {modeConfig?.backgroundLabel ?? 'Background'}
         </Button>
       </div>
 

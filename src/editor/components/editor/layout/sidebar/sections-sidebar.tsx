@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
+import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
@@ -37,7 +38,7 @@ export function SectionsSidebar({
   // Пересчитывается только при смене режима редактора
   const tabs = useMemo(
     () => [
-      { id: 'sections' as const, icon: Layers, label: editorMode === 'portfolio' ? 'Sections' : 'Content' },
+      { id: 'sections' as const, icon: Layers, label: getModeUiConfig(editorMode).sectionsTabLabel },
       { id: 'background' as const, icon: WandSparkles, label: 'Background' },
       { id: 'decorations' as const, icon: Sparkles, label: 'Decorations' },
     ],

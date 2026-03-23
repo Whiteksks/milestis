@@ -1,14 +1,18 @@
 "use client"
 
 import { memo, createElement } from 'react'
+import type { CSSProperties } from 'react'
 import { Check, LayoutTemplate, Layers } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { themes } from '@/editor/lib/themes'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
-import type { DepthEffect, RayEffect, TextureEffect } from '@/editor/lib/types'
+import type { DepthEffect, RayEffect, TextureEffect, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '@/editor/components/editor/layout/background-layers/registry'
 import type { EffectColors } from '@/editor/components/editor/layout/background-layers/types'
+import { PHOTOBOOK_PRESETS } from '@/editor/lib/photobook-presets'
+import type { PhotobookPreset } from '@/editor/lib/photobook-presets'
+import { getMoodFilter, getTextureStyle } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 
 // Module-level Maps for O(1) effect lookups — built once, never recreated
 const DEPTH_MAP = new Map(DEPTH_EFFECTS.map((e) => [e.id, e.Component]))
@@ -224,6 +228,121 @@ export function BackgroundsSection({
           </button>
         )
       })}
+    </div>
+  )
+}
+
+// ─── Photobook Mood & Texture section ─────────────────────────────────────
+
+// ─── Photobook Preset cards ────────────────────────────────────────────────
+
+/**
+ * Warm-toned landscape gradient used as the base "photo" for all
+ * preset preview thumbnails so that mood filters and texture overlays
+ * are clearly visible at card size.
+ */
+const PHOTO_BASE =
+  'linear-gradient(135deg, #c8a97e 0%, #9c7e60 25%, #7d9aad 55%, #a7b89c 80%, #d4c2a0 100%)'
+
+function PhotobookPresetCardInner({
+  preset,
+  isSelected,
+  onSelect,
+}: {
+  preset: PhotobookPreset
+  isSelected: boolean
+  onSelect: (id: string) => void
+}) {
+  const filter =
+    preset.mood !== 'none' ? getMoodFilter(preset.mood as PhotobookMood) : undefined
+  const raw =
+    preset.texture !== 'none' ? getTextureStyle(preset.texture as PhotobookTexture) : null
+  const overlayStyle: CSSProperties | undefined = raw
+    ? { ...raw, backgroundAttachment: 'scroll' }
+    : undefined
+
+  const moodLabel = preset.mood !== 'none' ? preset.mood : null
+  const textureLabel = preset.texture !== 'none' ? preset.texture : null
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(preset.id)}
+      className={cn(
+        'group relative overflow-hidden rounded-xl border text-left transition-colors duration-150 bg-card',
+        isSelected
+          ? 'border-primary ring-1 ring-primary'
+          : 'border-border hover:border-muted-foreground/40',
+      )}
+    >
+      {/* Visual preview */}
+      <div className="relative aspect-4/3 overflow-hidden rounded-t-xl">
+        {preset.mood === 'none' && preset.texture === 'none' ? (
+          <div className="absolute inset-0 bg-muted/60 flex items-center justify-center">
+            <span className="text-xs text-muted-foreground/50 font-medium tracking-widest uppercase">
+              Clean
+            </span>
+          </div>
+        ) : (
+          <>
+            <div className="absolute inset-0" style={{ background: PHOTO_BASE, filter }} />
+            {overlayStyle && <div className="absolute inset-0" style={overlayStyle} />}
+          </>
+        )}
+        {isSelected && (
+          <div className="absolute top-2 right-2 z-10">
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+              <Check className="h-3.5 w-3.5 text-primary-foreground" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Card body */}
+      <div className="p-3 space-y-1.5">
+        <h3 className="text-sm font-semibold text-card-foreground leading-tight">
+          {preset.name}
+        </h3>
+        <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">
+          {preset.description}
+        </p>
+        {(moodLabel || textureLabel) && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {moodLabel && (
+              <span className="text-[10px] font-medium bg-primary/8 text-primary/70 border border-primary/15 px-1.5 py-0.5 rounded-full capitalize">
+                {moodLabel}
+              </span>
+            )}
+            {textureLabel && (
+              <span className="text-[10px] font-medium bg-secondary/60 text-muted-foreground border border-border/60 px-1.5 py-0.5 rounded-full capitalize">
+                {textureLabel}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </button>
+  )
+}
+const PhotobookPresetCard = memo(PhotobookPresetCardInner)
+
+export function PhotobookPresetsSection({
+  selectedId,
+  onSelect,
+}: {
+  selectedId: string | null
+  onSelect: (id: string) => void
+}) {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+      {PHOTOBOOK_PRESETS.map((preset) => (
+        <PhotobookPresetCard
+          key={preset.id}
+          preset={preset}
+          isSelected={selectedId === preset.id}
+          onSelect={onSelect}
+        />
+      ))}
     </div>
   )
 }

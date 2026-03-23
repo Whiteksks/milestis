@@ -2,9 +2,9 @@
 
 import * as React from 'react'
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
+import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
 import { 
   RotateCcw, Sun, Sparkles, ChevronDown,
-  WandSparkles, Layers
 } from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
 import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '@/editor/lib/types'
@@ -62,6 +62,7 @@ export function ThemeSettingsPanel() {
 
   const editorMode = useUiSelector((state) => state.editorMode)
   const isPhotobook = editorMode === 'photobook'
+  const modeConfig = getModeUiConfig(editorMode)
 
   const {
     depthEffect: depth = 'none',
@@ -73,23 +74,9 @@ export function ThemeSettingsPanel() {
     photobookMood = 'none',
   } = themeCustomizations
 
-  const activeCount = isPhotobook
-    ? [photobookTexture, photobookMood].filter(v => v !== 'none').length
-    : [depth, rays, texture].filter(v => v !== 'none').length
+  const activeCount = modeConfig.getActiveEffectsCount(themeCustomizations)
 
-  const handleReset = () => {
-    if (isPhotobook) {
-      updateThemeCustomization({ photobookTexture: 'none', photobookMood: 'none' })
-    } else {
-      updateThemeCustomization({
-        depthEffect: 'none',
-        raysEffect: 'none',
-        textureEffect: 'none',
-        backgroundLayersTheme: 'dark',
-        backgroundScrollMode: 'fixed',
-      })
-    }
-  }
+  const handleReset = () => modeConfig.resetEffects(updateThemeCustomization)
 
   return (
     <div className="h-full flex flex-col bg-card/40 backdrop-blur-xl overflow-hidden">
@@ -99,17 +86,17 @@ export function ThemeSettingsPanel() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
-              {isPhotobook ? <Layers className="w-4 h-4 text-primary" /> : <WandSparkles className="w-4 h-4 text-primary" />}
+              <modeConfig.backgroundIcon className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground tracking-tight">
-                {isPhotobook ? 'Mood & Texture' : 'Background'}
+                {modeConfig.backgroundLabel}
               </h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {activeCount > 0 ? (
                   <span className="text-primary">{activeCount} effect{activeCount > 1 ? 's' : ''} active</span>
                 ) : (
-                  isPhotobook ? 'No overlays applied' : 'No effects applied'
+                  modeConfig.backgroundHint
                 )}
               </p>
             </div>

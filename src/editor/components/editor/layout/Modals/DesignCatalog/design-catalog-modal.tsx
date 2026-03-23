@@ -19,15 +19,17 @@ import { themes } from '@/editor/lib/themes'
 import { BACKGROUND_PRESETS } from '@/editor/lib/background-presets'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
 import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
-import type { TemplateId, Theme } from '@/editor/lib/types'
+import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
+import { PHOTOBOOK_PRESETS, findMatchingPreset } from '@/editor/lib/photobook-presets'
+import type { TemplateId, Theme, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { ChevronRight, Eye, EyeOff, Filter, LayoutTemplate, Palette, WandSparkles } from 'lucide-react'
+import { ChevronRight, Eye, EyeOff, Filter, LayoutTemplate, Palette } from 'lucide-react'
 
 import type { DesignCatalogSection } from './types'
 import { DesignCatalogSidebar } from './design-catalog-sidebar'
 import { DesignCatalogFooter } from './design-catalog-footer'
-import { BackgroundsSection, ThemesSection, TemplatesSection } from './sections'
+import { BackgroundsSection, PhotobookPresetsSection, ThemesSection, TemplatesSection } from './sections'
 
 export function DesignCatalogModal() {
   const {
@@ -66,6 +68,7 @@ export function DesignCatalogModal() {
   const [selectedTemplatesId, setSelectedTemplatesId] = useState<string | null>(null)
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null)
   const [selectedBackgroundId, setSelectedBackgroundId] = useState<string | null>(null)
+  const [selectedPhotobookPresetId, setSelectedPhotobookPresetId] = useState<string | null>(null)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const originalRef = useRef<{
     templateId: TemplateId
@@ -75,6 +78,8 @@ export function DesignCatalogModal() {
 
   const templates = useMemo(() => getModeTemplates(editorMode), [editorMode])
   const templateSectionCount = useMemo(() => getModeSectionCount(editorMode), [editorMode])
+  const isPhotobook = editorMode === 'photobook'
+  const modeConfig = getModeUiConfig(editorMode)
 
   useEffect(() => {
     if (isDesignModalOpen) {
@@ -102,11 +107,22 @@ export function DesignCatalogModal() {
   )
   const effectiveSelectedBackgroundId = selectedBackgroundId ?? currentBackgroundPresetId
 
+  const currentPhotobookPresetId = useMemo(
+    () =>
+      findMatchingPreset(
+        themeCustomizations?.photobookMood ?? 'none',
+        themeCustomizations?.photobookTexture ?? 'none',
+      )?.id ?? null,
+    [themeCustomizations],
+  )
+  const effectivePhotobookPresetId = selectedPhotobookPresetId ?? currentPhotobookPresetId
+
   const itemsForSection = useMemo(() => {
     if (designModalSection === 'templates') return templates
     if (designModalSection === 'themes') return themes
+    if (isPhotobook) return []
     return BACKGROUND_PRESETS
-  }, [designModalSection, templates])
+  }, [designModalSection, templates, isPhotobook])
 
   const sectionTitle = useMemo(() => {
     switch (designModalSection) {
@@ -115,9 +131,9 @@ export function DesignCatalogModal() {
       case 'themes':
         return 'Themes'
       case 'backgrounds':
-        return 'Background Effects'
+        return modeConfig.backgroundCatalogTitle
     }
-  }, [designModalSection])
+  }, [designModalSection, modeConfig])
 
   const tagMeta = useMemo(() => {
     const counts = new Map<string, number>()
@@ -164,6 +180,7 @@ export function DesignCatalogModal() {
     setSelectedTemplatesId(null)
     setSelectedThemeId(null)
     setSelectedBackgroundId(null)
+    setSelectedPhotobookPresetId(null)
     closeDesignModal()
   }
 
@@ -185,15 +202,25 @@ export function DesignCatalogModal() {
         setTemplate(effectiveSelectedTemplatesId as TemplateId)
       } else if (designModalSection === 'themes' && effectiveSelectedThemeId) {
         setTheme(effectiveSelectedThemeId as Theme)
-      } else if (designModalSection === 'backgrounds' && effectiveSelectedBackgroundId) {
-        const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
-        if (preset) {
-          updateThemeCustomization({
-            depthEffect: preset.depth,
-            raysEffect: preset.rays,
-            textureEffect: preset.texture,
-            backgroundLayersTheme: preset.theme,
-          })
+      } else if (designModalSection === 'backgrounds') {
+        if (isPhotobook) {
+          const preset = PHOTOBOOK_PRESETS.find((p) => p.id === effectivePhotobookPresetId)
+          if (preset) {
+            updateThemeCustomization({
+              photobookMood: preset.mood as PhotobookMood,
+              photobookTexture: preset.texture as PhotobookTexture,
+            })
+          }
+        } else if (effectiveSelectedBackgroundId) {
+          const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
+          if (preset) {
+            updateThemeCustomization({
+              depthEffect: preset.depth,
+              raysEffect: preset.rays,
+              textureEffect: preset.texture,
+              backgroundLayersTheme: preset.theme,
+            })
+          }
         }
       }
     } else {
@@ -205,7 +232,17 @@ export function DesignCatalogModal() {
     if (!isPreviewMode) {
       if (selectedTemplatesId) setTemplate(selectedTemplatesId as TemplateId)
       if (selectedThemeId) setTheme(selectedThemeId as Theme)
-      if (selectedBackgroundId) {
+      if (isPhotobook) {
+        if (selectedPhotobookPresetId) {
+          const preset = PHOTOBOOK_PRESETS.find((p) => p.id === selectedPhotobookPresetId)
+          if (preset) {
+            updateThemeCustomization({
+              photobookMood: preset.mood as PhotobookMood,
+              photobookTexture: preset.texture as PhotobookTexture,
+            })
+          }
+        }
+      } else if (selectedBackgroundId) {
         const preset = BACKGROUND_PRESETS.find((p) => p.id === selectedBackgroundId)
         if (preset) {
           updateThemeCustomization({
@@ -220,7 +257,7 @@ export function DesignCatalogModal() {
     closeModal()
   }
 
-  const isApplyDisabled = !selectedTemplatesId && !selectedThemeId && !selectedBackgroundId
+  const isApplyDisabled = !selectedTemplatesId && !selectedThemeId && !selectedBackgroundId && !selectedPhotobookPresetId
 
   const selectedLabel = useMemo(() => {
     if (designModalSection === 'templates') {
@@ -235,15 +272,21 @@ export function DesignCatalogModal() {
       return themes.find((t) => t.id === effectiveSelectedThemeId)?.name ?? effectiveSelectedThemeId
     }
     if (designModalSection === 'backgrounds') {
+      if (isPhotobook) {
+        const preset = PHOTOBOOK_PRESETS.find((p) => p.id === effectivePhotobookPresetId)
+        return preset ? preset.name : null
+      }
       if (!effectiveSelectedBackgroundId) return null
       return BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)?.name ?? effectiveSelectedBackgroundId
     }
     return null
   }, [
     designModalSection,
+    isPhotobook,
     effectiveSelectedTemplatesId,
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
+    effectivePhotobookPresetId,
     templates,
   ])
 
@@ -272,6 +315,18 @@ export function DesignCatalogModal() {
         }
       }
     }
+    const onPresetSelect = (id: string) => {
+      setSelectedPhotobookPresetId(id)
+      if (isPreviewMode) {
+        const preset = PHOTOBOOK_PRESETS.find((p) => p.id === id)
+        if (preset) {
+          updateThemeCustomization({
+            photobookMood: preset.mood as PhotobookMood,
+            photobookTexture: preset.texture as PhotobookTexture,
+          })
+        }
+      }
+    }
     return (
       <>
         {designModalSection === 'templates' && (
@@ -289,7 +344,13 @@ export function DesignCatalogModal() {
             onSelect={onThemeSelect}
           />
         )}
-        {designModalSection === 'backgrounds' && (
+        {designModalSection === 'backgrounds' && isPhotobook && (
+          <PhotobookPresetsSection
+            selectedId={effectivePhotobookPresetId}
+            onSelect={onPresetSelect}
+          />
+        )}
+        {designModalSection === 'backgrounds' && !isPhotobook && (
           <BackgroundsSection
             items={visibleItems as BackgroundPreset[]}
             selectedId={effectiveSelectedBackgroundId}
@@ -300,10 +361,12 @@ export function DesignCatalogModal() {
     )
   }, [
     designModalSection,
+    isPhotobook,
     visibleItems,
     effectiveSelectedTemplatesId,
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
+    effectivePhotobookPresetId,
     templateSectionCount,
     isPreviewMode,
     setTemplate,
@@ -316,7 +379,7 @@ export function DesignCatalogModal() {
     const mobileSections = [
       { id: 'templates' as const, icon: LayoutTemplate, label: 'Templates' },
       { id: 'themes' as const, icon: Palette, label: 'Themes' },
-      { id: 'backgrounds' as const, icon: WandSparkles, label: 'Background' },
+      { id: 'backgrounds' as const, icon: modeConfig.backgroundCatalogMobileIcon, label: modeConfig.backgroundCatalogMobileLabel },
     ]
 
     return (
@@ -465,6 +528,7 @@ export function DesignCatalogModal() {
             activeTagLabel={activeTagLabel}
             totalCount={itemsForSection.length}
             visibleCount={visibleItems.length}
+            editorMode={editorMode}
           />
 
           <main className="flex-1 flex flex-col min-h-0 min-w-0">
