@@ -1,5 +1,6 @@
 'use client'
 
+import { MotionConfig } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface ScaledWrapperProps {
@@ -15,7 +16,13 @@ interface ScaledWrapperProps {
 export function ScaledWrapper({ zoom = 3, background, children }: ScaledWrapperProps) {
   const scale = 1 / zoom
   return (
-    <div className="relative h-full w-full overflow-hidden pointer-events-none select-none">
+    <div
+      className={cn(
+        'relative h-full w-full overflow-hidden pointer-events-none select-none',
+        // Pause all CSS animations (animate-pulse, animate-ping, etc.)
+        '[&_*]:[animation-play-state:paused]',
+      )}
+    >
       <div
         style={{
           position: 'absolute',
@@ -28,9 +35,13 @@ export function ScaledWrapper({ zoom = 3, background, children }: ScaledWrapperP
           willChange: 'transform',
         }}
       >
-        <div className={cn('h-full', background)}>
-          {children}
-        </div>
+        {/* MotionConfig here ensures ALL Framer Motion animations are disabled
+            regardless of what individual components do internally */}
+        <MotionConfig reducedMotion="always">
+          <div className={cn('h-full', background)}>
+            {children}
+          </div>
+        </MotionConfig>
       </div>
     </div>
   )

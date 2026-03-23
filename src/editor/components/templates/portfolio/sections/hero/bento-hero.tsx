@@ -9,12 +9,6 @@ interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'section
   disableAnimations?: boolean
 }
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
-})
-
 export function BentoHero({ theme, sectionContent, disableAnimations = false }: BentoHeroProps) {
   const heroImage = sectionContent.hero.image
   const initials = sectionContent.hero.title
@@ -25,6 +19,13 @@ export function BentoHero({ theme, sectionContent, disableAnimations = false }: 
         .slice(0, 2)
         .toUpperCase()
     : '?'
+  const fadeUp = (delay = 0) => ({
+    initial: { opacity: 0, y: 24 },
+    animate: { opacity: 1, y: 0 },
+    transition: disableAnimations
+      ? { duration: 0, delay: 0 }
+      : { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
+  })
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>

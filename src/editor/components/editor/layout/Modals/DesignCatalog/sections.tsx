@@ -2,9 +2,12 @@
 
 import { memo, createElement } from 'react'
 import type { CSSProperties } from 'react'
-import { Check, LayoutTemplate, Layers } from 'lucide-react'
+import { Check, Layers } from 'lucide-react'
+import { TemplatePreview } from '@/components/shared/template-preview'
 
 import { cn } from '@/lib/utils'
+import { useUiSelector } from '@/editor/lib/store'
+import { useContentStore } from '@/editor/lib/store-content'
 import { themes } from '@/editor/lib/themes'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
 import type { DepthEffect, RayEffect, TextureEffect, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
@@ -81,13 +84,36 @@ export function TemplatesSection({
   items,
   selectedId,
   onSelect,
+  themeId,
 }: {
   items: Templates
   selectedId: string | null
   onSelect: (id: string) => void
+  themeId?: string
 }) {
+  const editorMode = useUiSelector((s) => s.editorMode)
+  const isPhotobook = editorMode === 'photobook'
+
+  const heroTitle = useContentStore((s) => s.sectionContent.hero.title)
+  const heroSubtitle = useContentStore((s) => s.sectionContent.hero.subtitle)
+  const heroImage = useContentStore((s) => s.sectionContent.hero.image)
+  const heroAspectRatio = useContentStore((s) => s.sectionContent.hero.aspectRatio)
+  const heroFrameStyle = useContentStore((s) => s.sectionContent.hero.frameStyle)
+
+  const coverTitle = useContentStore((s) => s.photobookSectionContent.cover.title)
+  const coverSubtitle = useContentStore((s) => s.photobookSectionContent.cover.subtitle)
+  const coverImage = useContentStore((s) => s.photobookSectionContent.cover.images?.image)
+  const coverDate = useContentStore((s) => s.photobookSectionContent.cover.date)
+
+  const title = isPhotobook ? coverTitle : heroTitle
+  const subtitle = isPhotobook ? coverSubtitle : heroSubtitle
+  const heroImageUrl = isPhotobook ? coverImage : heroImage
+  const aspectRatio = isPhotobook ? undefined : heroAspectRatio
+  const frameStyle = isPhotobook ? undefined : heroFrameStyle
+  const date = isPhotobook ? coverDate : undefined
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 gap-3 md:gap-4">
       {items.map((template) => {
         const isSelected = selectedId === template.id
         return (
@@ -102,8 +128,18 @@ export function TemplatesSection({
                 : 'border-border hover:border-muted-foreground/40'
             )}
           >
-            <div className="relative aspect-4/3 bg-muted overflow-hidden flex items-center justify-center">
-              <LayoutTemplate className="h-10 w-10 text-muted-foreground" />
+            <div className="relative aspect-4/3 overflow-hidden">
+              <TemplatePreview
+                templateId={template.id}
+                themeId={themeId}
+                title={title}
+                subtitle={subtitle}
+                heroImageUrl={heroImageUrl}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                date={date}
+                zoom={3.55}
+              />
               {isSelected ? (
                 <div className="absolute top-2 right-2 z-10">
                   <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
@@ -144,7 +180,7 @@ export function ThemesSection({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-3 gap-3 md:gap-4">
       {items.map((theme) => {
         const isSelected = selectedId === theme.id
         return (
@@ -202,7 +238,7 @@ export function BackgroundsSection({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-3 gap-3 md:gap-4">
       {items.map((preset) => {
         const isSelected = selectedId === preset.id
 
@@ -343,7 +379,7 @@ export function PhotobookPresetsSection({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 gap-3 md:gap-4">
       {PHOTOBOOK_PRESETS.map((preset) => (
         <PhotobookPresetCard
           key={preset.id}

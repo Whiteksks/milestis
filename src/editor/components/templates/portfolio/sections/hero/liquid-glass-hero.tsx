@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig, type Transition } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -15,6 +15,8 @@ interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 's
 export function LiquidGlassHero({ theme, sectionContent, disableAnimations = false }: LiquidGlassHeroProps) {
   const heroImage = sectionContent.hero.image
   const { primary, secondary, accent2, highlight } = theme.bgEffectColors
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -66,7 +68,7 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
         <motion.div
           initial={{ opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 2.2, ease: 'easeOut' }}
+          transition={t(2.2, 0, 'easeOut')}
           className="absolute inset-0"
         >
           <Image
@@ -93,7 +95,7 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
         <motion.div
           initial={{ opacity: 0, y: -14, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.55, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(0.55, 0.25, [0.16, 1, 0.3, 1])}
           className="flex"
         >
           <div
@@ -123,7 +125,7 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
         <motion.h1
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(0.85, 0.4, [0.16, 1, 0.3, 1])}
           className={cn(
             'font-black uppercase leading-[0.86] tracking-tighter text-white',
             '@lg:text-[5rem] @md:text-[4rem] text-[2.5rem]',
@@ -182,7 +184,7 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={t(0.6, 0.1)}
               className={cn('relative text-sm @md:text-base text-white/62 font-light leading-relaxed', theme.fontBody)}
             >
               {sectionContent.hero.description}

@@ -333,6 +333,7 @@ export function DesignCatalogModal() {
             items={visibleItems as typeof templates}
             selectedId={effectiveSelectedTemplatesId}
             onSelect={onTemplateSelect}
+            themeId={effectiveSelectedThemeId ?? currentTheme ?? undefined}
           />
         )}
         {designModalSection === 'themes' && (

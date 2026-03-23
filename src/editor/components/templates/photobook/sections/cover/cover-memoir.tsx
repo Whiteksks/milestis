@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, MotionConfig } from "framer-motion"
+import { motion, MotionConfig, type Transition } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -22,6 +22,8 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
   const imageUrl = imageBlock?.image ?? ''
   const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'portrait'
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -31,7 +33,7 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={t(1.6, 0, [0.16, 1, 0.3, 1])}
         className={cn('h-px origin-left shrink-0', theme.accent)}
       />
 
@@ -42,7 +44,7 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
         <motion.div
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1, 0.25, [0.16, 1, 0.3, 1])}
           className="order-2 @md:order-1 flex flex-col justify-center px-8 @md:px-12 @lg:px-20 py-14 @md:py-20 gap-8"
         >
           {/* Eyebrow label */}
@@ -91,7 +93,7 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1.2, 0.05, [0.16, 1, 0.3, 1])}
           className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16"
         >
           <div

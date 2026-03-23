@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
-import { TemplatePreview } from "@/components/layout/dashboard/template-preview"
+import { TemplatePreview } from "@/components/shared/template-preview"
 import { useTranslations } from "next-intl"
 import { PublishModal } from "@/editor/components/modals/publish-modal"
 
@@ -104,7 +104,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
         date={project.preview?.date}
         aspectRatio={project.preview?.aspectRatio}
         frameStyle={project.preview?.frameStyle}
-        zoom={3.5}
+        zoom={3.55}
       />
     ),
     [

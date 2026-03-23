@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
@@ -11,6 +11,8 @@ interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'secti
 
 export function ElegantHero({ theme, sectionContent, disableAnimations = false }: ElegantHeroProps) {
   const heroImage = sectionContent.hero.image
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
@@ -24,7 +26,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 0.35, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={t(0.8, 0, [0.16, 1, 0.3, 1])}
             className={cn('text-[10px] uppercase tracking-[0.35em]', theme.fontBody)}
           >
             {sectionContent.hero.subtitle}
@@ -34,7 +36,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            transition={t(0.9, 0.15, [0.16, 1, 0.3, 1])}
             className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}
           >
             {sectionContent.hero.title}
@@ -44,7 +46,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
             initial={{ scaleX: 0, opacity: 0 }}
             whileInView={{ scaleX: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={t(0.6, 0.3)}
             className="w-16 h-px bg-current/25 mx-auto origin-center"
           />
 
@@ -52,7 +54,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 0.6, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={t(0.8, 0.4, [0.16, 1, 0.3, 1])}
             className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light', theme.lineHeight, theme.fontBody)}
           >
             {sectionContent.hero.description}
@@ -63,7 +65,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              transition={t(1, 0.55, [0.16, 1, 0.3, 1])}
               className="pt-6"
             >
               <CroppedImage

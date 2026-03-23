@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig, type Transition } from 'framer-motion'
 import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -14,6 +14,8 @@ interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sect
 
 export function ShowcaseHero({ theme, sectionContent, disableAnimations = false }: ShowcaseHeroProps) {
   const heroImage = sectionContent.hero.image
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -30,7 +32,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         <motion.div
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, ease: 'easeOut' }}
+          transition={t(1.4, 0, 'easeOut')}
           className="absolute inset-0"
         >
           <Image
@@ -67,7 +69,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={t(0.6, 0.2)}
           className="mb-5 @md:mb-8 flex items-center gap-3"
         >
           <span
@@ -86,7 +88,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.3 }}
+          transition={t(0.9, 0.3)}
           className={cn(
             'leading-[0.88] uppercase font-black',
             '@lg:text-[6rem] @md:text-[4.5rem] text-[2.8rem]',
@@ -101,7 +103,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={t(0.8, 0.5)}
           className={cn(
             'mt-5 @md:mt-8 max-w-md text-sm @md:text-base leading-relaxed font-light',
             heroImage ? 'text-white/65' : 'opacity-50',
@@ -116,7 +118,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
+        transition={t(1, 1)}
         className={cn(
           'relative z-10 flex items-center justify-center pb-8',
           heroImage ? 'text-white/40' : 'opacity-30',

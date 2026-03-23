@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, MotionConfig } from "framer-motion"
+import { motion, MotionConfig, type Transition } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -20,6 +20,8 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
   const aspectClass = getAspectRatioClass(cover.images?.imageSettings[0]?.aspectRatio)
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -35,7 +37,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        transition={t(1)}
         className="flex items-center gap-4 mb-12 @md:mb-16"
       >
         <div className="h-px w-10 bg-current opacity-15" />
@@ -50,7 +52,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, delay: 0.2 }}
+          transition={t(1.1, 0.2)}
           className="w-full max-w-[240px] @sm:max-w-[300px] @md:max-w-sm mb-10 @md:mb-12"
         >
           <div className="border border-current/10 p-[3px]">
@@ -74,7 +76,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: hasImage ? 0.5 : 0.25 }}
+        transition={t(0.9, hasImage ? 0.5 : 0.25)}
         className="text-center space-y-3 max-w-md"
       >
         <h1
@@ -97,7 +99,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: hasImage ? 0.7 : 0.45 }}
+          transition={t(0.7, hasImage ? 0.7 : 0.45)}
           className={cn('mt-6 text-[9px] uppercase tracking-[0.38em] opacity-25', theme.fontBody)}
         >
           {[cover.date, cover.location].filter(Boolean).join('  —  ')}
@@ -108,7 +110,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.85 }}
+          transition={t(0.7, 0.85)}
           className={cn('mt-2 text-[10px] italic opacity-30', theme.fontBody)}
         >
           {cover.tagline}
@@ -119,7 +121,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 0.9, delay: 1.05 }}
+        transition={t(0.9, 1.05)}
         className="origin-center w-16 h-px bg-current opacity-15 mt-14 @md:mt-16"
       />
     </section>

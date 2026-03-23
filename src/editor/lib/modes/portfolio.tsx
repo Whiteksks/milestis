@@ -7,6 +7,15 @@ import { type PortfolioTemplateId } from './portfolio-ids'
 import dynamic from 'next/dynamic'
 import { PortfolioTemplateShell } from '@/editor/components/editor/layout/portfolio-template-shell'
 
+// Hero components — lightweight, used for template preview cards
+import { BentoHero } from '@/editor/components/templates/portfolio/sections/hero/bento-hero'
+import { EditorialHero } from '@/editor/components/templates/portfolio/sections/hero/editorial-hero'
+import { ElegantHero } from '@/editor/components/templates/portfolio/sections/hero/elegant-hero'
+import { GridHero } from '@/editor/components/templates/portfolio/sections/hero/grid-hero'
+import { MinimalHero } from '@/editor/components/templates/portfolio/sections/hero/minimal-hero'
+import { ShowcaseHero } from '@/editor/components/templates/portfolio/sections/hero/showcase-hero'
+import { LiquidGlassHero } from '@/editor/components/templates/portfolio/sections/hero/liquid-glass-hero'
+
 const LoadingTemplate = () => (
   <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
 )
@@ -100,13 +109,13 @@ const PORTFOLIO_SETTINGS_MAP: Record<string, React.ComponentType> = {
 export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
   label: 'Portfolio',
   templates: [
-    { id: 'editorial', name: 'Editorial', tags: ['Classic', "Modern"] },
-    { id: 'minimal', name: 'Minimal', tags: ['Clean', 'Classic'] },
-    { id: 'elegant', name: 'Elegant', tags: ['Clean', 'Classic'] },
-    { id: 'grid', name: 'Grid', tags: ['Structured', 'Clean'] },
-    { id: 'bento', name: 'Bento', tags: ['Structured', 'Modern'] },
-    { id: 'showcase', name: 'Showcase', tags: ['Modern', 'Visual'] },
-    { id: 'liquid-glass', name: 'Liquid Glass', tags: ['Modern', 'Visual'] },
+    { id: 'editorial', name: 'Editorial', tags: ['Classic', 'Modern'], previewComponent: EditorialHero },
+    { id: 'minimal', name: 'Minimal', tags: ['Clean', 'Classic'], previewComponent: MinimalHero },
+    { id: 'elegant', name: 'Elegant', tags: ['Clean', 'Classic'], previewComponent: ElegantHero },
+    { id: 'grid', name: 'Grid', tags: ['Structured', 'Clean'], previewComponent: GridHero },
+    { id: 'bento', name: 'Bento', tags: ['Structured', 'Modern'], previewComponent: BentoHero },
+    { id: 'showcase', name: 'Showcase', tags: ['Modern', 'Visual'], previewComponent: ShowcaseHero },
+    { id: 'liquid-glass', name: 'Liquid Glass', tags: ['Modern', 'Visual'], previewComponent: LiquidGlassHero },
   ],
   sections: [
     { id: 'header', name: 'Header', toggleKey: 'showHeader' },

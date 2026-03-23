@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, MotionConfig } from "framer-motion"
+import { motion, MotionConfig, type Transition } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -21,6 +21,8 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
 
   // Split title into words — alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -53,7 +55,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.9 }}
+        transition={t(0.9)}
         className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10"
       >
         {/* Left — publication name */}
@@ -102,7 +104,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1.4, 0, [0.16, 1, 0.3, 1])}
           className={cn(
             'h-px origin-left mb-8',
             hasImage ? 'bg-white/25' : theme.accent,
@@ -113,7 +115,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
         <motion.div
           initial={{ opacity: 0, y: 44 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1, 0.2, [0.16, 1, 0.3, 1])}
         >
           <h1
             className={cn(
@@ -150,7 +152,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.55 }}
+              transition={t(0.8, 0.55)}
               className={cn(
                 'mt-6 text-sm @md:text-base font-light max-w-[36ch]',
                 hasImage ? 'text-white/50' : 'opacity-50',

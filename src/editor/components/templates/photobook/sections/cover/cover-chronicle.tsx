@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, MotionConfig } from "framer-motion"
+import { motion, MotionConfig, type Transition } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -18,6 +18,8 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -48,7 +50,7 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={t(0.8)}
         className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10"
       >
         <div className="flex items-center gap-3">
@@ -84,14 +86,14 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1.4, 0, [0.16, 1, 0.3, 1])}
           className={cn('h-[2px] origin-left mb-8', hasImage ? 'bg-white/30' : theme.accent)}
         />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={t(1, 0.25, [0.16, 1, 0.3, 1])}
           className="space-y-5"
         >
           <h1

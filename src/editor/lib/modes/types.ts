@@ -14,6 +14,9 @@ export type TemplateDef = {
   description?: string
   thumbnail?: string
   tags?: string[]
+  /** Hero / Cover component used by TemplatePreview. Co-located here so adding
+   *  a template only requires editing one file. */
+  previewComponent?: React.ComponentType<any>
 }
 
 export type SectionDef<K extends string = string> = {

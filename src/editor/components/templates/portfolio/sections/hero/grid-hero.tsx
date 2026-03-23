@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
@@ -19,6 +19,8 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
         .slice(0, 2)
         .toUpperCase()
     : '?'
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
     <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
@@ -31,7 +33,7 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={t(0.8, 0, [0.22, 1, 0.36, 1])}
           className={cn(
             'relative rounded-2xl border border-current/8',
             'p-8 @lg:p-14 min-h-[72vh] flex items-center',

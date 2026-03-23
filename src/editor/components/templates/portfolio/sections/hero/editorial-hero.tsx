@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
@@ -12,6 +12,8 @@ interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sec
 export function EditorialHero({ theme, sectionContent, disableAnimations = false }: EditorialHeroProps) {
   const heroImage = sectionContent.hero.image
   const heroCropData = sectionContent.hero.cropData
+  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
+    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   const descriptionBlock = (
     <div className="space-y-5 max-w-sm">
@@ -19,7 +21,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
       <motion.p
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
+        transition={t(0.8, 0.4)}
         className={cn(
           'text-sm @md:text-base opacity-60 font-light leading-relaxed',
           theme.fontBody,
@@ -37,7 +39,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
       data-section-id="hero"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+      transition={t(1)}
         className={cn(
         '@container relative overflow-hidden min-h-[88vh] max-w-7xl mx-auto flex flex-col justify-center',
         theme.foreground,
@@ -64,7 +66,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
           <motion.h1
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.2 }}
+            transition={t(0.9, 0.2)}
             className={cn(
               'uppercase tracking-tighter leading-[0.85]',
               '@lg:text-[5rem] @md:text-6xl text-4xl',
@@ -86,7 +88,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.1, delay: 0.15 }}
+            transition={t(1.1, 0.15)}
             className="flex items-center justify-center @md:pr-10 @lg:pr-20 px-6 @md:px-0 pt-8 @md:pt-28 @lg:pt-32 pb-8 @md:pb-14"
           >
             <CroppedImage
