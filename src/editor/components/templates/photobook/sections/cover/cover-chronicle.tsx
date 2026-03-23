@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, MotionConfig } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -11,14 +11,16 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface CoverChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  disableAnimations?: boolean
 }
 
-export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
+export function CoverChronicle({ sectionContent, theme, disableAnimations = false }: CoverChronicleProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       className={cn(
         '@container relative min-h-screen flex flex-col overflow-hidden',
@@ -118,5 +120,6 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
         </motion.div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

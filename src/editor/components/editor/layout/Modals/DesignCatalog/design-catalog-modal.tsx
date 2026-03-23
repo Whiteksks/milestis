@@ -18,7 +18,7 @@ import { useThemeSelector, useUiSelector, type ThemeCustomizations } from '@/edi
 import { themes } from '@/editor/lib/themes'
 import { BACKGROUND_PRESETS } from '@/editor/lib/background-presets'
 import type { BackgroundPreset } from '@/editor/lib/background-presets'
-import { getModeSectionCount, getModeTemplates } from '@/editor/lib/mode-registry'
+import { getModeTemplates } from '@/editor/lib/mode-registry'
 import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
 import { PHOTOBOOK_PRESETS, findMatchingPreset } from '@/editor/lib/photobook-presets'
 import type { TemplateId, Theme, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
@@ -77,7 +77,6 @@ export function DesignCatalogModal() {
   } | null>(null)
 
   const templates = useMemo(() => getModeTemplates(editorMode), [editorMode])
-  const templateSectionCount = useMemo(() => getModeSectionCount(editorMode), [editorMode])
   const isPhotobook = editorMode === 'photobook'
   const modeConfig = getModeUiConfig(editorMode)
 
@@ -334,7 +333,6 @@ export function DesignCatalogModal() {
             items={visibleItems as typeof templates}
             selectedId={effectiveSelectedTemplatesId}
             onSelect={onTemplateSelect}
-            sectionCount={templateSectionCount}
           />
         )}
         {designModalSection === 'themes' && (
@@ -367,7 +365,6 @@ export function DesignCatalogModal() {
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
     effectivePhotobookPresetId,
-    templateSectionCount,
     isPreviewMode,
     setTemplate,
     setTheme,

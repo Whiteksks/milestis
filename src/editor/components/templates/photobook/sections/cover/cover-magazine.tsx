@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, MotionConfig } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -11,9 +11,10 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface CoverMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  disableAnimations?: boolean
 }
 
-export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
+export function CoverMagazine({ sectionContent, theme, disableAnimations = false }: CoverMagazineProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
@@ -22,6 +23,7 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
   const words = (cover.title ?? '').split(' ').filter(Boolean)
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       className={cn(
         '@container relative min-h-screen flex flex-col overflow-hidden',
@@ -162,5 +164,6 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
         </motion.div>
       </div>
     </section>
+    </MotionConfig>
   )
 }

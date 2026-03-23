@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, MotionConfig } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -13,9 +13,10 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface CoverMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  disableAnimations?: boolean
 }
 
-export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
+export function CoverMemoir({ sectionContent, theme, disableAnimations = false }: CoverMemoirProps) {
   const { cover } = sectionContent
   const imageBlock = cover.images
   const imageUrl = imageBlock?.image ?? ''
@@ -23,6 +24,7 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section className={cn('@container relative min-h-screen flex flex-col', theme.background, theme.foreground)}>
 
       {/* Top accent stroke — draws in from left */}
@@ -124,5 +126,6 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
         <div className="h-px bg-current opacity-[0.08]" />
       </div>
     </section>
+    </MotionConfig>
   )
 }

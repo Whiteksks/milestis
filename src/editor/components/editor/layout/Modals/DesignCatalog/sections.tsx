@@ -75,18 +75,16 @@ function BackgroundPreviewMiniInner({ preset }: { preset: BackgroundPreset }) {
 }
 const BackgroundPreviewMini = memo(BackgroundPreviewMiniInner)
 
-type Templates = Array<{ id: string; name: string }>
+type Templates = Array<{ id: string; name: string; tags?: string[] }>
 
 export function TemplatesSection({
   items,
   selectedId,
   onSelect,
-  sectionCount,
 }: {
   items: Templates
   selectedId: string | null
   onSelect: (id: string) => void
-  sectionCount: number
 }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
@@ -114,9 +112,20 @@ export function TemplatesSection({
                 </div>
               ) : null}
             </div>
-            <div className="p-3">
+            <div className="p-3 space-y-2">
               <h3 className="text-sm font-medium text-card-foreground truncate">{template.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1 truncate">{sectionCount} sections</p>
+              {template.tags && template.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {template.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[10px] font-medium bg-secondary/60 text-muted-foreground border border-border/60 px-1.5 py-0.5 rounded-full capitalize"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </button>
         )

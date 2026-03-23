@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, MotionConfig } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -12,15 +12,17 @@ const passthroughLoader: ImageLoader = ({ src }) => src
 interface CoverLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  disableAnimations?: boolean
 }
 
-export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
+export function CoverLumiere({ sectionContent, theme, disableAnimations = false }: CoverLumiereProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
   const aspectClass = getAspectRatioClass(cover.images?.imageSettings[0]?.aspectRatio)
 
   return (
+    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       className={cn(
         '@container min-h-screen flex flex-col items-center justify-center',
@@ -121,5 +123,6 @@ export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
         className="origin-center w-16 h-px bg-current opacity-15 mt-14 @md:mt-16"
       />
     </section>
+    </MotionConfig>
   )
 }

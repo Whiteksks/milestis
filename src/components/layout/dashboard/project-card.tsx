@@ -104,6 +104,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
         date={project.preview?.date}
         aspectRatio={project.preview?.aspectRatio}
         frameStyle={project.preview?.frameStyle}
+        zoom={3.5}
       />
     ),
     [

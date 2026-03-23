@@ -2,19 +2,11 @@
 'use client'
 
 import { getTheme } from '@/editor/lib/themes'
-import type { SectionContent } from '@/editor/lib/types'
+import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
 import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
 import { previewTheme, type PreviewColors } from './theme-extract'
 import { ScaledWrapper } from './scaled-wrapper'
-import { PORTFOLIO_PREVIEW_REGISTRY } from './template-registry'
-import { CoverSplitPreview } from './photobook-preview/cover-split-preview'
-import { CoverTimelinePreview } from './photobook-preview/cover-timeline-preview'
-import { CoverMasonryPreview } from './photobook-preview/cover-masonry-preview'
-import { CoverHeroFullscreenPreview } from './photobook-preview/cover-hero-fullscreen-preview'
-import { CoverCirclePortraitPreview } from './photobook-preview/cover-circle-portrait-preview'
-import { CoverMagazinePreview } from './photobook-preview/cover-magazine-preview'
-import { CoverPolaroidPreview } from './photobook-preview/cover-polaroid-preview'
-import { CoverVerticalTextPreview } from './photobook-preview/cover-vertical-text-preview'
+import { PORTFOLIO_PREVIEW_REGISTRY, PHOTOBOOK_PREVIEW_REGISTRY } from './template-registry'
 
 type PC = PreviewColors
 
@@ -26,7 +18,7 @@ function Fallback({ c }: { c: PC }) {
   )
 }
 
-// ─── sectionContent builder ───────────────────────────────────────────────────
+// ─── sectionContent builders ──────────────────────────────────────────────────
 
 function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio, frameStyle }: {
   title?: string
@@ -47,6 +39,29 @@ function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio
   } as SectionContent
 }
 
+function buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl }: {
+  title?: string
+  subtitle?: string
+  date?: string
+  heroImageUrl?: string
+}): PhotobookSectionContent {
+  return {
+    cover: {
+      title: title ?? 'Album Title',
+      subtitle: subtitle,
+      date: date,
+      images: heroImageUrl
+        ? { id: 'preview', image: heroImageUrl, imageSettings: [{ aspectRatio: 'portrait' as AspectRatio, frameStyle: 'none' as FrameStyle }] }
+        : undefined,
+    },
+    introduction: {},
+    story: {},
+    gallery: {},
+    highlight: {},
+    ending: {},
+  } as PhotobookSectionContent
+}
+
 // ─── Dispatcher ───────────────────────────────────────────────────────────────
 
 interface TemplatePreviewProps {
@@ -64,12 +79,12 @@ interface TemplatePreviewProps {
 
 export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subtitle, date, aspectRatio, frameStyle, zoom = 3 }: TemplatePreviewProps) {
   const c = previewTheme(themeId ?? 'parchment')
+  const theme = getTheme(themeId ?? 'parchment')
   const img = heroImageUrl || undefined
 
-  // Portfolio templates — resolved from registry
+  // Portfolio templates
   const HeroComponent = PORTFOLIO_PREVIEW_REGISTRY[templateId ?? '']
   if (HeroComponent) {
-    const theme = getTheme(themeId ?? 'parchment')
     const sectionContent = buildPreviewSectionContent({ title, subtitle, heroImageUrl: img, aspectRatio, frameStyle })
     return (
       <ScaledWrapper zoom={zoom} background={theme.background}>
@@ -79,16 +94,16 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
   }
 
   // Photobook templates
-  switch (templateId) {
-    case 'wedding-timeline':   return <CoverTimelinePreview themeId={themeId} title={title} subtitle={subtitle || date} heroImageUrl={img} />
-    case 'masonry':            return <CoverMasonryPreview themeId={themeId} title={title} subtitle={subtitle || date} heroImageUrl={img} />
-    case 'photobook-classic':  return <CoverHeroFullscreenPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'photobook-circle':   return <CoverCirclePortraitPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'photobook-magazine': return <CoverMagazinePreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'photobook-polaroid': return <CoverPolaroidPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'photobook-split':    return <CoverSplitPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    case 'photobook-vertical': return <CoverVerticalTextPreview themeId={themeId} title={title} subtitle={subtitle} heroImageUrl={img} />
-    default:                   return <Fallback c={c} />
+  const CoverComponent = PHOTOBOOK_PREVIEW_REGISTRY[templateId ?? '']
+  if (CoverComponent) {
+    const sectionContent = buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl: img })
+    return (
+      <ScaledWrapper zoom={zoom} background={theme.background}>
+        <CoverComponent theme={theme} sectionContent={sectionContent} disableAnimations />
+      </ScaledWrapper>
+    )
   }
+
+  return <Fallback c={c} />
 }
 
