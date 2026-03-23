@@ -20,6 +20,14 @@ const TemplateChronicleDesign = dynamic(
   () => import('@/editor/components/templates/photobook/template-chronicle').then(m => m.TemplateChronicleDesign),
   { loading: LoadingTemplate },
 )
+const TemplateMagazineDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-magazine').then(m => m.TemplateMagazineDesign),
+  { loading: LoadingTemplate },
+)
+const TemplateLumiereDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-lumiere').then(m => m.TemplateLumiereDesign),
+  { loading: LoadingTemplate },
+)
 
 // Section settings panels
 const PhotobookCoverSettings = dynamic(
@@ -52,6 +60,8 @@ const photobookTemplateComponents: Partial<
 > = {
   'photobook-memoir': TemplateMemoirDesign,
   'photobook-chronicle': TemplateChronicleDesign,
+  'photobook-magazine': TemplateMagazineDesign,
+  'photobook-lumiere': TemplateLumiereDesign,
 }
 
 export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> = {
@@ -59,6 +69,8 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
   templates: [
     { id: 'photobook-memoir', name: 'Memoir', tags: ['editorial', 'minimal'] },
     { id: 'photobook-chronicle', name: 'Chronicle', tags: ['editorial', 'documentary'] },
+    { id: 'photobook-magazine', name: 'Magazine', tags: ['editorial', 'magazine'] },
+    { id: 'photobook-lumiere', name: 'Lumière', tags: ['editorial', 'film', 'light'] },
   ],
   sections: [
     { id: 'cover', name: 'Cover', toggleKey: 'showCover' },

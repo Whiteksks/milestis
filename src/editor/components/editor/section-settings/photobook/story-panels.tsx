@@ -1,22 +1,26 @@
 "use client"
 
-import { useId, useMemo, useState, useCallback } from "react"
-import Image, { type ImageLoader } from "next/image"
-import { ChevronLeft, ChevronRight, Plus, Trash2, Image as ImageIcon } from "lucide-react"
+import { useCallback, useId, useMemo, useState } from "react"
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
 import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
-
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import type { PhotoBlock } from "@/editor/lib/types"
 
-const passthroughLoader: ImageLoader = ({ src }) => src
-
-// --- Shared Hooks & Utils ---
+// --- Shared Hooks ---
 
 function useStoryData() {
   return useContentSelector((state) => ({
@@ -24,86 +28,6 @@ function useStoryData() {
     updatePhotobookSection: state.updatePhotobookSection,
   }))
 }
-
-function useStoryMoments() {
-  const { story, updatePhotobookSection } = useStoryData()
-  const slots = story.images || []
-  const [activeIndex, setActiveIndex] = useState<number>(() => (slots.length ? 0 : -1))
-
-  const normalizedIndex = useMemo(() => {
-    if (!slots.length) return -1
-    return Math.min(Math.max(activeIndex, 0), slots.length - 1)
-  }, [activeIndex, slots.length])
-
-  const updateSlots = useCallback((nextSlots: any[]) => {
-    updatePhotobookSection("story", { images: nextSlots })
-  }, [updatePhotobookSection])
-
-  const addSlot = () => {
-    const next = [...slots, { id: `slot-${Date.now()}`, label: "New Moment", images: [], caption: "", imageSettings: [] }]
-    updateSlots(next)
-    setActiveIndex(next.length - 1)
-  }
-
-  const removeSlot = (idx: number) => {
-    const next = slots.filter((_, i) => i !== idx)
-    updateSlots(next)
-    setActiveIndex(prev => Math.min(prev, next.length - 1))
-  }
-
-  const updateSlot = (idx: number, updates: any) => {
-    const next = [...slots]
-    next[idx] = { ...next[idx], ...updates }
-    updateSlots(next)
-  }
-
-  const addImagesToSlot = (idx: number, urls: string[]) => {
-    const slot = slots[idx]
-    if (!slot) return
-    const currentImgs = slot.images || []
-    const toAdd = urls.slice(0, 4 - currentImgs.length)
-    if (!toAdd.length) return
-
-    updateSlot(idx, {
-      images: [...currentImgs, ...toAdd],
-      imageSettings: [...(slot.imageSettings || []), ...toAdd.map(() => ({ aspectRatio: "landscape", frameStyle: "soft" }))]
-    })
-  }
-
-  return { slots, activeIndex: normalizedIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot }
-}
-
-// --- Shared Sub-components ---
-
-function MomentNav({ slots, activeIndex, onChange, onRemove }: any) {
-  return (
-    <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => onChange(activeIndex - 1)} disabled={activeIndex <= 0}>
-        <ChevronLeft className="w-4 h-4" />
-      </Button>
-      <Select value={String(activeIndex)} onValueChange={(v) => onChange(parseInt(v, 10))}>
-        <SelectTrigger className="h-8 text-xs rounded-xl w-32">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {slots.map((s: any, i: number) => (
-            <SelectItem key={s.id || i} value={String(i)} className="text-xs">
-              {s.label?.trim() ? s.label : `Moment ${i + 1}`}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => onChange(activeIndex + 1)} disabled={activeIndex >= slots.length - 1}>
-        <ChevronRight className="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="icon" onClick={() => onRemove(activeIndex)} className="h-8 w-8 text-muted-foreground hover:text-destructive rounded-xl">
-        <Trash2 className="w-4 h-4" />
-      </Button>
-    </div>
-  )
-}
-
-// --- Main Components ---
 
 export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { story, updatePhotobookSection } = useStoryData()
@@ -197,75 +121,214 @@ export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
   )
 }
 
-export function StoryMomentsPanel({ dense = false }: { dense?: boolean }) {
-  const ownerId = useId()
-  const { slots, activeIndex, setActiveIndex, addSlot, removeSlot, updateSlot, addImagesToSlot } = useStoryMoments()
-  const { openMediaPicker } = useUiSelector((s) => ({ openMediaPicker: s.openMediaPicker }))
-  
-  const activeSlot = slots[activeIndex]
+// --- Single moment item — has its own MediaPickerModal so image can be replaced ---
 
+function StoryMomentItem({
+  block,
+  onUpdate,
+}: {
+  block: PhotoBlock
+  onUpdate: (patch: Partial<PhotoBlock>) => void
+}) {
+  const ownerId = useId()
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   return (
-    <section className="space-y-4">
-      <MediaPickerModal ownerId={ownerId} onSelectImage={(u) => addImagesToSlot(activeIndex, [u])} onSelectImages={(us) => addImagesToSlot(activeIndex, us)} />
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="text-sm font-medium">Moments</h4>
-          <p className="text-xs text-muted-foreground">Up to 4 photos per moment</p>
-        </div>
-        <Button size="sm" onClick={addSlot} className="h-8 text-xs"><Plus className="w-3.5 h-3.5 mr-2" /> Add</Button>
+    <div className="space-y-2">
+      <MediaPickerModal
+        ownerId={ownerId}
+        onSelectImage={(url) =>
+          onUpdate({
+            image: url,
+            imageSettings: block.imageSettings?.length
+              ? block.imageSettings
+              : [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+          })
+        }
+      />
+      <Input
+        value={block.label || ""}
+        onChange={(e) => onUpdate({ label: e.target.value })}
+        placeholder="Label (e.g. Morning)"
+        className={ps.pbInput}
+      />
+      <ImagePicker
+        label=""
+        value={block}
+        onChange={(next) => onUpdate(next)}
+        onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        showCaption
+      />
+    </div>
+  )
+}
+
+export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
+  const addOwnerId = useId()
+  const { story, updatePhotobookSection } = useStoryData()
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+
+  const images: PhotoBlock[] = story.images || []
+  const updateImages = (next: PhotoBlock[]) => updatePhotobookSection("story", { images: next })
+
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(() =>
+    images.length ? 0 : -1
+  )
+
+  const normalizedIndex = useMemo(() => {
+    if (!images.length) return -1
+    return Math.min(Math.max(activeImageIndex, 0), images.length - 1)
+  }, [activeImageIndex, images.length])
+
+  const activeImage = normalizedIndex >= 0 ? images[normalizedIndex] : null
+
+  const updateActiveImage = useCallback(
+    (patch: Partial<PhotoBlock>) => {
+      if (normalizedIndex < 0) return
+      updatePhotobookSection("story", {
+        images: images.map((b, i) => (i === normalizedIndex ? { ...b, ...patch } : b)),
+      })
+    },
+    [normalizedIndex, images, updatePhotobookSection],
+  )
+
+  const handleMultiAdd = (urls: string[]) => {
+    if (!urls.length) return
+    const ts = Date.now()
+    const newBlocks: PhotoBlock[] = urls.map((url, i) => ({
+      id: `story-${ts}-${i}`,
+      image: url,
+      label: "",
+      caption: "",
+      imageSettings: [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+    }))
+    const next = [...images, ...newBlocks]
+    updateImages(next)
+    setActiveImageIndex(next.length - 1)
+  }
+
+  const addEmpty = () => {
+    const newBlock: PhotoBlock = {
+      id: `story-${Date.now()}`,
+      image: "",
+      label: "",
+      caption: "",
+      imageSettings: [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+    }
+    const next = [...images, newBlock]
+    updateImages(next)
+    setActiveImageIndex(next.length - 1)
+  }
+
+  const deleteImage = (idx: number) => {
+    const next = images.filter((_, i) => i !== idx)
+    updateImages(next)
+    setActiveImageIndex(next.length ? Math.min(idx, next.length - 1) : -1)
+  }
+
+  return (
+    <div className={ps.pbRoot}>
+      <MediaPickerModal ownerId={addOwnerId} onSelectImages={handleMultiAdd} />
+
+      <div className="flex items-center justify-between gap-3">
+        {!dense && <PanelLabel>Photos</PanelLabel>}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
+          onClick={addEmpty}
+        >
+          <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add photo" : "Add"}
+        </Button>
       </div>
 
-      {slots.length > 0 ? (
+      {images.length === 0 ? (
+        <button
+          type="button"
+          onClick={() => openMediaPicker(addOwnerId)}
+          className={ps.emptyZone}
+        >
+          <Plus className={ps.emptyIcon} />
+          {!dense && <span className={ps.emptyText}>Click to add story photos</span>}
+        </button>
+      ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-muted-foreground">Moment {activeIndex + 1} / {slots.length}</div>
-            <MomentNav slots={slots} activeIndex={activeIndex} onChange={setActiveIndex} onRemove={removeSlot} />
+          {/* Switcher */}
+          <div className="flex items-center justify-between gap-2">
+            {!dense && (
+              <span className="text-[11px] text-muted-foreground/60 tabular-nums">
+                {normalizedIndex + 1} / {images.length}
+              </span>
+            )}
+
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-xl"
+                onClick={() => setActiveImageIndex(Math.max(0, normalizedIndex - 1))}
+                disabled={normalizedIndex <= 0}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+
+              <Select
+                value={String(normalizedIndex)}
+                onValueChange={(v) => setActiveImageIndex(parseInt(v, 10))}
+              >
+                <SelectTrigger className="h-8 text-xs bg-background rounded-xl w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {images.map((img, idx) => (
+                    <SelectItem key={img.id} value={String(idx)}>
+                      {img.label?.trim() ? img.label : `Photo ${idx + 1}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-xl"
+                onClick={() => setActiveImageIndex(Math.min(images.length - 1, normalizedIndex + 1))}
+                disabled={normalizedIndex >= images.length - 1}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-          {activeSlot && (
-            <div className="rounded-xl bg-muted/30 p-3 space-y-4">
-              <div className="space-y-1.5">
-                <PanelLabel>Title</PanelLabel>
-                <Input value={activeSlot.label} onChange={(e) => updateSlot(activeIndex, { label: e.target.value })} className={ps.pbInput} placeholder="Event name..." />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {activeSlot.images?.map((img: string, i: number) => (
-                  <div key={i} className="relative aspect-4/3 overflow-hidden rounded-lg border group">
-                    <Image loader={passthroughLoader} unoptimized src={img} alt="" fill className="object-cover" />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => updateSlot(activeIndex, {
-                        images: activeSlot.images.filter((_: any, idx: number) => idx !== i),
-                        imageSettings: activeSlot.imageSettings.filter((_: any, idx: number) => idx !== i)
-                      })}
-                      className="absolute right-1.5 top-1.5 h-6 w-6 bg-background/90 rounded-md shadow-sm md:opacity-0 md:group-hover:opacity-100"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ))}
-                {activeSlot.images?.length < 4 && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => openMediaPicker(ownerId)}
-                    className="flex flex-col h-auto items-center justify-center aspect-4/3 rounded-lg border border-dashed hover:bg-muted/30"
-                  >
-                    <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
-                    <span className="text-[10px] font-medium">Add Photo</span>
-                  </Button>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <PanelLabel>Caption</PanelLabel>
-                <Input value={activeSlot.caption || ""} onChange={(e) => updateSlot(activeIndex, { caption: e.target.value })} className={ps.pbInput} placeholder="Add a caption..." />
+
+          {/* Active item editor */}
+          {activeImage && (
+            <div className="rounded-xl bg-muted/30 p-3 space-y-4 relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted"
+                onClick={() => deleteImage(normalizedIndex)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+
+              <div className="pr-10">
+                <StoryMomentItem
+                  key={activeImage.id}
+                  block={activeImage}
+                  onUpdate={updateActiveImage}
+                />
               </div>
             </div>
           )}
         </div>
-      ) : (
-        <div className="rounded-xl border border-dashed px-4 py-10 text-center text-xs text-muted-foreground">No moments added yet</div>
       )}
-    </section>
+
+      <Button variant="outline" className="h-8 text-xs w-full" onClick={() => openMediaPicker(addOwnerId)}>
+        <Plus className="w-3.5 h-3.5 mr-2" /> Add photo
+      </Button>
+    </div>
   )
 }

@@ -1,0 +1,136 @@
+"use client"
+
+import { motion } from "framer-motion"
+import Image, { type ImageLoader } from 'next/image'
+import { cn } from '@/lib/utils'
+import type { ThemeConfig } from '@/editor/lib/themes'
+import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
+
+const passthroughLoader: ImageLoader = ({ src }) => src
+
+interface HighlightLumiereProps {
+  sectionContent: PhotobookSectionContent
+  theme: ThemeConfig
+}
+
+export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProps) {
+  const { highlight } = sectionContent
+  const imageUrl = highlight.images?.image ?? ''
+  const hasImage = Boolean(imageUrl)
+  const aspectClass = getAspectRatioClass(highlight.images?.imageSettings?.[0]?.aspectRatio)
+
+  return (
+    <section
+      className={cn(
+        '@container overflow-x-hidden py-20 @md:py-28',
+        theme.muted,
+        theme.foreground,
+      )}
+    >
+      <div className="max-w-3xl mx-auto px-8 @md:px-0 flex flex-col items-center text-center">
+
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center gap-4 mb-14 w-full"
+        >
+          <div className="h-px flex-1 bg-current opacity-10" />
+          <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
+            05  ·  Highlight
+          </span>
+          <div className="h-px flex-1 bg-current opacity-10" />
+        </motion.div>
+
+        {/* Title above photo */}
+        {highlight.title && (
+          <motion.h2
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8 }}
+            className={cn(
+              'text-2xl @sm:text-3xl @md:text-4xl font-light italic tracking-tight leading-snug mb-10',
+              theme.fontTitle,
+            )}
+          >
+            {highlight.title}
+          </motion.h2>
+        )}
+
+        {/* Statement framed photo */}
+        {hasImage && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 1 }}
+            className="w-full max-w-xl @md:max-w-2xl mb-10"
+          >
+            <div className="border border-current/10 p-[3px]">
+              <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/3]')}>
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt={highlight.title ?? 'Highlight'}
+                  fill
+                  sizes="(max-width: 768px) 95vw, 65vw"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Description */}
+        {highlight.description && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className={cn(
+              'text-sm font-light opacity-55 max-w-[42ch] leading-relaxed mb-10',
+              theme.fontBody,
+              theme.lineHeight,
+            )}
+          >
+            {highlight.description}
+          </motion.p>
+        )}
+
+        {/* Pull quote */}
+        {highlight.quote && (
+          <>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6 }}
+              className="origin-center w-10 h-px bg-current opacity-15 mb-8"
+            />
+            <motion.blockquote
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+            >
+              <p
+                className={cn(
+                  'text-lg @md:text-xl font-light italic opacity-50 max-w-[38ch] leading-relaxed',
+                  theme.fontBody,
+                )}
+              >
+                &ldquo;{highlight.quote}&rdquo;
+              </p>
+            </motion.blockquote>
+          </>
+        )}
+      </div>
+    </section>
+  )
+}

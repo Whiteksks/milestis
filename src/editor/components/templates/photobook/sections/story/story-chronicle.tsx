@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { motion } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
@@ -17,7 +17,7 @@ interface StoryChronicleProps {
 
 export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
   const { story } = sectionContent
-  const slots = story.images ?? []
+  const moments = story.images ?? []
   const paragraphs = story.paragraphs ?? []
 
   return (
@@ -64,27 +64,27 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
           </div>
         </motion.div>
 
-        {/* Story slots — editorial numbered layout */}
-        {slots.length > 0 && (
+        {/* Story moments — numbered editorial layout */}
+        {moments.length > 0 && (
           <div className="space-y-20 @md:space-y-28">
-            {slots.map((slot, index) => {
-              const imageUrl = slot.images?.[0] ?? ''
-              const paragraph = paragraphs[index] ?? slot.caption ?? ''
-              const aspectRatio = slot.imageSettings?.[0]?.aspectRatio ?? 'landscape'
-              const frameStyle = slot.imageSettings?.[0]?.frameStyle ?? 'none'
+            {moments.map((block, index) => {
+              const imageUrl = block.image
               const isEven = index % 2 === 0
               const slotNum = String(index + 1).padStart(2, '0')
+              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
+              const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
+              const paragraph = paragraphs[index] ?? block.caption ?? ''
 
               return (
                 <motion.div
-                  key={slot.id}
+                  key={block.id}
                   initial={{ opacity: 0, y: 28 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ duration: 0.8 }}
                   className="grid grid-cols-1 @md:grid-cols-[1fr_3fr] gap-6 @md:gap-10"
                 >
-                  {/* Slot number + label — editorial sidebar */}
+                  {/* Number + label sidebar */}
                   <div
                     className={cn(
                       'flex @md:flex-col items-start gap-4 @md:pt-3',
@@ -99,14 +99,14 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                     >
                       {slotNum}
                     </span>
-                    {slot.label && (
+                    {block.label && (
                       <p className={cn('text-[10px] uppercase tracking-widest opacity-40 @md:mt-3', theme.fontBody)}>
-                        {slot.label}
+                        {block.label}
                       </p>
                     )}
                   </div>
 
-                  {/* Photo + caption */}
+                  {/* Photo + paragraph */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
                     {imageUrl && (
                       <div
@@ -120,7 +120,7 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                           loader={passthroughLoader}
                           unoptimized
                           src={imageUrl}
-                          alt={slot.label ?? `Story ${index + 1}`}
+                          alt={block.label ?? `Story ${index + 1}`}
                           fill
                           sizes="(max-width: 768px) 90vw, 70vw"
                           className="object-cover"
@@ -143,6 +143,30 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
               )
             })}
           </div>
+        )}
+
+        {/* Standalone paragraphs when no moments */}
+        {moments.length === 0 && paragraphs.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7 }}
+            className="space-y-5 @md:columns-2 @md:gap-12"
+          >
+            {paragraphs.map((para, i) => (
+              <p
+                key={i}
+                className={cn(
+                  'text-sm @md:text-base font-light opacity-55 break-inside-avoid',
+                  theme.lineHeight,
+                  theme.fontBody,
+                )}
+              >
+                {para}
+              </p>
+            ))}
+          </motion.div>
         )}
       </div>
     </section>

@@ -202,21 +202,11 @@ export type PhotobookSectionVisibility = {
   [K in keyof PhotobookSectionContent as `show${Capitalize<string & K>}`]: boolean
 }
 
-export interface PhotobookSlot {
-  id: string
-  label?: string
-  images: string[]
-  caption?: string
-  imageSettings: Array<{
-    aspectRatio?: AspectRatio
-    frameStyle?: FrameStyle
-  }>
-}
-
 export interface PhotoBlock {
   id: string
   image: string
   thumbUrl?: string
+  label?: string
   caption?: string
   imageSettings: Array<{
     aspectRatio?: AspectRatio
@@ -249,7 +239,7 @@ export interface PhotobookSectionContent {
     date?: string
     location?: string
     paragraphs?: string[]
-    images?: PhotobookSlot[]
+    images?: PhotoBlock[]
   }
 
   gallery: {

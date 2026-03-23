@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { motion } from "framer-motion"
 import Image, { type ImageLoader } from 'next/image'
@@ -17,7 +17,7 @@ interface StoryMemoirProps {
 
 export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
   const { story } = sectionContent
-  const slots = story.images ?? []
+  const moments = story.images ?? []
   const paragraphs = story.paragraphs ?? []
 
   return (
@@ -65,19 +65,19 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
           </div>
         </motion.div>
 
-        {/* Narrative story slots — alternating image / text */}
-        {slots.length > 0 && (
+        {/* Story moments — alternating image / text */}
+        {moments.length > 0 && (
           <div className="space-y-24 @md:space-y-32">
-            {slots.map((slot, index) => {
-              const imageUrl = slot.images?.[0] ?? ''
+            {moments.map((block, index) => {
               const isEven = index % 2 === 0
-              const paragraph = paragraphs[index] ?? slot.caption ?? ''
-              const aspectRatio = slot.imageSettings?.[0]?.aspectRatio ?? 'landscape'
-              const frameStyle = slot.imageSettings?.[0]?.frameStyle ?? 'none'
+              const imageUrl = block.image
+              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
+              const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
+              const paragraph = paragraphs[index] ?? block.caption ?? ''
 
               return (
                 <motion.div
-                  key={slot.id}
+                  key={block.id}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-80px' }}
@@ -86,31 +86,29 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                 >
                   {/* Photo */}
                   <div className={cn(isEven ? '@md:order-1' : '@md:order-2')}>
-                    <div
-                      className={cn(
-                        'relative overflow-hidden',
-                        getAspectRatioClass(aspectRatio),
-                        getFrameStyle(frameStyle),
-                        theme.shadow,
-                      )}
-                    >
-                      {imageUrl ? (
+                    {imageUrl && (
+                      <div
+                        className={cn(
+                          'relative overflow-hidden',
+                          getAspectRatioClass(aspectRatio),
+                          getFrameStyle(frameStyle),
+                          theme.shadow,
+                        )}
+                      >
                         <Image
                           loader={passthroughLoader}
                           unoptimized
                           src={imageUrl}
-                          alt={slot.label ?? `Story moment ${index + 1}`}
+                          alt={block.label ?? story.title ?? 'Story'}
                           fill
                           sizes="(max-width: 768px) 100vw, 50vw"
                           className="object-cover"
                         />
-                      ) : (
-                        <div className={cn('absolute inset-0', theme.background)} />
-                      )}
-                    </div>
-                    {slot.caption && (
+                      </div>
+                    )}
+                    {block.caption && (
                       <p className={cn('mt-3 text-xs opacity-40', theme.fontBody)}>
-                        {slot.caption}
+                        {block.caption}
                       </p>
                     )}
                   </div>
@@ -122,41 +120,32 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                       isEven ? '@md:order-2' : '@md:order-1',
                     )}
                   >
-                    {/* Ghost index number */}
-                    <span
-                      aria-hidden
-                      className={cn(
-                        'text-[5rem] @lg:text-[7rem] font-black leading-none opacity-[0.06] select-none pointer-events-none tabular-nums tracking-tighter',
-                        theme.fontTitle,
-                      )}
-                    >
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-
-                    <div className="space-y-4 -mt-6">
-                      {slot.label && (
-                        <p className={cn('text-[10px] uppercase opacity-40', theme.letterSpacing, theme.fontBody)}>
-                          {slot.label}
-                        </p>
-                      )}
-                      <div className={cn('h-px w-10', theme.accent)} />
-                      {paragraph && (
-                        <p
-                          className={cn(
-                            'text-sm @md:text-base font-light opacity-65',
-                            theme.lineHeight,
-                            theme.fontBody,
-                          )}
-                        >
-                          {paragraph}
-                        </p>
-                      )}
-                    </div>
+                    {block.label && (
+                      <p className={cn('text-[10px] uppercase opacity-40', theme.letterSpacing, theme.fontBody)}>
+                        {block.label}
+                      </p>
+                    )}
+                    <div className={cn('h-px w-10', theme.accent)} />
+                    {paragraph && (
+                      <p
+                        className={cn(
+                          'text-sm @md:text-base font-light opacity-65',
+                          theme.lineHeight,
+                          theme.fontBody,
+                        )}
+                      >
+                        {paragraph}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               )
             })}
           </div>
+        )}
+
+        {moments.length === 0 && !paragraphs.length && (
+          <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
       </div>
     </section>

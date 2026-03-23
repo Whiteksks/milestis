@@ -6,7 +6,7 @@ import { AlignLeft, Calendar, Image as ImageIcon, MapPin, PenLine, Type } from "
 
 import { CoverImagePanel, CoverMetadataPanel, CoverTextPanel } from "@/editor/components/editor/section-settings/photobook/cover-panels"
 import { IntroductionImagePanel, IntroductionTextPanel } from "@/editor/components/editor/section-settings/photobook/introduction-panels"
-import { StoryHeaderPanel, StoryMomentsPanel, StoryTextPanel } from "@/editor/components/editor/section-settings/photobook/story-panels"
+import { StoryHeaderPanel, StoryImagePanel, StoryTextPanel } from "@/editor/components/editor/section-settings/photobook/story-panels"
 import { GalleryHeaderPanel, GalleryImagesPanel } from "@/editor/components/editor/section-settings/photobook/gallery-panels"
 import { HighlightImagePanel, HighlightTextPanel } from "@/editor/components/editor/section-settings/photobook/highlight-panels"
 import { EndingImagePanel, EndingMessagePanel, EndingSignaturePanel } from "@/editor/components/editor/section-settings/photobook/ending-panels"
@@ -31,7 +31,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PhotobookSectionQuickAction[]>>
   story: [
     { id: "story.header", title: "Header", Icon: MapPin, Panel: StoryHeaderPanel },
     { id: "story.text", title: "Text", Icon: AlignLeft, Panel: StoryTextPanel },
-    { id: "story.moments", title: "Moments", Icon: ImageIcon, Panel: StoryMomentsPanel },
+    { id: "story.image", title: "Photo", Icon: ImageIcon, Panel: StoryImagePanel },
   ],
   gallery: [
     { id: "gallery.header", title: "Header", Icon: Type, Panel: GalleryHeaderPanel },

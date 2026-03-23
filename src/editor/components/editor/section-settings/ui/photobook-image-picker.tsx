@@ -37,7 +37,7 @@ export function PhotobookImagePicker({
   }
 
   // Normalise PhotoBlock → flat core value
-  const settings = value.imageSettings[0] ?? {}
+  const settings = value.imageSettings?.[0] ?? {}
   const aspectRatio = (settings.aspectRatio as AspectRatio) ?? "square"
   const frameStyle = (settings.frameStyle as FrameStyle) ?? "none"
   const cropData = settings.cropData as ImageCropData | undefined
