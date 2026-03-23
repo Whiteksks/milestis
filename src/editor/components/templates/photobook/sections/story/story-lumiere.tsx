@@ -17,7 +17,6 @@ interface StoryLumiereProps {
 export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
   const { story } = sectionContent
   const moments = story.images ?? []
-  const paragraphs = story.paragraphs ?? []
 
   return (
     <section
@@ -75,7 +74,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
         {moments.map((block, index) => {
           const imageUrl = block.image
           const aspectClass = getAspectRatioClass(block.imageSettings?.[0]?.aspectRatio)
-          const paragraph = paragraphs[index] ?? ''
+          const description = block.description ?? ''
 
           return (
             <motion.div
@@ -122,7 +121,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                   )}
                 </>
               )}
-              {paragraph && (
+              {description && (
                 <p
                   className={cn(
                     'text-sm font-light opacity-60 leading-relaxed text-center max-w-prose',
@@ -130,30 +129,13 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                     theme.lineHeight,
                   )}
                 >
-                  {paragraph}
+                  {description}
                 </p>
               )}
             </motion.div>
           )
         })}
 
-        {/* Standalone paragraphs when no moments */}
-        {moments.length === 0 && paragraphs.length > 0 && (
-          <div className="space-y-5 text-center max-w-prose mx-auto">
-            {paragraphs.map((para: string, i: number) => (
-              <motion.p
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.6, delay: i * 0.06 }}
-                className={cn('text-sm font-light opacity-60 leading-relaxed', theme.fontBody, theme.lineHeight)}
-              >
-                {para}
-              </motion.p>
-            ))}
-          </div>
-        )}
       </div>
     </section>
   )

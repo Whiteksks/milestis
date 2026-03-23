@@ -18,7 +18,6 @@ interface StoryMemoirProps {
 export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
   const { story } = sectionContent
   const moments = story.images ?? []
-  const paragraphs = story.paragraphs ?? []
 
   return (
     <section className={cn('@container py-20 @md:py-28', theme.muted, theme.foreground)}>
@@ -73,7 +72,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
               const imageUrl = block.image
               const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
               const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
-              const paragraph = paragraphs[index] ?? block.caption ?? ''
+              const description = block.description ?? ''
 
               return (
                 <motion.div
@@ -126,7 +125,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                       </p>
                     )}
                     <div className={cn('h-px w-10', theme.accent)} />
-                    {paragraph && (
+                    {description && (
                       <p
                         className={cn(
                           'text-sm @md:text-base font-light opacity-65',
@@ -134,7 +133,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                           theme.fontBody,
                         )}
                       >
-                        {paragraph}
+                        {description}
                       </p>
                     )}
                   </div>
@@ -144,7 +143,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
           </div>
         )}
 
-        {moments.length === 0 && !paragraphs.length && (
+        {moments.length === 0 && (
           <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
       </div>

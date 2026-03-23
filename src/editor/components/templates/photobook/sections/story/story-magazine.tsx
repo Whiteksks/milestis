@@ -18,7 +18,6 @@ interface StoryMagazineProps {
 export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
   const { story } = sectionContent
   const moments = story.images ?? []
-  const paragraphs = story.paragraphs ?? []
 
   return (
     <section className={cn('@container overflow-x-hidden py-16 @md:py-24', theme.muted, theme.foreground)}>
@@ -74,7 +73,7 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
               const imageUrl = block.image
               const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
               const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
-              const paragraph = paragraphs[index] ?? ''
+              const description = block.description ?? ''
 
               return (
                 <motion.div
@@ -125,7 +124,7 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
                           {block.caption}
                         </p>
                       )}
-                      {paragraph && (
+                      {description && (
                         <p
                           className={cn(
                             'text-sm @md:text-base font-light opacity-55 max-w-[65ch]',
@@ -133,7 +132,7 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
                             theme.fontBody,
                           )}
                         >
-                          {paragraph}
+                          {description}
                         </p>
                       )}
                     </div>
@@ -144,25 +143,6 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
           </div>
         )}
 
-        {/* Paragraphs only (no moments) */}
-        {moments.length === 0 && paragraphs.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.7 }}
-            className="space-y-5 max-w-[65ch]"
-          >
-            {paragraphs.map((para, i) => (
-              <p
-                key={i}
-                className={cn('text-sm @md:text-base font-light opacity-55', theme.lineHeight, theme.fontBody)}
-              >
-                {para}
-              </p>
-            ))}
-          </motion.div>
-        )}
       </div>
     </section>
   )

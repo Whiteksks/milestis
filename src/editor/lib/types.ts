@@ -208,6 +208,7 @@ export interface PhotoBlock {
   thumbUrl?: string
   label?: string
   caption?: string
+  description?: string
   imageSettings: Array<{
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
@@ -238,7 +239,6 @@ export interface PhotobookSectionContent {
     title?: string
     date?: string
     location?: string
-    paragraphs?: string[]
     images?: PhotoBlock[]
   }
 

@@ -2,7 +2,7 @@
 
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { StoryHeaderPanel, StoryImagePanel, StoryTextPanel } from './story-panels'
+import { StoryHeaderPanel, StoryImagePanel } from './story-panels'
 
 export function PhotobookStorySettings() {
   return (
@@ -14,10 +14,6 @@ export function PhotobookStorySettings() {
         </div>
 
         <StoryHeaderPanel />
-
-        <Separator className="bg-border/40" />
-
-        <StoryTextPanel />
 
         <Separator className="bg-border/40" />
 

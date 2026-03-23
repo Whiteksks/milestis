@@ -4,7 +4,6 @@ import { useCallback, useId, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
 import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
@@ -50,85 +49,16 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   )
 }
 
-export function StoryTextPanel({ dense = false }: { dense?: boolean }) {
-  const { story, updatePhotobookSection } = useStoryData()
-  const paragraphs = story.paragraphs || []
-
-  const updateParagraphs = (next: string[]) => updatePhotobookSection("story", { paragraphs: next })
-  const add = () => updateParagraphs([...paragraphs, ""])
-
-  if (dense) {
-    return (
-      <div className="space-y-2">
-        {paragraphs.map((p, i) => (
-          <Textarea
-            key={i}
-            value={p}
-            onChange={(e) => {
-              const next = [...paragraphs]; next[i] = e.target.value; updateParagraphs(next)
-            }}
-            onBlur={() => !paragraphs[i]?.trim() && updateParagraphs(paragraphs.filter((_, idx) => idx !== i))}
-            rows={2}
-            className="text-xs resize-none"
-            placeholder="Start writing..."
-          />
-        ))}
-        {!paragraphs.length && (
-          <button
-            onClick={add}
-            className="w-full rounded-xl border border-dashed p-4 text-xs text-muted-foreground hover:bg-muted/30"
-          >
-            Click to add the first paragraph
-          </button>
-        )}
-        <Button size="sm" variant="outline" className="h-7 w-full text-xs" onClick={add}>
-          <Plus className="w-3.5 h-3.5 mr-1" /> Add paragraph
-        </Button>
-      </div>
-    )
-  }
-
-  return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h4 className="text-sm font-medium">Text</h4>
-          <p className="text-xs text-muted-foreground">Add paragraphs (empty ones are removed)</p>
-        </div>
-        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={add}><Plus className="w-3.5 h-3.5 mr-2" /> Add</Button>
-      </div>
-      <div className="space-y-3">
-        {paragraphs.map((p, i) => (
-          <Textarea
-            key={i}
-            value={p}
-            onChange={(e) => {
-              const next = [...paragraphs]; next[i] = e.target.value; updateParagraphs(next)
-            }}
-            onBlur={() => !paragraphs[i]?.trim() && updateParagraphs(paragraphs.filter((_, idx) => idx !== i))}
-            rows={3}
-            className="text-xs resize-none min-h-25"
-            placeholder="Start writing..."
-          />
-        ))}
-        {!paragraphs.length && (
-          <button onClick={add} className="w-full rounded-xl border border-dashed p-8 text-xs text-muted-foreground hover:bg-muted/30">
-            Click to add the first paragraph
-          </button>
-        )}
-      </div>
-    </section>
-  )
-}
-
 // --- Single moment item — has its own MediaPickerModal so image can be replaced ---
 
 function StoryMomentItem({
   block,
   onUpdate,
+  onDelete, // Передаем функцию удаления сюда
 }: {
   block: PhotoBlock
   onUpdate: (patch: Partial<PhotoBlock>) => void
+  onDelete: () => void
 }) {
   const ownerId = useId()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
@@ -146,18 +76,32 @@ function StoryMomentItem({
           })
         }
       />
-      <Input
-        value={block.label || ""}
-        onChange={(e) => onUpdate({ label: e.target.value })}
-        placeholder="Label (e.g. Morning)"
-        className={ps.pbInput}
-      />
+      
+      {/* Группируем Label и Кнопку удаления в одну строку */}
+      <div className="flex items-center gap-2">
+        <Input
+          value={block.label || ""}
+          onChange={(e) => onUpdate({ label: e.target.value })}
+          placeholder="Label (e.g. Morning)"
+          className={ps.pbInput}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+          onClick={onDelete}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+
       <ImagePicker
         label=""
         value={block}
         onChange={(next) => onUpdate(next)}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         showCaption
+        showDescription
       />
     </div>
   )
@@ -304,23 +248,13 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
 
           {/* Active item editor */}
           {activeImage && (
-            <div className="rounded-xl bg-muted/30 p-3 space-y-4 relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted"
-                onClick={() => deleteImage(normalizedIndex)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-
-              <div className="pr-10">
-                <StoryMomentItem
-                  key={activeImage.id}
-                  block={activeImage}
-                  onUpdate={updateActiveImage}
-                />
-              </div>
+            <div className="rounded-xl bg-muted/30 p-3 space-y-4">
+              <StoryMomentItem
+                key={activeImage.id}
+                block={activeImage}
+                onUpdate={updateActiveImage}
+                onDelete={() => deleteImage(normalizedIndex)}
+              />
             </div>
           )}
         </div>

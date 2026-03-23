@@ -43,38 +43,12 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
     title: 'The Day Unfolds',
     date: 'August 12, 2024',
     location: 'London',
-    paragraphs: [
-      'The morning began with a quiet, calm anticipation, fueled by hot coffee and nervous excitement.',
-      'Every sequence, from the preparation to the first dance, became an integral chapter of our shared narrative.',
-    ],
-    images: [
-      {
-        id: 'story-morning',
-        label: 'Bridal Preparation',
-        images: [''],
-        caption: 'Moments of tender, anticipatory preparation.',
-        imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
-      },
-      {
-        id: 'story-ceremony',
-        label: 'The Ceremony',
-        images: [''],
-        caption: 'The exact moment we exchanged our vows.',
-        imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
-      },
-    ],
+    images: [],
   },
   gallery: {
     title: 'Curated Collection',
     description: 'A selection of candid moments we cherish and revisit time and again.',
-    images: [
-      {
-        id: 'gallery-1',
-        image: '',
-        caption: 'Just us and the rhythm of the night.',
-        imageSettings: [{ aspectRatio: 'square', frameStyle: 'none' }],
-      },
-    ],
+    images: [],
   },
   highlight: {
     title: 'The Defining Moment',

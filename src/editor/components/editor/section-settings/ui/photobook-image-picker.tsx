@@ -14,6 +14,7 @@ interface PhotobookImagePickerProps {
   onChange: (value: PhotobookImagePickerValue) => void
   label?: string
   showCaption?: boolean
+  showDescription?: boolean
   onOpenMediaPicker?: () => void
   restrictions?: SectionImageRestrictions
 }
@@ -23,6 +24,7 @@ export function PhotobookImagePicker({
   onChange,
   label = "Image",
   showCaption = true,
+  showDescription = false,
   onOpenMediaPicker,
   restrictions,
 }: PhotobookImagePickerProps) {
@@ -46,12 +48,14 @@ export function PhotobookImagePicker({
     <ImagePickerCore
       label={label}
       showCaption={showCaption}
+      showDescription={showDescription}
       value={{
         image: value.image,
         aspectRatio,
         frameStyle,
         cropData,
         caption: value.caption,
+        description: value.description,
       }}
       onChange={(patch) => {
         // Merge patch back into PhotoBlock shape
@@ -65,6 +69,7 @@ export function PhotobookImagePicker({
           ...value,
           image: patch.image ?? value.image,
           caption: patch.caption ?? value.caption,
+          description: patch.description ?? value.description,
           imageSettings: [newSettings],
         })
       }}

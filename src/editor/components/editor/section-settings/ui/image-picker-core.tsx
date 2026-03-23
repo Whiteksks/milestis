@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -30,6 +31,7 @@ export interface ImagePickerCoreValue {
   frameStyle: FrameStyle
   cropData?: ImageCropData
   caption?: string
+  description?: string
 }
 
 export interface ImagePickerCoreProps {
@@ -39,6 +41,8 @@ export interface ImagePickerCoreProps {
   label?: string
   /** Show the caption input below the picker. Default: false. */
   showCaption?: boolean
+  /** Show the description textarea below the picker. Default: false. */
+  showDescription?: boolean
   onOpenMediaPicker?: () => void
   restrictions?: SectionImageRestrictions
 }
@@ -48,6 +52,7 @@ export function ImagePickerCore({
   onChange,
   label = "Image",
   showCaption = false,
+  showDescription = false,
   onOpenMediaPicker,
   restrictions = {},
 }: ImagePickerCoreProps) {
@@ -252,6 +257,16 @@ export function ImagePickerCore({
             className="h-7 border-b border-t-0 border-x-0 rounded-none bg-transparent text-xs italic text-muted-foreground focus-visible:ring-0 px-0 placeholder:text-muted-foreground/50 shadow-none"
           />
         </div>
+      )}
+
+      {showDescription && (
+        <Textarea
+          value={value.description || ""}
+          onChange={(e) => onChange({ description: e.target.value })}
+          placeholder="Add description..."
+          rows={3}
+          className="text-xs resize-none"
+        />
       )}
     </div>
   )
