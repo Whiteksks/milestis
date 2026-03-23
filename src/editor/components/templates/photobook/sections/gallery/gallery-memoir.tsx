@@ -18,8 +18,8 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
   const photos = gallery.images ?? []
 
   return (
-    <section className={cn('py-20 md:py-28', theme.background, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 md:px-12 lg:px-24">
+    <section className={cn('@container py-20 @md:py-28', theme.background, theme.foreground)}>
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
 
         {/* Header */}
         <motion.div
@@ -27,110 +27,67 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6 }}
-          className="mb-14"
+          className="mb-12 @md:mb-16"
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className={cn('h-px w-16', theme.accent)} />
+            <div className={cn('h-px w-12', theme.accent)} />
             <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
               Gallery
             </span>
           </div>
-          {gallery.title && (
-            <h2
-              className={cn(
-                'text-3xl md:text-4xl font-bold tracking-tight',
-                theme.fontTitle,
-              )}
-            >
-              {gallery.title}
-            </h2>
-          )}
-          {gallery.description && (
-            <p className={cn('mt-3 text-sm opacity-50 max-w-md', theme.fontBody)}>
-              {gallery.description}
-            </p>
-          )}
+          <div className="flex items-end justify-between gap-4">
+            {gallery.title && (
+              <h2 className={cn('text-2xl @sm:text-3xl @md:text-4xl font-bold tracking-tight', theme.fontTitle)}>
+                {gallery.title}
+              </h2>
+            )}
+            {photos.length > 0 && (
+              <span className={cn('hidden @sm:block text-[10px] opacity-20 shrink-0 mb-1', theme.fontBody)}>
+                {String(photos.length).padStart(2, '0')}
+              </span>
+            )}
+          </div>
         </motion.div>
 
-        {/* Mosaic grid — asymmetric layout */}
-        {photos.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-            {photos.map((block, index) => {
-              // First photo is a feature (spans 2 cols), 4th is tall, rest are normal
-              const isFeature = index === 0
-              const isTall = index === 3
+        {gallery.description && (
+          <p className={cn('mb-12 text-sm opacity-50 max-w-md', theme.lineHeight, theme.fontBody)}>
+            {gallery.description}
+          </p>
+        )}
 
-              return (
-                <motion.div
-                  key={block.id}
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: Math.min(index * 0.06, 0.3) }}
-                  className={cn(
-                    'overflow-hidden group',
-                    theme.cardStyle,
-                    theme.radiusMedium,
-                    isFeature ? 'col-span-2' : 'col-span-1',
+        {/* Photo grid — 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
+        {photos.length > 0 && (
+          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
+            {photos.map((block, index) => (
+              <motion.div
+                key={block.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.6, delay: Math.min((index % 3) * 0.1, 0.25) }}
+                className="group"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-current/5">
+                  {block.image ? (
+                    <Image
+                      loader={passthroughLoader}
+                      unoptimized
+                      src={block.image}
+                      alt={block.caption ?? `Photo ${index + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                  ) : (
+                    <div className={cn('absolute inset-0', theme.muted)} />
                   )}
-                >
-                  <div
-                    className={cn(
-                      'relative overflow-hidden',
-                      isFeature ? 'aspect-video' : (isTall ? 'aspect-[3/4]' : 'aspect-square'),
-                    )}
-                  >
-                    {block.image ? (
-                      <Image
-                        loader={passthroughLoader}
-                        unoptimized
-                        src={block.image}
-                        alt={block.caption ?? `Photo ${index + 1}`}
-                        fill
-                        sizes={
-                          isFeature
-                            ? '(max-width: 768px) 100vw, 66vw'
-                            : '(max-width: 768px) 50vw, 33vw'
-                        }
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <div className={cn('w-full h-full', theme.muted)} />
-                    )}
-
-                    {/* Caption on hover */}
-                    {block.caption && (
-                      <div className="absolute bottom-0 inset-x-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 p-3">
-                        <div
-                          className={cn(
-                            'px-2 py-1 text-[10px]',
-                            theme.card,
-                            theme.radiusMedium,
-                          )}
-                        >
-                          <span className={cn('opacity-70', theme.fontBody)}>
-                            {block.caption}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        ) : (
-          /* Empty state placeholder */
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 opacity-25">
-            {[0, 1, 2, 3, 4, 5].map(i => (
-              <div
-                key={i}
-                className={cn(
-                  'rounded-lg',
-                  theme.muted,
-                  i === 0 ? 'col-span-2 aspect-video' : 'aspect-square',
+                </div>
+                {block.caption && (
+                  <p className={cn('mt-2.5 text-xs opacity-40', theme.fontBody)}>
+                    {block.caption}
+                  </p>
                 )}
-              />
+              </motion.div>
             ))}
           </div>
         )}

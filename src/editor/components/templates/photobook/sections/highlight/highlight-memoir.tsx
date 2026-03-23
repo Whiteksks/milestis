@@ -5,6 +5,8 @@ import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
+import { getFrameStyle } from '@/editor/lib/frame-styles'
 
 const passthroughLoader: ImageLoader = ({ src }) => src
 
@@ -15,64 +17,62 @@ interface HighlightMemoirProps {
 
 export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps) {
   const { highlight } = sectionContent
+  const imageBlock = highlight.images
+  const imageUrl = imageBlock?.image ?? ''
+  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'square'
+  const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section className={cn('py-20 md:py-28', theme.muted, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 md:px-12 lg:px-24">
+    <section className={cn('@container overflow-x-hidden py-16 @md:py-24 @lg:py-32', theme.muted, theme.foreground)}>
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
-          {/* Left — Photo card (not a background, a contained element) */}
+          {/* Left – Photo (order-2 on mobile → shows below text) */}
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.9 }}
+            className="order-2 @md:order-1"
           >
             <div
               className={cn(
-                'overflow-hidden',
-                theme.cardStyle,
-                theme.radiusMedium,
+                'relative overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none',
+                getAspectRatioClass(aspectRatio),
+                getFrameStyle(frameStyle),
+                theme.shadow,
                 theme.elementGlow,
               )}
             >
-              <div className="aspect-square relative">
-                {highlight.images?.image ? (
-                  <Image
-                    loader={passthroughLoader}
-                    unoptimized
-                    src={highlight.images.image}
-                    alt={highlight.title ?? 'Highlight'}
-                    fill
-                    sizes="(max-width: 768px) 90vw, 45vw"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className={cn('w-full h-full', theme.background)} />
-                )}
-              </div>
+              {imageUrl ? (
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  src={imageUrl}
+                  alt={highlight.title ?? 'Highlight'}
+                  fill
+                  sizes="(max-width: 768px) 90vw, 45vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className={cn('absolute inset-0', theme.background)} />
+              )}
             </div>
           </motion.div>
 
-          {/* Right — Content */}
+          {/* Right – Content (order-1 on mobile → shows above photo) */}
           <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.9, delay: 0.15 }}
-            className="space-y-8"
+            className="order-1 @md:order-2 space-y-6 @md:space-y-8"
           >
-            {/* Section label */}
+            {/* Label */}
             <div className="flex items-center gap-4">
               <div className={cn('h-px w-12', theme.accent)} />
-              <span
-                className={cn(
-                  'text-[10px] uppercase opacity-30',
-                  theme.letterSpacing,
-                  theme.fontBody,
-                )}
-              >
+              <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
                 Highlight
               </span>
             </div>
@@ -81,7 +81,7 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
             {highlight.title && (
               <h2
                 className={cn(
-                  'text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight',
+                  'text-3xl @md:text-4xl @lg:text-5xl font-bold tracking-tight leading-tight',
                   theme.fontTitle,
                 )}
               >
@@ -91,30 +91,24 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
 
             {/* Description */}
             {highlight.description && (
-              <p
-                className={cn(
-                  'text-base font-light opacity-60',
-                  theme.lineHeight,
-                  theme.fontBody,
-                )}
-              >
+              <p className={cn('text-base font-light opacity-60', theme.lineHeight, theme.fontBody)}>
                 {highlight.description}
               </p>
             )}
 
-            {/* Pull quote — displayed as a card within the section */}
+            {/* Pull quote */}
             {highlight.quote && (
-              <div className={cn('p-5 md:p-6', theme.cardStyle, theme.radiusMedium)}>
+              <blockquote className="py-6 border-t border-b border-current/10">
                 <p
                   className={cn(
-                    'text-base italic font-light opacity-75',
+                    'text-lg @md:text-xl font-light italic opacity-60',
                     theme.lineHeight,
                     theme.fontBody,
                   )}
                 >
                   &ldquo;{highlight.quote}&rdquo;
                 </p>
-              </div>
+              </blockquote>
             )}
           </motion.div>
         </div>

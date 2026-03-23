@@ -40,6 +40,5 @@ export const TEXTURE_OPTIONS: PhotobookOption[] = [
   { id: 'grain',     label: 'Grain' },
   { id: 'canvas',    label: 'Canvas' },
   { id: 'velvet',    label: 'Velvet' },
-  { id: 'dust',      label: 'Dust' },
   { id: 'parchment', label: 'Parchment' },
 ]

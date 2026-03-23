@@ -1,6 +1,5 @@
-"use client"
+﻿"use client"
 
-import { useRef } from 'react'
 import { cn } from '@/lib/utils'
 import type { PhotobookTemplateProps } from '@/editor/lib/template-types'
 import { CoverMemoir } from './sections/cover/cover-memoir'
@@ -15,13 +14,8 @@ export function TemplateMemoirDesign({
   sectionVisibility,
   sectionContent,
 }: PhotobookTemplateProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
   return (
-    <div
-      ref={containerRef}
-      className={cn('min-h-screen overflow-x-hidden', theme.background, theme.foreground)}
-    >
+    <div className={cn('min-h-screen overflow-x-hidden', theme.background, theme.foreground)}>
       {sectionVisibility.showCover && (
         <CoverMemoir sectionContent={sectionContent} theme={theme} />
       )}

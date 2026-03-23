@@ -11,41 +11,13 @@ const LoadingTemplate = () => (
 )
 const LoadingSettings = () => null
 
-// Templates
-const PhotobookTimelineTemplate = dynamic(
-  () => import('@/editor/components/templates/photobook/photobook-timeline').then(m => m.PhotobookTimelineTemplate),
-  { loading: LoadingTemplate },
-)
-const PhotobookMasonryTemplate = dynamic(
-  () => import('@/editor/components/templates/photobook/photobook-masonry'),
-  { loading: LoadingTemplate },
-)
-const TemplateClassic = dynamic(
-  () => import('@/editor/components/templates/photobook/template-classic').then(m => m.TemplateClassic),
-  { loading: LoadingTemplate },
-)
-const TemplateCircle = dynamic(
-  () => import('@/editor/components/templates/photobook/template-circle').then(m => m.TemplateCircle),
-  { loading: LoadingTemplate },
-)
-const TemplateMagazine = dynamic(
-  () => import('@/editor/components/templates/photobook/template-magazine').then(m => m.TemplateMagazine),
-  { loading: LoadingTemplate },
-)
-const TemplatePolaroid = dynamic(
-  () => import('@/editor/components/templates/photobook/template-polaroid').then(m => m.TemplatePolaroid),
-  { loading: LoadingTemplate },
-)
-const TemplateSplit = dynamic(
-  () => import('@/editor/components/templates/photobook/template-split').then(m => m.TemplateSplit),
-  { loading: LoadingTemplate },
-)
-const TemplateVertical = dynamic(
-  () => import('@/editor/components/templates/photobook/template-vertical').then(m => m.TemplateVertical),
-  { loading: LoadingTemplate },
-)
+
 const TemplateMemoirDesign = dynamic(
   () => import('@/editor/components/templates/photobook/template-memoir').then(m => m.TemplateMemoirDesign),
+  { loading: LoadingTemplate },
+)
+const TemplateChronicleDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-chronicle').then(m => m.TemplateChronicleDesign),
   { loading: LoadingTemplate },
 )
 
@@ -78,29 +50,15 @@ const PhotobookEndingSettings = dynamic(
 const photobookTemplateComponents: Partial<
   Record<PhotobookTemplateId, React.ComponentType<PhotobookTemplateProps>>
 > = {
-  'wedding-timeline': PhotobookTimelineTemplate,
-  masonry: PhotobookMasonryTemplate,
-  'photobook-classic': TemplateClassic,
-  'photobook-circle': TemplateCircle,
-  'photobook-magazine': TemplateMagazine,
-  'photobook-polaroid': TemplatePolaroid,
-  'photobook-split': TemplateSplit,
-  'photobook-vertical': TemplateVertical,
   'photobook-memoir': TemplateMemoirDesign,
+  'photobook-chronicle': TemplateChronicleDesign,
 }
 
 export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> = {
   label: 'Photobook',
   templates: [
-    { id: 'wedding-timeline', name: 'Photobook Timeline', tags: ['modern'] },
-    { id: 'masonry', name: 'Photobook Masonry', tags: ['modern'] },
-    { id: 'photobook-classic', name: 'Photobook Classic', tags: ['classic'] },
-    { id: 'photobook-circle', name: 'Photobook Circle', tags: ['modern'] },
-    { id: 'photobook-magazine', name: 'Photobook Magazine', tags: ['elegant'] },
-    { id: 'photobook-polaroid', name: 'Photobook Polaroid', tags: ['classic'] },
-    { id: 'photobook-split', name: 'Photobook Split', tags: ['minimal'] },
-    { id: 'photobook-vertical', name: 'Photobook Vertical', tags: ['minimal'] },
     { id: 'photobook-memoir', name: 'Memoir', tags: ['editorial', 'minimal'] },
+    { id: 'photobook-chronicle', name: 'Chronicle', tags: ['editorial', 'documentary'] },
   ],
   sections: [
     { id: 'cover', name: 'Cover', toggleKey: 'showCover' },
@@ -129,8 +87,8 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
 
     const Design =
       photobookTemplateComponents[id] ??
-      photobookTemplateComponents['wedding-timeline'] ??
-      PhotobookTimelineTemplate
+      photobookTemplateComponents['photobook-memoir'] ??
+      TemplateMemoirDesign
 
     return <PhotobookTemplateShell Design={Design} />
   },

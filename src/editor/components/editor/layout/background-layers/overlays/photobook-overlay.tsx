@@ -124,15 +124,6 @@ const TEXTURES: Record<Exclude<PhotobookTexture, 'none'>, React.CSSProperties> =
     backgroundColor: 'rgba(20, 20, 20, 0.02)',
     mixBlendMode: 'soft-light',
   },
-  dust: {
-    // Sparse scattered specks — simulates age, long storage, or old film
-    backgroundImage: [
-      'repeating-radial-gradient(circle at 10% 10%,  rgba(0,0,0,0.02)  0px, rgba(0,0,0,0.02)  1px, transparent 1px, transparent 100px)',
-      'repeating-radial-gradient(circle at 90% 80%,  rgba(0,0,0,0.01)  0px, rgba(0,0,0,0.01)  1px, transparent 1px, transparent 120px)',
-      'repeating-radial-gradient(circle at 50% 50%,  rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 150px)',
-    ].join(', '),
-    mixBlendMode: 'overlay',
-  },
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
