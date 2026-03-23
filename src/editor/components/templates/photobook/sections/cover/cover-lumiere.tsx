@@ -1,13 +1,10 @@
 "use client"
 
 import { motion, MotionConfig, type Transition } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface CoverLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -19,7 +16,6 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectClass = getAspectRatioClass(cover.images?.imageSettings[0]?.aspectRatio)
   const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
     disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
@@ -56,18 +52,14 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
           className="w-full max-w-[240px] @sm:max-w-[300px] @md:max-w-sm mb-10 @md:mb-12"
         >
           <div className="border border-current/10 p-[3px]">
-            <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[3/4]')}>
-              <Image
-                loader={passthroughLoader}
-                unoptimized
-                src={imageUrl}
-                alt={cover.title ?? 'Cover'}
-                fill
-                sizes="(max-width: 768px) 90vw, 420px"
-                className="object-cover"
-                priority
-              />
-            </div>
+            <CroppedImage
+              src={imageUrl}
+              alt={cover.title ?? 'Cover'}
+              aspectRatio={cover.images?.imageSettings?.[0]?.aspectRatio ?? 'portrait'}
+              frameStyle={cover.images?.imageSettings?.[0]?.frameStyle ?? 'none'}
+              cropData={cover.images?.imageSettings?.[0]?.cropData}
+              priority
+            />
           </div>
         </motion.div>
       )}

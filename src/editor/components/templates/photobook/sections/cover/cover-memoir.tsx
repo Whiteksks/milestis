@@ -1,14 +1,11 @@
 "use client"
 
 import { motion, MotionConfig, type Transition } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
 
 interface CoverMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -22,6 +19,7 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
   const imageUrl = imageBlock?.image ?? ''
   const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'portrait'
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const cropData = imageBlock?.imageSettings?.[0]?.cropData
   const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
     disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
@@ -96,30 +94,25 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
           transition={t(1.2, 0.05, [0.16, 1, 0.3, 1])}
           className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16"
         >
-          <div
-            className={cn(
-              'relative overflow-hidden w-full max-w-[260px] @sm:max-w-[300px] @md:max-w-sm',
-              getAspectRatioClass(aspectRatio),
-              getFrameStyle(frameStyle),
-              theme.shadow,
-              theme.elementGlow,
-            )}
-          >
-            {imageUrl ? (
-              <Image
-                loader={passthroughLoader}
-                unoptimized
-                src={imageUrl}
-                alt={cover.title}
-                fill
-                sizes="(max-width: 768px) 80vw, 40vw"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className={cn('absolute inset-0', theme.muted)} />
-            )}
-          </div>
+          {imageUrl ? (
+            <CroppedImage
+              src={imageUrl}
+              alt={cover.title}
+              aspectRatio={aspectRatio}
+              frameStyle={frameStyle}
+              cropData={cropData}
+              className={cn('w-full max-w-[260px] @sm:max-w-[300px] @md:max-w-sm', theme.shadow, theme.elementGlow)}
+              priority
+            />
+          ) : (
+            <div
+              className={cn(
+                'w-full max-w-[260px] @sm:max-w-[300px] @md:max-w-sm',
+                getAspectRatioClass(aspectRatio),
+                theme.muted,
+              )}
+            />
+          )}
         </motion.div>
       </div>
 
