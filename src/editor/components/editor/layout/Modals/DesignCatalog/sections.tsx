@@ -180,7 +180,7 @@ export function ThemesSection({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="grid grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
       {items.map((theme) => {
         const isSelected = selectedId === theme.id
         return (
@@ -238,7 +238,7 @@ export function BackgroundsSection({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="grid grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
       {items.map((preset) => {
         const isSelected = selectedId === preset.id
 

@@ -67,9 +67,10 @@ interface ProjectCardProps {
   project: DashboardProject
   /** If true, renders the trash variant (restore + permanent delete) */
   trash?: boolean
+  zoom?: number
 }
 
-function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
+function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
@@ -104,7 +105,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
         date={project.preview?.date}
         aspectRatio={project.preview?.aspectRatio}
         frameStyle={project.preview?.frameStyle}
-        zoom={3.55}
+        zoom={zoom ?? 3.55}
       />
     ),
     [
@@ -116,6 +117,7 @@ function ProjectCardInner({ project, trash = false }: ProjectCardProps) {
       project.preview?.date,
       project.preview?.aspectRatio,
       project.preview?.frameStyle,
+      zoom,
     ]
   )
 

@@ -22,7 +22,7 @@ export default function DashboardPage() {
             View all →
           </Link>
         </div>
-        <ProjectGrid limit={4} />
+        <ProjectGrid limit={4} zoom={4}/>
       </section>
 
     </div>

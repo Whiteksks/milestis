@@ -8,9 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 interface ProjectGridProps {
   /** Maximum number of projects to display. Omit to show all. */
   limit?: number
+  zoom?: number
 }
 
-export function ProjectGrid({ limit }: ProjectGridProps) {
+export function ProjectGrid({ limit, zoom }: ProjectGridProps) {
   const { projects, loading } = useRecentProjectsQuery(limit ?? 4)
 
   if (loading) {
@@ -39,7 +40,7 @@ export function ProjectGrid({ limit }: ProjectGridProps) {
   return (
     <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {displayed.map((project) => (
-        <ProjectCard key={project.id} project={project} />
+        <ProjectCard key={project.id} project={project} zoom={zoom}/>
       ))}
     </div>
   )
