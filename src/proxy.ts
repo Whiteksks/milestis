@@ -4,6 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createMiddleware(routing);
 
+const BLOCKED_PAGES = [
+  'dashboard/analytics',
+  'dashboard/templates',
+  'admin/settings',
+  'api/internal'
+];
+
+
 export function proxy(request: NextRequest) {
   const host = request.headers.get('host') ?? ''
 
@@ -25,6 +33,16 @@ export function proxy(request: NextRequest) {
       url.pathname = `/sites${pathname}`
       return NextResponse.rewrite(url)
     }
+  }
+
+  // Block access to /dashboard/analytics and /dashboard/templates for subdomains and main domain
+  const pathname = request.nextUrl.pathname;
+  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
+  const isBlocked = BLOCKED_PAGES.some(path => 
+    pathWithoutLocale === `/${path}` || pathWithoutLocale.startsWith(`/${path}/`)
+  );
+  if (isBlocked) {
+    return new NextResponse(null, { status: 404 });
   }
 
   // Regular milestis.com traffic - i18n as usual

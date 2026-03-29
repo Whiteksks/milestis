@@ -11,32 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Copy, ExternalLink, Share2, Globe, BookOpen, Layout, Check } from "lucide-react"
-import { useActiveProjectsQuery } from "@/hooks/useProjectsQuery"
+import { Copy, ExternalLink, Share2, Globe, BookOpen, Layout, Check, Lock } from "lucide-react"
+import { usePublishedProjectsQuery, getProjectShareUrl } from "@/hooks/useProjectsQuery"
 import { useTranslations } from "next-intl"
 import { useTranslations as useGlobalT } from "next-intl"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
-
-const BASE_DOMAIN = "milestis.app"
-
-function getProjectDomain(project: DashboardProject): string {
-  return `${project.id}.${BASE_DOMAIN}`
-}
-
-function getProjectLink(project: DashboardProject): string {
-  return `https://${getProjectDomain(project)}`
-}
 
 export default function DomainsSettingsPage() {
   const t = useTranslations("account.domains")
   const g = useGlobalT()
   const [copiedId, setCopiedId] = useState<string | null>(null)
-  const { data: allProjects = [], isLoading } = useActiveProjectsQuery()
-
-  const publishedProjects = allProjects.filter((p) => p.isPublished)
+  const { data: publishedProjects = [], isLoading } = usePublishedProjectsQuery()
 
   const handleCopyLink = (project: DashboardProject) => {
-    navigator.clipboard.writeText(getProjectLink(project))
+    const url = getProjectShareUrl(project)
+    if (!url) return
+    navigator.clipboard.writeText(url)
     setCopiedId(project.id)
     setTimeout(() => setCopiedId(null), 2000)
   }
@@ -88,14 +78,16 @@ export default function DomainsSettingsPage() {
                   <DropdownMenuContent align="end" className="w-48 rounded-xl">
                     <DropdownMenuItem onClick={() => handleCopyLink(project)}>
                       <Copy className="mr-2 size-4" />
-                      Copy link
+                      {t("copyLink")}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => window.open(getProjectLink(project), "_blank")}
-                    >
-                      <ExternalLink className="mr-2 size-4" />
-                      Open project
-                    </DropdownMenuItem>
+                    {getProjectShareUrl(project) && (
+                      <DropdownMenuItem
+                        onClick={() => window.open(getProjectShareUrl(project)!, "_blank")}
+                      >
+                        <ExternalLink className="mr-2 size-4" />
+                        {t("openProject")}
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -139,10 +131,19 @@ export default function DomainsSettingsPage() {
                 </div>
 
                 <div className="mt-2 flex min-w-0 items-center gap-2 text-sm">
-                  <Globe className="size-3.5 text-primary" />
-                  <span className="truncate font-medium text-primary">
-                    {getProjectDomain(project)}
-                  </span>
+                  {project.mode === "photobook" && !project.publishedAccessToken ? (
+                    <>
+                      <Lock className="size-3.5 text-muted-foreground" />
+                      <span className="truncate text-muted-foreground italic">{t("tokenUnavailable")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Globe className="size-3.5 text-primary" />
+                      <span className="truncate font-medium text-primary">
+                        {getProjectShareUrl(project)}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -153,6 +154,7 @@ export default function DomainsSettingsPage() {
                   size="sm"
                   className="rounded-full"
                   onClick={() => handleCopyLink(project)}
+                  disabled={!getProjectShareUrl(project)}
                 >
                   {copiedId === project.id ? (
                     <>
@@ -171,22 +173,24 @@ export default function DomainsSettingsPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="rounded-full">
                       <Share2 className="mr-1.5 size-3.5" />
-                      Share
+                      {t("shareVia")}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 rounded-xl">
-                    <DropdownMenuItem onClick={() => handleCopyLink(project)}>
+                    <DropdownMenuItem onClick={() => handleCopyLink(project)} disabled={!getProjectShareUrl(project)}>
                       <Copy className="mr-2 size-4" />
                       {t("copyLink")}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => window.open(getProjectLink(project), "_blank")}
-                    >
-                      <ExternalLink className="mr-2 size-4" />
-                      {t("openProject")}
-                    </DropdownMenuItem>
+                    {getProjectShareUrl(project) && (
+                      <DropdownMenuItem
+                        onClick={() => window.open(getProjectShareUrl(project)!, "_blank")}
+                      >
+                        <ExternalLink className="mr-2 size-4" />
+                        {t("openProject")}
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem disabled={!getProjectShareUrl(project)}>
                       <Share2 className="mr-2 size-4" />
                       {t("shareVia")}
                     </DropdownMenuItem>

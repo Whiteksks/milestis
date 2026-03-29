@@ -145,12 +145,12 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
   if (trash) {
     return (
       <>
-        <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 opacity-80 hover:opacity-100 transition-opacity">
+        <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 transition-opacity md:opacity-80 md:hover:opacity-100">
           {/* Thumbnail */}
           <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
             <div className="absolute inset-0">{thumbnail}</div>
-            {/* Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            {/* Overlay — desktop only */}
+            <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <Button
                 size="sm"
                 variant="secondary"
@@ -187,6 +187,29 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
                 ? t('project.deletesOn', { date: formatPurgeDate(project.purgeAt) })
                 : t('project.pendingPurge')}
             </p>
+            {/* Mobile action row — desktop uses hover overlay */}
+            <div className="mt-2 flex gap-1.5 md:hidden">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 h-8 rounded-full text-xs gap-1"
+                disabled={busy}
+                onClick={handleRestore}
+              >
+                <RotateCcw className="size-3" />
+                Restore
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="flex-1 h-8 rounded-full text-xs gap-1"
+                disabled={busy}
+                onClick={() => setConfirmOpen(true)}
+              >
+                <Trash2 className="size-3" />
+                Delete
+              </Button>
+            </div>
           </CardContent>
         </div>
 
@@ -219,27 +242,33 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
   }
 
   return (
-    <div className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md">
+    <div
+      className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md cursor-pointer"
+      onClick={() => router.push(editUrl)}
+    >
       {/* Thumbnail area */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
         <div className="absolute inset-0">{thumbnail}</div>
 
-        {/* Hover action overlay */}
-        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <Button size="sm" className="rounded-full shadow-md" onClick={() => router.push(editUrl)}>
+        {/* Hover action overlay — desktop only */}
+        <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); router.push(editUrl) }}>
             <Edit className="mr-1.5 size-3.5" />
             {t('project.edit')}
           </Button>
           {project.isPublished && viewUrl && (
-            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={() => window.open(viewUrl, '_blank')}>
+            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); window.open(viewUrl, '_blank') }}>
               <Eye className="mr-1.5 size-3.5" />
               {t('project.view')}
             </Button>
           )}
         </div>
 
-        {/* More menu */}
-        <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        {/* More menu — always visible on mobile, hover on desktop */}
+        <div
+          className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
+          onClick={(e) => e.stopPropagation()}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="size-8 rounded-full shadow-md">

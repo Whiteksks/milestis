@@ -1,28 +1,29 @@
 "use client"
 
-import { BookOpen, Layout, Sparkles, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { useCreateProject } from "@/hooks/useCreateProject"
 import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils" // Убедись, что путь до утилиты shadcn правильный
 
 type ProjectMode = "portfolio" | "photobook"
 
-const cards: { mode: ProjectMode; icon: typeof BookOpen; titleKey: string; descriptionKey: string; badgeKey?: string | null; secondaryKey: string }[] = [
+const cards: {
+  mode: ProjectMode
+  number: string
+  titleKey: string
+  descriptionKey: string
+}[] = [
   {
     mode: "photobook",
-    icon: BookOpen,
+    number: "01", // Добавляем журнальную нумерацию
     titleKey: "createCards.photobook.title",
     descriptionKey: "createCards.photobook.description",
-    badgeKey: "createCards.photobook.badge",
-    secondaryKey: "createCards.photobook.secondary",
   },
   {
     mode: "portfolio",
-    icon: Layout,
+    number: "02",
     titleKey: "createCards.portfolio.title",
     descriptionKey: "createCards.portfolio.description",
-    badgeKey: null,
-    secondaryKey: "createCards.portfolio.secondary",
   },
 ]
 
@@ -31,43 +32,58 @@ export function CreateCards() {
   const t = useTranslations()
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    // mb-12 задает отступ до секции Recent Projects
+    <div className="mb-12 grid gap-6 md:grid-cols-2">
       {cards.map((card) => {
         const isLoading = loadingMode === card.mode
+        // Блокируем обе карточки, если идет загрузка любой из них
+        const isDisabled = !!loadingMode 
+
         return (
-          <div
-            key={card.titleKey}
-            className="group rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md"
+          <button
+            key={card.mode}
+            onClick={() => handleCreate(card.mode)}
+            disabled={isDisabled}
+            className={cn(
+              "group relative flex flex-col text-left transition-all duration-500 ease-out",
+              "rounded-2xl border border-border/40 bg-transparent p-6 md:p-8 lg:p-10",
+              "hover:border-border hover:bg-muted/10",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              isDisabled && "pointer-events-none opacity-60"
+            )}
           >
-            <div className="mb-4 flex items-start justify-between">
-              <div className="flex size-12 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-accent">
-                <card.icon className="size-5 text-primary" />
-              </div>
-              {card.badgeKey && (
-                <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  <Sparkles className="size-3" />
-                  {t(card.badgeKey)}
+            {/* Editorial Header: Моноширинный номер и тонкая иконка */}
+            <div className="absolute right-6 top-6 md:right-8 md:top-8">
+              <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground opacity-70 transition-opacity duration-300 group-hover:opacity-100">
+                {card.number}
+              </span>
+            </div>
+
+            {/* Контент: Убрали лишний mb-6 у заголовка, так как номера сверху больше нет */}
+            <div className="flex-1">
+              <h3 className="mb-3 font-serif text-2xl font-medium tracking-tight text-foreground md:text-3xl lg:text-4xl">
+                {t(card.titleKey)}
+              </h3>
+              <p className="max-w-[95%] text-sm leading-relaxed text-muted-foreground md:text-base">
+                {t(card.descriptionKey)}
+              </p>
+            </div>
+
+            {/* Индикатор действия (Скрыт по умолчанию, появляется при ховере) */}
+            <div className="mt-8 flex h-6 items-center overflow-hidden text-sm font-medium">
+              {isLoading ? (
+                <span className="flex items-center gap-2 text-primary">
+                  <Loader2 className="size-4 animate-spin" />
+                  {t('createCards.creating')}
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 text-foreground/80 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:text-foreground">
+                  {t('createCards.create')}
+                  <ArrowRight className="size-4 -translate-x-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100" />
                 </span>
               )}
             </div>
-
-            <h3 className="font-serif text-xl font-semibold">{t(card.titleKey)}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(card.descriptionKey)}</p>
-
-            <div className="mt-6 flex gap-3">
-              <Button
-                className="rounded-full gap-2 px-6"
-                disabled={!!loadingMode}
-                onClick={() => handleCreate(card.mode)}
-              >
-                {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-                {isLoading ? t('createCards.creating') : t('createCards.create')}
-              </Button>
-              <Button variant="ghost" className="rounded-full px-6 text-muted-foreground hover:text-foreground">
-                {t(card.secondaryKey)}
-              </Button>
-            </div>
-          </div>
+          </button>
         )
       })}
     </div>

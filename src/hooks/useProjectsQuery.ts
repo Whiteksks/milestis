@@ -13,6 +13,8 @@ export interface DashboardProject {
   status: 'active' | 'deleted'
   isPublished: boolean
   publishedSlug?: string | null
+  /** Plaintext access token stored on the project doc (photobooks only). */
+  publishedAccessToken?: string | null
   updatedAt: Date
   deletedAt?: Date
   purgeAt?: Date
@@ -60,6 +62,7 @@ export function mapProjectDoc(data: Record<string, any>, id: string): DashboardP
     status: data.status,
     isPublished: data.isPublished ?? false,
     publishedSlug: data.publishedSlug ?? null,
+    publishedAccessToken: data.publishedAccessToken ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),
     deletedAt: data.deletedAt?.toDate(),
     purgeAt: data.purgeAt?.toDate(),
@@ -138,4 +141,35 @@ export function useRecentProjectsQuery(limitCount = 4) {
     projects: allActive.slice(0, limitCount),
     loading: isLoading,
   }
+}
+
+// ─── Published projects ────────────────────────────────────────────────────
+
+const BASE_DOMAIN = 'milestis.site'
+
+/**
+ * Returns the canonical share URL for a published project.
+ * - Portfolio: https://{slug}.milestis.site
+ * - Photobook: https://milestis.site/{slug}?token={accessToken}
+ *   (token is absent if the project was published before the token-persistence change)
+ */
+export function getProjectShareUrl(project: DashboardProject): string | null {
+  if (!project.isPublished || !project.publishedSlug) return null
+  if (project.mode === 'portfolio') {
+    return `https://${project.publishedSlug}.${BASE_DOMAIN}`
+  }
+  const base = `https://${BASE_DOMAIN}/${project.publishedSlug}`
+  return project.publishedAccessToken
+    ? `${base}?token=${project.publishedAccessToken}`
+    : base
+}
+
+/**
+ * Returns only published active projects with their share URLs.
+ * Reuses the active projects cache — no extra Firestore read.
+ */
+export function usePublishedProjectsQuery() {
+  const { data: allActive = [], isLoading } = useActiveProjectsQuery()
+  const publishedProjects = allActive.filter((p) => p.isPublished)
+  return { data: publishedProjects, isLoading }
 }

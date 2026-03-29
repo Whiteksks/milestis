@@ -89,7 +89,9 @@
     "publishedDomains": "Published Domains",
     "security": "Security",
     "helpCenter": "Help Center",
-    "contactSupport": "Contact Support"
+    "contactSupport": "Contact Support",
+    "newProject": "New Project",
+    "new": "New"
   },
   "plans": {
     "free": "Free",
@@ -432,7 +434,8 @@
       "copyLink": "Copy link",
       "copied": "Copied",
       "openProject": "Open project",
-      "shareVia": "Share via link"
+      "shareVia": "Share via link",
+      "tokenUnavailable": "Republish to get share link"
     }
   },
   "loginModal": {

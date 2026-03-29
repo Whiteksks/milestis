@@ -1,36 +1,29 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import {
   Home,
   FolderOpen,
   LayoutTemplate,
   MoreHorizontal,
-  BarChart3,
   Globe,
   MessageCircle,
   FileText,
-  Bell,
   CreditCard,
   Shield,
   User,
-  Crown,
+  Plus,
   ChevronRight,
+  CrownIcon,
 
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer"
 import PromoCard, { MenuItem, MenuSection } from "./menu-card"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
+import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
 
 interface MobileBottomNavProps {
   activeItem?: string
@@ -46,13 +39,7 @@ function withLocale(locale: string | undefined, href: string) {
 const mainNavItems = [
   { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
   { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
-  { id: "templates", labelKey: "nav.templates", icon: LayoutTemplate, href: "/dashboard/templates" },
-  { id: "plan", labelKey: "nav.upgrade", icon: Crown, href: "/pricing" },
-]
-
-const extraNavItems = [
-  { id: "analytics", labelKey: "nav.analytics", icon: BarChart3, href: "/dashboard/analytics" },
-  { id: "domains", labelKey: "nav.domains", icon: Globe, href: "/dashboard/domains" },
+  { id: "upgrade", labelKey: "nav.upgrade", icon: CrownIcon, href: "/pricing" },
 ]
 
 const settingsLinks = [
@@ -68,13 +55,15 @@ const helpLinks = [
 
 export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBottomNavProps) {
   const [open, setOpen] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
   const t = useTranslations()
 
   return (
     <>
       {/* Bottom navigation bar */}
       <nav className="fixed rounded-t-md bottom-0 left-0 right-0  z-40 flex h-16 items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden">
-        {mainNavItems.map((item) => {
+        {/* Left nav items */}
+        {mainNavItems.slice(0, 2).map((item) => {
           const Icon = item.icon
           const isActive = activeItem === item.id
           return (
@@ -96,7 +85,46 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
               >
                 <Icon className="size-5 shrink-0" />
               </div>
-                <span className="text-[10px] font-medium truncate">{t(item.labelKey)}</span>
+              <span className="text-[10px] font-medium truncate">{t(item.labelKey)}</span>
+            </Link>
+          )
+        })}
+
+        {/* Center Create button */}
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="flex flex-col items-center gap-0.5 -mt-4 min-w-0"
+        >
+          <div className="flex items-center justify-center size-14 rounded-2xl bg-primary shadow-lg shadow-primary/30 transition-transform active:scale-95">
+            <Plus className="size-6 text-primary-foreground" />
+          </div>
+          <span className="text-[10px] font-medium text-primary mt-0.5">{t('nav.new')}</span>
+        </button>
+
+        {/* Right nav items */}
+        {mainNavItems.slice(2).map((item) => {
+          const Icon = item.icon
+          const isActive = activeItem === item.id
+          return (
+            <Link
+              key={item.id}
+              href={withLocale(locale, item.href)}
+              className={cn(
+                "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors min-w-0",
+                isActive
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center size-8 rounded-xl transition-colors",
+                  isActive && "bg-primary/10"
+                )}
+              >
+                <Icon className="size-5 shrink-0" />
+              </div>
+              <span className="text-[10px] font-medium truncate">{t(item.labelKey)}</span>
             </Link>
           )
         })}
@@ -164,6 +192,8 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
             </MenuSection>
         </div>
         </MobileDrawer>
+
+      <NewProjectModal open={createOpen} onOpenChange={setCreateOpen} />
     </>
   )
 }

@@ -248,11 +248,17 @@ export const publishProject = onRequest(
       }
       batch.set(publishedRef, publishedData);
 
-      batch.update(projectRef, {
+      const projectUpdate: Record<string, unknown> = {
         isPublished: true,
         publishedSlug: slug,
-        updatedAt:   FieldValue.serverTimestamp(),
-      });
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+      // Store the plaintext token so the owner can reconstruct the share URL later.
+      // The projects collection is owner-restricted, this does not expose the token publicly.
+      if (accessToken) {
+        projectUpdate.publishedAccessToken = accessToken;
+      }
+      batch.update(projectRef, projectUpdate);
 
       await batch.commit();
 

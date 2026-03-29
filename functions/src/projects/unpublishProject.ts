@@ -88,7 +88,8 @@ export const unpublishProject = onRequest(
       batch.update(projectRef, {
         isPublished: false,
         publishedSlug: FieldValue.delete(),
-        updatedAt:   FieldValue.serverTimestamp(),
+        publishedAccessToken: FieldValue.delete(),
+        updatedAt: FieldValue.serverTimestamp(),
       });
       await batch.commit();
 

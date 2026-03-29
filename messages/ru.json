@@ -89,7 +89,9 @@
     "publishedDomains": "Опубликованные домены",
     "security": "Безопасность",
     "helpCenter": "Центр помощи",
-    "contactSupport": "Связаться с поддержкой"
+    "contactSupport": "Связаться с поддержкой",
+    "newProject": "Новый проект",
+    "new": "Создать"
   },
   "plans": {
     "free": "Бесплатно",
@@ -411,7 +413,8 @@
       "copyLink": "Скопировать ссылку",
       "copied": "Скопировано",
       "openProject": "Открыть проект",
-      "shareVia": "Поделиться ссылкой"
+      "shareVia": "Поделиться ссылкой",
+      "tokenUnavailable": "Переопубликуйте для получения ссылки"
     }
   },
   "loginModal": {

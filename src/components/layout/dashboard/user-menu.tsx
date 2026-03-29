@@ -34,7 +34,7 @@ const MAIN_NAV_ITEMS = [
   { href: "/dashboard",       icon: LayoutDashboard, labelKey: "nav.dashboard" },
   { href: "/account/profile", icon: User,            labelKey: "nav.profile" },
   { href: "/account/billing", icon: CreditCard,      labelKey: "nav.billing" },
-  { href: "/account",         icon: Settings,        labelKey: "nav.settings" },
+  { href: "/account/settings", icon: Settings,        labelKey: "nav.settings" },
 ]
 
 export function UserMenu() {
@@ -138,7 +138,11 @@ export function UserMenu() {
       <MobileDrawer 
         open={open} 
         onOpenChange={setOpen} 
-        trigger={<UserAvatar size="sm" />}
+        trigger={
+          <button className="outline-none">
+            <UserAvatar size="sm" />
+          </button>
+        }
       >
         {menuBody}
       </MobileDrawer>

@@ -17,8 +17,8 @@ interface StoryChronicleProps {
 
 export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
   const { story } = sectionContent
+  // Используем ту же структуру данных, что и в StoryMemoir
   const moments = story.images ?? []
-  const paragraphs = story.paragraphs ?? []
 
   return (
     <section className={cn('@container overflow-x-hidden py-16 @md:py-24', theme.muted, theme.foreground)}>
@@ -73,7 +73,8 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
               const slotNum = String(index + 1).padStart(2, '0')
               const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
               const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
-              const paragraph = paragraphs[index] ?? block.caption ?? ''
+              // Берем description напрямую из блока, как в первом компоненте
+              const description = block.description ?? ''
 
               return (
                 <motion.div
@@ -82,7 +83,7 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ duration: 0.8 }}
-                  className="grid grid-cols-1 @md:grid-cols-[1fr_3fr] gap-6 @md:gap-10"
+                  className="grid grid-cols-1 @md:grid-cols-[1fr_2fr] gap-6 @md:gap-10"
                 >
                   {/* Number + label sidebar */}
                   <div
@@ -104,9 +105,20 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                         {block.label}
                       </p>
                     )}
+                    {description && (
+                      <p
+                        className={cn(
+                          'mt-4 text-sm @md:text-base font-light opacity-65 max-w-[60ch]',
+                          theme.lineHeight,
+                          theme.fontBody,
+                        )}
+                      >
+                        {description}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Photo + paragraph */}
+                  {/* Photo + Description */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
                     {imageUrl && (
                       <div
@@ -114,28 +126,23 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                           'relative overflow-hidden',
                           getAspectRatioClass(aspectRatio),
                           getFrameStyle(frameStyle),
+                          theme.shadow, // Добавил тень для консистентности
                         )}
                       >
                         <Image
                           loader={passthroughLoader}
                           unoptimized
                           src={imageUrl}
-                          alt={block.label ?? `Story ${index + 1}`}
+                          alt={block.label ?? story.title ?? `Story ${index + 1}`}
                           fill
                           sizes="(max-width: 768px) 90vw, 70vw"
                           className="object-cover"
                         />
                       </div>
                     )}
-                    {paragraph && (
-                      <p
-                        className={cn(
-                          'mt-4 text-sm @md:text-base font-light opacity-55 max-w-[60ch]',
-                          theme.lineHeight,
-                          theme.fontBody,
-                        )}
-                      >
-                        {paragraph}
+                    {block.caption && (
+                      <p className={cn('mt-2 text-xs opacity-40 italic', theme.fontBody)}>
+                        {block.caption}
                       </p>
                     )}
                   </div>
@@ -145,28 +152,8 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
           </div>
         )}
 
-        {/* Standalone paragraphs when no moments */}
-        {moments.length === 0 && paragraphs.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.7 }}
-            className="space-y-5 @md:columns-2 @md:gap-12"
-          >
-            {paragraphs.map((para, i) => (
-              <p
-                key={i}
-                className={cn(
-                  'text-sm @md:text-base font-light opacity-55 break-inside-avoid',
-                  theme.lineHeight,
-                  theme.fontBody,
-                )}
-              >
-                {para}
-              </p>
-            ))}
-          </motion.div>
+        {moments.length === 0 && (
+          <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
       </div>
     </section>
