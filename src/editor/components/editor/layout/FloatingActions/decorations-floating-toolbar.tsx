@@ -11,6 +11,7 @@ import { DecorationToolbar } from "./decoration-toolbar"
 import { loadImageAspectRatio } from "../decorationEdit/utils"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function DecorationsFloatingToolbar({
   decorations,
@@ -76,6 +77,7 @@ export function DecorationsFloatingToolbar({
   }, [scrollContainerRef, selectedDecoration])
 
   const handleAddDecoration = useCallback(() => {
+    if (normalizedDecorations.length >= LIMITS.decorations) return
     const scroller = scrollContainerRef.current
     const contentRoot = scroller?.querySelector<HTMLElement>('[data-canvas-content-root="true"]')
 
@@ -111,7 +113,7 @@ export function DecorationsFloatingToolbar({
       opacity: 1,
       scale: 1,
       responsiveScale: true,
-      zIndex: 5,
+      zIndex: 20,
       name: `Decoration ${normalizedDecorations.length + 1}`,
     }
 

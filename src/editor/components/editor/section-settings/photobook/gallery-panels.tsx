@@ -2,7 +2,7 @@
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { PanelLabel, ps } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { PanelLabel, ps, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -27,12 +27,14 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
           onChange={(e) => updatePhotobookSection("gallery", { title: e.target.value })}
           placeholder="Title"
           className={ps.pbInput}
+          maxLength={LIMITS.title}
         />
         <Input
           value={gallery.description || ""}
           onChange={(e) => updatePhotobookSection("gallery", { description: e.target.value })}
           placeholder="Description"
           className={ps.pbInput}
+          maxLength={LIMITS.description}
         />
       </div>
     </div>
@@ -55,9 +57,11 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
 
   const handleSelectImages = (urls: string[]) => {
     const current = gallery.images || []
+    const remaining = LIMITS.galleryImages - current.length
+    if (remaining <= 0) return
 
     const timestamp = Date.now()
-    const nextNew = urls.map((url, index) => ({
+    const nextNew = urls.slice(0, remaining).map((url, index) => ({
       id: `gallery-${timestamp}-${index}`,
       image: url,
       caption: "",
@@ -75,8 +79,8 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
         <>
           <Separator className="bg-border/40" />
           <div className="flex items-center justify-between gap-3">
-            <PanelLabel>Images</PanelLabel>
-            <Button variant="outline" onClick={() => openMediaPicker(ownerId)} className="h-8 text-xs">
+            <PanelLabel>Images <span className="text-muted-foreground/40 font-normal">({(gallery.images || []).length}/{LIMITS.galleryImages})</span></PanelLabel>
+            <Button variant="outline" onClick={() => openMediaPicker(ownerId)} className="h-8 text-xs" disabled={(gallery.images || []).length >= LIMITS.galleryImages}>
               <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add
             </Button>
           </div>

@@ -44,10 +44,18 @@ export const ps = {
 // ─── Limits ──────────────────────────────────────────────────────────────────
 
 export const LIMITS = {
-  // common
+  // common text
   title: 60,
   subtitle: 80,
   description: 300,
+  tagline: 100,
+  quote: 150,
+  dedication: 400,
+  location: 80,
+  date: 40,
+  signature: 60,
+  label: 50,
+  caption: 200,
   // hero
   heroTitle: 60,
   heroSubtitle: 80,
@@ -66,6 +74,11 @@ export const LIMITS = {
   // header
   linkLabel: 30,
   links: 5,
+  // item counts
+  decorations: 10,
+  featuredWorkProjects: 12,
+  storyImages: 20,
+  galleryImages: 30,
 } as const
 
 // ─── Components ──────────────────────────────────────────────────────────────

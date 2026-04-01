@@ -2,37 +2,115 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    // ─── Helper functions ─────────────────────────────────────────────────
+
+    // Is the caller authenticated?
+    function isAuthed() {
+      return request.auth != null;
     }
 
-    match /projects/{projectId} {
-      // Only the owner can read or write their own project
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
-      // Allow creation — the server (Admin SDK) writes ownerId, but client can also create
-      // through the Cloud Function, so direct client writes are blocked for create.
-      // Reading newly-created doc: ownerId is already set by the Cloud Function.
+    // Is the caller the owner of the document being read/written?
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
 
-      // Editor content subcollection — checked against parent project ownership
-      match /data/{docId} {
-        allow read, write: if request.auth != null
+    // Immutable fields must not change on update
+    function immutableFields(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Only these top-level keys may be present in the diff (i.e. changed)
+    function onlyAllowedKeys(allowedKeys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedKeys);
+    }
+
+    // ─── Users ────────────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Only the user themselves can read their own profile
+      allow read: if isAuthed() && isOwner(userId);
+
+      // Only allowed fields can be updated; uid and createdAt are frozen
+      allow update: if isAuthed()
+        && isOwner(userId)
+        && immutableFields(['uid', 'createdAt', 'email'])
+        && onlyAllowedKeys([
+          'displayName', 'profileTemplate', 'settings',
+          'updatedAt', 'photoURL'
+        ]);
+
+      // Creation is handled exclusively by Cloud Functions (Admin SDK)
+      allow create, delete: if false;
+    }
+
+    // ─── Projects ─────────────────────────────────────────────────────────
+
+    match /projects/{projectId} {
+      // Only the owner can read their project
+      allow read: if isAuthed() && isOwner(resource.data.ownerId);
+
+      // Updates: owner only, critical fields frozen, allowlisted keys only
+      // Client writes: preview, name, status, deletedAt, purgeAt, updatedAt
+      // Server-only (Cloud Functions): ownerId, createdAt, mode, isPublished, publishedAt, slug
+      allow update: if isAuthed()
+        && isOwner(resource.data.ownerId)
+        && immutableFields(['ownerId', 'createdAt', 'mode', 'isPublished', 'publishedAt', 'slug'])
+        && onlyAllowedKeys([
+          'preview', 'name', 'status', 'deletedAt', 'purgeAt', 'updatedAt'
+        ])
+        && (
+          // name must be a string under 100 chars when present
+          !('name' in request.resource.data.diff(resource.data).affectedKeys())
+          || (request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100)
+        )
+        && (
+          // status must be one of the known values when present
+          !('status' in request.resource.data.diff(resource.data).affectedKeys())
+          || request.resource.data.status in ['active', 'deleted']
+        );
+
+      // Creation and deletion are handled exclusively by Cloud Functions (Admin SDK)
+      allow create, delete: if false;
+
+      // ─── Editor content subcollection ─────────────────────────────────
+      // Exact path: projects/{projectId}/data/content
+      // Stores the heavy editor payload (theme + content). Checked against
+      // parent project ownership via a cross-document read.
+      match /data/content {
+        allow read: if isAuthed()
           && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+
+        // Only 'theme' and 'content' keys are allowed in this document
+        allow write: if isAuthed()
+          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid
+          && request.resource.data.keys().hasOnly(['theme', 'content']);
       }
     }
 
+    // ─── Images ───────────────────────────────────────────────────────────
+
     match /images/{imageId} {
       // Owner can read and delete their own images
-      allow read, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
-      // Client can create URL-type images directly (uploaded images are created by the Cloud Function via Admin SDK)
-      allow create: if request.auth != null
-                    && request.auth.uid == request.resource.data.ownerId
-                    && request.resource.data.type == 'url';
+      allow read, delete: if isAuthed() && isOwner(resource.data.ownerId);
+
+      // Client can only create URL-type images (uploaded images are created
+      // by the Cloud Function via Admin SDK with type != 'url')
+      allow create: if isAuthed()
+        && isOwner(request.resource.data.ownerId)
+        && request.resource.data.type == 'url'
+        && request.resource.data.keys().hasOnly(['ownerId', 'type', 'url', 'createdAt', 'name', 'projectId']);
+
+      // Images are immutable after creation
+      allow update: if false;
     }
 
-    // Published snapshots — publicly readable, only written by Cloud Functions via Admin SDK
+    // ─── Published snapshots ──────────────────────────────────────────────
+    // Publicly readable. Written exclusively by Cloud Functions (Admin SDK).
     match /published_projects/{projectId} {
       allow read: if true;
       allow write: if false;
     }
+
   }
 }

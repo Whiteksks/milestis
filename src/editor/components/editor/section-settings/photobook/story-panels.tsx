@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { PanelLabel, ps, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { PanelLabel, ps, editorialInput, editorialLabel, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Button } from "@/components/ui/button"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
@@ -44,6 +44,7 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
               onChange={(e) => update({ title: e.target.value })}
               placeholder="Story title"
               className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+              maxLength={LIMITS.title}
             />
           </div>
           <div className="space-y-1 pl-2">
@@ -53,14 +54,15 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
               onChange={(e) => update({ date: e.target.value })}
               placeholder="e.g. June 2024"
               className={cn(editorialInput, "text-base text-muted-foreground")}
+              maxLength={LIMITS.date}
             />
           </div>
         </div>
       )}
       {dense && (
         <div className={ps.pbGrid2}>
-          <Input value={story.title || ""} onChange={(e) => update({ title: e.target.value })} placeholder="Story title" className={ps.pbInput} />
-          <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} />
+          <Input value={story.title || ""} onChange={(e) => update({ title: e.target.value })} placeholder="Story title" className={ps.pbInput} maxLength={LIMITS.title} />
+          <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} maxLength={LIMITS.date} />
         </div>
       )}
       <div className="space-y-1">
@@ -70,6 +72,7 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
           onChange={(e) => update({ location: e.target.value })}
           placeholder="Location"
           className={dense ? ps.pbInput : cn(editorialInput, "text-sm text-muted-foreground")}
+          maxLength={LIMITS.location}
         />
       </div>
     </div>
@@ -114,6 +117,7 @@ function StoryMomentItem({
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder="e.g. Morning"
             className={cn(editorialInput, "text-sm")}
+            maxLength={LIMITS.label}
           />
         </div>
         <button
@@ -171,7 +175,9 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   const handleMultiAdd = (urls: string[]) => {
     if (!urls.length) return
     const ts = Date.now()
-    const newBlocks: PhotoBlock[] = urls.map((url, i) => ({
+    const remaining = LIMITS.storyImages - images.length
+    if (remaining <= 0) return
+    const newBlocks: PhotoBlock[] = urls.slice(0, remaining).map((url, i) => ({
       id: `story-${ts}-${i}`,
       image: url,
       label: "",
@@ -184,6 +190,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   }
 
   const addEmpty = () => {
+    if (images.length >= LIMITS.storyImages) return
     const newBlock: PhotoBlock = {
       id: `story-${Date.now()}`,
       image: "",
@@ -213,6 +220,8 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
           size="sm"
           className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
           onClick={addEmpty}
+          disabled={images.length >= LIMITS.storyImages}
+          title={images.length >= LIMITS.storyImages ? `Maximum ${LIMITS.storyImages} photos` : undefined}
         >
           <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add photo" : "Add"}
         </Button>
@@ -233,7 +242,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
           <div className="flex items-center justify-between gap-2">
             {!dense && (
               <span className="text-[11px] text-muted-foreground/60 tabular-nums">
-                {normalizedIndex + 1} / {images.length}
+                {normalizedIndex + 1} / {images.length} <span className="text-muted-foreground/30">({LIMITS.storyImages} max)</span>
               </span>
             )}
 
@@ -291,7 +300,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
         </div>
       )}
 
-      <Button variant="outline" className="h-8 text-xs w-full" onClick={() => openMediaPicker(addOwnerId)}>
+      <Button variant="outline" className="h-8 text-xs w-full" onClick={() => openMediaPicker(addOwnerId)} disabled={images.length >= LIMITS.storyImages}>
         <Plus className="w-3.5 h-3.5 mr-2" /> Add photo
       </Button>
     </div>

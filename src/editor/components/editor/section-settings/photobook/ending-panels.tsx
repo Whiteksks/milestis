@@ -2,7 +2,7 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { ps, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { ps, editorialInput, editorialLabel, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
@@ -24,6 +24,7 @@ export function EndingMessagePanel({ dense = false }: { dense?: boolean }) {
         placeholder="Thank you for watching..."
         rows={4}
         className={dense ? ps.pbTextarea : cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
+        maxLength={LIMITS.description}
       />
     </div>
   )
@@ -39,11 +40,11 @@ export function EndingSignaturePanel({ dense = false }: { dense?: boolean }) {
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-1">
         {!dense && <label className={editorialLabel}>Signature</label>}
-        <Input value={ending.signature || ""} onChange={(e) => updatePhotobookSection("ending", { signature: e.target.value })} placeholder="Signature" className={dense ? ps.pbInputItalic : cn(editorialInput, "text-sm italic")} />
+        <Input value={ending.signature || ""} onChange={(e) => updatePhotobookSection("ending", { signature: e.target.value })} placeholder="Signature" className={dense ? ps.pbInputItalic : cn(editorialInput, "text-sm italic")} maxLength={LIMITS.signature} />
       </div>
       <div className="space-y-1">
         {!dense && <label className={editorialLabel}>Date</label>}
-        <Input value={ending.date || ""} onChange={(e) => updatePhotobookSection("ending", { date: e.target.value })} placeholder="Date" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} />
+        <Input value={ending.date || ""} onChange={(e) => updatePhotobookSection("ending", { date: e.target.value })} placeholder="Date" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} maxLength={LIMITS.date} />
       </div>
     </div>
   )

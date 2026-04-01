@@ -127,6 +127,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   }
 
   const addProject = () => {
+    if (projects.length >= LIMITS.featuredWorkProjects) return
     const next = [
       ...projects,
       {
@@ -193,6 +194,8 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
             size="sm"
             className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
             onClick={addProject}
+            disabled={projects.length >= LIMITS.featuredWorkProjects}
+            title={projects.length >= LIMITS.featuredWorkProjects ? `Maximum ${LIMITS.featuredWorkProjects} projects` : undefined}
           >
             <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add project" : "Add"}
           </Button>
@@ -217,7 +220,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
             <div className="flex items-center justify-between gap-2">
               {!dense && (
                 <span className="text-[11px] text-muted-foreground/60 tabular-nums">
-                  {normalizedIndex + 1} / {projects.length}
+                  {normalizedIndex + 1} / {projects.length} <span className="text-muted-foreground/30">({LIMITS.featuredWorkProjects} max)</span>
                 </span>
               )}
 

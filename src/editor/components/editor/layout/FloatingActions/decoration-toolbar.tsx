@@ -164,6 +164,8 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   const fallbackOwnerId = useId()
   const ownerId = decoration?.id ?? fallbackOwnerId
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const editorMode = useUiStore((s) => s.editorMode)
+  const isPhotobook = editorMode === 'photobook'
 
   const {
     isExpanded,
@@ -309,6 +311,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             <Separator orientation="vertical" className={SEP} />
 
             {/* z-index */}
+            {!isPhotobook && (
             <Button
               variant="ghost"
               onClick={toggleZIndex}
@@ -317,6 +320,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             >
               {isFront ? <BringToFront className="h-4 w-4" /> : <SendToBack className="h-4 w-4" />}
             </Button>
+            )}
 
             {/* image replace */}
             <MediaPickerModal ownerId={ownerId} onSelectImage={onImageSelect} />

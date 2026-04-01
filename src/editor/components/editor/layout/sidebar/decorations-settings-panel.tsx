@@ -13,6 +13,7 @@ import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scro
 import Image from 'next/image'
 import { decorationAnimationOptions, type DecorationAnimation } from '@/editor/lib/decoration-animations'
 import { loadImageAspectRatio } from '@/editor/components/editor/layout/decorationEdit/utils'
+import { LIMITS } from '@/editor/components/editor/section-settings/ui/panel-ui'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -82,6 +83,7 @@ export function DecorationsSettingsPanel() {
   )
 
   const handleAddDecoration = useCallback(() => {
+    if (decorations.length >= LIMITS.decorations) return
     const scroller = canvasScrollRef?.current
     const contentRoot = scroller?.querySelector<HTMLElement>('[data-canvas-content-root="true"]')
 
@@ -113,7 +115,7 @@ export function DecorationsSettingsPanel() {
       opacity: 1,
       scale: 1,
       responsiveScale: true,
-      zIndex: 5,
+      zIndex: 20,
       name: `Decoration ${decorations.length + 1}`,
     }
 
@@ -191,7 +193,9 @@ export function DecorationsSettingsPanel() {
           <Button
             size="sm"
             onClick={handleAddDecoration}
-            className="h-9 px-4 text-[12px] font-medium rounded-sm bg-foreground text-background hover:bg-foreground/90 shadow-sm shrink-0 transition-transform active:scale-95"
+            disabled={decorations.length >= LIMITS.decorations}
+            title={decorations.length >= LIMITS.decorations ? `Maximum ${LIMITS.decorations} decorations` : undefined}
+            className="h-9 px-4 text-[12px] font-medium rounded-sm bg-foreground text-background hover:bg-foreground/90 shadow-sm shrink-0 transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Add New
@@ -214,7 +218,7 @@ export function DecorationsSettingsPanel() {
         <div className="space-y-3">
           <div className="flex items-center justify-between mb-4">
             <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-              Elements <span className="text-muted-foreground/40 font-normal ml-1">({decorations.length})</span>
+              Elements <span className="text-muted-foreground/40 font-normal ml-1">({decorations.length}/{LIMITS.decorations})</span>
             </Label>
             {decorations.length > 0 && (
               <Button

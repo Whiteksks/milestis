@@ -2,7 +2,7 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { PanelLabel, ps } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { PanelLabel, ps, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -25,12 +25,14 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
           onChange={(e) => updatePhotobookSection("introduction", { title: e.target.value })}
           placeholder="Page title"
           className={ps.pbInput}
+          maxLength={LIMITS.title}
         />
         <Input
           value={introduction.quote || ""}
           onChange={(e) => updatePhotobookSection("introduction", { quote: e.target.value })}
           placeholder="Quote"
           className={ps.pbInput}
+          maxLength={LIMITS.quote}
         />
       </div>
 
@@ -40,6 +42,7 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
         placeholder="Dedication..."
         rows={4}
         className={ps.pbTextarea}
+        maxLength={LIMITS.dedication}
       />
     </div>
   )
