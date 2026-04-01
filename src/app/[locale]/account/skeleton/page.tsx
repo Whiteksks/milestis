@@ -1,13 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function AppearanceSettingsSkeleton() {
-  const hmh = true
-  if(hmh) {
+  
+  if(true) {
     return (
       <div className="space-y-6">
-        <Textarea/>
+        <ScrollArea>
+          <Textarea/>
+        </ScrollArea>
       </div>  
     )
   }

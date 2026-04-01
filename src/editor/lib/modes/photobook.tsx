@@ -15,7 +15,6 @@ import { CoverMemoir } from '@/editor/components/templates/photobook/sections/co
 const LoadingTemplate = () => (
   <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
 )
-const LoadingSettings = () => null
 
 
 const TemplateMemoirDesign = dynamic(
@@ -35,31 +34,13 @@ const TemplateLumiereDesign = dynamic(
   { loading: LoadingTemplate },
 )
 
-// Section settings panels
-const PhotobookCoverSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/cover-settings'),
-  { loading: LoadingSettings },
-)
-const PhotobookIntroductionSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/introduction-settings'),
-  { loading: LoadingSettings },
-)
-const PhotobookStorySettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/story-settings'),
-  { loading: LoadingSettings },
-)
-const PhotobookGallerySettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/gallery-settings'),
-  { loading: LoadingSettings },
-)
-const PhotobookHighlightSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/highlight-settings'),
-  { loading: LoadingSettings },
-)
-const PhotobookEndingSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/photobook/ending-settings'),
-  { loading: LoadingSettings },
-)
+// Section settings panels — static imports so panels are ready when the drawer opens
+import PhotobookCoverSettings from '@/editor/components/editor/section-settings/photobook/cover-settings'
+import PhotobookIntroductionSettings from '@/editor/components/editor/section-settings/photobook/introduction-settings'
+import PhotobookStorySettings from '@/editor/components/editor/section-settings/photobook/story-settings'
+import PhotobookGallerySettings from '@/editor/components/editor/section-settings/photobook/gallery-settings'
+import PhotobookHighlightSettings from '@/editor/components/editor/section-settings/photobook/highlight-settings'
+import PhotobookEndingSettings from '@/editor/components/editor/section-settings/photobook/ending-settings'
 
 const photobookTemplateComponents: Partial<
   Record<PhotobookTemplateId, React.ComponentType<PhotobookTemplateProps>>

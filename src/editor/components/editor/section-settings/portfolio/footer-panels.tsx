@@ -72,7 +72,7 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className={dense ? ps.root(true) : "py-6 space-y-3"}>
       {!dense && <label className={editorialLabel}>Social Links</label>}
-      <SocialLinksEditor value={value} onChange={handleChange} />
+      <SocialLinksEditor value={value} onChange={handleChange} editorial />
     </div>
   )
 }

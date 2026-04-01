@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, ChevronDown } from 'lucide-react'
@@ -37,7 +36,7 @@ export function SectionsTab() {
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1 font-medium">
                     Active Layer
                   </span>
-                  <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-all max-w-full">
+                  <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-all max-w-full min-w-48">
                     <span className={cn(
                       "text-lg font-medium tracking-tight transition-opacity truncate",
                       !currentSection?.visible && "opacity-40"
@@ -45,7 +44,7 @@ export function SectionsTab() {
                       {currentSection?.name ?? 'Select...'}
                     </span>
                     <ChevronDown className={cn(
-                      "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-300",
+                      "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-300 ml-auto",
                       isOpen && "rotate-180"
                     )} />
                   </div>
@@ -53,49 +52,74 @@ export function SectionsTab() {
               </PopoverTrigger>
 
               <PopoverContent 
-                className="w-72 p-1.5 rounded-2xl border-border/40 bg-background/95 backdrop-blur-xl" 
+                className="w-72 p-2 rounded-2xl border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl" 
                 align="start"
                 sideOffset={12}
               >
-                <div className="space-y-0.5">
-                  {sections.map(section => (
-                    <div
-                      key={section.id}
-                      className={cn(
-                        'group flex items-center justify-between rounded-xl transition-all pl-3 pr-1 py-1',
-                        resolvedActiveSectionId === section.id 
-                          ? 'bg-foreground text-background font-medium' 
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                      )}
-                    >
-                      <span 
-                        className="flex-1 py-2 text-[13px] cursor-pointer truncate"
-                        onClick={() => {
-                          setActiveSectionId(section.id)
-                          setIsOpen(false)
-                        }}
-                      >
-                        {section.name}
-                      </span>
+                {/* Заголовок внутри списка для контекста */}
+                <div className="px-3 py-2 mb-1">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-semibold">
+                    Project Layers
+                  </span>
+                </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleVisibility(section.toggleKey)
-                        }}
+                <div className="space-y-0.5">
+                  {sections.map((section, index) => {
+                    const isActive = resolvedActiveSectionId === section.id;
+                    
+                    return (
+                      <div
+                        key={section.id}
                         className={cn(
-                          "h-8 w-8 rounded-lg transition-colors",
-                          resolvedActiveSectionId === section.id
-                            ? "hover:bg-background/10 text-background/60 hover:text-background"
-                            : "hover:bg-background text-muted-foreground hover:text-foreground"
+                          'group flex items-center justify-between rounded-xl transition-all pl-3 pr-1.5 py-1',
+                          isActive 
+                            ? 'bg-foreground text-background shadow-lg shadow-foreground/10' 
+                            : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                         )}
                       >
-                        {section.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5 opacity-40" />}
-                      </Button>
-                    </div>
-                  ))}
+                        <div 
+                          className="flex flex-1 items-center gap-3 py-2 cursor-pointer min-w-0"
+                          onClick={() => {
+                            setActiveSectionId(section.id)
+                            setIsOpen(false)
+                          }}
+                        >
+                          {/* Номер слоя для эстетики */}
+                          <span className={cn(
+                            "text-[9px] font-mono tabular-nums opacity-40",
+                            isActive ? "text-background" : "text-foreground"
+                          )}>
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+
+                          <span className="text-[13px] font-medium truncate tracking-tight">
+                            {section.name}
+                          </span>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleVisibility(section.toggleKey)
+                          }}
+                          className={cn(
+                            "h-8 w-8 rounded-lg transition-all",
+                            isActive
+                              ? "hover:bg-background/10 text-background/40 hover:text-background"
+                              : "hover:bg-background text-muted-foreground/40 hover:text-foreground"
+                          )}
+                        >
+                          {section.visible ? (
+                            <Eye className="w-3.5 h-3.5" />
+                          ) : (
+                            <EyeOff className="w-3.5 h-3.5" />
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               </PopoverContent>
             </Popover>
@@ -117,8 +141,7 @@ export function SectionsTab() {
         </header>
       )}
 
-      {/* ФИКС 3: overflow-hidden на ScrollArea и w-full позволяют Textarea правильно считать ширину */}
-      <ScrollArea className="flex-1 overflow-hidden">
+      <div className="editor-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <div className={cn(
           "p-6 w-full transition-all duration-300 ease-in-out",
           !currentSection?.visible && "opacity-10 blur-sm pointer-events-none grayscale select-none"
@@ -128,7 +151,7 @@ export function SectionsTab() {
              return Settings ? <Settings /> : null;
           })()}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }

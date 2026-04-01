@@ -19,7 +19,6 @@ import { LiquidGlassHero } from '@/editor/components/templates/portfolio/section
 const LoadingTemplate = () => (
   <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
 )
-const LoadingSettings = () => null
 
 // Templates
 const MinimalTemplateDesign = dynamic(
@@ -53,35 +52,14 @@ const LiquidGlassTemplateDesign = dynamic(
   { loading: LoadingTemplate },
 )
 
-// Section settings panels
-const HeaderSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/header-settings').then(m => m.HeaderSettings),
-  { loading: LoadingSettings },
-)
-const HeroSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/hero-settings').then(m => m.HeroSettings),
-  { loading: LoadingSettings },
-)
-const BioSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/bio-settings').then(m => m.BioSettings),
-  { loading: LoadingSettings },
-)
-const FeaturedWorkSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/featured-work-settings').then(m => m.FeaturedWorkSettings),
-  { loading: LoadingSettings },
-)
-const VideoSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/video-settings').then(m => m.VideoSettings),
-  { loading: LoadingSettings },
-)
-const ContactSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/contact-settings').then(m => m.ContactSettings),
-  { loading: LoadingSettings },
-)
-const FooterSettings = dynamic(
-  () => import('@/editor/components/editor/section-settings/portfolio/footer-settings').then(m => m.FooterSettings),
-  { loading: LoadingSettings },
-)
+// Section settings panels — static imports so panels are ready when the drawer opens
+import { HeaderSettings } from '@/editor/components/editor/section-settings/portfolio/header-settings'
+import { HeroSettings } from '@/editor/components/editor/section-settings/portfolio/hero-settings'
+import { BioSettings } from '@/editor/components/editor/section-settings/portfolio/bio-settings'
+import { FeaturedWorkSettings } from '@/editor/components/editor/section-settings/portfolio/featured-work-settings'
+import { VideoSettings } from '@/editor/components/editor/section-settings/portfolio/video-settings'
+import { ContactSettings } from '@/editor/components/editor/section-settings/portfolio/contact-settings'
+import { FooterSettings } from '@/editor/components/editor/section-settings/portfolio/footer-settings'
 
 const portfolioTemplateComponents: Partial<
   Record<PortfolioTemplateId, React.ComponentType<PortfolioTemplateProps>>

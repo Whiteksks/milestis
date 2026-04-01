@@ -2,8 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
-import { Label } from '@/components/ui/label'
-import { Eye, EyeOff, SlidersHorizontal } from 'lucide-react'
+import { Eye, EyeOff, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
@@ -17,7 +16,7 @@ export function SettingsContent() {
     resolvedActiveSectionId,
     setActiveSectionId,
   } = useModeSections()
-  const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const currentSection = useMemo(
     () => sections.find((s) => s.id === resolvedActiveSectionId),
@@ -32,95 +31,111 @@ export function SettingsContent() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm pb-3 border-b border-border/60">
-        <Label className="text-xs font-medium text-muted-foreground mb-2 block">
-          Edit Section
-        </Label>
-        <div className="flex gap-2">
-          <Popover open={isSectionPopoverOpen} onOpenChange={setIsSectionPopoverOpen} modal={true}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="justify-between flex-1"
-              >
-                <span className="truncate">
-                  {currentSection?.name ?? 'Select section'}
-                </span>
-                <SlidersHorizontal className="ml-2 h-4 w-4 opacity-60" />
-              </Button>
-            </PopoverTrigger>
-
-          <PopoverContent
-            align="start"
-            className={cn(
-              "w-64 mt-2",
-              "bg-background shadow-md",
-              "border border-border",
-              "rounded-xl",
-            )}
-          >
-            <div className="space-y-1">
-              {sections.map((section) => (
-                <div
-                  key={section.id}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm text-left hover:bg-muted/50 cursor-pointer",
-                    resolvedActiveSectionId === section.id && "bg-muted",
-                    !section.visible && "text-muted-foreground"
-                  )}
-                  onClick={() => {
-                    setActiveSectionId(section.id)
-                    setIsSectionPopoverOpen(false)
-                  }}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleVisibility(section.toggleKey)
-                      }}
-                      className={cn(
-                        "h-7 w-7 rounded-lg transition-colors",
-                        section.visible
-                          ? "bg-muted hover:bg-muted/80"
-                          : "bg-muted/50 hover:bg-muted"
-                      )}
-                    >
-                      {section.visible ? (
-                        <Eye className="w-3.5 h-4 text-foreground" />
-                      ) : (
-                        <EyeOff className="w-3.5 h-4 text-muted-foreground" />
-                      )}
-                    </Button>
-                    <span className="truncate">{section.name}</span>
+      {sections.length > 0 && (
+        <header className="sticky top-0 z-10 px-4 py-3 border-b border-border/40 bg-card/95 backdrop-blur-md">
+          <div className="flex items-end justify-between gap-4">
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+              <PopoverTrigger asChild>
+                <button className="group flex flex-col items-start outline-none transition-all min-w-0">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1 font-medium">
+                    Active Layer
+                  </span>
+                  <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-colors max-w-full min-w-40">
+                    <span className={cn(
+                      "text-base font-medium tracking-tight transition-opacity truncate",
+                      !currentSection?.visible && "opacity-40"
+                    )}>
+                      {currentSection?.name ?? 'Select...'}
+                    </span>
+                    <ChevronDown className={cn(
+                      "h-3.5 w-3.5 shrink-0 text-muted-foreground ml-auto transition-transform duration-200",
+                      isOpen && "rotate-180"
+                    )} />
                   </div>
-                </div>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+                </button>
+              </PopoverTrigger>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
-            className={cn(
-              "px-3 rounded-xl border h-10 w-10 transition-colors",
-              currentSection?.visible
-                ? "border-border bg-background hover:bg-muted/50"
-                : "border-border bg-muted hover:bg-muted/80"
-            )}
-          >
-            {currentSection?.visible ? (
-              <Eye className="w-4 h-4 text-foreground" />
-            ) : (
-              <EyeOff className="w-4 h-4 text-muted-foreground" />
-            )}
-          </Button>
-        </div>
-      </div>
+              <PopoverContent
+                className="w-64 p-2 rounded-2xl border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl"
+                align="start"
+                sideOffset={12}
+              >
+                <div className="px-3 py-2 mb-1">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-semibold">
+                    Project Layers
+                  </span>
+                </div>
+
+                <div className="space-y-0.5">
+                  {sections.map((section, index) => {
+                    const isActive = resolvedActiveSectionId === section.id
+                    return (
+                      <div
+                        key={section.id}
+                        className={cn(
+                          'group flex items-center justify-between rounded-xl transition-colors pl-3 pr-1.5 py-1',
+                          isActive
+                            ? 'bg-foreground text-background'
+                            : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                        )}
+                      >
+                        <div
+                          className="flex flex-1 items-center gap-3 py-2 cursor-pointer min-w-0"
+                          onClick={() => {
+                            setActiveSectionId(section.id)
+                            setIsOpen(false)
+                          }}
+                        >
+                          <span className={cn(
+                            "text-[9px] font-mono tabular-nums opacity-40",
+                            isActive ? "text-background" : "text-foreground"
+                          )}>
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          <span className="text-[13px] font-medium truncate tracking-tight">
+                            {section.name}
+                          </span>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleVisibility(section.toggleKey)
+                          }}
+                          className={cn(
+                            "h-8 w-8 rounded-lg transition-colors",
+                            isActive
+                              ? "hover:bg-background/10 text-background/40 hover:text-background"
+                              : "hover:bg-background text-muted-foreground/40 hover:text-foreground"
+                          )}
+                        >
+                          {section.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </Button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
+              className={cn(
+                "h-10 w-10 rounded-full border shrink-0 transition-colors",
+                !currentSection?.visible
+                  ? "bg-muted/50 border-transparent text-muted-foreground/40"
+                  : "border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
+              )}
+            >
+              {currentSection?.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </Button>
+          </div>
+        </header>
+      )}
 
       <div>
         {renderSettings()}
@@ -128,3 +143,4 @@ export function SettingsContent() {
     </div>
   )
 }
+
