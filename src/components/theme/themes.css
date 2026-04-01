@@ -34,6 +34,9 @@
   --sidebar-border: oklch(0.91 0.01 80);
   --sidebar-ring: oklch(0.7 0.08 30);
 
+  --editor-workspace: oklch(0.95 0.008 85);
+  --editor-surface:   oklch(1.00 0.002 80);
+
   --radius: 1.0rem;
   
   --shadow-2xs: 0px 8px 16px -4px oklch(0.00 0 0 / 0.04);
@@ -80,6 +83,9 @@
   --sidebar-accent-foreground: oklch(0.94 0.005 80);
   --sidebar-border: oklch(0.3 0.015 60);
   --sidebar-ring: oklch(0.5 0.08 30);
+
+  --editor-workspace: oklch(0.13 0.008 60);
+  --editor-surface:   oklch(0.22 0.01 60);
   
   --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
   --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
@@ -128,6 +134,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-editor-workspace: var(--editor-workspace);
+  --color-editor-surface: var(--editor-surface);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);

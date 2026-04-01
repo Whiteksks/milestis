@@ -29,6 +29,8 @@
   --input: oklch(0.88 0.03 80);
   --ring: oklch(0.62 0.13 45);
 
+  --editor-workspace: oklch(0.92 0.015 80); 
+  --editor-surface: oklch(0.99 0.005 80);
   /* Графики - приглушенная теплая палитра */
   --chart-1: oklch(0.65 0.15 45);
   --chart-2: oklch(0.75 0.12 70);

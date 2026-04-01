@@ -156,7 +156,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }, [])
 
   return (
-    <header className="relative h-16 border-b border-border/80 bg-card/95 z-50 shadow-[0_2px_16px_0_hsl(var(--foreground)/0.06)]">
+    <header className="relative h-16 border-b border-border bg-editor-surface z-50">
       <div className="h-full flex items-center px-6 justify-between">
         {/* LEFT */}
         <div className="flex items-center gap-2 min-w-0">

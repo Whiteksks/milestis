@@ -134,7 +134,7 @@ export function Canvas({
   }, [scrollContainerRef])
 
   return (
-    <div className="flex-1 min-h-0 bg-background p-0 md:p-2 lg:p-4 overflow-hidden">
+    <div className="flex-1 min-h-0 bg-editor-workspace p-0 md:p-2 lg:p-4 overflow-hidden">
       <div
         ref={viewportRef}
         className={cn(
@@ -165,8 +165,6 @@ export function Canvas({
             <div
               data-canvas-content-root="true"
               className={cn(
-                // shadow-2xl removed: box-shadow on the full-page scroll container forces
-                // a repaint on every scroll frame. Use a ring or border if an outline is needed.
                 'overflow-hidden relative',
                 'bg-transparent',
                 theme.foreground,

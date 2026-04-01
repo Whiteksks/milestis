@@ -72,7 +72,7 @@ export function SectionsSidebar({
 
       {/* Layer 2: visual panel — GPU translateX, no shadow */}
       <motion.div
-        className="hidden md:flex flex-col absolute right-0 top-0 h-full border-l border-border/60 bg-card/80 z-20 overflow-visible will-change-transform transform-gpu"
+        className="hidden md:flex flex-col absolute right-0 top-0 h-full border-l border-border bg-editor-surface z-20 overflow-visible will-change-transform transform-gpu"
         style={{ width: SIDEBAR_WIDTH }}
         initial={false}
         animate={{ x: isSidebarCollapsed ? SIDEBAR_WIDTH : 0 }}
@@ -91,7 +91,7 @@ export function SectionsSidebar({
             'group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-30',
             'hidden md:flex items-center justify-center',
             'w-12 h-16 rounded-none rounded-l-lg   p-0',
-            'bg-card/95 border border-border/60 border-r-0',
+            'bg-editor-surface border border-border border-r-0',
             'hover:bg-muted/60',
           )}
         >
