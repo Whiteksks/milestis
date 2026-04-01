@@ -1,5 +1,6 @@
 "use client"
 
+import { useId } from "react"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Input } from "@/components/ui/input"
@@ -8,9 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Trash2, Plus, Trophy } from "lucide-react"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
-import { useId } from "react"
+import { cn } from "@/lib/utils"
+import { ps, LIMITS, editorialInput, editorialLabel, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
   const { bio, updateSectionContent } = useContentSelector((state) => ({
@@ -18,22 +18,46 @@ export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
 
+  if (dense) {
+    return (
+      <div className={ps.root(true)}>
+        <div className={ps.grid2(true)}>
+          <Input className={ps.input} value={bio.title} onChange={(e) => updateSectionContent("bio", { title: e.target.value })} placeholder="Section title" maxLength={LIMITS.title} />
+          <Input className={ps.input} value={bio.subtitle || ""} onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })} placeholder="Subtitle" maxLength={LIMITS.subtitle} />
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.root(dense)}>
-      {!dense && <PanelLabel>Header</PanelLabel>}
-      <div className={ps.grid2(dense)}>
-        <Input
-          className={ps.input}
-          value={bio.title}
-          onChange={(e) => updateSectionContent("bio", { title: e.target.value })}
-          placeholder="Section title"
-        />
-        <Input
-          className={ps.input}
-          value={bio.subtitle || ""}
-          onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })}
-          placeholder="Subtitle"
-        />
+    <div className="py-2">
+      <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-6">
+        <div className="space-y-1 pr-2">
+          <div className="flex items-center justify-between">
+            <label className={editorialLabel}>Title</label>
+            <CharCounter value={bio.title} limit={LIMITS.title} />
+          </div>
+          <Input
+            className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+            value={bio.title}
+            onChange={(e) => updateSectionContent("bio", { title: e.target.value })}
+            placeholder="About"
+            maxLength={LIMITS.title}
+          />
+        </div>
+        <div className="space-y-1 pl-2">
+          <div className="flex items-center justify-between">
+            <label className={editorialLabel}>Subtitle</label>
+            <CharCounter value={bio.subtitle || ""} limit={LIMITS.subtitle} />
+          </div>
+          <Input
+            className={cn(editorialInput, "text-base text-muted-foreground")}
+            value={bio.subtitle || ""}
+            onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })}
+            placeholder="Who you are"
+            maxLength={LIMITS.subtitle}
+          />
+        </div>
       </div>
     </div>
   )
@@ -52,28 +76,42 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent("bio", { image: url })
   }
 
+  if (dense) {
+    return (
+      <div className={ps.root(true)}>
+        <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
+        <PortfolioImagePicker
+          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData }}
+          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData })}
+          onOpenMediaPicker={() => openMediaPicker(ownerId)}
+          restrictions={bioRestrictions}
+        />
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.root(dense)}>
+    <div className="py-6 border-b border-border/30 space-y-4">
       <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
-      {!dense && <PanelLabel>Profile Photo</PanelLabel>}
-      <PortfolioImagePicker
-        value={{
-          image: bio.image || "",
-          aspectRatio: bio.aspectRatio,
-          frameStyle: bio.frameStyle,
-          cropData: bio.cropData,
-        }}
-        onChange={(value) =>
-          updateSectionContent("bio", {
-            image: value.image,
-            aspectRatio: value.aspectRatio,
-            frameStyle: value.frameStyle,
-            cropData: value.cropData,
-          })
-        }
-        onOpenMediaPicker={() => openMediaPicker(ownerId)}
-        restrictions={bioRestrictions}
-      />
+      <div className="flex items-baseline justify-between">
+        <label className={editorialLabel}>Profile Photo</label>
+        <button
+          onClick={() => openMediaPicker(ownerId)}
+          className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors border-b border-muted-foreground/30 pb-0.5"
+        >
+          Replace Media
+        </button>
+      </div>
+      <div className="relative group transition-all duration-500">
+        <div className="absolute -inset-2 rounded-[2rem] bg-muted/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity pointer-events-none" />
+        <PortfolioImagePicker
+          label=""
+          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData }}
+          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData })}
+          onOpenMediaPicker={() => openMediaPicker(ownerId)}
+          restrictions={bioRestrictions}
+        />
+      </div>
     </div>
   )
 }
@@ -84,20 +122,37 @@ export function BioBiographyPanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
 
+  if (dense) {
+    return (
+      <div className={ps.root(true)}>
+        <Textarea
+          className={ps.textarea(true, "min-h-24", "min-h-32")}
+          value={bio.description}
+          onChange={(e) => updateSectionContent("bio", { description: e.target.value })}
+          placeholder="Tell your story"
+          maxLength={LIMITS.bio}
+        />
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.root(dense)}>
-      {!dense && <PanelLabel>Biography</PanelLabel>}
+    <div className="py-6 border-b border-border/30 overflow-hidden">
+      <div className="flex items-center justify-between mb-2">
+        <label className={editorialLabel}>Biography</label>
+        <CharCounter value={bio.description} limit={LIMITS.bio} />
+      </div>
       <Textarea
-        className={ps.textarea(dense, "min-h-24", "min-h-32")}
+        className={cn(editorialInput, "text-base leading-relaxed min-h-[120px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
         value={bio.description}
         onChange={(e) => updateSectionContent("bio", { description: e.target.value })}
-        placeholder="Tell your story"
+        placeholder="Tell your story..."
+        maxLength={LIMITS.bio}
       />
     </div>
   )
 }
-
-export function BioAchievementsPanel({ dense = false }: { dense?: boolean }) {
+export function BioAchievementsPanel() {
   const { bio, updateSectionContent } = useContentSelector((state) => ({
     bio: state.sectionContent.bio,
     updateSectionContent: state.updateSectionContent,
@@ -105,8 +160,10 @@ export function BioAchievementsPanel({ dense = false }: { dense?: boolean }) {
 
   const achievements = bio.achievements || []
 
-  const addAchievement = () =>
+  const addAchievement = () => {
+    if (achievements.length >= LIMITS.count) return
     updateSectionContent("bio", { achievements: [...achievements, ""] })
+  }
 
   const removeAchievement = (index: number) =>
     updateSectionContent("bio", {
@@ -120,67 +177,72 @@ export function BioAchievementsPanel({ dense = false }: { dense?: boolean }) {
   }
 
   return (
-    <div className={ps.root(dense)}>
-      {/* Header — only shows label and Add button when there are items */}
-      {achievements.length > 0 && (
-        <div className="flex items-center justify-between">
-          {!dense && <PanelLabel>Achievements</PanelLabel>}
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`${ps.addBtn} ml-auto`}
+    <div className="py-8 space-y-6">
+      {/* Шапка секции */}
+      <div className="flex items-center justify-between border-b border-border/30 pb-2">
+        <label className={editorialLabel}>Achievements & Recognition</label>
+        {achievements.length < LIMITS.count && (
+          <button 
             onClick={addAchievement}
+            className="text-[10px] uppercase tracking-widest text-foreground hover:opacity-60 transition-opacity flex items-center gap-1"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" />
-            Add
-          </Button>
-        </div>
-      )}
+            <Plus className="w-3 h-3" /> Add Item
+          </button>
+        )}
+      </div>
 
-      {/* Empty state */}
-      {achievements.length === 0 && (
-        <button
-          type="button"
-          onClick={addAchievement}
-          className={ps.emptyZone}
-        >
-          <Trophy className={ps.emptyIcon} />
-          {!dense && (
-            <span className={ps.emptyText}>
-              Add achievements
+      {/* Список */}
+      <div className="space-y-0 divide-y divide-border/10">
+        {achievements.map((achievement, index) => (
+          <div 
+            key={index} 
+            className="group flex items-start gap-4 py-3 transition-all"
+          >
+            {/* Нумерация в стиле индекса */}
+            <span className="text-[9px] text-muted-foreground/40 font-mono pt-1 w-4 shrink-0">
+              {String(index + 1).padStart(2, '0')}
             </span>
-          )}
-        </button>
-      )}
 
-      {/* List */}
-      {achievements.length > 0 && (
-        <div className="space-y-1.5">
-          {achievements.map((achievement, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-1.5 group rounded-md px-1.5 py-1 hover:bg-muted/50 transition-colors -mx-1.5"
-            >
-              <span className="text-[10px] tabular-nums text-muted-foreground/40 w-4 shrink-0 text-right select-none">
-                {index + 1}
-              </span>
+            {/* Поле ввода */}
+            <div className="flex-1">
               <Input
-                className="h-7 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:bg-background px-1.5 flex-1"
-                placeholder="Achievement"
+                className={cn(editorialInput, "text-sm leading-snug")}
+                placeholder="Grant, Award or Key Milestone..."
                 value={achievement}
                 onChange={(e) => updateAchievement(index, e.target.value)}
+                maxLength={LIMITS.achievement}
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0 text-muted-foreground md:text-muted-foreground/0 md:group-hover:text-muted-foreground hover:text-destructive hover:bg-transparent transition-colors"
-                onClick={() => removeAchievement(index)}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
             </div>
-          ))}
-        </div>
+
+            {/* Удаление — деликатное, проявляется при ховере */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive/5 hover:text-destructive -mt-1"
+              onClick={() => removeAchievement(index)}
+            >
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
+        ))}
+
+        {/* Empty State — если ничего нет */}
+        {achievements.length === 0 && (
+          <button
+            onClick={addAchievement}
+            className="w-full py-10 border border-dashed border-border/30 rounded-2xl flex flex-col items-center justify-center gap-2 text-muted-foreground/60 hover:text-foreground hover:border-border/60 transition-all group"
+          >
+            <Trophy className="w-5 h-5 mb-1 opacity-20 group-hover:opacity-100 transition-opacity" />
+            <span className="text-[10px] uppercase tracking-[0.2em]">Record an achievement</span>
+          </button>
+        )}
+      </div>
+
+      {/* Лимиты */}
+      {achievements.length >= LIMITS.count && (
+        <p className="text-[9px] text-muted-foreground/30 text-center italic pt-2">
+          Maximum display capacity reached.
+        </p>
       )}
     </div>
   )

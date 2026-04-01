@@ -2,8 +2,8 @@
 
 import { useContentSelector } from "@/editor/lib/store"
 import { Input } from "@/components/ui/input"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
+import { cn } from "@/lib/utils"
+import { ps, LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import {
   SocialLinksEditor,
   detectSocialSlug,
@@ -35,14 +35,23 @@ export function FooterCopyrightPanel({ dense = false }: { dense?: boolean }) {
     updateSectionContent: state.updateSectionContent,
   }))
 
+  if (dense) {
+    return (
+      <div className={ps.root(true)}>
+        <Input className={ps.input} value={footer.copyright} onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })} placeholder="© 2026. All rights reserved." maxLength={LIMITS.copyright} />
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.root(dense)}>
-      {!dense && <PanelLabel>Copyright</PanelLabel>}
+    <div className="py-6 border-b border-border/30 space-y-3">
+      <label className={editorialLabel}>Copyright</label>
       <Input
-        className={ps.input}
+        className={cn(editorialInput, "text-base text-foreground")}
         value={footer.copyright}
         onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })}
         placeholder="© 2026. All rights reserved."
+        maxLength={LIMITS.copyright}
       />
     </div>
   )
@@ -61,8 +70,8 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
   }
 
   return (
-    <div className={ps.root(dense)}>
-      {!dense && <PanelLabel>Social Links</PanelLabel>}
+    <div className={dense ? ps.root(true) : "py-6 space-y-3"}>
+      {!dense && <label className={editorialLabel}>Social Links</label>}
       <SocialLinksEditor value={value} onChange={handleChange} />
     </div>
   )

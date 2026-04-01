@@ -18,6 +18,7 @@ export interface PortfolioImagePickerValue {
 
 interface PortfolioImagePickerProps {
   label?: string
+  dense?: boolean
   value: PortfolioImagePickerValue
   onChange: (value: PortfolioImagePickerValue) => void
   onOpenMediaPicker?: () => void
@@ -26,6 +27,7 @@ interface PortfolioImagePickerProps {
 
 export function PortfolioImagePicker({
   label = "Image",
+  dense = false,
   value,
   onChange,
   onOpenMediaPicker,
@@ -34,6 +36,7 @@ export function PortfolioImagePicker({
   return (
     <ImagePickerCore
       label={label}
+      dense={dense}
       value={{
         image: value.image,
         aspectRatio: value.aspectRatio ?? "portrait",

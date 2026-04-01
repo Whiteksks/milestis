@@ -1,7 +1,17 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function AppearanceSettingsSkeleton() {
+  const hmh = true
+  if(hmh) {
+    return (
+      <div className="space-y-6">
+        <Textarea/>
+      </div>  
+    )
+  }
+
   return (
     <div className="space-y-6">
       <Card className="rounded-2xl border-border/40 bg-card/80">

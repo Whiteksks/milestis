@@ -18,7 +18,8 @@ import { type SectionImageRestrictions } from "@/editor/lib/restrictions/templat
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
 import Image from "next/image"
-import { ImageIcon, Plus, Settings2, X } from "lucide-react"
+import { Crop, ImageIcon, Palette, Plus, Settings2, Trash2, X } from "lucide-react"
+import { editorialLabel } from "./panel-ui"
 
 /**
  * Flat value that ImagePickerCore operates on.
@@ -39,6 +40,8 @@ export interface ImagePickerCoreProps {
   /** Called with only the changed fields — merge into your own type. */
   onChange: (patch: Partial<ImagePickerCoreValue>) => void
   label?: string
+  /** Compact thumbnail + text controls layout. Default: false. */
+  dense?: boolean
   /** Show the caption input below the picker. Default: false. */
   showCaption?: boolean
   /** Show the description textarea below the picker. Default: false. */
@@ -51,6 +54,7 @@ export function ImagePickerCore({
   value,
   onChange,
   label = "Image",
+  dense = false,
   showCaption = false,
   showDescription = false,
   onOpenMediaPicker,
@@ -92,6 +96,157 @@ export function ImagePickerCore({
       onChange({ cropData })
       setShowCrop(false)
     }
+  }
+
+  // ── Dense / compact mode ─────────────────────────────────────────────────
+if (dense) {
+    return (
+      <div className="space-y-1.5">
+        {showCrop && value.image ? (
+          <div className="overflow-hidden rounded-md border border-border bg-background">
+            <InlineCropPanel
+              image={originalImage}
+              aspectRatio={value.aspectRatio}
+              frameStyle={value.frameStyle}
+              crop={crop}
+              zoom={zoom}
+              isApplying={isApplying}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+              onReset={handleReset}
+              onApply={handleApplyAndSave}
+              onCancel={() => setShowCrop(false)}
+            />
+          </div>
+        ) : showStylePicker && !restrictions.hideFrameStyle ? (
+          <div className="overflow-hidden rounded-md border border-border bg-background">
+            <InlineStylePanel
+              image={value.image}
+              value={value.frameStyle}
+              aspectRatio={value.aspectRatio}
+              onChange={(val) => onChange(buildFrameStylePatch(val))}
+              onAspectRatioChange={(val) => onChange({ aspectRatio: val, cropData: undefined })}
+              onBack={() => setShowStylePicker(false)}
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 p-2 rounded-xl border border-border/50 bg-muted/20 group">
+            {/* Тхумбнаил как основная кнопка выбора */}
+            <button
+              type="button"
+              onClick={onOpenMediaPicker}
+              className="relative shrink-0 h-14 w-14 rounded-lg overflow-hidden border border-border shadow-sm bg-background hover:ring-2 ring-primary/20 transition-all"
+              aria-label="Pick image"
+            >
+              {value.image ? (
+                <>
+                  <Image src={value.image} alt="" fill unoptimized className="object-cover" />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <ImageIcon className="w-4 h-4 text-white" />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full gap-1">
+                  <ImageIcon className="w-4 h-4 text-muted-foreground/40" />
+                  <span className="text-[8px] uppercase font-medium text-muted-foreground/60">Add</span>
+                </div>
+              )}
+            </button>
+
+            {/* Компактное управление */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                
+                {/* Группа Aspect Ratio */}
+                {!restrictions.hideAspectRatio && (
+                  <Select
+                    value={getEffectiveAspectRatio(value.frameStyle, value.aspectRatio)}
+                    onValueChange={(val) => onChange({ aspectRatio: val as AspectRatio, cropData: undefined })}
+                    disabled={!!getFrameStyleRestrictions(value.frameStyle).lockedAspectRatio}
+                  >
+                    <SelectTrigger className="h-7 border-none bg-transparent hover:bg-background px-2 py-0 text-[10px] font-medium tracking-wide uppercase text-foreground/70 w-auto gap-1.5 transition-colors">
+                      <SelectValue>{RATIO_LABELS[getEffectiveAspectRatio(value.frameStyle, value.aspectRatio)]}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(aspectRatios).map((r) => (
+                        <SelectItem key={r.id} value={r.id} className="text-xs">
+                          <span className="font-mono mr-1.5 text-muted-foreground">{RATIO_LABELS[r.id]}</span>
+                          {r.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {/* Вторичные действия: Style, Crop, Remove */}
+                <div className="flex items-center gap-1 ml-auto">
+                  {!restrictions.hideFrameStyle && (
+                    <button
+                      type="button"
+                      disabled={!value.image}
+                      onClick={() => setShowStylePicker(true)}
+                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
+                      title={frameStyles[value.frameStyle]?.name ?? "Style"}
+                    >
+                      <Palette className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+
+                  {!restrictions.hideCrop && (
+                    <button
+                      type="button"
+                      disabled={!value.image}
+                      onClick={() => setShowCrop(true)}
+                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
+                      title="Crop"
+                    >
+                      <Crop className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+
+                  {value.image && (
+                    <button
+                      type="button"
+                      onClick={() => onChange({ image: "", cropData: undefined })}
+                      className="p-1.5 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all"
+                      title="Remove"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showCaption && !showCrop && !showStylePicker && (
+          <div className="pt-2">
+            <label className={editorialLabel}>Caption</label>
+            <Input
+              value={value.caption || ""}
+              onChange={(e) => onChange({ caption: e.target.value })}
+              placeholder="Add caption..."
+              className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs italic text-muted-foreground focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
+            />
+          </div>
+        )}
+
+        {showDescription && !showCrop && !showStylePicker && (
+          <div className="pt-2">
+            <label className={editorialLabel}>Description</label>
+            <Textarea
+              value={value.description || ""}
+              onChange={(e) => onChange({ description: e.target.value })}
+              placeholder="Add description..."
+              rows={2}
+              className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs resize-none overflow-x-hidden break-words w-full focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
+            />
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (

@@ -2,8 +2,7 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
+import { PanelLabel, ps } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"

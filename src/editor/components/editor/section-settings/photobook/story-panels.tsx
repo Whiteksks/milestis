@@ -4,9 +4,9 @@ import { useCallback, useId, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { PanelLabel, ps, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Button } from "@/components/ui/button"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
 import type { PhotoBlock } from "@/editor/lib/types"
 
 // --- Shared Hooks ---
@@ -33,17 +34,43 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   const update = (fields: any) => updatePhotobookSection("story", fields)
 
   return (
-    <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Header</PanelLabel>}
-      <Input
-        value={story.title || ""}
-        onChange={(e) => update({ title: e.target.value })}
-        placeholder="Story title"
-        className={ps.pbInputTitle}
-      />
-      <div className={ps.pbGrid2}>
-        <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} />
-        <Input value={story.location || ""} onChange={(e) => update({ location: e.target.value })} placeholder="Location" className={ps.pbInput} />
+    <div className="py-2">
+      {!dense && (
+        <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-4 mb-4">
+          <div className="space-y-1 pr-2">
+            <label className={editorialLabel}>Title</label>
+            <Input
+              value={story.title || ""}
+              onChange={(e) => update({ title: e.target.value })}
+              placeholder="Story title"
+              className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+            />
+          </div>
+          <div className="space-y-1 pl-2">
+            <label className={editorialLabel}>Date</label>
+            <Input
+              value={story.date || ""}
+              onChange={(e) => update({ date: e.target.value })}
+              placeholder="e.g. June 2024"
+              className={cn(editorialInput, "text-base text-muted-foreground")}
+            />
+          </div>
+        </div>
+      )}
+      {dense && (
+        <div className={ps.pbGrid2}>
+          <Input value={story.title || ""} onChange={(e) => update({ title: e.target.value })} placeholder="Story title" className={ps.pbInput} />
+          <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} />
+        </div>
+      )}
+      <div className="space-y-1">
+        {!dense && <label className={editorialLabel}>Location</label>}
+        <Input
+          value={story.location || ""}
+          onChange={(e) => update({ location: e.target.value })}
+          placeholder="Location"
+          className={dense ? ps.pbInput : cn(editorialInput, "text-sm text-muted-foreground")}
+        />
       </div>
     </div>
   )
@@ -53,10 +80,12 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
 
 function StoryMomentItem({
   block,
+  dense = false,
   onUpdate,
-  onDelete, // Передаем функцию удаления сюда
+  onDelete,
 }: {
   block: PhotoBlock
+  dense?: boolean
   onUpdate: (patch: Partial<PhotoBlock>) => void
   onDelete: () => void
 }) {
@@ -64,7 +93,7 @@ function StoryMomentItem({
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <MediaPickerModal
         ownerId={ownerId}
         onSelectImage={(url) =>
@@ -76,28 +105,31 @@ function StoryMomentItem({
           })
         }
       />
-      
-      {/* Группируем Label и Кнопку удаления в одну строку */}
+
       <div className="flex items-center gap-2">
-        <Input
-          value={block.label || ""}
-          onChange={(e) => onUpdate({ label: e.target.value })}
-          placeholder="Label (e.g. Morning)"
-          className={ps.pbInput}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+        <div className="flex-1 space-y-1">
+          <label className={editorialLabel}>Label</label>
+          <Input
+            value={block.label || ""}
+            onChange={(e) => onUpdate({ label: e.target.value })}
+            placeholder="e.g. Morning"
+            className={cn(editorialInput, "text-sm")}
+          />
+        </div>
+        <button
+          type="button"
           onClick={onDelete}
+          className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/30 hover:text-destructive/60 transition-colors mt-5 flex items-center gap-1 shrink-0"
         >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+          <Trash2 className="w-3 h-3" />
+          Delete
+        </button>
       </div>
 
       <ImagePicker
         label=""
         value={block}
+        dense={dense}
         onChange={(next) => onUpdate(next)}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         showCaption
@@ -248,14 +280,13 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
 
           {/* Active item editor */}
           {activeImage && (
-            <div className="rounded-xl bg-muted/30 p-3 space-y-4">
-              <StoryMomentItem
-                key={activeImage.id}
-                block={activeImage}
-                onUpdate={updateActiveImage}
-                onDelete={() => deleteImage(normalizedIndex)}
-              />
-            </div>
+            <StoryMomentItem
+              key={activeImage.id}
+              block={activeImage}
+              dense={dense}
+              onUpdate={updateActiveImage}
+              onDelete={() => deleteImage(normalizedIndex)}
+            />
           )}
         </div>
       )}

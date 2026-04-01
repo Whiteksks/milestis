@@ -79,7 +79,7 @@ export function ThemeSettingsPanel() {
   const handleReset = () => modeConfig.resetEffects(updateThemeCustomization)
 
   return (
-    <div className="h-full flex flex-col bg-card/40 backdrop-blur-xl overflow-hidden">
+    <div className="h-full flex flex-col bg-editor-surface overflow-hidden">
 
       {/* Header */}
       <div className="px-5 pb-4">

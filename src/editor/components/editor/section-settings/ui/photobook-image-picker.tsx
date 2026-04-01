@@ -13,6 +13,7 @@ interface PhotobookImagePickerProps {
   value?: PhotobookImagePickerValue
   onChange: (value: PhotobookImagePickerValue) => void
   label?: string
+  dense?: boolean
   showCaption?: boolean
   showDescription?: boolean
   onOpenMediaPicker?: () => void
@@ -23,6 +24,7 @@ export function PhotobookImagePicker({
   value: valueProp,
   onChange,
   label = "Image",
+  dense = false,
   showCaption = true,
   showDescription = false,
   onOpenMediaPicker,
@@ -47,6 +49,7 @@ export function PhotobookImagePicker({
   return (
     <ImagePickerCore
       label={label}
+      dense={dense}
       showCaption={showCaption}
       showDescription={showDescription}
       value={{

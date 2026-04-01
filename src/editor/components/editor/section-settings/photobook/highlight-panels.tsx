@@ -2,11 +2,10 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
+import { ps, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
@@ -16,31 +15,29 @@ export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
     updatePhotobookSection: state.updatePhotobookSection,
   }))
 
+  if (dense) {
+    return (
+      <div className={ps.pbRoot}>
+        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder="Title" className={ps.pbInput} />
+        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder="Description..." rows={3} className={ps.pbTextarea} />
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Text</PanelLabel>}
-
-      <Input
-        value={highlight.title || ""}
-        onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })}
-        placeholder="Title"
-        className={ps.pbInput}
-      />
-
-      <Textarea
-        value={highlight.description || ""}
-        onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })}
-        placeholder="Tell the story of this moment..."
-        rows={5}
-        className={ps.pbTextarea}
-      />
-
-      <Input
-        value={highlight.quote || ""}
-        onChange={(e) => updatePhotobookSection("highlight", { quote: e.target.value })}
-        placeholder="Quote (optional)"
-        className={ps.pbInputItalic}
-      />
+    <div className="space-y-4 py-2">
+      <div className="space-y-1">
+        <label className={editorialLabel}>Title</label>
+        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder="Title" className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")} />
+      </div>
+      <div className="space-y-1">
+        <label className={editorialLabel}>Story</label>
+        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder="Tell the story of this moment..." rows={4} className={cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")} />
+      </div>
+      <div className="space-y-1">
+        <label className={editorialLabel}>Quote</label>
+        <Input value={highlight.quote || ""} onChange={(e) => updatePhotobookSection("highlight", { quote: e.target.value })} placeholder="Optional quote" className={cn(editorialInput, "text-sm italic text-muted-foreground")} />
+      </div>
     </div>
   )
 }
@@ -72,16 +69,12 @@ export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
         }
       />
 
-      {!dense && (
-        <>
-          <Separator className="bg-border/40" />
-          <PanelLabel>Image</PanelLabel>
-        </>
-      )}
+      {!dense && <label className={editorialLabel}>Image</label>}
 
       <ImagePicker
         label=""
         value={highlight.images}
+        dense={dense}
         onChange={(next) => updatePhotobookSection("highlight", { images: next })}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         showCaption={false}

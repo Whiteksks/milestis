@@ -3,8 +3,8 @@
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Input } from "@/components/ui/input"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
+import { cn } from "@/lib/utils"
+import { ps } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Plus, Shuffle, Trash2, Wand2 } from "lucide-react"
@@ -20,8 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { aspectRatios } from "@/editor/lib/aspect-ratios"
+import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
+
+import { LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
@@ -29,22 +31,40 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
     updateSectionContent: state.updateSectionContent,
   }))
 
+  if (dense) {
+    return (
+      <div className={ps.root(true)}>
+        <div className={ps.grid2(true)}>
+          <Input className={ps.input} value={featuredWork.title} onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })} placeholder="My best work" maxLength={LIMITS.title} />
+          <Input className={ps.input} value={featuredWork.subtitle || ""} onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })} placeholder="Subtitle" maxLength={LIMITS.subtitle} />
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className={ps.root(dense)}>
-      {!dense && <PanelLabel>Section Header</PanelLabel>}
-      <div className={ps.grid2(dense)}>
-        <Input
-          className={ps.input}
-          value={featuredWork.title}
-          onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })}
-          placeholder="My best work"
-        />
-        <Input
-          className={ps.input}
-          value={featuredWork.subtitle || ""}
-          onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })}
-          placeholder="Subtitle"
-        />
+    <div className="py-2">
+      <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-6">
+        <div className="space-y-1 pr-2">
+          <label className={editorialLabel}>Title</label>
+          <Input
+            className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+            value={featuredWork.title}
+            onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })}
+            placeholder="My best work"
+            maxLength={LIMITS.title}
+          />
+        </div>
+        <div className="space-y-1 pl-2">
+          <label className={editorialLabel}>Subtitle</label>
+          <Input
+            className={cn(editorialInput, "text-base text-muted-foreground")}
+            value={featuredWork.subtitle || ""}
+            onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })}
+            placeholder="A curated selection"
+            maxLength={LIMITS.subtitle}
+          />
+        </div>
       </div>
     </div>
   )
@@ -136,44 +156,38 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
 
       {/* Quick actions */}
       {!dense && (
-        <div className="rounded-xl bg-muted/40 p-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <Wand2 className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground">
-              Quick Actions
-            </span>
-          </div>
-
+        <div className="flex items-center gap-4 border-b border-border/30 pb-4">
+          <label className={editorialLabel}>Quick</label>
+          <div className="flex-1" />
           <Select onValueChange={applyAspectRatioToAll}>
-            <SelectTrigger className="h-8 text-xs bg-background">
-              <SelectValue placeholder="Set aspect ratio for all" />
+            <SelectTrigger className="h-auto border-0 border-b border-border/40 rounded-none text-[10px] tracking-[0.1em] uppercase px-0 py-0.5 bg-transparent shadow-none focus:ring-0 gap-1.5 text-muted-foreground/50 w-auto min-w-[80px]">
+              <SelectValue placeholder="Ratio: all" />
             </SelectTrigger>
             <SelectContent>
               {Object.values(aspectRatios).map((ratio) => (
-                <SelectItem key={ratio.id} value={ratio.id}>
+                <SelectItem key={ratio.id} value={ratio.id} className="text-xs">
+                  <span className="font-mono mr-1.5 text-muted-foreground">{RATIO_LABELS[ratio.id]}</span>
                   {ratio.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-8 text-xs"
+          <button
+            type="button"
             onClick={() => openMediaPicker(quickPlacementOwnerId)}
             disabled={projects.length === 0}
+            className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/50 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
           >
-            <Shuffle className="w-3.5 h-3.5 mr-1.5" />
-            Quick Placement
-          </Button>
+            <Shuffle className="w-3 h-3" />
+            Place All
+          </button>
         </div>
       )}
 
       {/* Projects */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          {!dense && <PanelLabel>Projects</PanelLabel>}
+          {!dense && <label className={editorialLabel}>Projects</label>}
           <Button
             variant="ghost"
             size="sm"
@@ -252,38 +266,45 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
 
             {/* Editor */}
             {activeProject && (
-              <div className="rounded-xl bg-muted/30 p-3 space-y-4 relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted"
-                  onClick={() => deleteProject(normalizedIndex)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-
-                <div className="space-y-2 pr-10">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className={editorialLabel}>Title</label>
+                    <button
+                      type="button"
+                      onClick={() => deleteProject(normalizedIndex)}
+                      className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/30 hover:text-destructive/60 transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
+                  </div>
                   <Input
-                    className="h-8 text-xs font-medium border-0 px-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                    className={cn(editorialInput, "text-sm font-medium text-foreground")}
                     value={activeProject.title}
                     placeholder="Project title"
                     onChange={(e) => updateActiveProject({ title: e.target.value })}
+                    maxLength={LIMITS.projectTitle}
                   />
+                </div>
 
+                <div className="space-y-1">
+                  <label className={editorialLabel}>Description</label>
                   <Textarea
-                    className="min-h-17.5 text-xs resize-none"
+                    className={cn(editorialInput, "text-sm leading-relaxed min-h-[72px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
                     value={activeProject.description}
                     placeholder="Short description..."
                     onChange={(e) => updateActiveProject({ description: e.target.value })}
+                    maxLength={LIMITS.projectDesc}
                   />
                 </div>
 
                 <PortfolioImagePicker
                   label="Cover Image"
+                  dense={dense}
                   value={{
                     image: activeProject.image,
-                    aspectRatio:
-                      (activeProject.aspectRatio || "square") as AspectRatio,
+                    aspectRatio: (activeProject.aspectRatio || "square") as AspectRatio,
                     frameStyle: activeProject.frameStyle,
                     cropData: activeProject.cropData,
                   }}

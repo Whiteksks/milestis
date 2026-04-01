@@ -2,12 +2,13 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-label"
-import { ps } from "@/editor/components/editor/section-settings/ui/panel-styles"
+import { ps, editorialInput, editorialLabel, PanelLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
+import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 
 export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
   const { cover, updatePhotobookSection } = useContentSelector((state) => ({
@@ -15,31 +16,47 @@ export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
     updatePhotobookSection: state.updatePhotobookSection,
   }))
 
-  return (
-    <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Text</PanelLabel>}
+  if (dense) {
+    return (
       <div className={ps.pbRoot}>
-        <Input
-          value={cover.title}
-          onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })}
-          placeholder="Photobook title"
-          className={ps.pbInputTitle}
-        />
-
         <div className={ps.pbGrid2}>
+          <Input value={cover.title} onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })} placeholder="Photobook title" className={ps.pbInput} />
+          <Input value={cover.subtitle || ""} onChange={(e) => updatePhotobookSection("cover", { subtitle: e.target.value })} placeholder="Subtitle" className={ps.pbInput} />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="py-2">    
+      <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-4 mb-4">
+        <div className="space-y-1 pr-2">
+          <label className={editorialLabel}>Title</label>
+          <Input
+            value={cover.title}
+            onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })}
+            placeholder="Photobook title"
+            className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+          />
+        </div>
+        <div className="space-y-1 pl-2">
+          <label className={editorialLabel}>Subtitle</label>
           <Input
             value={cover.subtitle || ""}
             onChange={(e) => updatePhotobookSection("cover", { subtitle: e.target.value })}
             placeholder="Subtitle"
-            className={ps.pbInput}
-          />
-          <Input
-            value={cover.tagline || ""}
-            onChange={(e) => updatePhotobookSection("cover", { tagline: e.target.value })}
-            placeholder="Tagline / quote"
-            className={ps.pbInputItalic}
+            className={cn(editorialInput, "text-base text-muted-foreground")}
           />
         </div>
+      </div>
+      <div className="space-y-1">
+        <label className={editorialLabel}>Tagline / Quote</label>
+        <Input
+          value={cover.tagline || ""}
+          onChange={(e) => updatePhotobookSection("cover", { tagline: e.target.value })}
+          placeholder="A quote or tagline"
+          className={cn(editorialInput, "text-sm italic text-muted-foreground")}
+        />
       </div>
     </div>
   )
@@ -52,21 +69,14 @@ export function CoverMetadataPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Metadata</PanelLabel>}
-      <div className={ps.pbGrid2}>
-        <Input
-          value={cover.date || ""}
-          onChange={(e) => updatePhotobookSection("cover", { date: e.target.value })}
-          placeholder="Date"
-          className={ps.pbInput}
-        />
-        <Input
-          value={cover.location || ""}
-          onChange={(e) => updatePhotobookSection("cover", { location: e.target.value })}
-          placeholder="Location"
-          className={ps.pbInput}
-        />
+    <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-1">
+        {!dense && <label className={editorialLabel}>Date</label>}
+        <Input value={cover.date || ""} onChange={(e) => updatePhotobookSection("cover", { date: e.target.value })} placeholder="Date" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} />
+      </div>
+      <div className="space-y-1">
+        {!dense && <label className={editorialLabel}>Location</label>}
+        <Input value={cover.location || ""} onChange={(e) => updatePhotobookSection("cover", { location: e.target.value })} placeholder="Location" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} />
       </div>
     </div>
   )
