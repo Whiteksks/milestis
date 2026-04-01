@@ -420,7 +420,7 @@ if (dense) {
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder="Add description..."
           rows={3}
-          className="text-xs resize-none"
+          className="border-0 border-b border-border/40 bg-transparent rounded-none px-1 h-auto text-xs resize-none overflow-x-hidden break-words w-full focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
         />
       )}
     </div>

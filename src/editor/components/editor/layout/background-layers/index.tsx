@@ -69,14 +69,17 @@ export function BackgroundLayers({
 
   const noLayers = depth === 'none' && rays === 'none' && texture === 'none'
 
-  // Always render the wrapper div so layerRef.current is populated as soon as the
-  // component mounts. If we returned null when noLayers=true, layerRef.current would
-  // be null when the parallax effect ran — and since refs are stable objects, adding
-  // an effect later would NOT re-trigger useParallaxLayer (no re-render, no dep change).
-  // The empty div is invisible (pointer-events-none absolute) so there is no visual cost.
-  const activeDepth   = noLayers ? null : DEPTH_EFFECTS.find((e) => e.id === depth)
-  const activeRays    = noLayers ? null : RAYS_EFFECTS.find((e) => e.id === rays)
-  const activeTexture = noLayers ? null : TEXTURE_EFFECTS.find((e) => e.id === texture)
+  const [activeDepth, activeRays, activeTexture] = useMemo(
+    () =>
+      noLayers
+        ? [null, null, null]
+        : [
+            DEPTH_EFFECTS.find((e) => e.id === depth),
+            RAYS_EFFECTS.find((e) => e.id === rays),
+            TEXTURE_EFFECTS.find((e) => e.id === texture),
+          ],
+    [noLayers, depth, rays, texture],
+  )
 
   const colors = { isDark, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color }
 

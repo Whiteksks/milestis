@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,13 @@ export function SectionsTab() {
     [resolvedActiveSectionId, sections],
   )
 
+  // Memoize the Settings component reference so React sees the same component type
+  // between renders and doesn't unmount/remount the settings panel tree unnecessarily.
+  const SettingsComponent = useMemo(
+    () => getSettingsComponent(resolvedActiveSectionId),
+    [getSettingsComponent, resolvedActiveSectionId],
+  )
+
   return (
     // ФИКС 1: h-full + min-h-0 обязательны для работы вложенного скролла в flex-контейнере
     <div className="flex flex-col h-full min-h-0 bg-transparent">
@@ -38,7 +45,7 @@ export function SectionsTab() {
                   </span>
                   <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-all max-w-full min-w-48">
                     <span className={cn(
-                      "text-lg font-medium tracking-tight transition-opacity truncate",
+                      "text-md font-medium tracking-tight transition-opacity truncate",
                       !currentSection?.visible && "opacity-40"
                     )}>
                       {currentSection?.name ?? 'Select...'}
@@ -71,9 +78,9 @@ export function SectionsTab() {
                       <div
                         key={section.id}
                         className={cn(
-                          'group flex items-center justify-between rounded-xl transition-all pl-3 pr-1.5 py-1',
+                          'group flex items-center justify-between rounded-xl transition-all pl-3 pr-1.5 py-0.5',
                           isActive 
-                            ? 'bg-foreground text-background shadow-lg shadow-foreground/10' 
+                            ? 'bg-foreground text-background shadow-foreground/10' 
                             : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                         )}
                       >
@@ -146,10 +153,7 @@ export function SectionsTab() {
           "p-6 w-full transition-all duration-300 ease-in-out",
           !currentSection?.visible && "opacity-10 blur-sm pointer-events-none grayscale select-none"
         )}>
-          {(() => {
-             const Settings = getSettingsComponent(resolvedActiveSectionId);
-             return Settings ? <Settings /> : null;
-          })()}
+          {SettingsComponent ? <SettingsComponent /> : null}
         </div>
       </div>
     </div>

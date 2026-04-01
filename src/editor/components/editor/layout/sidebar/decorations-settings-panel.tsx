@@ -81,7 +81,7 @@ export function DecorationsSettingsPanel() {
     [decorations, updateDecoration],
   )
 
-  const handleAddDecoration = () => {
+  const handleAddDecoration = useCallback(() => {
     const scroller = canvasScrollRef?.current
     const contentRoot = scroller?.querySelector<HTMLElement>('[data-canvas-content-root="true"]')
 
@@ -119,24 +119,26 @@ export function DecorationsSettingsPanel() {
 
     addDecoration(newDecoration)
     setSelectedDecorationId(newDecoration.id)
-  }
+  }, [canvasScrollRef, decorations, addDecoration, setSelectedDecorationId])
 
-  const handleSelectDecoration = (id: string) => {
+  const handleSelectDecoration = useCallback((id: string) => {
     if (selectedDecorationId !== id) {
       setSelectedDecorationId(id)
     }
-  }
+  }, [selectedDecorationId, setSelectedDecorationId])
 
-  const createRemoveDecorationHandler = (id: string) => (event: MouseEvent<HTMLButtonElement>) => {
+  const handleRemoveDecoration = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    const id = event.currentTarget.dataset.decorationRemoveId
+    if (!id) return
     event.stopPropagation()
     removeDecoration(id)
     if (selectedDecorationId === id) setSelectedDecorationId(null)
-  }
+  }, [removeDecoration, selectedDecorationId, setSelectedDecorationId])
 
-  const handleClearDecorations = () => {
+  const handleClearDecorations = useCallback(() => {
     resetDecorations()
     setSelectedDecorationId(null)
-  }
+  }, [resetDecorations, setSelectedDecorationId])
 
   return (
     <div className="h-full flex flex-col">
@@ -294,7 +296,8 @@ export function DecorationsSettingsPanel() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={createRemoveDecorationHandler(decoration.id)}
+                        data-decoration-remove-id={decoration.id}
+                        onClick={handleRemoveDecoration}
                         className={cn(
                           "h-8 w-8 p-0 rounded-full shrink-0 transition-all duration-200",
                           "text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10",

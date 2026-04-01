@@ -5,10 +5,10 @@ import { BioAchievementsPanel, BioBiographyPanel, BioPhotoPanel, BioTitlePanel }
 export function BioSettings() {
   return (
     <div className="space-y-6">
-        <BioTitlePanel />
-        <BioPhotoPanel />
-        <BioBiographyPanel />
-        <BioAchievementsPanel />
+      <BioTitlePanel />
+      <BioPhotoPanel />
+      <BioBiographyPanel />
+      <BioAchievementsPanel />
     </div>
   )
 }

@@ -73,7 +73,7 @@ export function SettingsContent() {
                       <div
                         key={section.id}
                         className={cn(
-                          'group flex items-center justify-between rounded-xl transition-colors pl-3 pr-1.5 py-1',
+                          'group flex items-center justify-between rounded-xl transition-colors pl-3 pr-1.5 py-0.5',
                           isActive
                             ? 'bg-foreground text-background'
                             : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
