@@ -14,6 +14,7 @@ import { prefetchActiveProjects } from "@/hooks/useProjectsQuery"
 const headerTitles: Record<string, string> = {
   dashboard: "Dashboard",
   projects: "Projects",
+  exports: "Exports",
   templates: "Templates",
   analytics: "Analytics",
   domains: "Domains",

@@ -12,6 +12,7 @@ import {
   LayoutTemplate, 
   Globe, 
   Plus,
+  Download,
   Command // Заменим сердечко на более нейтральную иконку или просто оставим текст
 } from "lucide-react"
 import {
@@ -36,6 +37,7 @@ interface AppSidebarProps {
 const navItems = [
   { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
   { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
+  { id: "exports", labelKey: "nav.exports", icon: Download, href: "/dashboard/exports" },
   { id: "domains", labelKey: "nav.domains", icon: Globe, href: "/dashboard/domains" },
 ]
 

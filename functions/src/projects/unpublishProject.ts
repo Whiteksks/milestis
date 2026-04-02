@@ -2,7 +2,6 @@ import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
-import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 
 const ERROR = {
@@ -16,10 +15,13 @@ const ERROR = {
 } as const;
 
 /**
- * Unpublishes a project:
- *   1. Deletes all public Storage files under public/{projectId}/
- *   2. Deletes the published_projects/{projectId} document
- *   3. Sets isPublished: false on the project document
+ * Unpublishes a project (hides it from the internet without deleting data):
+ *   1. Sets isPublished: false + removes slug/token from published_projects/{id}
+ *   2. Clears isPublished, publishedSlug, publishedAccessToken on projects/{id}
+ *
+ * Storage files under public/{projectId}/ are intentionally NOT deleted.
+ * The project content and export files must remain accessible so the user
+ * can re-publish without re-exporting.
  *
  * POST /unpublishProject
  * Body: { projectId: string }
@@ -28,7 +30,7 @@ const ERROR = {
 export const unpublishProject = onRequest(
   {
     concurrency: 10,
-    timeoutSeconds: 120,
+    timeoutSeconds: 60,
     maxInstances: 10,
     cors: [/localhost/, /milestis\.com$/, /milestis\.site$/],
   },
@@ -77,20 +79,24 @@ export const unpublishProject = onRequest(
     }
 
     try {
-      // 1. Delete public Storage files
-      await getStorage().bucket().deleteFiles({ prefix: `public/${projectId}/` });
-      logger.info(`[unpublishProject] Deleted public Storage files for ${projectId}.`);
-
-      // 2. Delete published snapshot + mark project as unpublished
-      const publishedRef = db.collection("published_projects").doc(projectId);
       const batch = db.batch();
-      batch.delete(publishedRef);
+
+      // 1. Mark published_projects doc as hidden (keep data for re-publish).
+      const publishedRef = db.collection("published_projects").doc(projectId);
+      batch.update(publishedRef, {
+        isPublished: false,
+        slug: FieldValue.delete(),
+        accessToken: FieldValue.delete(),
+      });
+
+      // 2. Clear publish fields on the project doc.
       batch.update(projectRef, {
         isPublished: false,
         publishedSlug: FieldValue.delete(),
         publishedAccessToken: FieldValue.delete(),
         updatedAt: FieldValue.serverTimestamp(),
       });
+
       await batch.commit();
 
       logger.info(`[unpublishProject] Project ${projectId} unpublished by user ${uid}.`);

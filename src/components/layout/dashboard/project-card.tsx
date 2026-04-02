@@ -24,7 +24,7 @@ import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/shared/template-preview"
 import { useTranslations } from "next-intl"
-import { PublishModal } from "@/editor/components/modals/publish-modal"
+import { ExportModal } from "@/editor/components/modals/export-modal"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -83,7 +83,7 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
     || unpublishMutation.isPending
   const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [publishModalOpen, setPublishModalOpen] = useState(false)
+  const [exportModalOpen, setExportModalOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
@@ -134,8 +134,8 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
     forceDeleteMutation.mutate(project.id)
   }
 
-  function handlePublish() {
-    setPublishModalOpen(true)
+  function handleExport() {
+    setExportModalOpen(true)
   }
 
   function handleUnpublish() {
@@ -289,7 +289,7 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
                   </DropdownMenuItem>
                 </>
               ) : (
-                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handlePublish}>
+                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleExport}>
                   <Globe className="mr-2 size-4" /> {t('project.publish')}
                 </DropdownMenuItem>
               )}
@@ -326,11 +326,12 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
         <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
 
-      <PublishModal
-        open={publishModalOpen}
-        onOpenChange={setPublishModalOpen}
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
         projectId={project.id}
         mode={project.mode}
+        isExported={project.isExported}
       />
     </div>
   )

@@ -26,10 +26,11 @@
       ]
     },
     {
-      "collectionGroup": "published_projects",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "exports",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "slug", "order": "ASCENDING" }
+        { "fieldPath": "ownerId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }
   ],

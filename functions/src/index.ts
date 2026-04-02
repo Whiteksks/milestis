@@ -11,6 +11,7 @@ import {forceDeleteProject} from "./projects/forceDeleteProject";
 import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 import {publishProject} from "./projects/publishProject";
 import {unpublishProject} from "./projects/unpublishProject";
+import {exportProject} from "./projects/export";
 
 export {
 	createUser,
@@ -21,4 +22,5 @@ export {
 	purgeDeletedProjects,
 	publishProject,
 	unpublishProject,
+	exportProject,
 };

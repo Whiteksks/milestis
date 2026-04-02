@@ -95,6 +95,16 @@ export const toastProject = {
         err instanceof Error ? err.message : "Failed to unpublish project",
     })
   },
+
+  /** Export project (PDF / ZIP) with optional publish. */
+  export<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Exporting…",
+      success: "Export complete!",
+      error: (err) =>
+        err instanceof Error ? err.message : "Export failed",
+    })
+  },
 }
 
 // ─── Storage / Upload ──────────────────────────────────────────────────────

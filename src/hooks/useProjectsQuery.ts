@@ -1,5 +1,5 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query'
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
+import { collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
@@ -12,6 +12,7 @@ export interface DashboardProject {
   mode: 'portfolio' | 'photobook'
   status: 'active' | 'deleted'
   isPublished: boolean
+  isExported?: boolean
   publishedSlug?: string | null
   /** Plaintext access token stored on the project doc (photobooks only). */
   publishedAccessToken?: string | null
@@ -36,6 +37,7 @@ export const projectKeys = {
   all: (uid: string) => ['projects', uid] as const,
   active: (uid: string) => ['projects', uid, 'active'] as const,
   deleted: (uid: string) => ['projects', uid, 'deleted'] as const,
+  exports: (uid: string) => ['exports', uid] as const,
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -61,6 +63,7 @@ export function mapProjectDoc(data: Record<string, any>, id: string): DashboardP
     mode: data.mode,
     status: data.status,
     isPublished: data.isPublished ?? false,
+    isExported: data.isExported ?? false,
     publishedSlug: data.publishedSlug ?? null,
     publishedAccessToken: data.publishedAccessToken ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),
@@ -172,4 +175,56 @@ export function usePublishedProjectsQuery() {
   const { data: allActive = [], isLoading } = useActiveProjectsQuery()
   const publishedProjects = allActive.filter((p) => p.isPublished)
   return { data: publishedProjects, isLoading }
+}
+
+// ─── Exports ─────────────────────────────────────────────────────
+
+export interface ProjectExportRecord {
+  exportId: string
+  projectId: string
+  projectName: string
+  ownerId: string
+  versionNumber: number
+  mode: 'portfolio' | 'photobook'
+  creditCost: number
+  fileDownloadUrl: string
+  mimeType: string
+  publishedSlug?: string
+  createdAt: Date
+}
+
+async function fetchUserExports(uid: string): Promise<ProjectExportRecord[]> {
+  const q = query(
+    collectionGroup(db, 'exports'),
+    where('ownerId', '==', uid),
+    orderBy('createdAt', 'desc'),
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => {
+    const data = d.data()
+    return {
+      exportId: data.exportId ?? d.id,
+      projectId: data.projectId ?? '',
+      projectName: data.projectName ?? '',
+      ownerId: data.ownerId ?? uid,
+      versionNumber: data.versionNumber ?? 1,
+      mode: data.mode ?? 'photobook',
+      creditCost: data.creditCost ?? 0,
+      fileDownloadUrl: data.fileDownloadUrl ?? '',
+      mimeType: data.mimeType ?? 'application/octet-stream',
+      publishedSlug: data.publishedSlug,
+      createdAt: data.createdAt?.toDate() ?? new Date(),
+    } satisfies ProjectExportRecord
+  })
+}
+
+export function useProjectExportsQuery() {
+  const { uid, userLoading } = useUidAndLoading()
+  const result = useQuery({
+    queryKey: projectKeys.exports(uid ?? ''),
+    queryFn: () => fetchUserExports(uid!),
+    enabled: !userLoading && !!uid,
+    staleTime: STALE_TIME,
+  })
+  return { ...result, isLoading: userLoading || result.isLoading }
 }

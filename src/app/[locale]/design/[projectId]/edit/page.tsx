@@ -41,6 +41,7 @@ export default function EditorPage() {
   const setProjectId = useUiSelector((state) => state.setProjectId)
   const setProjectName = useUiSelector((state) => state.setProjectName)
   const setIsPublished = useUiSelector((state) => state.setIsPublished)
+  const setIsExported = useUiSelector((state) => state.setIsExported)
 
   const [loadState, setLoadState] = useState<LoadState>('loading')
 
@@ -78,6 +79,7 @@ export default function EditorPage() {
         setProjectId(projectId)
         setProjectName(project.name)
         setIsPublished(project.isPublished ?? false)
+        setIsExported(project.isExported ?? false)
         if (editorData?.theme) {
           useThemeStore.setState({
             currentTemplateId: editorData.theme.currentTemplateId,

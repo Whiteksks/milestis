@@ -1,0 +1,155 @@
+import { createHash } from "crypto";
+import { FieldValue, type Firestore } from "firebase-admin/firestore";
+import { logger } from "firebase-functions/v2";
+import type { ExportPublishInput } from "./types";
+import type { ProjectMode } from "../projectInterface";
+
+// ─── Ghost Mode ───────────────────────────────────────────────────────────────
+
+/**
+ * Creates or updates the published_projects document in "ghost" state:
+ * data is there, but isPublished = false and slug is absent.
+ *
+ * This lets the user activate publication later just by providing a slug,
+ * without needing to re-export.
+ *
+ * Safe to call even if a published doc already exists — it will NOT overwrite
+ * isPublished: true or an existing slug (uses merge so live docs are untouched).
+ */
+export async function writeGhostEntry(
+	db: Firestore,
+	projectId: string,
+	uid: string,
+	mode: ProjectMode,
+	projectName: string,
+	content: {
+		theme: Record<string, unknown> | null;
+		content: Record<string, unknown> | null;
+	},
+): Promise<void> {
+	const ref = db.collection("published_projects").doc(projectId);
+	const snap = await ref.get();
+
+	// Never downgrade an already-published document to ghost state.
+	if (snap.exists && snap.data()?.isPublished === true) {
+		// Still refresh the content snapshot (images now point to public/).
+		await ref.update({
+			theme: content.theme,
+			content: content.content,
+		});
+		logger.info(`[ghost] Refreshed content for already-published project ${projectId}.`);
+		return;
+	}
+
+	await ref.set(
+		{
+			ownerId: uid,
+			name: projectName,
+			mode,
+			theme: content.theme,
+			content: content.content,
+			isPublished: false,
+			exportedAt: FieldValue.serverTimestamp(),
+		},
+		{ merge: true },
+	);
+	logger.info(`[ghost] Ghost entry written for project ${projectId}.`);
+}
+
+// ─── Errors ───────────────────────────────────────────────────────────────────
+
+export class PublishValidationError extends Error {
+	constructor(
+		public readonly code: "INVALID_SLUG" | "SLUG_TAKEN" | "MISSING_ACCESS_TOKEN",
+		message: string,
+	) {
+		super(message);
+	}
+}
+
+const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Validates the publish payload, writes the published_projects document, and
+ * updates the project document (isPublished, slug, token).
+ *
+ * The content snapshot MUST already use public Storage URLs (post-migration).
+ *
+ * Throws PublishValidationError for business-logic failures (invalid slug,
+ * slug taken, missing token). Other errors propagate as-is.
+ */
+export async function applyPublish(
+	db: Firestore,
+	projectId: string,
+	uid: string,
+	mode: ProjectMode,
+	input: ExportPublishInput,
+	contentSnapshot: {
+		theme: Record<string, unknown> | null;
+		content: Record<string, unknown> | null;
+	},
+	projectName: string,
+): Promise<void> {
+	const { slug, accessToken } = input;
+
+	if (!slug || slug.length < 3 || slug.length > 63 || !SLUG_REGEX.test(slug)) {
+		throw new PublishValidationError(
+			"INVALID_SLUG",
+			"slug must be 3–63 lowercase alphanumeric characters or hyphens.",
+		);
+	}
+
+	// Portfolio slugs must be globally unique (they become subdomains).
+	if (mode === "portfolio") {
+		const existing = await db
+			.collection("published_projects")
+			.where("slug", "==", slug)
+			.limit(2)
+			.get();
+		const takenByOther = existing.docs.some((doc) => doc.id !== projectId);
+		if (takenByOther) {
+			throw new PublishValidationError("SLUG_TAKEN", "This slug is already taken.");
+		}
+	}
+
+	// Photobooks require an access token.
+	let hashedToken: string | undefined;
+	if (mode === "photobook") {
+		if (!accessToken) {
+			throw new PublishValidationError(
+				"MISSING_ACCESS_TOKEN",
+				"accessToken is required for photobook projects.",
+			);
+		}
+		hashedToken = createHash("sha256").update(accessToken).digest("hex");
+	}
+
+	const batch = db.batch();
+
+	const publishedData: Record<string, unknown> = {
+		ownerId: uid,
+		slug,
+		name: projectName,
+		mode,
+		theme: contentSnapshot.theme,
+		content: contentSnapshot.content,
+		publishedAt: FieldValue.serverTimestamp(),
+	};
+	if (hashedToken) publishedData.accessToken = hashedToken;
+	batch.set(db.collection("published_projects").doc(projectId), publishedData);
+
+	const projectUpdate: Record<string, unknown> = {
+		isPublished: true,
+		publishedSlug: slug,
+		updatedAt: FieldValue.serverTimestamp(),
+	};
+	// Store the plaintext token so the dashboard can reconstruct the share URL.
+	// The projects collection is owner-restricted; this does not expose the token publicly.
+	if (accessToken) projectUpdate.publishedAccessToken = accessToken;
+	batch.update(db.collection("projects").doc(projectId), projectUpdate);
+
+	await batch.commit();
+	logger.info(`[publish] Project ${projectId} published with slug "${slug}".`);
+}
