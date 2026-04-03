@@ -11,14 +11,25 @@ import { useUserStore } from "@/hooks/useUserStore"
 type ProjectMode = "portfolio" | "photobook"
 
 const adjectives = [
-  "golden", "summer", "bright", "quiet", "fresh",
-  "warm", "misty", "tender", "vivid", "calm",
-  "gentle", "secret", "serene", "radiant", "timeless",
+  // Световые и цветовые
+  "golden", "vivid", "radiant", "amber", "velvet", "neon", "monochrome", "sepia",
+  // Атмосферные
+  "misty", "serene", "ethereal", "hidden", "quiet", "infinite", "urban", "wild",
+  // Эмоциональные
+  "tender", "nostalgic", "bold", "solitary", "dreamy", "timeless", "honest",
+  // Временные
+  "eternal", "daily", "midnight", "autumn", "distant", "instant", "vintage"
 ]
+
 const nouns = [
-  "memories", "journey", "story", "moments", "chapter",
-  "escape", "lens", "voyage", "canvas", "light",
-  "bloom", "horizon", "portrait", "archive", "collection",
+  // Фотографические
+  "lens", "frame", "exposure", "portrait", "archive", "glimpse", "focus", "shot",
+  // Художественные
+  "canvas", "gallery", "palette", "sketch", "vision", "composition", "artifact",
+  // Метафоричные
+  "voyage", "horizon", "echo", "essence", "rhythm", "fragment", "symmetry",
+  // Описательные
+  "journal", "chapter", "haven", "mirage", "odyssey", "reverie", "atlas"
 ]
 
 export function randomProjectName(): string {

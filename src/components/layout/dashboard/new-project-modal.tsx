@@ -1,6 +1,6 @@
 "use client"
 
-import { BookOpen, Layout, Loader2, Sparkles, ArrowRight } from "lucide-react"
+import { Loader2, ArrowRight } from "lucide-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { useCreateProject } from "@/hooks/useCreateProject"
@@ -17,28 +17,18 @@ type ProjectMode = "portfolio" | "photobook"
 
 const options: {
   mode: ProjectMode
-  icon: typeof BookOpen
   title: string
   description: string
-  detail: string
-  badge?: string
-  accent: boolean
 }[] = [
   {
     mode: "photobook",
-    icon: BookOpen,
     title: "Memory Book",
-    description: "Preserve your most cherished moments in a beautifully designed photo book.",
-    detail: "Wedding albums · Birthday stories · Travel diaries",
-    accent: true,
+    description: "A timeless digital experience to preserve your most cherished stories.",
   },
   {
     mode: "portfolio",
-    icon: Layout,
-    title: "Portfolio Site",
-    description: "Showcase your work with a sleek personal site — no design skills needed.",
-    detail: "Photography · Creative work · Personal brand",
-    accent: false,
+    title: "Portfolio site",
+    description: "A sleek, modern website to showcase your work and achievements.",
   },
 ]
 
@@ -47,7 +37,6 @@ function OptionCard({ opt, loadingMode, onCreate }: {
   loadingMode: ProjectMode | null
   onCreate: (mode: ProjectMode) => void
 }) {
-  const Icon = opt.icon
   const isLoading = loadingMode === opt.mode
   const isDisabled = !!loadingMode
 
@@ -56,39 +45,31 @@ function OptionCard({ opt, loadingMode, onCreate }: {
       disabled={isDisabled}
       onClick={() => onCreate(opt.mode)}
       className={cn(
-        "group relative flex flex-col gap-4 rounded-2xl border p-5 text-left transition-all duration-200",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-        "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60",
-        opt.accent
-          ? "border-primary/25 bg-gradient-to-br from-primary/8 to-primary/3 hover:border-primary/50 hover:from-primary/12 hover:to-primary/6 hover:shadow-md"
-          : "border-border bg-card hover:bg-accent/30 hover:border-border hover:shadow-md"
+        "group relative flex flex-col justify-between gap-10 border border-border/40 p-8 text-left transition-all duration-300",
+        "rounded-2xl hover:bg-accent/30 hover:border-border/80 hover:shadow-sm",
+        "disabled:opacity-40"
       )}
     >
-      {/* Icon */}
-      <div className={cn(
-        "flex size-12 items-center justify-center rounded-xl transition-colors",
-        opt.accent ? "bg-primary/15" : "bg-secondary group-hover:bg-accent"
-      )}>
-        {isLoading
-          ? <Loader2 className="size-5 animate-spin text-primary" />
-          : <Icon className={cn("size-5", opt.accent ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-        }
+      {/* Топ: Текст */}
+      <div className="space-y-2">
+        <p className="font-serif text-2xl font-medium tracking-tight italic">
+          {opt.title}
+        </p>
+        <p className="text-base text-muted-foreground/90 leading-relaxed font-light max-w-[280px]">
+          {opt.description}
+        </p>
       </div>
 
-      {/* Text */}
-      <div className="flex-1 space-y-1.5">
-        <p className="font-semibold text-base leading-tight">{opt.title}</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">{opt.description}</p>
-        <p className="text-xs text-muted-foreground/60 pt-0.5">{opt.detail}</p>
-      </div>
-
-      {/* Arrow */}
-      <div className={cn(
-        "flex items-center gap-1.5 text-xs font-medium transition-colors",
-        opt.accent ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-      )}>
-        {isLoading ? "Creating…" : "Get started"}
-        <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+      {/* Низ: Кнопка */}
+      <div className="flex items-center gap-2 text-sm font-medium tracking-wide">
+        {isLoading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <>
+            <span>Create</span>
+            <ArrowRight className="size-4 opacity-70 transition-transform duration-300 group-hover:translate-x-1" />
+          </>
+        )}
       </div>
     </button>
   )
@@ -98,15 +79,15 @@ function ModalBody({ onClose }: { onClose?: () => void }) {
   const { handleCreate, loadingMode } = useCreateProject()
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      {/* Headline */}
-      <div className="space-y-1">
-        <h2 className="font-serif text-2xl font-semibold leading-tight">Start something new</h2>
-        <p className="text-sm text-muted-foreground">Choose a project type to begin your story.</p>
-      </div>
+    <div className="flex flex-col p-8 sm:p-14">
+      <header className="mb-14 space-y-2.5 text-center sm:text-left">
+        <h2 className="font-serif text-3xl font-light tracking-tight italic">
+          New Creation
+        </h2>
+        <div className="h-px w-14 bg-primary/20 mx-auto sm:mx-0" />
+      </header>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {options.map((opt) => (
           <OptionCard
             key={opt.mode}
@@ -129,7 +110,7 @@ export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
         open={open}
         onOpenChange={onOpenChange}
         title="New Project"
-        description="Choose a type to get started"
+        description="Choose your format"
       >
         <ModalBody onClose={() => onOpenChange(false)} />
       </MobileDrawer>
@@ -139,7 +120,7 @@ export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTitle className="sr-only">New Project</DialogTitle>
-      <DialogContent className="sm:max-w-lg rounded-3xl p-0 overflow-hidden gap-0">
+      <DialogContent className="sm:max-w-3xl rounded-3xl border border-border/30 p-0 bg-background overflow-hidden">
         <ModalBody />
       </DialogContent>
     </Dialog>

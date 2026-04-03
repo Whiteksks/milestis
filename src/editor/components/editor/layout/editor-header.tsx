@@ -179,6 +179,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
             onBlur={handleRename}
+            maxLength={30}
             onKeyDown={(e) => {
               if (e.key === 'Enter') e.currentTarget.blur()
               if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }

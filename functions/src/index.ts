@@ -9,7 +9,6 @@ import {resizeAvatar, resizeProjectImage} from "./storage";
 import {createProject} from "./projects/createProject";
 import {forceDeleteProject} from "./projects/forceDeleteProject";
 import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
-import {publishProject} from "./projects/publishProject";
 import {unpublishProject} from "./projects/unpublishProject";
 import {exportProject} from "./projects/export";
 
@@ -20,7 +19,6 @@ export {
 	createProject,
 	forceDeleteProject,
 	purgeDeletedProjects,
-	publishProject,
 	unpublishProject,
 	exportProject,
 };

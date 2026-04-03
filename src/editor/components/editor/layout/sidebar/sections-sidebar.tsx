@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles } from 'lucide-react'
 
@@ -12,14 +11,11 @@ import type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
+import { PersistentDrawer } from '@/components/ui/custom/persistent-drawer'
 
 export type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
 
-// Единая константа — spacer и панель анимируются на одно и то же значение
 const SIDEBAR_WIDTH = 380
-// Единая длительность — spacer (CSS) и панель (Framer Motion) синхронны
-const SIDEBAR_DURATION = 0.3
-const SIDEBAR_EASE = [0.32, 0.72, 0, 1] as const
 
 export function SectionsSidebar({
   activeTab,
@@ -35,7 +31,6 @@ export function SectionsSidebar({
     setSelectedDecorationId: state.setSelectedDecorationId,
   }))
 
-  // Пересчитывается только при смене режима редактора
   const tabs = useMemo(
     () => [
       { id: 'sections' as const, icon: Layers, label: getModeUiConfig(editorMode).sectionsTabLabel },
@@ -52,65 +47,40 @@ export function SectionsSidebar({
 
   return (
     <>
-      {/*
-        Two-layer approach:
-        1. A CSS-only spacer div reserves flex space so the canvas shifts — layout
-           reflow is unavoidable here, but it's driven by the CSS engine (one pass
-           per frame) rather than a JS RAF callback.
-        2. The visible panel is absolutely positioned and animates with translateX
-           only — pure compositor, zero layout cost for the actual rendering.
-      */}
-
-      {/* Layer 1: layout spacer — hidden md:block, no paint */}
-      <div
-        className="hidden md:block shrink-0 h-full"
-        style={{
-          width: isSidebarCollapsed ? 0 : SIDEBAR_WIDTH,
-          transition: `width ${SIDEBAR_DURATION}s cubic-bezier(${SIDEBAR_EASE})`,
-        }}
-      />
-
-      {/* Layer 2: visual panel — GPU translateX, no shadow */}
-      <motion.div
-        className="hidden md:flex flex-col absolute right-0 top-0 h-full border-l border-border bg-editor-surface z-20 overflow-visible will-change-transform transform-gpu"
-        style={{ width: SIDEBAR_WIDTH }}
-        initial={false}
-        animate={{ x: isSidebarCollapsed ? SIDEBAR_WIDTH : 0 }}
-        transition={{
-          type: 'tween',
-          duration: SIDEBAR_DURATION,
-          ease: SIDEBAR_EASE,
-        }}
+      <PersistentDrawer 
+        isOpen={!isSidebarCollapsed} 
+        width={SIDEBAR_WIDTH} 
+        className="top-16 h-[calc(100%-4rem)]"
       >
-        {/* Toggle button */}
-        <Button
-          variant="ghost"
+        {/* Кнопка — вне inert-дива, едет вместе с панелью, всегда кликабельна */}
+        <button
           onClick={toggleSidebar}
           aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           className={cn(
-            'group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-30',
-            'hidden md:flex items-center justify-center',
-            'w-12 h-16 rounded-none rounded-l-lg   p-0',
-            'bg-editor-surface border border-border border-r-0',
-            'hover:bg-muted/60',
+            "group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-10",
+            "hidden md:flex items-center justify-center",
+            "w-10 h-24 rounded-l-2xl border border-r-0 border-border/40",
+            "bg-background/80 backdrop-blur-xl transition-all duration-300 ease-out",
+            "hover:scale-x-110 hover:bg-background/90",
           )}
         >
-          <span className={cn('transition-transform duration-200', isSidebarCollapsed ? 'rotate-0' : 'rotate-180')}>
+          <div className="relative z-10 flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors duration-200">
             {isSidebarCollapsed ? (
-              <PanelRightOpen className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <PanelRightOpen className="h-4 w-4" strokeWidth={1.5} />
             ) : (
-              <PanelLeftClose className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
             )}
-          </span>
-        </Button>
+          </div>
+          <div className={cn(
+            "absolute left-[4px] top-1/2 -translate-y-1/2 rounded-full transition-all duration-300",
+            "h-8 w-[1.5px] bg-muted-foreground/70 group-hover:bg-muted-foreground group-hover:h-12"
+          )} />
+        </button>
 
-        {/* Content — always mounted, opacity fade only.
-            inert исключает весь поддерев из tab-order и дерева доступности
-            когда панель скрыта — фокус клавиатуры не проваливается внутрь. */}
         <div
-          className="flex flex-col h-full w-full transition-opacity duration-150"
+          className="flex flex-col h-full w-full transition-opacity duration-300"
           style={{ opacity: isSidebarCollapsed ? 0 : 1 }}
-          inert={isSidebarCollapsed || undefined}
+          inert={isSidebarCollapsed}
         >
           {/* Tabs */}
           <div className="border-b border-border/40">
@@ -119,21 +89,20 @@ export function SectionsSidebar({
                 <button
                   key={id}
                   onClick={() => handleTabChange(id)}
-                  aria-current={activeTab === id ? 'page' : undefined}
                   className={cn(
                     'relative flex items-center gap-1.5 px-3 py-3 text-sm transition-all',
                     activeTab === id
                       ? 'text-foreground font-medium'
-                      : 'text-muted-foreground hover:text-foreground font-normal'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  {label}
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="text-[13px] tracking-tight">{label}</span>
                   {activeTab === id && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-px bg-foreground"
-                      transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                      className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-foreground"
+                      transition={{ type: 'spring', bounce: 0.1, duration: 0.5 }}
                     />
                   )}
                 </button>
@@ -141,10 +110,18 @@ export function SectionsSidebar({
             </div>
           </div>
 
-          {/* Tab content */}
-          {activeTab === 'sections' ? <SectionsTab /> : activeTab === 'background' ? <ThemeTab /> : <DecorationsTab />}
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            {activeTab === 'sections' ? (
+              <SectionsTab />
+            ) : activeTab === 'background' ? (
+              <ThemeTab />
+            ) : (
+              <DecorationsTab />
+            )}
+          </div>
         </div>
-      </motion.div>
+      </PersistentDrawer>
     </>
   )
 }

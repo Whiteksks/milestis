@@ -112,5 +112,14 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Export records ───────────────────────────────────────────────────
+    // Stored at projects/{projectId}/exports/{exportId}.
+    // The wildcard recursive path is required so collectionGroup queries work.
+    // Written exclusively by Cloud Functions (Admin SDK).
+    match /{path=**}/exports/{exportId} {
+      allow read: if isAuthed() && isOwner(resource.data.ownerId);
+      allow write: if false;
+    }
+
   }
 }
