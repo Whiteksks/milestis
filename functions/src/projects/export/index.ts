@@ -289,7 +289,7 @@ export const exportProject = onRequest(
 			}
 
 			// ── 11. Delete private originals (free quota) ────────────────────
-			await deletePrivateProjectMedia(uid, projectId, rawJson);
+			await deletePrivateProjectMedia(uid, projectId);
 
 			// ── 12. Write export record + update project ─────────────────────
 			const exportRef = projectRef.collection("exports").doc(exportId);

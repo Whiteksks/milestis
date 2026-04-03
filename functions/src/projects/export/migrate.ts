@@ -97,14 +97,15 @@ export async function migrateProjectMedia(
 	const usersPrefix = `users/${uid}/projects/${projectId}/`;
 	const publicPrefix = `public/${projectId}/`;
 
-	// Track which public paths we write during this migration so we can prune
-	// orphaned files (images removed from the project) at the end — AFTER all
-	// copies succeed.  We must NOT delete upfront because on a re-export the
-	// sources are already in public/ and would vanish before the copy loop runs.
+	// Track which public paths we write so we can prune orphans afterwards.
+	// We must NOT delete public files upfront: on re-export the sources are
+	// already in public/ and would vanish before we copy them.
 	const newPublicPaths = new Set<string>();
 
+	// ── Pass 1: content-referenced files ────────────────────────────────────
+	// Build urlMapping for every URL found in the editor content JSON.
+	// These are the URLs that need to be rewritten in the content doc.
 	for (const [oldUrl, oldPath] of urlToPath) {
-		// Derive the relative path within the project folder.
 		let relativePath: string;
 		if (oldPath.startsWith(usersPrefix)) {
 			relativePath = oldPath.slice(usersPrefix.length);
@@ -119,16 +120,12 @@ export async function migrateProjectMedia(
 		const newPath = `${publicPrefix}${relativePath}`;
 		try {
 			if (!oldPath.startsWith(publicPrefix)) {
-				// Source is in private storage — copy it to public.
 				await bucket.file(oldPath).copy(bucket.file(newPath));
 			}
-			// Source is already in public/ (re-export) — file is already at newPath,
-			// nothing to copy.  Just ensure it has a download token below.
 			const token = await ensureDownloadToken(bucket, newPath);
 			urlMapping.set(oldUrl, makeDownloadUrl(bucketName, newPath, token));
 			newPublicPaths.add(newPath);
 
-			// Track bytes freed from the user's private quota only.
 			if (oldPath.startsWith(usersPrefix)) {
 				try {
 					const [meta] = await bucket.file(oldPath).getMetadata();
@@ -146,9 +143,43 @@ export async function migrateProjectMedia(
 		}
 	}
 
-	// Prune orphaned public media: files that existed from a previous export but
-	// are no longer referenced in the current content.  The rendered export file
-	// lives under public/{id}/exports/ and must be preserved — skip that prefix.
+	// ── Pass 2: full private folder scan ────────────────────────────────────
+	// Some variants (e.g. middle.webp) may be stored only in Firestore images
+	// collection and not directly referenced in the editor content JSON.
+	// Copy everything under usersPrefix so ALL variants end up in public/.
+	try {
+		const [privateFiles] = await bucket.getFiles({ prefix: usersPrefix });
+		await Promise.all(
+			privateFiles.map(async (file) => {
+				const relativePath = file.name.slice(usersPrefix.length);
+				const newPath = `${publicPrefix}${relativePath}`;
+				if (newPublicPaths.has(newPath)) return; // already handled in pass 1
+				try {
+					await file.copy(bucket.file(newPath));
+					newPublicPaths.add(newPath);
+					// Count bytes freed for quota tracking.
+					try {
+						const [meta] = await file.getMetadata();
+						const size =
+							typeof meta.size === "string"
+								? parseInt(meta.size, 10)
+								: (meta.size as number | undefined) ?? 0;
+						if (!isNaN(size)) freedBytes += size;
+					} catch {
+						// ignore
+					}
+				} catch (err) {
+					logger.warn(`[migrate] Pass 2: failed to copy ${file.name} → ${newPath}`, err);
+				}
+			}),
+		);
+	} catch (err) {
+		logger.warn("[migrate] Pass 2 full-folder scan failed — skipping", err);
+	}
+
+	// ── Prune orphans ────────────────────────────────────────────────────────
+	// Delete public files from a previous export that are no longer in use.
+	// The rendered export file lives under public/{id}/exports/ — preserve it.
 	try {
 		const [existingFiles] = await bucket.getFiles({ prefix: publicPrefix });
 		const exportsSubdir = `${publicPrefix}exports/`;
@@ -170,29 +201,18 @@ export async function migrateProjectMedia(
 
 /**
  * Deletes all project media from users/ private storage.
- * Call this after a successful export to free the user's quota.
+ * Uses a bucket prefix scan — not just content-referenced files — so that
+ * all variants (middle.webp etc.) that aren't in the editor JSON are also removed.
  */
 export async function deletePrivateProjectMedia(
 	uid: string,
 	projectId: string,
-	contentJson: string,
 ): Promise<void> {
 	const bucket = getStorage().bucket();
 	const usersPrefix = `users/${uid}/projects/${projectId}/`;
-	const urlToPath = extractProjectUrls(contentJson, uid, projectId);
-
-	const privatePaths = Array.from(urlToPath.values()).filter((p) =>
-		p.startsWith(usersPrefix),
-	);
-
-	await Promise.all(
-		privatePaths.map((p) =>
-			bucket
-				.file(p)
-				.delete()
-				.catch((err) => {
-					logger.warn(`[migrate] Failed to delete private file ${p}`, err);
-				}),
-		),
-	);
+	try {
+		await bucket.deleteFiles({ prefix: usersPrefix });
+	} catch (err) {
+		logger.warn(`[migrate] Failed to delete private files for ${projectId}`, err);
+	}
 }

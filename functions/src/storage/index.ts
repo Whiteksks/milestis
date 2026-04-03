@@ -70,7 +70,7 @@ export const resizeProjectImage = makeResizeFunction({
     }
 
     const projectSnap = await db.collection("projects").doc(projectId).get();
-    const isPhotobook = projectSnap.data()?.type === "photobook";
+    const isPhotobook = projectSnap.data()?.mode === "photobook";
 
     if (isPhotobook) {
       return [
