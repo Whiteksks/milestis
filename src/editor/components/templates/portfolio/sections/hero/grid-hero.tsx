@@ -3,7 +3,7 @@
 import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -82,7 +82,7 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
             <div className="@lg:col-span-6 flex justify-center @lg:justify-end">
               <div className="w-full transition-transform duration-500 hover:-translate-y-1">
                 {heroImage ? (
-                  <CroppedImage
+                  <SiteImage
                     src={heroImage}
                     alt={sectionContent.hero.title || 'Hero Image'}
                     aspectRatio={sectionContent.hero.aspectRatio || 'square'}

@@ -1,14 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { FrameStyle } from '@/editor/lib/types'
+import type { ImageCropData } from '@/editor/lib/crop-data'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface BentoFeaturedWorkProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -18,6 +17,7 @@ type Project = {
   image: string
   tags?: string[]
   frameStyle?: FrameStyle
+  cropData?: ImageCropData
 }
 
 // ─── Reusable project card ────────────────────────────────────────────────────
@@ -48,14 +48,14 @@ function ProjectCard({
     >
       {/* Image */}
       {project.image ? (
-        <Image
-          loader={passthroughLoader}
+        <SiteImage
+          fillParent
           unoptimized
           src={project.image}
           alt={project.title || 'Project'}
-          fill
           sizes={imgSizes}
-          className={cn(
+          cropData={project.cropData}
+          imageClassName={cn(
             'object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.07]',
             getFrameStyle(project.frameStyle || 'none'),
           )}

@@ -1,14 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -95,24 +91,16 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.8, delay: 0.15 }}
             >
-              <div
-                className={cn(
-                  'relative overflow-hidden',
-                  getAspectRatioClass(aspectRatio),
-                  getFrameStyle(frameStyle),
-                  theme.shadow,
-                )}
-              >
-                <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={imageUrl}
-                  alt={introduction.title ?? 'Introduction'}
-                  fill
-                  sizes="(max-width: 768px) 80vw, 35vw"
-                  className="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt={introduction.title ?? 'Introduction'}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageBlock?.imageSettings?.[0]?.cropData}
+                unoptimized
+                sizes="(max-width: 768px) 80vw, 35vw"
+                className={theme.shadow}
+              />
             </motion.div>
           )}
         </div>

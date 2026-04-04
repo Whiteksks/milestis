@@ -1,12 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryChronicleProps {
   sectionContent: PhotobookSectionContent
@@ -62,14 +60,13 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
               >
                 <div className="relative aspect-[16/7] @md:aspect-[21/9] overflow-hidden">
                   {feature.image ? (
-                    <Image
-                      loader={passthroughLoader}
+                    <SiteImage
+                      fillParent
                       unoptimized
                       src={feature.image}
                       alt={feature.caption ?? 'Feature'}
-                      fill
                       sizes="100vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      imageClassName="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   ) : (
                     <div className={cn('absolute inset-0', theme.muted)} />
@@ -97,14 +94,13 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
                   >
                     <div className="relative aspect-[4/5] overflow-hidden">
                       {block.image ? (
-                        <Image
-                          loader={passthroughLoader}
+                        <SiteImage
+                          fillParent
                           unoptimized
                           src={block.image}
                           alt={block.caption ?? `Photo ${index + 2}`}
-                          fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                          imageClassName="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                         />
                       ) : (
                         <div className={cn('absolute inset-0', theme.muted)} />

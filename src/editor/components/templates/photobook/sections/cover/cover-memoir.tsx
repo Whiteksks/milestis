@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface CoverMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -95,7 +95,7 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
           className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16"
         >
           {imageUrl ? (
-            <CroppedImage
+            <SiteImage
               src={imageUrl}
               alt={cover.title}
               aspectRatio={aspectRatio}

@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface EditorialBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -42,24 +38,17 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex-shrink-0"
           >
-            <div
-              className={cn(
-                'relative w-48 overflow-hidden bg-neutral-100',
-                getAspectRatioClass(sectionContent.bio.aspectRatio || 'portrait'),
-                theme.shadow,
-                getFrameStyle(sectionContent.bio.frameStyle || 'none'),
-              )}
-            >
-              <Image
-                loader={passthroughLoader}
-                unoptimized
-                src={sectionContent.bio.image || '/placeholder.svg?height=176&width=128'}
-                alt={sectionContent.bio.title || 'Profile'}
-                fill
-                sizes="(max-width: 768px) 112px, 128px"
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out"
-              />
-            </div>
+            <SiteImage
+              unoptimized
+              src={sectionContent.bio.image || '/placeholder.svg?height=176&width=128'}
+              alt={sectionContent.bio.title || 'Profile'}
+              aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
+              frameStyle={sectionContent.bio.frameStyle || 'none'}
+              cropData={sectionContent.bio.cropData}
+              sizes="(max-width: 768px) 112px, 128px"
+              className={cn('w-48 bg-neutral-100', theme.shadow)}
+              imageClassName="object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out"
+            />
           </motion.div>
 
           {/* Контентная часть */}

@@ -3,7 +3,7 @@
 import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -91,7 +91,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
             transition={t(1.1, 0.15)}
             className="flex items-center justify-center @md:pr-10 @lg:pr-20 px-6 @md:px-0 pt-8 @md:pt-28 @lg:pt-32 pb-8 @md:pb-14"
           >
-            <CroppedImage
+            <SiteImage
               src={heroImage}
               alt={sectionContent.hero.title}
               aspectRatio={sectionContent.hero.aspectRatio || 'square'}

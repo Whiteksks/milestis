@@ -1,12 +1,10 @@
 "use client"
 
 import { motion, MotionConfig, type Transition } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface CoverChronicleProps {
   sectionContent: PhotobookSectionContent
@@ -32,14 +30,13 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
       {/* Full-bleed background photo */}
       {hasImage && (
         <div className="absolute inset-0">
-          <Image
-            loader={passthroughLoader}
+          <SiteImage
+            fillParent
             unoptimized
             src={imageUrl}
             alt={cover.title ?? 'Cover'}
-            fill
             sizes="100vw"
-            className="object-cover"
+            imageClassName="object-cover"
             priority
           />
           <div className="absolute inset-0 bg-black/60" />

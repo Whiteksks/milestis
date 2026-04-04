@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface ShowcaseFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -59,14 +57,14 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
           >
             <div className="relative overflow-hidden aspect-video bg-current/5">
               {featured.image && (
-                <Image
-                  loader={passthroughLoader}
+                <SiteImage
+                  fillParent
                   unoptimized
                   src={featured.image}
                   alt={featured.title}
-                  fill
                   sizes="100vw"
-                  className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
+                  cropData={featured.cropData}
+                  imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                 />
               )}
               {/* Overlay gradient */}
@@ -139,14 +137,14 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                   )}
                 >
                   {project.image && (
-                    <Image
-                      loader={passthroughLoader}
+                    <SiteImage
+                      fillParent
                       unoptimized
                       src={project.image}
                       alt={project.title}
-                      fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
+                      cropData={project.cropData}
+                      imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                     />
                   )}
                   {/* subtle hover tint */}

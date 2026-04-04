@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface MinimalFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -61,25 +57,16 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                 {/* Image — compact fixed width, hover scoped to image only */}
                 {project.image && (
                   <div className="@lg:w-[42%] w-full shrink-0 group">
-                    <div
-                      className={cn(
-                        'relative overflow-hidden w-full',
-                        getAspectRatioClass(project.aspectRatio || 'landscape'),
-                      )}
-                    >
-                      <Image
-                        loader={passthroughLoader}
-                        unoptimized
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 42vw"
-                        className={cn(
-                          'object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out',
-                          getFrameStyle(project.frameStyle || 'none'),
-                        )}
-                      />
-                    </div>
+                    <SiteImage
+                      unoptimized
+                      src={project.image}
+                      alt={project.title}
+                      aspectRatio={project.aspectRatio || 'landscape'}
+                      frameStyle={project.frameStyle || 'none'}
+                      cropData={project.cropData}
+                      sizes="(max-width: 768px) 100vw, 42vw"
+                      imageClassName="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                    />
                   </div>
                 )}
 

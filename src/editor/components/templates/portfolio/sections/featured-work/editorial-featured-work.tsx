@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface EditorialFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -87,7 +85,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
 
                   {/* Изображение */}
                   <div className="@lg:col-span-7">
-                    <motion.div 
+                    <motion.div
                       whileHover={{ scale: 0.98 }}
                       transition={{ duration: 0.5 }}
                       className={cn(
@@ -97,13 +95,14 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
                         getFrameStyle(project.frameStyle || 'none'),
                       )}
                     >
-                      <Image
-                        loader={passthroughLoader}
+                      <SiteImage
+                        fillParent
                         unoptimized
                         src={project.image || '/placeholder.svg?height=600&width=1000'}
                         alt={project.title}
-                        fill
-                        className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000 ease-in-out scale-105 group-hover:scale-100"
+                        sizes="(max-width: 768px) 100vw, 58vw"
+                        cropData={project.cropData}
+                        imageClassName="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000 ease-in-out scale-105 group-hover:scale-100"
                       />
                     </motion.div>
                   </div>

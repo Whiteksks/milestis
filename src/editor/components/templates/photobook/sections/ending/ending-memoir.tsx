@@ -1,14 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -81,24 +77,16 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex justify-center @md:justify-end"
           >
-            <div
-              className={cn(
-                'relative overflow-hidden w-full max-w-xs @md:max-w-none @md:w-full',
-                getAspectRatioClass(aspectRatio),
-                getFrameStyle(frameStyle),
-                theme.shadow,
-              )}
-            >
-              <Image
-                loader={passthroughLoader}
-                unoptimized
+              <SiteImage
                 src={imageUrl}
                 alt={ending.signature ?? 'Ending'}
-                fill
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageBlock?.imageSettings?.[0]?.cropData}
+                unoptimized
                 sizes="(max-width: 768px) 80vw, 40vw"
-                className="object-cover"
+                className={cn('w-full max-w-xs @md:max-w-none @md:w-full', theme.shadow)}
               />
-            </div>
           </motion.div>
         )}
       </div>

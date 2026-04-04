@@ -1,14 +1,12 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -46,14 +44,13 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
               )}
             >
               {imageUrl ? (
-                <Image
-                  loader={passthroughLoader}
+                <SiteImage
+                  fillParent
                   unoptimized
                   src={imageUrl}
                   alt={highlight.title ?? 'Highlight'}
-                  fill
                   sizes="(max-width: 768px) 90vw, 45vw"
-                  className="object-cover"
+                  cropData={imageBlock?.imageSettings?.[0]?.cropData}
                 />
               ) : (
                 <div className={cn('absolute inset-0', theme.background)} />

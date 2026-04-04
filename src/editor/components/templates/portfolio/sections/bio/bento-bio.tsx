@@ -1,12 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface BentoBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -40,17 +37,14 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
                 theme.card,
               )}
             >
-              <Image
-                loader={passthroughLoader}
+              <SiteImage
+                fillParent
                 unoptimized
                 src={sectionContent.bio.image || '/placeholder.svg?height=480&width=360'}
                 alt={sectionContent.bio.title || 'Profile'}
-                fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className={cn(
-                  'object-cover transition-transform duration-700 hover:scale-[1.03]',
-                  getFrameStyle(sectionContent.bio.frameStyle || 'none'),
-                )}
+                cropData={sectionContent.bio.cropData}
+                imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
             </motion.div>

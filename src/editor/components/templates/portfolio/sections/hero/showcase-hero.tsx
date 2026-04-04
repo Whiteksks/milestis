@@ -1,12 +1,10 @@
 'use client'
 
 import { motion, MotionConfig, type Transition } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -35,14 +33,14 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
           transition={t(1.4, 0, 'easeOut')}
           className="absolute inset-0"
         >
-          <Image
-            loader={passthroughLoader}
+          <SiteImage
+            fillParent
             unoptimized
             src={heroImage}
             alt={sectionContent.hero.title}
-            fill
             sizes="100vw"
-            className="object-cover object-center"
+            cropData={sectionContent.hero.cropData}
+            imageClassName="object-cover object-center"
             priority
           />
           {/* Gradient: bottom-heavy on mobile, left→right on desktop */}

@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface LiquidGlassFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -89,14 +87,14 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: LiquidGlassFe
                     {/* Image */}
                     <div className={cn('relative shrink-0 @sm:w-56 @md:w-72 overflow-hidden', getAspectRatioClass(project.aspectRatio || 'landscape'), getFrameStyle(project.frameStyle || 'none'), '@sm:aspect-auto @sm:h-44 @md:h-52')}>
                       {project.image && (
-                        <Image
-                          loader={passthroughLoader}
+                        <SiteImage
+                          fillParent
                           unoptimized
                           src={project.image}
                           alt={project.title}
-                          fill
                           sizes="(max-width: 640px) 100vw, 25vw"
-                          className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
+                          cropData={project.cropData}
+                          imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
                         />
                       )}
                     </div>
@@ -137,14 +135,14 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: LiquidGlassFe
                   /* First card — full image with overlay */
                   <>
                     {project.image && (
-                      <Image
-                        loader={passthroughLoader}
+                      <SiteImage
+                        fillParent
                         unoptimized
                         src={project.image}
                         alt={project.title}
-                        fill
                         sizes="100vw"
-                        className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
+                        cropData={project.cropData}
+                        imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
                       />
                     )}
                     <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)' }} />

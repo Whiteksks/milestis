@@ -1,13 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface GridBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -44,22 +40,17 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <div className={cn(
-                'relative w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2',
-                getAspectRatioClass(sectionContent.bio.aspectRatio || 'portrait'),
-              )}>
-                <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
-                  alt={sectionContent.bio.title || 'Profile'}
-                  fill
-                  className={cn(
-                    'object-cover rounded-2xl',
-                    getFrameStyle(sectionContent.bio.frameStyle || 'none'),
-                  )}
-                />
-              </div>
+              <SiteImage
+                unoptimized
+                src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
+                alt={sectionContent.bio.title || 'Profile'}
+                aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
+                frameStyle={sectionContent.bio.frameStyle || 'none'}
+                cropData={sectionContent.bio.cropData}
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2 rounded-2xl"
+                imageClassName="object-cover"
+              />
             </motion.div>
 
             {/* [B] Правая колонка: Инфо */}

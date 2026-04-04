@@ -1,14 +1,10 @@
 ﻿"use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -86,24 +82,16 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                   {/* Photo */}
                   <div className={cn(isEven ? '@md:order-1' : '@md:order-2')}>
                     {imageUrl && (
-                      <div
-                        className={cn(
-                          'relative overflow-hidden',
-                          getAspectRatioClass(aspectRatio),
-                          getFrameStyle(frameStyle),
-                          theme.shadow,
-                        )}
-                      >
-                        <Image
-                          loader={passthroughLoader}
-                          unoptimized
-                          src={imageUrl}
-                          alt={block.label ?? story.title ?? 'Story'}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
-                        />
-                      </div>
+                      <SiteImage
+                        src={imageUrl}
+                        alt={block.label ?? story.title ?? 'Story'}
+                        aspectRatio={aspectRatio}
+                        frameStyle={frameStyle}
+                        cropData={block.imageSettings?.[0]?.cropData}
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className={theme.shadow}
+                      />
                     )}
                     {block.caption && (
                       <p className={cn('mt-3 text-xs opacity-40', theme.fontBody)}>

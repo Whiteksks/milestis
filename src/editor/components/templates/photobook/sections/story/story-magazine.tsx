@@ -1,14 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -84,23 +80,15 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
                   transition={{ duration: 0.9 }}
                 >
                   {imageUrl && (
-                    <div
-                      className={cn(
-                        'relative overflow-hidden',
-                        getAspectRatioClass(aspectRatio),
-                        getFrameStyle(frameStyle),
-                      )}
-                    >
-                      <Image
-                        loader={passthroughLoader}
-                        unoptimized
-                        src={imageUrl}
-                        alt={block.label ?? story.title ?? 'Story'}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 80vw"
-                        className="object-cover"
-                      />
-                    </div>
+                    <SiteImage
+                      src={imageUrl}
+                      alt={block.label ?? story.title ?? 'Story'}
+                      aspectRatio={aspectRatio}
+                      frameStyle={frameStyle}
+                      cropData={block.imageSettings?.[0]?.cropData}
+                      unoptimized
+                      sizes="(max-width: 768px) 100vw, 80vw"
+                    />
                   )}
 
                   {/* Caption row */}

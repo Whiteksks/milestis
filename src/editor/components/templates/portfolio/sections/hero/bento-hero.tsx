@@ -3,7 +3,7 @@
 import { motion, MotionConfig } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -93,7 +93,7 @@ export function BentoHero({ theme, sectionContent, disableAnimations = false }: 
             >
               {heroImage ? (
                 <>
-                  <CroppedImage
+                  <SiteImage
                     src={heroImage}
                     alt={sectionContent.hero.title}
                     aspectRatio={sectionContent.hero.aspectRatio || 'portrait'}

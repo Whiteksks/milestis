@@ -1,14 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface IntroMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -104,24 +100,16 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div
-                className={cn(
-                  'relative overflow-hidden',
-                  getAspectRatioClass(aspectRatio),
-                  getFrameStyle(frameStyle),
-                  theme.shadow,
-                )}
-              >
-                <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={imageUrl}
-                  alt={introduction.title ?? 'Introduction'}
-                  fill
-                  sizes="(max-width: 768px) 90vw, 38vw"
-                  className="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt={introduction.title ?? 'Introduction'}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageBlock?.imageSettings?.[0]?.cropData}
+                unoptimized
+                sizes="(max-width: 768px) 90vw, 38vw"
+                className={theme.shadow}
+              />
               {imageBlock?.caption && (
                 <p className={cn('mt-2.5 text-[10px] uppercase tracking-widest opacity-30', theme.fontBody)}>
                   {imageBlock.caption}

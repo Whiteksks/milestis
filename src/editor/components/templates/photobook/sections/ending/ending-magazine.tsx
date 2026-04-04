@@ -1,12 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -82,13 +80,13 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
               className="@lg:col-span-5 relative"
             >
               <div className="relative aspect-[3/4] @lg:aspect-[4/5] overflow-hidden bg-current/5 shadow-2xl">
-                <Image
-                  loader={passthroughLoader}
+                <SiteImage
+                  fillParent
                   unoptimized
                   src={imageUrl}
                   alt={ending.text ?? 'Closing'}
-                  fill
-                  className="object-cover transition-transform duration-700 hover:scale-105"
+                  sizes="(max-width: 1024px) 90vw, 40vw"
+                  imageClassName="object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
               {/* Декоративный элемент "Magazine" */}

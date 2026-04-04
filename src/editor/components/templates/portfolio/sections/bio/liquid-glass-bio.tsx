@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -67,14 +65,14 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
             {image && (
               <div className="@md:w-64 @lg:w-80 shrink-0 relative overflow-hidden @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl">
                 <div className={cn('relative w-full', getAspectRatioClass(aspectRatio || 'portrait'), getFrameStyle(frameStyle || 'none'), '@md:h-full @md:aspect-auto')}>
-                  <Image
-                    loader={passthroughLoader}
+                  <SiteImage
+                    fillParent
                     unoptimized
                     src={image}
                     alt={title || 'Profile'}
-                    fill
                     sizes="(max-width: 768px) 100vw, 320px"
-                    className="object-cover"
+                    cropData={sectionContent.bio.cropData}
+                    imageClassName="object-cover"
                   />
                   <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 70%, rgba(0,0,0,0.4) 100%)' }} />
                 </div>

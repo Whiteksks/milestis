@@ -1,10 +1,5 @@
 import { AspectRatio, FrameStyle, PhotoBlock } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { cn } from '@/lib/utils'
-import Image, { type ImageLoader } from 'next/image'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 export function PhotoBlockUI ({
   block,
@@ -21,23 +16,15 @@ export function PhotoBlockUI ({
 
   return (
     <div className="overflow-hidden rounded-lg border bg-slate-100 shadow-sm w-full max-w-65">
-      <div
-        className={cn(
-          'relative w-full h-full',
-          getAspectRatioClass(aspect),
-          getFrameStyle(frame),
-        )}
-      >
-        <Image
-          loader={passthroughLoader}
-          unoptimized
-          src={block.image}
-          alt=""
-          fill
-          sizes="260px"
-          className="object-cover"
-        />
-      </div>
+      <SiteImage
+        src={block.image}
+        alt=""
+        aspectRatio={aspect}
+        frameStyle={frame}
+        cropData={settings?.cropData}
+        unoptimized
+        sizes="260px"
+      />
     </div>
   )
 }

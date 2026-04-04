@@ -1,13 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -72,14 +70,13 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
           >
             <div className="border border-current/10 p-[3px]">
               <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/3]')}>
-                <Image
-                  loader={passthroughLoader}
+                <SiteImage
+                  fillParent
                   unoptimized
                   src={imageUrl}
                   alt={highlight.title ?? 'Highlight'}
-                  fill
                   sizes="(max-width: 768px) 95vw, 65vw"
-                  className="object-cover"
+                  imageClassName="object-cover"
                 />
               </div>
             </div>

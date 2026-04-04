@@ -1,12 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface ElegantBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
@@ -22,13 +20,14 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
               'relative w-[180px] @md:w-[220px] @lg:w-[240px] aspect-[4/5] overflow-hidden shadow-sm', 
               getFrameStyle(sectionContent.bio.frameStyle || 'soft')
             )}>
-              <Image
-                loader={passthroughLoader}
+              <SiteImage
+                fillParent
                 unoptimized
                 src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
                 alt={sectionContent.bio.title || 'Profile image'}
-                fill
-                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 240px"
+                cropData={sectionContent.bio.cropData}
+                imageClassName="object-cover"
               />
             </div>
           </div>

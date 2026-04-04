@@ -1,7 +1,7 @@
 "use client"
 
 import { Loader2, ArrowRight } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { useCreateProject } from "@/hooks/useCreateProject"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -120,6 +120,7 @@ export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTitle className="sr-only">New Project</DialogTitle>
+      <DialogDescription className="sr-only">Choose your format</DialogDescription>
       <DialogContent className="sm:max-w-3xl rounded-3xl border border-border/30 p-0 bg-background overflow-hidden">
         <ModalBody />
       </DialogContent>

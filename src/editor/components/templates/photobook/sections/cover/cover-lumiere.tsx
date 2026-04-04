@@ -4,7 +4,7 @@ import { motion, MotionConfig, type Transition } from "framer-motion"
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface CoverLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -52,7 +52,7 @@ export function CoverLumiere({ sectionContent, theme, disableAnimations = false 
           className="w-full max-w-[240px] @sm:max-w-[300px] @md:max-w-sm mb-10 @md:mb-12"
         >
           <div className="border border-current/10 p-[3px]">
-            <CroppedImage
+            <SiteImage
               src={imageUrl}
               alt={cover.title ?? 'Cover'}
               aspectRatio={cover.images?.imageSettings?.[0]?.aspectRatio ?? 'portrait'}

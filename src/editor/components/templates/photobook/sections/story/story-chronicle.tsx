@@ -1,14 +1,10 @@
 ﻿"use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryChronicleProps {
   sectionContent: PhotobookSectionContent
@@ -121,24 +117,16 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                   {/* Photo + Description */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
                     {imageUrl && (
-                      <div
-                        className={cn(
-                          'relative overflow-hidden',
-                          getAspectRatioClass(aspectRatio),
-                          getFrameStyle(frameStyle),
-                          theme.shadow, // Добавил тень для консистентности
-                        )}
-                      >
-                        <Image
-                          loader={passthroughLoader}
-                          unoptimized
-                          src={imageUrl}
-                          alt={block.label ?? story.title ?? `Story ${index + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 90vw, 70vw"
-                          className="object-cover"
-                        />
-                      </div>
+                      <SiteImage
+                        src={imageUrl}
+                        alt={block.label ?? story.title ?? `Story ${index + 1}`}
+                        aspectRatio={aspectRatio}
+                        frameStyle={frameStyle}
+                        cropData={block.imageSettings?.[0]?.cropData}
+                        unoptimized
+                        sizes="(max-width: 768px) 90vw, 70vw"
+                        className={theme.shadow}
+                      />
                     )}
                     {block.caption && (
                       <p className={cn('mt-2 text-xs opacity-40 italic', theme.fontBody)}>

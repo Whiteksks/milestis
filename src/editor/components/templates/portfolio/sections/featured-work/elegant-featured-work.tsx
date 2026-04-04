@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface ElegantFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -54,14 +52,14 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                   'relative overflow-hidden w-full mb-8 group',
                   getAspectRatioClass(project.aspectRatio || 'landscape'),
                 )}>
-                  <Image
-                    loader={passthroughLoader}
+                  <SiteImage
+                    fillParent
                     unoptimized
                     src={project.image}
                     alt={project.title || 'Project image'}
-                    fill
                     sizes="(max-width: 768px) 100vw, 80vw"
-                    className={cn(
+                    cropData={project.cropData}
+                    imageClassName={cn(
                       'object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-out',
                       getFrameStyle(project.frameStyle || 'none'),
                     )}

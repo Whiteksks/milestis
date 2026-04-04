@@ -1,14 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface EndingChronicleProps {
   sectionContent: PhotobookSectionContent
@@ -107,24 +103,16 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
               transition={{ duration: 0.8, delay: 0.2 }}
               className="w-full @md:w-64 @lg:w-80 shrink-0"
             >
-              <div
-                className={cn(
-                  'relative overflow-hidden',
-                  getAspectRatioClass(aspectRatio),
-                  getFrameStyle(frameStyle),
-                  theme.shadow,
-                )}
-              >
-                <Image
-                  loader={passthroughLoader}
-                  unoptimized
-                  src={imageUrl}
-                  alt={ending.signature ?? 'Ending'}
-                  fill
-                  sizes="(max-width: 768px) 80vw, 320px"
-                  className="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt={ending.signature ?? 'Ending'}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageBlock?.imageSettings?.[0]?.cropData}
+                unoptimized
+                sizes="(max-width: 768px) 80vw, 320px"
+                className={theme.shadow}
+              />
             </motion.div>
           )}
         </div>

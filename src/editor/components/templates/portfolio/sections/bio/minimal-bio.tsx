@@ -3,16 +3,12 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import Image, { type ImageLoader } from 'next/image'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface MinimalBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } = sectionContent.bio
+  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio
   return (
     <section
       id="bio"
@@ -51,20 +47,17 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className={cn(
-                'relative w-[160px]',
-                getAspectRatioClass(aspectRatio || 'portrait'),
-              )}>
-                <Image
-                  loader={passthroughLoader}
+              <SiteImage
                   unoptimized
                   src={image}
                   alt={title || 'Profile'}
-                  fill
+                  aspectRatio={aspectRatio || 'portrait'}
+                  frameStyle={frameStyle || 'none'}
+                  cropData={cropData}
                   sizes="160px"
-                  className={cn('object-cover', getFrameStyle(frameStyle || 'none'))}
+                  className="w-[160px]"
+                  imageClassName="object-cover"
                 />
-              </div>
             </motion.div>
           )}
 

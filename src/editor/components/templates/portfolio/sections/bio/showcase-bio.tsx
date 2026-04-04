@@ -1,19 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface ShowcaseBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } =
-    sectionContent.bio
+  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio
 
   return (
     <motion.section
@@ -51,24 +46,17 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
               transition={{ duration: 0.7, delay: 0.1 }}
               className="@lg:col-span-4 flex justify-start"
             >
-              <div
-                className={cn(
-                  'relative overflow-hidden w-[58vw] max-w-[220px] @md:w-full @md:max-w-xs @lg:max-w-none',
-                  getAspectRatioClass(aspectRatio || 'portrait'),
-                  getFrameStyle(frameStyle || 'none'),
-                  theme.shadow,
-                )}
-              >
-                <Image
-                  loader={passthroughLoader}
+              <SiteImage
                   unoptimized
                   src={image}
                   alt={title || 'Profile'}
-                  fill
+                  aspectRatio={aspectRatio || 'portrait'}
+                  frameStyle={frameStyle || 'none'}
+                  cropData={cropData}
                   sizes="(max-width: 768px) 58vw, 33vw"
-                  className="object-cover"
+                  className={cn('w-[58vw] max-w-[220px] @md:w-full @md:max-w-xs @lg:max-w-none', theme.shadow)}
+                  imageClassName="object-cover"
                 />
-              </div>
             </motion.div>
           )}
 

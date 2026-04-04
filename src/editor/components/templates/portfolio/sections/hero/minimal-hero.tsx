@@ -3,7 +3,7 @@
 import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { CroppedImage } from '@/editor/components/editor/section-settings/ui/cropped-image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface MinimalHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -85,7 +85,7 @@ export function MinimalHero({ theme, sectionContent, disableAnimations = false }
               animate={{ opacity: 1, y: 0 }}
               transition={t(0.9, 0.3, [0.16, 1, 0.3, 1])}
             >
-              <CroppedImage
+              <SiteImage
                 src={heroImage}
                 alt={sectionContent.hero.title}
                 aspectRatio={sectionContent.hero.aspectRatio || 'portrait'}

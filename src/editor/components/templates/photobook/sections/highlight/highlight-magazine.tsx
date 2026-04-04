@@ -1,12 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface HighlightMagazineProps {
   sectionContent: PhotobookSectionContent
@@ -26,14 +24,13 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
         {hasImage ? (
           <>
             <div className="absolute inset-0">
-              <Image
-                loader={passthroughLoader}
+              <SiteImage
+                fillParent
                 unoptimized
                 src={imageUrl}
                 alt={highlight.title ?? 'Highlight'}
-                fill
                 sizes="100vw"
-                className="object-cover"
+                imageClassName="object-cover"
               />
               {/* Bottom-heavy gradient for text legibility */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />

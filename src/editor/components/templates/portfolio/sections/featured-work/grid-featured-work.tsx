@@ -1,12 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -56,13 +54,14 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
               <div className={cn(
                 'relative aspect-[3/4] overflow-hidden ',
               )}>
-                <Image
-                  loader={passthroughLoader}
+                <SiteImage
+                  fillParent
                   unoptimized
                   src={project.image || '/placeholder.svg?height=800&width=600'}
                   alt={project.title || ''}
-                  fill
-                  className={cn(
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  cropData={project.cropData}
+                  imageClassName={cn(
                     'object-cover transition-transform duration-500 ease-out group-hover:scale-105',
                     getFrameStyle(project.frameStyle || 'none')
                   )}

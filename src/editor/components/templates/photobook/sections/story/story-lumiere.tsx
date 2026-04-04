@@ -1,13 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface StoryLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -90,14 +88,13 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                   <div className="w-full max-w-md @md:max-w-xl">
                     <div className="border border-current/10 p-[3px]">
                       <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/3]')}>
-                        <Image
-                          loader={passthroughLoader}
+                        <SiteImage
+                          fillParent
                           unoptimized
                           src={imageUrl}
                           alt={block.label ?? story.title ?? 'Story'}
-                          fill
                           sizes="(max-width: 768px) 95vw, 60vw"
-                          className="object-cover"
+                          imageClassName="object-cover"
                         />
                       </div>
                     </div>

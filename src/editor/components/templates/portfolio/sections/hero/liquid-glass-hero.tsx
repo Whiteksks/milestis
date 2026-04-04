@@ -1,12 +1,10 @@
 'use client'
 
 import { motion, MotionConfig, type Transition } from 'framer-motion'
-import Image, { type ImageLoader } from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
   disableAnimations?: boolean
@@ -71,14 +69,14 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
           transition={t(2.2, 0, 'easeOut')}
           className="absolute inset-0"
         >
-          <Image
-            loader={passthroughLoader}
+          <SiteImage
+            fillParent
             unoptimized
             src={heroImage}
             alt={sectionContent.hero.title}
-            fill
             sizes="100vw"
-            className="object-cover object-center opacity-20"
+            cropData={sectionContent.hero.cropData}
+            imageClassName="object-cover object-center opacity-20"
             priority
           />
           <div

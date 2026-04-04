@@ -1,12 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image, { type ImageLoader } from 'next/image'
+import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-
-const passthroughLoader: ImageLoader = ({ src }) => src
 
 interface GalleryMemoirProps {
   sectionContent: PhotobookSectionContent
@@ -69,14 +67,13 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-current/5">
                   {block.image ? (
-                    <Image
-                      loader={passthroughLoader}
+                    <SiteImage
+                      fillParent
                       unoptimized
                       src={block.image}
                       alt={block.caption ?? `Photo ${index + 1}`}
-                      fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
                   ) : (
                     <div className={cn('absolute inset-0', theme.muted)} />
