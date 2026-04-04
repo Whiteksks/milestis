@@ -123,12 +123,12 @@ export default function ExportsPage() {
       <header className="relative mb-6 border-b border-border/30 pb-6">
         <div className="flex flex-col gap-4">
           <h1 className="font-serif text-4xl md:text-5xl font-light tracking-tighter italic">
-            Exports
+            Archive
           </h1>
           <div className="flex items-center gap-3">
             <div className="h-px w-12 bg-primary/30" />
             <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-              Archive & Distribution · {exports.length} Total
+              Exported projects · {exports.length} Total
             </p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function ExportsPage() {
            <p className="font-serif text-2xl italic text-muted-foreground/50">Your archive is empty</p>
         </div>
       ) : (
-        <div className="space-y-24">
+        <div className="space-y-2">
           {grouped.map(([projectId, group]) => (
             <section 
               key={projectId} 

@@ -139,10 +139,10 @@ export const exportProject = onRequest(
 			res.status(403).json({ error: ERROR.FORBIDDEN });
 			return;
 		}
-		if (projectData.status !== "active") {
+		if (projectData.status !== "active" && projectData.status !== "archived") {
 			res.status(400).json({
 				error: ERROR.PROJECT_NOT_ACTIVE,
-				message: "Only active projects can be exported.",
+				message: "Only active or archived projects can be exported.",
 			});
 			return;
 		}
@@ -315,6 +315,7 @@ export const exportProject = onRequest(
 			});
 
 			const projectDocUpdate: Record<string, unknown> = {
+				status: "archived",
 				isExported: true,
 				lastExportId: exportId,
 				exportVersion: newVersionNumber,

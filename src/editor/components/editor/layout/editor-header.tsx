@@ -17,6 +17,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ExportModal } from '@/editor/components/modals/export-modal'
+import { PublishExportedModal } from '@/editor/components/modals/publish-exported-modal'
 
 interface EditorHeaderProps {
   projectId: string
@@ -27,6 +28,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
@@ -308,6 +310,28 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : isExported ? (
+            // Exported but not published: show both Publish and Export again
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                onClick={() => setIsPublishModalOpen(true)}
+                className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
+              >
+                <Globe className="h-3 w-3" />
+                <span className="hidden sm:inline">Publish</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleOpenExportModal}
+                disabled={saveState === 'saving'}
+                className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
+              >
+                <Download className="h-3 w-3" />
+                <span className="hidden sm:inline">Re-export</span>
+              </Button>
+            </div>
           ) : (
             <Button
               size="sm"
@@ -328,6 +352,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         projectId={projectId}
         mode={editorMode as 'portfolio' | 'photobook'}
         isExported={isExported}
+      />
+      <PublishExportedModal
+        open={isPublishModalOpen}
+        onOpenChange={setIsPublishModalOpen}
+        projectId={projectId}
+        mode={editorMode as 'portfolio' | 'photobook'}
       />
     </header>
   )

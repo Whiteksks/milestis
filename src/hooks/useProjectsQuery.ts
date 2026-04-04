@@ -36,6 +36,7 @@ export interface DashboardProject {
 export const projectKeys = {
   all: (uid: string) => ['projects', uid] as const,
   active: (uid: string) => ['projects', uid, 'active'] as const,
+  archived: (uid: string) => ['projects', uid, 'archived'] as const,
   deleted: (uid: string) => ['projects', uid, 'deleted'] as const,
   exports: (uid: string) => ['exports', uid] as const,
 }
@@ -75,7 +76,7 @@ export function mapProjectDoc(data: Record<string, any>, id: string): DashboardP
 
 async function fetchProjectsByStatus(
   uid: string,
-  status: 'active' | 'deleted',
+  status: 'active' | 'archived' | 'deleted',
 ): Promise<DashboardProject[]> {
   const q = query(
     collection(db, 'projects'),
@@ -131,6 +132,17 @@ export function useTrashedProjectsQuery({ enabled: extraEnabled = true }: { enab
   const result = useQuery({
     queryKey: projectKeys.deleted(uid ?? ''),
     queryFn: () => fetchProjectsByStatus(uid!, 'deleted'),
+    enabled: !userLoading && !!uid && extraEnabled,
+    staleTime: STALE_TIME,
+  })
+  return { ...result, isLoading: userLoading || result.isLoading }
+}
+
+export function useArchivedProjectsQuery({ enabled: extraEnabled = true }: { enabled?: boolean } = {}) {
+  const { uid, userLoading } = useUidAndLoading()
+  const result = useQuery({
+    queryKey: projectKeys.archived(uid ?? ''),
+    queryFn: () => fetchProjectsByStatus(uid!, 'archived'),
     enabled: !userLoading && !!uid && extraEnabled,
     staleTime: STALE_TIME,
   })

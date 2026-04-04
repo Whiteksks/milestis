@@ -62,3 +62,43 @@ export async function exportProject(
 
   return data as ExportProjectResult
 }
+
+// ─── Publish exported project ─────────────────────────────────────────────────
+
+export interface PublishExportedProjectInput {
+  projectId: string
+  slug: string
+  /** Plaintext token (photobook only). */
+  accessToken?: string
+}
+
+export interface PublishExportedProjectResult {
+  publishedSlug: string
+}
+
+export async function publishExportedProject(
+  input: PublishExportedProjectInput,
+): Promise<PublishExportedProjectResult> {
+  const user = auth.currentUser
+  if (!user) throw new ExportProjectError("UNAUTHORIZED", "Not authenticated")
+
+  const idToken = await user.getIdToken()
+  const url = process.env.NEXT_PUBLIC_PUBLISH_EXPORTED_PROJECT_URL
+  if (!url) throw new ExportProjectError("CONFIG_ERROR", "Publish URL not configured")
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(input),
+  })
+
+  const data = await res.json()
+  if (!res.ok) {
+    throw new ExportProjectError(data.error ?? "UNKNOWN", data.message ?? "Publish failed")
+  }
+
+  return data as PublishExportedProjectResult
+}
