@@ -1,13 +1,14 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { Download, Globe, ArrowUpRight, FileText, Archive } from "lucide-react"
+import { Download, ArrowUpRight, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
-import { useProjectExportsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
+import { useProjectExportsQuery, useArchivedProjectsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
+import { PublishExportedModal } from "@/editor/components/modals/publish-exported-modal"
 import { cn } from "@/lib/utils"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -25,13 +26,6 @@ function formatDate(date: Date): string {
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
 function ExportRow({ record }: { record: ProjectExportRecord }) {
-  const shareUrl =
-    record.publishedSlug
-      ? record.mode === "portfolio"
-        ? `https://${record.publishedSlug}.${BASE_DOMAIN}`
-        : `https://${BASE_DOMAIN}/${record.publishedSlug}`
-      : null
-
   return (
     <div className="group flex items-center gap-6 border-b border-border/40 py-5 transition-colors hover:bg-accent/20 px-2 -mx-2 rounded-lg">
       {/* File Info */}
@@ -57,17 +51,6 @@ function ExportRow({ record }: { record: ProjectExportRecord }) {
 
       {/* Actions */}
       <div className="flex items-center gap-1 sm:gap-4 shrink-0">
-        {shareUrl && (
-          <a 
-            href={shareUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-primary/80 hover:text-primary transition-colors px-2 py-1"
-          >
-            <Globe className="size-3" />
-            <span className="hidden sm:inline font-medium">Live Site</span>
-          </a>
-        )}
         
         <Button
           variant="ghost"
@@ -106,6 +89,15 @@ export default function ExportsPage() {
   const params = useParams()
   const locale = params.locale as string
   const { data: exports = [], isLoading } = useProjectExportsQuery()
+  const { data: archivedProjects = [] } = useArchivedProjectsQuery()
+  const [publishTarget, setPublishTarget] = useState<{ projectId: string; mode: 'portfolio' | 'photobook' } | null>(null)
+
+  // Map projectId → project info from archived query
+  const archivedMap = useMemo(() => {
+    const m = new Map<string, typeof archivedProjects[number]>()
+    for (const p of archivedProjects) m.set(p.id, p)
+    return m
+  }, [archivedProjects])
 
   const grouped = useMemo(() => {
     const map = new Map<string, { projectName: string; records: ProjectExportRecord[] }>()
@@ -157,12 +149,43 @@ export default function ExportsPage() {
                 <h2 className="font-serif text-lg md:text-xl italic tracking-tight leading-none">
                   {group.projectName}
                 </h2>
-                <Link
-                  href={`/${locale}/design/${projectId}/edit`}
-                  className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors"
-                >
-                  Edit Project <ArrowUpRight className="size-2.5" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const p = archivedMap.get(projectId)
+                    if (!p) return null
+                    if (p.isPublished) {
+                      const shareUrl = p.mode === 'portfolio'
+                        ? `https://${p.publishedSlug}.${BASE_DOMAIN}`
+                        : `https://${BASE_DOMAIN}/${p.publishedSlug}`
+                      return (
+                        <a
+                          href={shareUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.2em] text-primary/70 hover:text-primary transition-colors"
+                        >
+                          <Globe className="size-2.5" /> Live
+                        </a>
+                      )
+                    }
+                    return (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2 text-[9px] uppercase tracking-[0.15em] font-medium text-muted-foreground hover:text-foreground"
+                        onClick={() => setPublishTarget({ projectId, mode: p.mode })}
+                      >
+                        <Globe className="size-2.5 mr-1" /> Publish
+                      </Button>
+                    )
+                  })()}
+                  <Link
+                    href={`/${locale}/design/${projectId}/edit`}
+                    className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors"
+                  >
+                    Edit <ArrowUpRight className="size-2.5" />
+                  </Link>
+                </div>
               </aside>
 
               {/* Rows List */}
@@ -175,6 +198,16 @@ export default function ExportsPage() {
             </section>
           ))}
         </div>
+      )}
+
+      {/* Publish modal */}
+      {publishTarget && (
+        <PublishExportedModal
+          open={!!publishTarget}
+          onOpenChange={(open) => { if (!open) setPublishTarget(null) }}
+          projectId={publishTarget.projectId}
+          mode={publishTarget.mode}
+        />
       )}
     </div>
   )

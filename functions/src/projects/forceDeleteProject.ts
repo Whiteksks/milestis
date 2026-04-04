@@ -83,8 +83,8 @@ export const forceDeleteProject = onRequest(
       return;
     }
 
-    // Only allow deleting projects that are already in the trash
-    if (data.status !== "deleted") {
+    // Only allow deleting trashed or archived projects
+    if (data.status !== "deleted" && data.status !== "archived") {
       res.status(400).json({
         error: ERROR.PROJECT_NOT_IN_TRASH,
         message: "Move the project to trash before permanently deleting it.",

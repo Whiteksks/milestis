@@ -171,7 +171,7 @@ export default function ProjectsPage() {
         ) : view === "archive" ? (
           filteredArchive.length === 0 ? <ArchiveEmpty /> : (
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-              {filteredArchive.map((p) => <ProjectCard key={p.id} project={p} />)}
+              {filteredArchive.map((p) => <ProjectCard key={p.id} project={p} archive />)}
             </div>
           )
         ) : activeProjects.length === 0 ? (

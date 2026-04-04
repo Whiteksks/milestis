@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Check, Mail, Chrome } from "lucide-react"
+import { Check, Mail } from "lucide-react"
+import { FaChrome } from "react-icons/fa6"
 import { onAuthStateChanged } from "firebase/auth"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -153,7 +154,7 @@ export default function SecuritySettings() {
             <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Chrome className="size-5 text-primary" />
+                  <FaChrome className="size-5 text-primary" />
                 </div>
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">

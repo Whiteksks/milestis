@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, Globe, BookOpen, Layout, RotateCcw, AlertTriangle } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, Globe, BookOpen, Layout, RotateCcw, AlertTriangle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import {
@@ -24,7 +24,6 @@ import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/shared/template-preview"
 import { useTranslations } from "next-intl"
-import { ExportModal } from "@/editor/components/modals/export-modal"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -67,10 +66,12 @@ interface ProjectCardProps {
   project: DashboardProject
   /** If true, renders the trash variant (restore + permanent delete) */
   trash?: boolean
+  /** If true, renders the archive variant (edit only, delete redirects to settings) */
+  archive?: boolean
   zoom?: number
 }
 
-function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
+function ProjectCardInner({ project, trash = false, archive = false, zoom }: ProjectCardProps) {
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
@@ -83,7 +84,6 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
     || unpublishMutation.isPending
   const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [exportModalOpen, setExportModalOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
@@ -134,12 +134,67 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
     forceDeleteMutation.mutate(project.id)
   }
 
-  function handleExport() {
-    setExportModalOpen(true)
-  }
-
   function handleUnpublish() {
     unpublishMutation.mutate(project.id)
+  }
+
+  if (archive) {
+    return (
+      <div
+        className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md cursor-pointer"
+        onClick={() => router.push(editUrl)}
+      >
+        <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
+          <div className="absolute inset-0">{thumbnail}</div>
+          <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); router.push(editUrl) }}>
+              <Edit className="mr-1.5 size-3.5" />
+              {t('project.edit')}
+            </Button>
+          </div>
+          <div
+            className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="size-8 rounded-full shadow-md">
+                  <MoreHorizontal className="size-4" />
+                  <span className="sr-only">{t('project.openMenu')}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-xl">
+                <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
+                  <Edit className="mr-2 size-4" /> {t('project.edit')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg"
+                  onClick={() => router.push(`/${locale}/account/archive`)}
+                >
+                  <Settings className="mr-2 size-4" /> Manage in Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+            <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
+              <modeInfo.icon className="size-3" />
+              {t(modeInfo.labelKey)}
+            </span>
+            {project.isPublished && (
+              <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">
+                {t('project.status.published')}
+              </span>
+            )}
+          </div>
+        </div>
+        <CardContent className="p-3">
+          <p className="truncate text-sm font-medium">{project.name}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
+        </CardContent>
+      </div>
+    )
   }
 
   if (trash) {
@@ -277,20 +332,14 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl">
-              {project.isPublished ? (
-                <>
-                  {viewUrl && (
-                    <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
-                      <Eye className="mr-2 size-4" /> {t('project.view')}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
-                    <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleExport}>
-                  <Globe className="mr-2 size-4" /> {t('project.publish')}
+              {project.isPublished && viewUrl && (
+                <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
+                  <Eye className="mr-2 size-4" /> {t('project.view')}
+                </DropdownMenuItem>
+              )}
+              {project.isPublished && (
+                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
+                  <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
@@ -325,14 +374,6 @@ function ProjectCardInner({ project, trash = false, zoom }: ProjectCardProps) {
         <p className="truncate text-sm font-medium">{project.name}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
-
-      <ExportModal
-        open={exportModalOpen}
-        onOpenChange={setExportModalOpen}
-        projectId={project.id}
-        mode={project.mode}
-        isExported={project.isExported}
-      />
     </div>
   )
 }

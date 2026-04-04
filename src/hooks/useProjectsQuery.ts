@@ -180,13 +180,14 @@ export function getProjectShareUrl(project: DashboardProject): string | null {
 }
 
 /**
- * Returns only published active projects with their share URLs.
- * Reuses the active projects cache — no extra Firestore read.
+ * Returns only published projects (active or archived) with their share URLs.
+ * Combines active and archived caches — no extra Firestore read.
  */
 export function usePublishedProjectsQuery() {
-  const { data: allActive = [], isLoading } = useActiveProjectsQuery()
-  const publishedProjects = allActive.filter((p) => p.isPublished)
-  return { data: publishedProjects, isLoading }
+  const { data: allActive = [], isLoading: activeLoading } = useActiveProjectsQuery()
+  const { data: allArchived = [], isLoading: archivedLoading } = useArchivedProjectsQuery()
+  const publishedProjects = [...allActive, ...allArchived].filter((p) => p.isPublished)
+  return { data: publishedProjects, isLoading: activeLoading || archivedLoading }
 }
 
 // ─── Exports ─────────────────────────────────────────────────────

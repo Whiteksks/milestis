@@ -79,7 +79,7 @@ function ModalBody({ onClose }: { onClose?: () => void }) {
   const { handleCreate, loadingMode } = useCreateProject()
 
   return (
-    <div className="flex flex-col p-8 sm:p-14">
+    <div className="flex flex-col p-4 md:p-8">
       <header className="mb-14 space-y-2.5 text-center sm:text-left">
         <h2 className="font-serif text-3xl font-light tracking-tight italic">
           New Creation

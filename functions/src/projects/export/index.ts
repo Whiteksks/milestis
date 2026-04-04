@@ -41,10 +41,16 @@ async function uploadRenderedFile(
 	filePath: string,
 	buffer: Buffer,
 	mimeType: string,
+	downloadName: string,
 ): Promise<string> {
 	const bucket = getStorage().bucket();
 	const file = bucket.file(filePath);
-	await file.save(buffer, { metadata: { contentType: mimeType } });
+	await file.save(buffer, {
+		metadata: {
+			contentType: mimeType,
+			contentDisposition: `attachment; filename="${downloadName}"`,
+		},
+	});
 	const token = randomBytes(16).toString("hex");
 	await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: token } });
 	return makeDownloadUrl(bucket.name, filePath, token);
@@ -238,11 +244,16 @@ export const exportProject = onRequest(
 			});
 
 			// ── 9. Upload rendered file ──────────────────────────────────────
+			const safeProjectName = (projectData.name ?? "project")
+				.replace(/[^\w\s\-]/g, "")
+				.trim()
+				.replace(/\s+/g, "-") || "project";
 			const renderedFilePath = `public/${projectId}/exports/${exportId}.${renderOutput.extension}`;
 			const fileDownloadUrl = await uploadRenderedFile(
 				renderedFilePath,
 				renderOutput.buffer,
 				renderOutput.mimeType,
+				`${safeProjectName}.${renderOutput.extension}`,
 			);
 
 			const contentSnapshot = {

@@ -4,16 +4,17 @@
  * Add new platforms here — all footer files pick them up automatically.
  */
 
+import { Mail, Globe } from 'lucide-react'
+
 import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Github,
-  Mail,
-  Youtube,
-  Globe,
-} from 'lucide-react'
+  FaFacebook,
+  FaInstagram,
+  FaXTwitter,
+  FaLinkedin,
+  FaGithub,
+  FaYoutube,
+} from 'react-icons/fa6'
+
 import type { SVGProps } from 'react'
 
 // ─── Custom SVGs for platforms not in Lucide ─────────────────────────────────
@@ -45,15 +46,15 @@ function TikTokIcon(props: SVGProps<SVGSVGElement>) {
 // ─── Icon map ─────────────────────────────────────────────────────────────────
 
 const ICON_MAP: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>> = {
-  facebook:  Facebook,
-  instagram: Instagram,
-  twitter:   Twitter,
-  x:         Twitter,
-  linkedin:  Linkedin,
-  github:    Github,
+  facebook:  FaFacebook,
+  instagram: FaInstagram,
+  twitter:   FaXTwitter,
+  x:         FaXTwitter,
+  linkedin:  FaLinkedin,
+  github:    FaGithub,
   email:     Mail,
   mail:      Mail,
-  youtube:   Youtube,
+  youtube:   FaYoutube,
   dribbble:  DribbbleIcon,
   behance:   BehanceIcon,
   tiktok:    TikTokIcon,
