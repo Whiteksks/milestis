@@ -81,6 +81,7 @@ export function ExportModal({ open, onOpenChange, projectId, mode, isExported }:
       // Invalidate dashboard cache so the export record and storage stats refresh.
       if (uid) {
         void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+        void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
         void queryClient.invalidateQueries({ queryKey: projectKeys.exports(uid) })
       }
 

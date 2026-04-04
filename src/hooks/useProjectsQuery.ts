@@ -10,7 +10,7 @@ export interface DashboardProject {
   id: string
   name: string
   mode: 'portfolio' | 'photobook'
-  status: 'active' | 'deleted'
+  status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
   isExported?: boolean
   publishedSlug?: string | null

@@ -109,22 +109,33 @@ export const forceDeleteProject = onRequest(
         logger.info(`[forceDeleteProject] Deleted ${imagesSnap.size} image doc(s) for ${projectId}.`);
       }
 
-      // 2. Delete editor content subcollection document
+      // 2. Delete editor content subcollection
       const contentRef = projectRef.collection("data").doc("content");
       await contentRef.delete();
 
-      // 3. Delete all private Storage files for this project
+      // 3. Delete exports subcollection
+      const exportsSnap = await projectRef.collection("exports").get();
+      if (!exportsSnap.empty) {
+        const exportsBatch = db.batch();
+        for (const exportDoc of exportsSnap.docs) {
+          exportsBatch.delete(exportDoc.ref);
+        }
+        await exportsBatch.commit();
+        logger.info(`[forceDeleteProject] Deleted ${exportsSnap.size} export record(s) for ${projectId}.`);
+      }
+
+      // 4. Delete all private Storage files for this project
       const storage = getStorage();
       await storage.bucket().deleteFiles({
         prefix: `users/${uid}/projects/${projectId}/`,
       });
-      // 4. Delete public Storage files (if the project was ever published)
+      // 5. Delete public Storage files (if the project was ever published)
       await storage.bucket().deleteFiles({
         prefix: `public/${projectId}/`,
       });
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);
 
-      // 5. Delete project doc + published snapshot + decrement user counter
+      // 6. Delete project doc + published snapshot + decrement user counter
       const userRef = db.collection("users").doc(uid);
       const publishedRef = db.collection("published_projects").doc(projectId);
       const deleteBatch = db.batch();
