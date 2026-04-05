@@ -2,6 +2,7 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
+import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { ps, editorialInput, editorialLabel, PanelLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -101,6 +102,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
     updatePhotobookSection: state.updatePhotobookSection,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const coverRestrictions = useSectionRestrictions('cover')
 
   return (
     <div className={ps.pbRoot}>
@@ -134,6 +136,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
         value={cover.images}
         onChange={(next) => updatePhotobookSection("cover", { images: next })}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        restrictions={coverRestrictions}
       />
     </div>
   )

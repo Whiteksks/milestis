@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
+import type { SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import {
   Select,
   SelectContent,
@@ -86,11 +88,13 @@ function StoryMomentItem({
   dense = false,
   onUpdate,
   onDelete,
+  restrictions,
 }: {
   block: PhotoBlock
   dense?: boolean
   onUpdate: (patch: Partial<PhotoBlock>) => void
   onDelete: () => void
+  restrictions?: SectionImageRestrictions
 }) {
   const ownerId = useId()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
@@ -138,6 +142,7 @@ function StoryMomentItem({
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         showCaption
         showDescription
+        restrictions={restrictions}
       />
     </div>
   )
@@ -147,6 +152,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   const addOwnerId = useId()
   const { story, updatePhotobookSection } = useStoryData()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const storyRestrictions = useSectionRestrictions('story')
 
   const images: PhotoBlock[] = story.images || []
   const updateImages = (next: PhotoBlock[]) => updatePhotobookSection("story", { images: next })
@@ -295,6 +301,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
               dense={dense}
               onUpdate={updateActiveImage}
               onDelete={() => deleteImage(normalizedIndex)}
+              restrictions={storyRestrictions}
             />
           )}
         </div>

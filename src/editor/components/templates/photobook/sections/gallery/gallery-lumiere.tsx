@@ -5,7 +5,6 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 
 interface GalleryLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -62,7 +61,9 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
           <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 @md:gap-5">
             {images.map((photo, index) => {
               const imageUrl = photo.image ?? ''
-              const aspectClass = getAspectRatioClass(photo.imageSettings?.[0]?.aspectRatio)
+              const imageSettings = photo.imageSettings?.[0]
+              const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
+              const frameStyle = imageSettings?.frameStyle ?? 'none'
               const photoNum = String(index + 1).padStart(2, '0')
 
               return (
@@ -76,18 +77,17 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
                 >
                   {/* Framed photo */}
                   <div className="border border-current/10 p-[3px]">
-                    <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/5]')}>
-                      {imageUrl && (
-                        <SiteImage
-                          fillParent
-                          unoptimized
-                          src={imageUrl}
-                          alt={photo.caption ?? `Photo ${photoNum}`}
-                          sizes="(max-width: 640px) 95vw, (max-width: 1024px) 45vw, 30vw"
-                          imageClassName="object-cover"
-                        />
-                      )}
-                    </div>
+                    {imageUrl && (
+                      <SiteImage
+                        src={imageUrl}
+                        alt={photo.caption ?? `Photo ${photoNum}`}
+                        aspectRatio={aspectRatio}
+                        frameStyle={frameStyle}
+                        cropData={imageSettings?.cropData}
+                        unoptimized
+                        sizes="(max-width: 640px) 95vw, (max-width: 1024px) 45vw, 30vw"
+                      />
+                    )}
                   </div>
 
                   {/* Caption */}

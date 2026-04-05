@@ -2,6 +2,7 @@
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
+import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { ps, editorialInput, editorialLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -58,6 +59,7 @@ export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
     updatePhotobookSection: state.updatePhotobookSection,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const highlightRestrictions = useSectionRestrictions('highlight')
 
   return (
     <div className={ps.pbRoot}>
@@ -87,6 +89,7 @@ export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
         onChange={(next) => updatePhotobookSection("highlight", { images: next })}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         showCaption={false}
+        restrictions={highlightRestrictions}
       />
     </div>
   )

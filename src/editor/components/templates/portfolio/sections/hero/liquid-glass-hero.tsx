@@ -75,7 +75,6 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
             src={heroImage}
             alt={sectionContent.hero.title}
             sizes="100vw"
-            cropData={sectionContent.hero.cropData}
             imageClassName="object-cover object-center opacity-20"
             priority
           />

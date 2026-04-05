@@ -43,7 +43,6 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
                 src={sectionContent.bio.image || '/placeholder.svg?height=480&width=360'}
                 alt={sectionContent.bio.title || 'Profile'}
                 sizes="(max-width: 768px) 100vw, 33vw"
-                cropData={sectionContent.bio.cropData}
                 imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />

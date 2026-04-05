@@ -26,7 +26,6 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
                 src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
                 alt={sectionContent.bio.title || 'Profile image'}
                 sizes="(max-width: 768px) 100vw, 240px"
-                cropData={sectionContent.bio.cropData}
                 imageClassName="object-cover"
               />
             </div>

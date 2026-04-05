@@ -39,7 +39,6 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
             src={heroImage}
             alt={sectionContent.hero.title}
             sizes="100vw"
-            cropData={sectionContent.hero.cropData}
             imageClassName="object-cover object-center"
             priority
           />

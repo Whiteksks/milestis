@@ -5,7 +5,6 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 
 interface HighlightLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -14,9 +13,11 @@ interface HighlightLumiereProps {
 
 export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProps) {
   const { highlight } = sectionContent
+  const imageSettings = highlight.images?.imageSettings?.[0]
   const imageUrl = highlight.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectClass = getAspectRatioClass(highlight.images?.imageSettings?.[0]?.aspectRatio)
+  const aspectRatio = imageSettings?.aspectRatio ?? 'landscape'
+  const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
     <section
@@ -69,16 +70,15 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
             className="w-full max-w-xl @md:max-w-2xl mb-10"
           >
             <div className="border border-current/10 p-[3px]">
-              <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/3]')}>
-                <SiteImage
-                  fillParent
-                  unoptimized
-                  src={imageUrl}
-                  alt={highlight.title ?? 'Highlight'}
-                  sizes="(max-width: 768px) 95vw, 65vw"
-                  imageClassName="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt={highlight.title ?? 'Highlight'}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageSettings?.cropData}
+                unoptimized
+                sizes="(max-width: 768px) 95vw, 65vw"
+              />
             </div>
           </motion.div>
         )}

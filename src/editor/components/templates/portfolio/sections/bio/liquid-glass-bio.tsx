@@ -3,14 +3,12 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } = sectionContent.bio
+  const { title, subtitle, description, image, achievements } = sectionContent.bio
   const { primary, secondary, accent2 } = theme.bgEffectColors
 
   return (
@@ -64,14 +62,13 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
             {/* Image panel */}
             {image && (
               <div className="@md:w-64 @lg:w-80 shrink-0 relative overflow-hidden @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl">
-                <div className={cn('relative w-full', getAspectRatioClass(aspectRatio || 'portrait'), getFrameStyle(frameStyle || 'none'), '@md:h-full @md:aspect-auto')}>
+                <div className="relative w-full aspect-[3/4] @md:h-full @md:aspect-auto">
                   <SiteImage
                     fillParent
                     unoptimized
                     src={image}
                     alt={title || 'Profile'}
                     sizes="(max-width: 768px) 100vw, 320px"
-                    cropData={sectionContent.bio.cropData}
                     imageClassName="object-cover"
                   />
                   <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 70%, rgba(0,0,0,0.4) 100%)' }} />

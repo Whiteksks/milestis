@@ -1,4 +1,4 @@
-"use client"
+  "use client"
 
 import { motion } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -13,8 +13,11 @@ interface EndingLumiereProps {
 
 export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
   const { ending } = sectionContent
+  const imageSettings = ending.images?.imageSettings?.[0]
   const imageUrl = ending.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
+  const aspectRatio = imageSettings?.aspectRatio ?? 'square'
+  const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
     <section
@@ -114,16 +117,15 @@ export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
             className="w-full max-w-[180px] @sm:max-w-[220px] mx-auto pt-2"
           >
             <div className="border border-current/10 p-[3px]">
-              <div className="relative overflow-hidden aspect-square">
-                <SiteImage
-                  fillParent
-                  unoptimized
-                  src={imageUrl}
-                  alt="Closing photograph"
-                  sizes="220px"
-                  imageClassName="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt="Closing photograph"
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageSettings?.cropData}
+                unoptimized
+                sizes="220px"
+              />
             </div>
           </motion.div>
         )}

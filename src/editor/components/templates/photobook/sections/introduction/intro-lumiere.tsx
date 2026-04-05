@@ -5,7 +5,6 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 
 interface IntroLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -14,9 +13,11 @@ interface IntroLumiereProps {
 
 export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
   const { introduction } = sectionContent
+  const imageSettings = introduction.images?.imageSettings?.[0]
   const imageUrl = introduction.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectClass = getAspectRatioClass(introduction.images?.imageSettings[0]?.aspectRatio)
+  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
+  const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
     <section
@@ -114,16 +115,15 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
             className="w-full max-w-[280px] @md:max-w-xs mx-auto"
           >
             <div className="border border-current/10 p-[3px]">
-              <div className={cn('relative overflow-hidden', aspectClass ?? 'aspect-[4/5]')}>
-                <SiteImage
-                  fillParent
-                  unoptimized
-                  src={imageUrl}
-                  alt={introduction.title ?? 'Introduction'}
-                  sizes="(max-width: 768px) 80vw, 320px"
-                  imageClassName="object-cover"
-                />
-              </div>
+              <SiteImage
+                src={imageUrl}
+                alt={introduction.title ?? 'Introduction'}
+                aspectRatio={aspectRatio}
+                frameStyle={frameStyle}
+                cropData={imageSettings?.cropData}
+                unoptimized
+                sizes="(max-width: 768px) 80vw, 320px"
+              />
             </div>
             {introduction.images?.caption && (
               <p className={cn('mt-2 text-[9px] uppercase tracking-widest opacity-25 text-center', theme.fontBody)}>
