@@ -16,7 +16,7 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
   const imageSettings = highlight.images?.imageSettings?.[0]
   const imageUrl = highlight.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'landscape'
+  const aspectRatio = imageSettings?.aspectRatio ?? 'square'
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (

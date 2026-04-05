@@ -118,7 +118,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
               imageSettings:
                 cover.images?.imageSettings?.length
                   ? cover.images.imageSettings
-                  : [{ aspectRatio: "landscape", frameStyle: "soft" }],
+                  : [{ aspectRatio: "square", frameStyle: "soft" }],
             },
           })
         }

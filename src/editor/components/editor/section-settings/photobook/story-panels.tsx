@@ -108,7 +108,7 @@ function StoryMomentItem({
             image: url,
             imageSettings: block.imageSettings?.length
               ? block.imageSettings
-              : [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+              : [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
           })
         }
       />
@@ -188,7 +188,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
       image: url,
       label: "",
       caption: "",
-      imageSettings: [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+      imageSettings: [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
     }))
     const next = [...images, ...newBlocks]
     updateImages(next)
@@ -202,7 +202,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
       image: "",
       label: "",
       caption: "",
-      imageSettings: [{ aspectRatio: "landscape" as const, frameStyle: "none" as const }],
+      imageSettings: [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
     }
     const next = [...images, newBlock]
     updateImages(next)

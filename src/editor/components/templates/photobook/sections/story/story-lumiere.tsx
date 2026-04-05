@@ -71,7 +71,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
         {moments.map((block, index) => {
           const imageUrl = block.image
           const imageSettings = block.imageSettings?.[0]
-          const aspectRatio = imageSettings?.aspectRatio ?? 'landscape'
+          const aspectRatio = imageSettings?.aspectRatio ?? 'square'
           const frameStyle = imageSettings?.frameStyle ?? 'none'
           const description = block.description ?? ''
 

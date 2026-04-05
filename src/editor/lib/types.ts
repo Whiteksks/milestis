@@ -44,7 +44,9 @@ export type FrameStyleCategory = 'shape' | 'border'
 export const ASPECT_RATIOS = {
   square: 'square',
   portrait: 'portrait',
-  landscape: 'landscape',
+  poster: 'poster',
+  wide: 'wide',
+  cinematic: 'cinematic',
 } as const
 
 export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]

@@ -42,7 +42,6 @@ const TEMPLATE_RESTRICTIONS: Partial<
    */
   'liquid-glass': {
     hero: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
-    bio: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
   },
   /**
    * Elegant: bio photo sits inside a hardcoded aspect-[4/5] container —
