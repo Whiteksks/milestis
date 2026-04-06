@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -19,12 +19,12 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section
-      className={cn(
-        '@container overflow-x-hidden min-h-screen flex flex-col justify-between py-12 @md:py-16',
-        theme.background,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="ending"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.background)}
+      padded={false}
+      containerClassName="max-w-none flex flex-col justify-between min-h-screen py-12 @md:py-16"
     >
       {/* Top rule */}
       <div className="max-w-7xl mx-auto w-full px-8 @md:px-12 @lg:px-20">
@@ -35,13 +35,7 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
       <div className="flex-1 max-w-7xl mx-auto w-full px-8 @md:px-12 @lg:px-20 py-12 @md:py-16 @lg:py-20 grid grid-cols-1 @md:grid-cols-2 gap-10 @md:gap-16 @lg:gap-20 items-center">
 
         {/* Closing typography */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.9 }}
-          className="space-y-6 @md:space-y-10"
-        >
+        <div className="space-y-6 @md:space-y-10">
           {ending.text && (
             <p
               className={cn(
@@ -66,17 +60,11 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
               </p>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Optional closing photo */}
         {imageUrl && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex justify-center @md:justify-end"
-          >
+          <div className="flex justify-center @md:justify-end">
               <SiteImage
                 src={imageUrl}
                 alt={ending.signature ?? 'Ending'}
@@ -87,20 +75,14 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
                 sizes="(max-width: 768px) 80vw, 40vw"
                 className={cn('w-full max-w-xs @md:max-w-none @md:w-full', theme.shadow)}
               />
-          </motion.div>
+          </div>
         )}
       </div>
 
       {/* Bottom accent line */}
       <div className="max-w-7xl mx-auto w-full px-8 @md:px-12 @lg:px-20 pb-8">
-        <motion.div
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className={cn('h-px origin-left', theme.accent)}
-        />
+        <div className={cn('h-px origin-left', theme.accent)} />
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

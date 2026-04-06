@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { ShowcaseHeader as RawShowcaseHeader } from './sections/header/showcase-header'
 import { ShowcaseHero as RawShowcaseHero } from './sections/hero/showcase-hero'
 import { ShowcaseBio as RawShowcaseBio } from './sections/bio/showcase-bio'

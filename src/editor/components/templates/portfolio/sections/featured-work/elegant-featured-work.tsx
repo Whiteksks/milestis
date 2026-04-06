@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface ElegantFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -21,7 +21,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 py-24 @md:py-36">
 
         {/* Section heading — left-aligned, sparse */}
-        <FadeIn
+        <Animate
           direction="up"
           distance={12}
           delay={0.2}
@@ -33,12 +33,12 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
           <h2 className={cn('@lg:text-7xl @md:text-6xl text-5xl font-thin tracking-tight leading-none', theme.fontTitle)}>
             {sectionContent.featuredWork.title}
           </h2>
-        </FadeIn>
+        </Animate>
 
         {/* Projects — full-width catalog layout */}
         <div className="space-y-32 @md:space-y-44">
           {projects.map((project, i) => (
-            <FadeIn
+            <Animate
               key={i}
               direction="up"
               distance={24}
@@ -89,7 +89,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                   </div>
                 )}
               </div>
-            </FadeIn>
+            </Animate>
           ))}
         </div>
       </div>

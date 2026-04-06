@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 
 import { EditorialHeader as RawEditorialHeader } from './sections/header/editorial-header'
 import { EditorialHero as RawEditorialHero } from './sections/hero/editorial-hero'

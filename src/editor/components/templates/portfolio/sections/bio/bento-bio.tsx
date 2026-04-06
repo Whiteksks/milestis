@@ -4,8 +4,8 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -24,7 +24,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
           {/* [A] Photo card — tall, 4/12 */}
-          <FadeIn
+          <Animate
             delay={0}
             direction="up"
             distance={16}
@@ -44,13 +44,13 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
               imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-          </FadeIn>
+          </Animate>
 
           {/* [B] Content column — 8/12 */}
           <div className="@lg:col-span-8 @md:col-span-4 col-span-1 flex flex-col gap-3">
 
             {/* [B1] Name + subtitle + description */}
-            <FadeIn
+            <Animate
               delay={0.05}
               direction="up"
               distance={14}
@@ -68,11 +68,11 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
               <p className={cn('text-sm opacity-60 leading-relaxed', theme.lineHeight, theme.fontBody)}>
                 {sectionContent.bio.description}
               </p>
-            </FadeIn>
+            </Animate>
 
             {/* [B2] Achievement chips */}
             {achievements.length > 0 && (
-              <FadeIn
+              <Animate
                 delay={0.12}
                 direction="up"
                 distance={10}
@@ -83,7 +83,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
               >
                 <div className="flex flex-wrap gap-2">
                   {achievements.map((item, i) => (
-                    <FadeIn
+                    <Animate
                       as="span"
                       key={i}
                       delay={0.15 + i * 0.04}
@@ -95,10 +95,10 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
                       )}
                     >
                       {item}
-                    </FadeIn>
+                    </Animate>
                   ))}
                 </div>
-              </FadeIn>
+              </Animate>
             )}
           </div>
 

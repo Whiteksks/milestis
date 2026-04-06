@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -15,21 +15,20 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
   const { introduction } = sectionContent
   const imageBlock = introduction.images
   const imageUrl = imageBlock?.image ?? ''
-  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'landscape'
+  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'wide'
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section className={cn('@container py-16 @md:py-24 @lg:py-32', theme.background, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20">
+    <SectionWrapper
+      id="introduction"
+      themeForeground={theme.foreground}
+      className={theme.background}
+      padded={false}
+      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32"
+    >
 
         {/* Editorial header */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 @md:mb-16"
-        >
+        <div className="mb-12 @md:mb-16">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
             <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.letterSpacing, theme.fontBody)}>
@@ -39,19 +38,11 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
               I
             </span>
           </div>
-        </motion.div>
-
-        {/* Main grid: text left, image right */}
+        </div>
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-10 @md:gap-16 @lg:gap-24 items-start">
 
           {/* Left – editorial text */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
-            className="space-y-9"
-          >
+          <div className="space-y-9">
             {introduction.title && (
               <h2
                 className={cn(
@@ -95,16 +86,11 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
                 </p>
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Right – image */}
           {imageUrl && (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
+            <div>
               <SiteImage
                 src={imageUrl}
                 alt={introduction.title ?? 'Introduction'}
@@ -120,10 +106,9 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
                   {imageBlock.caption}
                 </p>
               )}
-            </motion.div>
+            </div>
           )}
         </div>
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

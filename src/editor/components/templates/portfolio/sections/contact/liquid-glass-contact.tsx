@@ -1,8 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useT, useDisabled } from '../../primitives/animation-context'
-import { FadeIn } from '../../primitives/fade-in'
+import { Animate } from '../../../primitives/animate'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -11,8 +10,6 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 interface LiquidGlassContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContactProps) {
-  const t = useT()
-  const disabled = useDisabled()
   const { primary, secondary, accent2 } = theme.bgEffectColors
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
 
@@ -60,7 +57,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
           <div className="relative grid grid-cols-1 @lg:grid-cols-2 gap-0">
             {/* Left — headline */}
             <div className="p-8 @md:p-12 @lg:p-14 flex flex-col justify-center gap-6 @lg:border-r border-r-0 border-b @lg:border-b-0 border-white/8">
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={16}
                 as="h2"
@@ -72,10 +69,10 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.35)' }}
               >
                 {sectionContent.contact.title}
-              </FadeIn>
+              </Animate>
 
               {sectionContent.contact.description && (
-                <FadeIn
+                <Animate
                   direction="up"
                   distance={10}
                   delay={0.08}
@@ -83,7 +80,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                   className={cn('max-w-sm text-sm text-white/48 font-light leading-relaxed', theme.lineHeight, theme.fontBody)}
                 >
                   {sectionContent.contact.description}
-                </FadeIn>
+                </Animate>
               )}
 
               {sectionContent.contact.email && (
@@ -114,9 +111,9 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
             <form onSubmit={handleSubmit} className="p-8 @md:p-12 @lg:p-14 space-y-0">
               {status !== 'idle' && (
                 <motion.div
-                  initial={disabled ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -8, scale: 0.97 }}
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={disabled ? undefined : t(0.3)}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className={cn(
                     'mb-4 px-4 py-2.5 rounded-xl text-[11px] border',
                     status === 'sent'

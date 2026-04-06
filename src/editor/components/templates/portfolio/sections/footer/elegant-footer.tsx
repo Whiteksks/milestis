@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
-import { FadeIn } from '../../primitives/fade-in'
-import { SectionWrapper } from '../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 
 interface ElegantFooterProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -21,17 +21,17 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-10">
         <div className="flex flex-col @md:flex-row items-center justify-between gap-6">
           {/* Left: copyright */}
-          <FadeIn
+          <Animate
             direction="up"
             distance={5}
             className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
           >
             <p>© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
-          </FadeIn>
+          </Animate>
 
           {/* Right: social icons */}
           {(sectionContent.footer?.socialLinks ?? []).length > 0 && (
-            <FadeIn
+            <Animate
               direction="up"
               distance={5}
               delay={0.1}
@@ -46,7 +46,7 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
                   className="opacity-25 hover:opacity-60 transition-opacity duration-300"
                 />
               ))}
-            </FadeIn>
+            </Animate>
           )}
         </div>
       </div>

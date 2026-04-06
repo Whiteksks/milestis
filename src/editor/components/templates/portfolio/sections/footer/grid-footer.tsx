@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GridFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -20,7 +20,7 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
     >
       <div className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6">
         <div className="max-w-6xl mx-auto">
-          <FadeIn
+          <Animate
             direction="up"
             distance={5}
             className={cn(
@@ -47,7 +47,7 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
               </div>
             )}
 
-          </FadeIn>
+          </Animate>
         </div>
       </div>
     </SectionWrapper>

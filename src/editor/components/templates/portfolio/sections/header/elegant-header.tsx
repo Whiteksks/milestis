@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useT } from '../../primitives/animation-context'
+import { useT } from '../../../primitives/animation-context'
 import { useState, useEffect, useRef } from 'react'
 import { MenuIcon, XIcon } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'

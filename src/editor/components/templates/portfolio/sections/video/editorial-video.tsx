@@ -3,10 +3,10 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../primitives/typography'
-import { EditorialDivider } from '../../primitives/divider'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
+import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
 interface EditorialVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -22,23 +22,23 @@ export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
           </EditorialLabel>
 
           <div className="space-y-6">
-            <FadeIn direction="left" delay={0.1}>
+            <Animate direction="left" delay={0.1}>
               <EditorialTitle themeFont={theme.fontTitle} className="@lg:text-5xl @md:text-4xl text-3xl tracking-tight">
                 {sectionContent.video.title}
               </EditorialTitle>
-            </FadeIn>
+            </Animate>
 
             {sectionContent.video.description && (
-              <FadeIn direction="up" delay={0.2}>
+              <Animate direction="up" delay={0.2}>
                 <EditorialParagraph themeFont={theme.fontBody} themeLineHeight={theme.lineHeight} className="@md:text-sm text-xs opacity-50 max-w-lg">
                   {sectionContent.video.description}
                 </EditorialParagraph>
-              </FadeIn>
+              </Animate>
             )}
           </div>
 
           {/* Full-width video — no border radius, raw */}
-          <FadeIn direction="up" delay={0.3} className="relative aspect-video overflow-hidden bg-current/5">
+          <Animate direction="up" delay={0.3} className="relative aspect-video overflow-hidden bg-current/5">
             {sectionContent.video.videoUrl ? (
               <iframe
                 src={sectionContent.video.videoUrl}
@@ -53,7 +53,7 @@ export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
                 </span>
               </div>
             )}
-          </FadeIn>
+          </Animate>
         </div>
       </div>
 

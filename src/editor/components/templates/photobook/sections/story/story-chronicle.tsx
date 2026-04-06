@@ -1,6 +1,6 @@
-﻿"use client"
+"use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -13,21 +13,20 @@ interface StoryChronicleProps {
 
 export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
   const { story } = sectionContent
-  // Используем ту же структуру данных, что и в StoryMemoir
+  // ���������� �� �� ��������� ������, ��� � � StoryMemoir
   const moments = story.images ?? []
 
   return (
-    <section className={cn('@container overflow-x-hidden py-16 @md:py-24', theme.muted, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20">
+    <SectionWrapper
+      id="story"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.muted)}
+      padded={false}
+      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24"
+    >
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-16 @md:mb-20"
-        >
+        <div className="mb-16 @md:mb-20">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-end justify-between mt-3 gap-4">
             <div>
@@ -58,27 +57,20 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
               )}
             </div>
           </div>
-        </motion.div>
-
-        {/* Story moments — numbered editorial layout */}
+        </div>
         {moments.length > 0 && (
           <div className="space-y-20 @md:space-y-28">
             {moments.map((block, index) => {
               const imageUrl = block.image
               const isEven = index % 2 === 0
               const slotNum = String(index + 1).padStart(2, '0')
-              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
+              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'square'
               const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
-              // Берем description напрямую из блока, как в первом компоненте
               const description = block.description ?? ''
 
               return (
-                <motion.div
+                <div
                   key={block.id}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.8 }}
                   className="grid grid-cols-1 @md:grid-cols-[1fr_2fr] gap-6 @md:gap-10"
                 >
                   {/* Number + label sidebar */}
@@ -134,7 +126,7 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                       </p>
                     )}
                   </div>
-                </motion.div>
+                </div>
               )
             })}
           </div>
@@ -143,7 +135,6 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
         {moments.length === 0 && (
           <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

@@ -4,8 +4,8 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { useContactForm } from '@/editor/hooks/useContactForm'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -24,7 +24,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3 mb-3">
 
           {/* [A] Headline card — 7/12 */}
-          <FadeIn
+          <Animate
             delay={0}
             direction="up"
             distance={14}
@@ -45,10 +45,10 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 {sectionContent.contact.description}
               </p>
             )}
-          </FadeIn>
+          </Animate>
 
           {/* [B] Email card — 5/12 */}
-          <FadeIn
+          <Animate
             delay={0.07}
             direction="up"
             distance={14}
@@ -78,12 +78,12 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 Write ↗
               </a>
             </div>
-          </FadeIn>
+          </Animate>
 
         </div>
 
         {/* ── Row 2: Form card ── */}
-        <FadeIn
+        <Animate
           delay={0.1}
           direction="up"
           distance={12}
@@ -169,7 +169,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               </button>
             </div>
           </form>
-        </FadeIn>
+        </Animate>
 
       </div>
     </SectionWrapper>

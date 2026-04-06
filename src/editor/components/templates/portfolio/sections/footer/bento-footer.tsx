@@ -4,8 +4,8 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -21,7 +21,7 @@ export function BentoFooter({ theme, sectionContent }: BentoFooterProps) {
       className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6"
     >
       <div className="max-w-6xl mx-auto w-full">
-        <FadeIn
+        <Animate
           delay={0}
           direction="none"
           className={cn(
@@ -49,7 +49,7 @@ export function BentoFooter({ theme, sectionContent }: BentoFooterProps) {
             </div>
           )}
 
-        </FadeIn>
+        </Animate>
       </div>
     </SectionWrapper>
   )

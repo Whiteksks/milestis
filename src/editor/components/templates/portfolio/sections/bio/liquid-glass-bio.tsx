@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { FadeIn } from '../../primitives/fade-in'
+import { Animate } from '../../../primitives/animate'
 
 interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -29,14 +29,14 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
         {/* Section label */}
-        <FadeIn direction="left" distance={20} className="flex items-center gap-4 mb-12">
+          <Animate direction="left" distance={20} className="flex items-center gap-4 mb-12">
           <div
             className="px-3 py-1.5 rounded-full border border-white/15 text-[10px] uppercase tracking-[0.28em] text-white/50"
             style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           >
             {subtitle || 'About'}
           </div>
-        </FadeIn>
+        </Animate>
 
         {/* Main glass card */}
         <div
@@ -73,7 +73,7 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
 
             {/* Text panel */}
             <div className="flex-1 p-7 @md:p-10 @lg:p-14 space-y-6">
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={16}
                 as="h2"
@@ -85,9 +85,9 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
               >
                 {title}
-              </FadeIn>
+              </Animate>
 
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={12}
                 delay={0.1}
@@ -95,10 +95,10 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                 className={cn('text-sm @md:text-base text-white/55 font-light leading-relaxed whitespace-pre-line', theme.lineHeight, theme.fontBody)}
               >
                 {description}
-              </FadeIn>
+              </Animate>
 
               {achievements && achievements.length > 0 && (
-                <FadeIn
+                <Animate
                   direction="up"
                   distance={10}
                   delay={0.2}
@@ -121,7 +121,7 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                       </div>
                     ))}
                   </div>
-                </FadeIn>
+                </Animate>
               )}
             </div>
           </div>

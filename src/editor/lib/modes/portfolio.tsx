@@ -17,7 +17,7 @@ import { ShowcaseHero } from '@/editor/components/templates/portfolio/sections/h
 import { LiquidGlassHero } from '@/editor/components/templates/portfolio/sections/hero/liquid-glass-hero'
 
 const LoadingTemplate = () => (
-  <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
+  <div className="w-full h-full min-h-screen bg-transparent" />
 )
 
 // Templates

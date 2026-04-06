@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -17,7 +17,13 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
   const hasImage = Boolean(imageUrl)
 
   return (
-    <section className={cn('@container overflow-x-hidden', theme.background, theme.foreground)}>
+    <SectionWrapper
+      id="highlight"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.background)}
+      padded={false}
+      containerClassName="max-w-none p-0"
+    >
 
       {/* Cinematic photo panel */}
       <div className="relative min-h-[60vh] @md:min-h-[75vh] flex flex-col justify-end overflow-hidden">
@@ -40,13 +46,7 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
         )}
 
         {/* Text overlay — anchored bottom-left */}
-        <motion.div
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.9 }}
-          className="relative z-10 px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-16 space-y-4 max-w-4xl"
-        >
+        <div className="relative z-10 px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-16 space-y-4 max-w-4xl">
           <div className="flex items-center gap-3">
             <div className={cn('h-px w-8', hasImage ? 'bg-white/40' : theme.accent)} />
             <span
@@ -84,18 +84,12 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
               {highlight.description}
             </p>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Pull quote — below image, standard section background */}
       {highlight.quote && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.7 }}
-          className="px-8 @md:px-14 @lg:px-20 py-12 @md:py-16 max-w-7xl mx-auto w-full"
-        >
+        <div className="px-8 @md:px-14 @lg:px-20 py-12 @md:py-16 max-w-7xl mx-auto w-full">
           <blockquote className={cn('border-l-2 pl-6', theme.border)}>
             <p
               className={cn(
@@ -107,8 +101,8 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
               &ldquo;{highlight.quote}&rdquo;
             </p>
           </blockquote>
-        </motion.div>
+        </div>
       )}
-    </section>
+    </SectionWrapper>
   )
 }

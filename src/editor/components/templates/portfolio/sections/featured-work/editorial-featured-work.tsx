@@ -6,10 +6,10 @@ import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialTitle, EditorialParagraph } from '../../primitives/typography'
-import { EditorialDivider } from '../../primitives/divider'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
+import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
 interface EditorialFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -22,7 +22,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-24 @md:py-20 py-14">
         
         {/* Header Block */}
-        <FadeIn direction="up" delay={0.1} className="flex flex-col @md:flex-row @md:items-end justify-between gap-6 mb-20 w-full">
+        <Animate direction="up" delay={0.1} className="flex flex-col @md:flex-row @md:items-end justify-between gap-6 mb-20 w-full">
           <div className="space-y-4 flex-shrink-0">
             <span className={cn('text-[10px] uppercase tracking-[0.2em] opacity-40', theme.fontBody)}>
               {sectionContent.featuredWork.subtitle || 'Selected Projects'}
@@ -35,14 +35,14 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
           <span className={cn('text-[10px] opacity-40 mb-1 flex-shrink-0', theme.fontBody)}>
             {String(projects.length).padStart(2, '0')}
           </span>
-        </FadeIn>
+        </Animate>
 
         {/* List of Projects */}
         <div className="space-y-32 @md:space-y-40">
           {projects.map((project, i) => {
             const isEven = i % 2 === 0
             return (
-              <FadeIn
+              <Animate
                 key={i}
                 as="article"
                 direction="up"
@@ -104,7 +104,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
                   </div>
 
                 </div>
-              </FadeIn>
+              </Animate>
             )
           })}
         </div>

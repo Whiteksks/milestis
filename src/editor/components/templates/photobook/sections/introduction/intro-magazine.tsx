@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -19,36 +19,29 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section className={cn('@container py-16 @md:py-24 @lg:py-32', theme.background, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20">
+    <SectionWrapper
+      id="introduction"
+      themeForeground={theme.foreground}
+      className={theme.background}
+      padded={false}
+      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32"
+    >
 
-        {/* Magazine spread header */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-between mb-14 @md:mb-20"
-        >
-          <div className={cn('h-[2px] flex-1', theme.accent)} />
-          <span className={cn('px-5 text-[9px] uppercase tracking-[0.35em] opacity-35', theme.letterSpacing, theme.fontBody)}>
-            Introduction
-          </span>
-          <div className="h-px flex-1 bg-current opacity-10" />
-          <span className={cn('pl-5 text-[9px] opacity-20', theme.fontBody)}>p. 02</span>
-        </motion.div>
+      {/* Magazine spread header */}
+      <div className="flex items-center justify-between mb-14 @md:mb-20">
+        <div className={cn('h-[2px] flex-1', theme.accent)} />
+        <span className={cn('px-5 text-[9px] uppercase tracking-[0.35em] opacity-35', theme.letterSpacing, theme.fontBody)}>
+          Introduction
+        </span>
+        <div className="h-px flex-1 bg-current opacity-10" />
+        <span className={cn('pl-5 text-[9px] opacity-20', theme.fontBody)}>p. 02</span>
+      </div>
 
-        {/* Two-column spread: big quote left, image right */}
-        <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 @lg:gap-28 items-start">
+      {/* Two-column spread: big quote left, image right */}
+      <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 @lg:gap-28 items-start">
 
-          {/* Left — editorial text column */}
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
-            className="space-y-10"
-          >
+        {/* Left — editorial text column */}
+        <div className="space-y-10">
             {introduction.title && (
               <h2
                 className={cn(
@@ -90,17 +83,12 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
                 </p>
               </div>
             )}
-          </motion.div>
+        </div>
 
-          {/* Right — image */}
-          {imageUrl && (
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <SiteImage
+        {/* Right — image */}
+        {imageUrl && (
+          <div>
+            <SiteImage
                 src={imageUrl}
                 alt={introduction.title ?? 'Introduction'}
                 aspectRatio={aspectRatio}
@@ -115,10 +103,9 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
                   {imageBlock.caption}
                 </p>
               )}
-            </motion.div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

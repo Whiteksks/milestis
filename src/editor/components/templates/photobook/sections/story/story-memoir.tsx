@@ -1,6 +1,6 @@
-﻿"use client"
+"use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -16,17 +16,16 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
   const moments = story.images ?? []
 
   return (
-    <section className={cn('@container py-20 @md:py-28', theme.muted, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
+    <SectionWrapper
+      id="story"
+      themeForeground={theme.foreground}
+      className={theme.muted}
+      padded={false}
+      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28"
+    >
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-20 @md:mb-28"
-        >
+        <div className="mb-20 @md:mb-28">
           <div className="flex items-center gap-4 mb-6">
             <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
               Story
@@ -58,25 +57,19 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
               )}
             </div>
           </div>
-        </motion.div>
-
-        {/* Story moments — alternating image / text */}
+        </div>
         {moments.length > 0 && (
           <div className="space-y-24 @md:space-y-32">
             {moments.map((block, index) => {
               const isEven = index % 2 === 0
               const imageUrl = block.image
-              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'landscape'
+              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'wide'
               const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
               const description = block.description ?? ''
 
               return (
-                <motion.div
+                <div
                   key={block.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-80px' }}
-                  transition={{ duration: 0.8 }}
                   className="grid grid-cols-1 @md:grid-cols-2 gap-10 @md:gap-16 items-center"
                 >
                   {/* Photo */}
@@ -125,7 +118,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                       </p>
                     )}
                   </div>
-                </motion.div>
+                </div>
               )
             })}
           </div>
@@ -134,7 +127,6 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
         {moments.length === 0 && (
           <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

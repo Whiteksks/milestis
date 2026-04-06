@@ -1,6 +1,6 @@
 'use client'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'

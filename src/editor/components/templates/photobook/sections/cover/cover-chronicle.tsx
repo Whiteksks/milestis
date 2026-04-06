@@ -1,31 +1,30 @@
 "use client"
 
-import { motion, MotionConfig, type Transition } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface CoverChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  disableAnimations?: boolean
 }
 
-export function CoverChronicle({ sectionContent, theme, disableAnimations = false }: CoverChronicleProps) {
+export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
-
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
-    <section
+    <SectionWrapper
+      id="cover"
+      themeForeground={!hasImage ? theme.foreground : undefined}
       className={cn(
-        '@container relative min-h-screen flex flex-col overflow-hidden',
-        !hasImage && cn(theme.background, theme.foreground),
+        '@container relative min-h-screen flex flex-col overflow-hidden',       
+        !hasImage && theme.background,
       )}
+      padded={false}
     >
       {/* Full-bleed background photo */}
       {hasImage && (
@@ -44,12 +43,7 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
       )}
 
       {/* Masthead top bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={t(0.8)}
-        className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10"
-      >
+      <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10">
         <div className="flex items-center gap-3">
           <div className={cn('h-px w-8', hasImage ? 'bg-white/40' : theme.accent)} />
           <span
@@ -74,25 +68,15 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
             {[cover.date, cover.location].filter(Boolean).join('  ·  ')}
           </p>
         )}
-      </motion.div>
+      </Animate>
 
       {/* Bottom section */}
       <div className="relative z-10 flex-1 flex flex-col justify-end px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-20 @lg:pb-28">
 
         {/* Thick accent rule */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={t(1.4, 0, [0.16, 1, 0.3, 1])}
-          className={cn('h-[2px] origin-left mb-8', hasImage ? 'bg-white/30' : theme.accent)}
-        />
+        <Animate trigger="mount" direction="none" className={cn('h-[2px] origin-left mb-8', hasImage ? 'bg-white/30' : theme.accent)} />
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={t(1, 0.25, [0.16, 1, 0.3, 1])}
-          className="space-y-5"
-        >
+        <Animate trigger="mount" delay={0.25} distance={40} className="space-y-5">
           <h1
             className={cn(
               'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[7rem]',
@@ -116,9 +100,8 @@ export function CoverChronicle({ sectionContent, theme, disableAnimations = fals
               {cover.subtitle || cover.tagline}
             </p>
           )}
-        </motion.div>
+        </Animate>
       </div>
-    </section>
-    </MotionConfig>
+    </SectionWrapper>
   )
 }

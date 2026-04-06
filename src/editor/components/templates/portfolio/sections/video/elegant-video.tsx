@@ -2,8 +2,8 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface ElegantVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -19,14 +19,14 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
         <div className="space-y-14">
           {/* Heading */}
           <div className="text-center space-y-4">
-            <FadeIn
+            <Animate
               direction="up"
               distance={10}
               className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
             >
               <p>{sectionContent.video.subtitle || 'Watch'}</p>
-            </FadeIn>
-            <FadeIn
+            </Animate>
+            <Animate
               direction="up"
               distance={16}
               delay={0.1}
@@ -34,21 +34,21 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
               <h2 className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight tracking-tight', theme.fontTitle)}>
                 {sectionContent.video.title}
               </h2>
-            </FadeIn>
+            </Animate>
             {sectionContent.video.description && (
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={10}
                 delay={0.2}
                 className={cn('@md:text-base text-sm font-light max-w-xl mx-auto opacity-55', theme.lineHeight, theme.fontBody)}
               >
                 <p>{sectionContent.video.description}</p>
-              </FadeIn>
+              </Animate>
             )}
           </div>
 
           {/* Video frame — thin ornamental border */}
-          <FadeIn
+          <Animate
             direction="up"
             distance={16}
             delay={0.15}
@@ -69,7 +69,7 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
                 <p className={cn('text-[9px] uppercase tracking-[0.3em] opacity-20', theme.fontBody)}>Showreel</p>
               </div>
             )}
-          </FadeIn>
+          </Animate>
         </div>
       </div>
     </SectionWrapper>

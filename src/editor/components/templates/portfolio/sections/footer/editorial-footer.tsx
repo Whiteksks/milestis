@@ -4,9 +4,9 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialDivider } from '../../primitives/divider'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
 interface EditorialFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -20,7 +20,7 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
       padded={false}
     >
       <EditorialDivider className="w-full" />
-      <FadeIn direction="up" distance={20} className="@lg:px-20 @md:px-12 px-6 py-8">
+      <Animate direction="up" distance={20} className="@lg:px-20 @md:px-12 px-6 py-8">
         <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-start @md:items-center justify-between gap-4">
           {/* Left: copyright */}
           <div className="flex items-center gap-4">
@@ -44,7 +44,7 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
             </div>
           )}
         </div>
-      </FadeIn>
+      </Animate>
     </SectionWrapper>
   )
 }

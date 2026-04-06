@@ -1,10 +1,11 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface IntroLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -20,55 +21,38 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
-    <section
-      className={cn(
-        '@container overflow-x-hidden py-20 @md:py-28',
-        theme.background,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="introduction"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.background)}
+      padded={false}
+      containerClassName="max-w-2xl px-8 @md:px-0 text-center space-y-12 @md:space-y-16 py-20 @md:py-28"
     >
-      <div className="max-w-2xl mx-auto px-8 @md:px-0 text-center space-y-12 @md:space-y-16">
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4"
-        >
+        <div className="flex items-center gap-4">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
             02  ·  Introduction
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
-        </motion.div>
+        </div>
 
         {/* Title */}
         {introduction.title && (
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+          <h2
             className={cn(
               'text-2xl @sm:text-3xl @md:text-4xl font-light italic tracking-tight leading-snug',
               theme.fontTitle,
             )}
           >
             {introduction.title}
-          </motion.h2>
+          </h2>
         )}
 
         {/* Quote */}
         {introduction.quote && (
-          <motion.blockquote
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="space-y-3"
-          >
+          <Animate className="space-y-3">
             <p
               className={cn(
                 'text-lg @md:text-xl leading-relaxed font-light italic opacity-60',
@@ -78,42 +62,26 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
             >
               &ldquo;{introduction.quote}&rdquo;
             </p>
-          </motion.blockquote>
+          </Animate>
         )}
 
         {/* Dedication */}
         {introduction.dedication && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+          <p
             className={cn('text-[10px] uppercase tracking-[0.35em] opacity-30', theme.fontBody)}
           >
             {introduction.dedication}
-          </motion.p>
+          </p>
         )}
 
         {/* Thin rule between text and photo */}
         {hasImage && (
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.7 }}
-            className="origin-center w-12 h-px bg-current opacity-15 mx-auto"
-          />
+          <div className="origin-center w-12 h-px bg-current opacity-15 mx-auto" />
         )}
 
         {/* Framed photo */}
         {hasImage && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.9, delay: 0.1 }}
-            className="w-full max-w-[280px] @md:max-w-xs mx-auto"
-          >
+          <div className="w-full max-w-[280px] @md:max-w-xs mx-auto">
             <div className="border border-current/10 p-[3px]">
               <SiteImage
                 src={imageUrl}
@@ -130,9 +98,8 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
                 {introduction.images.caption}
               </p>
             )}
-          </motion.div>
+          </div>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

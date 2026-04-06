@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -17,14 +17,13 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
   const hasImage = Boolean(imageUrl)
 
   return (
-    <section
-      className={cn(
-        '@container overflow-hidden py-20 @md:py-32 px-6 @md:px-12',
-        theme.background,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="ending"
+      themeForeground={theme.foreground}
+      className={cn('overflow-hidden', theme.background)}
+      padded={false}
+      containerClassName="max-w-5xl py-20 @md:py-32 px-6 @md:px-12"
     >
-      <div className="max-w-5xl mx-auto">
         {/* Верхняя линия с номером страницы или пометкой "FIN" */}
         <div className="flex justify-between items-baseline mb-12 border-b border-current/10 pb-4">
           <span className="text-[10px] uppercase tracking-[0.3em] opacity-50">Editorial Archive</span>
@@ -35,10 +34,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
           
           {/* Левая колонка: Текст */}
           <div className="@lg:col-span-7 flex flex-col">
-            <motion.h2
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <h2
               className={cn(
                 'text-5xl @md:text-6xl @lg:text-7xl font-bold leading-[0.9] tracking-tighter mb-8 uppercase',
                 theme.fontTitle,
@@ -48,18 +44,13 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
               <span className={cn("block text-xl @md:text-2xl mt-4 font-light normal-case tracking-normal italic opacity-70", theme.fontBody)}>
                 of this chapter
               </span>
-            </motion.h2>
+            </h2>
 
             <div className="max-w-sm">
               {ending.signature && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className={cn('text-lg leading-relaxed mb-6 opacity-80', theme.fontBody)}
-                >
+                <p className={cn('text-lg leading-relaxed mb-6 opacity-80', theme.fontBody)}>
                   {ending.signature}
-                </motion.p>
+                </p>
               )}
               
               {ending.date && (
@@ -73,12 +64,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
 
           {/* Правая колонка: Изображение */}
           {hasImage && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="@lg:col-span-5 relative"
-            >
+            <div className="@lg:col-span-5 relative">
               <div className="relative aspect-[3/4] @lg:aspect-[4/5] overflow-hidden bg-current/5 shadow-2xl">
                 <SiteImage
                   fillParent
@@ -96,7 +82,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
               )}>
                 &
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
 
@@ -106,7 +92,6 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-40', theme.accent)} />
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-20', theme.accent)} />
         </div>
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

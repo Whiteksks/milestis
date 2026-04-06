@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { LiquidGlassHeader as RawLiquidGlassHeader } from './sections/header/liquid-glass-header'
 import { LiquidGlassHero as RawLiquidGlassHero } from './sections/hero/liquid-glass-hero'
 import { LiquidGlassBio as RawLiquidGlassBio } from './sections/bio/liquid-glass-bio'

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { FadeIn } from '../../primitives/fade-in'
+import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 
 interface LiquidGlassVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -27,7 +27,7 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
         {/* Header */}
-        <FadeIn direction="up" distance={16} className="flex items-end justify-between gap-8 mb-10">
+        <Animate direction="up" distance={16} className="flex items-end justify-between gap-8 mb-10">
           <div>
             <p className={cn('text-[10px] uppercase tracking-[0.3em] text-white/35 mb-3', theme.fontBody)}>
               {sectionContent.video.subtitle || 'Showreel'}
@@ -41,7 +41,7 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
               {sectionContent.video.description}
             </p>
           )}
-          </FadeIn>
+          </Animate>
 
         {sectionContent.video.description && (
           <p className={cn('@md:hidden text-xs text-white/40 leading-relaxed font-light mb-8', theme.fontBody)}>

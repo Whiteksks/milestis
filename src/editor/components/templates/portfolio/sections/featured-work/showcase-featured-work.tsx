@@ -1,7 +1,7 @@
 'use client'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
@@ -44,7 +44,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
 
         {/* Featured project — full-width cinema card */}
         {featured && (
-          <FadeIn as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
+          <Animate as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
             <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
               {featured.image && (
                 <SiteImage
@@ -103,14 +103,14 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                 </p>
               </div>
             </div>
-          </FadeIn>
+          </Animate>
         )}
 
         {/* Remaining projects — 2-column grid */}
         {rest.length > 0 && (
           <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
             {rest.map((project, i) => (
-              <FadeIn as="article" key={i + 1} direction="up" distance={30} delay={i * 0.1} className="group">
+              <Animate as="article" key={i + 1} direction="up" distance={30} delay={i * 0.1} className="group">
                 {/* Image */}
                 <div
                   className={cn(
@@ -163,7 +163,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                     ))}
                   </div>
                 </div>
-              </FadeIn>
+              </Animate>
             ))}
           </div>
         )}

@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { BentoHeader as RawBentoHeader } from './sections/header/bento-header'
 import { BentoHero as RawBentoHero } from './sections/hero/bento-hero'
 import { BentoBio as RawBentoBio } from './sections/bio/bento-bio'

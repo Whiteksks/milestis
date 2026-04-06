@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { FadeIn } from '../../primitives/fade-in'
+import { Animate } from '../../../primitives/animate'
 
 export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -24,14 +24,14 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 @md:px-12">
         <header className="mb-12 @md:mb-20">
-          <FadeIn
+          <Animate
             direction="up"
             distance={15}
             as="h2"
             className={cn("text-5xl @md:text-8xl font-black uppercase tracking-tighter text-white leading-[0.8]", theme.fontTitle)}
           >
             {sectionContent.featuredWork.title}
-          </FadeIn>
+          </Animate>
         </header>
 
           <div className="grid grid-cols-1 @md:grid-cols-12 gap-6 @md:gap-10 items-stretch">
@@ -50,7 +50,7 @@ function ProjectCard({ project, index, theme }: { project: any, index: number, t
   const hasDescription = !!project.description && project.description.trim() !== ''
   
   return (
-    <FadeIn
+    <Animate
       as="article"
       direction="up"
       distance={25}
@@ -128,6 +128,6 @@ function ProjectCard({ project, index, theme }: { project: any, index: number, t
       )}
 
       <div className="hidden @lg:block absolute inset-0 z-40 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-tr from-white/5 via-transparent to-transparent" />
-    </FadeIn>
+    </Animate>
   )
 }

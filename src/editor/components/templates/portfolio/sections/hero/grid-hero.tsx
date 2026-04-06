@@ -4,8 +4,8 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -28,7 +28,7 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
       className="@container pt-20 @md:pt-24 pb-3"
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8 w-full">
-        <FadeIn
+        <Animate
           delay={0}
           direction="up"
           distance={30}
@@ -94,7 +94,7 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
             </div>
 
           </div>
-        </FadeIn>
+        </Animate>
       </div>
     </SectionWrapper>
   )

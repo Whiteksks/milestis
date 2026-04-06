@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface ElegantBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -20,7 +20,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
         <div className="flex flex-col @lg:flex-row items-start gap-12 @lg:gap-20">
           
           {/* Фото: остается компактным (240px), но плотно прижато к сетке */}
-          <FadeIn
+          <Animate
             delay={0.1}
             direction="right"
             distance={20}
@@ -37,12 +37,12 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
               className="w-[180px] @md:w-[220px] @lg:w-[240px] shadow-sm"
               imageClassName="object-cover"
             />
-          </FadeIn>
+          </Animate>
 
           {/* Текст: теперь он "главный" */}
           <div className="flex-1 space-y-10">
             <div className="space-y-6">
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={15}
                 delay={0.2}
@@ -54,9 +54,9 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
                 <h2 className={cn('text-3xl @md:text-4xl @lg:text-5xl font-extralight tracking-tight', theme.fontTitle)}>
                   {sectionContent.bio.title}
                 </h2>
-              </FadeIn>
+              </Animate>
 
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={15}
                 delay={0.3}
@@ -65,14 +65,14 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
                 <p className={cn('text-base @md:text-lg font-light leading-relaxed whitespace-pre-line opacity-80', theme.fontBody)}>
                   {sectionContent.bio.description}
                 </p>
-              </FadeIn>
+              </Animate>
             </div>
 
             {/* Achievements: делаем их компактным списком внизу */}
             {(sectionContent.bio.achievements ?? []).length > 0 && (
               <div className="grid @sm:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t border-current/10">
                 {(sectionContent.bio.achievements ?? []).map((achievement, i) => (
-                  <FadeIn
+                  <Animate
                     key={i}
                     direction="up"
                     distance={10}
@@ -81,7 +81,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
                   >
                     <span className="text-[10px] opacity-40">0{i + 1}</span>
                     <p className={cn('text-xs @md:text-sm font-light', theme.fontBody)}>{achievement}</p>
-                  </FadeIn>
+                  </Animate>
                 ))}
               </div>
             )}

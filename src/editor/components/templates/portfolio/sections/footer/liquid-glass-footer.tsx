@@ -3,7 +3,7 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
-import { FadeIn } from '../../primitives/fade-in'
+import { Animate } from '../../../primitives/animate'
 
 interface LiquidGlassFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -40,7 +40,7 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
           <div className="absolute inset-0 rounded-2xl @md:rounded-3xl pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)' }} />
 
           {/* Left: colored dots + copyright */}
-          <FadeIn direction="up" distance={8} className="flex items-center gap-4">
+          <Animate direction="up" distance={8} className="flex items-center gap-4">
             <div className="flex gap-1.5">
               {[primary, secondary, accent2].map((c, i) => (
                 <div key={i} className="w-2 h-2 rounded-full" style={{ background: c, boxShadow: `0 0 5px ${c}` }} />
@@ -49,11 +49,11 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
             <p className={cn('text-[10px] uppercase tracking-[0.2em] text-white/30', theme.fontBody)}>
               © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
-          </FadeIn>
+          </Animate>
 
           {/* Right: social icons */}
           {socialLinks.length > 0 && (
-            <FadeIn direction="none" delay={0.1} className="flex items-center gap-5">
+            <Animate direction="none" delay={0.1} className="flex items-center gap-5">
               {socialLinks.map((link, i) => (
                 <SocialIconLink
                   key={i}
@@ -63,7 +63,7 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
                   className="text-white/30 hover:text-white/70 transition-colors duration-200"
                 />
               ))}
-            </FadeIn>
+            </Animate>
           )}
         </div>
       </div>

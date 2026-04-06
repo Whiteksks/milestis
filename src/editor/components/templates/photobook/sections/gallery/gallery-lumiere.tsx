@@ -1,10 +1,11 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GalleryLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -16,44 +17,33 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
   const images = gallery.images ?? []
 
   return (
-    <section
-      className={cn(
-        '@container overflow-x-hidden py-20 @md:py-28',
-        theme.background,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="gallery"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.background)}
+      padded={false}
+      containerClassName="max-w-5xl px-8 @md:px-14 @lg:px-10 py-20 @md:py-28"
     >
-      <div className="max-w-5xl mx-auto px-8 @md:px-14 @lg:px-10">
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4 mb-14 @md:mb-18"
-        >
+        <div className="flex items-center gap-4 mb-14 @md:mb-18">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
             {String(images.length).padStart(2, '0')}  ·  Gallery
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
-        </motion.div>
+        </div>
 
         {/* Gallery title */}
         {gallery.title && (
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7 }}
+          <h2
             className={cn(
               'text-center text-xl @md:text-2xl font-light italic opacity-55 mb-12',
               theme.fontTitle,
             )}
           >
             {gallery.title}
-          </motion.h2>
+          </h2>
         )}
 
         {/* Contact-sheet grid */}
@@ -67,12 +57,11 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
               const photoNum = String(index + 1).padStart(2, '0')
 
               return (
-                <motion.div
+                <Animate
                   key={photo.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.7, delay: (index % 3) * 0.08 }}
+                  direction="up"
+                  distance={20}
+                  delay={index * 0.05}
                   className="flex flex-col gap-1.5"
                 >
                   {/* Framed photo */}
@@ -101,7 +90,7 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
                       </p>
                     )}
                   </div>
-                </motion.div>
+                </Animate>
               )
             })}
           </div>
@@ -115,7 +104,6 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
             ))}
           </div>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

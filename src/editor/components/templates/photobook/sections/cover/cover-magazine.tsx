@@ -1,35 +1,33 @@
 "use client"
 
-import { motion, MotionConfig, type Transition } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface CoverMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  disableAnimations?: boolean
 }
 
-export function CoverMagazine({ sectionContent, theme, disableAnimations = false }: CoverMagazineProps) {
+export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
 
   // Split title into words — alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
-
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
-    <section
+    <SectionWrapper
+      id="cover"
+      themeForeground={theme.foreground}
       className={cn(
-        '@container relative min-h-screen flex flex-col overflow-hidden',
+        '@container relative min-h-screen flex flex-col overflow-hidden',       
         theme.background,
-        theme.foreground,
       )}
+      padded={false}
     >
       {/* Full-bleed background */}
       {hasImage && (
@@ -49,12 +47,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
       )}
 
       {/* Masthead top bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={t(0.9)}
-        className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10"
-      >
+      <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10">
         {/* Left — publication name */}
         <span
           className={cn(
@@ -92,28 +85,20 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
             </span>
           )}
         </div>
-      </motion.div>
+      </Animate>
 
       {/* Bottom title block */}
       <div className="relative z-10 flex-1 flex flex-col justify-end px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-20 @lg:pb-28">
 
         {/* Top thin rule above title */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={t(1.4, 0, [0.16, 1, 0.3, 1])}
-          className={cn(
+        <Animate trigger="mount" direction="none" className={cn(
             'h-px origin-left mb-8',
             hasImage ? 'bg-white/25' : theme.accent,
           )}
         />
 
         {/* Alternate solid / outline title words */}
-        <motion.div
-          initial={{ opacity: 0, y: 44 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={t(1, 0.2, [0.16, 1, 0.3, 1])}
-        >
+        <Animate trigger="mount" delay={0.2} distance={44}>
           <h1
             className={cn(
               'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[8rem]',
@@ -146,11 +131,7 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
 
           {/* Subtitle / tagline */}
           {(cover.subtitle || cover.tagline) && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={t(0.8, 0.55)}
-              className={cn(
+            <Animate as="p" trigger="mount" direction="none" delay={0.55} className={cn(
                 'mt-6 text-sm @md:text-base font-light max-w-[36ch]',
                 hasImage ? 'text-white/50' : 'opacity-50',
                 theme.lineHeight,
@@ -158,11 +139,10 @@ export function CoverMagazine({ sectionContent, theme, disableAnimations = false
               )}
             >
               {cover.subtitle || cover.tagline}
-            </motion.p>
+            </Animate>
           )}
-        </motion.div>
+        </Animate>
       </div>
-    </section>
-    </MotionConfig>
+    </SectionWrapper>
   )
 }

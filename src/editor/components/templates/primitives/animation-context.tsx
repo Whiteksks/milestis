@@ -24,6 +24,11 @@ export type TemplateId =
   | 'minimal'
   | 'grid'
   | 'liquid-glass'
+  | 'lumiere'
+  | 'memoir'
+  | 'chronicle'
+  | 'magazine'
+  | 'soleil'
 
 // ── Eases ─────────────────────────────────────────────────────────────────────
 
@@ -67,6 +72,11 @@ export const TEMPLATE_CONFIG: Record<
   minimal:         { duration: 0.65, ease: EASE.spring },
   grid:            { duration: 0.60, ease: EASE.snappy },
   bento:           { duration: 0.55, ease: EASE.snappy },
+  lumiere:          { duration: 0.90, ease: EASE.spring },
+  memoir:           { duration: 0.90, ease: EASE.spring },
+  chronicle:        { duration: 0.75, ease: EASE.spring },
+  magazine:         { duration: 0.80, ease: EASE.spring },
+  soleil:           { duration: 0.78, ease: EASE.spring },
 }
 
 // ── Context type ──────────────────────────────────────────────────────────────
@@ -114,7 +124,7 @@ export function AnimationProvider({
   templateId,
   disabled = false,
 }: AnimationProviderProps) {
-  const { ease: baseEase } = TEMPLATE_CONFIG[templateId]
+  const { ease: baseEase } = TEMPLATE_CONFIG[templateId] ?? TEMPLATE_CONFIG['editorial']
 
   const t = useMemo<AnimationContextValue['t']>(
     () =>

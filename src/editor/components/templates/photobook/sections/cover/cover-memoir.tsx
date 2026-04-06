@@ -1,50 +1,42 @@
 "use client"
 
-import { motion, MotionConfig, type Transition } from "framer-motion"
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface CoverMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
-  disableAnimations?: boolean
 }
 
-export function CoverMemoir({ sectionContent, theme, disableAnimations = false }: CoverMemoirProps) {
+export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
   const { cover } = sectionContent
   const imageBlock = cover.images
   const imageUrl = imageBlock?.image ?? ''
   const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'portrait'
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
   const cropData = imageBlock?.imageSettings?.[0]?.cropData
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
-
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
-    <section className={cn('@container relative min-h-screen flex flex-col', theme.background, theme.foreground)}>
+    <SectionWrapper
+      id="cover"
+      themeForeground={theme.foreground}
+      className={theme.background}
+      containerClassName="relative min-h-screen flex flex-col"
+      padded={false}
+    >
 
-      {/* Top accent stroke — draws in from left */}
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={t(1.6, 0, [0.16, 1, 0.3, 1])}
-        className={cn('h-px origin-left shrink-0', theme.accent)}
-      />
+      {/* Top accent stroke */}
+      <Animate trigger="mount" direction="none" className={cn('h-px origin-left shrink-0', theme.accent)} />
 
       {/* Main two-column grid */}
       <div className="flex-1 grid grid-cols-1 @md:grid-cols-[3fr_2fr] items-center">
 
         {/* Left – Typography */}
-        <motion.div
-          initial={{ opacity: 0, y: 36 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={t(1, 0.25, [0.16, 1, 0.3, 1])}
-          className="order-2 @md:order-1 flex flex-col justify-center px-8 @md:px-12 @lg:px-20 py-14 @md:py-20 gap-8"
-        >
+        <Animate trigger="mount" delay={0.25} distance={36} className="order-2 @md:order-1 flex flex-col justify-center px-8 @md:px-12 @lg:px-20 py-14 @md:py-20 gap-8">
           {/* Eyebrow label */}
           <div className="flex items-center gap-3">
             <span className={cn('text-[10px] uppercase opacity-25', theme.letterSpacing, theme.fontBody)}>
@@ -85,15 +77,10 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
               </p>
             </div>
           )}
-        </motion.div>
+        </Animate>
 
         {/* Right – Photo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={t(1.2, 0.05, [0.16, 1, 0.3, 1])}
-          className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16"
-        >
+        <Animate trigger="mount" type="scale" scaleOffset={0.96} delay={0.05} className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16">
           {imageUrl ? (
             <SiteImage
               src={imageUrl}
@@ -113,14 +100,13 @@ export function CoverMemoir({ sectionContent, theme, disableAnimations = false }
               )}
             />
           )}
-        </motion.div>
+        </Animate>
       </div>
 
       {/* Bottom rule */}
       <div className="px-8 @md:px-12 @lg:px-20 pb-8 shrink-0">
         <div className="h-px bg-current opacity-[0.08]" />
       </div>
-    </section>
-    </MotionConfig>
+    </SectionWrapper>
   )
 }

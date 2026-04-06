@@ -1,19 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useT, useDisabled } from '../../primitives/animation-context'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { Animate } from '../../../primitives/animate'
 
 interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
   const heroImage = sectionContent.hero.image
-  const t = useT()
-  const disabled = useDisabled()
-
   return (
     <section
       id="hero"
@@ -23,14 +20,9 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
         theme.foreground,
       )}
     >
-      {/* Background image — full bleed, all breakpoints */}
+      {/* Background image */}
       {heroImage && (
-        <motion.div
-          initial={disabled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={disabled ? undefined : t(0.9, 0, 'easeOut')}
-          className="absolute inset-0"
-        >
+        <Animate trigger="mount" type="scale" scaleOffset={1.05} className="absolute inset-0">
           <SiteImage
             fillParent
             unoptimized
@@ -55,18 +47,13 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
                 'linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.40) 55%, transparent 100%)',
             }}
           />
-        </motion.div>
+        </Animate>
       )}
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col justify-end @md:justify-center max-w-7xl mx-auto w-full px-6 @md:px-12 @lg:px-20 pt-28 pb-20 @md:pt-32 @md:pb-24">
         {/* Tag pill */}
-        <motion.div
-          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={disabled ? undefined : t(0.6, 0.2)}
-          className="mb-5 @md:mb-8 flex items-center gap-3"
-        >
+        <Animate trigger="mount" direction="none" delay={0.2} className="mb-5 @md:mb-8 flex items-center gap-3">
           <span
             className={cn(
               'inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em]',
@@ -77,13 +64,14 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
             <span className="w-4 h-px bg-current" />
             {sectionContent.hero.subtitle || 'Portfolio'}
           </span>
-        </motion.div>
+        </Animate>
 
         {/* Title */}
-        <motion.h1
-          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={disabled ? undefined : t(0.9, 0.3)}
+        <Animate
+          trigger="mount"
+          delay={0.3}
+          distance={30}
+          as="h1"
           className={cn(
             'leading-[0.88] uppercase font-black',
             '@lg:text-[6rem] @md:text-[4.5rem] text-[2.8rem]',
@@ -92,13 +80,14 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
           )}
         >
           {sectionContent.hero.title}
-        </motion.h1>
+        </Animate>
 
         {/* Description */}
-        <motion.p
-          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={disabled ? undefined : t(0.8, 0.5)}
+        <Animate
+          trigger="mount"
+          delay={0.5}
+          distance={20}
+          as="p"
           className={cn(
             'mt-5 @md:mt-8 max-w-md text-sm @md:text-base leading-relaxed font-light',
             heroImage ? 'text-white/65' : 'opacity-50',
@@ -106,14 +95,14 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
           )}
         >
           {sectionContent.hero.description}
-        </motion.p>
+        </Animate>
       </div>
 
       {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={t(1, 1)}
+        transition={{ duration: 1, delay: 1 }}
         className={cn(
           'relative z-10 flex items-center justify-center pb-8',
           heroImage ? 'text-white/40' : 'opacity-30',

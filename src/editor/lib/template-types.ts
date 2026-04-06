@@ -22,4 +22,6 @@ export interface PortfolioTemplateProps extends BaseTemplateProps {
 export interface PhotobookTemplateProps extends BaseTemplateProps {
   sectionVisibility: PhotobookSectionVisibility
   sectionContent: PhotobookSectionContent
+  /** Set to true to disable all animations (used in editor preview). */
+  disableAnimations?: boolean
 }

@@ -2,8 +2,8 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GridVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -21,7 +21,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
         <div className="max-w-6xl mx-auto space-y-3">
 
           {/* ── Cinematic video card ── */}
-          <FadeIn
+          <Animate
             direction="up"
             distance={5}
             scaleOffset={0.99}
@@ -54,7 +54,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
                 </div>
               )}
             </div>
-          </FadeIn>
+          </Animate>
 
           {/* ── Info row ── */}
           <div className={cn(

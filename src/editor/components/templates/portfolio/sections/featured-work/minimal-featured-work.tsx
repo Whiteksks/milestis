@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface MinimalFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -21,21 +21,21 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
 
         {/* Section header */}
         <div className="flex items-center justify-between mb-20 border-t border-current/10 pt-8">
-          <FadeIn
+          <Animate
             direction="left"
             distance={10}
             as="p"
             className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
           >
             {sectionContent.featuredWork.subtitle || 'Selected Work'}
-          </FadeIn>
+          </Animate>
         </div>
 
         {/* Project list — alternating editorial layout */}
         <div className="space-y-0">
           {projects.map((project, i) => (
             <div key={i} className="border-t border-current/10 last:border-b">
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={16}
                 delay={0.05}
@@ -90,7 +90,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                     </div>
                   )}
                 </div>
-              </FadeIn>
+              </Animate>
             </div>
           ))}
         </div>

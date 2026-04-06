@@ -2,8 +2,8 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface MinimalVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -17,18 +17,18 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         {/* Section header */}
         <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
-          <FadeIn
+          <Animate
             direction="left"
             distance={10}
             as="p"
             className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
           >
             {sectionContent.video.subtitle || 'Showreel'}
-          </FadeIn>
+          </Animate>
         </div>
 
         <div className="space-y-8">
-          <FadeIn direction="up" distance={14} delay={0.05}>
+          <Animate direction="up" distance={14} delay={0.05}>
             <h2 className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight', theme.fontTitle)}>
               {sectionContent.video.title}
             </h2>
@@ -37,10 +37,10 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
                 {sectionContent.video.description}
               </p>
             )}
-          </FadeIn>
+          </Animate>
 
           {/* Video frame */}
-          <FadeIn
+          <Animate
             direction="up"
             distance={10}
             delay={0.15}
@@ -61,7 +61,7 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
                 <p className={cn('text-[9px] uppercase tracking-[0.3em] opacity-20', theme.fontBody)}>Video</p>
               </div>
             )}
-          </FadeIn>
+          </Animate>
         </div>
       </div>
     </SectionWrapper>

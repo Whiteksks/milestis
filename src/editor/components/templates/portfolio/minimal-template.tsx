@@ -2,8 +2,8 @@
 
 import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { MinimalHero as RawMinimalHero } from './sections/hero/minimal-hero'
 import { MinimalBio as RawMinimalBio } from './sections/bio/minimal-bio'
 import { MinimalFeaturedWork as RawMinimalFeaturedWork } from './sections/featured-work/minimal-featured-work'

@@ -1,6 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -19,34 +20,25 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section className={cn('@container py-20 @md:py-28 @lg:py-36', theme.background, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
+    <SectionWrapper
+      id="introduction"
+      themeForeground={theme.foreground}
+      className={theme.background}
+      padded={false}
+      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-36"
+    >
 
         {/* Section label */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4 mb-16 @md:mb-20"
-        >
+        <Animate direction="up" distance={20} className="flex items-center gap-4 mb-16 @md:mb-20">
           <div className={cn('h-px w-12', theme.accent)} />
           <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
             Introduction
           </span>
-        </motion.div>
-
-        {/* Content: text left, image right */}
+        </Animate>
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 items-start">
 
-          {/* Left – text */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
-            className="space-y-10"
-          >
+          {/* Left вЂ“ text */}
+          <Animate direction="right" distance={30} delay={0.1} className="space-y-10">
             {introduction.title && (
               <h2
                 className={cn(
@@ -81,16 +73,10 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
                 </p>
               </div>
             )}
-          </motion.div>
+          </Animate>
 
-          {/* Right – image */}
           {imageUrl && (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.8, delay: 0.15 }}
-            >
+            <Animate direction="left" distance={30} delay={0.2} scaleOffset={0.98}>
               <SiteImage
                 src={imageUrl}
                 alt={introduction.title ?? 'Introduction'}
@@ -101,10 +87,9 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
                 sizes="(max-width: 768px) 80vw, 35vw"
                 className={theme.shadow}
               />
-            </motion.div>
+            </Animate>
           )}
         </div>
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

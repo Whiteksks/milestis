@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
-import { useT } from '../../primitives/animation-context'
+import { useT } from '../../../primitives/animation-context'
 import { Menu, X, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'

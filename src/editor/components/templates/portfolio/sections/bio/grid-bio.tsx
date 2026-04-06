@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GridBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -21,7 +21,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
         
         {/* Основная оболочка-карточка */}
-        <FadeIn
+        <Animate
           direction="up"
           distance={20}
           className={cn(
@@ -35,7 +35,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
           <div className="grid grid-cols-1 @lg:grid-cols-12 gap-8 @lg:gap-16 items-center relative z-10 w-full">
             
             {/* [A] Левая колонка: Компактное фото */}
-            <FadeIn 
+            <Animate 
               direction="up"
               distance={10}
               delay={0.2}
@@ -52,52 +52,52 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
                 className="w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2 rounded-2xl"
                 imageClassName="object-cover"
               />
-            </FadeIn>
+            </Animate>
 
             {/* [B] Правая колонка: Инфо */}
             <div className="@lg:col-span-8 flex flex-col">
               <div className="space-y-2 mb-6">
-                <FadeIn direction="up" delay={0.25} distance={10}>
+                <Animate direction="up" delay={0.25} distance={10}>
                   <span className="text-[10px] uppercase tracking-[0.3em] opacity-40 font-medium">
                     {sectionContent.bio.subtitle || 'Personal Profile'}
                   </span>
-                </FadeIn>
-                <FadeIn direction="up" delay={0.3} distance={10}>
+                </Animate>
+                <Animate direction="up" delay={0.3} distance={10}>
                   <h2 className={cn(
                     'text-3xl @md:text-4xl @lg:text-5xl font-bold leading-tight',
                     theme.fontTitle
                   )}>
                     {sectionContent.bio.title}
                   </h2>
-                </FadeIn>
+                </Animate>
               </div>
 
-              <FadeIn direction="up" delay={0.35} distance={10}>
+              <Animate direction="up" delay={0.35} distance={10}>
                 <p className={cn(
                   'text-base @lg:text-lg opacity-70 leading-relaxed mb-10 max-w-2xl',
                   theme.fontBody
                 )}>
                   {sectionContent.bio.description}
                 </p>
-              </FadeIn>
+              </Animate>
 
               {/* Achievements как горизонтальный скролл или сетка */}
               {achievements.length > 0 && (
                 <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 pt-8 border-t border-current/5">
                   {achievements.map((item, i) => (
-                    <FadeIn key={i} direction="up" delay={0.4 + i * 0.05} distance={10} className="flex items-start gap-3 group">
+                    <Animate key={i} direction="up" delay={0.4 + i * 0.05} distance={10} className="flex items-start gap-3 group">
                       <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-current opacity-30 group-hover:opacity-100 transition-opacity" />
                       <span className={cn('text-sm opacity-60 group-hover:opacity-90 transition-opacity', theme.fontBody)}>
                         {item}
                       </span>
-                    </FadeIn>
+                    </Animate>
                   ))}
                 </div>
               )}
             </div>
 
           </div>
-        </FadeIn>
+        </Animate>
       </div>
     </SectionWrapper>
   )

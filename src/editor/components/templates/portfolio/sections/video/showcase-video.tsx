@@ -1,7 +1,7 @@
 'use client'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
@@ -60,7 +60,7 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
         )}
 
         {/* Video — cinematic aspect ratio, no border-radius */}
-        <FadeIn direction="none" scaleOffset={0.98} delay={0.2} className="relative aspect-video w-full overflow-hidden bg-current/5">
+        <Animate direction="none" scaleOffset={0.98} delay={0.2} className="relative aspect-video w-full overflow-hidden bg-current/5">
           {sectionContent.video.videoUrl ? (
             <iframe
               src={sectionContent.video.videoUrl}
@@ -86,7 +86,7 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
               </span>
             </div>
           )}
-        </FadeIn>
+        </Animate>
       </div>
 
       {/* Bottom separator */}

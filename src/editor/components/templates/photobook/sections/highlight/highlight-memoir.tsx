@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -21,19 +21,18 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
   const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
 
   return (
-    <section className={cn('@container overflow-x-hidden py-16 @md:py-24 @lg:py-32', theme.muted, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
+    <SectionWrapper
+      id="highlight"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.muted)}
+      padded={false}
+      containerClassName="px-8 @md:px-12 @lg:px-20 py-16 @md:py-24 @lg:py-32"
+    >
 
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
           {/* Left – Photo (order-2 on mobile → shows below text) */}
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.9 }}
-            className="order-2 @md:order-1"
-          >
+          <div className="order-2 @md:order-1">
             <div
               className={cn(
                 'relative overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none',
@@ -56,16 +55,10 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
                 <div className={cn('absolute inset-0', theme.background)} />
               )}
             </div>
-          </motion.div>
+          </div>
 
           {/* Right – Content (order-1 on mobile → shows above photo) */}
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.9, delay: 0.15 }}
-            className="order-1 @md:order-2 space-y-6 @md:space-y-8"
-          >
+          <div className="order-1 @md:order-2 space-y-6 @md:space-y-8">
             {/* Label */}
             <div className="flex items-center gap-4">
               <div className={cn('h-px w-12', theme.accent)} />
@@ -107,9 +100,8 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
                 </p>
               </blockquote>
             )}
-          </motion.div>
+          </div>
         </div>
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

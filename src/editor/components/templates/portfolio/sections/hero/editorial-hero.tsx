@@ -4,9 +4,9 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialDivider } from '../../primitives/divider'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
 interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -17,7 +17,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
   const descriptionBlock = (
     <div className="space-y-5 max-w-sm">
       <div className="w-10 h-px bg-current opacity-20" />
-      <FadeIn
+      <Animate
         direction="up"
         distance={16}
         delay={0.4}
@@ -27,7 +27,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
         )}
       >
         <p>{sectionContent.hero.description}</p>
-      </FadeIn>
+      </Animate>
     </div>
   )
 
@@ -54,7 +54,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
             </div>
 
             {/* Title — overflows onto photo on desktop */}
-            <FadeIn
+            <Animate
               direction="left"
               distance={-30}
               delay={0.2}
@@ -69,7 +69,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
               >
                 {sectionContent.hero.title}
               </h1>
-            </FadeIn>
+            </Animate>
 
             {/* Description — bottom of left col, desktop only */}
             <div className="mt-auto pt-14 hidden @md:block">
@@ -79,7 +79,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
 
           {/* RIGHT: photo — vertically centered, clears header with top padding */}
           {heroImage && (
-            <FadeIn
+            <Animate
               direction="right"
               distance={20}
               delay={0.15}
@@ -94,7 +94,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
                 className="w-full"
                 priority
               />
-            </FadeIn>
+            </Animate>
           )}
         </div>
 

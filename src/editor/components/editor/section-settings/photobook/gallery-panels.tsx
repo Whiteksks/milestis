@@ -65,7 +65,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
       id: `gallery-${timestamp}-${index}`,
       image: url,
       caption: "",
-      imageSettings: [{ aspectRatio: "landscape" as const, frameStyle: "soft" as const }],
+      imageSettings: [{ aspectRatio: "wide" as const, frameStyle: "soft" as const }],
     }))
 
     updatePhotobookSection("gallery", { images: [...current, ...nextNew] })

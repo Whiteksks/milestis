@@ -74,7 +74,7 @@ export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
               imageSettings:
                 highlight.images?.imageSettings?.length
                   ? highlight.images.imageSettings
-                  : [{ aspectRatio: "landscape", frameStyle: "none" }],
+                  : [{ aspectRatio: "wide" as const, frameStyle: "none" as const }],
             },
           })
         }

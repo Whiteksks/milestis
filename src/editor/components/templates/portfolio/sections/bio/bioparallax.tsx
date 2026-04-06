@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useT } from '../../primitives/animation-context'
+import { useT } from '../../../primitives/animation-context'
 import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'

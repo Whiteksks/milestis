@@ -4,8 +4,8 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -33,7 +33,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
           {/* [A] Title / intro card */}
-          <FadeIn
+          <Animate
             delay={0}
             direction="up"
             distance={24}
@@ -71,10 +71,10 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
               </p>
 
             </div>
-          </FadeIn>
+          </Animate>
 
           {/* [B] Photo or monogram card */}
-          <FadeIn
+          <Animate
             delay={0.1}
             direction="up"
             distance={24}
@@ -107,7 +107,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
                 </span>
               </div>
             )}
-          </FadeIn>
+          </Animate>
 
         </div>
       </div>

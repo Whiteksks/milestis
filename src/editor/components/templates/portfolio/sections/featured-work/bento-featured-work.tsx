@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoFeaturedWorkProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -36,7 +36,7 @@ function ProjectCard({
   titleSize?: string
 }) {
   return (
-    <FadeIn
+    <Animate
       delay={index * 0.065}
       direction="up"
       distance={18}
@@ -106,7 +106,7 @@ function ProjectCard({
           {project.description}
         </p>
       </div>
-    </FadeIn>
+    </Animate>
   )
 }
 
@@ -126,7 +126,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
       <div className="max-w-6xl mx-auto space-y-3 w-full">
 
         {/* ── Header ── */}
-        <FadeIn
+        <Animate
           delay={0}
           direction="up"
           distance={12}
@@ -144,7 +144,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
             </h2>
           </div>
 
-        </FadeIn>
+        </Animate>
 
         {/* ── Bento grid ── */}
         {projects.length > 0 && (

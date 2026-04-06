@@ -6,9 +6,9 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useContactForm } from '@/editor/hooks/useContactForm'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../primitives/typography'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 
 interface EditorialContactProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -30,32 +30,32 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
 
             {/* Left — headline */}
             <div className="space-y-6">
-              <FadeIn direction="left" delay={0.1}>
+              <Animate direction="left" delay={0.1}>
                 <EditorialTitle themeFont={theme.fontTitle} className="@lg:text-5xl @md:text-4xl text-3xl tracking-tight">
                   {sectionContent.contact.title}
                 </EditorialTitle>
-              </FadeIn>
+              </Animate>
 
               {sectionContent.contact.description && (
-                <FadeIn direction="up" delay={0.2}>
+                <Animate direction="up" delay={0.2}>
                   <EditorialParagraph themeFont={theme.fontBody} themeLineHeight={theme.lineHeight} className="opacity-50">
                     {sectionContent.contact.description}
                   </EditorialParagraph>
-                </FadeIn>
+                </Animate>
               )}
 
-              <FadeIn direction="up" delay={0.3} className="pt-4 space-y-1">
+              <Animate direction="up" delay={0.3} className="pt-4 space-y-1">
                 <p className={cn('text-[10px] uppercase opacity-25', theme.letterSpacing, theme.fontBody)}>
                   Direct
                 </p>
                 <p className={cn('text-sm opacity-60 font-light', theme.fontBody)}>
                   {sectionContent.contact.email}
                 </p>
-              </FadeIn>
+              </Animate>
             </div>
 
             {/* Right — minimalist underline-only form */}
-            <FadeIn direction="up" delay={0.2} as="div">
+            <Animate direction="up" delay={0.2} as="div">
               <form onSubmit={handleSubmit} className="space-y-0">
                 {status !== 'idle' && (
                   <motion.div
@@ -143,7 +143,7 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
                   </Button>
                 </div>
               </form>
-            </FadeIn>
+            </Animate>
           </div>
         </div>
       </div>

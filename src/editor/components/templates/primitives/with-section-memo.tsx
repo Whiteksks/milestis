@@ -1,6 +1,5 @@
 import React from 'react'
 import fastDeepEqual from 'fast-deep-equal'
-import type { SectionContent } from '@/editor/lib/types'
 
 /**
  * Wraps a template section (e.g. Hero, Bio) to prevent unnecessary re-renders.
@@ -10,9 +9,9 @@ import type { SectionContent } from '@/editor/lib/types'
  * @param Component The section component
  * @param sectionKey The key in `sectionContent` this section cares about (e.g., 'hero')
  */
-export function withSectionMemo<P extends { sectionContent: SectionContent; theme: any; [key: string]: any }>(
+export function withSectionMemo<P extends { sectionContent: Record<string, any>; theme: any; [key: string]: any }>(
   Component: React.ComponentType<P>,
-  sectionKey: keyof SectionContent
+  sectionKey: string
 ) {
   return React.memo(Component, (prevProps, nextProps) => {
     // Check the relevant section slice and theme first (cheap path for most keystrokes)

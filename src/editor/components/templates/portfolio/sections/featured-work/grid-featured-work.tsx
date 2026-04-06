@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -19,7 +19,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
 
         {/* Header Section */}
-        <FadeIn direction="up" distance={15} delay={0.1} className="mb-12 flex flex-col gap-4 border-b border-current/10 pb-8">
+        <Animate direction="up" distance={15} delay={0.1} className="mb-12 flex flex-col gap-4 border-b border-current/10 pb-8">
           <div className="flex justify-between items-end">
             <div>
               <h2 className={cn('text-3xl @md:text-5xl font-bold tracking-tight mb-2', theme.fontTitle)}>
@@ -30,10 +30,10 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
               </p>
             </div>
           </div>
-        </FadeIn>
+        </Animate>
         <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 gap-x-6 gap-y-12">
           {projects.map((project, index) => (
-            <FadeIn
+            <Animate
               key={index}
               direction="up"
               distance={20}
@@ -84,7 +84,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   {project.description}
                 </p>
               </div>
-            </FadeIn>
+            </Animate>
           ))}
         </div>
       </div>

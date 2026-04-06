@@ -2,12 +2,12 @@
 
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useT, useDisabled } from './animation-context'
 
 interface TextRevealProps {
   text: string
   className?: string
   delay?: number
-  disableAnimations?: boolean
   as?: React.ElementType
 }
 
@@ -15,23 +15,21 @@ export function TextReveal({
   text,
   className,
   delay = 0,
-  disableAnimations = false,
   as: Component = 'span',
 }: TextRevealProps) {
+  const t = useT()
+  const disabled = useDisabled()
+
   const lineVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.9,
-        ease: [0.16, 1, 0.3, 1],
-        delay,
-      },
+      transition: t(0.9, delay),
     },
   } as const
 
-  if (disableAnimations) {
+  if (disabled) {
     return <Component className={className}>{text}</Component>
   }
 

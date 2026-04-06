@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
 // Primitives: The basic building blocks for templates
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
-import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../primitives/typography'
-import { EditorialDivider } from '../../primitives/divider'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
+import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
+import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
 interface EditorialBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -24,7 +24,7 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
       <div className="flex @md:flex-row flex-col gap-10 @lg:gap-16 items-start">
         
         {/* Photo Block (Fixed size) */}
-        <FadeIn direction="none" delay={0.1} initial={{ scale: 0.95 }} whileInView={{ scale: 1 }} className="flex-shrink-0">
+        <Animate direction="none" delay={0.1} type="scale" scaleOffset={0.95} className="flex-shrink-0">
           <SiteImage
             unoptimized
             src={sectionContent.bio.image || '/placeholder.svg?height=176&width=128'}
@@ -36,7 +36,7 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
             className={cn('w-48 bg-neutral-100', theme.shadow)}
             imageClassName="object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out"
           />
-        </FadeIn>
+        </Animate>
 
         {/* Content Block */}
         <div className="flex-1 min-w-0">
@@ -57,14 +57,14 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
                 </p>
                 <div className="grid @sm:grid-cols-2 grid-cols-1 gap-x-12 gap-y-4">
                   {sectionContent.bio.achievements.map((achievement, i) => (
-                    <FadeIn key={i} delay={i * 0.05} direction="up" distance={10} className="group flex items-start gap-4">
+                    <Animate key={i} delay={i * 0.05} direction="up" distance={10} className="group flex items-start gap-4">
                       <span className={cn('text-[9px] mt-1 font-medium opacity-30 group-hover:opacity-100 transition-opacity', theme.fontBody)}>
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <p className={cn('text-xs opacity-60 leading-snug', theme.fontBody)}>
                         {achievement}
                       </p>
-                    </FadeIn>
+                    </Animate>
                   ))}
                 </div>
               </div>

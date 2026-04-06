@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { useContactForm } from '@/editor/hooks/useContactForm'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface GridContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -23,7 +23,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
             
             {/* ЛЕВАЯ СТОРОНА: Инфо и Контакты */}
             <div className="flex flex-col gap-6">
-              <FadeIn
+              <Animate
                 direction="up"
                 distance={20}
                 className={cn(
@@ -58,11 +58,11 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                   
 
                 </div>
-              </FadeIn>
+              </Animate>
             </div>
 
             {/* ПРАВАЯ СТОРОНА: Форма */}
-            <FadeIn
+            <Animate
               direction="up"
               distance={20}
               delay={0.1}
@@ -73,7 +73,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
             >
               <form onSubmit={handleSubmit} className="h-full flex flex-col">
                 {status !== 'idle' && (
-                  <FadeIn
+                  <Animate
                     direction="up"
                     distance={8}
                     scaleOffset={0.97}
@@ -86,7 +86,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                     )}
                   >
                     {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
-                  </FadeIn>
+                  </Animate>
                 )}
                 <div className="space-y-4 flex-1">
                   <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
@@ -163,7 +163,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                   Send Message
                 </button>
               </form>
-            </FadeIn>
+            </Animate>
 
           </div>
         </div>

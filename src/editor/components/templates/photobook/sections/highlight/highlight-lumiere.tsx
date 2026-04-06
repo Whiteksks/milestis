@@ -1,10 +1,10 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 
 interface HighlightLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -20,55 +20,38 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
-    <section
-      className={cn(
-        '@container overflow-x-hidden py-20 @md:py-28',
-        theme.muted,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="highlight"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.muted)}
+      padded={false}
+      containerClassName="max-w-3xl px-8 @md:px-0 flex flex-col items-center text-center py-20 @md:py-28"
     >
-      <div className="max-w-3xl mx-auto px-8 @md:px-0 flex flex-col items-center text-center">
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4 mb-14 w-full"
-        >
+        <div className="flex items-center gap-4 mb-14 w-full">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
             05  ·  Highlight
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
-        </motion.div>
+        </div>
 
         {/* Title above photo */}
         {highlight.title && (
-          <motion.h2
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
+          <h2
             className={cn(
               'text-2xl @sm:text-3xl @md:text-4xl font-light italic tracking-tight leading-snug mb-10',
               theme.fontTitle,
             )}
           >
             {highlight.title}
-          </motion.h2>
+          </h2>
         )}
 
         {/* Statement framed photo */}
         {hasImage && (
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 1 }}
-            className="w-full max-w-xl @md:max-w-2xl mb-10"
-          >
+          <div className="w-full max-w-xl @md:max-w-2xl mb-10">
             <div className="border border-current/10 p-[3px]">
               <SiteImage
                 src={imageUrl}
@@ -80,16 +63,12 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
                 sizes="(max-width: 768px) 95vw, 65vw"
               />
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Description */}
         {highlight.description && (
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+          <p
             className={cn(
               'text-sm font-light opacity-55 max-w-[42ch] leading-relaxed mb-10',
               theme.fontBody,
@@ -97,25 +76,14 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
             )}
           >
             {highlight.description}
-          </motion.p>
+          </p>
         )}
 
         {/* Pull quote */}
         {highlight.quote && (
           <>
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.6 }}
-              className="origin-center w-10 h-px bg-current opacity-15 mb-8"
-            />
-            <motion.blockquote
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-            >
+            <div className="origin-center w-10 h-px bg-current opacity-15 mb-8" />
+            <blockquote>
               <p
                 className={cn(
                   'text-lg @md:text-xl font-light italic opacity-50 max-w-[38ch] leading-relaxed',
@@ -124,10 +92,9 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
               >
                 &ldquo;{highlight.quote}&rdquo;
               </p>
-            </motion.blockquote>
+            </blockquote>
           </>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

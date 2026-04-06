@@ -1,9 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useT, useDisabled } from '../../primitives/animation-context'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -12,8 +11,6 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 interface ShowcaseContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps) {
-  const t = useT();
-  const disabled = useDisabled()
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <SectionWrapper
@@ -32,7 +29,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
         {/* Main layout */}
         <div className="grid grid-cols-1 @lg:grid-cols-2 gap-16 @lg:gap-24 items-start">
           {/* Left — statement */}
-          <FadeIn direction="left" distance={20} delay={0.1} className="space-y-8">
+          <Animate direction="left" distance={20} delay={0.1} className="space-y-8">
             <h2
               className={cn(
                 'font-black uppercase leading-[0.88] tracking-tighter',
@@ -73,15 +70,15 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
                 />
               </a>
             )}
-          </FadeIn>
+          </Animate>
 
           {/* Right — form */}
-          <FadeIn as="form" onSubmit={handleSubmit} direction="right" distance={20} delay={0.2} className="space-y-0">
+          <Animate as="form" onSubmit={handleSubmit as any} direction="right" distance={20} delay={0.2} className="space-y-0">
             {status !== 'idle' && (
               <motion.div
-                initial={disabled ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -8, scale: 0.97 }}
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={disabled ? undefined : t(0.3)}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'mb-6 px-4 py-2.5 rounded-xl text-[11px] border',
                   status === 'sent'
@@ -170,7 +167,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
                 />
               </button>
             </div>
-          </FadeIn>
+          </Animate>
         </div>
       </div>
     </SectionWrapper>

@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { ElegantHero as RawElegantHero } from './sections/hero/elegant-hero'
 import { ElegantBio as RawElegantBio } from './sections/bio/elegant-bio'
 import { ElegantFeaturedWork as RawElegantFeaturedWork } from './sections/featured-work/elegant-featured-work'

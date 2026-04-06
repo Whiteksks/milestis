@@ -1,8 +1,8 @@
 'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import { AnimationProvider } from './primitives/animation-context'
-import { withSectionMemo } from './primitives/with-section-memo'
+import { AnimationProvider } from '../primitives/animation-context'
+import { withSectionMemo } from '../primitives/with-section-memo'
 import { GridHeader as RawGridHeader } from './sections/header/grid-header'
 import { GridHero as RawGridHero } from './sections/hero/grid-hero'
 import { GridBio as RawGridBio } from './sections/bio/grid-bio'

@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface BentoVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -21,7 +21,7 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
       <div className="max-w-6xl mx-auto w-full">
 
         {/* ── Cinematic video card ── */}
-        <FadeIn
+        <Animate
           delay={0}
           direction="up"
           distance={16}
@@ -71,7 +71,7 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
             )}
           </div>
 
-        </FadeIn>
+        </Animate>
       </div>
     </SectionWrapper>
   )

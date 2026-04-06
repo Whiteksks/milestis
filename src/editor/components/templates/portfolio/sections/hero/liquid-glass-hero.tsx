@@ -1,20 +1,17 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useT, useDisabled } from '../../primitives/animation-context'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { Animate } from '../../../primitives/animate'
 
 interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps) {
   const heroImage = sectionContent.hero.image
   const { primary, secondary, accent2, highlight } = theme.bgEffectColors
-  const t = useT()
-  const disabled = useDisabled()
-
   return (
     <section
       id="hero"
@@ -61,12 +58,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
 
       {/* Hero image (behind glass) */}
       {heroImage && (
-        <motion.div
-          initial={disabled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.06 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={disabled ? undefined : t(2.2, 0, 'easeOut')}
-          className="absolute inset-0"
-        >
+        <Animate trigger="mount" type="scale" scaleOffset={1.06} className="absolute inset-0">
           <SiteImage
             fillParent
             unoptimized
@@ -80,19 +72,14 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)' }}
           />
-        </motion.div>
+        </Animate>
       )}
 
       {/* ── Content layout ── */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 @md:px-14 pt-28 pb-20 @md:py-32 flex flex-col gap-8">
 
         {/* Floating subtitle chip */}
-        <motion.div
-          initial={disabled ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -14, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={disabled ? undefined : t(0.55, 0.25, [0.16, 1, 0.3, 1])}
-          className="flex"
-        >
+        <Animate trigger="mount" delay={0.25} type="scale" scaleOffset={0.9} direction="down" distance={14} className="flex">
           <div
             className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full"
             style={{
@@ -114,13 +101,14 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
               {sectionContent.hero.subtitle || 'Portfolio'}
             </span>
           </div>
-        </motion.div>
+        </Animate>
 
-        {/* Large title — outside glass for maximum crispness */}
-        <motion.h1
-          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={disabled ? undefined : t(0.85, 0.4, [0.16, 1, 0.3, 1])}
+        {/* Large title */}
+        <Animate
+          trigger="mount"
+          delay={0.4}
+          distance={36}
+          as="h1"
           className={cn(
             'font-black uppercase leading-[0.86] tracking-tighter text-white',
             '@lg:text-[5rem] @md:text-[4rem] text-[2.5rem]',
@@ -129,7 +117,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           style={{ textShadow: '0 2px 50px rgba(0,0,0,0.55)' }}
         >
           {sectionContent.hero.title}
-        </motion.h1>
+        </Animate>
 
         {/* Glass info card — description + accent row */}
         <div className="relative max-w-xl">
@@ -175,14 +163,15 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
               style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent)', transform: 'skewX(-18deg)' }}
             />
 
-            <motion.p
-              initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={disabled ? undefined : t(0.6, 0.55)}
+            <Animate
+              trigger="mount"
+              delay={0.55}
+              distance={10}
+              as="p"
               className={cn('relative text-sm @md:text-base text-white/62 font-light leading-relaxed', theme.fontBody)}
             >
               {sectionContent.hero.description}
-            </motion.p>
+            </Animate>
 
             {/* Accent row */}
             <div className="relative mt-5 pt-4 border-t border-white/[0.08] flex items-center justify-end">

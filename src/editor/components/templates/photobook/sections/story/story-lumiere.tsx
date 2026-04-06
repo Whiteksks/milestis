@@ -1,10 +1,10 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 
 interface StoryLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -16,39 +16,26 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
   const moments = story.images ?? []
 
   return (
-    <section
-      className={cn(
-        '@container overflow-x-hidden py-20 @md:py-28',
-        theme.muted,
-        theme.foreground,
-      )}
+    <SectionWrapper
+      id="story"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.muted)}
+      padded={false}
+      containerClassName="max-w-3xl px-8 @md:px-0 py-20 @md:py-28"
     >
-      <div className="max-w-3xl mx-auto px-8 @md:px-0">
 
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4 mb-14 @md:mb-20"
-        >
+        <div className="flex items-center gap-4 mb-14 @md:mb-20">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
             03  ·  Story
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
-        </motion.div>
+        </div>
 
         {/* Story meta */}
         {(story.title || story.date || story.location) && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-14 space-y-2"
-          >
+          <div className="text-center mb-14 space-y-2">
             {story.title && (
               <h2
                 className={cn(
@@ -64,7 +51,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                 {[story.date, story.location].filter(Boolean).join('  —  ')}
               </p>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Story moments — centered framed */}
@@ -76,12 +63,8 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
           const description = block.description ?? ''
 
           return (
-            <motion.div
+            <div
               key={block.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.9 }}
               className="flex flex-col items-center gap-4 mb-14"
             >
               {imageUrl && (
@@ -129,11 +112,10 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                   {description}
                 </p>
               )}
-            </motion.div>
+            </div>
           )
         })}
 
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

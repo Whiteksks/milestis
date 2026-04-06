@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -17,7 +17,13 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
   const hasImage = Boolean(imageUrl)
 
   return (
-    <section className={cn('@container overflow-x-hidden', theme.muted, theme.foreground)}>
+    <SectionWrapper
+      id="highlight"
+      themeForeground={theme.foreground}
+      className={cn('overflow-x-clip', theme.muted)}
+      padded={false}
+      containerClassName="max-w-none"
+    >
 
       {/* Full-bleed feature photo */}
       <div className="relative min-h-[55vh] @md:min-h-[70vh] overflow-hidden">
@@ -37,13 +43,7 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
             </div>
 
             {/* Title anchored bottom-left over photo */}
-            <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9 }}
-              className="absolute bottom-0 left-0 right-0 z-10 px-8 @md:px-14 @lg:px-20 pb-10 @md:pb-14 space-y-3 max-w-5xl"
-            >
+            <div className="absolute bottom-0 left-0 right-0 z-10 px-8 @md:px-14 @lg:px-20 pb-10 @md:pb-14 space-y-3 max-w-5xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 bg-white/35" />
                 <span className="text-[9px] uppercase tracking-[0.35em] text-white/50 font-sans">
@@ -73,7 +73,7 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
                   {highlight.description}
                 </p>
               )}
-            </motion.div>
+            </div>
           </>
         ) : (
           /* No image placeholder */
@@ -101,13 +101,7 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
 
       {/* Pull quote strip — below the image */}
       {highlight.quote && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.7 }}
-          className={cn('border-t border-b border-current/10 py-10 @md:py-14')}
-        >
+        <div className={cn('border-t border-b border-current/10 py-10 @md:py-14')}>
           <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 grid grid-cols-1 @md:grid-cols-[1fr_3fr] gap-6 @md:gap-16 items-center">
             <span className={cn('text-[9px] uppercase tracking-[0.35em] opacity-30', theme.fontBody)}>
               p. 05
@@ -123,8 +117,8 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
               </p>
             </blockquote>
           </div>
-        </motion.div>
+        </div>
       )}
-    </section>
+    </SectionWrapper>
   )
 }

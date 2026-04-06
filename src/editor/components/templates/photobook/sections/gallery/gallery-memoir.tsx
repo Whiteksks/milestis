@@ -1,6 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -16,17 +17,16 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
   const photos = gallery.images ?? []
 
   return (
-    <section className={cn('@container py-20 @md:py-28', theme.background, theme.foreground)}>
-      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20">
+    <SectionWrapper
+      id="gallery"
+      themeForeground={theme.foreground}
+      className={theme.background}
+      padded={false}
+      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28"
+    >
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 @md:mb-16"
-        >
+        <Animate direction="up" distance={20} className="mb-12 @md:mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className={cn('h-px w-12', theme.accent)} />
             <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
@@ -45,7 +45,7 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
               </span>
             )}
           </div>
-        </motion.div>
+        </Animate>
 
         {gallery.description && (
           <p className={cn('mb-12 text-sm opacity-50 max-w-md', theme.lineHeight, theme.fontBody)}>
@@ -57,12 +57,11 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
         {photos.length > 0 && (
           <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
             {photos.map((block, index) => (
-              <motion.div
+              <Animate
+                direction="up"
+                distance={30}
+                delay={index * 0.05}
                 key={block.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.6, delay: Math.min((index % 3) * 0.1, 0.25) }}
                 className="group"
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-current/5">
@@ -84,11 +83,10 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
                     {block.caption}
                   </p>
                 )}
-              </motion.div>
+              </Animate>
             ))}
           </div>
         )}
-      </div>
-    </section>
+    </SectionWrapper>
   )
 }

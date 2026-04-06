@@ -11,10 +11,12 @@ import { CoverChronicle } from '@/editor/components/templates/photobook/sections
 import { CoverLumiere } from '@/editor/components/templates/photobook/sections/cover/cover-lumiere'
 import { CoverMagazine } from '@/editor/components/templates/photobook/sections/cover/cover-magazine'
 import { CoverMemoir } from '@/editor/components/templates/photobook/sections/cover/cover-memoir'
+import { CoverSoleil } from '@/editor/components/templates/photobook/sections/cover/cover-soleil'
 
 const LoadingTemplate = () => (
-  <div className="w-full h-full min-h-[50vh] bg-slate-50 animate-pulse rounded-lg" />
+  <div className="w-full h-full min-h-screen bg-transparent" />
 )
+
 
 
 const TemplateMemoirDesign = dynamic(
@@ -33,6 +35,10 @@ const TemplateLumiereDesign = dynamic(
   () => import('@/editor/components/templates/photobook/template-lumiere').then(m => m.TemplateLumiereDesign),
   { loading: LoadingTemplate },
 )
+const TemplateSoleilDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-soleil').then(m => m.TemplateSoleilDesign),
+  { loading: LoadingTemplate },
+)
 
 // Section settings panels — static imports so panels are ready when the drawer opens
 import PhotobookCoverSettings from '@/editor/components/editor/section-settings/photobook/cover-settings'
@@ -49,6 +55,7 @@ const photobookTemplateComponents: Partial<
   'photobook-chronicle': TemplateChronicleDesign,
   'photobook-magazine': TemplateMagazineDesign,
   'photobook-lumiere': TemplateLumiereDesign,
+  'photobook-soleil': TemplateSoleilDesign,
 }
 
 export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> = {
@@ -58,6 +65,7 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
     { id: 'photobook-chronicle', name: 'Chronicle', tags: ['editorial', 'documentary'], previewComponent: CoverChronicle },
     { id: 'photobook-magazine', name: 'Magazine', tags: ['editorial', 'magazine'], previewComponent: CoverMagazine },
     { id: 'photobook-lumiere', name: 'Lumière', tags: ['editorial', 'film', 'light'], previewComponent: CoverLumiere },
+    { id: 'photobook-soleil', name: 'Soleil', tags: ['warm', 'spacious', 'minimal'], previewComponent: CoverSoleil },
   ],
   sections: [
     { id: 'cover', name: 'Cover', toggleKey: 'showCover' },

@@ -3,8 +3,8 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
-import { SectionWrapper } from '../../primitives/section-wrapper'
-import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -20,16 +20,16 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 text-center">
         <div className="space-y-10">
-          <FadeIn
+          <Animate
             delay={0}
             direction="up"
             distance={12}
             className={cn('text-[10px] uppercase tracking-[0.35em] opacity-35', theme.fontBody)}
           >
             <p>{sectionContent.hero.subtitle}</p>
-          </FadeIn>
+          </Animate>
 
-          <FadeIn
+          <Animate
             direction="up"
             distance={22}
             delay={0.15}
@@ -37,26 +37,26 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
             <h1 className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}>
               {sectionContent.hero.title}
             </h1>
-          </FadeIn>
+          </Animate>
 
-          <FadeIn
+          <Animate
             direction="up"
             delay={0.3}
           >
             <div className="w-16 h-px bg-current opacity-25 mx-auto origin-center" />
-          </FadeIn>
+          </Animate>
 
-          <FadeIn
+          <Animate
             direction="up"
             distance={12}
             delay={0.4}
             className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light opacity-60', theme.lineHeight, theme.fontBody)}
           >
             <p>{sectionContent.hero.description}</p>
-          </FadeIn>
+          </Animate>
 
           {heroImage && (
-            <FadeIn
+            <Animate
               direction="up"
               distance={24}
               delay={0.55}
@@ -69,7 +69,7 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
                 frameStyle={sectionContent.hero.frameStyle || 'none'}
                 cropData={sectionContent.hero.cropData}
               />
-            </FadeIn>
+            </Animate>
           )}
         </div>
       </div>
