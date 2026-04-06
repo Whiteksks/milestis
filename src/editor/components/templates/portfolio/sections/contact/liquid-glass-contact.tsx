@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface LiquidGlassContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContactProps) {
   const { primary, secondary, accent2 } = theme.bgEffectColors
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
 
   return (
     <section
@@ -106,13 +108,32 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
             </div>
 
             {/* Right — form */}
-            <form className="p-8 @md:p-12 @lg:p-14 space-y-0">
+            <form onSubmit={handleSubmit} className="p-8 @md:p-12 @lg:p-14 space-y-0">
+              {status !== 'idle' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className={cn(
+                    'mb-4 px-4 py-2.5 rounded-xl text-[11px] border',
+                    status === 'sent'
+                      ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-400'
+                      : 'border-red-400/25 bg-red-400/10 text-red-400',
+                    theme.fontBody,
+                  )}
+                >
+                  {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                </motion.div>
+              )}
               {/* Name + Email */}
               <div className="grid @sm:grid-cols-2 gap-0">
                 <div className="py-5 border-b border-white/10 @sm:pr-6">
                   <label className={cn('block text-[9px] uppercase tracking-widest text-white/30 mb-2', theme.fontBody)}>Name</label>
                   <input
                     type="text"
+                    name="name"
+                    value={fields.name}
+                    onChange={handleChange}
                     placeholder="Your name"
                     className={cn('w-full bg-transparent outline-none text-sm text-white placeholder:text-white/20', theme.fontBody)}
                   />
@@ -121,6 +142,9 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                   <label className={cn('block text-[9px] uppercase tracking-widest text-white/30 mb-2', theme.fontBody)}>Email</label>
                   <input
                     type="email"
+                    name="email"
+                    value={fields.email}
+                    onChange={handleChange}
                     placeholder="your@email.com"
                     className={cn('w-full bg-transparent outline-none text-sm text-white placeholder:text-white/20', theme.fontBody)}
                   />
@@ -132,6 +156,9 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                 <label className={cn('block text-[9px] uppercase tracking-widest text-white/30 mb-2', theme.fontBody)}>Subject</label>
                 <input
                   type="text"
+                  name="subject"
+                  value={fields.subject}
+                  onChange={handleChange}
                   placeholder="Project inquiry"
                   className={cn('w-full bg-transparent outline-none text-sm text-white placeholder:text-white/20', theme.fontBody)}
                 />
@@ -141,6 +168,9 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
               <div className="py-5 border-b border-white/10">
                 <label className={cn('block text-[9px] uppercase tracking-widest text-white/30 mb-2', theme.fontBody)}>Message</label>
                 <textarea
+                  name="message"
+                  value={fields.message}
+                  onChange={handleChange}
                   placeholder="Tell me about your project…"
                   rows={4}
                   className={cn('w-full bg-transparent outline-none text-sm text-white resize-none placeholder:text-white/20', theme.fontBody)}

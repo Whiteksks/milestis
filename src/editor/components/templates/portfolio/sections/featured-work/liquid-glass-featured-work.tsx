@@ -1,175 +1,130 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface LiquidGlassFeaturedWorkProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
-
-export function LiquidGlassFeaturedWork({ theme, sectionContent }: LiquidGlassFeaturedWorkProps) {
+export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
-  const { primary, secondary, accent2, subtle } = theme.bgEffectColors
+  const { primary, secondary } = theme.bgEffectColors
 
   return (
     <section
       id="work"
-      data-section-id="featured-work"
-      className="@container relative w-full overflow-hidden py-24 @md:py-32"
-      style={{ background: `radial-gradient(ellipse at 20% 30%, ${secondary}45 0%, transparent 55%), radial-gradient(ellipse at 85% 70%, ${primary}40 0%, transparent 55%), #0a0a10` }}
+      className="@container relative w-full overflow-hidden py-20 @md:py-32 bg-[#08080c]"
     >
-      {/* Blobs */}
-      <motion.div
-        animate={{ x: [0, -30, 0], y: [0, 25, 0] }}
-        transition={{ repeat: Infinity, duration: 11, ease: 'easeInOut' }}
-        className="absolute rounded-full pointer-events-none"
-        style={{ width: 450, height: 450, bottom: '-10%', left: '-5%', background: `radial-gradient(circle, ${accent2}45 0%, transparent 70%)`, filter: 'blur(70px)' }}
-      />
+      <div className="absolute inset-0 pointer-events-none opacity-30">
+        <div className="absolute inset-0" 
+             style={{ backgroundImage: `radial-gradient(circle at 15% 25%, ${primary}15, transparent 40%), radial-gradient(circle at 85% 75%, ${secondary}15, transparent 40%)` }} />
+      </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55 }}
-          className="flex items-end justify-between mb-12 gap-6"
-        >
-          <div>
-            <p className={cn('text-[10px] uppercase tracking-[0.3em] text-white/35 mb-3', theme.fontBody)}>
-              {sectionContent.featuredWork.subtitle || 'Selected Work'}
-            </p>
-            <h2
-              className={cn(
-                'font-black uppercase leading-none tracking-tighter text-white',
-                '@lg:text-6xl @md:text-5xl text-4xl',
-                theme.fontTitle,
-              )}
-            >
-              {sectionContent.featuredWork.title}
-            </h2>
-          </div>
-          {/* Glass pill count */}
-          <div
-            className="shrink-0 px-3 py-1.5 rounded-full text-[11px] text-white/45 border border-white/12"
-            style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 @md:px-12">
+        <header className="mb-12 @md:mb-20">
+          <motion.h2 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={cn("text-5xl @md:text-8xl font-black uppercase tracking-tighter text-white leading-[0.8]", theme.fontTitle)}
           >
-            {String(projects.length).padStart(2, '0')} Works
-          </div>
-        </motion.div>
+            {sectionContent.featuredWork.title}
+          </motion.h2>
+        </header>
 
-        {/* Cards grid — first card is wide, rest are equal */}
-        <div className="space-y-5">
-          {projects.map((project, i) => {
-            const isFirst = i === 0
-            return (
-              <article
-                key={i}
-                className={cn('relative group rounded-3xl overflow-hidden', isFirst ? 'aspect-video @md:aspect-[16/7]' : '')}
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  backdropFilter: 'blur(28px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  boxShadow: '0 12px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.18)',
-                }}
-              >
-                {/* Glare */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 55%)' }} />
-                <div className="absolute top-0 left-6 right-6 h-px pointer-events-none" style={{ background: `linear-gradient(to right, transparent, ${i % 2 === 0 ? primary : secondary}70 50%, transparent)` }} />
-
-                {/* Non-first: horizontal layout */}
-                {!isFirst ? (
-                  <div className="flex flex-col @sm:flex-row">
-                    {/* Image */}
-                    <div className={cn('relative shrink-0 @sm:w-56 @md:w-72 overflow-hidden', getAspectRatioClass(project.aspectRatio || 'landscape'), getFrameStyle(project.frameStyle || 'none'), '@sm:aspect-auto @sm:h-44 @md:h-52')}>
-                      {project.image && (
-                        <SiteImage
-                          fillParent
-                          unoptimized
-                          src={project.image}
-                          alt={project.title}
-                          sizes="(max-width: 640px) 100vw, 25vw"
-                          cropData={project.cropData}
-                          imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
-                        />
-                      )}
-                    </div>
-                    {/* Text */}
-                    <div className="flex-1 p-6 @md:p-8 flex flex-col justify-center gap-3">
-                      <motion.h3
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                        className={cn('text-lg @md:text-2xl font-black uppercase leading-tight text-white', theme.fontTitle)}
-                      >
-                        {project.title}
-                      </motion.h3>
-                      <motion.p
-                        initial={{ opacity: 0, y: 8 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.08 }}
-                        className={cn('text-xs @md:text-sm text-white/50 leading-relaxed line-clamp-2', theme.fontBody)}
-                      >
-                        {project.description}
-                      </motion.p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {(project.tags ?? []).slice(0, 3).map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className={cn('text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full text-white/50 border border-white/10', theme.fontBody)}
-                            style={{ background: 'rgba(255,255,255,0.06)' }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* First card — full image with overlay */
-                  <>
-                    {project.image && (
-                      <SiteImage
-                        fillParent
-                        unoptimized
-                        src={project.image}
-                        alt={project.title}
-                        sizes="100vw"
-                        cropData={project.cropData}
-                        imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
-                      />
-                    )}
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)' }} />
-                    {/* Glass text chip */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 @md:p-10">
-                      <div
-                        className="inline-block rounded-2xl px-5 @md:px-8 py-4 @md:py-6"
-                        style={{
-                          background: 'rgba(255,255,255,0.08)',
-                          backdropFilter: 'blur(20px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          border: '1px solid rgba(255,255,255,0.15)',
-                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
-                        }}
-                      >
-                        <div className="absolute top-0 left-4 right-4 h-px" style={{ background: `linear-gradient(to right, transparent, ${primary}80, transparent)` }} />
-                        <h3 className={cn('text-2xl @md:text-4xl @lg:text-5xl font-black uppercase leading-none tracking-tighter text-white', theme.fontTitle)}>{project.title}</h3>
-                        <p className={cn('mt-2 text-xs @md:text-sm text-white/55 line-clamp-2 max-w-2xl', theme.fontBody)}>{project.description}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </article>
-            )
-          })}
+          <div className="grid grid-cols-1 @md:grid-cols-12 gap-6 @md:gap-10 items-stretch">
+            {projects.map((project, i) => (
+            <ProjectCard key={i} project={project} index={i} theme={theme} />
+          ))}
         </div>
       </div>
     </section>
+  )
+}
+
+function ProjectCard({ project, index, theme }: { project: any, index: number, theme: any }) {
+  const [showInfo, setShowInfo] = useState(false)
+  const isFeatured = index % 3 === 0
+  const hasDescription = !!project.description && project.description.trim() !== ''
+  
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className={cn(
+        "group relative rounded-[2.5rem] overflow-hidden flex flex-col cursor-pointer bg-[#111] transform-gpu",
+        isFeatured ? "@md:col-span-12 aspect-[21/9]" : "@md:col-span-6 aspect-square"
+      )}
+    >
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {project.image && (
+          <SiteImage
+            fillParent
+            src={project.image}
+            alt={project.title}
+            imageClassName="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.2,1,0.3,1)] group-hover:scale-103"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
+      </div>
+
+      <div className="absolute top-4 left-4 right-4 @md:top-8 @md:left-8 z-20 flex justify-between items-start">
+        <div className="px-5 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-xl">
+          <h3 className={cn("text-sm @md:text-xl font-bold text-white tracking-tight leading-none", theme.fontTitle)}>
+            {project.title}
+          </h3>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          {project.tags?.[0] && (
+            <div className="hidden @md:block px-3 py-1.5 rounded-full border border-white/5 bg-black/40 backdrop-blur-md text-[9px] text-white/40 uppercase tracking-widest">
+              {project.tags[0]}
+            </div>
+          )}
+          
+          {hasDescription && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); setShowInfo(!showInfo); }}
+              className="@lg:hidden h-9 w-9 flex items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur-xl text-white active:scale-90 transition-all shadow-lg"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {showInfo && hasDescription && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-30 p-8 flex flex-col justify-end @lg:hidden bg-black/60 backdrop-blur-lg"
+            onClick={() => setShowInfo(false)}
+          >
+             <motion.p 
+               initial={{ y: 10 }}
+               animate={{ y: 0 }}
+               className={cn("text-sm text-white/90 leading-relaxed font-light", theme.fontBody)}
+             >
+               {project.description}
+             </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {hasDescription && (
+        <div className="hidden @lg:flex relative z-10 mt-auto p-10 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out">
+          <p className={cn("text-base text-white/50 max-w-lg leading-relaxed font-light", theme.fontBody)}>
+            {project.description}
+          </p>
+        </div>
+      )}
+
+      <div className="hidden @lg:block absolute inset-0 z-40 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-tr from-white/5 via-transparent to-transparent" />
+    </motion.article>
   )
 }

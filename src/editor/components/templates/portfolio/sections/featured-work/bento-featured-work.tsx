@@ -88,13 +88,7 @@ function ProjectCard({
         </div>
       </div>
 
-      {/* Index badge (fades out on hover) */}
-      <span className={cn(
-        'absolute top-4 right-4 text-[11px] font-mono tabular-nums text-white/30',
-        'transition-opacity duration-200 group-hover:opacity-0 pointer-events-none',
-      )}>
-        {String(index + 1).padStart(2, '0')}
-      </span>
+
 
       {/* Bottom info */}
       <div className={cn(
@@ -149,9 +143,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                 {sectionContent.featuredWork.title}
               </h2>
             </div>
-            <span className={cn('flex-shrink-0 text-[10px] tabular-nums opacity-20', theme.fontBody)}>
-              {projects.length.toString().padStart(2, '0')}
-            </span>
+
           </motion.div>
 
           {/* ── Bento grid ── */}

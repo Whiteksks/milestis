@@ -24,8 +24,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
         <div className="space-y-10">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 0.35, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 0.35, y: 0 }}
             transition={t(0.8, 0, [0.16, 1, 0.3, 1])}
             className={cn('text-[10px] uppercase tracking-[0.35em]', theme.fontBody)}
           >
@@ -34,8 +33,7 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
 
           <motion.h1
             initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={t(0.9, 0.15, [0.16, 1, 0.3, 1])}
             className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}
           >
@@ -44,16 +42,14 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
 
           <motion.div
             initial={{ scaleX: 0, opacity: 0 }}
-            whileInView={{ scaleX: 1, opacity: 1 }}
-            viewport={{ once: true }}
+            animate={{ scaleX: 1, opacity: 1 }}
             transition={t(0.6, 0.3)}
             className="w-16 h-px bg-current/25 mx-auto origin-center"
           />
 
           <motion.p
             initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 0.6, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 0.6, y: 0 }}
             transition={t(0.8, 0.4, [0.16, 1, 0.3, 1])}
             className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light', theme.lineHeight, theme.fontBody)}
           >
@@ -63,15 +59,14 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
           {heroImage && (
             <motion.div
               initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={t(1, 0.55, [0.16, 1, 0.3, 1])}
               className="pt-6"
             >
               <SiteImage
                 src={heroImage}
                 alt={sectionContent.hero.title}
-                aspectRatio={sectionContent.hero.aspectRatio || 'landscape'}
+                aspectRatio={sectionContent.hero.aspectRatio || 'wide'}
                 frameStyle={sectionContent.hero.frameStyle || 'none'}
                 cropData={sectionContent.hero.cropData}
               />

@@ -27,15 +27,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
           >
             {subtitle || 'About'}
           </motion.p>
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
-          >
-            02
-          </motion.span>
+
         </div>
 
         {/* Identity block — centered, stacked: photo → name → subtitle */}
@@ -106,10 +98,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
               className="pt-8 border-t border-current/10 space-y-5"
             >
               {achievements.map((item, i) => (
-                <div key={i} className="flex items-baseline gap-5">
-                  <span className={cn('text-[9px] tabular-nums opacity-20 shrink-0 w-4', theme.fontBody)}>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+                <div key={i}>
                   <p className={cn('@md:text-sm text-xs font-light opacity-50 leading-relaxed', theme.fontBody)}>{item}</p>
                 </div>
               ))}

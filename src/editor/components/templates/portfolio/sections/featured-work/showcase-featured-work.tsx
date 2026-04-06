@@ -42,7 +42,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
             </h2>
           </div>
           <span className={cn('text-[10px] opacity-25 shrink-0 mb-1', theme.fontBody)}>
-            {String(projects.length).padStart(2, '0')} Projects
+            {String(projects.length).padStart(2, '0')}
           </span>
         </div>
 
@@ -55,7 +55,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
             transition={{ duration: 0.8 }}
             className="group mb-6 @md:mb-8"
           >
-            <div className="relative overflow-hidden aspect-video bg-current/5">
+            <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
               {featured.image && (
                 <SiteImage
                   fillParent
@@ -132,7 +132,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                 <div
                   className={cn(
                     'relative overflow-hidden mb-5 bg-current/5',
-                    getAspectRatioClass(project.aspectRatio || 'landscape'),
+                    getAspectRatioClass(project.aspectRatio || 'wide'),
                     getFrameStyle(project.frameStyle || 'none'),
                   )}
                 >

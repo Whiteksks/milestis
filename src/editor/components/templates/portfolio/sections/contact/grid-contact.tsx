@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface GridContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function GridContact({ theme, sectionContent }: GridContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <motion.section
       id="contact"
@@ -58,17 +60,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                     </a>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
-                      <span className={cn('text-[10px] font-bold uppercase tracking-wider text-emerald-600/80', theme.fontBody)}>
-                        Available for projects
-                      </span>
-                    </div>
-                  </div>
+
                 </div>
               </motion.div>
             </div>
@@ -84,14 +76,33 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                 theme.card
               )}
             >
-              <form className="h-full flex flex-col">
+              <form onSubmit={handleSubmit} className="h-full flex flex-col">
+                {status !== 'idle' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className={cn(
+                      'mb-4 px-4 py-2.5 rounded-xl text-[11px] border',
+                      status === 'sent'
+                        ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                        : 'border-red-500/25 bg-red-500/10 text-red-500',
+                      theme.fontBody,
+                    )}
+                  >
+                    {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                  </motion.div>
+                )}
                 <div className="space-y-4 flex-1">
                   <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Name</label>
                       <input
                         type="text"
-                        placeholder="John Doe"
+                        name="name"
+                        value={fields.name}
+                        onChange={handleChange}
+                        placeholder="Your name"
                         className={cn(
                           'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
                           theme.fontBody
@@ -102,7 +113,10 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                       <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Email</label>
                       <input
                         type="email"
-                        placeholder="hello@example.com"
+                        name="email"
+                        value={fields.email}
+                        onChange={handleChange}
+                        placeholder="your@email.com"
                         className={cn(
                           'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
                           theme.fontBody
@@ -115,7 +129,10 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                     <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Subject</label>
                     <input
                       type="text"
-                      placeholder="Project Inquiry"
+                      name="subject"
+                      value={fields.subject}
+                      onChange={handleChange}
+                      placeholder="Subject"
                       className={cn(
                         'w-full px-6 py-4 bg-current/5 border border-current/5 rounded-2xl outline-none focus:border-current/20 transition-all placeholder:opacity-20',
                         theme.fontBody
@@ -126,6 +143,9 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase ml-4 opacity-40 font-bold">Message</label>
                     <textarea
+                      name="message"
+                      value={fields.message}
+                      onChange={handleChange}
                       placeholder="Tell me more..."
                       rows={5}
                       className={cn(

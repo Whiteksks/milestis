@@ -3,11 +3,13 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface ElegantContactProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <section
       id="contact"
@@ -58,15 +60,35 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
 
           {/* Form */}
           <motion.form
+            onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.15 }}
             className="space-y-8"
           >
+            {status !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'mb-6 px-4 py-2.5 rounded-xl text-[11px] text-center border',
+                  status === 'sent'
+                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                    : 'border-red-500/25 bg-red-500/10 text-red-500',
+                  theme.fontBody,
+                )}
+              >
+                {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+              </motion.div>
+            )}
             <div className="grid @md:grid-cols-2 grid-cols-1 gap-8">
               <input
                 type="text"
+                name="name"
+                value={fields.name}
+                onChange={handleChange}
                 placeholder="Name"
                 className={cn(
                   'px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
@@ -76,6 +98,9 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
               />
               <input
                 type="email"
+                name="email"
+                value={fields.email}
+                onChange={handleChange}
                 placeholder="Email"
                 className={cn(
                   'px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
@@ -86,6 +111,9 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
             </div>
             <input
               type="text"
+              name="subject"
+              value={fields.subject}
+              onChange={handleChange}
               placeholder="Subject"
               className={cn(
                 'w-full px-0 py-4 bg-transparent border-b border-current/10 focus:border-current/30 outline-none transition-colors',
@@ -94,6 +122,9 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
               )}
             />
             <textarea
+              name="message"
+              value={fields.message}
+              onChange={handleChange}
               placeholder="Message"
               rows={5}
               className={cn(

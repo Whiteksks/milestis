@@ -93,7 +93,7 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
                 <div className="ml-1 opacity-60" style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid white' }} />
               </div>
               <span className={cn('text-[10px] uppercase tracking-[0.3em] text-white/25', theme.fontBody)}>
-                Video Placeholder
+                {sectionContent.video.subtitle || ''}
               </span>
             </div>
           )}

@@ -85,9 +85,6 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
                     theme.card,
                   )}
                 >
-                  <p className={cn('text-[10px] uppercase tracking-widest opacity-35 mb-3', theme.fontBody)}>
-                    Skills &amp; Expertise
-                  </p>
                   <div className="flex flex-wrap gap-2">
                     {achievements.map((item, i) => (
                       <motion.span

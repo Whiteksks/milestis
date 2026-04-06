@@ -29,15 +29,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
           >
             {sectionContent.featuredWork.subtitle || 'Selected Work'}
           </motion.p>
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
-          >
-            03
-          </motion.span>
+
         </div>
 
         {/* Project list — alternating editorial layout */}
@@ -61,7 +53,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                       unoptimized
                       src={project.image}
                       alt={project.title}
-                      aspectRatio={project.aspectRatio || 'landscape'}
+                      aspectRatio={project.aspectRatio || 'wide'}
                       frameStyle={project.frameStyle || 'none'}
                       cropData={project.cropData}
                       sizes="(max-width: 768px) 100vw, 42vw"
@@ -73,10 +65,6 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                 {/* Content — 2/5 width, stacked vertically with generous spacing */}
                 <div className="@lg:w-2/5 flex flex-col justify-between gap-8">
                   <div className="space-y-5">
-                    {/* Index above title */}
-                    <span className={cn('block text-[9px] tabular-nums opacity-20', theme.fontBody)}>
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                     <h3
                       className={cn(
                         '@lg:text-4xl @md:text-3xl text-2xl font-extralight leading-none tracking-tight',

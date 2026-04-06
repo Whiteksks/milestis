@@ -75,10 +75,7 @@ export function BentoHero({ theme, sectionContent, disableAnimations = false }: 
                 )}>
                   {sectionContent.hero.description}
                 </p>
-                <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-current/10 opacity-60">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className={cn('text-[10px] uppercase tracking-wider', theme.fontBody)}>Open</span>
-                </div>
+
               </div>
             </motion.div>
 

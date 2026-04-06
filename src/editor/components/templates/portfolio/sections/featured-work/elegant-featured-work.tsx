@@ -50,7 +50,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
               {project.image && (
                 <div className={cn(
                   'relative overflow-hidden w-full mb-8 group',
-                  getAspectRatioClass(project.aspectRatio || 'landscape'),
+                  getAspectRatioClass(project.aspectRatio || 'wide'),
                 )}>
                   <SiteImage
                     fillParent
@@ -64,16 +64,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                       getFrameStyle(project.frameStyle || 'none'),
                     )}
                   />
-                  {/* Ghost index — large typographic ornament */}
-                  <span
-                    aria-hidden
-                    className={cn(
-                      'absolute bottom-4 right-5 text-[6rem] @md:text-[9rem] font-thin leading-none opacity-[0.07] select-none pointer-events-none tabular-nums',
-                      theme.fontTitle,
-                    )}
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+
                 </div>
               )}
 

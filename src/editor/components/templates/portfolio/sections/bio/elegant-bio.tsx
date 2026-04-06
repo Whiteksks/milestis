@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
@@ -16,19 +17,17 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
           
           {/* Фото: остается компактным (240px), но плотно прижато к сетке */}
           <div className="shrink-0 @lg:sticky @lg:top-32">
-            <div className={cn(
-              'relative w-[180px] @md:w-[220px] @lg:w-[240px] aspect-[4/5] overflow-hidden shadow-sm', 
-              getFrameStyle(sectionContent.bio.frameStyle || 'soft')
-            )}>
-              <SiteImage
-                fillParent
-                unoptimized
-                src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
-                alt={sectionContent.bio.title || 'Profile image'}
-                sizes="(max-width: 768px) 100vw, 240px"
-                imageClassName="object-cover"
-              />
-            </div>
+            <SiteImage
+              unoptimized
+              src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
+              alt={sectionContent.bio.title || 'Profile image'}
+              aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
+              frameStyle={sectionContent.bio.frameStyle || 'soft'}
+              cropData={sectionContent.bio.cropData}
+              sizes="(max-width: 768px) 100vw, 240px"
+              className="w-[180px] @md:w-[220px] @lg:w-[240px] shadow-sm"
+              imageClassName="object-cover"
+            />
           </div>
 
           {/* Текст: теперь он "главный" */}

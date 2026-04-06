@@ -77,7 +77,7 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
               {sectionContent.bio.achievements && sectionContent.bio.achievements.length > 0 && (
                 <div className="pt-8 border-t border-current/10">
                   <p className={cn('text-[10px] uppercase tracking-widest opacity-30 mb-6', theme.fontBody)}>
-                    Selected Achievements
+                    {sectionContent.bio.subtitle || 'Highlights'}
                   </p>
                   <div className="grid @sm:grid-cols-2 grid-cols-1 gap-x-12 gap-y-4">
                     {sectionContent.bio.achievements.map((achievement, i) => (

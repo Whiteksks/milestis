@@ -57,9 +57,7 @@ export function EditorialHero({ theme, sectionContent, disableAnimations = false
               {sectionContent.hero.subtitle || 'Editorial'}
             </p>
             <div className="w-16 h-px bg-current opacity-10" />
-            <p className={cn('text-[10px] uppercase opacity-20', theme.letterSpacing, theme.fontBody)}>
-              N°01
-            </p>
+
           </div>
 
           {/* Title — overflows onto photo on desktop */}

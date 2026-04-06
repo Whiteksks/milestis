@@ -23,10 +23,6 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
         <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-start @md:items-center justify-between gap-4">
           {/* Left: Vol. I ornament + copyright */}
           <div className="flex items-center gap-4">
-            <span className={cn('text-[10px] uppercase opacity-20', theme.letterSpacing, theme.fontBody)}>
-              Vol. I
-            </span>
-            <div className="w-px h-3 bg-current opacity-15" />
             <p className={cn('text-[10px] uppercase opacity-20', theme.letterSpacing, theme.fontBody)}>
               © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>

@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface BentoContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function BentoContact({ theme, sectionContent }: BentoContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <motion.section
       id="contact"
@@ -95,10 +97,29 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               theme.card,
             )}
           >
-            <form className="p-6 @lg:p-8">
+            <form onSubmit={handleSubmit} className="p-6 @lg:p-8">
+              {status !== 'idle' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className={cn(
+                    'mb-4 px-4 py-2.5 rounded-xl text-[11px] border',
+                    status === 'sent'
+                      ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                      : 'border-red-500/25 bg-red-500/10 text-red-500',
+                    theme.fontBody,
+                  )}
+                >
+                  {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                </motion.div>
+              )}
               <div className="grid @md:grid-cols-3 grid-cols-1 gap-3 mb-3">
                 <input
                   type="text"
+                  name="name"
+                  value={fields.name}
+                  onChange={handleChange}
                   placeholder="Your name"
                   className={cn(
                     'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -108,6 +129,9 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={fields.email}
+                  onChange={handleChange}
                   placeholder="Email address"
                   className={cn(
                     'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -117,6 +141,9 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 />
                 <input
                   type="text"
+                  name="subject"
+                  value={fields.subject}
+                  onChange={handleChange}
                   placeholder="Subject"
                   className={cn(
                     'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -126,6 +153,9 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                 />
               </div>
               <textarea
+                name="message"
+                value={fields.message}
+                onChange={handleChange}
                 placeholder="Tell me about your project…"
                 rows={4}
                 className={cn(

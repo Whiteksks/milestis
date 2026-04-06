@@ -4,10 +4,12 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface ShowcaseContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <motion.section
       id="contact"
@@ -81,17 +83,38 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
 
           {/* Right — form */}
           <motion.form
+            onSubmit={handleSubmit}
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="space-y-0"
           >
+            {status !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'mb-6 px-4 py-2.5 rounded-xl text-[11px] border',
+                  status === 'sent'
+                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                    : 'border-red-500/25 bg-red-500/10 text-red-500',
+                  theme.fontBody,
+                )}
+              >
+                {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+              </motion.div>
+            )}
+
             {/* Name + Email row */}
             <div className="grid @sm:grid-cols-2 gap-0">
               <div className="border-b border-current/15 py-5">
                 <input
                   type="text"
+                  name="name"
+                  value={fields.name}
+                  onChange={handleChange}
                   placeholder="Name"
                   className={cn(
                     'w-full bg-transparent outline-none text-sm placeholder:opacity-25 focus:placeholder:opacity-10 transition-all',
@@ -102,6 +125,9 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               <div className="border-b border-current/15 py-5 @sm:border-l border-l-0 @sm:pl-6">
                 <input
                   type="email"
+                  name="email"
+                  value={fields.email}
+                  onChange={handleChange}
                   placeholder="Email address"
                   className={cn(
                     'w-full bg-transparent outline-none text-sm placeholder:opacity-25 focus:placeholder:opacity-10 transition-all',
@@ -115,6 +141,9 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
             <div className="border-b border-current/15 py-5">
               <input
                 type="text"
+                name="subject"
+                value={fields.subject}
+                onChange={handleChange}
                 placeholder="Subject"
                 className={cn(
                   'w-full bg-transparent outline-none text-sm placeholder:opacity-25 focus:placeholder:opacity-10 transition-all',
@@ -126,6 +155,9 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
             {/* Message */}
             <div className="border-b border-current/15 py-5">
               <textarea
+                name="message"
+                value={fields.message}
+                onChange={handleChange}
                 placeholder="Your message"
                 rows={4}
                 className={cn(

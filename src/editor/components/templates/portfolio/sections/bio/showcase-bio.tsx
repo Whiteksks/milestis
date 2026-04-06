@@ -105,7 +105,7 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
                     theme.fontBody,
                   )}
                 >
-                  Highlights
+                  {subtitle || 'Highlights'}
                 </p>
                 <div className="grid @sm:grid-cols-2 grid-cols-1 gap-4">
                   {achievements.map((item, i) => (

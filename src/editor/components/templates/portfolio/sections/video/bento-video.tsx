@@ -46,7 +46,7 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
                     </svg>
                   </div>
                   <span className={cn('text-[10px] uppercase tracking-widest opacity-20', theme.fontBody)}>
-                    Showreel
+                    {sectionContent.video.subtitle || ''}
                   </span>
                 </div>
               )}

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
@@ -31,11 +32,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                 {sectionContent.featuredWork.subtitle || 'Selected Archive'}
               </p>
             </div>
-            <div className="text-right hidden @md:block">
-              <span className={cn('text-4xl font-light opacity-10 tabular-nums', theme.fontTitle)}>
-                {projects.length.toString().padStart(2, '0')}
-              </span>
-            </div>
+
           </div>
         </div>
 
@@ -52,7 +49,8 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
             >
               {/* Image Wrapper */}
               <div className={cn(
-                'relative aspect-[3/4] overflow-hidden ',
+                'relative overflow-hidden',
+                getAspectRatioClass(project.aspectRatio || 'poster'),
               )}>
                 <SiteImage
                   fillParent

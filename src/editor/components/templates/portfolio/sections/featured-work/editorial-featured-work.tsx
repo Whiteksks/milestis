@@ -37,7 +37,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
           </div>
           <div className="h-px flex-1 bg-current opacity-10 hidden @md:block mx-10 mb-4" />
           <span className={cn('text-[10px] opacity-40 mb-1', theme.fontBody)}>
-            {projects.length} VOLUME — 2024
+            {String(projects.length).padStart(2, '0')}
           </span>
         </div>
 
@@ -90,7 +90,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
                       transition={{ duration: 0.5 }}
                       className={cn(
                         'relative overflow-hidden bg-neutral-100',
-                        getAspectRatioClass(project.aspectRatio || 'landscape'),
+                        getAspectRatioClass(project.aspectRatio || 'wide'),
                         theme.shadow,
                         getFrameStyle(project.frameStyle || 'none'),
                       )}

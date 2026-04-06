@@ -179,27 +179,21 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
 
             <motion.p
               initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={t(0.6, 0.1)}
+              animate={{ opacity: 1, y: 0 }}
+              transition={t(0.6, 0.55)}
               className={cn('relative text-sm @md:text-base text-white/62 font-light leading-relaxed', theme.fontBody)}
             >
               {sectionContent.hero.description}
             </motion.p>
 
             {/* Accent row */}
-            <div className="relative mt-5 pt-4 border-t border-white/[0.08] flex items-center justify-between">
-              <span className={cn('text-[9px] uppercase tracking-[0.3em] text-white/28', theme.fontBody)}>
-                Creative Portfolio
-              </span>
+            <div className="relative mt-5 pt-4 border-t border-white/[0.08] flex items-center justify-end">
               <div className="flex gap-2">
                 {[primary, secondary, accent2].map((c, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    animate={{ scale: [1, 1.35, 1], opacity: [0.65, 1, 0.65] }}
-                    transition={{ repeat: Infinity, duration: 2.8, delay: i * 0.5, ease: 'easeInOut' }}
                     className="w-2 h-2 rounded-full"
-                    style={{ background: c, boxShadow: `0 0 8px ${c}99` }}
+                    style={{ background: c }}
                   />
                 ))}
               </div>

@@ -67,15 +67,7 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-current/10 bg-current/[0.02]">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </span>
-                <span className={cn('text-[10px] uppercase tracking-widest opacity-55', theme.fontBody)}>
-                  Open for opportunities
-                </span>
-              </div>
+
             </div>
 
             {/* [RIGHT] Photo — large */}

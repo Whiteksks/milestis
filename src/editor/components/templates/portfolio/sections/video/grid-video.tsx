@@ -52,7 +52,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
                     </svg>
                   </div>
                   <span className={cn('text-[10px] uppercase tracking-widest opacity-20', theme.fontBody)}>
-                    Showreel
+                    {sectionContent.video.subtitle || ''}
                   </span>
                 </div>
               )}
@@ -78,12 +78,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
                 {sectionContent.video.description}
               </p>
             )}
-            <span className={cn(
-              'hidden @lg:block text-[10px] uppercase tracking-widest opacity-20 shrink-0 self-center',
-              theme.fontBody,
-            )}>
-              16 : 9
-            </span>
+
           </div>
 
         </div>

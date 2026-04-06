@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface EditorialContactProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function EditorialContact({ theme, sectionContent }: EditorialContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <motion.section
       id="contact"
@@ -73,11 +75,30 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
             </div>
 
             {/* Right — minimalist underline-only form */}
-            <form className="space-y-0">
+            <form onSubmit={handleSubmit} className="space-y-0">
+              {status !== 'idle' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className={cn(
+                    'mb-6 px-4 py-2.5 rounded-xl text-[11px] border',
+                    status === 'sent'
+                      ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                      : 'border-red-500/25 bg-red-500/10 text-red-500',
+                    theme.fontBody,
+                  )}
+                >
+                  {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                </motion.div>
+              )}
               <div className="grid @md:grid-cols-2 gap-0">
                 <div className="border-b border-current/15 py-4">
                   <input
                     type="text"
+                    name="name"
+                    value={fields.name}
+                    onChange={handleChange}
                     placeholder="Name"
                     className={cn(
                       'w-full bg-transparent outline-none text-sm placeholder:opacity-30',
@@ -88,6 +109,9 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
                 <div className="border-b border-current/15 py-4 @md:border-l border-l-0 @md:pl-6">
                   <input
                     type="email"
+                    name="email"
+                    value={fields.email}
+                    onChange={handleChange}
                     placeholder="Email"
                     className={cn(
                       'w-full bg-transparent outline-none text-sm placeholder:opacity-30',
@@ -98,7 +122,24 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
               </div>
 
               <div className="border-b border-current/15 py-4">
+                <input
+                  type="text"
+                  name="subject"
+                  value={fields.subject}
+                  onChange={handleChange}
+                  placeholder="Subject"
+                  className={cn(
+                    'w-full bg-transparent outline-none text-sm placeholder:opacity-30',
+                    theme.fontBody,
+                  )}
+                />
+              </div>
+
+              <div className="border-b border-current/15 py-4">
                 <textarea
+                  name="message"
+                  value={fields.message}
+                  onChange={handleChange}
                   placeholder="Tell me about your project"
                   className={cn(
                     'w-full bg-transparent outline-none text-sm min-h-28 resize-none placeholder:opacity-30',

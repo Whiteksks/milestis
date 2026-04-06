@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
@@ -63,19 +62,18 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
           <div className="flex flex-col @md:flex-row gap-0">
             {/* Image panel */}
             {image && (
-              <div className="@md:w-64 @lg:w-80 shrink-0 relative overflow-hidden @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl">
-                <div className={cn('relative w-full', getAspectRatioClass(aspectRatio || 'portrait'), getFrameStyle(frameStyle || 'none'), '@md:h-full @md:aspect-auto')}>
-                  <SiteImage
-                    fillParent
-                    unoptimized
-                    src={image}
-                    alt={title || 'Profile'}
-                    sizes="(max-width: 768px) 100vw, 320px"
-                    cropData={sectionContent.bio.cropData}
-                    imageClassName="object-cover"
-                  />
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 70%, rgba(0,0,0,0.4) 100%)' }} />
-                </div>
+              <div className="shrink-0 relative @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl overflow-hidden">
+                <SiteImage
+                  unoptimized
+                  src={image}
+                  alt={title || 'Profile'}
+                  aspectRatio="poster"
+                  cropData={sectionContent.bio.cropData}
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  className="@md:w-64 @lg:w-80 w-full"
+                  imageClassName="object-cover"
+                />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent 70%, rgba(0,0,0,0.4) 100%)' }} />
               </div>
             )}
 
@@ -115,7 +113,7 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                   className="pt-6 border-t border-white/10"
                 >
                   <p className={cn('text-[10px] uppercase tracking-widest text-white/30 mb-5', theme.fontBody)}>
-                    Highlights
+                    {subtitle || 'Highlights'}
                   </p>
                   <div className="grid @sm:grid-cols-2 grid-cols-1 gap-3">
                     {achievements.map((item, i) => (

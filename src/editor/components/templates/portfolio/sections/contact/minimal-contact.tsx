@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { useContactForm } from '@/editor/hooks/useContactForm'
 
 interface MinimalContactProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
+  const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
     <section
       id="contact"
@@ -27,15 +29,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
           >
             {sectionContent.contact.subtitle || 'Contact'}
           </motion.p>
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
-          >
-            05
-          </motion.span>
+
         </div>
 
         <div className="grid @lg:grid-cols-2 grid-cols-1 gap-16 @lg:gap-24">
@@ -85,25 +79,68 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
 
           {/* Right: minimal form */}
           <motion.form
+            onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="space-y-0"
           >
-            {[{ label: 'Name', type: 'text', placeholder: 'Your name' }, { label: 'Email', type: 'email', placeholder: 'your@email.com' }].map((field) => (
-              <div key={field.label} className="border-b border-current/10 py-4">
-                <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>{field.label}</label>
-                <input
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20', theme.fontBody)}
-                />
-              </div>
-            ))}
+            {status !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'mb-6 px-4 py-2.5 rounded-xl text-[11px] border',
+                  status === 'sent'
+                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+                    : 'border-red-500/25 bg-red-500/10 text-red-500',
+                  theme.fontBody,
+                )}
+              >
+                {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+              </motion.div>
+            )}
+            <div className="border-b border-current/10 py-4">
+              <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>Name</label>
+              <input
+                type="text"
+                name="name"
+                value={fields.name}
+                onChange={handleChange}
+                placeholder="Your name"
+                className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20', theme.fontBody)}
+              />
+            </div>
+            <div className="border-b border-current/10 py-4">
+              <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>Email</label>
+              <input
+                type="email"
+                name="email"
+                value={fields.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+                className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20', theme.fontBody)}
+              />
+            </div>
+            <div className="border-b border-current/10 py-4">
+              <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>Subject</label>
+              <input
+                type="text"
+                name="subject"
+                value={fields.subject}
+                onChange={handleChange}
+                placeholder="Subject"
+                className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20', theme.fontBody)}
+              />
+            </div>
             <div className="border-b border-current/10 py-4">
               <label className={cn('block text-[9px] uppercase tracking-[0.3em] opacity-25 mb-2', theme.fontBody)}>Message</label>
               <textarea
+                name="message"
+                value={fields.message}
+                onChange={handleChange}
                 placeholder="Tell me about your project…"
                 rows={4}
                 className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20 resize-none', theme.fontBody)}

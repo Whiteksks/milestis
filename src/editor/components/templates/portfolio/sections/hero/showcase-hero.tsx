@@ -30,7 +30,7 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         <motion.div
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={t(1.4, 0, 'easeOut')}
+          transition={t(0.9, 0, 'easeOut')}
           className="absolute inset-0"
         >
           <SiteImage

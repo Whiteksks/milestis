@@ -74,8 +74,7 @@ export function MinimalHero({ theme, sectionContent, disableAnimations = false }
               transition={t(0.5, 0.5)}
               className="flex items-center justify-between pt-8 border-t border-current/10"
             >
-              <span className={cn('text-[9px] uppercase tracking-[0.35em] opacity-25', theme.fontBody)}>Scroll to explore</span>
-              <span className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}>01</span>
+              <span className={cn('text-[9px] uppercase tracking-[0.35em] opacity-25', theme.fontBody)}>{sectionContent.hero.subtitle}</span>
             </motion.div>
           </div>
 

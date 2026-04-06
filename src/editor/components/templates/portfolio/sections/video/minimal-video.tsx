@@ -25,15 +25,7 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
           >
             {sectionContent.video.subtitle || 'Showreel'}
           </motion.p>
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className={cn('text-[9px] tabular-nums opacity-20', theme.fontBody)}
-          >
-            04
-          </motion.span>
+
         </div>
 
         <div className="space-y-8">
