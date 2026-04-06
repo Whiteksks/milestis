@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT, useDisabled } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,8 @@ interface ShowcaseHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: ShowcaseHeaderProps) {
+  const t = useT();
+  const disabled = useDisabled()
   const [isOpen, setIsOpen] = useState(false)
   const [heroVisible, setHeroVisible] = useState(true)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
@@ -43,9 +46,9 @@ export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: Sho
         <motion.a
           href="#hero"
           onClick={(e) => handleAnchorClick(e, '#hero')}
-          initial={{ opacity: 0, x: -20 }}
+          initial={disabled ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={disabled ? undefined : t(0.6)}
           className={cn(
             'text-sm font-bold uppercase tracking-[0.3em] transition-colors duration-500',
             theme.fontTitle,
@@ -57,9 +60,9 @@ export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: Sho
 
         {/* Nav — desktop */}
         <motion.nav
-          initial={{ opacity: 0, y: -8 }}
+          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={disabled ? undefined : t(0.6, 0.1)}
           className="hidden @md:flex items-center gap-10"
         >
           {(sectionContent.header.links ?? []).map((link, i) => (
@@ -101,7 +104,7 @@ export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: Sho
                   initial={{ opacity: 0, scale: 0.94, y: -6 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.94, y: -6 }}
-                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  transition={t(0.18)}
                   className="absolute right-0 top-full mt-2 min-w-[160px] rounded-xl overflow-hidden"
                   style={{ transformOrigin: 'top right' }}
                 >

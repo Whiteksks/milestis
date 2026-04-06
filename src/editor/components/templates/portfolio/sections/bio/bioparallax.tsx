@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
@@ -67,6 +68,7 @@ function useSectionParallaxY(sectionRef: React.RefObject<HTMLElement | null>, st
 }
 
 export function BioParallaxFramer({ theme, sectionContent }: BioParallaxProps) {
+  const t = useT();
   const sectionRef = useRef<HTMLElement>(null)
   const canvasScrollRef = useCanvasScrollContainer()
 
@@ -86,7 +88,7 @@ export function BioParallaxFramer({ theme, sectionContent }: BioParallaxProps) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.8, delay: 0.2 }}
+      transition={t(0.8, 0.2 )}
       className="@container"
     >
       <div className="@lg:px-12 @md:px-8 px-4 @lg:py-20 @md:py-16 py-12">

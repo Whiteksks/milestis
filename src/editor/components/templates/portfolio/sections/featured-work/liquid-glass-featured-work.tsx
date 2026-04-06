@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { FadeIn } from '../../primitives/fade-in'
 
 export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -13,6 +14,7 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
   return (
     <section
       id="work"
+      data-section-id="work"
       className="@container relative w-full overflow-hidden py-20 @md:py-32 bg-[#08080c]"
     >
       <div className="absolute inset-0 pointer-events-none opacity-30">
@@ -22,14 +24,14 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 @md:px-12">
         <header className="mb-12 @md:mb-20">
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <FadeIn
+            direction="up"
+            distance={15}
+            as="h2"
             className={cn("text-5xl @md:text-8xl font-black uppercase tracking-tighter text-white leading-[0.8]", theme.fontTitle)}
           >
             {sectionContent.featuredWork.title}
-          </motion.h2>
+          </FadeIn>
         </header>
 
           <div className="grid grid-cols-1 @md:grid-cols-12 gap-6 @md:gap-10 items-stretch">
@@ -48,10 +50,11 @@ function ProjectCard({ project, index, theme }: { project: any, index: number, t
   const hasDescription = !!project.description && project.description.trim() !== ''
   
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+    <FadeIn
+      as="article"
+      direction="up"
+      distance={25}
+      delay={0.05}
       className={cn(
         "group relative rounded-[2.5rem] overflow-hidden flex flex-col cursor-pointer bg-[#111] transform-gpu",
         isFeatured ? "@md:col-span-12 aspect-[21/9]" : "@md:col-span-6 aspect-square"
@@ -125,6 +128,6 @@ function ProjectCard({ project, index, theme }: { project: any, index: number, t
       )}
 
       <div className="hidden @lg:block absolute inset-0 z-40 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-tr from-white/5 via-transparent to-transparent" />
-    </motion.article>
+    </FadeIn>
   )
 }

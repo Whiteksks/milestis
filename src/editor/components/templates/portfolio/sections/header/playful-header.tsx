@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,7 @@ interface PlayfulHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function HeaderPlayful({ theme, sectionContent, handleAnchorClick }: PlayfulHeaderProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
@@ -93,7 +95,7 @@ export function HeaderPlayful({ theme, sectionContent, handleAnchorClick }: Play
                   initial={{ rotate: -90, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
                   exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={t(0.2)}
                 >
                   <X size={22} />
                 </motion.div>
@@ -103,7 +105,7 @@ export function HeaderPlayful({ theme, sectionContent, handleAnchorClick }: Play
                   initial={{ rotate: 90, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
                   exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={t(0.2)}
                 >
                   <Menu size={22} />
                 </motion.div>

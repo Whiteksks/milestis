@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
@@ -15,14 +16,9 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
   const [featured, ...rest] = projects
 
   return (
-    <motion.section
+    <SectionWrapper
       id="work"
-      data-section-id="featured-work"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.8 }}
-      className={cn('@container w-full', theme.foreground)}
+      className={cn('w-full', theme.foreground)}
     >
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
         {/* Section header */}
@@ -48,13 +44,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
 
         {/* Featured project — full-width cinema card */}
         {featured && (
-          <motion.article
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
-            className="group mb-6 @md:mb-8"
-          >
+          <FadeIn as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
             <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
               {featured.image && (
                 <SiteImage
@@ -113,21 +103,14 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                 </p>
               </div>
             </div>
-          </motion.article>
+          </FadeIn>
         )}
 
         {/* Remaining projects — 2-column grid */}
         {rest.length > 0 && (
           <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
             {rest.map((project, i) => (
-              <motion.article
-                key={i + 1}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.7, delay: i * 0.1 }}
-                className="group"
-              >
+              <FadeIn as="article" key={i + 1} direction="up" distance={30} delay={i * 0.1} className="group">
                 {/* Image */}
                 <div
                   className={cn(
@@ -180,7 +163,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                     ))}
                   </div>
                 </div>
-              </motion.article>
+              </FadeIn>
             ))}
           </div>
         )}
@@ -190,6 +173,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

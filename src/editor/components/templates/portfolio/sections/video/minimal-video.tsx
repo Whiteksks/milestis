@@ -1,40 +1,34 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface MinimalVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
   return (
-    <section
+    <SectionWrapper
       id="video"
-      data-section-id="video"
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         {/* Section header */}
         <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
-          <motion.p
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+          <FadeIn
+            direction="left"
+            distance={10}
+            as="p"
             className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
           >
             {sectionContent.video.subtitle || 'Showreel'}
-          </motion.p>
-
+          </FadeIn>
         </div>
 
         <div className="space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
+          <FadeIn direction="up" distance={14} delay={0.05}>
             <h2 className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight', theme.fontTitle)}>
               {sectionContent.video.title}
             </h2>
@@ -43,14 +37,13 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
                 {sectionContent.video.description}
               </p>
             )}
-          </motion.div>
+          </FadeIn>
 
-          {/* Video frame — 1px border, no bg fill */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+          {/* Video frame */}
+          <FadeIn
+            direction="up"
+            distance={10}
+            delay={0.15}
             className="relative aspect-video border border-current/15 overflow-hidden"
           >
             {sectionContent.video.videoUrl ? (
@@ -68,10 +61,10 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
                 <p className={cn('text-[9px] uppercase tracking-[0.3em] opacity-20', theme.fontBody)}>Video</p>
               </div>
             )}
-          </motion.div>
+          </FadeIn>
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   )
 }
    

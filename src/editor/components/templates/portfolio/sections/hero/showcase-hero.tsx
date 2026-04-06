@@ -1,22 +1,20 @@
 'use client'
 
-import { motion, MotionConfig, type Transition } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { useT, useDisabled } from '../../primitives/animation-context'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
-  disableAnimations?: boolean
-}
+interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
-export function ShowcaseHero({ theme, sectionContent, disableAnimations = false }: ShowcaseHeroProps) {
+export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
   const heroImage = sectionContent.hero.image
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
+  const t = useT()
+  const disabled = useDisabled()
 
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -28,9 +26,9 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
       {/* Background image — full bleed, all breakpoints */}
       {heroImage && (
         <motion.div
-          initial={{ opacity: 0, scale: 1.05 }}
+          initial={disabled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={t(0.9, 0, 'easeOut')}
+          transition={disabled ? undefined : t(0.9, 0, 'easeOut')}
           className="absolute inset-0"
         >
           <SiteImage
@@ -64,9 +62,9 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
       <div className="relative z-10 flex-1 flex flex-col justify-end @md:justify-center max-w-7xl mx-auto w-full px-6 @md:px-12 @lg:px-20 pt-28 pb-20 @md:pt-32 @md:pb-24">
         {/* Tag pill */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={t(0.6, 0.2)}
+          transition={disabled ? undefined : t(0.6, 0.2)}
           className="mb-5 @md:mb-8 flex items-center gap-3"
         >
           <span
@@ -83,9 +81,9 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
 
         {/* Title */}
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={t(0.9, 0.3)}
+          transition={disabled ? undefined : t(0.9, 0.3)}
           className={cn(
             'leading-[0.88] uppercase font-black',
             '@lg:text-[6rem] @md:text-[4.5rem] text-[2.8rem]',
@@ -98,9 +96,9 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
 
         {/* Description */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={t(0.8, 0.5)}
+          transition={disabled ? undefined : t(0.8, 0.5)}
           className={cn(
             'mt-5 @md:mt-8 max-w-md text-sm @md:text-base leading-relaxed font-light',
             heroImage ? 'text-white/65' : 'opacity-50',
@@ -129,6 +127,5 @@ export function ShowcaseHero({ theme, sectionContent, disableAnimations = false 
         </motion.div>
       </motion.div>
     </section>
-    </MotionConfig>
   )
 }

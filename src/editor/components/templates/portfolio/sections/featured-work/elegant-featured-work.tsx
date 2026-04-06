@@ -1,11 +1,10 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface ElegantFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -13,19 +12,19 @@ interface ElegantFeaturedWorkProps
 export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   return (
-    <section
-      id="work"
-      data-section-id="featured-work"
-      className={cn('@container', theme.foreground)}
+    <SectionWrapper
+      id="featured-work"
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container"
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 py-24 @md:py-36">
 
         {/* Section heading — left-aligned, sparse */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+        <FadeIn
+          direction="up"
+          distance={12}
+          delay={0.2}
           className="mb-24 @md:mb-32"
         >
           <p className={cn('text-[10px] uppercase tracking-[0.4em] opacity-30 mb-4', theme.fontBody)}>
@@ -34,37 +33,31 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
           <h2 className={cn('@lg:text-7xl @md:text-6xl text-5xl font-thin tracking-tight leading-none', theme.fontTitle)}>
             {sectionContent.featuredWork.title}
           </h2>
-        </motion.div>
+        </FadeIn>
 
         {/* Projects — full-width catalog layout */}
         <div className="space-y-32 @md:space-y-44">
           {projects.map((project, i) => (
-            <motion.div
+            <FadeIn
               key={i}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              direction="up"
+              distance={24}
+              delay={0.1}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* Full-width image */}
               {project.image && (
-                <div className={cn(
-                  'relative overflow-hidden w-full mb-8 group',
-                  getAspectRatioClass(project.aspectRatio || 'wide'),
-                )}>
+                <div className="relative overflow-hidden w-full mb-8 group">
                   <SiteImage
-                    fillParent
                     unoptimized
                     src={project.image}
                     alt={project.title || 'Project image'}
-                    sizes="(max-width: 768px) 100vw, 80vw"
+                    aspectRatio={project.aspectRatio || 'wide'}
+                    frameStyle={project.frameStyle || 'none'}
                     cropData={project.cropData}
-                    imageClassName={cn(
-                      'object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-out',
-                      getFrameStyle(project.frameStyle || 'none'),
-                    )}
+                    sizes="(max-width: 768px) 100vw, 80vw"
+                    imageClassName="object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-out"
                   />
-
                 </div>
               )}
 
@@ -96,10 +89,10 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                   </div>
                 )}
               </div>
-            </motion.div>
+            </FadeIn>
           ))}
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

@@ -1,40 +1,40 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
+import { FadeIn } from '../../primitives/fade-in'
+import { SectionWrapper } from '../../primitives/section-wrapper'
 
 interface ElegantFooterProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
   return (
-    <footer
+    <SectionWrapper
       id="footer"
-      data-section-id="footer"
-      className={cn('@container border-t border-current/10', theme.foreground)}
+      as="footer"
+      themeForeground={theme.foreground}
+      padded={false}
+      className="border-t border-current/10"
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-10">
         <div className="flex flex-col @md:flex-row items-center justify-between gap-6">
           {/* Left: copyright */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className={cn('text-[10px] uppercase tracking-[0.3em] opacity-25', theme.fontBody)}
+          <FadeIn
+            direction="up"
+            distance={5}
+            className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
           >
-            © {new Date().getFullYear()} {sectionContent.footer.copyright}
-          </motion.p>
+            <p>© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
+          </FadeIn>
 
           {/* Right: social icons */}
           {(sectionContent.footer?.socialLinks ?? []).length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.05 }}
+            <FadeIn
+              direction="up"
+              distance={5}
+              delay={0.1}
               className="flex items-center gap-6"
             >
               {(sectionContent.footer?.socialLinks ?? []).map((link, i) => (
@@ -46,10 +46,10 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
                   className="opacity-25 hover:opacity-60 transition-opacity duration-300"
                 />
               ))}
-            </motion.div>
+            </FadeIn>
           )}
         </div>
       </div>
-    </footer>
+    </SectionWrapper>
   )
 }

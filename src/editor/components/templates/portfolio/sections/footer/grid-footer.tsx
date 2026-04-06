@@ -1,34 +1,33 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface GridFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
-export function GridFooter({ theme, sectionContent }: GridFooterProps) {
+export function GridFooter({ theme, sectionContent }: GridFooterProps) {        
   const socialLinks = sectionContent.footer.socialLinks ?? []
 
   return (
-    <motion.footer
+    <SectionWrapper
       id="footer"
-      data-section-id="footer"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container"
     >
       <div className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6">
         <div className="max-w-6xl mx-auto">
-          <div className={cn(
-            'rounded-2xl border border-current/8 px-6 py-5',
-            'flex @md:flex-row flex-col items-start @md:items-center justify-between gap-4',
-            theme.card,
-          )}>
-
-            {/* Left: copyright */}
+          <FadeIn
+            direction="up"
+            distance={5}
+            className={cn(
+              'rounded-2xl border border-current/8 px-6 py-5',
+              'flex @md:flex-row flex-col items-start @md:items-center justify-between gap-4',
+              theme.card,
+            )}>
             <p className={cn('text-[10px] uppercase tracking-[0.2em] opacity-25', theme.fontBody)}>
               © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
@@ -48,9 +47,9 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
               </div>
             )}
 
-          </div>
+          </FadeIn>
         </div>
       </div>
-    </motion.footer>
+    </SectionWrapper>
   )
 }

@@ -7,6 +7,7 @@ import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
 import { previewTheme, type PreviewColors } from './theme-extract'
 import { ScaledWrapper } from './scaled-wrapper'
 import { PORTFOLIO_PREVIEW_REGISTRY, PHOTOBOOK_PREVIEW_REGISTRY } from './template-registry'
+import { AnimationProvider, type TemplateId } from '@/editor/components/templates/portfolio/primitives/animation-context'
 
 type PC = PreviewColors
 
@@ -88,7 +89,9 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
     const sectionContent = buildPreviewSectionContent({ title, subtitle, heroImageUrl: img, aspectRatio, frameStyle })
     return (
       <ScaledWrapper zoom={zoom} background={theme.background}>
-        <HeroComponent theme={theme} sectionContent={sectionContent} disableAnimations />
+        <AnimationProvider templateId={(templateId ?? 'editorial') as TemplateId} disabled>
+          <HeroComponent theme={theme} sectionContent={sectionContent} />
+        </AnimationProvider>
       </ScaledWrapper>
     )
   }

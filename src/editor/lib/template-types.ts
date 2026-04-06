@@ -15,6 +15,8 @@ export interface PortfolioTemplateProps extends BaseTemplateProps {
   sectionVisibility: SectionVisibility
   sectionContent: SectionContent
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
+  /** Set to true to disable all animations (used in editor preview). */
+  disableAnimations?: boolean
 }
 
 export interface PhotobookTemplateProps extends BaseTemplateProps {

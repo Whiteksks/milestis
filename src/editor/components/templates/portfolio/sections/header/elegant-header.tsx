@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { useState, useEffect, useRef } from 'react'
 import { MenuIcon, XIcon } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -10,6 +11,7 @@ interface ElegantHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: ElegantHeaderProps) {
+  const t = useT();
   const [scrolled, setScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
@@ -74,7 +76,7 @@ export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: Eleg
                   initial={{ opacity: 0, scale: 0.96, y: -4 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96, y: -4 }}
-                  transition={{ duration: 0.2 }}
+                  transition={t(0.2)}
                   style={{ transformOrigin: 'top right' }}
                   className={cn(
                     'absolute right-0 top-full mt-2 min-w-[148px] py-2 z-50',

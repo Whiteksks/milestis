@@ -6,7 +6,6 @@ import { getModeTemplates } from '@/editor/lib/mode-registry'
 export type HeroPreviewComponent = ComponentType<{
   theme: ThemeConfig
   sectionContent: SectionContent
-  disableAnimations?: boolean
 }>
 
 export type CoverPreviewComponent = ComponentType<{

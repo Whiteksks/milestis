@@ -1,59 +1,57 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface ElegantVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
   return (
-    <section
+    <SectionWrapper
       id="video"
-      data-section-id="video"
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container"
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         <div className="space-y-14">
           {/* Heading */}
           <div className="text-center space-y-4">
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 0.35, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className={cn('text-[10px] uppercase tracking-[0.3em]', theme.fontBody)}
+            <FadeIn
+              direction="up"
+              distance={10}
+              className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
             >
-              {sectionContent.video.subtitle || 'Watch'}
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight tracking-tight', theme.fontTitle)}
+              <p>{sectionContent.video.subtitle || 'Watch'}</p>
+            </FadeIn>
+            <FadeIn
+              direction="up"
+              distance={16}
+              delay={0.1}
             >
-              {sectionContent.video.title}
-            </motion.h2>
+              <h2 className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight tracking-tight', theme.fontTitle)}>
+                {sectionContent.video.title}
+              </h2>
+            </FadeIn>
             {sectionContent.video.description && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 0.55, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                className={cn('@md:text-base text-sm font-light max-w-xl mx-auto', theme.lineHeight, theme.fontBody)}
+              <FadeIn
+                direction="up"
+                distance={10}
+                delay={0.2}
+                className={cn('@md:text-base text-sm font-light max-w-xl mx-auto opacity-55', theme.lineHeight, theme.fontBody)}
               >
-                {sectionContent.video.description}
-              </motion.p>
+                <p>{sectionContent.video.description}</p>
+              </FadeIn>
             )}
           </div>
 
           {/* Video frame — thin ornamental border */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.15 }}
+          <FadeIn
+            direction="up"
+            distance={16}
+            delay={0.15}
             className="relative aspect-video border border-current/10 overflow-hidden"
           >
             {sectionContent.video.videoUrl ? (
@@ -71,10 +69,10 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
                 <p className={cn('text-[9px] uppercase tracking-[0.3em] opacity-20', theme.fontBody)}>Showreel</p>
               </div>
             )}
-          </motion.div>
+          </FadeIn>
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   )
 }
  

@@ -1,66 +1,65 @@
 'use client'
 
-import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
-interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
-  disableAnimations?: boolean
-}
+interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
-export function ElegantHero({ theme, sectionContent, disableAnimations = false }: ElegantHeroProps) {
+export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
   const heroImage = sectionContent.hero.image
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
+  
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
-    <section
+    <SectionWrapper
       id="hero"
-      data-section-id="hero"
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container pt-12 pb-16 @md:pb-24"
     >
-      <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 pt-12 pb-16 @md:pb-24 text-center">
+      <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 text-center">
         <div className="space-y-10">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 0.35, y: 0 }}
-            transition={t(0.8, 0, [0.16, 1, 0.3, 1])}
-            className={cn('text-[10px] uppercase tracking-[0.35em]', theme.fontBody)}
+          <FadeIn
+            delay={0}
+            direction="up"
+            distance={12}
+            className={cn('text-[10px] uppercase tracking-[0.35em] opacity-35', theme.fontBody)}
           >
-            {sectionContent.hero.subtitle}
-          </motion.p>
+            <p>{sectionContent.hero.subtitle}</p>
+          </FadeIn>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={t(0.9, 0.15, [0.16, 1, 0.3, 1])}
-            className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}
+          <FadeIn
+            direction="up"
+            distance={22}
+            delay={0.15}
           >
-            {sectionContent.hero.title}
-          </motion.h1>
+            <h1 className={cn('@lg:text-[5.5rem] @md:text-7xl text-5xl font-extralight tracking-tight leading-none', theme.fontTitle)}>
+              {sectionContent.hero.title}
+            </h1>
+          </FadeIn>
 
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={t(0.6, 0.3)}
-            className="w-16 h-px bg-current/25 mx-auto origin-center"
-          />
-
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 0.6, y: 0 }}
-            transition={t(0.8, 0.4, [0.16, 1, 0.3, 1])}
-            className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light', theme.lineHeight, theme.fontBody)}
+          <FadeIn
+            direction="up"
+            delay={0.3}
           >
-            {sectionContent.hero.description}
-          </motion.p>
+            <div className="w-16 h-px bg-current opacity-25 mx-auto origin-center" />
+          </FadeIn>
+
+          <FadeIn
+            direction="up"
+            distance={12}
+            delay={0.4}
+            className={cn('@lg:text-lg @md:text-base text-sm max-w-2xl mx-auto font-light opacity-60', theme.lineHeight, theme.fontBody)}
+          >
+            <p>{sectionContent.hero.description}</p>
+          </FadeIn>
 
           {heroImage && (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={t(1, 0.55, [0.16, 1, 0.3, 1])}
+            <FadeIn
+              direction="up"
+              distance={24}
+              delay={0.55}
               className="pt-6"
             >
               <SiteImage
@@ -70,11 +69,10 @@ export function ElegantHero({ theme, sectionContent, disableAnimations = false }
                 frameStyle={sectionContent.hero.frameStyle || 'none'}
                 cropData={sectionContent.hero.cropData}
               />
-            </motion.div>
+            </FadeIn>
           )}
         </div>
       </div>
-    </section>
-    </MotionConfig>
+    </SectionWrapper>
   )
 }

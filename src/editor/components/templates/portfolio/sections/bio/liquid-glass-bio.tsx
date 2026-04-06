@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -29,20 +29,14 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
         {/* Section label */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center gap-4 mb-12"
-        >
+        <FadeIn direction="left" distance={20} className="flex items-center gap-4 mb-12">
           <div
             className="px-3 py-1.5 rounded-full border border-white/15 text-[10px] uppercase tracking-[0.28em] text-white/50"
             style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           >
             {subtitle || 'About'}
           </div>
-        </motion.div>
+        </FadeIn>
 
         {/* Main glass card */}
         <div
@@ -79,11 +73,10 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
 
             {/* Text panel */}
             <div className="flex-1 p-7 @md:p-10 @lg:p-14 space-y-6">
-              <motion.h2
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
+              <FadeIn
+                direction="up"
+                distance={16}
+                as="h2"
                 className={cn(
                   'font-black uppercase leading-tight tracking-tighter text-white',
                   '@lg:text-5xl @md:text-4xl text-3xl',
@@ -92,24 +85,23 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
               >
                 {title}
-              </motion.h2>
+              </FadeIn>
 
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
+              <FadeIn
+                direction="up"
+                distance={12}
+                delay={0.1}
+                as="p"
                 className={cn('text-sm @md:text-base text-white/55 font-light leading-relaxed whitespace-pre-line', theme.lineHeight, theme.fontBody)}
               >
                 {description}
-              </motion.p>
+              </FadeIn>
 
               {achievements && achievements.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+                <FadeIn
+                  direction="up"
+                  distance={10}
+                  delay={0.2}
                   className="pt-6 border-t border-white/10"
                 >
                   <p className={cn('text-[10px] uppercase tracking-widest text-white/30 mb-5', theme.fontBody)}>
@@ -129,7 +121,7 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
                       </div>
                     ))}
                   </div>
-                </motion.div>
+                </FadeIn>
               )}
             </div>
           </div>

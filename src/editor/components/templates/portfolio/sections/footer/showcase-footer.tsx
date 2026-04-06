@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { SectionWrapper } from '../../primitives/section-wrapper'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
@@ -10,17 +10,10 @@ interface ShowcaseFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'se
 export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []
   return (
-    <motion.footer
+    <SectionWrapper
+      as="footer"
       id="footer"
-      data-section-id="footer"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.6 }}
-      className={cn(
-        '@container border-t border-current/10 relative overflow-hidden',
-        theme.foreground,
-      )}
+      className={cn('border-t border-current/10 relative overflow-hidden', theme.foreground)}
     >
       {/* Faded watermark */}
       <div
@@ -59,6 +52,6 @@ export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
 
         </div>
       </div>
-    </motion.footer>
+    </SectionWrapper>
   )
 }

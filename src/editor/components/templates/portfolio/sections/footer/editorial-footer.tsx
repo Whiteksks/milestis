@@ -1,27 +1,28 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
+
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
+import { EditorialDivider } from '../../primitives/divider'
 
 interface EditorialFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
 export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []
   return (
-    <motion.footer
+    <SectionWrapper
       id="footer"
-      data-section-id="footer"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.6 }}
-      className={cn('@container border-t border-current/10', theme.foreground)}
+      as="footer"
+      themeForeground={theme.foreground}
+      padded={false}
     >
-      <div className="@lg:px-20 @md:px-12 px-6 py-8">
+      <EditorialDivider className="w-full" />
+      <FadeIn direction="up" distance={20} className="@lg:px-20 @md:px-12 px-6 py-8">
         <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-start @md:items-center justify-between gap-4">
-          {/* Left: Vol. I ornament + copyright */}
+          {/* Left: copyright */}
           <div className="flex items-center gap-4">
             <p className={cn('text-[10px] uppercase opacity-20', theme.letterSpacing, theme.fontBody)}>
               © {new Date().getFullYear()} {sectionContent.footer.copyright}
@@ -43,7 +44,8 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
             </div>
           )}
         </div>
-      </div>
-    </motion.footer>
+      </FadeIn>
+    </SectionWrapper>
   )
 }
+

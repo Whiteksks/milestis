@@ -1,15 +1,15 @@
 'use client'
 
-import { motion, MotionConfig, type Transition } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
-  disableAnimations?: boolean
-}
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
-export function GridHero({ theme, sectionContent, disableAnimations = false }: GridHeroProps) {
+interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+
+export function GridHero({ theme, sectionContent }: GridHeroProps) {
   const heroImage = sectionContent.hero.image
   const initials = sectionContent.hero.title
     ? sectionContent.hero.title
@@ -19,21 +19,19 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
         .slice(0, 2)
         .toUpperCase()
     : '?'
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
 
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
-    <section
+    <SectionWrapper
       id="hero"
-      data-section-id="hero"
-      className={cn('@container pt-20 @md:pt-24 pb-3', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container pt-20 @md:pt-24 pb-3"
     >
-      <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={t(0.8, 0, [0.22, 1, 0.36, 1])}
+      <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8 w-full">
+        <FadeIn
+          delay={0}
+          direction="up"
+          distance={30}
           className={cn(
             'relative rounded-2xl border border-current/8',
             'p-8 @lg:p-14 min-h-[72vh] flex items-center',
@@ -96,9 +94,8 @@ export function GridHero({ theme, sectionContent, disableAnimations = false }: G
             </div>
 
           </div>
-        </motion.div>
+        </FadeIn>
       </div>
-    </section>
-    </MotionConfig>
+    </SectionWrapper>
   )
 }

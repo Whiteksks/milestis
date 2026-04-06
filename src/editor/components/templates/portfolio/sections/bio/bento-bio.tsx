@@ -1,9 +1,11 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface BentoBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -11,104 +13,97 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
   const achievements = sectionContent.bio.achievements ?? []
 
   return (
-    <motion.section
+    <SectionWrapper
       id="bio"
-      data-section-id="bio"
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6 }}
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@lg:px-6 @md:px-5 px-4 py-3"
     >
-      <div className="@lg:px-6 @md:px-5 px-4 py-3">
-        <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto w-full">
 
-          <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
+        <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
-            {/* [A] Photo card — tall, 4/12 */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+          {/* [A] Photo card — tall, 4/12 */}
+          <FadeIn
+            delay={0}
+            direction="up"
+            distance={16}
+            scaleOffset={0.96}
+            className={cn(
+              '@lg:col-span-4 @md:col-span-2 col-span-1',
+              'relative rounded-3xl border border-current/8 overflow-hidden min-h-[44vh]',
+              theme.card,
+            )}
+          >
+            <SiteImage
+              fillParent
+              unoptimized
+              src={sectionContent.bio.image || '/placeholder.svg?height=480&width=360'}
+              alt={sectionContent.bio.title || 'Profile'}
+              sizes="(max-width: 768px) 100vw, 33vw"
+              imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+          </FadeIn>
+
+          {/* [B] Content column — 8/12 */}
+          <div className="@lg:col-span-8 @md:col-span-4 col-span-1 flex flex-col gap-3">
+
+            {/* [B1] Name + subtitle + description */}
+            <FadeIn
+              delay={0.05}
+              direction="up"
+              distance={14}
               className={cn(
-                '@lg:col-span-4 @md:col-span-2 col-span-1',
-                'relative rounded-3xl border border-current/8 overflow-hidden min-h-[44vh]',
+                'rounded-3xl border border-current/8 overflow-hidden p-6 @lg:p-8 flex-1',
                 theme.card,
               )}
             >
-              <SiteImage
-                fillParent
-                unoptimized
-                src={sectionContent.bio.image || '/placeholder.svg?height=480&width=360'}
-                alt={sectionContent.bio.title || 'Profile'}
-                sizes="(max-width: 768px) 100vw, 33vw"
-                imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-            </motion.div>
+              <p className={cn('text-[10px] uppercase tracking-widest opacity-40 mb-2', theme.fontBody)}>
+                {sectionContent.bio.subtitle || 'About'}
+              </p>
+              <h2 className={cn('@lg:text-3xl @md:text-2xl text-xl font-bold leading-tight mb-4', theme.fontTitle)}>
+                {sectionContent.bio.title}
+              </h2>
+              <p className={cn('text-sm opacity-60 leading-relaxed', theme.lineHeight, theme.fontBody)}>
+                {sectionContent.bio.description}
+              </p>
+            </FadeIn>
 
-            {/* [B] Content column — 8/12 */}
-            <div className="@lg:col-span-8 @md:col-span-4 col-span-1 flex flex-col gap-3">
-
-              {/* [B1] Name + subtitle + description */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, delay: 0.05 }}
+            {/* [B2] Achievement chips */}
+            {achievements.length > 0 && (
+              <FadeIn
+                delay={0.12}
+                direction="up"
+                distance={10}
                 className={cn(
-                  'rounded-3xl border border-current/8 overflow-hidden p-6 @lg:p-8 flex-1',
+                  'rounded-3xl border border-current/8 overflow-hidden p-5',
                   theme.card,
                 )}
               >
-                <p className={cn('text-[10px] uppercase tracking-widest opacity-40 mb-2', theme.fontBody)}>
-                  {sectionContent.bio.subtitle || 'About'}
-                </p>
-                <h2 className={cn('@lg:text-3xl @md:text-2xl text-xl font-bold leading-tight mb-4', theme.fontTitle)}>
-                  {sectionContent.bio.title}
-                </h2>
-                <p className={cn('text-sm opacity-60 leading-relaxed', theme.lineHeight, theme.fontBody)}>
-                  {sectionContent.bio.description}
-                </p>
-              </motion.div>
-
-              {/* [B2] Achievement chips */}
-              {achievements.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.12 }}
-                  className={cn(
-                    'rounded-3xl border border-current/8 overflow-hidden p-5',
-                    theme.card,
-                  )}
-                >
-                  <div className="flex flex-wrap gap-2">
-                    {achievements.map((item, i) => (
-                      <motion.span
-                        key={i}
-                        initial={{ opacity: 0, scale: 0.88 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.35, delay: 0.15 + i * 0.04 }}
-                        className={cn(
-                          'px-3 py-1.5 text-[11px] rounded-full border border-current/12 opacity-65',
-                          theme.fontBody,
-                        )}
-                      >
-                        {item}
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
+                <div className="flex flex-wrap gap-2">
+                  {achievements.map((item, i) => (
+                    <FadeIn
+                      as="span"
+                      key={i}
+                      delay={0.15 + i * 0.04}
+                      direction="none"
+                      scaleOffset={0.88}
+                      className={cn(
+                        'px-3 py-1.5 text-[11px] rounded-full border border-current/12 opacity-65',
+                        theme.fontBody,
+                      )}
+                    >
+                      {item}
+                    </FadeIn>
+                  ))}
+                </div>
+              </FadeIn>
+            )}
           </div>
+
         </div>
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

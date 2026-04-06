@@ -1,23 +1,21 @@
 'use client'
 
-import { motion, MotionConfig, type Transition } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { useT, useDisabled } from '../../primitives/animation-context'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {
-  disableAnimations?: boolean
-}
+interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
-export function LiquidGlassHero({ theme, sectionContent, disableAnimations = false }: LiquidGlassHeroProps) {
+export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps) {
   const heroImage = sectionContent.hero.image
   const { primary, secondary, accent2, highlight } = theme.bgEffectColors
-  const t = (duration: number, delay = 0, ease?: Transition['ease']): Transition =>
-    disableAnimations ? { duration: 0, delay: 0 } : { duration, delay, ...(ease !== undefined ? { ease } : {}) }
+  const t = useT()
+  const disabled = useDisabled()
 
   return (
-    <MotionConfig reducedMotion={disableAnimations ? 'always' : 'user'}>
     <section
       id="hero"
       data-section-id="hero"
@@ -64,9 +62,9 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
       {/* Hero image (behind glass) */}
       {heroImage && (
         <motion.div
-          initial={{ opacity: 0, scale: 1.06 }}
+          initial={disabled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={t(2.2, 0, 'easeOut')}
+          transition={disabled ? undefined : t(2.2, 0, 'easeOut')}
           className="absolute inset-0"
         >
           <SiteImage
@@ -90,9 +88,9 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
 
         {/* Floating subtitle chip */}
         <motion.div
-          initial={{ opacity: 0, y: -14, scale: 0.9 }}
+          initial={disabled ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -14, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={t(0.55, 0.25, [0.16, 1, 0.3, 1])}
+          transition={disabled ? undefined : t(0.55, 0.25, [0.16, 1, 0.3, 1])}
           className="flex"
         >
           <div
@@ -120,9 +118,9 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
 
         {/* Large title — outside glass for maximum crispness */}
         <motion.h1
-          initial={{ opacity: 0, y: 36 }}
+          initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={t(0.85, 0.4, [0.16, 1, 0.3, 1])}
+          transition={disabled ? undefined : t(0.85, 0.4, [0.16, 1, 0.3, 1])}
           className={cn(
             'font-black uppercase leading-[0.86] tracking-tighter text-white',
             '@lg:text-[5rem] @md:text-[4rem] text-[2.5rem]',
@@ -178,9 +176,9 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
             />
 
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
+              initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={t(0.6, 0.55)}
+              transition={disabled ? undefined : t(0.6, 0.55)}
               className={cn('relative text-sm @md:text-base text-white/62 font-light leading-relaxed', theme.fontBody)}
             >
               {sectionContent.hero.description}
@@ -202,6 +200,5 @@ export function LiquidGlassHero({ theme, sectionContent, disableAnimations = fal
         </div>
       </div>
     </section>
-    </MotionConfig>
   )
 }

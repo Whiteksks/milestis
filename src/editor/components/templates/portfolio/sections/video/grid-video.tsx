@@ -1,8 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface GridVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -10,24 +11,20 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
   const hasVideo = !!sectionContent.video.videoUrl
 
   return (
-    <motion.section
+    <SectionWrapper
       id="video"
-      data-section-id="video"
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6 }}
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container"
     >
       <div className="@lg:px-6 @md:px-5 px-4 py-3">
         <div className="max-w-6xl mx-auto space-y-3">
 
           {/* ── Cinematic video card ── */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.99 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.65 }}
+          <FadeIn
+            direction="up"
+            distance={5}
+            scaleOffset={0.99}
             className={cn(
               'relative rounded-2xl border border-current/8 overflow-hidden',
               theme.card,
@@ -57,7 +54,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
                 </div>
               )}
             </div>
-          </motion.div>
+          </FadeIn>
 
           {/* ── Info row ── */}
           <div className={cn(
@@ -83,6 +80,6 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
 
         </div>
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

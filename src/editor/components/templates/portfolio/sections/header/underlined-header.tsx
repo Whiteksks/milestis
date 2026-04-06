@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,7 @@ interface UnderlinedHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function HeaderUnderlined({ theme, sectionContent, handleAnchorClick }: UnderlinedHeaderProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 

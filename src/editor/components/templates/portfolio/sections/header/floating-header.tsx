@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,7 @@ interface FloatingHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function HeaderFloating({ theme, sectionContent, handleAnchorClick }: FloatingHeaderProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
@@ -64,7 +66,7 @@ export function HeaderFloating({ theme, sectionContent, handleAnchorClick }: Flo
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            transition={t(0.2)}
             className={cn(
               "@md:hidden mt-2 rounded-2xl overflow-hidden shadow-lg shadow-black/5",
               theme.cardStyle

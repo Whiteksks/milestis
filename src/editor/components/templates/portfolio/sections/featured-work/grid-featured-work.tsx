@@ -1,67 +1,56 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
 
   return (
-    <motion.section
-      id="work"
-      data-section-id="featured-work"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      className={cn('py-20 @container', theme.foreground)}
+    <SectionWrapper
+      id="featured-work"
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container py-20"
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
-        
+
         {/* Header Section */}
-        <div className="mb-12 flex flex-col gap-4 border-b border-current/10 pb-8">
+        <FadeIn direction="up" distance={15} delay={0.1} className="mb-12 flex flex-col gap-4 border-b border-current/10 pb-8">
           <div className="flex justify-between items-end">
             <div>
               <h2 className={cn('text-3xl @md:text-5xl font-bold tracking-tight mb-2', theme.fontTitle)}>
                 {sectionContent.featuredWork.title}
               </h2>
               <p className={cn('text-sm uppercase tracking-widest opacity-40', theme.fontBody)}>
-                {sectionContent.featuredWork.subtitle || 'Selected Archive'}
+                {sectionContent.featuredWork.subtitle || 'Selected Archive'}    
               </p>
             </div>
-
           </div>
-        </div>
-
-        {/* Regular Symmetric Grid */}
+        </FadeIn>
         <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 gap-x-6 gap-y-12">
           {projects.map((project, index) => (
-            <motion.div
+            <FadeIn
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+              direction="up"
+              distance={20}
+              delay={(index % 3) * 0.1}
               className="group cursor-pointer"
             >
               {/* Image Wrapper */}
-              <div className={cn(
-                'relative overflow-hidden',
-                getAspectRatioClass(project.aspectRatio || 'poster'),
-              )}>
+              <div className="relative overflow-hidden">
                 <SiteImage
-                  fillParent
                   unoptimized
                   src={project.image || '/placeholder.svg?height=800&width=600'}
                   alt={project.title || ''}
+                  aspectRatio={project.aspectRatio || 'poster'}
+                  frameStyle={project.frameStyle || 'none'}
+                  cropData={project.cropData}
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  imageClassName={cn(
-                    'object-cover transition-transform duration-500 ease-out group-hover:scale-105',
-                    getFrameStyle(project.frameStyle || 'none')
-                  )}
+                  imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
                 
                 {/* Номер проекта при наведении (опционально) */}
@@ -95,10 +84,10 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   {project.description}
                 </p>
               </div>
-            </motion.div>
+            </FadeIn>
           ))}
         </div>
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

@@ -1,12 +1,14 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { FrameStyle } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface BentoFeaturedWorkProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
@@ -34,11 +36,10 @@ function ProjectCard({
   titleSize?: string
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.55, delay: index * 0.065, ease: [0.22, 1, 0.36, 1] }}
+    <FadeIn
+      delay={index * 0.065}
+      direction="up"
+      distance={18}
       className={cn(
         'group relative overflow-hidden rounded-3xl cursor-pointer select-none',
         className,
@@ -105,7 +106,7 @@ function ProjectCard({
           {project.description}
         </p>
       </div>
-    </motion.div>
+    </FadeIn>
   )
 }
 
@@ -116,141 +117,138 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
   const [p1, p2, p3, ...rest] = projects
 
   return (
-    <section
+    <SectionWrapper
       id="work"
-      data-section-id="featured-work"
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@lg:px-6 @md:px-5 px-4 py-3"
     >
-      <div className="@lg:px-6 @md:px-5 px-4 py-3">
-        <div className="max-w-6xl mx-auto space-y-3">
+      <div className="max-w-6xl mx-auto space-y-3 w-full">
 
-          {/* ── Header ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={cn(
-              'rounded-3xl border border-current/8 px-6 py-4 flex items-center justify-between gap-4',
-              theme.card,
-            )}
-          >
-            <div className="min-w-0">
-              <p className={cn('text-[10px] uppercase tracking-widest opacity-35 mb-0.5', theme.fontBody)}>
-                {sectionContent.featuredWork.subtitle || 'Selected work'}
-              </p>
-              <h2 className={cn('@lg:text-2xl text-xl font-bold tracking-tight', theme.fontTitle)}>
-                {sectionContent.featuredWork.title}
-              </h2>
-            </div>
-
-          </motion.div>
-
-          {/* ── Bento grid ── */}
-          {projects.length > 0 && (
-            <>
-              {/* ─ 1 project: full-width hero ─ */}
-              {projects.length === 1 && p1 && (
-                <ProjectCard
-                  project={p1}
-                  index={0}
-                  imgSizes="100vw"
-                  titleSize="text-xl"
-                  className={cn('border border-current/8 min-h-[55vh]', theme.card)}
-                />
-              )}
-
-              {/* ─ 2 projects: equal halves ─ */}
-              {projects.length === 2 && (
-                <div className="grid @md:grid-cols-2 grid-cols-1 gap-3">
-                  {[p1, p2].map((p, i) => p && (
-                    <ProjectCard
-                      key={i}
-                      project={p}
-                      index={i}
-                      imgSizes="(max-width: 768px) 100vw, 50vw"
-                      titleSize="text-base"
-                      className={cn('border border-current/8 min-h-[44vh]', theme.card)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* ─ 3+ projects: true 2D bento ─ */}
-              {projects.length >= 3 && (
-                <div className="grid @lg:grid-cols-12 @md:grid-cols-2 grid-cols-1 gap-3">
-
-                  {/* [1] Featured — 8 cols, row-span-2 */}
-                  {p1 && (
-                    <ProjectCard
-                      project={p1}
-                      index={0}
-                      imgSizes="(max-width: 768px) 100vw, 67vw"
-                      titleSize="text-base"
-                      className={cn(
-                        'border border-current/8',
-                        '@lg:col-span-8 @lg:row-span-2 min-h-[46vh] @lg:min-h-[560px]',
-                        theme.card,
-                      )}
-                    />
-                  )}
-
-                  {/* [2] Top-right — 4 cols */}
-                  {p2 && (
-                    <ProjectCard
-                      project={p2}
-                      index={1}
-                      imgSizes="(max-width: 768px) 100vw, 33vw"
-                      titleSize="text-sm"
-                      className={cn(
-                        'border border-current/8',
-                        '@lg:col-span-4 min-h-[30vh] @lg:min-h-[272px]',
-                        theme.card,
-                      )}
-                    />
-                  )}
-
-                  {/* [3] Bottom-right — 4 cols */}
-                  {p3 && (
-                    <ProjectCard
-                      project={p3}
-                      index={2}
-                      imgSizes="(max-width: 768px) 100vw, 33vw"
-                      titleSize="text-sm"
-                      className={cn(
-                        'border border-current/8',
-                        '@lg:col-span-4 min-h-[30vh] @lg:min-h-[272px]',
-                        theme.card,
-                      )}
-                    />
-                  )}
-
-                  {/* [4+] Bottom row — equal thirds */}
-                  {rest.length > 0 && (
-                    <div className="@lg:col-span-12 @md:col-span-2 col-span-1 grid @lg:grid-cols-3 @md:grid-cols-2 grid-cols-1 gap-3">
-                      {rest.map((project, i) => (
-                        <ProjectCard
-                          key={i}
-                          project={project}
-                          index={i + 3}
-                          imgSizes="(max-width: 768px) 100vw, 33vw"
-                          titleSize="text-sm"
-                          className={cn(
-                            'border border-current/8 min-h-[30vh]',
-                            theme.card,
-                          )}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                </div>
-              )}
-            </>
+        {/* ── Header ── */}
+        <FadeIn
+          delay={0}
+          direction="up"
+          distance={12}
+          className={cn(
+            'rounded-3xl border border-current/8 px-6 py-4 flex items-center justify-between gap-4',
+            theme.card,
           )}
+        >
+          <div className="min-w-0">
+            <p className={cn('text-[10px] uppercase tracking-widest opacity-35 mb-0.5', theme.fontBody)}>
+              {sectionContent.featuredWork.subtitle || 'Selected work'}
+            </p>
+            <h2 className={cn('@lg:text-2xl text-xl font-bold tracking-tight', theme.fontTitle)}>
+              {sectionContent.featuredWork.title}
+            </h2>
+          </div>
 
-        </div>
+        </FadeIn>
+
+        {/* ── Bento grid ── */}
+        {projects.length > 0 && (
+          <>
+            {/* ─ 1 project: full-width hero ─ */}
+            {projects.length === 1 && p1 && (
+              <ProjectCard
+                project={p1}
+                index={0}
+                imgSizes="100vw"
+                titleSize="text-xl"
+                className={cn('border border-current/8 min-h-[55vh]', theme.card)}
+              />
+            )}
+
+            {/* ─ 2 projects: equal halves ─ */}
+            {projects.length === 2 && (
+              <div className="grid @md:grid-cols-2 grid-cols-1 gap-3">
+                {[p1, p2].map((p, i) => p && (
+                  <ProjectCard
+                    key={i}
+                    project={p}
+                    index={i}
+                    imgSizes="(max-width: 768px) 100vw, 50vw"
+                    titleSize="text-base"
+                    className={cn('border border-current/8 min-h-[44vh]', theme.card)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* ─ 3+ projects: true 2D bento ─ */}
+            {projects.length >= 3 && (
+              <div className="grid @lg:grid-cols-12 @md:grid-cols-2 grid-cols-1 gap-3">
+
+                {/* [1] Featured — 8 cols, row-span-2 */}
+                {p1 && (
+                  <ProjectCard
+                    project={p1}
+                    index={0}
+                    imgSizes="(max-width: 768px) 100vw, 67vw"
+                    titleSize="text-base"
+                    className={cn(
+                      'border border-current/8',
+                      '@lg:col-span-8 @lg:row-span-2 min-h-[46vh] @lg:min-h-[560px]',
+                      theme.card,
+                    )}
+                  />
+                )}
+
+                {/* [2] Top-right — 4 cols */}
+                {p2 && (
+                  <ProjectCard
+                    project={p2}
+                    index={1}
+                    imgSizes="(max-width: 768px) 100vw, 33vw"
+                    titleSize="text-sm"
+                    className={cn(
+                      'border border-current/8',
+                      '@lg:col-span-4 min-h-[30vh] @lg:min-h-[272px]',
+                      theme.card,
+                    )}
+                  />
+                )}
+
+                {/* [3] Bottom-right — 4 cols */}
+                {p3 && (
+                  <ProjectCard
+                    project={p3}
+                    index={2}
+                    imgSizes="(max-width: 768px) 100vw, 33vw"
+                    titleSize="text-sm"
+                    className={cn(
+                      'border border-current/8',
+                      '@lg:col-span-4 min-h-[30vh] @lg:min-h-[272px]',
+                      theme.card,
+                    )}
+                  />
+                )}
+
+                {/* [4+] Bottom row — equal thirds */}
+                {rest.length > 0 && (
+                  <div className="@lg:col-span-12 @md:col-span-2 col-span-1 grid @lg:grid-cols-3 @md:grid-cols-2 grid-cols-1 gap-3">
+                    {rest.map((project, i) => (
+                      <ProjectCard
+                        key={i}
+                        project={project}
+                        index={i + 3}
+                        imgSizes="(max-width: 768px) 100vw, 33vw"
+                        titleSize="text-sm"
+                        className={cn(
+                          'border border-current/8 min-h-[30vh]',
+                          theme.card,
+                        )}
+                      />
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            )}
+          </>
+        )}
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

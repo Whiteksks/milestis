@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,7 @@ interface MinimalHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: MinimalHeaderProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
@@ -26,7 +28,7 @@ export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: Mini
           onClick={(e) => handleAnchorClick(e, '#hero')}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7 }}
+          transition={t(0.7)}
           className={cn('text-[11px] uppercase tracking-[0.38em] font-medium hover:opacity-50 transition-opacity duration-300', theme.fontTitle)}
         >
           {sectionContent.header.title}
@@ -36,7 +38,7 @@ export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: Mini
         <motion.nav
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
+          transition={t(0.7, 0.1 )}
           className="hidden @md:flex items-center gap-10"
         >
           {(sectionContent.header.links ?? []).map((link, i) => (
@@ -71,7 +73,7 @@ export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: Mini
                   initial={{ opacity: 0, scale: 0.96, y: -4 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96, y: -4 }}
-                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  transition={t(0.15)}
                   className={cn('absolute right-0 top-full mt-2 min-w-[148px] border border-current/10 overflow-hidden', theme.glassPanel)}
                   style={{ transformOrigin: 'top right' }}
                 >

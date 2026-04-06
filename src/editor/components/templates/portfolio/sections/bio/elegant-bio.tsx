@@ -1,22 +1,31 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface ElegantBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+
 export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
   return (
-    <section id="bio" data-section-id="bio" className={cn('@container', theme.foreground)}>
+    <SectionWrapper
+      id="bio"
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container"
+    >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 py-20 @md:py-32">
-        
         <div className="flex flex-col @lg:flex-row items-start gap-12 @lg:gap-20">
           
           {/* Фото: остается компактным (240px), но плотно прижато к сетке */}
-          <div className="shrink-0 @lg:sticky @lg:top-32">
+          <FadeIn
+            delay={0.1}
+            direction="right"
+            distance={20}
+            className="shrink-0 @lg:sticky @lg:top-32"
+          >
             <SiteImage
               unoptimized
               src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
@@ -28,15 +37,15 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
               className="w-[180px] @md:w-[220px] @lg:w-[240px] shadow-sm"
               imageClassName="object-cover"
             />
-          </div>
+          </FadeIn>
 
           {/* Текст: теперь он "главный" */}
           <div className="flex-1 space-y-10">
             <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+              <FadeIn
+                direction="up"
+                distance={15}
+                delay={0.2}
                 className="space-y-3"
               >
                 <p className={cn('text-[10px] uppercase tracking-[0.4em] opacity-40', theme.fontBody)}>
@@ -45,43 +54,40 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
                 <h2 className={cn('text-3xl @md:text-4xl @lg:text-5xl font-extralight tracking-tight', theme.fontTitle)}>
                   {sectionContent.bio.title}
                 </h2>
-              </motion.div>
+              </FadeIn>
 
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 0.8, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
+              <FadeIn
+                direction="up"
+                distance={15}
+                delay={0.3}
                 className="max-w-2xl"
               >
-                <p className={cn('text-base @md:text-lg font-light leading-relaxed whitespace-pre-line', theme.fontBody)}>
+                <p className={cn('text-base @md:text-lg font-light leading-relaxed whitespace-pre-line opacity-80', theme.fontBody)}>
                   {sectionContent.bio.description}
                 </p>
-              </motion.div>
+              </FadeIn>
             </div>
 
             {/* Achievements: делаем их компактным списком внизу */}
             {(sectionContent.bio.achievements ?? []).length > 0 && (
               <div className="grid @sm:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t border-current/10">
                 {(sectionContent.bio.achievements ?? []).map((achievement, i) => (
-                  <motion.div
+                  <FadeIn
                     key={i}
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 0.6 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-baseline gap-3"
+                    direction="up"
+                    distance={10}
+                    delay={0.4 + i * 0.1}
+                    className="flex items-baseline gap-3 opacity-60"
                   >
                     <span className="text-[10px] opacity-40">0{i + 1}</span>
                     <p className={cn('text-xs @md:text-sm font-light', theme.fontBody)}>{achievement}</p>
-                  </motion.div>
+                  </FadeIn>
                 ))}
               </div>
             )}
           </div>
-
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

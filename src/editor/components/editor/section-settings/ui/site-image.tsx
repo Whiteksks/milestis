@@ -54,8 +54,8 @@ interface SiteImageProps {
 export function SiteImage({
   src,
   alt = "",
-  aspectRatio = "landscape",
-  frameStyle = "soft",
+  aspectRatio = "square",
+  frameStyle = "none",
   cropData,
   className,
   imageClassName,

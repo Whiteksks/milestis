@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
@@ -8,14 +9,9 @@ interface ShowcaseVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sec
 
 export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
   return (
-    <motion.section
+    <SectionWrapper
       id="video"
-      data-section-id="video"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.8 }}
-      className={cn('@container', theme.foreground)}
+      className={cn(theme.foreground)}
     >
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
         {/* Header row */}
@@ -64,13 +60,7 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
         )}
 
         {/* Video — cinematic aspect ratio, no border-radius */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="relative aspect-video w-full overflow-hidden bg-current/5"
-        >
+        <FadeIn direction="none" scaleOffset={0.98} delay={0.2} className="relative aspect-video w-full overflow-hidden bg-current/5">
           {sectionContent.video.videoUrl ? (
             <iframe
               src={sectionContent.video.videoUrl}
@@ -96,13 +86,13 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
               </span>
             </div>
           )}
-        </motion.div>
+        </FadeIn>
       </div>
 
       {/* Bottom separator */}
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

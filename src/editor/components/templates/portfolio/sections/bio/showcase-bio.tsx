@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -11,41 +12,24 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
   const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio
 
   return (
-    <motion.section
+    <SectionWrapper
       id="bio"
-      data-section-id="bio"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.8 }}
-      className={cn('@container relative w-full overflow-hidden', theme.foreground)}
+      className={cn('relative w-full overflow-hidden', theme.foreground)}
     >
       <div className="relative max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
         {/* Section label */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center gap-4 mb-14"
-        >
+        <FadeIn direction="left" distance={20} className="flex items-center gap-4 mb-14">
           <span className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
             {subtitle || 'About'}
           </span>
           <div className="w-12 h-px bg-current opacity-15" />
-        </motion.div>
+        </FadeIn>
 
         {/* Main grid: image + content */}
         <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 @lg:gap-20 items-start">
           {/* Image */}
           {image && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="@lg:col-span-4 flex justify-start"
-            >
+            <FadeIn direction="up" distance={30} delay={0.1} className="@lg:col-span-4 flex justify-start">
               <SiteImage
                   unoptimized
                   src={image}
@@ -57,17 +41,11 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
                   className={cn('w-[58vw] max-w-[220px] @md:w-full @md:max-w-xs @lg:max-w-none', theme.shadow)}
                   imageClassName="object-cover"
                 />
-            </motion.div>
+            </FadeIn>
           )}
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className={cn(image ? '@lg:col-span-8' : '@lg:col-span-12', 'space-y-8')}
-          >
+          <FadeIn direction="up" distance={30} delay={0.2} className={cn(image ? '@lg:col-span-8' : '@lg:col-span-12', 'space-y-8')}>
             {/* Name / title */}
             <h2
               className={cn(
@@ -92,13 +70,7 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
 
             {/* Achievements */}
             {achievements && achievements.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="pt-6 border-t border-current/10"
-              >
+              <FadeIn direction="none" delay={0.3} className="pt-6 border-t border-current/10">
                 <p
                   className={cn(
                     'text-[10px] uppercase tracking-widest opacity-30 mb-6',
@@ -129,9 +101,9 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </FadeIn>
             )}
-          </motion.div>
+          </FadeIn>
         </div>
       </div>
 
@@ -139,6 +111,6 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

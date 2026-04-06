@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
+import { useT } from '../../primitives/animation-context'
 import { Menu, X, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -18,6 +19,7 @@ export function RevealHeader({
   sectionContent,
   handleAnchorClick,
 }: RevealHeaderProps) {
+  const t = useT();
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -44,7 +46,7 @@ export function RevealHeader({
         id="header"
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={t(0.3)}
         className={cn(
           '@container fixed top-0 left-0 z-40 transition-shadow duration-300',
           hasScrolled && theme.shadow,
@@ -117,7 +119,7 @@ export function RevealHeader({
                         initial={{ rotate: -90, opacity: 0 }}
                         animate={{ rotate: 0, opacity: 1 }}
                         exit={{ rotate: 90, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={t(0.25)}
                       >
                         <X className="w-5 h-5" />
                       </motion.div>
@@ -127,7 +129,7 @@ export function RevealHeader({
                         initial={{ rotate: 90, opacity: 0 }}
                         animate={{ rotate: 0, opacity: 1 }}
                         exit={{ rotate: -90, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={t(0.25)}
                       >
                         <Menu className="w-5 h-5" />
                       </motion.div>
@@ -171,7 +173,7 @@ export function RevealHeader({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
+            transition={t(0.2)}
             className="@container @md:hidden fixed top-16 left-0 z-30 px-4"
             style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
           >

@@ -1,35 +1,31 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
+import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { useContactForm } from '@/editor/hooks/useContactForm'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface GridContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
 
-export function GridContact({ theme, sectionContent }: GridContactProps) {
+export function GridContact({ theme, sectionContent }: GridContactProps) {      
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
   return (
-    <motion.section
+    <SectionWrapper
       id="contact"
-      data-section-id="contact"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className={cn('@container py-16', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
+      className="@container py-16"
     >
-      <div className="@lg:px-8 @md:px-6 px-4">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6 items-stretch">
             
             {/* ЛЕВАЯ СТОРОНА: Инфо и Контакты */}
             <div className="flex flex-col gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+              <FadeIn
+                direction="up"
+                distance={20}
                 className={cn(
                   'flex-1 rounded-3xl border border-current/10 p-8 @lg:p-12 flex flex-col justify-between',
                   theme.card
@@ -62,15 +58,14 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                   
 
                 </div>
-              </motion.div>
+              </FadeIn>
             </div>
 
             {/* ПРАВАЯ СТОРОНА: Форма */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+            <FadeIn
+              direction="up"
+              distance={20}
+              delay={0.1}
               className={cn(
                 'rounded-3xl border border-current/10 p-8 @lg:p-12',
                 theme.card
@@ -78,20 +73,20 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
             >
               <form onSubmit={handleSubmit} className="h-full flex flex-col">
                 {status !== 'idle' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  <FadeIn
+                    direction="up"
+                    distance={8}
+                    scaleOffset={0.97}
                     className={cn(
                       'mb-4 px-4 py-2.5 rounded-xl text-[11px] border',
                       status === 'sent'
                         ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
-                        : 'border-red-500/25 bg-red-500/10 text-red-500',
+                        : 'border-red-500/25 bg-red-500/10 text-red-500',       
                       theme.fontBody,
                     )}
                   >
                     {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
-                  </motion.div>
+                  </FadeIn>
                 )}
                 <div className="space-y-4 flex-1">
                   <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
@@ -168,11 +163,10 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                   Send Message
                 </button>
               </form>
-            </motion.div>
+            </FadeIn>
 
           </div>
         </div>
-      </div>
-    </motion.section>
+    </SectionWrapper>
   )
 }

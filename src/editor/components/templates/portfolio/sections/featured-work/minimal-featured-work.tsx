@@ -1,9 +1,10 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SectionWrapper } from '../../primitives/section-wrapper'
+import { FadeIn } from '../../primitives/fade-in'
 
 interface MinimalFeaturedWorkProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
@@ -11,42 +12,39 @@ interface MinimalFeaturedWorkProps
 export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   return (
-    <section
+    <SectionWrapper
       id="work"
-      data-section-id="featured-work"
-      className={cn('@container', theme.foreground)}
+      themeForeground={theme.foreground}
+      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
 
-        {/* Section header — consistent with bio: label left, number right */}
+        {/* Section header */}
         <div className="flex items-center justify-between mb-20 border-t border-current/10 pt-8">
-          <motion.p
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+          <FadeIn
+            direction="left"
+            distance={10}
+            as="p"
             className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.letterSpacing, theme.fontBody)}
           >
             {sectionContent.featuredWork.subtitle || 'Selected Work'}
-          </motion.p>
-
+          </FadeIn>
         </div>
 
         {/* Project list — alternating editorial layout */}
         <div className="space-y-0">
           {projects.map((project, i) => (
             <div key={i} className="border-t border-current/10 last:border-b">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              <FadeIn
+                direction="up"
+                distance={16}
+                delay={0.05}
                 className={cn(
                   'flex flex-col @lg:flex-row gap-10 @lg:gap-16 py-12 @md:py-16',
                   i % 2 === 1 && '@lg:flex-row-reverse',
                 )}
               >
-                {/* Image — compact fixed width, hover scoped to image only */}
+                {/* Image */}
                 {project.image && (
                   <div className="@lg:w-[42%] w-full shrink-0 group">
                     <SiteImage
@@ -62,7 +60,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                   </div>
                 )}
 
-                {/* Content — 2/5 width, stacked vertically with generous spacing */}
+                {/* Content */}
                 <div className="@lg:w-2/5 flex flex-col justify-between gap-8">
                   <div className="space-y-5">
                     <h3
@@ -78,7 +76,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                     </p>
                   </div>
 
-                  {/* Tags — bottom of content, kept secondary */}
+                  {/* Tags */}
                   {(project.tags ?? []).length > 0 && (
                     <div className="flex flex-wrap gap-x-4 gap-y-2">
                       {(project.tags ?? []).slice(0, 4).map((tag, idx) => (
@@ -92,11 +90,11 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </FadeIn>
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   )
 }

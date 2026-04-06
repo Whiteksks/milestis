@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT, useDisabled } from '../../primitives/animation-context'
 import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,8 @@ interface LiquidGlassHeaderProps
   extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
 
 export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: LiquidGlassHeaderProps) {
+  const t = useT()
+  const disabled = useDisabled()
   const [isOpen, setIsOpen] = useState(false)
   const [heroVisible, setHeroVisible] = useState(true)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
@@ -53,9 +56,9 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
           <motion.a
             href="#hero"
             onClick={(e) => handleAnchorClick(e, '#hero')}
-            initial={{ opacity: 0, x: -16 }}
+            initial={disabled ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={disabled ? undefined : t(0.6)}
             className={cn('text-sm font-bold uppercase tracking-[0.28em] text-white drop-shadow-sm', theme.fontTitle)}
           >
             {sectionContent.header.title}
@@ -63,9 +66,9 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
 
           {/* Nav — desktop */}
           <motion.nav
-            initial={{ opacity: 0, y: -8 }}
+            initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={disabled ? undefined : t(0.6, 0.1)}
             className="hidden @md:flex items-center gap-8"
           >
             {(sectionContent.header.links ?? []).map((link, i) => (
@@ -104,7 +107,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
             initial={{ opacity: 0, y: -8, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.2 }}
+            transition={t(0.2)}
             className="mx-3 mt-2 rounded-2xl overflow-hidden border border-white/15"
             style={{
               background: 'rgba(255,255,255,0.12)',
