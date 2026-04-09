@@ -9,51 +9,86 @@ runConfig:
 env:
   # ── Public Firebase config (safe to commit) ───────────────────────────────
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: REPLACE_ME
+    value: AIzaSyBVDtmawDn2y3WstBrLGNeuVXde7Dg_pWs
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: REPLACE_ME
+    value: milestis.com
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: REPLACE_ME
+    value: milestis
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: REPLACE_ME
+    value: milestis.firebasestorage.app
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: REPLACE_ME
+    value: "396823314479"
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: REPLACE_ME
+    value: 1:396823314479:web:7269a883f2e6de56bdc6da
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: REPLACE_ME
+    value: G-1MTWED9VBW
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_CREATEUSER_URL
-    value: REPLACE_ME
+    value: https://createuser-5h4wes5waq-ez.a.run.app
     availability:
       - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_CREATE_PROJECT_URL
+    value: https://createproject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FORCE_DELETE_PROJECT_URL
+    value: https://forceDeleteProject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_UNPUBLISH_PROJECT_URL
+    value: https://unpublishProject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_EXPORT_PROJECT_URL
+    value: https://exportProject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PUBLISH_EXPORTED_PROJECT_URL
+    value: https://publishexportedproject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_APP_URL
+    value: https://milestis.com
+    availability:
       - RUNTIME
 
   # ── Server-side secrets (хранятся в Firebase Secret Manager) ─────────────
@@ -70,3 +105,8 @@ env:
   #   secret: firebase-admin-private-key
   #   availability:
   #     - RUNTIME
+
+  - variable: EXPORT_RENDER_SECRET
+    secret: export-render-secret
+    availability:
+      - RUNTIME

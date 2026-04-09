@@ -7,6 +7,7 @@ import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 export const metadata: Metadata = {
   title: 'Milestis',
   description: 'Create Your Interactive Photo Book',
+  robots: { index: false, follow: false },
 };
 
 const alice = Alice({

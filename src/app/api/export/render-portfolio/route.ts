@@ -1,5 +1,6 @@
+export const runtime = 'nodejs'
+
 import { NextRequest, NextResponse } from 'next/server'
-import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
 import { MotionConfig } from 'framer-motion'
 
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
   const handleAnchorClick = (_e: React.MouseEvent<HTMLAnchorElement>, _href: string) => {}
 
   // ── Render ────────────────────────────────────────────────────────────────
+  const { renderToStaticMarkup } = await import('react-dom/server')
   let html: string
   try {
     html = renderToStaticMarkup(
