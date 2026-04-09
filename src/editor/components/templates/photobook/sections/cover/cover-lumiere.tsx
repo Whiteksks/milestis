@@ -27,28 +27,18 @@ export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
       )}
       padded={false}
     >
-      {/* Wordmark */}
-      <Animate trigger="mount" direction="none" className="flex items-center gap-4 mb-12 @md:mb-16">
-        <div className="h-px w-10 bg-current opacity-15" />
-        <span className={cn('text-[8px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}>
-          Lumière
-        </span>
-        <div className="h-px w-10 bg-current opacity-15" />
-      </Animate>
 
       {/* Framed photo */}
       {hasImage && (
         <Animate trigger="mount" delay={0.2} distance={28} className="w-full max-w-[240px] @sm:max-w-[300px] @md:max-w-sm mb-10 @md:mb-12">
-          <div className="border border-current/10 p-[3px]">
-            <SiteImage
-              src={imageUrl}
-              alt={cover.title ?? 'Cover'}
-              aspectRatio={cover.images?.imageSettings?.[0]?.aspectRatio ?? 'portrait'}
-              frameStyle={cover.images?.imageSettings?.[0]?.frameStyle ?? 'none'}
-              cropData={cover.images?.imageSettings?.[0]?.cropData}
-              priority
-            />
-          </div>
+          <SiteImage
+            src={imageUrl}
+            alt={cover.title ?? 'Cover'}
+            aspectRatio={cover.images?.imageSettings?.[0]?.aspectRatio ?? 'portrait'}
+            frameStyle={cover.images?.imageSettings?.[0]?.frameStyle ?? 'none'}
+            cropData={cover.images?.imageSettings?.[0]?.cropData}
+            priority
+          />
         </Animate>
       )}
 

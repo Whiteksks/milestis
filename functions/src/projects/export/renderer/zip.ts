@@ -3,7 +3,7 @@ import type { RenderInput, RenderOutput } from "./types";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-/** URL of the Next.js app (e.g. https://milestis.app). Set via Firebase Function env. */
+/** URL of the Next.js app (e.g. https://milestis.site). Set via Firebase Function env. */
 const NEXT_APP_URL = process.env.NEXT_APP_URL;
 /** Shared secret that the Next.js render API route validates. */
 const RENDER_SECRET = process.env.EXPORT_RENDER_SECRET;

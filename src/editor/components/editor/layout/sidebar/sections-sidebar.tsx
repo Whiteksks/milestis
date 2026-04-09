@@ -50,7 +50,7 @@ export function SectionsSidebar({
       <PersistentDrawer 
         isOpen={!isSidebarCollapsed} 
         width={SIDEBAR_WIDTH} 
-        className="top-16 h-[calc(100%-4rem)]"
+        className="hidden md:flex top-16 h-[calc(100%-4rem)]"
       >
         {/* Кнопка — вне inert-дива, едет вместе с панелью, всегда кликабельна */}
         <button

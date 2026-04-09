@@ -1,0 +1,72 @@
+runConfig:
+  runtime: nodejs20
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+  minInstances: 0
+  maxInstances: 100
+
+env:
+  # ── Public Firebase config (safe to commit) ───────────────────────────────
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_CREATEUSER_URL
+    value: REPLACE_ME
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ── Server-side secrets (хранятся в Firebase Secret Manager) ─────────────
+  # На App Hosting firebase-admin использует ADC автоматически,
+  # поэтому FIREBASE_ADMIN_* переменные нужны ТОЛЬКО для локального режима.
+  # Раскомментируй если хочешь явно задать через секреты:
+  #
+  # - variable: FIREBASE_ADMIN_CLIENT_EMAIL
+  #   secret: firebase-admin-client-email
+  #   availability:
+  #     - RUNTIME
+  #
+  # - variable: FIREBASE_ADMIN_PRIVATE_KEY
+  #   secret: firebase-admin-private-key
+  #   availability:
+  #     - RUNTIME

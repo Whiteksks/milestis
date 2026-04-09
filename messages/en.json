@@ -227,7 +227,7 @@
     "publishProject": "Publish project",
     "createPrompt": "Create a photobook or portfolio to get started",
     "aboutTitle": "About Milestis domains",
-    "aboutDescription": "All published projects get a free milestis.app subdomain. Custom domains are coming soon."
+    "aboutDescription": "All published projects get a free milestis.site subdomain. Custom domains are coming soon."
   },
   "analytics": {
     "title": "Analytics",
