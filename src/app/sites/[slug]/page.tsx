@@ -2,6 +2,7 @@
 import { createHash } from "crypto"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
+import { PublishedPortfolioView, TokenGateForm } from "./published-view"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -67,16 +68,28 @@ export default async function SitePage({ params, searchParams }: Props) {
     const { token } = await searchParams
     const tokenString = Array.isArray(token) ? token[0] : token
     if (!tokenString || !verifyToken(tokenString, project.accessToken)) {
-      notFound()
+      return <TokenGateForm slug={slug} />
     }
   }
 
+  // Portfolio rendering
+  if (project.mode === "portfolio") {
+    const content = project.content ?? {}
+    const theme = project.theme ?? {}
+    return (
+      <PublishedPortfolioView
+        templateId={(theme.currentTemplateId as string | undefined) ?? "minimal"}
+        themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
+        sectionContent={content.sectionContent ?? {}}
+        sectionVisibility={content.sectionVisibility ?? {}}
+      />
+    )
+  }
+
+  // Photobook (token already verified above)
   return (
-    <main>
-      {/* TODO: render portfolio / photobook by project.mode, project.content, project.theme */}
-      <pre className="p-8 text-xs opacity-50">
-        {JSON.stringify({ id: project.id, slug: project.slug, mode: project.mode }, null, 2)}
-      </pre>
+    <main className="p-8">
+      <p className="text-sm opacity-50">Photobook viewer coming soon.</p>
     </main>
   )
 }
