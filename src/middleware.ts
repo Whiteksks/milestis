@@ -44,14 +44,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  // ── milestis.site/{slug} → /sites/{slug} ──────────────────────────────────
+  // ── milestis.site → published projects only ───────────────────────────────
   const isMilestisSite = host === 'milestis.site' || /^milestis\.site:\d+$/.test(host);
   if (isMilestisSite) {
-    if (pathname !== '/' && pathname.startsWith('/')) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/sites${pathname}`;
-      return NextResponse.rewrite(url);
+    // Root with no slug → redirect to main site
+    if (pathname === '/' || pathname === '') {
+      return NextResponse.redirect('https://milestis.com');
     }
+    // /my-slug (and anything deeper) → /sites/my-slug
+    const url = request.nextUrl.clone();
+    url.pathname = `/sites${pathname}`;
+    return NextResponse.rewrite(url);
   }
 
   // ── Blocked pages (under construction) ─────────────────────────────────────

@@ -67,7 +67,33 @@ export default async function SitePage({ params, searchParams }: Props) {
     const { token } = await searchParams
     const tokenString = Array.isArray(token) ? token[0] : token
     if (!tokenString || !verifyToken(tokenString, project.accessToken)) {
-      notFound()
+      // Show a token entry form instead of a blank 404
+      return (
+        <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
+          <div className="w-full max-w-sm text-center">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">{project.name}</h1>
+            <p className="text-gray-500 mb-6 text-sm">This photobook is private. Enter the access token to view it.</p>
+            <form method="GET" className="flex flex-col gap-3">
+              <input
+                name="token"
+                type="text"
+                placeholder="Access token"
+                autoComplete="off"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+              >
+                Open photobook
+              </button>
+              {tokenString && (
+                <p className="text-red-500 text-xs mt-1">Invalid token. Please check and try again.</p>
+              )}
+            </form>
+          </div>
+        </main>
+      )
     }
   }
 
