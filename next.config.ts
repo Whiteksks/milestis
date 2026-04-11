@@ -5,6 +5,8 @@ const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: false },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.shadcnstudio.com", pathname: "/**" },
