@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -48,7 +49,7 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
         {photos.length > 0 && (
           <div className="space-y-3 @md:space-y-4">
 
-            {/* Feature photo — full width, cinematic aspect */}
+            {/* Feature photo вЂ” full width, cinematic aspect */}
             {feature && (
               <div className="group">
                 <div className="relative aspect-[16/7] @md:aspect-[21/9] overflow-hidden">

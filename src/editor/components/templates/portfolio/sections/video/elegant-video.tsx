@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -46,7 +47,7 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
             )}
           </div>
 
-          {/* Video frame вЂ” thin ornamental border */}
+          {/* Video frame РІР‚вЂќ thin ornamental border */}
           <Animate
             direction="up"
             distance={16}

@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -18,7 +19,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
       <div className="max-w-5xl mx-auto px-6 @md:px-10 py-20 @md:py-32">
         <div className="flex flex-col @lg:flex-row items-start gap-12 @lg:gap-20">
           
-          {/* Р¤РѕС‚Рѕ: РѕСЃС‚Р°РµС‚СЃСЏ РєРѕРјРїР°РєС‚РЅС‹Рј (240px), РЅРѕ РїР»РѕС‚РЅРѕ РїСЂРёР¶Р°С‚Рѕ Рє СЃРµС‚РєРµ */}
+          {/* Р В¤Р С•РЎвЂљР С•: Р С•РЎРѓРЎвЂљР В°Р ВµРЎвЂљРЎРѓРЎРЏ Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…РЎвЂ№Р С (240px), Р Р…Р С• Р С—Р В»Р С•РЎвЂљР Р…Р С• Р С—РЎР‚Р С‘Р В¶Р В°РЎвЂљР С• Р С” РЎРѓР ВµРЎвЂљР С”Р Вµ */}
           <Animate
             delay={0.1}
             direction="right"
@@ -38,7 +39,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
             />
           </Animate>
 
-          {/* РўРµРєСЃС‚: С‚РµРїРµСЂСЊ РѕРЅ "РіР»Р°РІРЅС‹Р№" */}
+          {/* Р СћР ВµР С”РЎРѓРЎвЂљ: РЎвЂљР ВµР С—Р ВµРЎР‚РЎРЉ Р С•Р Р… "Р С–Р В»Р В°Р Р†Р Р…РЎвЂ№Р в„–" */}
           <div className="flex-1 space-y-10">
             <div className="space-y-6">
               <Animate
@@ -67,7 +68,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
               </Animate>
             </div>
 
-            {/* Achievements: РґРµР»Р°РµРј РёС… РєРѕРјРїР°РєС‚РЅС‹Рј СЃРїРёСЃРєРѕРј РІРЅРёР·Сѓ */}
+            {/* Achievements: Р Т‘Р ВµР В»Р В°Р ВµР С Р С‘РЎвЂ¦ Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…РЎвЂ№Р С РЎРѓР С—Р С‘РЎРѓР С”Р С•Р С Р Р†Р Р…Р С‘Р В·РЎС“ */}
             {(sectionContent.bio.achievements ?? []).length > 0 && (
               <div className="grid @sm:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t border-current/10">
                 {(sectionContent.bio.achievements ?? []).map((achievement, i) => (

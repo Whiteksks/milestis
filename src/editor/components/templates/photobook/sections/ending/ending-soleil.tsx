@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -36,7 +37,7 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
       {/* Central content */}
       <div className="flex-1 flex flex-col @md:flex-row items-center justify-center gap-12 @md:gap-20 px-8 @md:px-14 @lg:px-20 py-16">
 
-        {/* Closing photo — optional */}
+        {/* Closing photo вЂ” optional */}
         {hasImage && (
           <Animate direction="right" distance={24} className="shrink-0">
             <div className="w-48 @sm:w-56 @md:w-64 overflow-hidden rounded-sm">
@@ -71,7 +72,7 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
 
           {ending.signature && (
             <p className={cn('text-sm font-light opacity-45 italic', theme.fontBody)}>
-              — {ending.signature}
+              вЂ” {ending.signature}
             </p>
           )}
 

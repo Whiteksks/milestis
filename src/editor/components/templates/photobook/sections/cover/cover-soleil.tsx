@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -54,7 +55,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
               theme.fontBody,
             )}
           >
-            {[cover.date, cover.location].filter(Boolean).join('  ·  ')}
+            {[cover.date, cover.location].filter(Boolean).join('  В·  ')}
           </p>
         )}
       </Animate>
@@ -106,7 +107,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
             )}
             {(cover.date || cover.location) && (
               <p className={cn('text-[10px] uppercase tracking-[0.35em] opacity-30 pt-4', theme.fontBody)}>
-                {[cover.date, cover.location].filter(Boolean).join('  ·  ')}
+                {[cover.date, cover.location].filter(Boolean).join('  В·  ')}
               </p>
             )}
           </div>

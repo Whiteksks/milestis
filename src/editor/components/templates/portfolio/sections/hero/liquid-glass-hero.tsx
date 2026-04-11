@@ -1,3 +1,4 @@
+'use client'
 
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -22,7 +23,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           #07070e`,
       }}
     >
-      {/* Deep background orbs вЂ” slow, organic drift */}
+      {/* Deep background orbs РІР‚вЂќ slow, organic drift */}
       <motion.div
         animate={{ x: [0, 50, 18, 0], y: [0, -35, 14, 0], scale: [1, 1.12, 0.96, 1] }}
         transition={{ repeat: Infinity, duration: 18, ease: 'easeInOut' }}
@@ -73,7 +74,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
         </Animate>
       )}
 
-      {/* в”Ђв”Ђ Content layout в”Ђв”Ђ */}
+      {/* РІвЂќР‚РІвЂќР‚ Content layout РІвЂќР‚РІвЂќР‚ */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 @md:px-14 pt-28 pb-20 @md:py-32 flex flex-col gap-8">
 
         {/* Floating subtitle chip */}
@@ -117,7 +118,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           {sectionContent.hero.title}
         </Animate>
 
-        {/* Glass info card вЂ” description + accent row */}
+        {/* Glass info card РІР‚вЂќ description + accent row */}
         <div className="relative max-w-xl">
           <div
             className="relative rounded-2xl overflow-hidden p-6 @md:p-7"

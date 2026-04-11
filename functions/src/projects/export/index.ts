@@ -10,7 +10,7 @@ import { processTransaction, TransactionEngineError } from "../../transactions/e
 import { migrateProjectMedia, deletePrivateProjectMedia } from "./migrate";
 import { renderExport } from "./renderer";
 import { applyPublish, writeGhostEntry, PublishValidationError } from "./publish";
-import { EXPORT_COST_CREDITS, type ExportInput, type ExportOutput } from "./types";
+import { EXPORT_COST_CREDITS, type ExportInput, type ExportOutput, type PortfolioRenderData } from "./types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -235,27 +235,33 @@ export const exportProject = onRequest(
 			// ── 7. Persist new URLs in the content doc ───────────────────────
 			await contentRef.update(migratedData);
 
-			// ── 8. Render ────────────────────────────────────────────────────
-			const renderOutput = await renderExport(projectData.mode, {
-				projectId,
-				projectName: projectData.name,
-				mode: projectData.mode,
-				content: migratedData.content ?? null,
-				theme: migratedData.theme ?? null,
-			});
+			// ── 8 & 9. Render + upload (photobook only) ─────────────────────
+			// Portfolio: the client renders the ZIP locally using the content data
+			// returned in this response — no server rendering needed.
+			let fileDownloadUrl: string | undefined;
+			let renderedFilePath: string | undefined;
 
-			// ── 9. Upload rendered file ──────────────────────────────────────
-			const safeProjectName = (projectData.name ?? "project")
-				.replace(/[^\w\s-]/g, "")
-				.trim()
-				.replace(/\s+/g, "-") || "project";
-			const renderedFilePath = `public/${projectId}/exports/${exportId}.${renderOutput.extension}`;
-			const fileDownloadUrl = await uploadRenderedFile(
-				renderedFilePath,
-				renderOutput.buffer,
-				renderOutput.mimeType,
-				`${safeProjectName}.${renderOutput.extension}`,
-			);
+			if (projectData.mode === "photobook") {
+				const renderOutput = await renderExport(projectData.mode, {
+					projectId,
+					projectName: projectData.name,
+					mode: projectData.mode,
+					content: migratedData.content ?? null,
+					theme: migratedData.theme ?? null,
+				});
+
+				const safeProjectName = (projectData.name ?? "project")
+					.replace(/[^\w\s-]/g, "")
+					.trim()
+					.replace(/\s+/g, "-") || "project";
+				renderedFilePath = `public/${projectId}/exports/${exportId}.${renderOutput.extension}`;
+				fileDownloadUrl = await uploadRenderedFile(
+					renderedFilePath,
+					renderOutput.buffer,
+					renderOutput.mimeType,
+					`${safeProjectName}.${renderOutput.extension}`,
+				);
+			}
 
 			const contentSnapshot = {
 				theme: migratedData.theme ?? null,
@@ -319,9 +325,9 @@ export const exportProject = onRequest(
 				versionNumber: newVersionNumber,
 				mode: projectData.mode,
 				creditCost: EXPORT_COST_CREDITS,
-				filePath: renderedFilePath,
-				fileDownloadUrl,
-				mimeType: renderOutput.mimeType,
+				...(renderedFilePath ? { filePath: renderedFilePath } : {}),
+				...(fileDownloadUrl ? { fileDownloadUrl } : {}),
+				...(fileDownloadUrl ? { mimeType: "application/pdf" } : {}),
 				...(publish ? { publishedSlug: publish.slug } : {}),
 				createdAt: FieldValue.serverTimestamp(),
 			});
@@ -409,6 +415,20 @@ export const exportProject = onRequest(
 				);
 			}
 
+			// ── Assemble portfolio render data for client-side ZIP generation ──
+			let portfolioRenderData: PortfolioRenderData | undefined;
+			if (projectData.mode === "portfolio") {
+				const themeData = (migratedData.theme ?? {}) as Record<string, unknown>;
+				const contentData = (migratedData.content ?? {}) as Record<string, unknown>;
+				portfolioRenderData = {
+					templateId: (themeData.currentTemplateId as string | undefined) ?? "minimal",
+					themeId: (themeData.currentTheme as string | undefined) ?? "parchment",
+					sectionContent: (contentData.sectionContent ?? {}) as Record<string, unknown>,
+					sectionVisibility: (contentData.sectionVisibility ?? {}) as Record<string, boolean>,
+					projectName: projectData.name,
+				};
+			}
+
 			logger.info(
 				`[exportProject] Project ${projectId} exported by ${uid}. v${newVersionNumber}, credits: ${EXPORT_COST_CREDITS}`,
 			);
@@ -417,8 +437,9 @@ export const exportProject = onRequest(
 				ok: true,
 				exportId,
 				versionNumber: newVersionNumber,
-				fileDownloadUrl,
+				...(fileDownloadUrl ? { fileDownloadUrl } : {}),
 				...(publish ? { publishedSlug: publish.slug } : {}),
+				...(portfolioRenderData ? { portfolioRenderData } : {}),
 				balance: finalBalance,
 			};
 			res.status(200).json(output);

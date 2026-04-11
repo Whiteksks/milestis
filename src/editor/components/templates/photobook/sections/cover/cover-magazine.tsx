@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -17,7 +18,7 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
 
-  // Split title into words — alternate solid / outline rendering
+  // Split title into words вЂ” alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
   return (
     <SectionWrapper
@@ -48,7 +49,7 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
 
       {/* Masthead top bar */}
       <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10">
-        {/* Left — publication name */}
+        {/* Left вЂ” publication name */}
         <span
           className={cn(
             'text-[10px] uppercase tracking-[0.4em] font-bold',
@@ -60,7 +61,7 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
           Photobook
         </span>
 
-        {/* Right — date / location */}
+        {/* Right вЂ” date / location */}
         <div className="flex items-center gap-6">
           {cover.date && (
             <span

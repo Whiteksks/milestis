@@ -39,11 +39,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: false },
-  // framer-motion has 'use client' in its package, which causes Next.js RSC bundler
-  // to refuse imports from server components. Marking it external makes the server
-  // bundle load it via require() at runtime, bypassing RSC transformation entirely.
-  // renderToStaticMarkup works fine — motion.* renders as plain HTML without animations.
-  serverExternalPackages: ['framer-motion'],
   async headers() {
     return [
       {

@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -28,7 +29,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
         <div className="flex items-center gap-4 mb-14 @md:mb-20">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
-            03  ·  Story
+            03  В·  Story
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
         </div>
@@ -48,13 +49,13 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
             )}
             {(story.date || story.location) && (
               <p className={cn('text-[9px] uppercase tracking-[0.35em] opacity-25', theme.fontBody)}>
-                {[story.date, story.location].filter(Boolean).join('  —  ')}
+                {[story.date, story.location].filter(Boolean).join('  вЂ”  ')}
               </p>
             )}
           </div>
         )}
 
-        {/* Story moments — centered framed */}
+        {/* Story moments вЂ” centered framed */}
         {moments.map((block, _index) => {
           const imageUrl = block.image
           const imageSettings = block.imageSettings?.[0]

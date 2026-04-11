@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -57,7 +58,7 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
       {photos.length > 0 && (
         <div className="space-y-3 @md:space-y-4">
 
-          {/* Feature — hero full-width, widescreen */}
+          {/* Feature вЂ” hero full-width, widescreen */}
           {feature && (
             <div>
                 <div className="relative aspect-[21/9] @md:aspect-[21/8] overflow-hidden group">
@@ -82,7 +83,7 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
             </div>
           )}
 
-          {/* Remaining — editorial 3-column grid with numbered captions */}
+          {/* Remaining вЂ” editorial 3-column grid with numbered captions */}
           {rest.length > 0 && (
             <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4 pt-2">
               {rest.map((block, index) => (

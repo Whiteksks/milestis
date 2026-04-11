@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -62,7 +63,7 @@ export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
       {/* Date / location */}
       {(cover.date || cover.location) && (
         <Animate as="p" trigger="mount" direction="none" delay={hasImage ? 0.7 : 0.45} className={cn('mt-6 text-[9px] uppercase tracking-[0.38em] opacity-25', theme.fontBody)}>
-          {[cover.date, cover.location].filter(Boolean).join('  —  ')}
+          {[cover.date, cover.location].filter(Boolean).join('  вЂ”  ')}
         </Animate>
       )}
 

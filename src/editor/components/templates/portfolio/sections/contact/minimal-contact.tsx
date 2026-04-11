@@ -1,3 +1,4 @@
+'use client'
 
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
@@ -86,7 +87,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent вЂ” check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
               </motion.div>
             )}
             <div className="border-b border-current/10 py-4">
@@ -128,7 +129,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
                 name="message"
                 value={fields.message}
                 onChange={handleChange}
-                placeholder="Tell me about your projectвЂ¦"
+                placeholder="Tell me about your projectРІР‚В¦"
                 rows={4}
                 className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20 resize-none', theme.fontBody)}
               />

@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -24,7 +25,7 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
             distance={5}
             className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
           >
-            <p>В© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
+            <p>Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
           </Animate>
 
           {/* Right: social icons */}

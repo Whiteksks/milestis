@@ -30,6 +30,7 @@ import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useRenderZip } from '@/hooks/useRenderZip'
 import { EXPORT_COST_CREDITS } from '@/editor/components/modals/export-modal.constants'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -56,18 +57,24 @@ export function ExportModal({ open, onOpenChange, projectId, mode, isExported }:
 
   const modalData = useExportModal(projectId, mode)
   const isMobile = useIsMobile()
+  const { generateZip, isRunning: isZipping } = useRenderZip()
 
   const exportMutation = useMutation({
     mutationFn: () =>
       exportProject({ projectId, publish: modalData.publishPayload }),
-    onSuccess: (result) => {
-      // Trigger file download.
-      const link = document.createElement('a')
-      link.href = result.fileDownloadUrl
-      link.download = ''
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+    onSuccess: async (result) => {
+      // Portfolio: render ZIP locally in the browser
+      if (mode === 'portfolio' && result.portfolioRenderData) {
+        await generateZip(result.portfolioRenderData)
+      } else if (result.fileDownloadUrl) {
+        // Photobook: download PDF from Storage
+        const link = document.createElement('a')
+        link.href = result.fileDownloadUrl
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
 
       // Update editor UI if the export included a publish.
       if (result.publishedSlug) {
@@ -90,7 +97,7 @@ export function ExportModal({ open, onOpenChange, projectId, mode, isExported }:
   })
 
   function handleExport() {
-    if (!modalData.canExport || exportMutation.isPending) return
+    if (!modalData.canExport || exportMutation.isPending || isZipping) return
     const promise = exportMutation.mutateAsync()
     toastProject.export(promise)
   }
@@ -113,7 +120,7 @@ export function ExportModal({ open, onOpenChange, projectId, mode, isExported }:
 
   const footer = (
     <ExportFooter
-      isPending={exportMutation.isPending}
+      isPending={exportMutation.isPending || isZipping}
       canExport={modalData.canExport && hasEnoughCredits}
       fileLabel={fileLabel}
       withPublish={modalData.withPublish}

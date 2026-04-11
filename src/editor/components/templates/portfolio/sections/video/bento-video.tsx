@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -19,7 +20,7 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* в”Ђв”Ђ Cinematic video card в”Ђв”Ђ */}
+        {/* РІвЂќР‚РІвЂќР‚ Cinematic video card РІвЂќР‚РІвЂќР‚ */}
         <Animate
           delay={0}
           direction="up"

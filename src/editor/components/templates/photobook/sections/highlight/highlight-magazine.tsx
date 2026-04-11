@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -99,7 +100,7 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
         )}
       </div>
 
-      {/* Pull quote strip — below the image */}
+      {/* Pull quote strip вЂ” below the image */}
       {highlight.quote && (
         <div className={cn('border-t border-b border-current/10 py-10 @md:py-14')}>
           <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 grid grid-cols-1 @md:grid-cols-[1fr_3fr] gap-6 @md:gap-16 items-center">

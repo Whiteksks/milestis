@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -51,7 +52,7 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
           <div className="space-y-2 pt-2">
             {ending.signature && (
               <p className={cn('text-sm opacity-50 italic', theme.fontBody)}>
-                — {ending.signature}
+                вЂ” {ending.signature}
               </p>
             )}
             {ending.date && (

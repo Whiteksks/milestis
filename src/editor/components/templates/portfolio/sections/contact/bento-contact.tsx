@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -19,10 +20,10 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* в”Ђв”Ђ Row 1: CTA cells в”Ђв”Ђ */}
+        {/* РІвЂќР‚РІвЂќР‚ Row 1: CTA cells РІвЂќР‚РІвЂќР‚ */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3 mb-3">
 
-          {/* [A] Headline card вЂ” 7/12 */}
+          {/* [A] Headline card РІР‚вЂќ 7/12 */}
           <Animate
             delay={0}
             direction="up"
@@ -46,7 +47,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
             )}
           </Animate>
 
-          {/* [B] Email card вЂ” 5/12 */}
+          {/* [B] Email card РІР‚вЂќ 5/12 */}
           <Animate
             delay={0.07}
             direction="up"
@@ -74,14 +75,14 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Write в†—
+                Write РІвЂ вЂ”
               </a>
             </div>
           </Animate>
 
         </div>
 
-        {/* в”Ђв”Ђ Row 2: Form card в”Ђв”Ђ */}
+        {/* РІвЂќР‚РІвЂќР‚ Row 2: Form card РІвЂќР‚РІвЂќР‚ */}
         <Animate
           delay={0.1}
           direction="up"
@@ -102,7 +103,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent вЂ” check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
               </div>
             )}
             <div className="grid @md:grid-cols-3 grid-cols-1 gap-3 mb-3">
@@ -147,7 +148,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               name="message"
               value={fields.message}
               onChange={handleChange}
-              placeholder="Tell me about your projectвЂ¦"
+              placeholder="Tell me about your projectРІР‚В¦"
               rows={4}
               className={cn(
                 'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -164,7 +165,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Send message в†’
+                Send message РІвЂ вЂ™
               </button>
             </div>
           </form>

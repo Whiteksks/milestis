@@ -1,3 +1,4 @@
+'use client'
 
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -26,7 +27,7 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
           {/* Asymmetric layout: big heading left, form right */}
           <div className="grid @lg:grid-cols-[2fr,3fr] @md:grid-cols-1 grid-cols-1 gap-16 items-start">
 
-            {/* Left вЂ” headline */}
+            {/* Left РІР‚вЂќ headline */}
             <div className="space-y-6">
               <Animate direction="left" delay={0.1}>
                 <EditorialTitle themeFont={theme.fontTitle} className="@lg:text-5xl @md:text-4xl text-3xl tracking-tight">
@@ -52,7 +53,7 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
               </Animate>
             </div>
 
-            {/* Right вЂ” minimalist underline-only form */}
+            {/* Right РІР‚вЂќ minimalist underline-only form */}
             <Animate direction="up" delay={0.2} as="div">
               <form onSubmit={handleSubmit} className="space-y-0">
                 {status !== 'idle' && (
@@ -68,7 +69,7 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
                       theme.fontBody,
                     )}
                   >
-                    {status === 'sent' ? 'Message sent вЂ” check your email client.' : 'Please fill in all required fields.'}
+                    {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
                   </motion.div>
                 )}
                 <div className="grid @md:grid-cols-2 gap-0">

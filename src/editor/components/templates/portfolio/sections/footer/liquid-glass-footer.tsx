@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -46,7 +47,7 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
               ))}
             </div>
             <p className={cn('text-[10px] uppercase tracking-[0.2em] text-white/30', theme.fontBody)}>
-              В© {new Date().getFullYear()} {sectionContent.footer.copyright}
+              Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
           </Animate>
 

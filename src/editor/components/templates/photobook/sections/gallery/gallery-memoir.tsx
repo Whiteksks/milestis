@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -53,7 +54,7 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
           </p>
         )}
 
-        {/* Photo grid — 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
+        {/* Photo grid вЂ” 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
         {photos.length > 0 && (
           <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
             {photos.map((block, index) => (

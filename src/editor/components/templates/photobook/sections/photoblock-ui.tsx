@@ -1,3 +1,4 @@
+'use client'
 import { AspectRatio, FrameStyle, PhotoBlock } from '@/editor/lib/types'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 

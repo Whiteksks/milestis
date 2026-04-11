@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -13,7 +14,7 @@ interface StoryChronicleProps {
 
 export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
   const { story } = sectionContent
-  // ���������� �� �� ��������� ������, ��� � � StoryMemoir
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅ пїЅ StoryMemoir
   const moments = story.images ?? []
 
   return (

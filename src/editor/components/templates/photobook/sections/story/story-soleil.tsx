@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -42,13 +43,13 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
           )}
           {(story.date || story.location) && (
             <p className={cn('text-[10px] uppercase tracking-[0.3em] opacity-30', theme.fontBody)}>
-              {[story.date, story.location].filter(Boolean).join('  —  ')}
+              {[story.date, story.location].filter(Boolean).join('  вЂ”  ')}
             </p>
           )}
         </Animate>
       )}
 
-      {/* Moments — alternating photo / caption layout */}
+      {/* Moments вЂ” alternating photo / caption layout */}
       {moments.length > 0 && (
         <div className="space-y-16 @md:space-y-24">
           {moments.map((block, index) => {

@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -65,7 +66,7 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
               theme.fontBody,
             )}
           >
-            {[cover.date, cover.location].filter(Boolean).join('  ·  ')}
+            {[cover.date, cover.location].filter(Boolean).join('  В·  ')}
           </p>
         )}
       </Animate>

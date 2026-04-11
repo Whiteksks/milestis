@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -22,7 +23,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
 
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
-          {/* [A] Photo card вЂ” tall, 4/12 */}
+          {/* [A] Photo card РІР‚вЂќ tall, 4/12 */}
           <Animate
             delay={0}
             direction="up"
@@ -45,7 +46,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
           </Animate>
 
-          {/* [B] Content column вЂ” 8/12 */}
+          {/* [B] Content column РІР‚вЂќ 8/12 */}
           <div className="@lg:col-span-8 @md:col-span-4 col-span-1 flex flex-col gap-3">
 
             {/* [B1] Name + subtitle + description */}

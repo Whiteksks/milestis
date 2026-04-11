@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -43,7 +44,7 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
 
         <div className="flex-1 flex flex-col @md:flex-row gap-12 @md:gap-20 items-start @md:items-center">
 
-          {/* Left — typographic closing */}
+          {/* Left вЂ” typographic closing */}
           <div className="flex-1 space-y-6 @md:space-y-8">
             {/* "The End" masthead */}
             <h2
@@ -71,7 +72,7 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
             <div className="space-y-1.5 pt-2">
               {ending.signature && (
                 <p className={cn('text-sm italic opacity-45', theme.fontBody)}>
-                  — {ending.signature}
+                  вЂ” {ending.signature}
                 </p>
               )}
               {ending.date && (
@@ -82,7 +83,7 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
             </div>
           </div>
 
-          {/* Right — optional closing photo */}
+          {/* Right вЂ” optional closing photo */}
           {imageUrl && (
             <div className="w-full @md:w-64 @lg:w-80 shrink-0">
               <SiteImage

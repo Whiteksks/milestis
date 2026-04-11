@@ -20,12 +20,23 @@ export interface ExportProjectInput {
   }
 }
 
+export interface PortfolioRenderData {
+  templateId: string
+  themeId: string
+  sectionContent: Record<string, unknown>
+  sectionVisibility: Record<string, boolean>
+  projectName: string
+}
+
 export interface ExportProjectResult {
   exportId: string
   versionNumber: number
-  fileDownloadUrl: string
+  /** PDF download URL — photobook only. Undefined for portfolio. */
+  fileDownloadUrl?: string
   /** Present only when the request included a publish payload. */
   publishedSlug?: string
+  /** Portfolio only — passed to the client-side ZIP renderer. */
+  portfolioRenderData?: PortfolioRenderData
   balance: {
     total: number
     purchased: number

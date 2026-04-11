@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -40,7 +41,7 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
       {/* Two-column spread: big quote left, image right */}
       <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 @lg:gap-28 items-start">
 
-        {/* Left — editorial text column */}
+        {/* Left вЂ” editorial text column */}
         <div className="space-y-10">
             {introduction.title && (
               <h2
@@ -85,7 +86,7 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
             )}
         </div>
 
-        {/* Right — image */}
+        {/* Right вЂ” image */}
         {imageUrl && (
           <div>
             <SiteImage

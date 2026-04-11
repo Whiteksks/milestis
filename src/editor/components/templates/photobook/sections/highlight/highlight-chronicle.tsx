@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -45,7 +46,7 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
           <div className={cn('absolute inset-0', theme.muted)} />
         )}
 
-        {/* Text overlay — anchored bottom-left */}
+        {/* Text overlay вЂ” anchored bottom-left */}
         <div className="relative z-10 px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-16 space-y-4 max-w-4xl">
           <div className="flex items-center gap-3">
             <div className={cn('h-px w-8', hasImage ? 'bg-white/40' : theme.accent)} />
@@ -87,7 +88,7 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
         </div>
       </div>
 
-      {/* Pull quote — below image, standard section background */}
+      {/* Pull quote вЂ” below image, standard section background */}
       {highlight.quote && (
         <div className="px-8 @md:px-14 @lg:px-20 py-12 @md:py-16 max-w-7xl mx-auto w-full">
           <blockquote className={cn('border-l-2 pl-6', theme.border)}>

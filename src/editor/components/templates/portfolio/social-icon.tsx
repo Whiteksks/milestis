@@ -1,7 +1,8 @@
+'use client'
 /**
  * social-icon.tsx
  * Single source of truth for social platform icons used in portfolio footers.
- * Add new platforms here — all footer files pick them up automatically.
+ * Add new platforms here вЂ” all footer files pick them up automatically.
  */
 
 import { Mail, Globe } from 'lucide-react'
@@ -17,7 +18,7 @@ import {
 
 import type { SVGProps } from 'react'
 
-// ─── Custom SVGs for platforms not in Lucide ─────────────────────────────────
+// в”Ђв”Ђв”Ђ Custom SVGs for platforms not in Lucide в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 function DribbbleIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -43,7 +44,7 @@ function TikTokIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-// ─── Icon map ─────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Icon map в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 const ICON_MAP: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>> = {
   facebook:  FaFacebook,
@@ -61,7 +62,7 @@ const ICON_MAP: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>> = {
   website:   Globe,
 }
 
-// ─── Components ──────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Components в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 interface SocialIconProps {
   /** Platform slug: "instagram", "github", etc. */
@@ -88,7 +89,7 @@ interface SocialIconLinkProps {
 
 /**
  * A single social link rendered as an icon button.
- * Use this in every footer — no need to import individual icons there.
+ * Use this in every footer вЂ” no need to import individual icons there.
  */
 export function SocialIconLink({
   href,

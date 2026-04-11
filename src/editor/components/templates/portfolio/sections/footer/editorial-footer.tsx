@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -24,7 +25,7 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
           {/* Left: copyright */}
           <div className="flex items-center gap-4">
             <p className={cn('text-[10px] uppercase opacity-20', theme.letterSpacing, theme.fontBody)}>
-              В© {new Date().getFullYear()} {sectionContent.footer.copyright}
+              Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
           </div>
 

@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -24,7 +25,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
       padded={false}
       containerClassName="max-w-5xl py-20 @md:py-32 px-6 @md:px-12"
     >
-        {/* Верхняя линия с номером страницы или пометкой "FIN" */}
+        {/* Р’РµСЂС…РЅСЏСЏ Р»РёРЅРёСЏ СЃ РЅРѕРјРµСЂРѕРј СЃС‚СЂР°РЅРёС†С‹ РёР»Рё РїРѕРјРµС‚РєРѕР№ "FIN" */}
         <div className="flex justify-between items-baseline mb-12 border-b border-current/10 pb-4">
           <span className="text-[10px] uppercase tracking-[0.3em] opacity-50">Editorial Archive</span>
           <span className={cn("text-xs italic", theme.fontBody)}>Finis</span>
@@ -32,7 +33,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
 
         <div className="grid grid-cols-1 @lg:grid-cols-12 gap-12 items-start">
           
-          {/* Левая колонка: Текст */}
+          {/* Р›РµРІР°СЏ РєРѕР»РѕРЅРєР°: РўРµРєСЃС‚ */}
           <div className="@lg:col-span-7 flex flex-col">
             <h2
               className={cn(
@@ -62,7 +63,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
             </div>
           </div>
 
-          {/* Правая колонка: Изображение */}
+          {/* РџСЂР°РІР°СЏ РєРѕР»РѕРЅРєР°: РР·РѕР±СЂР°Р¶РµРЅРёРµ */}
           {hasImage && (
             <div className="@lg:col-span-5 relative">
               <div className="relative aspect-[3/4] @lg:aspect-[4/5] overflow-hidden bg-current/5 shadow-2xl">
@@ -75,7 +76,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
                   imageClassName="object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
-              {/* Декоративный элемент "Magazine" */}
+              {/* Р”РµРєРѕСЂР°С‚РёРІРЅС‹Р№ СЌР»РµРјРµРЅС‚ "Magazine" */}
               <div className={cn(
                 "absolute -bottom-6 -right-4 text-6xl opacity-10 pointer-events-none select-none font-serif italic",
                 theme.fontTitle
@@ -86,7 +87,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
           )}
         </div>
 
-        {/* Нижний колонтитул */}
+        {/* РќРёР¶РЅРёР№ РєРѕР»РѕРЅС‚РёС‚СѓР» */}
         <div className="mt-20 flex justify-center">
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1', theme.accent)} />
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-40', theme.accent)} />

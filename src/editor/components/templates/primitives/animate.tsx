@@ -1,28 +1,29 @@
+'use client'
 
 import { useMemo } from 'react'
 import { motion, HTMLMotionProps } from 'framer-motion'
 import { useBaseTransition, useDisabled } from './animation-context'
 
-// в”Ђв”Ђв”Ђ Types в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Types РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 /**
  * How the animation entry is triggered:
- *  - 'scroll'  вЂ” fires when the element enters the viewport (whileInView). Default.
- *  - 'mount'   вЂ” fires immediately on component mount (animate). Use for above-the-fold
+ *  - 'scroll'  РІР‚вЂќ fires when the element enters the viewport (whileInView). Default.
+ *  - 'mount'   РІР‚вЂќ fires immediately on component mount (animate). Use for above-the-fold
  *                content (cover sections, hero) that is visible before any scrolling.
  */
 export type AnimateTrigger = 'scroll' | 'mount'
 
 /**
  * Visual style of the entrance animation.
- * Add new values here as the design system evolves вЂ” all existing usages
+ * Add new values here as the design system evolves РІР‚вЂќ all existing usages
  * keep working because they don't pass `type` explicitly (defaults to 'fade').
  *
- *  - 'fade'   вЂ” opacity + optional translate/scale. Current behaviour.
- *  - 'rise'   вЂ” stronger translate-up, no opacity change (decorative text, big numbers).
- *  - 'scale'  вЂ” scale from scaleOffset to 1 at origin-center, mild opacity.
- *  - 'blur'   вЂ” opacity + blur(8pxв†’0). Soft, editorial.
- *  - 'slide'  вЂ” pure translate, no opacity. Bold, magazine-like.
+ *  - 'fade'   РІР‚вЂќ opacity + optional translate/scale. Current behaviour.
+ *  - 'rise'   РІР‚вЂќ stronger translate-up, no opacity change (decorative text, big numbers).
+ *  - 'scale'  РІР‚вЂќ scale from scaleOffset to 1 at origin-center, mild opacity.
+ *  - 'blur'   РІР‚вЂќ opacity + blur(8pxРІвЂ вЂ™0). Soft, editorial.
+ *  - 'slide'  РІР‚вЂќ pure translate, no opacity. Bold, magazine-like.
  */
 export type AnimateType = 'fade' | 'rise' | 'scale' | 'blur' | 'slide'
 
@@ -47,7 +48,7 @@ interface AnimateProps extends Omit<HTMLMotionProps<'div'>, 'direction'> {
   [key: string]: unknown
 }
 
-// в”Ђв”Ђв”Ђ Derive initial/animate variants from type в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Derive initial/animate variants from type РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 function buildVariants(
   type: AnimateType,
@@ -104,7 +105,7 @@ function buildVariants(
   }
 }
 
-// в”Ђв”Ђв”Ђ Component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Component РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 export function Animate({
   children,
@@ -118,7 +119,7 @@ export function Animate({
   type = 'fade',
   ...props
 }: AnimateProps) {
-  // Memoize so React doesn't unmount/remount the DOM node on every render вЂ”
+  // Memoize so React doesn't unmount/remount the DOM node on every render РІР‚вЂќ
   // which would break animations during text input in the editor.
   const MotionComponent = useMemo(
     () => motion(Component as React.ComponentType<Record<string, unknown>>) as React.ComponentType<Record<string, unknown>>,

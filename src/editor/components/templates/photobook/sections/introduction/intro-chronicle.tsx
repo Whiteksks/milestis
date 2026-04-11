@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -41,7 +42,7 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
         </div>
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-10 @md:gap-16 @lg:gap-24 items-start">
 
-          {/* Left – editorial text */}
+          {/* Left вЂ“ editorial text */}
           <div className="space-y-9">
             {introduction.title && (
               <h2
@@ -88,7 +89,7 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
             )}
           </div>
 
-          {/* Right – image */}
+          {/* Right вЂ“ image */}
           {imageUrl && (
             <div>
               <SiteImage

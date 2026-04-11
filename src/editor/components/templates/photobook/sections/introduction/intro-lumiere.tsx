@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -33,7 +34,7 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
         <div className="flex items-center gap-4">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
-            02  ·  Introduction
+            02  В·  Introduction
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
         </div>

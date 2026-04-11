@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -29,12 +30,12 @@ export function HighlightSoleil({ sectionContent, theme }: HighlightSoleilProps)
       padded={false}
       containerClassName="py-20 @md:py-28"
     >
-      {/* Section label — full width */}
+      {/* Section label вЂ” full width */}
       <div className="px-8 @md:px-14 @lg:px-20 mb-12 @md:mb-16">
         <SectionLabel num={5} label="Highlight" theme={theme} variant="rule-label" />
       </div>
 
-      {/* Full-width photo — edge-to-edge */}
+      {/* Full-width photo вЂ” edge-to-edge */}
       {hasImage && (
         <Animate className="mb-12 @md:mb-16 overflow-hidden">
           <SiteImage
@@ -50,7 +51,7 @@ export function HighlightSoleil({ sectionContent, theme }: HighlightSoleilProps)
         </Animate>
       )}
 
-      {/* Text below photo — centered narrow column */}
+      {/* Text below photo вЂ” centered narrow column */}
       <div className="px-8 @md:px-14 @lg:px-20 max-w-2xl mx-auto text-center space-y-6">
         {highlight.title && (
           <Animate>

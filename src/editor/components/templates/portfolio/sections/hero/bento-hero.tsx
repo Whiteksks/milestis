@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -28,7 +29,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* в”Ђв”Ђ Bento grid: Row 1 в”Ђв”Ђ */}
+        {/* РІвЂќР‚РІвЂќР‚ Bento grid: Row 1 РІвЂќР‚РІвЂќР‚ */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
           {/* [A] Title / intro card */}

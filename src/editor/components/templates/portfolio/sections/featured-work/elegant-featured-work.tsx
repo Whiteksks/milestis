@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -18,7 +19,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 py-24 @md:py-36">
 
-        {/* Section heading вЂ” left-aligned, sparse */}
+        {/* Section heading РІР‚вЂќ left-aligned, sparse */}
         <Animate
           direction="up"
           distance={12}
@@ -33,7 +34,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
           </h2>
         </Animate>
 
-        {/* Projects вЂ” full-width catalog layout */}
+        {/* Projects РІР‚вЂќ full-width catalog layout */}
         <div className="space-y-32 @md:space-y-44">
           {projects.map((project, i) => (
             <Animate
@@ -59,7 +60,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                 </div>
               )}
 
-              {/* Caption row вЂ” two columns: title left, meta right */}
+              {/* Caption row РІР‚вЂќ two columns: title left, meta right */}
               <div className="flex flex-col @md:flex-row @md:items-end justify-between gap-6">
                 <div className="space-y-2 max-w-lg">
                   <h3 className={cn(
@@ -73,7 +74,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                   </p>
                 </div>
 
-                {/* Tags вЂ” right-aligned, stacked */}
+                {/* Tags РІР‚вЂќ right-aligned, stacked */}
                 {(project.tags ?? []).length > 0 && (
                   <div className="flex flex-wrap @md:flex-col @md:items-end gap-2 @md:gap-1.5 shrink-0">
                     {(project.tags ?? []).slice(0, 4).map((tag, idx) => (

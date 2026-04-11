@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { cn } from '@/lib/utils'
@@ -35,7 +36,7 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
       {/* Main two-column grid */}
       <div className="flex-1 grid grid-cols-1 @md:grid-cols-[3fr_2fr] items-center">
 
-        {/* Left – Typography */}
+        {/* Left вЂ“ Typography */}
         <Animate trigger="mount" delay={0.25} distance={36} className="order-2 @md:order-1 flex flex-col justify-center px-8 @md:px-12 @lg:px-20 py-14 @md:py-20 gap-8">
           {/* Eyebrow label */}
           <div className="flex items-center gap-3">
@@ -73,13 +74,13 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
             <div className="flex items-center gap-4 pt-4 border-t border-current/10">
               <div className={cn('h-px w-8 shrink-0', theme.accent)} />
               <p className={cn('text-xs uppercase tracking-[0.2em] opacity-40', theme.fontBody)}>
-                {[cover.date, cover.location].filter(Boolean).join('  ·  ')}
+                {[cover.date, cover.location].filter(Boolean).join('  В·  ')}
               </p>
             </div>
           )}
         </Animate>
 
-        {/* Right – Photo */}
+        {/* Right вЂ“ Photo */}
         <Animate trigger="mount" type="scale" scaleOffset={0.96} delay={0.05} className="order-1 @md:order-2 flex items-center justify-center @md:justify-end px-8 @md:px-10 @lg:px-14 py-10 @md:py-16">
           {imageUrl ? (
             <SiteImage

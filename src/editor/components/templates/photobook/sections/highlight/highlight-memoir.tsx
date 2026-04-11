@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -31,7 +32,7 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
 
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
-          {/* Left – Photo (order-2 on mobile → shows below text) */}
+          {/* Left вЂ“ Photo (order-2 on mobile в†’ shows below text) */}
           <div className="order-2 @md:order-1">
             <div
               className={cn(
@@ -57,7 +58,7 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
             </div>
           </div>
 
-          {/* Right – Content (order-1 on mobile → shows above photo) */}
+          {/* Right вЂ“ Content (order-1 on mobile в†’ shows above photo) */}
           <div className="order-1 @md:order-2 space-y-6 @md:space-y-8">
             {/* Label */}
             <div className="flex items-center gap-4">

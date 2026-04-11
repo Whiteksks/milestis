@@ -1,3 +1,4 @@
+'use client'
 "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -32,7 +33,7 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
         <div className="flex items-center gap-4 mb-14 w-full">
           <div className="h-px flex-1 bg-current opacity-10" />
           <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
-            05  ·  Highlight
+            05  В·  Highlight
           </span>
           <div className="h-px flex-1 bg-current opacity-10" />
         </div>

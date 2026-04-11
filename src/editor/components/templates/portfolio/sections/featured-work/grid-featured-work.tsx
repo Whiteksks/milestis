@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
@@ -52,7 +53,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
                 
-                {/* РќРѕРјРµСЂ РїСЂРѕРµРєС‚Р° РїСЂРё РЅР°РІРµРґРµРЅРёРё (РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ) */}
+                {/* Р СњР С•Р СР ВµРЎР‚ Р С—РЎР‚Р С•Р ВµР С”РЎвЂљР В° Р С—РЎР‚Р С‘ Р Р…Р В°Р Р†Р ВµР Т‘Р ВµР Р…Р С‘Р С‘ (Р С•Р С—РЎвЂ Р С‘Р С•Р Р…Р В°Р В»РЎРЉР Р…Р С•) */}
                 <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
                    <span className="text-[10px] text-white font-mono">{(index + 1).toString().padStart(2, '0')}</span>
                 </div>
@@ -73,7 +74,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   <div className="flex flex-wrap gap-2">
                     {project.tags.slice(0, 3).map((tag, i) => (
                       <span key={i} className="text-[10px] opacity-40 uppercase tracking-wider">
-                        {tag}{i !== project.tags!.slice(0, 3).length - 1 && ' вЂў'}
+                        {tag}{i !== project.tags!.slice(0, 3).length - 1 && ' РІР‚Сћ'}
                       </span>
                     ))}
                   </div>

@@ -1,3 +1,4 @@
+'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -19,7 +20,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
         
-        {/* РћСЃРЅРѕРІРЅР°СЏ РѕР±РѕР»РѕС‡РєР°-РєР°СЂС‚РѕС‡РєР° */}
+        {/* Р С›РЎРѓР Р…Р С•Р Р†Р Р…Р В°РЎРЏ Р С•Р В±Р С•Р В»Р С•РЎвЂЎР С”Р В°-Р С”Р В°РЎР‚РЎвЂљР С•РЎвЂЎР С”Р В° */}
         <Animate
           direction="up"
           distance={20}
@@ -28,12 +29,12 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
             theme.card
           )}
         >
-          {/* Р”РµРєРѕСЂР°С‚РёРІРЅС‹Р№ СЌР»РµРјРµРЅС‚ РЅР° С„РѕРЅРµ (РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ) */}
+          {/* Р вЂќР ВµР С”Р С•РЎР‚Р В°РЎвЂљР С‘Р Р†Р Р…РЎвЂ№Р в„– РЎРЊР В»Р ВµР СР ВµР Р…РЎвЂљ Р Р…Р В° РЎвЂћР С•Р Р…Р Вµ (Р С•Р С—РЎвЂ Р С‘Р С•Р Р…Р В°Р В»РЎРЉР Р…Р С•) */}
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-current/5 blur-[80px] pointer-events-none" />
 
           <div className="grid grid-cols-1 @lg:grid-cols-12 gap-8 @lg:gap-16 items-center relative z-10 w-full">
             
-            {/* [A] Р›РµРІР°СЏ РєРѕР»РѕРЅРєР°: РљРѕРјРїР°РєС‚РЅРѕРµ С„РѕС‚Рѕ */}
+            {/* [A] Р вЂєР ВµР Р†Р В°РЎРЏ Р С”Р С•Р В»Р С•Р Р…Р С”Р В°: Р С™Р С•Р СР С—Р В°Р С”РЎвЂљР Р…Р С•Р Вµ РЎвЂћР С•РЎвЂљР С• */}
             <Animate 
               direction="up"
               distance={10}
@@ -53,7 +54,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
               />
             </Animate>
 
-            {/* [B] РџСЂР°РІР°СЏ РєРѕР»РѕРЅРєР°: РРЅС„Рѕ */}
+            {/* [B] Р СџРЎР‚Р В°Р Р†Р В°РЎРЏ Р С”Р С•Р В»Р С•Р Р…Р С”Р В°: Р ВР Р…РЎвЂћР С• */}
             <div className="@lg:col-span-8 flex flex-col">
               <div className="space-y-2 mb-6">
                 <Animate direction="up" delay={0.25} distance={10}>
@@ -80,7 +81,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
                 </p>
               </Animate>
 
-              {/* Achievements РєР°Рє РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ СЃРєСЂРѕР»Р» РёР»Рё СЃРµС‚РєР° */}
+              {/* Achievements Р С”Р В°Р С” Р С–Р С•РЎР‚Р С‘Р В·Р С•Р Р…РЎвЂљР В°Р В»РЎРЉР Р…РЎвЂ№Р в„– РЎРѓР С”РЎР‚Р С•Р В»Р В» Р С‘Р В»Р С‘ РЎРѓР ВµРЎвЂљР С”Р В° */}
               {achievements.length > 0 && (
                 <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 pt-8 border-t border-current/5">
                   {achievements.map((item, i) => (
