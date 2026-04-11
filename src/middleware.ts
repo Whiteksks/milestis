@@ -33,7 +33,11 @@ const AUTH_PAGES = ['/auth'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const host = request.headers.get('host') ?? '';
+  // Firebase App Hosting may rewrite the Host header — check x-forwarded-host first
+  const host =
+    request.headers.get('x-forwarded-host') ??
+    request.headers.get('host') ??
+    ''
 
   // ── Subdomain rewrite: {slug}.milestis.site → /sites/{slug} ──────────────
   const subdomainMatch = host.match(/^([a-z0-9-]+)\.milestis\.site(?::\d+)?$/);
