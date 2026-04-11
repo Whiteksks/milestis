@@ -132,7 +132,7 @@ export function useRenderZip() {
       const bodyHtml = renderToStaticMarkup(
         createElement(TemplateComponent, {
           theme,
-          sectionContent: data.sectionContent as SectionContent,
+          sectionContent: (data.sectionContent as unknown) as SectionContent,
           sectionVisibility: data.sectionVisibility as SectionVisibility,
           handleAnchorClick: () => {},
           disableAnimations: true,
