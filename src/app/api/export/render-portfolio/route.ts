@@ -2,7 +2,6 @@ export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createElement } from 'react'
-import { MotionConfig } from 'framer-motion'
 
 import { getTheme } from '@/editor/lib/themes'
 import type { SectionContent, SectionVisibility } from '@/editor/lib/types'
@@ -103,16 +102,13 @@ export async function POST(req: NextRequest) {
   let html: string
   try {
     html = renderToStaticMarkup(
-      createElement(
-        MotionConfig,
-        { reducedMotion: 'always' },
-        createElement(TemplateComponent, {
-          theme,
-          sectionContent,
-          sectionVisibility,
-          handleAnchorClick,
-        }),
-      ),
+      createElement(TemplateComponent, {
+        theme,
+        sectionContent,
+        sectionVisibility,
+        handleAnchorClick,
+        disableAnimations: true,
+      }),
     )
   } catch (err) {
     return NextResponse.json(
