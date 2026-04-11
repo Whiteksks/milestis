@@ -5,9 +5,39 @@ import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'Milestis',
-  description: 'Create Your Interactive Photo Book',
+  metadataBase: new URL(process.env.NEXT_APP_URL ?? 'https://milestis.com'),
+  title: {
+    default: 'Milestis',
+    template: '%s | Milestis',
+  },
+  description: 'Create your interactive photo book and share your story with the world.',
+  // Disabled until public launch — flip to true when ready
   robots: { index: false, follow: false },
+  openGraph: {
+    type: 'website',
+    siteName: 'Milestis',
+    title: 'Milestis — Interactive Photo Books',
+    description: 'Create your interactive photo book and share your story with the world.',
+    url: '/',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Milestis',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Milestis — Interactive Photo Books',
+    description: 'Create your interactive photo book and share your story with the world.',
+    images: ['/og-image.png'],
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 const alice = Alice({

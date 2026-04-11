@@ -23,6 +23,15 @@ import { cn } from '@/lib/utils'
 import HeaderAuthButton from './auth/auth-open-button'
 import Logo from './logo'
 
+function useIsAuthenticated() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  useEffect(() => {
+    const match = document.cookie.match(/(?:^|;\s*)milestis_session=([^;]*)/)
+    setIsAuthenticated(match?.[1] === '1')
+  }, [])
+  return isAuthenticated
+}
+
 const NAVIGATION = [
   { title: 'Features', href: '/features' },
   { title: 'Examples', href: '/examples' },
@@ -40,7 +49,8 @@ const Header = ({
   showAuthButton = true,
 }: HeaderProps) => {
 
-  
+  const isAuthenticated = useIsAuthenticated()
+  const logoHref = isAuthenticated ? '/about' : '/'
   const pathname = usePathname()
   const { scrollY } = useScroll()
 
@@ -120,7 +130,7 @@ const Header = ({
       )}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="shrink-0">
+        <Link href={logoHref} className="shrink-0">
           <Logo className="gap-3" />
         </Link>
 

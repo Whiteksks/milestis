@@ -7,6 +7,14 @@ const intlMiddleware = createMiddleware(routing);
 const LOCALES = ['en', 'ru', 'kz'];
 const SESSION_COOKIE = 'milestis_session';
 
+/** Routes under construction — always 404 */
+const BLOCKED_PAGES = [
+  'dashboard/analytics',
+  'dashboard/templates',
+  'admin/settings',
+  'api/internal'
+];
+
 /** Strip leading locale segment, e.g. /en/dashboard → /dashboard */
 function stripLocale(pathname: string): string {
   for (const locale of LOCALES) {
@@ -44,6 +52,15 @@ export function middleware(request: NextRequest) {
       url.pathname = `/sites${pathname}`;
       return NextResponse.rewrite(url);
     }
+  }
+
+  // ── Blocked pages (under construction) ─────────────────────────────────────
+  const bare0 = stripLocale(pathname);
+  const isBlocked = BLOCKED_PAGES.some(
+    (p) => bare0 === p || bare0.startsWith(`${p}/`)
+  );
+  if (isBlocked) {
+    return new NextResponse(null, { status: 404 });
   }
 
   // ── Auth-based redirects (main domain only) ───────────────────────────────
