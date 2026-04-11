@@ -2,7 +2,7 @@
 import { createHash } from "crypto"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
-import { PublishedPortfolioView, TokenGateForm } from "./published-view"
+import { PublishedPortfolioView, PublishedPhotobookView, TokenGateForm } from "./published-view"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -87,9 +87,16 @@ export default async function SitePage({ params, searchParams }: Props) {
   }
 
   // Photobook (token already verified above)
-  return (
-    <main className="p-8">
-      <p className="text-sm opacity-50">Photobook viewer coming soon.</p>
-    </main>
-  )
+  if (project.mode === "photobook") {
+    const content = project.content ?? {}
+    const theme = project.theme ?? {}
+    return (
+      <PublishedPhotobookView
+        templateId={(theme.currentTemplateId as string | undefined) ?? "photobook-memoir"}
+        themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
+        sectionContent={content.sectionContent ?? {}}
+        sectionVisibility={content.sectionVisibility ?? {}}
+      />
+    )
+  }
 }

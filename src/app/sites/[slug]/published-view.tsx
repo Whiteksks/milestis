@@ -4,10 +4,10 @@ import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { getTheme } from '@/editor/lib/themes'
-import type { SectionContent, SectionVisibility } from '@/editor/lib/types'
+import type { SectionContent, SectionVisibility, PhotobookSectionContent, PhotobookSectionVisibility } from '@/editor/lib/types'
 import type { ThemeConfig } from '@/editor/lib/themes'
 
-// ─── Dynamic template imports (lazy, no SSR) ─────────────────────────────────
+// ─── Dynamic portfolio template imports (lazy, no SSR) ───────────────────────
 
 const MinimalTemplateDesign = dynamic(
   () => import('@/editor/components/templates/portfolio/minimal-template').then((m) => m.MinimalTemplateDesign),
@@ -35,6 +35,29 @@ const ShowcaseTemplateDesign = dynamic(
 )
 const LiquidGlassTemplateDesign = dynamic(
   () => import('@/editor/components/templates/portfolio/liquid-glass-template').then((m) => m.LiquidGlassTemplateDesign),
+  { ssr: false },
+)
+
+// ─── Dynamic photobook template imports (lazy, no SSR) ───────────────────────
+
+const TemplateMemoirDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-memoir').then((m) => m.TemplateMemoirDesign),
+  { ssr: false },
+)
+const TemplateChronicleDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-chronicle').then((m) => m.TemplateChronicleDesign),
+  { ssr: false },
+)
+const TemplateMagazineDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-magazine').then((m) => m.TemplateMagazineDesign),
+  { ssr: false },
+)
+const TemplateLumiereDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-lumiere').then((m) => m.TemplateLumiereDesign),
+  { ssr: false },
+)
+const TemplateSoleilDesign = dynamic(
+  () => import('@/editor/components/templates/photobook/template-soleil').then((m) => m.TemplateSoleilDesign),
   { ssr: false },
 )
 
@@ -90,13 +113,50 @@ export function PublishedPortfolioView({
   }
 }
 
+// ─── Photobook view ───────────────────────────────────────────────────────────
+
+interface PhotobookViewProps {
+  templateId: string
+  themeId: string
+  sectionContent: PhotobookSectionContent
+  sectionVisibility: PhotobookSectionVisibility
+}
+
+export function PublishedPhotobookView({
+  templateId,
+  themeId,
+  sectionContent,
+  sectionVisibility,
+}: PhotobookViewProps) {
+  const theme: ThemeConfig = getTheme(themeId)
+
+  const sharedProps = {
+    theme,
+    sectionContent,
+    sectionVisibility,
+  }
+
+  switch (templateId) {
+    case 'photobook-chronicle':
+      return <TemplateChronicleDesign {...sharedProps} />
+    case 'photobook-magazine':
+      return <TemplateMagazineDesign {...sharedProps} />
+    case 'photobook-lumiere':
+      return <TemplateLumiereDesign {...sharedProps} />
+    case 'photobook-soleil':
+      return <TemplateSoleilDesign {...sharedProps} />
+    default:
+      return <TemplateMemoirDesign {...sharedProps} />
+  }
+}
+
 // ─── Token gate form ──────────────────────────────────────────────────────────
 
 interface TokenGateFormProps {
   slug: string
 }
 
-export function TokenGateForm({ slug }: TokenGateFormProps) {
+export function TokenGateForm({ slug: _slug }: TokenGateFormProps) {
   const router = useRouter()
   const [value, setValue] = useState('')
   const [error, setError] = useState(false)

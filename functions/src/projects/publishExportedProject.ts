@@ -99,6 +99,15 @@ export const publishExportedProject = onRequest(
 			});
 			return;
 		}
+		// Portfolio uses the single-step exportProject flow (export + publish atomically).
+		// This endpoint is exclusively for the two-step photobook flow.
+		if (projectData.mode === "portfolio") {
+			res.status(400).json({
+				error: ERROR.INVALID_PAYLOAD,
+				message: "Portfolio projects cannot be published via this endpoint. Use exportProject with a publish payload.",
+			});
+			return;
+		}
 		if (projectData.isPublished) {
 			res.status(409).json({
 				error: ERROR.ALREADY_PUBLISHED,

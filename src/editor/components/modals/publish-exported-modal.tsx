@@ -32,7 +32,8 @@ interface PublishExportedModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: string
-  mode: 'portfolio' | 'photobook'
+  /** This modal is exclusively for the photobook two-step flow (export → publish). */
+  mode: 'photobook'
 }
 
 export function PublishExportedModal({

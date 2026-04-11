@@ -10,7 +10,8 @@ import { processTransaction, TransactionEngineError } from "../../transactions/e
 import { migrateProjectMedia, deletePrivateProjectMedia } from "./migrate";
 import { renderExport } from "./renderer";
 import { applyPublish, writeGhostEntry, PublishValidationError } from "./publish";
-import { EXPORT_COST_CREDITS, type ExportInput, type ExportOutput, type PortfolioRenderData } from "./types";
+import { type ExportInput, type ExportOutput } from "./types";
+import { getModeConfig } from "./mode-config";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -153,6 +154,18 @@ export const exportProject = onRequest(
 			return;
 		}
 
+		// ── Mode config ────────────────────────────────────────────────
+		const modeConfig = getModeConfig(projectData.mode);
+
+		// Validate that publish payload is present when required by this mode.
+		if (modeConfig.requiresPublish && !publish) {
+			res.status(400).json({
+				error: ERROR.INVALID_PAYLOAD,
+				message: `${modeConfig.label} projects must include a publish payload.`,
+			});
+			return;
+		}
+
 		// ── 3. Load content ──────────────────────────────────────────────────
 		const contentRef = projectRef.collection("data").doc("content");
 		const contentSnap = await contentRef.get();
@@ -176,10 +189,10 @@ export const exportProject = onRequest(
 		}
 		const _userData = userSnap.data() as Record<string, Record<string, unknown>> | undefined;
 		const totalBalance: number = typeof _userData?.balance?.total === "number" ? _userData.balance.total : 0;
-		if (totalBalance < EXPORT_COST_CREDITS) {
+		if (totalBalance < modeConfig.creditCost) {
 			res.status(402).json({
 				error: ERROR.INSUFFICIENT_CREDITS,
-				required: EXPORT_COST_CREDITS,
+				required: modeConfig.creditCost,
 				available: totalBalance,
 			});
 			return;
@@ -235,20 +248,19 @@ export const exportProject = onRequest(
 			// ── 7. Persist new URLs in the content doc ───────────────────────
 			await contentRef.update(migratedData);
 
-			// ── 8 & 9. Render + upload (photobook only) ─────────────────────
-			// Portfolio: the client renders the ZIP locally using the content data
-			// returned in this response — no server rendering needed.
+			// ── 8 & 9. Render + upload ───────────────────────────────────────
+			// Only modes with rendersFile: true produce a downloadable file.
 			let fileDownloadUrl: string | undefined;
 			let renderedFilePath: string | undefined;
 
-			if (projectData.mode === "photobook") {
-				const renderOutput = await renderExport(projectData.mode, {
+			if (modeConfig.rendersFile) {
+				const renderOutput = (await renderExport(projectData.mode, {
 					projectId,
 					projectName: projectData.name,
 					mode: projectData.mode,
 					content: migratedData.content ?? null,
 					theme: migratedData.theme ?? null,
-				});
+				}))!;
 
 				const safeProjectName = (projectData.name ?? "project")
 					.replace(/[^\w\s-]/g, "")
@@ -324,7 +336,7 @@ export const exportProject = onRequest(
 				projectName: projectData.name,
 				versionNumber: newVersionNumber,
 				mode: projectData.mode,
-				creditCost: EXPORT_COST_CREDITS,
+				creditCost: modeConfig.creditCost,
 				...(renderedFilePath ? { filePath: renderedFilePath } : {}),
 				...(fileDownloadUrl ? { fileDownloadUrl } : {}),
 				...(fileDownloadUrl ? { mimeType: "application/pdf" } : {}),
@@ -334,7 +346,8 @@ export const exportProject = onRequest(
 
 			const projectDocUpdate: Record<string, unknown> = {
 				status: "archived",
-				isExported: true,
+				// setsIsExported drives the two-step "exported but not yet published" UI.
+				...(modeConfig.setsIsExported ? { isExported: true } : {}),
 				lastExportId: exportId,
 				exportVersion: newVersionNumber,
 				lastExportAt: FieldValue.serverTimestamp(),
@@ -397,7 +410,7 @@ export const exportProject = onRequest(
 					direction: "out",
 					credit: {
 						type: "spend",
-						amount: EXPORT_COST_CREDITS,
+						amount: modeConfig.creditCost,
 						meta: {
 							projectId,
 							projectName: projectData.name,
@@ -415,22 +428,8 @@ export const exportProject = onRequest(
 				);
 			}
 
-			// ── Assemble portfolio render data for client-side ZIP generation ──
-			let portfolioRenderData: PortfolioRenderData | undefined;
-			if (projectData.mode === "portfolio") {
-				const themeData = (migratedData.theme ?? {}) as Record<string, unknown>;
-				const contentData = (migratedData.content ?? {}) as Record<string, unknown>;
-				portfolioRenderData = {
-					templateId: (themeData.currentTemplateId as string | undefined) ?? "minimal",
-					themeId: (themeData.currentTheme as string | undefined) ?? "parchment",
-					sectionContent: (contentData.sectionContent ?? {}) as Record<string, unknown>,
-					sectionVisibility: (contentData.sectionVisibility ?? {}) as Record<string, boolean>,
-					projectName: projectData.name,
-				};
-			}
-
 			logger.info(
-				`[exportProject] Project ${projectId} exported by ${uid}. v${newVersionNumber}, credits: ${EXPORT_COST_CREDITS}`,
+				`[exportProject] Project ${projectId} exported by ${uid}. v${newVersionNumber}, credits: ${modeConfig.creditCost}`,
 			);
 
 			const output: ExportOutput = {
@@ -439,7 +438,6 @@ export const exportProject = onRequest(
 				versionNumber: newVersionNumber,
 				...(fileDownloadUrl ? { fileDownloadUrl } : {}),
 				...(publish ? { publishedSlug: publish.slug } : {}),
-				...(portfolioRenderData ? { portfolioRenderData } : {}),
 				balance: finalBalance,
 			};
 			res.status(200).json(output);

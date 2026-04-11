@@ -48,8 +48,7 @@ function validatePayload(body: unknown): CreateProjectPayload {
     );
   }
 
-  // eslint-disable-next-line no-control-regex
-  const controlChars = new RegExp("[\\x00-\\x1F\\x7F]");
+  const controlChars = /[\x00-\x1F\x7F]/;
   if (controlChars.test(trimmedName)) {
     throw new ValidationError("Project name contains invalid characters.");
   }

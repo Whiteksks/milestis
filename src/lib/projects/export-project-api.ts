@@ -20,13 +20,6 @@ export interface ExportProjectInput {
   }
 }
 
-export interface PortfolioRenderData {
-  templateId: string
-  themeId: string
-  sectionContent: Record<string, unknown>
-  sectionVisibility: Record<string, boolean>
-  projectName: string
-}
 
 export interface ExportProjectResult {
   exportId: string
@@ -35,8 +28,6 @@ export interface ExportProjectResult {
   fileDownloadUrl?: string
   /** Present only when the request included a publish payload. */
   publishedSlug?: string
-  /** Portfolio only — passed to the client-side ZIP renderer. */
-  portfolioRenderData?: PortfolioRenderData
   balance: {
     total: number
     purchased: number

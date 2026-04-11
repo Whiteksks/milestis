@@ -20,7 +20,9 @@ function generateToken(): string {
 }
 
 export function useExportModal(projectId: string, mode: 'portfolio' | 'photobook') {
-  const [withPublish, setWithPublish] = useState(false)
+  // Portfolio: publishing is the only action — initialize true to avoid race condition
+  // where a fast click before useEffect fires would submit without a publish payload.
+  const [withPublish, setWithPublish] = useState(() => mode === 'portfolio')
   const [slug, setSlug] = useState('')
   const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
   // Stable token generated once per modal instance (photobooks only).

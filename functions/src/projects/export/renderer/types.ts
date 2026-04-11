@@ -8,7 +8,7 @@ export interface RenderInput {
 	theme: Record<string, unknown> | null;
 }
 
-export type RenderExtension = "pdf" | "zip";
+export type RenderExtension = "pdf";
 
 export interface RenderOutput {
 	buffer: Buffer;

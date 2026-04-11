@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { useProjectExportsQuery, useArchivedProjectsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
 import { PublishExportedModal } from "@/editor/components/modals/publish-exported-modal"
 import { cn } from "@/lib/utils"
+import { getProjectConfig } from "@/lib/projects/project-type-config"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,8 @@ function formatDate(date: Date): string {
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
 function ExportRow({ record }: { record: ProjectExportRecord }) {
+  const config = getProjectConfig(record.mode)
+
   return (
     <div className="group flex items-center gap-6 border-b border-border/40 py-5 transition-colors hover:bg-accent/20 px-2 -mx-2 rounded-lg">
       {/* File Info */}
@@ -37,10 +40,10 @@ function ExportRow({ record }: { record: ProjectExportRecord }) {
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium tracking-tight truncate">
-              {record.mimeType === "application/pdf" ? "Document Archive" : "Digital Package"}
+              {config.archiveRecordTitle}
             </span>
             <Badge variant="outline" className="text-[9px] font-normal tracking-wider uppercase px-1.5 h-4 border-muted-foreground/20">
-              {record.mimeType === "application/pdf" ? "PDF" : "ZIP"}
+              {config.archiveBadge}
             </Badge>
           </div>
           <p className="text-[11px] text-muted-foreground/60 font-light italic">
@@ -51,18 +54,31 @@ function ExportRow({ record }: { record: ProjectExportRecord }) {
 
       {/* Actions */}
       <div className="flex items-center gap-1 sm:gap-4 shrink-0">
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
-          asChild
-        >
-          <a href={record.fileDownloadUrl} target="_blank" rel="noopener noreferrer" download>
-            <Download className="size-3.5 sm:mr-2" />
-            <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">Download</span>
-          </a>
-        </Button>
+        {config.canDownloadFile ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
+            asChild
+          >
+            <a href={record.fileDownloadUrl} target="_blank" rel="noopener noreferrer" download>
+              <Download className="size-3.5 sm:mr-2" />
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">Download</span>
+            </a>
+          </Button>
+        ) : record.publishedSlug ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
+            asChild
+          >
+            <a href={config.getShareUrl(record.publishedSlug)} target="_blank" rel="noopener noreferrer">
+              <Globe className="size-3.5 sm:mr-2" />
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">View site</span>
+            </a>
+          </Button>
+        ) : null}
       </div>
     </div>
   )
@@ -90,7 +106,7 @@ export default function ExportsPage() {
   const locale = params.locale as string
   const { data: exports = [], isLoading } = useProjectExportsQuery()
   const { data: archivedProjects = [] } = useArchivedProjectsQuery()
-  const [publishTarget, setPublishTarget] = useState<{ projectId: string; mode: 'portfolio' | 'photobook' } | null>(null)
+  const [publishTarget, setPublishTarget] = useState<{ projectId: string; mode: 'photobook' } | null>(null)
 
   // Map projectId → project info from archived query
   const archivedMap = useMemo(() => {
@@ -168,16 +184,21 @@ export default function ExportsPage() {
                         </a>
                       )
                     }
-                    return (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 px-2 text-[9px] uppercase tracking-[0.15em] font-medium text-muted-foreground hover:text-foreground"
-                        onClick={() => setPublishTarget({ projectId, mode: p.mode })}
-                      >
-                        <Globe className="size-2.5 mr-1" /> Publish
-                      </Button>
-                    )
+                    // Photobook-only: two-step flow — exported but not yet published.
+                    // Portfolio is always published atomically via exportProject.
+                    if (p.mode !== 'portfolio') {
+                      return (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-2 text-[9px] uppercase tracking-[0.15em] font-medium text-muted-foreground hover:text-foreground"
+                          onClick={() => setPublishTarget({ projectId, mode: 'photobook' })}
+                        >
+                          <Globe className="size-2.5 mr-1" /> Publish
+                        </Button>
+                      )
+                    }
+                    return null
                   })()}
                   <Link
                     href={`/${locale}/design/${projectId}/edit`}

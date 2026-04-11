@@ -96,7 +96,7 @@ export const toastProject = {
     })
   },
 
-  /** Export project (PDF / ZIP) with optional publish. */
+  /** Export / publish project. For photobooks: downloads a PDF. For portfolios: publishes the site. */
   export<T>(promise: Promise<T>) {
     return toast.promise(promise, {
       loading: "Exporting…",

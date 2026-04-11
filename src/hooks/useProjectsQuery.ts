@@ -200,8 +200,10 @@ export interface ProjectExportRecord {
   versionNumber: number
   mode: 'portfolio' | 'photobook'
   creditCost: number
-  fileDownloadUrl: string
-  mimeType: string
+  /** PDF download URL — photobook only. Undefined for portfolio. */
+  fileDownloadUrl?: string
+  /** MIME type of the exported file — photobook only. */
+  mimeType?: string
   publishedSlug?: string
   createdAt: Date
 }
@@ -223,8 +225,8 @@ async function fetchUserExports(uid: string): Promise<ProjectExportRecord[]> {
       versionNumber: data.versionNumber ?? 1,
       mode: data.mode ?? 'photobook',
       creditCost: data.creditCost ?? 0,
-      fileDownloadUrl: data.fileDownloadUrl ?? '',
-      mimeType: data.mimeType ?? 'application/octet-stream',
+      fileDownloadUrl: data.fileDownloadUrl ?? undefined,
+      mimeType: data.mimeType ?? undefined,
       publishedSlug: data.publishedSlug,
       createdAt: data.createdAt?.toDate() ?? new Date(),
     } satisfies ProjectExportRecord

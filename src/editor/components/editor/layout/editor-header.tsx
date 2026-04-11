@@ -17,6 +17,7 @@ import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutat
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ExportModal } from '@/editor/components/modals/export-modal'
 import { PublishExportedModal } from '@/editor/components/modals/publish-exported-modal'
+import { getProjectConfig } from '@/lib/projects/project-type-config'
 
 interface EditorHeaderProps {
   projectId: string
@@ -102,7 +103,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }
 
   async function handleOpenExportModal() {
-    // Auto-save before opening the export modal.
+    // Auto-save before opening the export modal (photobook only).
     if (isDirty) {
       setSaveState('saving')
       try {
@@ -300,8 +301,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleOpenExportModal}>
-                  <Download className="size-4" />
-                  Export again
+                  {editorMode === 'portfolio' ? <Globe className="size-4" /> : <Download className="size-4" />}
+                  {getProjectConfig(editorMode as 'portfolio' | 'photobook').republishLabel}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
                   <EyeOff className="size-4" />
@@ -309,8 +310,19 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : editorMode === 'portfolio' ? (
+            // Portfolio: paid publish modal
+            <Button
+              size="sm"
+              onClick={handleOpenExportModal}
+              disabled={saveState === 'saving'}
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
+            >
+              <Globe className="h-3 w-3" />
+              <span className="hidden sm:inline">Publish</span>
+            </Button>
           ) : isExported ? (
-            // Exported but not published: show both Publish and Export again
+            // Photobook exported but not published
             <div className="flex items-center gap-1.5">
               <Button
                 size="sm"
@@ -332,6 +344,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               </Button>
             </div>
           ) : (
+            // Photobook not yet exported
             <Button
               size="sm"
               onClick={handleOpenExportModal}
@@ -339,12 +352,13 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
             >
               <Download className="h-3 w-3" />
-              <span className="hidden sm:inline">Export</span>
+              <span className="hidden sm:inline">Export PDF</span>
             </Button>
           )}
         </div>
       </div>
 
+      {/* Export / Publish modal (both modes, costs credits) */}
       <ExportModal
         open={isExportModalOpen}
         onOpenChange={setIsExportModalOpen}
@@ -352,11 +366,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         mode={editorMode as 'portfolio' | 'photobook'}
         isExported={isExported}
       />
+      {/* Photobook: publish after export (free) */}
       <PublishExportedModal
-        open={isPublishModalOpen}
+        open={isPublishModalOpen && editorMode === 'photobook'}
         onOpenChange={setIsPublishModalOpen}
         projectId={projectId}
-        mode={editorMode as 'portfolio' | 'photobook'}
+        mode="photobook"
       />
     </header>
   )
