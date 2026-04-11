@@ -8,6 +8,17 @@ import type { ContentStore } from '@/editor/lib/store-content'
 
 import type React from 'react'
 
+/** Args passed to each mode's `renderPublished` — no Zustand, data comes from props. */
+export type PublishedRenderArgs = {
+  templateId: string
+  theme: ThemeConfig
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visibility: Record<string, any>
+  handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
+}
+
 export type TemplateDef = {
   id: TemplateId
   name: string
@@ -49,6 +60,9 @@ export type ModeRegistryEntry<TVisibilityKey extends string> = {
   canvasDataSelector: (s: ContentStore) => Partial<CanvasRenderArgs>
 
   renderCanvas: (args: CanvasRenderArgs) => React.ReactNode
+
+  /** Renders the template with explicit props (for the published site — no Zustand). */
+  renderPublished: (args: PublishedRenderArgs) => React.ReactNode
 
   /** Extracts this mode's section visibility from ContentStore. */
   visibilitySelector: (s: ContentStore) => Record<TVisibilityKey, boolean>

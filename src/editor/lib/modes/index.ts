@@ -2,7 +2,7 @@ import type { EditorMode } from '@/editor/lib/types'
 import { portfolioMode } from './portfolio'
 import { photobookMode } from './photobook'
 
-export type { TemplateDef, SectionDef, CanvasRenderArgs, ModeRegistryEntry } from './types'
+export type { TemplateDef, SectionDef, CanvasRenderArgs, PublishedRenderArgs, ModeRegistryEntry } from './types'
 export type { PortfolioTemplateId } from './portfolio-ids'
 export type { PhotobookTemplateId }  from './photobook-ids'
 

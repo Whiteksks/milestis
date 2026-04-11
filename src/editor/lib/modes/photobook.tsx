@@ -1,4 +1,4 @@
-import type { PhotobookSectionVisibility } from '@/editor/lib/types'
+import type { PhotobookSectionVisibility, PhotobookSectionContent } from '@/editor/lib/types'
 import type { PhotobookTemplateProps } from '@/editor/lib/template-types'
 import type { ModeRegistryEntry } from './types'
 import { type PhotobookTemplateId } from './photobook-ids'
@@ -98,6 +98,22 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
       TemplateMemoirDesign
 
     return <PhotobookTemplateShell Design={Design} />
+  },
+
+  renderPublished: ({ templateId, theme, content, visibility }) => {
+    const id = templateId as PhotobookTemplateId
+    const Design =
+      photobookTemplateComponents[id] ??
+      photobookTemplateComponents['photobook-memoir'] ??
+      TemplateMemoirDesign
+
+    return (
+      <Design
+        theme={theme}
+        sectionContent={content as PhotobookSectionContent}
+        sectionVisibility={visibility as PhotobookSectionVisibility}
+      />
+    )
   },
 
   visibilitySelector: (s) => s.photobookSectionVisibility,

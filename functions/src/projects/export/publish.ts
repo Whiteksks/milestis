@@ -101,17 +101,16 @@ export async function applyPublish(
 		);
 	}
 
-	// Portfolio slugs must be globally unique (they become subdomains).
-	if (mode === "portfolio") {
-		const existing = await db
-			.collection("published_projects")
-			.where("slug", "==", slug)
-			.limit(2)
-			.get();
-		const takenByOther = existing.docs.some((doc) => doc.id !== projectId);
-		if (takenByOther) {
-			throw new PublishValidationError("SLUG_TAKEN", "This slug is already taken.");
-		}
+	// Slugs must be globally unique across all modes (portfolios become subdomains;
+	// photobooks use slug as the URL path — neither can share a slug with any other project).
+	const existing = await db
+		.collection("published_projects")
+		.where("slug", "==", slug)
+		.limit(2)
+		.get();
+	const takenByOther = existing.docs.some((doc) => doc.id !== projectId);
+	if (takenByOther) {
+		throw new PublishValidationError("SLUG_TAKEN", "This slug is already taken.");
 	}
 
 	// Photobooks require an access token.

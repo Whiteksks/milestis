@@ -2,7 +2,9 @@
 import { createHash } from "crypto"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
-import { PublishedPortfolioView, PublishedPhotobookView, TokenGateForm } from "./published-view"
+import { PublishedView, TokenGateForm } from "./published-view"
+import type { ThemeCustomizations } from "@/editor/lib/store-theme"
+import type { ThemeCustomDecorations } from "@/editor/lib/types"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -77,11 +79,14 @@ export default async function SitePage({ params, searchParams }: Props) {
     const content = project.content ?? {}
     const theme = project.theme ?? {}
     return (
-      <PublishedPortfolioView
+      <PublishedView
+        mode="portfolio"
         templateId={(theme.currentTemplateId as string | undefined) ?? "minimal"}
         themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
-        sectionContent={content.sectionContent ?? {}}
-        sectionVisibility={content.sectionVisibility ?? {}}
+        themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
+        customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
+        content={(content.sectionContent ?? {}) as Record<string, unknown>}
+        visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
       />
     )
   }
@@ -91,11 +96,14 @@ export default async function SitePage({ params, searchParams }: Props) {
     const content = project.content ?? {}
     const theme = project.theme ?? {}
     return (
-      <PublishedPhotobookView
+      <PublishedView
+        mode="photobook"
         templateId={(theme.currentTemplateId as string | undefined) ?? "photobook-memoir"}
         themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
-        sectionContent={content.sectionContent ?? {}}
-        sectionVisibility={content.sectionVisibility ?? {}}
+        themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
+        customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
+        content={(content.sectionContent ?? {}) as Record<string, unknown>}
+        visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
       />
     )
   }

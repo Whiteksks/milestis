@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { SectionVisibility } from '@/editor/lib/types'
+import type { SectionContent, SectionVisibility } from '@/editor/lib/types'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { ModeRegistryEntry } from './types'
 import { type PortfolioTemplateId } from './portfolio-ids'
@@ -116,6 +116,23 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
       EditorialTemplateDesign
 
     return <PortfolioTemplateShell Design={Design} />
+  },
+
+  renderPublished: ({ templateId, theme, content, visibility, handleAnchorClick }) => {
+    const id = templateId as PortfolioTemplateId
+    const Design =
+      portfolioTemplateComponents[id] ??
+      portfolioTemplateComponents.editorial ??
+      EditorialTemplateDesign
+
+    return (
+      <Design
+        theme={theme}
+        sectionContent={content as SectionContent}
+        sectionVisibility={visibility as SectionVisibility}
+        handleAnchorClick={handleAnchorClick}
+      />
+    )
   },
 
   visibilitySelector: (s) => s.sectionVisibility,

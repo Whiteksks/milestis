@@ -1,82 +1,39 @@
-'use client'
+﻿'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
+import { cn } from '@/lib/utils'
 import { getTheme } from '@/editor/lib/themes'
-import type { SectionContent, SectionVisibility, PhotobookSectionContent, PhotobookSectionVisibility } from '@/editor/lib/types'
-import type { ThemeConfig } from '@/editor/lib/themes'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
+import type { EditorMode } from '@/editor/lib/types'
+import type { ThemeCustomizations } from '@/editor/lib/store-theme'
+import type { ThemeCustomDecorations } from '@/editor/lib/types'
+import type { DecorationAnimation } from '@/editor/lib/decoration-animations'
+import { PublishedBackgroundLayers } from '@/editor/components/editor/layout/background-layers/published-background-layers'
+import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-logic'
 
-// ─── Dynamic portfolio template imports (lazy, no SSR) ───────────────────────
+// ─── Published view ───────────────────────────────────────────────────────────
 
-const MinimalTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/minimal-template').then((m) => m.MinimalTemplateDesign),
-  { ssr: false },
-)
-const EditorialTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/editorial-template').then((m) => m.EditorialTemplateDesign),
-  { ssr: false },
-)
-const ElegantTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/elegant-template').then((m) => m.ElegantTemplateDesign),
-  { ssr: false },
-)
-const GridTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/grid-template').then((m) => m.GridTemplateDesign),
-  { ssr: false },
-)
-const BentoTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/bento-template').then((m) => m.BentoTemplateDesign),
-  { ssr: false },
-)
-const ShowcaseTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/showcase-template').then((m) => m.ShowcaseTemplateDesign),
-  { ssr: false },
-)
-const LiquidGlassTemplateDesign = dynamic(
-  () => import('@/editor/components/templates/portfolio/liquid-glass-template').then((m) => m.LiquidGlassTemplateDesign),
-  { ssr: false },
-)
-
-// ─── Dynamic photobook template imports (lazy, no SSR) ───────────────────────
-
-const TemplateMemoirDesign = dynamic(
-  () => import('@/editor/components/templates/photobook/template-memoir').then((m) => m.TemplateMemoirDesign),
-  { ssr: false },
-)
-const TemplateChronicleDesign = dynamic(
-  () => import('@/editor/components/templates/photobook/template-chronicle').then((m) => m.TemplateChronicleDesign),
-  { ssr: false },
-)
-const TemplateMagazineDesign = dynamic(
-  () => import('@/editor/components/templates/photobook/template-magazine').then((m) => m.TemplateMagazineDesign),
-  { ssr: false },
-)
-const TemplateLumiereDesign = dynamic(
-  () => import('@/editor/components/templates/photobook/template-lumiere').then((m) => m.TemplateLumiereDesign),
-  { ssr: false },
-)
-const TemplateSoleilDesign = dynamic(
-  () => import('@/editor/components/templates/photobook/template-soleil').then((m) => m.TemplateSoleilDesign),
-  { ssr: false },
-)
-
-// ─── Portfolio view ───────────────────────────────────────────────────────────
-
-interface PortfolioViewProps {
+interface PublishedViewProps {
+  mode: EditorMode
   templateId: string
   themeId: string
-  sectionContent: SectionContent
-  sectionVisibility: SectionVisibility
+  themeCustomizations: ThemeCustomizations
+  customDecorations: ThemeCustomDecorations[]
+  content: Record<string, unknown>
+  visibility: Record<string, unknown>
 }
 
-export function PublishedPortfolioView({
+export function PublishedView({
+  mode,
   templateId,
   themeId,
-  sectionContent,
-  sectionVisibility,
-}: PortfolioViewProps) {
-  const theme: ThemeConfig = getTheme(themeId)
+  themeCustomizations,
+  customDecorations,
+  content,
+  visibility,
+}: PublishedViewProps) {
+  const theme = getTheme(themeId)
 
   const handleAnchorClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -88,66 +45,54 @@ export function PublishedPortfolioView({
     [],
   )
 
-  const sharedProps = {
+  const template = MODE_REGISTRY[mode].renderPublished({
+    templateId,
     theme,
-    sectionContent,
-    sectionVisibility,
+    content,
+    visibility,
     handleAnchorClick,
-  }
+  })
 
-  switch (templateId) {
-    case 'editorial':
-      return <EditorialTemplateDesign {...sharedProps} />
-    case 'elegant':
-      return <ElegantTemplateDesign {...sharedProps} />
-    case 'grid':
-      return <GridTemplateDesign {...sharedProps} />
-    case 'bento':
-      return <BentoTemplateDesign {...sharedProps} />
-    case 'showcase':
-      return <ShowcaseTemplateDesign {...sharedProps} />
-    case 'liquid-glass':
-      return <LiquidGlassTemplateDesign {...sharedProps} />
-    default:
-      return <MinimalTemplateDesign {...sharedProps} />
-  }
-}
+  // Ensure every decoration has a stable id (same normalisation as the editor)
+  const decorations = useMemo(
+    () => customDecorations.map((d, i) => ({ ...d, id: d.id ?? `decoration-${i}` })),
+    [customDecorations],
+  )
 
-// ─── Photobook view ───────────────────────────────────────────────────────────
+  const decorationAnimation = (themeCustomizations.decorationAnimation ?? 'fade') as DecorationAnimation
 
-interface PhotobookViewProps {
-  templateId: string
-  themeId: string
-  sectionContent: PhotobookSectionContent
-  sectionVisibility: PhotobookSectionVisibility
-}
+  return (
+    <div className={cn('@container w-full min-h-screen relative', theme.background)}>
+      {/* Background effects layer (depth / rays / texture) */}
+      <PublishedBackgroundLayers theme={theme} themeCustomizations={themeCustomizations} />
 
-export function PublishedPhotobookView({
-  templateId,
-  themeId,
-  sectionContent,
-  sectionVisibility,
-}: PhotobookViewProps) {
-  const theme: ThemeConfig = getTheme(themeId)
+      {/* Content root — mirrors the canvas content-root div with typography classes */}
+      <div
+        className={cn(
+          'relative z-10 w-full min-h-screen',
+          theme.foreground,
+          theme.fontBody,
+          theme.lineHeight,
+          theme.letterSpacing,
+          theme.shadow,
+        )}
+      >
+        {/* Decorations layer — read-only (no selection / dragging) */}
+        <DecorationsLayer
+          decorations={decorations}
+          selectedId={null}
+          deviceView="desktop"
+          animation={decorationAnimation}
+          onUpdate={() => {}}
+          onRemove={() => {}}
+        />
 
-  const sharedProps = {
-    theme,
-    sectionContent,
-    sectionVisibility,
-  }
-
-  switch (templateId) {
-    case 'photobook-chronicle':
-      return <TemplateChronicleDesign {...sharedProps} />
-    case 'photobook-magazine':
-      return <TemplateMagazineDesign {...sharedProps} />
-    case 'photobook-lumiere':
-      return <TemplateLumiereDesign {...sharedProps} />
-    case 'photobook-soleil':
-      return <TemplateSoleilDesign {...sharedProps} />
-    default:
-      return <TemplateMemoirDesign {...sharedProps} />
-  }
+        <div className="relative z-10">
+          {template}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // ─── Token gate form ──────────────────────────────────────────────────────────
