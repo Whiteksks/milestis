@@ -90,16 +90,16 @@ export const createUser = onRequest(
       logger.info("User document created", { uid });
       res.status(201).json({ ok: true, uid });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Обработка уже существующего документа
-      if (error.code === 6 || error.message?.includes("already exists")) {
-        logger.warn("User already exists", { uid, code: error.code });
+      if ((error as Record<string, unknown>)?.code === 6 || (error as Error)?.message?.includes("already exists")) {
+        logger.warn("User already exists", { uid, code: (error as Record<string, unknown>).code });
         res.status(409).json({ error: "USER_ALREADY_EXISTS" });
         return;
       }
 
       // Ошибки Firebase Auth
-      if (error.code?.startsWith("auth/")) {
+      if ((error as Record<string, string>).code?.startsWith("auth/")) {
         res.status(401).json({ error: "INVALID_OR_EXPIRED_TOKEN" });
         return;
       }

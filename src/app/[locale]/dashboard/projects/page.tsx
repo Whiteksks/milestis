@@ -1,11 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { Search, Plus, Trash2, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"

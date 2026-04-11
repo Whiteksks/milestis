@@ -11,7 +11,6 @@ import {
   List,
   Mail,
   Navigation,
-  Plus,
   Share2,
   Type,
   Video,

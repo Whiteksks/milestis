@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { Archive, Trash2, AlertTriangle, Globe, BookOpen, Layout, Eye, Loader2 } from "lucide-react"
+import { Archive, Trash2, AlertTriangle, Globe, BookOpen, Layout, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {

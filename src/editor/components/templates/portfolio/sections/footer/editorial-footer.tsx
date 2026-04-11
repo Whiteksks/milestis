@@ -8,7 +8,7 @@ import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-interface EditorialFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []

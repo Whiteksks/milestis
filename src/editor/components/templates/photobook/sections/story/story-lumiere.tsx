@@ -55,7 +55,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
         )}
 
         {/* Story moments — centered framed */}
-        {moments.map((block, index) => {
+        {moments.map((block, _index) => {
           const imageUrl = block.image
           const imageSettings = block.imageSettings?.[0]
           const aspectRatio = imageSettings?.aspectRatio ?? 'square'

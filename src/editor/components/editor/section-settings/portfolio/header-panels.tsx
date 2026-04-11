@@ -4,7 +4,7 @@ import { useContentSelector } from "@/editor/lib/store"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Plus, Menu } from "lucide-react"
+import { Trash2, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ps, LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 

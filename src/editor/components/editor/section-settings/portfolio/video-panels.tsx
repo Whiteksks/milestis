@@ -78,7 +78,7 @@ export function VideoUrlPanel({ dense = false }: { dense?: boolean }) {
   }))
 
   const handleVideoUrlChange = (rawUrl: string) => {
-    let url = rawUrl.trim()
+    const url = rawUrl.trim()
     if (url.includes("/embed/")) {
       updateSectionContent("video", { videoUrl: url })
       return

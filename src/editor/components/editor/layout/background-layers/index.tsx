@@ -64,9 +64,8 @@ export function BackgroundLayers({
     scale: 1.2,
   })
 
-  // All effects live in viewport placement only — content placement is a no-op.
-  if (placement === 'content') return null
-
+  // Derived: whether there are any active layers at all.
+  // Computed here (before the early return) to satisfy rules-of-hooks.
   const noLayers = depth === 'none' && rays === 'none' && texture === 'none'
 
   const [activeDepth, activeRays, activeTexture] = useMemo(
@@ -80,6 +79,9 @@ export function BackgroundLayers({
           ],
     [noLayers, depth, rays, texture],
   )
+
+  // All effects live in viewport placement only — content placement is a no-op.
+  if (placement === 'content') return null
 
   const colors = { isDark, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color }
 

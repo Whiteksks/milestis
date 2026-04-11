@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface BentoVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type BentoVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
   const hasVideo = !!sectionContent.video.videoUrl

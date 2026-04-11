@@ -7,8 +7,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface LiquidGlassHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type LiquidGlassHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: LiquidGlassHeaderProps) {
   const t = useT()

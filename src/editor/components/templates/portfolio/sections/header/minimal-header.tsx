@@ -7,8 +7,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface MinimalHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type MinimalHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function HeaderMinimal({ theme, sectionContent, handleAnchorClick }: MinimalHeaderProps) {
   const t = useT();

@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -50,7 +49,7 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
-  showCloseButton = true,
+  showCloseButton: _showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -69,7 +68,6 @@ function DialogContent({
           {...props}
         >
           {children}
-          {/* ... кнопка закрытия ... */}
         </DialogPrimitive.Content>
       </DialogOverlay>
     </DialogPortal>

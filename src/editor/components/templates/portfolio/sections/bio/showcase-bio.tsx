@@ -6,7 +6,7 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface ShowcaseBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
   const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio

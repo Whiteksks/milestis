@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, memo } from 'react'
+import { useState, useMemo } from 'react'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'

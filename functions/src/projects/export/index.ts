@@ -174,7 +174,8 @@ export const exportProject = onRequest(
 			res.status(404).json({ error: ERROR.NOT_FOUND, message: "User not found." });
 			return;
 		}
-		const totalBalance: number = (userSnap.data() as any)?.balance?.total ?? 0;
+		const _userData = userSnap.data() as Record<string, Record<string, unknown>> | undefined;
+		const totalBalance: number = typeof _userData?.balance?.total === "number" ? _userData.balance.total : 0;
 		if (totalBalance < EXPORT_COST_CREDITS) {
 			res.status(402).json({
 				error: ERROR.INSUFFICIENT_CREDITS,
@@ -245,7 +246,7 @@ export const exportProject = onRequest(
 
 			// ── 9. Upload rendered file ──────────────────────────────────────
 			const safeProjectName = (projectData.name ?? "project")
-				.replace(/[^\w\s\-]/g, "")
+				.replace(/[^\w\s-]/g, "")
 				.trim()
 				.replace(/\s+/g, "-") || "project";
 			const renderedFilePath = `public/${projectId}/exports/${exportId}.${renderOutput.extension}`;

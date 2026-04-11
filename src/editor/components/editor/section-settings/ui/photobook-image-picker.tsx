@@ -7,7 +7,7 @@ import { type SectionImageRestrictions } from "@/editor/lib/restrictions/templat
 import { ImagePickerCore } from "@/editor/components/editor/section-settings/ui/image-picker-core"
 
 /** PhotoBlock is the native type for photobook image slots. */
-export interface PhotobookImagePickerValue extends PhotoBlock {}
+export type PhotobookImagePickerValue = PhotoBlock
 
 interface PhotobookImagePickerProps {
   value?: PhotobookImagePickerValue

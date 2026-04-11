@@ -3,7 +3,7 @@
 import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Plus, Palette, WandSparkles, LayoutTemplate } from 'lucide-react'
+import { Palette, WandSparkles, LayoutTemplate } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {

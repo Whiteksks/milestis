@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, Globe, BookOpen, Layout, RotateCcw, AlertTriangle, Settings } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import {
@@ -27,7 +27,7 @@ import { useTranslations } from "next-intl"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-function formatRelativeDate(date: Date, t: (key: string, vars?: Record<string, any>) => string): string {
+function formatRelativeDate(date: Date, t: ReturnType<typeof useTranslations>): string {
   const diff = Date.now() - date.getTime()
   const minutes = Math.floor(diff / 60_000)
   if (minutes < 1) return t('time.justNow')

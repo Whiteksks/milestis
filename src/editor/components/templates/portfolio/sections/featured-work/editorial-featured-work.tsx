@@ -11,8 +11,7 @@ import { Animate } from '../../../primitives/animate'
 import { EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-interface EditorialFeaturedWorkProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []

@@ -7,8 +7,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface FloatingHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type FloatingHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function HeaderFloating({ theme, sectionContent, handleAnchorClick }: FloatingHeaderProps) {
   const t = useT();

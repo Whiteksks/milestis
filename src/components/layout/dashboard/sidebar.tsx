@@ -9,11 +9,9 @@ import {
   Home, 
   Settings, 
   HelpCircle, 
-  LayoutTemplate, 
   Globe, 
   Plus,
   Archive,
-  Command // Заменим сердечко на более нейтральную иконку или просто оставим текст
 } from "lucide-react"
 import {
   Sidebar,

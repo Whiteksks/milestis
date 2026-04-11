@@ -100,6 +100,7 @@ export function useExportModal(projectId: string, mode: 'portfolio' | 'photobook
     portfolioUrl,
     photobookUrl,
     canExport,
+    canPublish: slugReady,
     publishPayload,
   }
 }

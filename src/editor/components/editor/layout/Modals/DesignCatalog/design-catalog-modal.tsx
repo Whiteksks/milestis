@@ -123,17 +123,6 @@ export function DesignCatalogModal() {
     return BACKGROUND_PRESETS
   }, [designModalSection, templates, isPhotobook])
 
-  const sectionTitle = useMemo(() => {
-    switch (designModalSection) {
-      case 'templates':
-        return 'Templates'
-      case 'themes':
-        return 'Themes'
-      case 'backgrounds':
-        return modeConfig.backgroundCatalogTitle
-    }
-  }, [designModalSection, modeConfig])
-
   const tagMeta = useMemo(() => {
     const counts = new Map<string, number>()
     for (const item of itemsForSection as Array<{ tags?: string[] }>) {
@@ -370,6 +359,7 @@ export function DesignCatalogModal() {
     setTemplate,
     setTheme,
     updateThemeCustomization,
+    currentTheme,
   ])
 
   // ── MOBILE: Drawer ──────────────────────────────────────────────

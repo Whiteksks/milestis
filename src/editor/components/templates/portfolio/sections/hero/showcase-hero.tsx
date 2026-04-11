@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { Animate } from '../../../primitives/animate'
 
-interface ShowcaseHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
   const heroImage = sectionContent.hero.image

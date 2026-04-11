@@ -10,7 +10,7 @@ interface PaymentMethodProps {
 }
 
 export function PaymentMethodCard({
-  type = "Credit Card",
+  type: _type = "Credit Card",
   last4 = "4242",
   expiry = "12/24",
   brand = "visa",

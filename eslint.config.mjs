@@ -29,7 +29,11 @@ const eslintConfig = [
   // 3. Твои дополнительные настройки (если нужны)
   {
     rules: {
-      // Например, можно добавить: "no-unused-vars": "warn"
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+      }],
     },
   },
 ];

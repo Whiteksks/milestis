@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import type { PhotoBlock } from "@/editor/lib/types"
+import type { PhotoBlock, PhotobookSectionContent } from "@/editor/lib/types"
 
 // --- Shared Hooks ---
 
@@ -33,7 +33,7 @@ function useStoryData() {
 
 export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { story, updatePhotobookSection } = useStoryData()
-  const update = (fields: any) => updatePhotobookSection("story", fields)
+  const update = (fields: Partial<PhotobookSectionContent['story']>) => updatePhotobookSection("story", fields)
 
   return (
     <div className="py-2">
@@ -154,7 +154,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   const storyRestrictions = useSectionRestrictions('story')
 
-  const images: PhotoBlock[] = story.images || []
+  const images: PhotoBlock[] = useMemo(() => story.images || [], [story.images])
   const updateImages = (next: PhotoBlock[]) => updatePhotobookSection("story", { images: next })
 
   const [activeImageIndex, setActiveImageIndex] = useState<number>(() =>

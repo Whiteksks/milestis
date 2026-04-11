@@ -6,8 +6,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface BentoHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type BentoHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)

@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import ProfileDropdown from "@/components/layout/auth/dropdown-profile"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import AuthDialogController from "./AuthDialogController"
 import { useUserStore } from "@/hooks/useUserStore"
 import { UserAvatar } from "@/components/shared/user-avatar"

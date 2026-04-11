@@ -6,7 +6,7 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface GridContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type GridContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function GridContact({ theme, sectionContent }: GridContactProps) {      
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')

@@ -8,7 +8,7 @@ import { Animate } from '../../../primitives/animate'
 import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-interface EditorialVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
   return (

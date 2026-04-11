@@ -6,8 +6,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface MinimalFeaturedWorkProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type MinimalFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []

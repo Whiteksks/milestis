@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   webpack(config) {
     // Ищем правило для изображений
     const imageRule = config.module.rules.find(
-      (rule: any) =>
+      (rule: { test?: RegExp }) =>
         typeof rule !== "string" &&
         rule.test instanceof RegExp &&
         rule.test.test(".svg")

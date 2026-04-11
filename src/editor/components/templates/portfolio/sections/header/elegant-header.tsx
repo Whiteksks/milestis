@@ -7,8 +7,7 @@ import { MenuIcon, XIcon } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface ElegantHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type ElegantHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function ElegantHeader({ theme, sectionContent, handleAnchorClick }: ElegantHeaderProps) {
   const t = useT();

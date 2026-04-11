@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 import { motion, HTMLMotionProps } from 'framer-motion'
-import { cn } from '@/lib/utils'
 import { useBaseTransition, useDisabled } from './animation-context'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -46,7 +45,7 @@ interface AnimateProps extends Omit<HTMLMotionProps<'div'>, 'direction'> {
   trigger?: AnimateTrigger
   /** Animation style. Default: 'fade'. */
   type?: AnimateType
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // ─── Derive initial/animate variants from type ───────────────────────────────
@@ -122,13 +121,16 @@ export function Animate({
 }: AnimateProps) {
   // Memoize so React doesn't unmount/remount the DOM node on every render —
   // which would break animations during text input in the editor.
-  const MotionComponent = useMemo(() => motion(Component as any) as any, [Component])
+  const MotionComponent = useMemo(
+    () => motion(Component as React.ComponentType<Record<string, unknown>>) as React.ComponentType<Record<string, unknown>>,
+    [Component]
+  )
 
   const disabled = useDisabled()
   const transition = useBaseTransition(delay)
 
   if (disabled) {
-    return <Component className={className} {...(props as any)}>{children}</Component>
+    return <Component className={className} {...(props as Record<string, unknown>)}>{children}</Component>
   }
 
   const { initial, target } = buildVariants(type, direction, distance, scaleOffset)
@@ -139,7 +141,7 @@ export function Animate({
         className={className}
         initial={initial}
         animate={target}
-        transition={transition as any}
+        transition={transition}
         {...props}
       >
         {children}
@@ -154,7 +156,7 @@ export function Animate({
       initial={initial}
       whileInView={target}
       viewport={{ once: true, margin: '-50px' }}
-      transition={transition as any}
+      transition={transition}
       {...props}
     >
       {children}

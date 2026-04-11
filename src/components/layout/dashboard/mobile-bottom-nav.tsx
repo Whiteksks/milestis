@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl"
 import {
   Home,
   FolderOpen,
-  LayoutTemplate,
   MoreHorizontal,
   Globe,
   MessageCircle,
@@ -15,9 +14,7 @@ import {
   Shield,
   User,
   Plus,
-  ChevronRight,
   CrownIcon,
-
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"

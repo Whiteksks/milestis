@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface MinimalVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type MinimalVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
   return (

@@ -7,7 +7,7 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { useContactForm } from '@/editor/hooks/useContactForm'
 
-interface LiquidGlassContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type LiquidGlassContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContactProps) {
   const { primary, secondary, accent2 } = theme.bgEffectColors

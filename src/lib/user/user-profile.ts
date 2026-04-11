@@ -14,12 +14,12 @@ export interface UserProfileUpdate {
 
 // Recursively removes undefined values so Firestore never receives them.
 // Uses constructor check to avoid recursing into FieldValue / Timestamp etc.
-function stripUndefined(obj: Record<string, any>): Record<string, any> {
-  const result: Record<string, any> = {}
+function stripUndefined(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(obj)) {
     if (value === undefined) continue
     if (value !== null && typeof value === "object" && value.constructor === Object) {
-      result[key] = stripUndefined(value)
+      result[key] = stripUndefined(value as Record<string, unknown>)
     } else {
       result[key] = value
     }

@@ -10,8 +10,7 @@ import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 
-interface EditorialContactProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialContact({ theme, sectionContent }: EditorialContactProps) {
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')

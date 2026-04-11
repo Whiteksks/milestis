@@ -6,7 +6,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface MinimalBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type MinimalBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
   const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio

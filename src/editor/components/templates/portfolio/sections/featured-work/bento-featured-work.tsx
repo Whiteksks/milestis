@@ -10,7 +10,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface BentoFeaturedWorkProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type BentoFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 type Project = {
   title: string

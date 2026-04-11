@@ -1,5 +1,3 @@
-import { publishProject } from "./publish-project-api"
-
 export { createProject, CreateProjectError } from "./create-project-api"
 export { softDeleteProject, computePurgeAt } from "./delete-project"
 export { forceDeleteProject, DeleteProjectError } from "./force-delete-project-api"

@@ -5,7 +5,7 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 
-interface ShowcaseFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []

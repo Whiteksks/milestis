@@ -1,5 +1,5 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query'
-import { collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
+import { type DocumentData, collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
@@ -48,7 +48,7 @@ function isThumbPreviewUrl(url: string | undefined): boolean {
   return url.includes('thumb.webp') || /%2Fthumb\.(?:webp|png|jpe?g)(?:$|[?#])/i.test(url)
 }
 
-export function mapProjectDoc(data: Record<string, any>, id: string): DashboardProject {
+export function mapProjectDoc(data: DocumentData, id: string): DashboardProject {
   const preview = data.preview
     ? {
         ...data.preview,

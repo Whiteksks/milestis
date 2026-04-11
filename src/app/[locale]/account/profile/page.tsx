@@ -38,6 +38,7 @@ export default function ProfileSettings() {
       profile.profileTemplate?.sociallinks?.link3 ?? "",
       profile.profileTemplate?.sociallinks?.link4 ?? "",
     ] as SocialLinksTuple)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.uid])
 
   const handleEditOpen = () => {
@@ -54,8 +55,8 @@ export default function ProfileSettings() {
         await toastUser.saveName(saveUserProfile({ displayName: editName }))
       }
       setEditing(false)
-    } catch (err: any) {
-      setEditError(err.message)
+    } catch (err: unknown) {
+      setEditError((err as Error).message)
     } finally {
       setEditSaving(false)
     }

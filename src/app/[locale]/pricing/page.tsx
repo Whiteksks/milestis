@@ -89,7 +89,7 @@ const PricingPage = () => {
               </div>
               <h2 className="text-3xl font-bold tracking-tight text-foreground">1 Credit = 1 Memory</h2>
               <p className="text-muted-foreground leading-relaxed">
-                We don't believe in rigid templates. With our credit system, you only pay for the content you add. Use credits for high-resolution photos in your photobooks or special elements in your portfolio.
+                We don&apos;t believe in rigid templates. With our credit system, you only pay for the content you add. Use credits for high-resolution photos in your photobooks or special elements in your portfolio.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
@@ -124,7 +124,17 @@ const PricingPage = () => {
   );
 };
 
-const PricingCard = ({ title, price, description, features, buttonText, variant, isPopular = false }: any) => (
+interface PricingCardProps {
+  title: string
+  price: string | number
+  description: string
+  features: string[]
+  buttonText: string
+  variant?: string
+  isPopular?: boolean
+}
+
+const PricingCard = ({ title, price, description, features, buttonText, variant, isPopular = false }: PricingCardProps) => (
   <Card className={`relative flex flex-col h-full bg-card border-border transition-all duration-300 hover:shadow-xl ${isPopular ? 'ring-2 ring-primary scale-105 z-10' : ''}`}>
     {isPopular && (
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">

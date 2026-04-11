@@ -44,7 +44,7 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
   )
 }
 
-function ProjectCard({ project, index, theme }: { project: any, index: number, theme: any }) {
+function ProjectCard({ project, index, theme }: { project: PortfolioTemplateProps['sectionContent']['featuredWork']['projects'][number], index: number, theme: PortfolioTemplateProps['theme'] }) {
   const [showInfo, setShowInfo] = useState(false)
   const isFeatured = index % 3 === 0
   const hasDescription = !!project.description && project.description.trim() !== ''

@@ -1,8 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, Receipt } from "lucide-react"
 import { CreditsCard } from "@/components/layout/settings/credits-card"
 import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
 import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"

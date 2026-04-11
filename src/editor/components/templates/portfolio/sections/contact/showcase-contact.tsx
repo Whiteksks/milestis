@@ -8,7 +8,7 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { useContactForm } from '@/editor/hooks/useContactForm'
 
-interface ShowcaseContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps) {
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
@@ -73,7 +73,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
           </Animate>
 
           {/* Right — form */}
-          <Animate as="form" onSubmit={handleSubmit as any} direction="right" distance={20} delay={0.2} className="space-y-0">
+          <Animate as="form" onSubmit={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)} direction="right" distance={20} delay={0.2} className="space-y-0">
             {status !== 'idle' && (
               <motion.div
                 initial={{ opacity: 0, y: -8, scale: 0.97 }}

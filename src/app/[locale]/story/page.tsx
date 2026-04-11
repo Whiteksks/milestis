@@ -4,11 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 
-// Компонент полностью статичен и готов к SSR
 const MissionPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
       <Header />
+      
       {/* Hero Section */}
       <header className="relative pt-32 pb-20 px-6 border-b border-border/40">
         <div className="max-w-4xl mx-auto text-center">
@@ -18,7 +18,7 @@ const MissionPage = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-foreground leading-[1.1]">
-            Memories shouldn't <br /> 
+            Memories shouldn{"'"}t <br /> 
             <span className="text-muted-foreground italic font-serif">just fade away.</span>
           </h1>
           
@@ -28,7 +28,7 @@ const MissionPage = () => {
         </div>
       </header>
 
-      {/* The Soul of the Project: Memory & Legacy */}
+      {/* The Soul of the Project */}
       <article className="py-24 px-6 bg-muted/20">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -46,7 +46,7 @@ const MissionPage = () => {
                   <div>
                     <h4 className="font-semibold text-foreground">Forever Hosting</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Once created, your story stays online. Always accessible, never forgotten. A permanent digital space for your artists' portfolio or family memories.
+                      Once created, your story stays online. Always accessible, never forgotten. A permanent digital space for your artists{"'"} portfolio or family memories.
                     </p>
                   </div>
                 </div>
@@ -58,7 +58,7 @@ const MissionPage = () => {
               <div className="relative text-center">
                 <Sparkles className="w-16 h-16 text-primary/30 mx-auto mb-4" />
                 <p className="text-lg font-serif italic text-muted-foreground leading-relaxed px-4">
-                  "Turning today's pixels into tomorrow's legacy."
+                  &quot;Turning today{"'"}s pixels into tomorrow{"'"}s legacy.&quot;
                 </p>
               </div>
             </div>
@@ -114,7 +114,7 @@ const MissionPage = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
           <CardContent className="p-12 text-center relative z-10">
             <h2 className="text-3xl md:text-5xl font-bold mb-6 italic font-serif leading-tight">
-              Don't let your stories get lost in the scroll.
+              Don{"'"}t let your stories get lost in the scroll.
             </h2>
             <p className="text-primary-foreground/90 mb-10 max-w-lg mx-auto text-lg leading-relaxed">
               Join our community today. Get 50 monthly credits to begin building your digital heritage.

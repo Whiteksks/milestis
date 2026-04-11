@@ -6,8 +6,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface EditorialHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type EditorialHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: EditorialHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)

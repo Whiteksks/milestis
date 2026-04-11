@@ -6,8 +6,7 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 
-interface GridHeaderProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> {}
+type GridHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function GridHeader({ theme, sectionContent, handleAnchorClick }: GridHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)

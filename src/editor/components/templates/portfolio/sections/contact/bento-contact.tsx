@@ -7,7 +7,7 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface BentoContactProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type BentoContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function BentoContact({ theme, sectionContent }: BentoContactProps) {
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')

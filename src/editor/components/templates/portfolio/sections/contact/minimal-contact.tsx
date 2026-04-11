@@ -8,8 +8,7 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface MinimalContactProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type MinimalContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')
@@ -72,7 +71,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
             distance={16}
             delay={0.1}
             as="form"
-            onSubmit={handleSubmit as any}
+            onSubmit={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)}
             className="space-y-0"
           >
             {status !== 'idle' && (

@@ -6,7 +6,6 @@ import type { DecorationElement } from "@/editor/lib/types"
 import { useUiStore } from "@/editor/lib/store-ui"
 import { useThemeSelector, type ThemeCustomDecorations } from "@/editor/lib/store"
 import { useEditorDecorations } from "@/editor/hooks/use-editor-decorations"
-import { decorationAnimationOptions, type DecorationAnimation } from "@/editor/lib/decoration-animations"
 import { DecorationToolbar } from "./decoration-toolbar"
 import { loadImageAspectRatio } from "../decorationEdit/utils"
 import { Button } from "@/components/ui/button"
@@ -22,10 +21,8 @@ export function DecorationsFloatingToolbar({
 }) {
   const setSelectedDecorationId = useUiStore((s) => s.setSelectedDecorationId)
 
-  const { addDecoration, themeCustomizations, updateThemeCustomization } = useThemeSelector((s) => ({
+  const { addDecoration } = useThemeSelector((s) => ({
     addDecoration: s.addDecoration,
-    themeCustomizations: s.themeCustomizations,
-    updateThemeCustomization: s.updateThemeCustomization,
   }))
 
   const { normalizedDecorations, selectedId, handleUpdate, handleRemove } =
@@ -120,8 +117,6 @@ export function DecorationsFloatingToolbar({
     addDecoration(newDecoration)
     setSelectedDecorationId(newDecoration.id)
   }, [scrollContainerRef, normalizedDecorations.length, addDecoration, setSelectedDecorationId])
-
-  const animationValue = themeCustomizations.decorationAnimation || 'fade'
 
   // When there are no decorations yet, show a minimal "add" prompt
   if (!normalizedDecorations.length) {

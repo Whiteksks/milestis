@@ -6,8 +6,7 @@ import { useContactForm } from '@/editor/hooks/useContactForm'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface ElegantContactProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ElegantContactProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
   const { fields, status, handleChange, handleSubmit } = useContactForm(sectionContent.contact.email || '')

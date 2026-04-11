@@ -10,7 +10,7 @@ import { Animate } from '../../../primitives/animate'
 import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-interface EditorialBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
   return (

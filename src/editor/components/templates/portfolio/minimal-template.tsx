@@ -1,6 +1,5 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { AnimationProvider } from '../primitives/animation-context'
 import { withSectionMemo } from '../primitives/with-section-memo'

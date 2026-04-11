@@ -8,7 +8,7 @@ import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-interface EditorialHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type EditorialHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
   const heroImage = sectionContent.hero.image

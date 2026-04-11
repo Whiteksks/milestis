@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -9,7 +9,6 @@ import {
   HelpCircleIcon,
   ShieldCheckIcon,
   LogOutIcon,
-  SettingsIcon
 } from 'lucide-react'
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -45,7 +44,6 @@ type Props = {
 }
 
 const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
-  const menuRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
   const [open, setOpen] = useState(false)
   const router = useRouter()

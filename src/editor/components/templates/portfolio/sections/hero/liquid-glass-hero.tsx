@@ -1,17 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { Animate } from '../../../primitives/animate'
 
-interface LiquidGlassHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type LiquidGlassHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps) {
   const heroImage = sectionContent.hero.image
-  const { primary, secondary, accent2, highlight } = theme.bgEffectColors
+  const { primary, secondary, accent2 } = theme.bgEffectColors
   return (
     <section
       id="hero"

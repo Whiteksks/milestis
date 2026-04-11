@@ -28,7 +28,6 @@ export function DecorationsLayer({
   deviceView = "desktop" as DeviceView,
   animation,
   onUpdate,
-  onRemove,
   onSelect,
   className,
 }: DecorationsLayerProps) {

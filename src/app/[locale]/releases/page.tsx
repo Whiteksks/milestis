@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Header from '@/components/layout/header';
@@ -68,9 +68,10 @@ const ChangelogPage = () => {
 
                 {/* Image Placeholder */}
                 <div className="mb-8 rounded-2xl overflow-hidden border border-border/40 bg-muted/30 aspect-video flex items-center justify-center">
-                  <img 
+                  <Image 
                     src={entry.image} 
                     alt={entry.title} 
+                    fill
                     className="w-full h-full object-cover opacity-90"
                   />
                 </div>

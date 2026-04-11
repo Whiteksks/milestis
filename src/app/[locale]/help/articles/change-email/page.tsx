@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, AlertCircle } from "lucide-react"
-import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "How to change your email — Milestis Help",

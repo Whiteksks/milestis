@@ -48,7 +48,8 @@ function validatePayload(body: unknown): CreateProjectPayload {
     );
   }
 
-  if (/[\x00-\x1F\x7F]/.test(trimmedName)) {
+  const controlChars = new RegExp("[\\x00-\\x1F\\x7F]");
+  if (controlChars.test(trimmedName)) {
     throw new ValidationError("Project name contains invalid characters.");
   }
 

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface ElegantVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ElegantVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
   return (

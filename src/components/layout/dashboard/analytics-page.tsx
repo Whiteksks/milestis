@@ -68,9 +68,9 @@ export function AnalyticsPage() {
                 descriptionKey: 'analytics.features.time.description',
               },
             ].map((feature) => (
-              <div key={(feature as any).titleKey} className="rounded-2xl border border-muted-foreground/10 bg-muted/30 p-4">
-                <h3 className="mb-1 font-medium text-foreground">{t((feature as any).titleKey)}</h3>
-                <p className="text-sm text-muted-foreground">{t((feature as any).descriptionKey)}</p>
+              <div key={feature.titleKey} className="rounded-2xl border border-muted-foreground/10 bg-muted/30 p-4">
+                <h3 className="mb-1 font-medium text-foreground">{t(feature.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground">{t(feature.descriptionKey)}</p>
               </div>
             ))}
           </div>

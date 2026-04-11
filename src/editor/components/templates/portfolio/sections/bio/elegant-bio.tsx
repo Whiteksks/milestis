@@ -6,7 +6,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface ElegantBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ElegantBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
   return (

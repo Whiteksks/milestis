@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -26,7 +25,6 @@ import {
   Loader2,
   Check,
   X,
-  Copy,
   ExternalLink,
   Link2,
   ShieldCheck,
@@ -134,7 +132,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
     </Dialog>
   )
 }
-export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; data: any }) {
+export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; data: ReturnType<typeof usePublishModal> }) {
   const { slug, handleSlugChange, slugStatus } = data
   const maxLength = 24
 

@@ -7,7 +7,7 @@ import { SocialIconLink } from '@/editor/components/templates/portfolio/social-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface BentoFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type BentoFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function BentoFooter({ theme, sectionContent }: BentoFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []

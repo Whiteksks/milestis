@@ -75,7 +75,7 @@ function OptionCard({ opt, loadingMode, onCreate }: {
   )
 }
 
-function ModalBody({ onClose }: { onClose?: () => void }) {
+function ModalBody({ onClose: _onClose }: { onClose?: () => void }) {
   const { handleCreate, loadingMode } = useCreateProject()
 
   return (

@@ -6,7 +6,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface ElegantHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ElegantHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
   const heroImage = sectionContent.hero.image

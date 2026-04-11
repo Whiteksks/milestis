@@ -21,7 +21,7 @@ export const webhookPaddle = onRequest(
 			return;
 		}
 
-		const rawBody = (req as any).rawBody as Buffer | undefined;
+		const rawBody = (req as unknown as Record<string, unknown>).rawBody as Buffer | undefined;
 		if (!rawBody) {
 			res.status(400).json({ error: "RAW_BODY_REQUIRED" });
 			return;

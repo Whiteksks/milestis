@@ -8,8 +8,7 @@ import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 
-interface ShowcaseFeaturedWorkProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []

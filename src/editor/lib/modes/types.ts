@@ -16,6 +16,7 @@ export type TemplateDef = {
   tags?: string[]
   /** Hero / Cover component used by TemplatePreview. Co-located here so adding
    *  a template only requires editing one file. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   previewComponent?: React.ComponentType<any>
 }
 

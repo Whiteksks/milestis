@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Globe, Bell, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
+import { Globe, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user"
@@ -76,6 +76,7 @@ export default function AccountSettings() {
       personalized_recommendations: n.personalized_recommendations ?? true,
       seasonal_specials: n.seasonal_specials ?? false,
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.uid])
 
   const toggle = (key: NotificationKey, value: boolean) =>

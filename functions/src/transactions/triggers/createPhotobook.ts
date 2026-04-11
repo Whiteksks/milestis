@@ -43,7 +43,7 @@ export const createPhotobook = onCall(
 		try {
 			const projectSnap = await db.collection("projects").doc(data.projectId).get();
 			if (projectSnap.exists) {
-				const p = projectSnap.data() as any;
+				const p = projectSnap.data() as Record<string, unknown>;
 				const readyFlag =
 					typeof p?.layoutReady === "boolean"
 						? p.layoutReady

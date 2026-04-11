@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { Animate } from '../../../primitives/animate'
 
-interface LiquidGlassBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type LiquidGlassBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements } = sectionContent.bio
+  const { title, subtitle, description, image, achievements } = sectionContent.bio
   const { primary, secondary, accent2 } = theme.bgEffectColors
 
   return (

@@ -5,7 +5,7 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 
-interface LiquidGlassVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type LiquidGlassVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProps) {
   const { primary, secondary, accent2 } = theme.bgEffectColors

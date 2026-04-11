@@ -7,7 +7,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface GridHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type GridHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function GridHero({ theme, sectionContent }: GridHeroProps) {
   const heroImage = sectionContent.hero.image

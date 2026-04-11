@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
+
 
 export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
   const { cover, updatePhotobookSection } = useContentSelector((state) => ({

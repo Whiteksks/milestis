@@ -6,8 +6,7 @@ import { SocialIconLink } from '@/editor/components/templates/portfolio/social-i
 import { Animate } from '../../../primitives/animate'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 
-interface ElegantFooterProps
-  extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ElegantFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
   return (

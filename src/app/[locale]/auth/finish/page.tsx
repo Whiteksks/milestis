@@ -53,6 +53,7 @@ export default function FinishPage() {
         setStatus('needsEmail');
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const completeSignIn = async (userEmail: string) => {
@@ -72,8 +73,8 @@ export default function FinishPage() {
       setStatus('success');
       const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
       setTimeout(() => router.push(isLinkingFlow ? '/account/security' : '/'), 2000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err as Error).message);
       setStatus('error');
     }
   };

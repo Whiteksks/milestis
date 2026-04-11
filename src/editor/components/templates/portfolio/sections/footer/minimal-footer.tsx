@@ -6,7 +6,7 @@ import { SocialIconLink } from '@/editor/components/templates/portfolio/social-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface MinimalFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type MinimalFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function MinimalFooter({ theme, sectionContent }: MinimalFooterProps) {
   const socialLinks = sectionContent.footer.socialLinks ?? []

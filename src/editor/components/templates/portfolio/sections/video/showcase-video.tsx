@@ -5,7 +5,7 @@ import { Animate } from '../../../primitives/animate'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-interface ShowcaseVideoProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type ShowcaseVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
   return (

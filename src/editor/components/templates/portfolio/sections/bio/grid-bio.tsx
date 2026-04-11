@@ -6,7 +6,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface GridBioProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type GridBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function GridBio({ theme, sectionContent }: GridBioProps) {
   const achievements = sectionContent.bio.achievements ?? []

@@ -9,23 +9,28 @@ import fastDeepEqual from 'fast-deep-equal'
  * @param Component The section component
  * @param sectionKey The key in `sectionContent` this section cares about (e.g., 'hero')
  */
-export function withSectionMemo<P extends { sectionContent: Record<string, any>; theme: any; [key: string]: any }>(
+export function withSectionMemo<P extends { sectionContent: object; theme: unknown }>(
   Component: React.ComponentType<P>,
   sectionKey: string
 ) {
   return React.memo(Component, (prevProps, nextProps) => {
+    const prevSC = prevProps.sectionContent as Record<string, unknown>
+    const nextSC = nextProps.sectionContent as Record<string, unknown>
+
     // Check the relevant section slice and theme first (cheap path for most keystrokes)
     if (
       !fastDeepEqual(prevProps.theme, nextProps.theme) ||
-      !fastDeepEqual(prevProps.sectionContent[sectionKey], nextProps.sectionContent[sectionKey])
+      !fastDeepEqual(prevSC[sectionKey], nextSC[sectionKey])
     ) {
       return false // must re-render
     }
 
     // Also check any extra props (e.g. handleAnchorClick on header sections)
+    const prev = prevProps as Record<string, unknown>
+    const next = nextProps as Record<string, unknown>
     for (const key in nextProps) {
       if (key === 'theme' || key === 'sectionContent') continue
-      if (!Object.is(prevProps[key], nextProps[key])) return false
+      if (!Object.is(prev[key], next[key])) return false
     }
 
     return true // equal — skip re-render

@@ -6,7 +6,7 @@ import { SocialIconLink } from '@/editor/components/templates/portfolio/social-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface GridFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type GridFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function GridFooter({ theme, sectionContent }: GridFooterProps) {        
   const socialLinks = sectionContent.footer.socialLinks ?? []

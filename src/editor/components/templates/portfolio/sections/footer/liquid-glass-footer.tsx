@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 import { Animate } from '../../../primitives/animate'
 
-interface LiquidGlassFooterProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type LiquidGlassFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterProps) {
   const { primary, secondary, accent2 } = theme.bgEffectColors

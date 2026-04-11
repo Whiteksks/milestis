@@ -27,7 +27,7 @@ export function SectionWrapper({
 }: SectionWrapperProps) {
   // Always produce a motion-capable component so framer props never end up on a plain DOM element.
   const MotionComponent = useMemo(
-    () => (typeof Component === 'string' ? motion(Component as any) : Component) as any,
+    () => (typeof Component === 'string' ? motion(Component) : Component) as React.ComponentType<Record<string, unknown>>,
     [Component],
   )
   const disabled = useDisabled()

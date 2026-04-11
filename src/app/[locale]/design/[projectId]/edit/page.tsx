@@ -140,7 +140,7 @@ export default function EditorPage() {
 
     loadProject()
     return () => { cancelled = true; setProjectId(null); setProjectName(null); setIsPublished(false) }
-  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName, setIsPublished])
+  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName, setIsPublished, setIsExported])
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')

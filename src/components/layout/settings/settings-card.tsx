@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card} from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 interface SettingsCardProps extends React.ComponentProps<typeof Card> {

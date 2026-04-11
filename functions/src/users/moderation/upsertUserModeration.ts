@@ -5,7 +5,7 @@ export async function upsertUserModeration(
   uid: string,
   updates: Partial<UserModeration>,
 ): Promise<void> {
-  const payload: Record<string, any> = {};
+  const payload: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(updates)) {
     payload[`moderation.${key}`] = value;

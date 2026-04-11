@@ -11,7 +11,6 @@ import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, C
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
-import { toastProject } from '@/lib/toast'
 import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'

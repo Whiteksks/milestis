@@ -88,11 +88,12 @@ function clampNonNegative(n: number): number {
 	return n < 0 ? 0 : n;
 }
 
-function normalizeBalance(balance: any): BalanceSnapshot {
-	const total = typeof balance?.total === "number" ? balance.total : 0;
-	const purchased = typeof balance?.purchased === "number" ? balance.purchased : 0;
-	const subscription = typeof balance?.subscription === "number" ? balance.subscription : 0;
-	const bonus = typeof balance?.bonus === "number" ? balance.bonus : 0;
+function normalizeBalance(balance: unknown): BalanceSnapshot {
+	const b = balance as Record<string, unknown> | null | undefined;
+	const total = typeof b?.total === "number" ? b.total : 0;
+	const purchased = typeof b?.purchased === "number" ? b.purchased : 0;
+	const subscription = typeof b?.subscription === "number" ? b.subscription : 0;
+	const bonus = typeof b?.bonus === "number" ? b.bonus : 0;
 	return {
 		total: clampNonNegative(total),
 		purchased: clampNonNegative(purchased),
@@ -167,7 +168,7 @@ async function consumeLots(
 	const q = lotsCol
 		.where("bucket", "==", bucket)
 		// Important: keep a single range filter field to avoid Firestore restrictions.
-		.where("expiresAtMillis", comparator as any, nowMillis)
+		.where("expiresAtMillis", comparator as FirebaseFirestore.WhereFilterOp, nowMillis)
 		.orderBy("expiresAtMillis", "asc")
 		.orderBy("createdAtMillis", "asc")
 		.limit(200);
@@ -176,7 +177,7 @@ async function consumeLots(
 	let remaining = amount;
 	for (const doc of snap.docs) {
 		if (remaining <= 0) break;
-		const data = doc.data() as any;
+		const data = doc.data() as Record<string, unknown>;
 		const lotRemaining = typeof data.remainingAmount === "number" ? data.remainingAmount : 0;
 		if (lotRemaining <= 0) continue;
 		const take = Math.min(lotRemaining, remaining);
@@ -259,7 +260,7 @@ export async function processTransaction(
 	return await db.runTransaction(async (tx) => {
 		const idemSnap = await tx.get(idemRef);
 		if (idemSnap.exists) {
-			const existingTid = (idemSnap.data() as any)?.tid as string | undefined;
+			const existingTid = (idemSnap.data() as Record<string, unknown>)?.tid as string | undefined;
 			if (!existingTid) {
 				throw new TransactionEngineError(
 					"idempotency_conflict",
@@ -289,7 +290,7 @@ export async function processTransaction(
 			throw new TransactionEngineError("user_not_found", "User not found");
 		}
 
-		const userData = userSnap.data() as any;
+		const userData = userSnap.data() as Record<string, unknown>;
 		const currentBalance = normalizeBalance(userData?.balance);
 		let nextBalance = { ...currentBalance };
 		const nowMillis = Date.now();
@@ -345,7 +346,7 @@ export async function processTransaction(
 					const lotRef = db.doc(credit.expireLotPath);
 					const lotSnap = await tx.get(lotRef);
 					if (lotSnap.exists) {
-						const lotData = lotSnap.data() as any;
+						const lotData = lotSnap.data() as Record<string, unknown>;
 						const bucket = lotData?.bucket as BalanceBucket | undefined;
 						const lotRemaining =
 							typeof lotData?.remainingAmount === "number"

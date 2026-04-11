@@ -7,7 +7,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-interface BentoHeroProps extends Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> {}
+type BentoHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
   const heroImage = sectionContent.hero.image

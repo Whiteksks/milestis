@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
 import { Plus, Trash2, Image as ImageIcon, Sparkles, Shuffle } from 'lucide-react'
-import { useMemo, useCallback, useId, MouseEvent } from 'react'
+import { useCallback, useId, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import Image from 'next/image'
@@ -28,14 +28,6 @@ const createDecorationId = (prefix = 'decoration') => {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 }
 
-const coerceImageUrl = (value: unknown) => {
-  if (typeof value === 'string') return value
-  if (value && typeof value === 'object' && 'url' in value && typeof (value as Record<string, unknown>).url === 'string') {
-    return (value as Record<string, unknown>).url as string
-  }
-  return ''
-}
-
 export function DecorationsSettingsPanel() {
   const canvasScrollRef = useCanvasScrollContainer()
   const quickPlacementOwnerId = useId()
@@ -49,7 +41,6 @@ export function DecorationsSettingsPanel() {
     updateDecoration,
     removeDecoration,
     resetDecorations,
-    setDecorations,
   } = useThemeSelector((state) => ({
     themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
@@ -58,7 +49,6 @@ export function DecorationsSettingsPanel() {
     updateDecoration: state.updateDecoration,
     removeDecoration: state.removeDecoration,
     resetDecorations: state.resetDecorations,
-    setDecorations: state.setDecorations,
   }))
 
   const { selectedDecorationId, setSelectedDecorationId } = useUiSelector((state) => ({
