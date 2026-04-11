@@ -53,7 +53,7 @@ export function PublishedPortfolioView({
   sectionContent,
   sectionVisibility,
 }: PortfolioViewProps) {
-  const theme: ThemeConfig = getTheme(themeId, templateId)
+  const theme: ThemeConfig = getTheme(themeId)
 
   const handleAnchorClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
