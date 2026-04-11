@@ -6,6 +6,16 @@ import { doc, onSnapshot } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
 
+const SESSION_COOKIE = 'milestis_session'
+
+function setSessionCookie(value: '1' | '0') {
+  if (value === '1') {
+    document.cookie = `${SESSION_COOKIE}=1; path=/; SameSite=Lax`
+  } else {
+    document.cookie = `${SESSION_COOKIE}=0; path=/; max-age=0; SameSite=Lax`
+  }
+}
+
 export default function FirebaseInitializer() {
   const setProfile = useUserStore((state) => state.setProfile)
   const clearProfile = useUserStore((state) => state.clearProfile)
@@ -23,6 +33,7 @@ export default function FirebaseInitializer() {
 
       if (!user) {
         clearProfile()
+        setSessionCookie('0')
         return
       }
 
@@ -44,6 +55,7 @@ export default function FirebaseInitializer() {
               balance: data.balance,
               stats: data.stats,
             })
+            setSessionCookie('1')
           } else {
             // Документ ещё не существует — это переходное состояние между
             // регистрацией и созданием документа через createUser cloud function.
