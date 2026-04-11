@@ -7,8 +7,8 @@ const withNextIntl = createNextIntlPlugin()
 // Adjust src lists as you add new third-party services.
 const CSP = [
   "default-src 'self'",
-  // Scripts: Next.js chunks + Firebase + Framer Motion inline scripts
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com",
+  // Scripts: Next.js chunks + Firebase + Google APIs (apis.google.com used by Firebase Auth)
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://accounts.google.com",
   // Styles: inline styles used by Tailwind / Radix
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // Fonts
@@ -17,8 +17,8 @@ const CSP = [
   "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com",
   // Fetch / XHR: Firebase services + Cloud Run functions
   "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app",
-  // Frames: Firebase Auth popup
-  "frame-src https://*.firebaseapp.com",
+  // Frames: Firebase Auth popup + Google Sign-In
+  "frame-src https://*.firebaseapp.com https://accounts.google.com",
   // Media
   "media-src 'self' blob: https://firebasestorage.googleapis.com",
   // Workers (Framer Motion / Next.js)
