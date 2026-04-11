@@ -10,7 +10,7 @@ export const createUser = onRequest(
     concurrency: 20,
     timeoutSeconds: 60,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.app$/],
+    cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
   },
   async (req, res) => {
     let uid: string | undefined;

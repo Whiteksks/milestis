@@ -32,7 +32,7 @@ export const unpublishProject = onRequest(
     concurrency: 10,
     timeoutSeconds: 60,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.com$/, /milestis\.site$/],
+    cors: [/localhost/, /milestis\.com$/, /milestis\.site$/, /\.hosted\.app$/],
   },
   async (req, res) => {
     // ── Method guard ──────────────────────────────────────────────────────

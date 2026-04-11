@@ -86,7 +86,7 @@ export const exportProject = onRequest(
 		timeoutSeconds: 540, // 9 min — rendering large photobooks takes time
 		memory: "1GiB",
 		maxInstances: 5,
-		cors: [/localhost/, /milestis\.app$/, /milestis\.site$/],
+		cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
 	},
 	async (req, res) => {
 		// ── 1. Method guard ─────────────────────────────────────────────────

@@ -48,6 +48,7 @@ function validatePayload(body: unknown): CreateProjectPayload {
     );
   }
 
+  // eslint-disable-next-line no-control-regex
   const controlChars = new RegExp("[\\x00-\\x1F\\x7F]");
   if (controlChars.test(trimmedName)) {
     throw new ValidationError("Project name contains invalid characters.");
@@ -109,7 +110,7 @@ export const createProject = onRequest(
     concurrency: 20,
     timeoutSeconds: 60,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.app$/],
+    cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
   },
   async (req, res) => {
     let uid: string | undefined;
