@@ -1,3 +1,4 @@
+'use client'
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -56,7 +57,7 @@ export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: Sho
           {sectionContent.header.title}
         </motion.a>
 
-        {/* Nav вЂ” desktop */}
+        {/* Nav РІР‚вЂќ desktop */}
         <motion.nav
           initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
