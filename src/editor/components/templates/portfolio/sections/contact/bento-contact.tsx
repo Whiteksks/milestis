@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -20,10 +19,10 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* ── Row 1: CTA cells ── */}
+        {/* в”Ђв”Ђ Row 1: CTA cells в”Ђв”Ђ */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3 mb-3">
 
-          {/* [A] Headline card — 7/12 */}
+          {/* [A] Headline card вЂ” 7/12 */}
           <Animate
             delay={0}
             direction="up"
@@ -47,7 +46,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
             )}
           </Animate>
 
-          {/* [B] Email card — 5/12 */}
+          {/* [B] Email card вЂ” 5/12 */}
           <Animate
             delay={0.07}
             direction="up"
@@ -75,14 +74,14 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Write ↗
+                Write в†—
               </a>
             </div>
           </Animate>
 
         </div>
 
-        {/* ── Row 2: Form card ── */}
+        {/* в”Ђв”Ђ Row 2: Form card в”Ђв”Ђ */}
         <Animate
           delay={0.1}
           direction="up"
@@ -103,7 +102,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent вЂ” check your email client.' : 'Please fill in all required fields.'}
               </div>
             )}
             <div className="grid @md:grid-cols-3 grid-cols-1 gap-3 mb-3">
@@ -148,7 +147,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               name="message"
               value={fields.message}
               onChange={handleChange}
-              placeholder="Tell me about your project…"
+              placeholder="Tell me about your projectвЂ¦"
               rows={4}
               className={cn(
                 'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -165,7 +164,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Send message →
+                Send message в†’
               </button>
             </div>
           </form>

@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
@@ -29,7 +28,7 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
               theme.card,
             )}>
             <p className={cn('text-[10px] uppercase tracking-[0.2em] opacity-25', theme.fontBody)}>
-              © {new Date().getFullYear()} {sectionContent.footer.copyright}
+              В© {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
 
             {/* Right: social icons */}

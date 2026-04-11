@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -29,7 +28,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
           </Animate>
         </div>
 
-        {/* Identity block — centered, stacked: photo → name → subtitle */}
+        {/* Identity block вЂ” centered, stacked: photo в†’ name в†’ subtitle */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
           {image && (
             <Animate direction="none" scaleOffset={0.96} delay={0.1}>
@@ -70,7 +69,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
           </div>
         </div>
 
-        {/* Description block — centered container, left-aligned text */}
+        {/* Description block вЂ” centered container, left-aligned text */}
         <div className="max-w-xl mx-auto space-y-10">
           <Animate
             direction="up"

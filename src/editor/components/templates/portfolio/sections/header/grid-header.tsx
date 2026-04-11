@@ -1,4 +1,3 @@
-'use client'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -22,7 +21,7 @@ export function GridHeader({ theme, sectionContent, handleAnchorClick }: GridHea
         'max-w-6xl mx-auto px-5 @lg:px-8 h-14 flex items-center justify-between gap-8',
       )}>
 
-        {/* Name — bold, left */}
+        {/* Name вЂ” bold, left */}
         <a
           href="#hero"
           onClick={(e) => handleAnchorClick(e, '#hero')}
@@ -44,7 +43,7 @@ export function GridHeader({ theme, sectionContent, handleAnchorClick }: GridHea
           </span>
         </a>
 
-        {/* Desktop nav — pill tabs */}
+        {/* Desktop nav вЂ” pill tabs */}
         {hasLinks && (
           <nav className={cn(
             'hidden @md:flex items-center gap-1 p-1 rounded-full border border-current/10 bg-current/[0.03]',

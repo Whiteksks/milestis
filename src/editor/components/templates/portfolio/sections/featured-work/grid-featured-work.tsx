@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
@@ -53,7 +52,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
                 
-                {/* Номер проекта при наведении (опционально) */}
+                {/* РќРѕРјРµСЂ РїСЂРѕРµРєС‚Р° РїСЂРё РЅР°РІРµРґРµРЅРёРё (РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ) */}
                 <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
                    <span className="text-[10px] text-white font-mono">{(index + 1).toString().padStart(2, '0')}</span>
                 </div>
@@ -74,7 +73,7 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                   <div className="flex flex-wrap gap-2">
                     {project.tags.slice(0, 3).map((tag, i) => (
                       <span key={i} className="text-[10px] opacity-40 uppercase tracking-wider">
-                        {tag}{i !== project.tags!.slice(0, 3).length - 1 && ' •'}
+                        {tag}{i !== project.tags!.slice(0, 3).length - 1 && ' вЂў'}
                       </span>
                     ))}
                   </div>

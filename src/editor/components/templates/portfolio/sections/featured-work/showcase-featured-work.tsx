@@ -1,4 +1,3 @@
-'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
@@ -41,7 +40,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
           </span>
         </div>
 
-        {/* Featured project — full-width cinema card */}
+        {/* Featured project вЂ” full-width cinema card */}
         {featured && (
           <Animate as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
             <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
@@ -105,7 +104,7 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
           </Animate>
         )}
 
-        {/* Remaining projects — 2-column grid */}
+        {/* Remaining projects вЂ” 2-column grid */}
         {rest.length > 0 && (
           <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
             {rest.map((project, i) => (

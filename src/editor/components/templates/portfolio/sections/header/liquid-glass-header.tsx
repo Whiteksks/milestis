@@ -1,4 +1,3 @@
-'use client'
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -63,7 +62,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
             {sectionContent.header.title}
           </motion.a>
 
-          {/* Nav — desktop */}
+          {/* Nav вЂ” desktop */}
           <motion.nav
             initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,7 +98,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
         </div>
       </div>
 
-      {/* Mobile menu — separate glass panel */}
+      {/* Mobile menu вЂ” separate glass panel */}
       <AnimatePresence>
         {isOpen && hasLinks && (
           <motion.div

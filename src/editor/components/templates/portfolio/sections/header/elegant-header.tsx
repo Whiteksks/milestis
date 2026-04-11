@@ -1,4 +1,3 @@
-'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useT } from '../../../primitives/animation-context'

@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'

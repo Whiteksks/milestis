@@ -1,6 +1,5 @@
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
-import path from "path"
 
 const withNextIntl = createNextIntlPlugin()
 
@@ -63,17 +62,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/**" },
     ],
   },
-  webpack(config, { isServer }) {
-    // On the server bundle, replace framer-motion with a passthrough shim so
-    // that renderToStaticMarkup in route handlers can render templates without
-    // hitting React 19's "cannot call client component from server" error.
-    if (isServer) {
-      config.resolve.alias = {
-        ...(config.resolve.alias as Record<string, string>),
-        'framer-motion': path.resolve('./src/lib/server-framer-motion-shim.tsx'),
-      }
-    }
-
+  webpack(config) {
     // Ищем правило для изображений
     const imageRule = config.module.rules.find(
       (rule: { test?: RegExp }) =>

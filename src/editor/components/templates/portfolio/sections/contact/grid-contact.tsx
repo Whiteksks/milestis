@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
@@ -21,7 +20,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
           
           <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6 items-stretch">
             
-            {/* ЛЕВАЯ СТОРОНА: Инфо и Контакты */}
+            {/* Р›Р•Р’РђРЇ РЎРўРћР РћРќРђ: РРЅС„Рѕ Рё РљРѕРЅС‚Р°РєС‚С‹ */}
             <div className="flex flex-col gap-6">
               <Animate
                 direction="up"
@@ -61,7 +60,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
               </Animate>
             </div>
 
-            {/* ПРАВАЯ СТОРОНА: Форма */}
+            {/* РџР РђР’РђРЇ РЎРўРћР РћРќРђ: Р¤РѕСЂРјР° */}
             <Animate
               direction="up"
               distance={20}
@@ -85,7 +84,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                       theme.fontBody,
                     )}
                   >
-                    {status === 'sent' ? 'Message sent — check your email client.' : 'Please fill in all required fields.'}
+                    {status === 'sent' ? 'Message sent вЂ” check your email client.' : 'Please fill in all required fields.'}
                   </Animate>
                 )}
                 <div className="space-y-4 flex-1">

@@ -1,4 +1,3 @@
-'use client'
 
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -6,7 +5,7 @@ import type { ThemeConfig } from '@/editor/lib/themes'
 interface SectionLabelProps {
   /**
    * Optional sequential number. When provided it is zero-padded to 2 digits
-   * and prepended:  "02  ·  Introduction"
+   * and prepended:  "02  В·  Introduction"
    */
   num?: number
   label: string
@@ -14,9 +13,9 @@ interface SectionLabelProps {
   className?: string
   /**
    * Layout variant:
-   *  - 'line-label-line'  — rule · text · rule  (symmetric, lumière/memoir style)
-   *  - 'rule-label'       — ─── LABEL           (left-anchored, soleil/chronicle style)
-   *  - 'label-only'       — LABEL               (bare text, no rule)
+   *  - 'line-label-line'  вЂ” rule В· text В· rule  (symmetric, lumiГЁre/memoir style)
+   *  - 'rule-label'       вЂ” в”Ђв”Ђв”Ђ LABEL           (left-anchored, soleil/chronicle style)
+   *  - 'label-only'       вЂ” LABEL               (bare text, no rule)
    */
   variant?: 'line-label-line' | 'rule-label' | 'label-only'
 }
@@ -30,7 +29,7 @@ export function SectionLabel({
 }: SectionLabelProps) {
   const text =
     num !== undefined
-      ? `${String(num).padStart(2, '0')}  ·  ${label}`
+      ? `${String(num).padStart(2, '0')}  В·  ${label}`
       : label
 
   if (variant === 'label-only') {

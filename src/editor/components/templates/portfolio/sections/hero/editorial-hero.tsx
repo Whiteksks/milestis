@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -53,7 +52,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
 
             </div>
 
-            {/* Title — overflows onto photo on desktop */}
+            {/* Title вЂ” overflows onto photo on desktop */}
             <Animate
               direction="left"
               distance={-30}
@@ -71,13 +70,13 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
               </h1>
             </Animate>
 
-            {/* Description — bottom of left col, desktop only */}
+            {/* Description вЂ” bottom of left col, desktop only */}
             <div className="mt-auto pt-14 hidden @md:block">
               {descriptionBlock}
             </div>
           </div>
 
-          {/* RIGHT: photo — vertically centered, clears header with top padding */}
+          {/* RIGHT: photo вЂ” vertically centered, clears header with top padding */}
           {heroImage && (
             <Animate
               direction="right"
@@ -98,7 +97,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
           )}
         </div>
 
-        {/* Description — mobile only, below photo */}
+        {/* Description вЂ” mobile only, below photo */}
         <div className="@md:hidden max-w-7xl mx-auto w-full @lg:px-20 @md:px-12 px-6 pb-10 pt-4">
           {descriptionBlock}
         </div>

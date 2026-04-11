@@ -1,4 +1,3 @@
-'use client'
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
@@ -30,7 +29,7 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
           </Animate>
         </div>
 
-        {/* Project list — alternating editorial layout */}
+        {/* Project list вЂ” alternating editorial layout */}
         <div className="space-y-0">
           {projects.map((project, i) => (
             <div key={i} className="border-t border-current/10 last:border-b">

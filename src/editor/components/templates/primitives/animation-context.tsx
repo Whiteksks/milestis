@@ -1,20 +1,19 @@
-'use client'
 
 /**
- * AnimationContext — unified animation config for all portfolio templates.
+ * AnimationContext вЂ” unified animation config for all portfolio templates.
  *
  * Usage:
  *   1. Wrap a template root with <AnimationProvider templateId="bento" disabled={disableAnimations}>
  *   2. Inside any section/primitive, call `const t = useT()` and use t(duration, delay?) for transitions.
  *
- * Everything — disabled state, template ease, MotionConfig — is handled here.
+ * Everything вЂ” disabled state, template ease, MotionConfig вЂ” is handled here.
  * No prop-threading required.
  */
 
 import { createContext, useContext, useMemo } from 'react'
 import { MotionConfig, type Transition } from 'framer-motion'
 
-// ── Template IDs ──────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Template IDs в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 export type TemplateId =
   | 'bento'
@@ -30,15 +29,15 @@ export type TemplateId =
   | 'magazine'
   | 'soleil'
 
-// ── Eases ─────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Eases в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 /**
  * Two characteristic eases that define the feel split between templates.
  *
- * SPRING → long, elegant tail. Feels weightless and refined.
+ * SPRING в†’ long, elegant tail. Feels weightless and refined.
  *          Used by: editorial, showcase, elegant, minimal, liquid-glass
  *
- * SNAPPY → fast build, assertive punch. Feels decisive and structured.
+ * SNAPPY в†’ fast build, assertive punch. Feels decisive and structured.
  *          Used by: bento, grid
  */
 export const EASE: { spring: [number, number, number, number]; snappy: [number, number, number, number] } = {
@@ -46,20 +45,20 @@ export const EASE: { spring: [number, number, number, number]; snappy: [number, 
   snappy: [0.22, 1, 0.36, 1],
 }
 
-// ── Per-template config ───────────────────────────────────────────────────────
+// в”Ђв”Ђ Per-template config в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 /**
  * Base duration = the default section-enter transition for this template.
  * Internal card stagger delays should still be passed explicitly via t(duration, delay).
  *
  * These values are intentional:
- *   elegant  0.90s spring → feels the slowest and most luxurious
- *   showcase 0.80s spring → cinematic, deliberate
- *   liquid   0.85s spring → fluid, slightly longer than showcase
- *   editorial 0.70s spring → confident, editorial rhythm
- *   minimal  0.65s spring → clean, no excess
- *   grid     0.60s snappy → structured, fast
- *   bento    0.55s snappy → the most energetic — cards pop
+ *   elegant  0.90s spring в†’ feels the slowest and most luxurious
+ *   showcase 0.80s spring в†’ cinematic, deliberate
+ *   liquid   0.85s spring в†’ fluid, slightly longer than showcase
+ *   editorial 0.70s spring в†’ confident, editorial rhythm
+ *   minimal  0.65s spring в†’ clean, no excess
+ *   grid     0.60s snappy в†’ structured, fast
+ *   bento    0.55s snappy в†’ the most energetic вЂ” cards pop
  */
 export const TEMPLATE_CONFIG: Record<
   TemplateId,
@@ -79,7 +78,7 @@ export const TEMPLATE_CONFIG: Record<
   soleil:           { duration: 0.78, ease: EASE.spring },
 }
 
-// ── Context type ──────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Context type в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 export interface AnimationContextValue {
   /** True when animations are disabled for this template instance. */
@@ -96,7 +95,7 @@ export interface AnimationContextValue {
   t: (duration: number, delay?: number, ease?: Transition['ease']) => Transition
 }
 
-// ── Default context (safe fallback when used outside a provider) ───────────────
+// в”Ђв”Ђ Default context (safe fallback when used outside a provider) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 const defaultT: AnimationContextValue['t'] = (duration, delay = 0, ease) => ({
   duration,
@@ -110,7 +109,7 @@ const AnimationContext = createContext<AnimationContextValue>({
   t: defaultT,
 })
 
-// ── Provider ──────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Provider в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 interface AnimationProviderProps {
   children: React.ReactNode
@@ -144,8 +143,8 @@ export function AnimationProvider({
     <AnimationContext.Provider value={value}>
       {/*
         MotionConfig at the provider level:
-        • reducedMotion="always" when disabled → all framer-motion transitions are instant globally
-        • reducedMotion="user" when enabled → respects OS accessibility preference
+        вЂў reducedMotion="always" when disabled в†’ all framer-motion transitions are instant globally
+        вЂў reducedMotion="user" when enabled в†’ respects OS accessibility preference
       */}
       <MotionConfig reducedMotion={disabled ? 'always' : 'user'}>
         {children}
@@ -154,7 +153,7 @@ export function AnimationProvider({
   )
 }
 
-// ── Hooks ─────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Hooks в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 /** Full context. Use when you need both disabled flag and t(). */
 export const useAnimationContext = (): AnimationContextValue =>

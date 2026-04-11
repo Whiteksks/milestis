@@ -1,4 +1,3 @@
-'use client'
 
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
@@ -20,7 +19,7 @@ type Project = {
   frameStyle?: FrameStyle
 }
 
-// ─── Reusable project card ────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Reusable project card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 function ProjectCard({
   project,
@@ -68,7 +67,7 @@ function ProjectCard({
       {/* Hover: darken whole card slightly */}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
 
-      {/* Top row — tags & arrow (appears on hover) */}
+      {/* Top row вЂ” tags & arrow (appears on hover) */}
       <div className={cn(
         'absolute top-0 left-0 right-0 p-4 flex items-start justify-between gap-2',
         'opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0',
@@ -110,7 +109,7 @@ function ProjectCard({
   )
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Main component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -125,7 +124,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
     >
       <div className="max-w-6xl mx-auto space-y-3 w-full">
 
-        {/* ── Header ── */}
+        {/* в”Ђв”Ђ Header в”Ђв”Ђ */}
         <Animate
           delay={0}
           direction="up"
@@ -146,10 +145,10 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
 
         </Animate>
 
-        {/* ── Bento grid ── */}
+        {/* в”Ђв”Ђ Bento grid в”Ђв”Ђ */}
         {projects.length > 0 && (
           <>
-            {/* ─ 1 project: full-width hero ─ */}
+            {/* в”Ђ 1 project: full-width hero в”Ђ */}
             {projects.length === 1 && p1 && (
               <ProjectCard
                 project={p1}
@@ -160,7 +159,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
               />
             )}
 
-            {/* ─ 2 projects: equal halves ─ */}
+            {/* в”Ђ 2 projects: equal halves в”Ђ */}
             {projects.length === 2 && (
               <div className="grid @md:grid-cols-2 grid-cols-1 gap-3">
                 {[p1, p2].map((p, i) => p && (
@@ -176,11 +175,11 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
               </div>
             )}
 
-            {/* ─ 3+ projects: true 2D bento ─ */}
+            {/* в”Ђ 3+ projects: true 2D bento в”Ђ */}
             {projects.length >= 3 && (
               <div className="grid @lg:grid-cols-12 @md:grid-cols-2 grid-cols-1 gap-3">
 
-                {/* [1] Featured — 8 cols, row-span-2 */}
+                {/* [1] Featured вЂ” 8 cols, row-span-2 */}
                 {p1 && (
                   <ProjectCard
                     project={p1}
@@ -195,7 +194,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [2] Top-right — 4 cols */}
+                {/* [2] Top-right вЂ” 4 cols */}
                 {p2 && (
                   <ProjectCard
                     project={p2}
@@ -210,7 +209,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [3] Bottom-right — 4 cols */}
+                {/* [3] Bottom-right вЂ” 4 cols */}
                 {p3 && (
                   <ProjectCard
                     project={p3}
@@ -225,7 +224,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [4+] Bottom row — equal thirds */}
+                {/* [4+] Bottom row вЂ” equal thirds */}
                 {rest.length > 0 && (
                   <div className="@lg:col-span-12 @md:col-span-2 col-span-1 grid @lg:grid-cols-3 @md:grid-cols-2 grid-cols-1 gap-3">
                     {rest.map((project, i) => (

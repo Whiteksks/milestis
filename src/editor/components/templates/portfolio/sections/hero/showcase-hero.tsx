@@ -1,4 +1,3 @@
-'use client'
 
 import { motion } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
@@ -32,7 +31,7 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
             imageClassName="object-cover object-center"
             priority
           />
-          {/* Gradient: bottom-heavy on mobile, left→right on desktop */}
+          {/* Gradient: bottom-heavy on mobile, leftв†’right on desktop */}
           <div
             className="absolute inset-0"
             style={{
