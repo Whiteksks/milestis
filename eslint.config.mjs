@@ -37,6 +37,9 @@ const eslintConfig = [
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_",
       }],
+      // Standard React hydration-guard pattern (useEffect(() => { setMounted(true) }, []))
+      // and effect-based state cleanup are valid use cases — this rule is too strict here.
+      "react-hooks/set-state-in-effect": "off",
     },
   },
 ];

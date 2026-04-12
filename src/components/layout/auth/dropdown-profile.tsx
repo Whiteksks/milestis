@@ -38,6 +38,65 @@ const MENU_GROUPS = [
   }
 ]
 
+// 2. Универсальный рендер контента (вне компонента, чтобы React не пересоздавал его на каждый рендер)
+type MenuContentProps = {
+  displayName: string
+  photoURL: string
+  initials: string
+  onClose: () => void
+  onLogout: () => void
+}
+
+function MenuContent({ displayName, photoURL, initials, onClose, onLogout }: MenuContentProps) {
+  return (
+    <div className="flex flex-col w-full">
+      {/* Header / Profile Info */}
+      <div className="flex items-center gap-2 p-2">
+        <Avatar className="size-10 border ml-2 mt-2">
+          <AvatarImage src={photoURL} alt={displayName} />
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col overflow-hidden">
+          <span className="font-semibold truncate mt-2">{displayName}</span>
+        </div>
+      </div>
+
+      {/* Mapping groups */}
+      {MENU_GROUPS.map((group, idx) => (
+        <div key={group.id}>
+          {idx !== 0 && <hr className="my-2 opacity-50 mx-2" />}
+          <div className="space-y-1 px-2">
+            {group.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className="flex items-center gap-3 p-2 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+              >
+                <item.icon className="size-4 text-muted-foreground" />
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <hr className="my-2 opacity-50 mx-2" />
+
+      {/* Logout Action */}
+      <div className="px-2 pb-2">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+        >
+          <LogOutIcon className="size-4" />
+          Logout
+        </button>
+      </div>
+    </div>
+  )
+}
+
 type Props = {
   trigger: ReactNode
   align?: 'start' | 'center' | 'end'
@@ -63,67 +122,23 @@ const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
     }
   }
 
-
-  
-  // 2. Универсальный рендер контента
-  const MenuContent = () => (
-    <div className="flex flex-col w-full">
-      {/* Header / Profile Info */}
-      <div className="flex items-center gap-2 p-2">
-        <Avatar className="size-10 border ml-2 mt-2">
-          <AvatarImage src={photoURL} alt={displayName} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col overflow-hidden">
-          <span className="font-semibold truncate mt-2">{displayName}</span>
-        </div>
-      </div>
-
-      {/* Mapping groups */}
-      {MENU_GROUPS.map((group, idx) => (
-        <div key={group.id}>
-          {idx !== 0 && <hr className="my-2 opacity-50 mx-2" />}
-          <div className="space-y-1 px-2">
-            {group.items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 p-2 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
-              >
-                <item.icon className="size-4 text-muted-foreground" />
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))}
-
-      <hr className="my-2 opacity-50 mx-2" />
-
-      {/* Logout Action */}
-      <div className="px-2 pb-2">
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
-        >
-          <LogOutIcon className="size-4" />
-          Logout
-        </button>
-      </div>
-    </div>
-  )
+  const menuProps: MenuContentProps = {
+    displayName,
+    photoURL,
+    initials,
+    onClose: () => setOpen(false),
+    onLogout: handleLogout,
+  }
 
   // 3. Условный рендеринг обертки
-    // 3. Условный рендеринг обертки
   if (isMobile) {
     return (
       <MobileDrawer
         open={open}
         onOpenChange={setOpen}
-        trigger={trigger} 
+        trigger={trigger}
       >
-        <MenuContent />
+        <MenuContent {...menuProps} />
       </MobileDrawer>
     )
   }
@@ -132,7 +147,7 @@ const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent className="w-64 p-0" align={align}>
-        <MenuContent />
+        <MenuContent {...menuProps} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

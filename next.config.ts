@@ -37,7 +37,6 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: false },
   async headers() {
     return [

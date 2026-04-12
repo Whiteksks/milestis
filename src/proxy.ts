@@ -50,7 +50,7 @@ const AUTH_REQUIRED = ['/dashboard', '/account', '/design'];
 /** Routes that should redirect authenticated users away (auth pages) */
 const AUTH_PAGES = ['/auth'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Bot / scanner trap — return bare 404 before any processing ───────────

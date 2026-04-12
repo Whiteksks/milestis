@@ -153,6 +153,7 @@ export function SectionsTab() {
           "p-6 w-full transition-all duration-300 ease-in-out",
           !currentSection?.visible && "opacity-10 blur-sm pointer-events-none grayscale select-none"
         )}>
+          {/* eslint-disable-next-line react-hooks/static-components -- intentional: memoized dynamic component */}
           {SettingsComponent ? <SettingsComponent /> : null}
         </div>
       </div>
