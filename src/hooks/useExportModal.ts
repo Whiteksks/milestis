@@ -41,14 +41,10 @@ export function useExportModal(projectId: string, mode: 'portfolio' | 'photobook
         setSlugStatus('invalid')
         return
       }
-      // Photobook slugs are not required to be globally unique.
-      if (mode === 'photobook') {
-        setSlugStatus('available')
-        return
-      }
+      // Photobook slugs are checked within the photobook namespace.
       setSlugStatus('checking')
       try {
-        const params = new URLSearchParams({ slug: value, excludeProjectId: projectId })
+        const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
         const res = await fetch(`/api/projects/check-slug?${params}`)
         const data = await res.json()
         setSlugStatus(data.available ? 'available' : 'taken')

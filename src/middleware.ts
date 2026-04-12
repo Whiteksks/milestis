@@ -7,6 +7,25 @@ const intlMiddleware = createMiddleware(routing);
 const LOCALES = ['en', 'ru', 'kz'];
 const SESSION_COOKIE = 'milestis_session';
 
+/**
+ * Bot/scanner trap patterns — instant 404, no page rendering.
+ * Covers WordPress scanners, PHP probes, secrets hunters, etc.
+ */
+const TRASH_PATTERNS = [
+  /\.php($|\?)/i,
+  /\.aspx($|\?)/i,
+  /\.env($|\?)/i,
+  /\.git(\/|$)/i,
+  /\/wp-admin(\/|$)/i,
+  /\/wp-content(\/|$)/i,
+  /\/wp-includes(\/|$)/i,
+  /\/cgi-bin(\/|$)/i,
+  /\/\.well-known(\/|$)/i,
+  /\/config\.json($|\?)/i,
+  /\/xmlrpc\.php/i,
+  /\/wp-login\.php/i,
+];
+
 /** Routes under construction — always 404 */
 const BLOCKED_PAGES = [
   'dashboard/analytics',
@@ -33,6 +52,12 @@ const AUTH_PAGES = ['/auth'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ── Bot / scanner trap — return bare 404 before any processing ───────────
+  if (TRASH_PATTERNS.some((re) => re.test(pathname))) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // Firebase App Hosting may rewrite the Host header — check x-forwarded-host first
   const host =
     request.headers.get('x-forwarded-host') ??
@@ -40,15 +65,19 @@ export function middleware(request: NextRequest) {
     ''
 
   // ── Subdomain rewrite: {slug}.milestis.site → /sites/{slug} ──────────────
+  // Mode = portfolio (custom subdomain)
   const subdomainMatch = host.match(/^([a-z0-9-]+)\.milestis\.site(?::\d+)?$/);
   if (subdomainMatch) {
     const slug = subdomainMatch[1];
     const url = request.nextUrl.clone();
     url.pathname = `/sites/${slug}`;
-    return NextResponse.rewrite(url);
+    const reqHeaders = new Headers(request.headers);
+    reqHeaders.set('x-milestis-mode', 'portfolio');
+    return NextResponse.rewrite(url, { request: { headers: reqHeaders } });
   }
 
   // ── milestis.site → published projects only ───────────────────────────────
+  // Mode = photobook (path-based slug)
   const isMilestisSite = host === 'milestis.site' || /^milestis\.site:\d+$/.test(host);
   if (isMilestisSite) {
     // Root with no slug → redirect to main site
@@ -58,7 +87,9 @@ export function middleware(request: NextRequest) {
     // /my-slug (and anything deeper) → /sites/my-slug
     const url = request.nextUrl.clone();
     url.pathname = `/sites${pathname}`;
-    return NextResponse.rewrite(url);
+    const reqHeaders = new Headers(request.headers);
+    reqHeaders.set('x-milestis-mode', 'photobook');
+    return NextResponse.rewrite(url, { request: { headers: reqHeaders } });
   }
 
   // ── Blocked pages (under construction) ─────────────────────────────────────
@@ -111,5 +142,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
+  // Catch everything except Next.js internals and static assets.
+  // The broader matcher lets us intercept bot probes with dotted extensions
+  // (e.g. /wp-admin/setup.php) before Next.js attempts to render a page.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

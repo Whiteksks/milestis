@@ -47,7 +47,7 @@ export function LiquidGlassFooter({ theme, sectionContent }: LiquidGlassFooterPr
               ))}
             </div>
             <p className={cn('text-[10px] uppercase tracking-[0.2em] text-white/30', theme.fontBody)}>
-              Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}
+              © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
           </Animate>
 

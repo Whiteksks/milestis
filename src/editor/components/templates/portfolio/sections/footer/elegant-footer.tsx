@@ -3,7 +3,6 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
-import { Animate } from '../../../primitives/animate'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 
 type ElegantFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
@@ -20,22 +19,15 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-10">
         <div className="flex flex-col @md:flex-row items-center justify-between gap-6">
           {/* Left: copyright */}
-          <Animate
-            direction="up"
-            distance={5}
+          <div
             className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}
           >
-            <p>Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
-          </Animate>
+            <p>© {new Date().getFullYear()} {sectionContent.footer.copyright}</p>
+          </div>
 
           {/* Right: social icons */}
           {(sectionContent.footer?.socialLinks ?? []).length > 0 && (
-            <Animate
-              direction="up"
-              distance={5}
-              delay={0.1}
-              className="flex items-center gap-6"
-            >
+            <div className="flex items-center gap-6">
               {(sectionContent.footer?.socialLinks ?? []).map((link, i) => (
                 <SocialIconLink
                   key={i}
@@ -45,7 +37,7 @@ export function ElegantFooter({ theme, sectionContent }: ElegantFooterProps) {
                   className="opacity-25 hover:opacity-60 transition-opacity duration-300"
                 />
               ))}
-            </Animate>
+            </div>
           )}
         </div>
       </div>

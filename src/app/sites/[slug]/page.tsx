@@ -1,5 +1,6 @@
 ﻿import { notFound } from "next/navigation"
 import { createHash } from "crypto"
+import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
 import { PublishedView, TokenGateForm } from "./published-view"
@@ -11,12 +12,13 @@ interface Props {
   searchParams: Promise<Record<string, string | string[]>>
 }
 
-// --- Lookup by slug (Firestore query) ---
+// --- Lookup by slug + mode (Firestore query) ---
 
-async function getPublishedProjectBySlug(slug: string) {
+async function getPublishedProjectBySlug(slug: string, mode: "portfolio" | "photobook") {
   const snap = await adminDb
     .collection("published_projects")
     .where("slug", "==", slug)
+    .where("mode", "==", mode)
     .limit(1)
     .get()
 
@@ -45,7 +47,9 @@ function verifyToken(incoming: string, stored: string): boolean {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const project = await getPublishedProjectBySlug(slug)
+  const reqHeaders = await headers()
+  const mode = (reqHeaders.get('x-milestis-mode') ?? 'portfolio') as "portfolio" | "photobook"
+  const project = await getPublishedProjectBySlug(slug, mode)
 
   if (!project) return { title: "Not found" }
 
@@ -61,7 +65,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SitePage({ params, searchParams }: Props) {
   const { slug } = await params
-  const project = await getPublishedProjectBySlug(slug)
+  const reqHeaders = await headers()
+  const mode = (reqHeaders.get('x-milestis-mode') ?? 'portfolio') as "portfolio" | "photobook"
+  const project = await getPublishedProjectBySlug(slug, mode)
 
   if (!project) notFound()
 

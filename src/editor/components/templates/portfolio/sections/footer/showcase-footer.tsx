@@ -32,7 +32,7 @@ export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
         <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-center justify-between gap-6">
           {/* Left: copyright */}
           <p className={cn('text-[10px] uppercase tracking-[0.15em] opacity-20', theme.fontBody)}>
-            Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}
+            © {new Date().getFullYear()} {sectionContent.footer.copyright}
           </p>
 
           {/* Right: social icons */}

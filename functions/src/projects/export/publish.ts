@@ -101,11 +101,14 @@ export async function applyPublish(
 		);
 	}
 
-	// Slugs must be globally unique across all modes (portfolios become subdomains;
-	// photobooks use slug as the URL path — neither can share a slug with any other project).
+	// Slugs must be unique within the same mode namespace:
+	// - portfolio slugs → subdomains (abc.milestis.site)
+	// - photobook slugs → URL paths (milestis.site/abc)
+	// The two namespaces are independent, so a portfolio and a photobook may share a slug.
 	const existing = await db
 		.collection("published_projects")
 		.where("slug", "==", slug)
+		.where("mode", "==", mode)
 		.limit(2)
 		.get();
 	const takenByOther = existing.docs.some((doc) => doc.id !== projectId);

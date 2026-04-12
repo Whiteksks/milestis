@@ -38,14 +38,10 @@ export function usePublishModal(projectId: string, mode: 'portfolio' | 'photoboo
         setSlugStatus('invalid')
         return
       }
-      // Photobooks don't require unique slugs
-      if (mode === 'photobook') {
-        setSlugStatus('available')
-        return
-      }
+      // Photobooks: uniqueness is checked within the photobook namespace
       setSlugStatus('checking')
       try {
-        const params = new URLSearchParams({ slug: value, excludeProjectId: projectId })
+        const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
         const res = await fetch(`/api/projects/check-slug?${params}`)
         const data = await res.json()
         setSlugStatus(data.available ? 'available' : 'taken')

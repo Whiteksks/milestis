@@ -46,13 +46,13 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
-      {
-        // Long-term cache for immutable Next.js assets
-        source: "/_next/static/(.*)",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-        ],
-      },
+      // {
+      //   // Long-term cache for immutable Next.js assets
+      //   source: "/_next/static/(.*)",
+      //   headers: [
+      //     { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+      //   ],
+      // },
     ]
   },
   images: {

@@ -4,7 +4,6 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SocialIconLink } from '@/editor/components/templates/portfolio/social-icon'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { Animate } from '../../../primitives/animate'
 
 type GridFooterProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
@@ -20,16 +19,14 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
     >
       <div className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6">
         <div className="max-w-6xl mx-auto">
-          <Animate
-            direction="up"
-            distance={5}
+          <div
             className={cn(
               'rounded-2xl border border-current/8 px-6 py-5',
               'flex @md:flex-row flex-col items-start @md:items-center justify-between gap-4',
               theme.card,
             )}>
             <p className={cn('text-[10px] uppercase tracking-[0.2em] opacity-25', theme.fontBody)}>
-              Р’В© {new Date().getFullYear()} {sectionContent.footer.copyright}
+              © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
 
             {/* Right: social icons */}
@@ -47,7 +44,7 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
               </div>
             )}
 
-          </Animate>
+          </div>
         </div>
       </div>
     </SectionWrapper>

@@ -105,8 +105,3 @@ env:
   #   secret: firebase-admin-private-key
   #   availability:
   #     - RUNTIME
-
-  - variable: EXPORT_RENDER_SECRET
-    secret: export-render-secret
-    availability:
-      - RUNTIME
