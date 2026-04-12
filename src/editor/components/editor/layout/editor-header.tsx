@@ -41,7 +41,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const {
     deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean,
     isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode,
-    isExported,
+    isExported, setIsPreviewOpen,
   } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
@@ -56,6 +56,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     publishedAccessToken: state.publishedAccessToken,
     editorMode: state.editorMode,
     isExported: state.isExported,
+    setIsPreviewOpen: state.setIsPreviewOpen,
   }))
 
   const [localName, setLocalName] = useState(projectName ?? '')
@@ -259,6 +260,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setIsPreviewOpen(true)}
             className="gap-2 text-muted-foreground hover:text-foreground hidden sm:inline-flex rounded-full h-8 px-4 transition-all text-xs font-medium"
           >
             <Eye className="h-3.5 w-3.5" />

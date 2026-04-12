@@ -57,6 +57,9 @@ export interface UiStore {
   isDirty: boolean
   markDirty: () => void
   markClean: () => void
+
+  isPreviewOpen: boolean
+  setIsPreviewOpen: (open: boolean) => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -82,6 +85,7 @@ export const useUiStore = create<UiStore>((set) => ({
   publishedSlug: null,
   publishedAccessToken: null,
   isDirty: false,
+  isPreviewOpen: false,
 
   setDeviceView: (view) => set({ deviceView: view }),
 
@@ -130,4 +134,6 @@ export const useUiStore = create<UiStore>((set) => ({
 
   markDirty: () => set(() => ({ isDirty: true })),
   markClean: () => set(() => ({ isDirty: false })),
+
+  setIsPreviewOpen: (open) => set(() => ({ isPreviewOpen: open })),
 }))

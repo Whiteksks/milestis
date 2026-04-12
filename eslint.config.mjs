@@ -1,16 +1,19 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import nextConfig from "eslint-config-next";
+import nextTs from "eslint-config-next/typescript";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
+// eslint-plugin-react@7 (bundled in eslint-config-next) не совместим с ESLint 10 —
+// фильтруем его плагин и правила react/* из базового конфига.
+const filteredNextConfig = nextConfig.map((entry) => {
+  if (!entry.plugins) return entry;
+  const { react: _react, ...otherPlugins } = entry.plugins;
+  const filteredRules = Object.fromEntries(
+    Object.entries(entry.rules ?? {}).filter(([key]) => !key.startsWith("react/"))
+  );
+  return { ...entry, plugins: otherPlugins, rules: filteredRules };
 });
 
 const eslintConfig = [
-  // 1. Игнорируемые файлы (вместо globalIgnores)
+  // 1. Игнорируемые файлы
   {
     ignores: [
       "node_modules/**",
@@ -22,11 +25,11 @@ const eslintConfig = [
     ],
   },
 
-  // 2. Правила Next.js и TypeScript через адаптер
-  // Это автоматически подтянет и core-web-vitals, и настройки для TS
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // 2. Next.js + TypeScript (без eslint-plugin-react@7 несовместимого с ESLint 10)
+  ...filteredNextConfig,
+  ...nextTs,
 
-  // 3. Твои дополнительные настройки (если нужны)
+  // 3. Дополнительные настройки
   {
     rules: {
       "@typescript-eslint/no-unused-vars": ["warn", {

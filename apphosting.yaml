@@ -1,10 +1,10 @@
 runConfig:
-  runtime: nodejs20
+  runtime: nodejs24
   concurrency: 80
   cpu: 1
-  memoryMiB: 512
+  memoryMiB: 1024
   minInstances: 0
-  maxInstances: 100
+  maxInstances: 50
 
 env:
   # ── Public Firebase config (safe to commit) ───────────────────────────────

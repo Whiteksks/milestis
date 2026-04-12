@@ -24,6 +24,7 @@ import { useThemeStore } from '@/editor/lib/store-theme'
 import { defaultPortfolioContent, defaultPortfolioVisibility } from '@/editor/lib/store-content-portfolio'
 import { defaultPhotobookContent, defaultPhotobookVisibility } from '@/editor/lib/store-content-photobook'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
+import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
 
 type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
 
@@ -253,6 +254,8 @@ export default function EditorPage() {
       <DesignCatalogModal />
       {/* Upload/manage images */}
       <MediaLibraryModal mode="manage" />
+      {/* Full-screen preview — renders the real PublishedView with current store state */}
+      <PreviewOverlay />
     </div>
   )
 }
