@@ -24,9 +24,8 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
       id="introduction"
       themeForeground={theme.foreground}
       className={theme.background}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32">
 
         {/* Editorial header */}
         <div className="mb-12 @md:mb-16">
@@ -110,6 +109,7 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
             </div>
           )}
         </div>
+      </div>
     </SectionWrapper>
   )
 }

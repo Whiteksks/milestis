@@ -13,7 +13,6 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
     <SectionWrapper
       id="bio"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 py-20 @md:py-32">

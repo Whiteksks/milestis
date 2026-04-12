@@ -25,7 +25,6 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
         '@container relative min-h-screen flex flex-col overflow-hidden',
         !hasImage && theme.background,
       )}
-      padded={false}
     >
       {/* Full-bleed background */}
       {hasImage && (

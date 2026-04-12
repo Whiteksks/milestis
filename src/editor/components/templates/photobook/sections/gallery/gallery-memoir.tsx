@@ -22,9 +22,8 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
       id="gallery"
       themeForeground={theme.foreground}
       className={theme.background}
-      padded={false}
-      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28">
 
         {/* Header */}
         <Animate direction="up" distance={20} className="mb-12 @md:mb-16">
@@ -88,6 +87,7 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
             ))}
           </div>
         )}
+      </div>
     </SectionWrapper>
   )
 }

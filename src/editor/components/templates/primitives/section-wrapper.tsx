@@ -9,18 +9,7 @@ interface SectionWrapperProps extends HTMLMotionProps<'section'> {
   id: string
   children: React.ReactNode
   className?: string
-  /**
-   * Extra classes applied to the inner max-width container.
-   * Only has effect when padded={true} (the default).
-   */
-  containerClassName?: string
   themeForeground?: string
-  /**
-   * When true (default) wraps children in a max-width container with
-   * standard horizontal and vertical padding.
-   * Set to false for sections that control their own layout (footers, etc.).
-   */
-  padded?: boolean
   as?: React.ElementType
 }
 
@@ -28,9 +17,7 @@ export function SectionWrapper({
   id,
   children,
   className,
-  containerClassName,
   themeForeground,
-  padded = true,
   as: Component = motion.section,
   ...props
 }: SectionWrapperProps) {
@@ -71,19 +58,7 @@ export function SectionWrapper({
       {...animationProps}
       {...props}
     >
-      {padded ? (
-        <div
-          className={cn(
-            'max-w-7xl mx-auto',
-            '@lg:px-20 @md:px-12 px-6 @lg:py-16 @md:py-14 py-10',
-            containerClassName,
-          )}
-        >
-          {children}
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </MotionComponent>
   )
 }

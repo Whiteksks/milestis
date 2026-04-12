@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
@@ -21,9 +20,8 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
       id="story"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="max-w-3xl px-8 @md:px-0 py-20 @md:py-28"
     >
+      <div className="max-w-3xl mx-auto px-8 @md:px-0 py-20 @md:py-28">
 
         {/* Section header */}
         <div className="flex items-center gap-4 mb-14 @md:mb-20">
@@ -116,7 +114,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
             </div>
           )
         })}
-
+      </div>
     </SectionWrapper>
   )
 }

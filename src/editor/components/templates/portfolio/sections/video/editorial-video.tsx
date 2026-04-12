@@ -12,7 +12,7 @@ type EditorialVideoProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionConten
 
 export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
   return (
-    <SectionWrapper id="video" themeForeground={theme.foreground} padded={false}>
+    <SectionWrapper id="video" themeForeground={theme.foreground}>
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-24 @md:py-20 py-14">
         <div className="max-w-7xl mx-auto space-y-14">
 

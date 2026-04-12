@@ -35,7 +35,6 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
       <SectionWrapper
         id="hero"
         themeForeground={theme.foreground}
-        padded={false} // Custom padding for hero
         className="min-h-[88vh] flex flex-col justify-center overflow-hidden"
       >
         {/* Main grid: 2 cols on desktop, stack on mobile */}

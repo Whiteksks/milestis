@@ -24,7 +24,6 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
     <SectionWrapper
       id="hero"
       themeForeground={theme.foreground}
-      padded={false}
       className="@lg:px-6 @md:px-5 px-4 pt-20 @md:pt-24 pb-4"
     >
       <div className="max-w-6xl mx-auto w-full">

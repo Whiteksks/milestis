@@ -16,7 +16,6 @@ export function BentoFooter({ theme, sectionContent }: BentoFooterProps) {
       id="footer"
       as="footer"
       themeForeground={theme.foreground}
-      padded={false}
       className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6"
     >
       <div className="max-w-6xl mx-auto w-full">

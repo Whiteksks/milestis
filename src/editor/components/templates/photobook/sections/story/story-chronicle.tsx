@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -22,9 +21,8 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
       id="story"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
         {/* Section header */}
         <div className="mb-16 @md:mb-20">
@@ -136,6 +134,7 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
         {moments.length === 0 && (
           <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
+      </div>
     </SectionWrapper>
   )
 }

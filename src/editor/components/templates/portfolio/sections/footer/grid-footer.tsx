@@ -14,7 +14,6 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
     <SectionWrapper
       id="footer"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="@lg:px-6 @md:px-5 px-4 pt-3 pb-6">

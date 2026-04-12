@@ -25,9 +25,8 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
       id="highlight"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="max-w-3xl px-8 @md:px-0 flex flex-col items-center text-center py-20 @md:py-28"
     >
+      <div className="max-w-3xl mx-auto px-8 @md:px-0 flex flex-col items-center text-center py-20 @md:py-28">
 
         {/* Section header */}
         <div className="flex items-center gap-4 mb-14 w-full">
@@ -96,6 +95,7 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
             </blockquote>
           </>
         )}
+      </div>
     </SectionWrapper>
   )
 }

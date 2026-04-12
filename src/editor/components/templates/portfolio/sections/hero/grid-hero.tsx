@@ -24,7 +24,6 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
     <SectionWrapper
       id="hero"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container pt-20 @md:pt-24 pb-3"
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8 w-full">

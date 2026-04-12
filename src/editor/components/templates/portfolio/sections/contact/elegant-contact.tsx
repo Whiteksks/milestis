@@ -14,7 +14,6 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
     <SectionWrapper
       id="contact"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="max-w-3xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">

@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -21,9 +20,8 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
       id="story"
       themeForeground={theme.foreground}
       className={theme.muted}
-      padded={false}
-      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28">
 
         {/* Section header */}
         <div className="mb-20 @md:mb-28">
@@ -128,6 +126,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
         {moments.length === 0 && (
           <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
         )}
+      </div>
     </SectionWrapper>
   )
 }

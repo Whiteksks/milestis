@@ -16,7 +16,6 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
     <SectionWrapper
       id="contact"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         {/* Section header */}

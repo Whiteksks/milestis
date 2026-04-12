@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
@@ -17,19 +16,24 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
   const { cover } = sectionContent
   const imageUrl = cover.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
+
+  // Константы стилей для уменьшения вложенности в JSX
+  const textContrast = hasImage ? 'text-white' : ''
+  const subTextContrast = hasImage ? 'text-white/50' : 'opacity-50'
+  const paddingX = 'px-8 @md:px-14 @lg:px-20'
+
   return (
     <SectionWrapper
       id="cover"
       themeForeground={!hasImage ? theme.foreground : undefined}
       className={cn(
-        '@container relative min-h-screen flex flex-col overflow-hidden',       
-        !hasImage && theme.background,
+        'relative min-h-screen flex flex-col overflow-hidden',
+        !hasImage && theme.background
       )}
-      padded={false}
     >
-      {/* Full-bleed background photo */}
+      {/* Background Layer */}
       {hasImage && (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 z-0">
           <SiteImage
             fillParent
             unoptimized
@@ -39,65 +43,52 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
             imageClassName="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
         </div>
       )}
 
-      {/* Masthead top bar */}
-      <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10">
-        <div className="flex items-center gap-3">
-          <div className={cn('h-px w-8', hasImage ? 'bg-white/40' : theme.accent)} />
-          <span
-            className={cn(
-              'text-[9px] uppercase tracking-[0.3em]',
-              hasImage ? 'text-white/50' : 'opacity-40',
-              theme.fontBody,
-            )}
-          >
+      {/* Header */}
+      <Animate 
+        trigger="mount" 
+        className={cn('relative z-10 flex items-center justify-between pt-8 @md:pt-10', paddingX)}
+      >
+        <div className="flex items-center gap-4">
+          <div className={cn('h-[1px] w-10 transition-all', hasImage ? 'bg-white/40' : theme.accent)} />
+          <span className={cn('text-[10px] uppercase tracking-[0.4em]', subTextContrast, theme.fontBody)}>
             Chronicle
           </span>
         </div>
+        
         {(cover.date || cover.location) && (
-          <p
-            className={cn(
-              'text-[9px] uppercase tracking-[0.18em]',
-              hasImage ? 'text-white/40' : 'opacity-30',
-              theme.letterSpacing,
-              theme.fontBody,
-            )}
-          >
-            {[cover.date, cover.location].filter(Boolean).join('  В·  ')}
+          <p className={cn('text-[10px] uppercase tracking-widest', subTextContrast, theme.fontBody)}>
+            {[cover.date, cover.location].filter(Boolean).join('  •  ')}
           </p>
         )}
       </Animate>
 
-      {/* Bottom section */}
-      <div className="relative z-10 flex-1 flex flex-col justify-end px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-20 @lg:pb-28">
+      {/* Hero Content */}
+      <div className={cn('relative z-10 flex-1 flex flex-col justify-end pb-12 @md:pb-20 @lg:pb-28', paddingX)}>
+        <Animate trigger="mount" direction="none" className="w-full">
+          <div className={cn('h-[2px] w-24 mb-10', hasImage ? 'bg-white/30' : theme.accent)} />
+        </Animate>
 
-        {/* Thick accent rule */}
-        <Animate trigger="mount" direction="none" className={cn('h-[2px] origin-left mb-8', hasImage ? 'bg-white/30' : theme.accent)} />
-
-        <Animate trigger="mount" delay={0.25} distance={40} className="space-y-5">
-          <h1
-            className={cn(
-              'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[7rem]',
-              'font-bold tracking-tight leading-[0.88] max-w-[16ch]',
-              hasImage ? 'text-white' : '',
-              theme.fontTitle,
-            )}
-          >
+        <Animate trigger="mount" delay={0.2} distance={30} className="space-y-6">
+          <h1 className={cn(
+            'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[8rem]',
+            'font-bold tracking-tighter leading-[0.85] max-w-[15ch]',
+            textContrast,
+            theme.fontTitle
+          )}>
             {cover.title}
           </h1>
 
           {(cover.subtitle || cover.tagline) && (
-            <p
-              className={cn(
-                'text-sm @md:text-base font-light max-w-[34ch]',
-                hasImage ? 'text-white/55' : 'opacity-55',
-                theme.lineHeight,
-                theme.fontBody,
-              )}
-            >
+            <p className={cn(
+              'text-base @md:text-lg font-light max-w-[40ch] border-l border-white/10 pl-6',
+              subTextContrast,
+              theme.lineHeight,
+              theme.fontBody
+            )}>
               {cover.subtitle || cover.tagline}
             </p>
           )}

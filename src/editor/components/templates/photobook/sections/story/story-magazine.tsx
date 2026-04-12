@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -21,9 +20,8 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
       id="story"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
       {/* Magazine section header */}
       <div className="mb-16 @md:mb-24">
@@ -125,6 +123,7 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
         </div>
       )}
 
+      </div>
     </SectionWrapper>
   )
 }

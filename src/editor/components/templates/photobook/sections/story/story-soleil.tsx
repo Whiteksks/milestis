@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -23,9 +22,8 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
       id="story"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-20 @md:py-28"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-20 @md:py-28">
       <SectionLabel num={3} label="Story" theme={theme} variant="rule-label" className="mb-12 @md:mb-16" />
 
       {/* Story meta */}
@@ -111,6 +109,7 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
           })}
         </div>
       )}
+      </div>
     </SectionWrapper>
   )
 }

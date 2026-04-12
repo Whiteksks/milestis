@@ -22,8 +22,6 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
       id="highlight"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-none p-0"
     >
 
       {/* Cinematic photo panel */}

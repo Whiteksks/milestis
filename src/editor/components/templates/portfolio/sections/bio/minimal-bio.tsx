@@ -14,7 +14,6 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
     <SectionWrapper
       id="bio"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <div className="max-w-3xl mx-auto px-6 @md:px-10 py-20 @md:py-28">
         {/* Section header row */}

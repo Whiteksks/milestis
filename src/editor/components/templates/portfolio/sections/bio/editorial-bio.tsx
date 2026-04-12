@@ -15,7 +15,8 @@ type EditorialBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'
 export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
   return (
     <SectionWrapper id="bio" themeForeground={theme.foreground}>
-      
+      <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-16 @md:py-14 py-10">
+
       {/* Top Label & Line */}
       <EditorialLabel themeFont={theme.fontBody} className="mb-12">
         {sectionContent.bio.subtitle || 'Profile'}
@@ -78,6 +79,7 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
         <EditorialDivider />
       </div>
 
+      </div>
     </SectionWrapper>
   )
 }

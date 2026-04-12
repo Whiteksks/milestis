@@ -22,8 +22,6 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
       id="highlight"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="max-w-none"
     >
 
       {/* Full-bleed feature photo */}

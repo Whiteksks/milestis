@@ -28,7 +28,6 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
         '@container relative min-h-screen flex flex-col overflow-hidden',       
         theme.background,
       )}
-      padded={false}
     >
       {/* Full-bleed background */}
       {hasImage && (

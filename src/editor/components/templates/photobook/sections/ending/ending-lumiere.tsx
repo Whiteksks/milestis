@@ -25,8 +25,6 @@ export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
       id="ending"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-none flex flex-col min-h-screen"
     >
       {/* Top decorative rule */}
       <div className="px-8 @md:px-16 pt-10 @md:pt-14">

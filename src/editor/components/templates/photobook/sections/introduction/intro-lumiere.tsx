@@ -26,9 +26,8 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
       id="introduction"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-2xl px-8 @md:px-0 text-center space-y-12 @md:space-y-16 py-20 @md:py-28"
     >
+      <div className="max-w-2xl mx-auto px-8 @md:px-0 text-center space-y-12 @md:space-y-16 py-20 @md:py-28">
 
         {/* Section header */}
         <div className="flex items-center gap-4">
@@ -101,6 +100,7 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
             )}
           </div>
         )}
+      </div>
     </SectionWrapper>
   )
 }

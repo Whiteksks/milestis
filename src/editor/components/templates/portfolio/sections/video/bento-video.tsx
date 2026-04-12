@@ -15,7 +15,6 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
     <SectionWrapper
       id="video"
       themeForeground={theme.foreground}
-      padded={false}
       className="@lg:px-6 @md:px-5 px-4 py-3"
     >
       <div className="max-w-6xl mx-auto w-full">

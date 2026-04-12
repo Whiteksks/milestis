@@ -26,7 +26,6 @@ export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
         'px-8 @md:px-16 @lg:px-24 py-16',
         theme.background,
       )}
-      padded={false}
     >
 
       {/* Framed photo */}

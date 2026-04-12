@@ -24,8 +24,6 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
       id="ending"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-none flex flex-col justify-between min-h-screen py-12 @md:py-16"
     >
       {/* Top rule */}
       <div className="max-w-7xl mx-auto w-full px-8 @md:px-12 @lg:px-20">

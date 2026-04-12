@@ -13,7 +13,6 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
     <SectionWrapper
       id="featured-work"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container py-20"
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">

@@ -22,9 +22,8 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
       id="gallery"
       themeForeground={theme.foreground}
       className={theme.background}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
       {/* Magazine spread header */}
       <div className="mb-10 @md:mb-14">
@@ -118,6 +117,7 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
           )}
         </div>
       )}
+      </div>
     </SectionWrapper>
   )
 }

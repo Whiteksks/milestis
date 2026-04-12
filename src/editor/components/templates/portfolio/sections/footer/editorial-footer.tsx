@@ -16,7 +16,6 @@ export function EditorialFooter({ theme, sectionContent }: EditorialFooterProps)
       id="footer"
       as="footer"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <EditorialDivider className="w-full" />
       <div className="@lg:px-20 @md:px-12 px-6 py-8">

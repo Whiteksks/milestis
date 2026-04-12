@@ -14,7 +14,6 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
     <SectionWrapper
       id="video"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="@lg:px-6 @md:px-5 px-4 py-3">

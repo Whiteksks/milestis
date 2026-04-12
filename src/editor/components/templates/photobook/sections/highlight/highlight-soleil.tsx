@@ -27,8 +27,6 @@ export function HighlightSoleil({ sectionContent, theme }: HighlightSoleilProps)
       id="highlight"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="py-20 @md:py-28"
     >
       {/* Section label вЂ” full width */}
       <div className="px-8 @md:px-14 @lg:px-20 mb-12 @md:mb-16">

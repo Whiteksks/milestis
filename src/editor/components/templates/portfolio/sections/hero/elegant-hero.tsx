@@ -15,7 +15,6 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
     <SectionWrapper
       id="hero"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container pt-12 pb-16 @md:pb-24"
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 text-center">

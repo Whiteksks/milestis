@@ -26,9 +26,8 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
       id="highlight"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="px-8 @md:px-12 @lg:px-20 py-16 @md:py-24 @lg:py-32"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-16 @md:py-24 @lg:py-32">
 
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
@@ -103,6 +102,7 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
             )}
           </div>
         </div>
+      </div>
     </SectionWrapper>
   )
 }

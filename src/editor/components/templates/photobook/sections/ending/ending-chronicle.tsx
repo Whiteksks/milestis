@@ -24,8 +24,6 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
       id="ending"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
-      padded={false}
-      containerClassName="max-w-none flex flex-col min-h-screen py-12 @md:py-16"
     >
       <div className="max-w-7xl mx-auto w-full px-8 @md:px-14 @lg:px-20 flex flex-col gap-10 @md:gap-14">
 

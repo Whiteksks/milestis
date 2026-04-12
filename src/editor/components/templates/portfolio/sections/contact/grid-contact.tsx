@@ -14,7 +14,6 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
     <SectionWrapper
       id="contact"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container py-16"
     >
         <div className="max-w-6xl mx-auto">

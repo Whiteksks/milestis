@@ -14,7 +14,6 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
     <SectionWrapper
       id="work"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
 

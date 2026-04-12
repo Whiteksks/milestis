@@ -25,9 +25,8 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
       id="introduction"
       themeForeground={theme.foreground}
       className={theme.background}
-      padded={false}
-      containerClassName="px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-36"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-36">
 
         {/* Section label */}
         <Animate direction="up" distance={20} className="flex items-center gap-4 mb-16 @md:mb-20">
@@ -91,6 +90,7 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
             </Animate>
           )}
         </div>
+      </div>
     </SectionWrapper>
   )
 }

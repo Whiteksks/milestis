@@ -26,8 +26,6 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
       id="ending"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-none flex flex-col min-h-screen"
     >
       {/* Top thin rule */}
       <div className="px-8 @md:px-14 @lg:px-20 pt-12 @md:pt-16">

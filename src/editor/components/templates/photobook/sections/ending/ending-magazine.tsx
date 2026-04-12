@@ -22,10 +22,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
       id="ending"
       themeForeground={theme.foreground}
       className={cn('overflow-hidden', theme.background)}
-      padded={false}
-      containerClassName="max-w-5xl py-20 @md:py-32 px-6 @md:px-12"
-    >
-        {/* Р’РµСЂС…РЅСЏСЏ Р»РёРЅРёСЏ СЃ РЅРѕРјРµСЂРѕРј СЃС‚СЂР°РЅРёС†С‹ РёР»Рё РїРѕРјРµС‚РєРѕР№ "FIN" */}
+    >      <div className="max-w-5xl mx-auto py-20 @md:py-32 px-6 @md:px-12">        {/* Р’РµСЂС…РЅСЏСЏ Р»РёРЅРёСЏ СЃ РЅРѕРјРµСЂРѕРј СЃС‚СЂР°РЅРёС†С‹ РёР»Рё РїРѕРјРµС‚РєРѕР№ "FIN" */}
         <div className="flex justify-between items-baseline mb-12 border-b border-current/10 pb-4">
           <span className="text-[10px] uppercase tracking-[0.3em] opacity-50">Editorial Archive</span>
           <span className={cn("text-xs italic", theme.fontBody)}>Finis</span>
@@ -93,6 +90,7 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-40', theme.accent)} />
            <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-20', theme.accent)} />
         </div>
+      </div>
     </SectionWrapper>
   )
 }

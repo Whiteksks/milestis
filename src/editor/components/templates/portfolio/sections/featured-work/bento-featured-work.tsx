@@ -120,7 +120,6 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
     <SectionWrapper
       id="work"
       themeForeground={theme.foreground}
-      padded={false}
       className="@lg:px-6 @md:px-5 px-4 py-3"
     >
       <div className="max-w-6xl mx-auto space-y-3 w-full">

@@ -14,7 +14,6 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
     <SectionWrapper
       id="featured-work"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 py-24 @md:py-36">

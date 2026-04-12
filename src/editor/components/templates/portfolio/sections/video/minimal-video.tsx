@@ -12,7 +12,6 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
     <SectionWrapper
       id="video"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         {/* Section header */}

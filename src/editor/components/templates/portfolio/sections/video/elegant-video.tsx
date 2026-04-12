@@ -12,7 +12,6 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
     <SectionWrapper
       id="video"
       themeForeground={theme.foreground}
-      padded={false}
       className="@container"
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">

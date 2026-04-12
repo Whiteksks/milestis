@@ -27,9 +27,8 @@ export function IntroSoleil({ sectionContent, theme }: IntroSoleilProps) {
       id="introduction"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-3xl px-8 @md:px-0 py-20 @md:py-28 space-y-12 @md:space-y-16"
     >
+      <div className="max-w-3xl mx-auto px-8 @md:px-0 py-20 @md:py-28 space-y-12 @md:space-y-16">
       <SectionLabel num={2} label="Introduction" theme={theme} variant="rule-label" />
 
       {/* Title */}
@@ -94,6 +93,7 @@ export function IntroSoleil({ sectionContent, theme }: IntroSoleilProps) {
             )}
           </Animate>
         )}
+      </div>
       </div>
     </SectionWrapper>
   )

@@ -22,9 +22,8 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
       id="gallery"
       themeForeground={theme.foreground}
       className={theme.background}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-16 @md:py-24"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
         {/* Editorial header */}
         <div className="mb-10 @md:mb-14">
@@ -111,6 +110,7 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
             {gallery.description}
           </p>
         )}
+      </div>
     </SectionWrapper>
   )
 }

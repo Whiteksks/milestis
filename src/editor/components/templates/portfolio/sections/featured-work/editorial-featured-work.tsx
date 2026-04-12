@@ -17,7 +17,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
   const projects = sectionContent.featuredWork.projects ?? []
 
   return (
-    <SectionWrapper id="work" themeForeground={theme.foreground} padded={false}>
+    <SectionWrapper id="work" themeForeground={theme.foreground}>
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-24 @md:py-20 py-14">
         
         {/* Header Block */}

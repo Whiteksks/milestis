@@ -23,9 +23,8 @@ export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
       id="gallery"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="px-8 @md:px-14 @lg:px-20 py-20 @md:py-28"
     >
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-20 @md:py-28">
       {/* Header */}
       <div className="flex items-end justify-between gap-4 mb-12 @md:mb-16">
         <div className="space-y-4">
@@ -109,6 +108,7 @@ export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
           ))}
         </div>
       )}
+      </div>
     </SectionWrapper>
   )
 }

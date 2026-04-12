@@ -14,7 +14,6 @@ export function MinimalFooter({ theme, sectionContent }: MinimalFooterProps) {
       id="footer"
       as="footer"
       themeForeground={theme.foreground}
-      padded={false}
       className="border-t border-current/10"
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-8">

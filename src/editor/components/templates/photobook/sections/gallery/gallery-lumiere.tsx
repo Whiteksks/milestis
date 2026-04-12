@@ -22,9 +22,8 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
       id="gallery"
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
-      padded={false}
-      containerClassName="max-w-5xl px-8 @md:px-14 @lg:px-10 py-20 @md:py-28"
     >
+      <div className="max-w-5xl mx-auto px-8 @md:px-14 @lg:px-10 py-20 @md:py-28">
 
         {/* Section header */}
         <div className="flex items-center gap-4 mb-14 @md:mb-18">
@@ -105,6 +104,7 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
             ))}
           </div>
         )}
+      </div>
     </SectionWrapper>
   )
 }

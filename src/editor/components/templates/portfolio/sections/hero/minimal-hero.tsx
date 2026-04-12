@@ -14,7 +14,6 @@ export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
     <SectionWrapper
       id="hero"
       themeForeground={theme.foreground}
-      padded={false}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-16 @md:pt-24">
         {/* Top hairline */}
