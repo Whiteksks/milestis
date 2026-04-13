@@ -48,6 +48,7 @@ export function PublishedView({
   const template = MODE_REGISTRY[mode].renderPublished({
     templateId,
     theme,
+    themeCustomizations,
     content,
     visibility,
     handleAnchorClick,

@@ -5,6 +5,7 @@ import type {
   TemplateId,
 } from '@/editor/lib/types'
 import type { ContentStore } from '@/editor/lib/store-content'
+import type { ThemeCustomizations } from '@/editor/lib/store-theme'
 
 import type React from 'react'
 
@@ -12,6 +13,7 @@ import type React from 'react'
 export type PublishedRenderArgs = {
   templateId: string
   theme: ThemeConfig
+  themeCustomizations: ThemeCustomizations
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: Record<string, any>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

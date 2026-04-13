@@ -43,10 +43,7 @@ export function useAutoSave(projectId: string) {
     if (savingRef.current || !useUiStore.getState().isDirty) return
     savingRef.current = true
     try {
-      await saveProject(projectId, {
-        updateDashboardMeta: false,
-        updateTimestamp: false,
-      })
+      await saveProject(projectId)
       markClean()
     } catch {
       // Silent — data stays in Zustand memory, user can retry via Save button
@@ -69,23 +66,10 @@ export function useAutoSave(projectId: string) {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
       if (!useUiStore.getState().isDirty) return
       e.preventDefault()
-      e.returnValue = '' // required for Chrome to show the dialog
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [])
-
-  // ── Ctrl+S / Cmd+S ────────────────────────────────────────────────────
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault()
-        save()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [save])
 
   return { save, isDirty }
 }

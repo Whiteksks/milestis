@@ -5,6 +5,7 @@ import { type PhotobookTemplateId } from './photobook-ids'
 
 import dynamic from 'next/dynamic'
 import { PhotobookTemplateShell } from '@/editor/components/editor/layout/photobook-template-shell'
+import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 
 // Cover components — lightweight, used for template preview cards
 import { CoverChronicle } from '@/editor/components/templates/photobook/sections/cover/cover-chronicle'
@@ -100,19 +101,29 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
     return <PhotobookTemplateShell Design={Design} />
   },
 
-  renderPublished: ({ templateId, theme, content, visibility }) => {
+  renderPublished: ({ templateId, theme, themeCustomizations, content, visibility }) => {
     const id = templateId as PhotobookTemplateId
     const Design =
       photobookTemplateComponents[id] ??
       photobookTemplateComponents['photobook-memoir'] ??
       TemplateMemoirDesign
 
+    const texture = themeCustomizations.photobookTexture ?? 'none'
+    const mood    = themeCustomizations.photobookMood    ?? 'none'
+    const moodFilter = getMoodFilter(mood)
+
     return (
-      <Design
-        theme={theme}
-        sectionContent={content as PhotobookSectionContent}
-        sectionVisibility={visibility as PhotobookSectionVisibility}
-      />
+      <div
+        className="relative overflow-hidden"
+        style={moodFilter !== 'none' ? { filter: moodFilter } : undefined}
+      >
+        <Design
+          theme={theme}
+          sectionContent={content as PhotobookSectionContent}
+          sectionVisibility={visibility as PhotobookSectionVisibility}
+        />
+        <PhotobookTextureOverlay texture={texture} />
+      </div>
     )
   },
 
