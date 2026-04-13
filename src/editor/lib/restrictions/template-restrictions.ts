@@ -67,18 +67,51 @@ const TEMPLATE_RESTRICTIONS: Partial<
     featuredWork: { hideAspectRatio: true, hideCrop: true },
   },
   /**
+   * Lumière cover: full-bleed background with no aspectRatio, frameStyle, or
+   * cropData passed — all three controls are inert.
+   */
+  'photobook-lumiere': {
+    cover: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
+  },
+  /**
+   * Soleil cover: image sits inside a hardcoded aspect-[3/4] container —
+   * the data aspectRatio is overridden by the parent CSS. Frame and crop work.
+   */
+  'photobook-soleil': {
+    cover: { hideAspectRatio: true },
+  },
+  /**
    * Magazine cover: full-bleed background photo with gradient overlay.
    * The image fills the entire viewport — aspect ratio and frame are meaningless.
    * Crop IS used for subject positioning.
+   * Gallery: all images use fillParent with hardcoded CSS containers — no
+   * aspectRatio, frameStyle, or cropData passed anywhere.
+   * Highlight: full-bleed background panel — same as cover.
+   * Ending: full-bleed background section — same full-bleed pattern.
    */
   'photobook-magazine': {
     cover: { hideAspectRatio: true, hideFrameStyle: true },
+    gallery: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
+    highlight: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
+    ending: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
   },
   /**
    * Chronicle cover: same full-bleed fill pattern as Magazine.
+   * Gallery: feature + grid images all use fillParent in hardcoded containers
+   * with no cropData — all three controls are inert.
+   * Highlight: full-bleed cinematic background panel — no settings passed.
    */
   'photobook-chronicle': {
     cover: { hideAspectRatio: true, hideFrameStyle: true },
+    gallery: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
+    highlight: { hideAspectRatio: true, hideFrameStyle: true, hideCrop: true },
+  },
+  /**
+   * Memoir gallery: hero + rest all use fillParent inside hardcoded CSS aspect
+   * containers — aspectRatio and frameStyle are never passed. cropData IS used.
+   */
+  'photobook-memoir': {
+    gallery: { hideAspectRatio: true, hideFrameStyle: true },
   },
 }
 

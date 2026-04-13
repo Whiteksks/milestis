@@ -21,6 +21,13 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className={ps.pbRoot}>
       {!dense && <PanelLabel>Header</PanelLabel>}
+      <Input
+        value={gallery.label || ""}
+        onChange={(e) => updatePhotobookSection("gallery", { label: e.target.value })}
+        placeholder="Section label (e.g. Gallery)"
+        className={ps.pbInput}
+        maxLength={LIMITS.label}
+      />
       <div className={ps.pbGrid2}>
         <Input
           value={gallery.title || ""}

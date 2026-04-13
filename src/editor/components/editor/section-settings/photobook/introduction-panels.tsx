@@ -20,6 +20,14 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
     <div className={ps.pbRoot}>
       {!dense && <PanelLabel>Text</PanelLabel>}
 
+      <Input
+        value={introduction.label || ""}
+        onChange={(e) => updatePhotobookSection("introduction", { label: e.target.value })}
+        placeholder="Section label (e.g. Introduction)"
+        className={ps.pbInput}
+        maxLength={LIMITS.label}
+      />
+
       <div className={ps.pbGrid2}>
         <Input
           value={introduction.title}

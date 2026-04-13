@@ -38,6 +38,18 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="py-2">
       {!dense && (
+        <div className="space-y-1 pb-4 mb-4">
+          <label className={editorialLabel}>Section Label</label>
+          <Input
+            value={story.label || ""}
+            onChange={(e) => update({ label: e.target.value })}
+            placeholder="Section label (e.g. Story)"
+            className={cn(editorialInput, "text-sm text-muted-foreground")}
+            maxLength={LIMITS.label}
+          />
+        </div>
+      )}
+      {!dense && (
         <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-4 mb-4">
           <div className="space-y-1 pr-2">
             <label className={editorialLabel}>Title</label>

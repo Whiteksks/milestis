@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -7,6 +7,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
+import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 
 interface StorySoleilProps {
   sectionContent: PhotobookSectionContent
@@ -15,6 +16,7 @@ interface StorySoleilProps {
 
 export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
   const { story } = sectionContent
+  const num = usePhotobookSectionNum('story')
   const moments = story.images ?? []
 
   return (
@@ -24,7 +26,9 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
       className={cn('overflow-x-clip', theme.muted)}
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-20 @md:py-28">
-      <SectionLabel num={3} label="Story" theme={theme} variant="rule-label" className="mb-12 @md:mb-16" />
+      {story.label && (
+        <SectionLabel num={num} label={story.label} theme={theme} variant="rule-label" className="mb-12 @md:mb-16" />
+      )}
 
       {/* Story meta */}
       {(story.title || story.date || story.location) && (
@@ -41,7 +45,7 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
           )}
           {(story.date || story.location) && (
             <p className={cn('text-[10px] uppercase tracking-[0.3em] opacity-30', theme.fontBody)}>
-              {[story.date, story.location].filter(Boolean).join('  вЂ”  ')}
+              {[story.date, story.location].filter(Boolean).join('  —  ')}
             </p>
           )}
         </Animate>
@@ -95,6 +99,11 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
                     {block.label && (
                       <p className={cn('text-xs uppercase tracking-[0.3em] opacity-40', theme.fontBody)}>
                         {block.label}
+                      </p>
+                    )}
+                    {block.description && (
+                      <p className={cn('text-base font-light opacity-60 leading-relaxed', theme.fontBody, theme.lineHeight)}>
+                        {block.description}
                       </p>
                     )}
                     {block.caption && (

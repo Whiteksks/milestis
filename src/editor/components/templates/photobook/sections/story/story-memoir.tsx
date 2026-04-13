@@ -25,12 +25,14 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
 
         {/* Section header */}
         <div className="mb-20 @md:mb-28">
-          <div className="flex items-center gap-4 mb-6">
-            <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
-              Story
-            </span>
-            <div className="h-px flex-1 bg-current opacity-10" />
-          </div>
+          {story.label && (
+            <div className="flex items-center gap-4 mb-6">
+              <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
+                {story.label}
+              </span>
+              <div className="h-px flex-1 bg-current opacity-10" />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 items-end">
             {story.title && (
@@ -123,9 +125,6 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
           </div>
         )}
 
-        {moments.length === 0 && (
-          <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
-        )}
       </div>
     </SectionWrapper>
   )

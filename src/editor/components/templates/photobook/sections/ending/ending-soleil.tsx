@@ -1,5 +1,4 @@
-'use client'
-"use client"
+﻿'use client'
 
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -18,7 +17,7 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
   const imageUrl = ending.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
   const imageSettings = ending.images?.imageSettings?.[0]
-  const aspectRatio = imageSettings?.aspectRatio ?? 'square'
+  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
@@ -27,37 +26,54 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.background)}
     >
-      {/* Top thin rule */}
-      <div className="px-8 @md:px-14 @lg:px-20 pt-12 @md:pt-16">
-        <div className="h-px w-full bg-current opacity-10" />
-      </div>
+      <div className="flex flex-col items-center px-8 @md:px-14 @lg:px-20 py-20 @md:py-28 @lg:py-36">
 
-      {/* Central content */}
-      <div className="flex-1 flex flex-col @md:flex-row items-center justify-center gap-12 @md:gap-20 px-8 @md:px-14 @lg:px-20 py-16">
+        {/* Top thin rule */}
+        <Animate trigger="mount" direction="none" className="w-full max-w-2xl mb-16 @md:mb-20">
+          <div className="h-px w-full bg-current opacity-10" />
+        </Animate>
 
-        {/* Closing photo вЂ” optional */}
+        {/* Label ornament */}
+        {ending.label && (
+          <Animate trigger="mount" direction="none" delay={0.1} className="mb-12 @md:mb-16 flex items-center gap-4">
+            <div className="h-px w-8 bg-current opacity-15" />
+            <span className={cn('text-[9px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}>{ending.label}</span>
+            <div className="h-px w-8 bg-current opacity-15" />
+          </Animate>
+        )}
+
+        {ending.title && (
+          <Animate trigger="mount" direction="none" delay={0.15} className="mb-12 @md:mb-16">
+            <p className={cn('text-2xl @md:text-3xl font-light italic opacity-45 text-center', theme.fontTitle)}>
+              {ending.title}
+            </p>
+          </Animate>
+        )}
+
+        {/* Large closing photo */}
         {hasImage && (
-          <Animate direction="right" distance={24} className="shrink-0">
-            <div className="w-48 @sm:w-56 @md:w-64 overflow-hidden rounded-sm">
+          <Animate trigger="mount" delay={0.2} distance={32} className="w-full max-w-sm @md:max-w-md mb-14 @md:mb-18">
+            <div className="overflow-hidden rounded-sm">
               <SiteImage
                 src={imageUrl}
-                alt={ending.signature ?? 'Ending'}
+                alt={ending.signature ?? 'Closing'}
                 aspectRatio={aspectRatio}
                 frameStyle={frameStyle}
                 cropData={imageSettings?.cropData}
                 unoptimized
-                sizes="(max-width: 768px) 50vw, 256px"
+                sizes="(max-width: 768px) 80vw, 400px"
+                className="w-full"
               />
             </div>
           </Animate>
         )}
 
-        {/* Text */}
-        <Animate className="text-center @md:text-left space-y-6 max-w-xs">
+        {/* Text block */}
+        <Animate trigger="mount" delay={hasImage ? 0.35 : 0.2} direction="none" className="flex flex-col items-center text-center space-y-6 max-w-[38ch]">
           {ending.text && (
             <p
               className={cn(
-                'text-base @md:text-lg font-light opacity-60 leading-relaxed',
+                'text-base @md:text-lg @lg:text-xl font-light italic opacity-55 leading-relaxed',
                 theme.fontBody,
                 theme.lineHeight,
               )}
@@ -66,27 +82,28 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
             </p>
           )}
 
-          <div className="w-8 h-px bg-current opacity-20 mx-auto @md:mx-0" />
-
-          {ending.signature && (
-            <p className={cn('text-sm font-light opacity-45 italic', theme.fontBody)}>
-              вЂ” {ending.signature}
-            </p>
-          )}
-
-          {ending.date && (
-            <p className={cn('text-[10px] uppercase tracking-[0.35em] opacity-25', theme.fontBody)}>
-              {ending.date}
-            </p>
+          {(ending.signature || ending.date) && (
+            <>
+              <div className="w-8 h-px bg-current opacity-20" />
+              {ending.signature && (
+                <p className={cn('text-sm font-light opacity-45 italic', theme.fontBody)}>
+                  {'\u2014'} {ending.signature}
+                </p>
+              )}
+              {ending.date && (
+                <p className={cn('text-[10px] uppercase tracking-[0.45em] opacity-25', theme.fontBody)}>
+                  {ending.date}
+                </p>
+              )}
+            </>
           )}
         </Animate>
-      </div>
 
-      {/* Bottom wordmark */}
-      <div className="px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-16 flex items-center justify-center">
-        <span className={cn('text-[8px] uppercase tracking-[0.5em] opacity-15', theme.fontBody)}>
-          Soleil
-        </span>
+        {/* Bottom thin rule */}
+        <Animate trigger="mount" direction="none" delay={hasImage ? 0.5 : 0.35} className="w-full max-w-2xl mt-16 @md:mt-20">
+          <div className="h-px w-full bg-current opacity-10" />
+        </Animate>
+
       </div>
     </SectionWrapper>
   )

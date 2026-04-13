@@ -137,6 +137,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
         onChange={(next) => updatePhotobookSection("cover", { images: next })}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
         restrictions={coverRestrictions}
+        showCaption={false}
       />
     </div>
   )

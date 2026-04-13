@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
@@ -21,34 +20,45 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
     <SectionWrapper
       id="gallery"
       themeForeground={theme.foreground}
-      className={cn('overflow-x-clip', theme.background)}
+      // Добавляем относительное позиционирование для декоративных элементов
+      className={cn('overflow-x-clip relative', theme.background)}
     >
-      <div className="max-w-5xl mx-auto px-8 @md:px-14 @lg:px-10 py-20 @md:py-28">
+      {/* Декоративный эффект зернистости (Grain Overlay) */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-        {/* Section header */}
-        <div className="flex items-center gap-4 mb-14 @md:mb-18">
-          <div className="h-px flex-1 bg-current opacity-10" />
-          <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
-            {String(images.length).padStart(2, '0')}  В·  Gallery
-          </span>
-          <div className="h-px flex-1 bg-current opacity-10" />
-        </div>
+      <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-24 @md:py-32 relative z-10">
+        
+        {/* Шапка галереи в стиле музейной экспликации */}
+        <Animate trigger="mount" direction="none" className="mb-20 @md:mb-28 flex flex-col items-center">
+          <div className="w-px h-12 bg-current opacity-20 mb-8" /> {/* Вертикальная линия вместо горизонтальной */}
+          {gallery.label && (
+            <p className={cn('mb-4 text-[9px] uppercase tracking-[0.4em] opacity-30', theme.fontBody)}>
+              {gallery.label}
+            </p>
+          )}
+          
+          {gallery.title && (
+            <h2 className={cn(
+              'text-center text-2xl @md:text-4xl font-extralight tracking-tight italic mb-4',
+              theme.fontTitle
+            )}>
+              {gallery.title}
+            </h2>
+          )}
+          
+          {gallery.description && (
+            <p className={cn(
+              'max-w-md text-center text-[10px] uppercase tracking-[0.3em] opacity-40 leading-relaxed',
+              theme.fontBody
+            )}>
+              {gallery.description}
+            </p>
+          )}
+        </Animate>
 
-        {/* Gallery title */}
-        {gallery.title && (
-          <h2
-            className={cn(
-              'text-center text-xl @md:text-2xl font-light italic opacity-55 mb-12',
-              theme.fontTitle,
-            )}
-          >
-            {gallery.title}
-          </h2>
-        )}
-
-        {/* Contact-sheet grid */}
+        {/* Сетка с эффектом смещения (Offset Grid) */}
         {images.length > 0 ? (
-          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 @md:gap-5">
+          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 space-y-4 @md:space-y-6  ">
             {images.map((photo, index) => {
               const imageUrl = photo.image ?? ''
               const imageSettings = photo.imageSettings?.[0]
@@ -60,32 +70,42 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
                 <Animate
                   key={photo.id}
                   direction="up"
-                  distance={20}
-                  delay={index * 0.05}
-                  className="flex flex-col gap-1.5"
+                  distance={30}
+                  delay={index * 0.08}
+                  // Lumiere Style: Нечетные карточки чуть смещаем вниз для динамики
+                  className={cn(
+                    "flex flex-col gap-4",
+                    index % 2 === 1 ? "@sm:translate-y-12" : ""
+                  )}
                 >
-                  {/* Framed photo */}
-                  <div className="border border-current/10 p-[3px]">
-                    {imageUrl && (
-                      <SiteImage
-                        src={imageUrl}
-                        alt={photo.caption ?? `Photo ${photoNum}`}
-                        aspectRatio={aspectRatio}
-                        frameStyle={frameStyle}
-                        cropData={imageSettings?.cropData}
-                        unoptimized
-                        sizes="(max-width: 640px) 95vw, (max-width: 1024px) 45vw, 30vw"
-                      />
-                    )}
+                  {/* Фото в "паспарту" или с тонкой рамкой */}
+                  <div className="group relative bg-white/[0.02] p-2 transition-transform duration-700 hover:scale-[1.02]">
+                    <div className="overflow-hidden border border-current/5">
+                      {imageUrl && (
+                        <SiteImage
+                          src={imageUrl}
+                          alt={photo.caption ?? `Photo ${photoNum}`}
+                          aspectRatio={aspectRatio}
+                          frameStyle={frameStyle}
+                          cropData={imageSettings?.cropData}
+                          unoptimized
+                          className="grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0"
+                          sizes="(max-width: 640px) 95vw, (max-width: 1024px) 45vw, 30vw"
+                        />
+                      )}
+                    </div>
                   </div>
 
-                  {/* Caption */}
-                  <div className="flex items-baseline gap-2">
-                    <span className={cn('text-[8px] opacity-20 shrink-0', theme.fontBody)}>
-                      {photoNum}
-                    </span>
+                  {/* Подпись в стиле каталога */}
+                  <div className="flex flex-col gap-1 px-1">
+                    <div className="flex justify-between items-center">
+                      <span className={cn('text-[9px] font-medium opacity-40 tabular-nums', theme.fontBody)}>
+                        {photoNum}
+                      </span>
+                      <div className="h-px w-4 bg-current opacity-10" />
+                    </div>
                     {photo.caption && (
-                      <p className={cn('text-[9px] uppercase tracking-widest opacity-25 leading-snug', theme.fontBody)}>
+                      <p className={cn('text-[10px] lowercase italic opacity-30 tracking-wide', theme.fontBody)}>
                         {photo.caption}
                       </p>
                     )}
@@ -96,11 +116,9 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
           </div>
         ) : (
           /* Empty state */
-          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="border border-current/10 p-[3px]">
-                <div className="aspect-[4/5] bg-current/5" />
-              </div>
+          <div className="grid grid-cols-1 @sm:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] bg-current/[0.02] border border-current/5" />
             ))}
           </div>
         )}

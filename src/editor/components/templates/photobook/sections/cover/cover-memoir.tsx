@@ -33,13 +33,6 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
         {/* Left Column – Typography */}
         <div className={cn('relative flex flex-col justify-center py-16 @md:py-24 gap-10', contentPadding)}>
           <Animate trigger="mount" delay={0.1} distance={20} className="space-y-8">
-            <div className="flex items-center gap-4">
-              <span className={cn('text-[10px] uppercase tracking-[0.3em] opacity-30', theme.fontBody)}>
-                Photobook Edition
-              </span>
-              <div className="flex-1 h-px bg-current opacity-10" />
-            </div>
-
             <h1 className={cn(
               'text-5xl @sm:text-6xl @md:text-7xl @lg:text-8xl font-bold leading-[0.9] tracking-tighter',
               theme.fontTitle
@@ -47,13 +40,22 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
               {cover.title}
             </h1>
 
-            {(cover.subtitle || cover.tagline) && (
+            {cover.subtitle && (
               <p className={cn(
                 'text-base @lg:text-xl font-light opacity-60 max-w-[32ch]',
                 theme.lineHeight,
                 theme.fontBody
               )}>
-                {cover.subtitle || cover.tagline}
+                {cover.subtitle}
+              </p>
+            )}
+            {cover.tagline && (
+              <p className={cn(
+                'text-sm font-light italic opacity-40 max-w-[36ch]',
+                theme.lineHeight,
+                theme.fontBody
+              )}>
+                {cover.tagline}
               </p>
             )}
           </Animate>

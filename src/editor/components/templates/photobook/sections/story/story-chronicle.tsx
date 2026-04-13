@@ -29,9 +29,11 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-end justify-between mt-3 gap-4">
             <div>
-              <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
-                Story
-              </span>
+              {story.label && (
+                <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
+                  {story.label}
+                </span>
+              )}
               {story.title && (
                 <h2
                   className={cn(
@@ -131,9 +133,6 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
           </div>
         )}
 
-        {moments.length === 0 && (
-          <p className={cn('text-sm opacity-25 italic', theme.fontBody)}>Your story moments appear here.</p>
-        )}
       </div>
     </SectionWrapper>
   )

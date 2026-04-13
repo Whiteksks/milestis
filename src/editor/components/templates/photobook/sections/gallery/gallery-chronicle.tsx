@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -29,12 +28,14 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
         <div className="mb-10 @md:mb-14">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
-            <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
-              Gallery
-            </span>
+            {gallery.label && (
+              <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
+                {gallery.label}
+              </span>
+            )}
             {photos.length > 0 && (
               <span className={cn('text-[9px] opacity-20', theme.fontBody)}>
-                {String(photos.length).padStart(2, '0')} images
+                {String(photos.length).padStart(2, '0')}
               </span>
             )}
           </div>

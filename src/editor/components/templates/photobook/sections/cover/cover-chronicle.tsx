@@ -54,9 +54,6 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
       >
         <div className="flex items-center gap-4">
           <div className={cn('h-[1px] w-10 transition-all', hasImage ? 'bg-white/40' : theme.accent)} />
-          <span className={cn('text-[10px] uppercase tracking-[0.4em]', subTextContrast, theme.fontBody)}>
-            Chronicle
-          </span>
         </div>
         
         {(cover.date || cover.location) && (
@@ -82,14 +79,23 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
             {cover.title}
           </h1>
 
-          {(cover.subtitle || cover.tagline) && (
+          {cover.subtitle && (
             <p className={cn(
               'text-base @md:text-lg font-light max-w-[40ch] border-l border-white/10 pl-6',
               subTextContrast,
               theme.lineHeight,
               theme.fontBody
             )}>
-              {cover.subtitle || cover.tagline}
+              {cover.subtitle}
+            </p>
+          )}
+          {cover.tagline && (
+            <p className={cn(
+              'text-sm font-light italic max-w-[44ch] pl-6 opacity-45',
+              hasImage ? 'text-white/45' : 'opacity-40',
+              theme.fontBody
+            )}>
+              {cover.tagline}
             </p>
           )}
         </Animate>

@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -31,17 +30,15 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
         <div className="mb-12 @md:mb-16">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
-            <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.letterSpacing, theme.fontBody)}>
-              Introduction
-            </span>
-            <span className={cn('text-[9px] uppercase tracking-[0.2em] opacity-20', theme.fontBody)}>
-              I
-            </span>
+            {introduction.label && (
+              <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.letterSpacing, theme.fontBody)}>
+                {introduction.label}
+              </span>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-10 @md:gap-16 @lg:gap-24 items-start">
 
-          {/* Left вЂ“ editorial text */}
           <div className="space-y-9">
             {introduction.title && (
               <h2
@@ -56,15 +53,6 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
 
             {introduction.quote && (
               <div className="relative">
-                {/* Oversized quotation mark */}
-                <span
-                  className={cn(
-                    'absolute -top-4 -left-1 text-[5rem] leading-none opacity-10 select-none',
-                    theme.fontTitle,
-                  )}
-                >
-                  &ldquo;
-                </span>
                 <blockquote className="pl-6 border-l-2 border-current/15">
                   <p
                     className={cn(
@@ -88,7 +76,7 @@ export function IntroChronicle({ sectionContent, theme }: IntroChronicleProps) {
             )}
           </div>
 
-          {/* Right вЂ“ image */}
+          {/* Right – image */}
           {imageUrl && (
             <div>
               <SiteImage

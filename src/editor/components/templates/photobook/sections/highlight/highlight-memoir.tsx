@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -60,12 +59,14 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
           {/* Right вЂ“ Content (order-1 on mobile в†’ shows above photo) */}
           <div className="order-1 @md:order-2 space-y-6 @md:space-y-8">
             {/* Label */}
-            <div className="flex items-center gap-4">
-              <div className={cn('h-px w-12', theme.accent)} />
-              <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
-                Highlight
-              </span>
-            </div>
+            {highlight.label && (
+              <div className="flex items-center gap-4">
+                <div className={cn('h-px w-12', theme.accent)} />
+                <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
+                  {highlight.label}
+                </span>
+              </div>
+            )}
 
             {/* Title */}
             {highlight.title && (

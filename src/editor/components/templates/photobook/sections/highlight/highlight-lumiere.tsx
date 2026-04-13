@@ -1,11 +1,11 @@
 'use client'
-"use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface HighlightLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -17,7 +17,7 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
   const imageSettings = highlight.images?.imageSettings?.[0]
   const imageUrl = highlight.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'square'
+  const aspectRatio = imageSettings?.aspectRatio ?? 'wide'
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
@@ -26,32 +26,23 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
     >
-      <div className="max-w-3xl mx-auto px-8 @md:px-0 flex flex-col items-center text-center py-20 @md:py-28">
+      <div className="max-w-3xl mx-auto px-8 @md:px-0 py-20 @md:py-28 flex flex-col items-center">
 
-        {/* Section header */}
-        <div className="flex items-center gap-4 mb-14 w-full">
+        {/* Thin section divider */}
+        <Animate trigger="mount" direction="none" className="w-full flex items-center gap-4 mb-14 @md:mb-18">
           <div className="h-px flex-1 bg-current opacity-10" />
-          <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-25 shrink-0', theme.fontBody)}>
-            05  В·  Highlight
-          </span>
+          {highlight.label && (
+            <span className={cn('text-[9px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}>
+              {highlight.label}
+            </span>
+          )}
+          {!highlight.label && <div className="w-1 h-1 rounded-full bg-current opacity-20" />}
           <div className="h-px flex-1 bg-current opacity-10" />
-        </div>
+        </Animate>
 
-        {/* Title above photo */}
-        {highlight.title && (
-          <h2
-            className={cn(
-              'text-2xl @sm:text-3xl @md:text-4xl font-light italic tracking-tight leading-snug mb-10',
-              theme.fontTitle,
-            )}
-          >
-            {highlight.title}
-          </h2>
-        )}
-
-        {/* Statement framed photo */}
+        {/* Full-width film-framed statement photo */}
         {hasImage && (
-          <div className="w-full max-w-xl @md:max-w-2xl mb-10">
+          <Animate trigger="mount" delay={0.1} distance={20} className="w-full mb-10 @md:mb-12">
             <div className="border border-current/10 p-[3px]">
               <SiteImage
                 src={imageUrl}
@@ -60,40 +51,60 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
                 frameStyle={frameStyle}
                 cropData={imageSettings?.cropData}
                 unoptimized
-                sizes="(max-width: 768px) 95vw, 65vw"
+                sizes="(max-width: 768px) 95vw, 70vw"
               />
             </div>
-          </div>
+          </Animate>
+        )}
+
+        {/* Title below photo */}
+        {highlight.title && (
+          <Animate trigger="mount" delay={hasImage ? 0.25 : 0.1} distance={16} className="text-center mb-7 @md:mb-8 w-full">
+            <h2
+              className={cn(
+                'text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl font-light italic tracking-tight leading-snug',
+                theme.fontTitle,
+              )}
+            >
+              {highlight.title}
+            </h2>
+          </Animate>
         )}
 
         {/* Description */}
         {highlight.description && (
-          <p
-            className={cn(
-              'text-sm font-light opacity-55 max-w-[42ch] leading-relaxed mb-10',
-              theme.fontBody,
-              theme.lineHeight,
-            )}
-          >
-            {highlight.description}
-          </p>
+          <Animate trigger="mount" delay={hasImage ? 0.35 : 0.18} direction="none" className="text-center max-w-[44ch] mb-10">
+            <p
+              className={cn(
+                'text-sm @md:text-base font-light opacity-55 leading-relaxed',
+                theme.fontBody,
+                theme.lineHeight,
+              )}
+            >
+              {highlight.description}
+            </p>
+          </Animate>
         )}
 
-        {/* Pull quote */}
+        {/* Pull quote — the emotional centrepiece */}
         {highlight.quote && (
-          <>
-            <div className="origin-center w-10 h-px bg-current opacity-15 mb-8" />
-            <blockquote>
+          <Animate trigger="mount" delay={hasImage ? 0.45 : 0.28} direction="none" className="w-full flex flex-col items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="h-px w-6 bg-current opacity-15" />
+              <div className="w-[3px] h-[3px] rounded-full bg-current opacity-20" />
+              <div className="h-px w-6 bg-current opacity-15" />
+            </div>
+            <blockquote className="text-center max-w-[40ch]">
               <p
                 className={cn(
-                  'text-lg @md:text-xl font-light italic opacity-50 max-w-[38ch] leading-relaxed',
+                  'text-lg @md:text-xl @lg:text-2xl font-light italic opacity-55 leading-relaxed',
                   theme.fontBody,
                 )}
               >
                 &ldquo;{highlight.quote}&rdquo;
               </p>
             </blockquote>
-          </>
+          </Animate>
         )}
       </div>
     </SectionWrapper>

@@ -1,5 +1,4 @@
-'use client'
-"use client"
+﻿'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -31,12 +30,11 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
         <div>
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
-            <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
-              Chronicle
-            </span>
-            <span className={cn('text-[9px] uppercase tracking-[0.2em] opacity-20', theme.fontBody)}>
-              Fin
-            </span>
+            {ending.label && (
+              <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
+                {ending.label}
+              </span>
+            )}
           </div>
         </div>
 
@@ -44,16 +42,18 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
 
           {/* Left вЂ” typographic closing */}
           <div className="flex-1 space-y-6 @md:space-y-8">
-            {/* "The End" masthead */}
-            <h2
-              className={cn(
-                'text-[3.5rem] @sm:text-[5rem] @md:text-[7rem] @lg:text-[9rem]',
-                'font-bold leading-none tracking-tighter',
-                theme.fontTitle,
-              )}
-            >
-              The<br />End
-            </h2>
+            {/* Title masthead */}
+            {ending.title && (
+              <h2
+                className={cn(
+                  'text-[3.5rem] @sm:text-[5rem] @md:text-[7rem] @lg:text-[9rem]',
+                  'font-bold leading-none tracking-tighter',
+                  theme.fontTitle,
+                )}
+              >
+                {ending.title}
+              </h2>
+            )}
 
             {ending.text && (
               <p
@@ -70,7 +70,7 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
             <div className="space-y-1.5 pt-2">
               {ending.signature && (
                 <p className={cn('text-sm italic opacity-45', theme.fontBody)}>
-                  вЂ” {ending.signature}
+                  — {ending.signature}
                 </p>
               )}
               {ending.date && (

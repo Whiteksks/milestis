@@ -1,11 +1,11 @@
 'use client'
-  "use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
+import { Animate } from '../../../primitives/animate'
 
 interface EndingLumiereProps {
   sectionContent: PhotobookSectionContent
@@ -17,98 +17,102 @@ export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
   const imageSettings = ending.images?.imageSettings?.[0]
   const imageUrl = ending.images?.image ?? ''
   const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'square'
+  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
   const frameStyle = imageSettings?.frameStyle ?? 'none'
 
   return (
     <SectionWrapper
       id="ending"
       themeForeground={theme.foreground}
-      className={cn('overflow-x-clip', theme.background)}
+      className={cn('@container overflow-x-clip', theme.background)}
     >
-      {/* Top decorative rule */}
-      <div className="px-8 @md:px-16 pt-10 @md:pt-14">
-        <div className="flex items-center gap-4">
+      <div className="max-w-2xl mx-auto px-8 @md:px-0 py-20 @md:py-28 flex flex-col items-center">
+
+        {/* Top ornament — mirrors intro */}
+        <Animate trigger="mount" direction="none" className="w-full flex items-center gap-4 mb-16 @md:mb-20">
           <div className="h-px flex-1 bg-current opacity-10" />
-          <span className={cn('text-[8px] uppercase tracking-[0.45em] opacity-20 shrink-0', theme.fontBody)}>
-            06  В·  Fin
-          </span>
+          <div className="w-1 h-1 rounded-full bg-current opacity-20" />
           <div className="h-px flex-1 bg-current opacity-10" />
-        </div>
-      </div>
+        </Animate>
 
-      {/* Central colophon */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 py-16 text-center space-y-8 @md:space-y-10">
-
-        {/* "Fin." */}
-        <div
-          className={cn(
-            'text-[4rem] @sm:text-[5.5rem] @md:text-[7rem] font-light italic leading-none tracking-tight opacity-75',
-            theme.fontTitle,
-          )}
-        >
-          Fin.
-        </div>
-
-        {/* Decorative rule */}
-        <div className="origin-center w-12 h-px bg-current opacity-15" />
-
-        {/* Closing message */}
-        {ending.text && (
-          <p
-            className={cn(
-              'text-sm font-light italic opacity-45 max-w-[38ch] leading-relaxed',
-              theme.fontBody,
-              theme.lineHeight,
+        {/* Label + Title */}
+        {(ending.label || ending.title) && (
+          <Animate trigger="mount" direction="none" delay={0.05} className="flex flex-col items-center gap-3 mb-12 @md:mb-16">
+            {ending.label && (
+              <span className={cn('text-[9px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}>
+                {ending.label}
+              </span>
             )}
-          >
-            {ending.text}
-          </p>
+            {ending.title && (
+              <p className={cn('text-2xl @md:text-3xl font-light italic opacity-50 text-center', theme.fontTitle)}>
+                {ending.title}
+              </p>
+            )}
+          </Animate>
         )}
 
-        {/* Signature */}
-        {ending.signature && (
-          <p
-            className={cn('text-[10px] uppercase tracking-[0.35em] opacity-30', theme.fontBody)}
-          >
-            {ending.signature}
-          </p>
-        )}
-
-        {/* Date */}
-        {ending.date && (
-          <p
-            className={cn('text-[9px] uppercase tracking-[0.38em] opacity-20', theme.fontBody)}
-          >
-            {ending.date}
-          </p>
-        )}
-
-        {/* Optional closing photograph */}
+        {/* Optional closing photo — large, film-framed */}
         {hasImage && (
-          <div className="w-full max-w-[180px] @sm:max-w-[220px] mx-auto pt-2">
+          <Animate trigger="mount" delay={0.1} distance={24} className="w-full max-w-xs @md:max-w-sm mb-12 @md:mb-14">
             <div className="border border-current/10 p-[3px]">
               <SiteImage
                 src={imageUrl}
-                alt="Closing photograph"
+                alt={ending.signature ?? 'Closing'}
                 aspectRatio={aspectRatio}
                 frameStyle={frameStyle}
                 cropData={imageSettings?.cropData}
                 unoptimized
-                sizes="220px"
+                sizes="(max-width: 768px) 75vw, 380px"
               />
             </div>
-          </div>
+          </Animate>
         )}
-      </div>
 
-      {/* Bottom decorative rule */}
-      <div className="px-8 @md:px-16 pb-10 @md:pb-14">
-        <div className="flex items-center gap-4">
+        {/* Closing text — the emotional heartbeat */}
+        <Animate trigger="mount" delay={hasImage ? 0.3 : 0.15} direction="none" className="flex flex-col items-center text-center space-y-5">
+          {ending.text && (
+            <p
+              className={cn(
+                'text-base @md:text-lg font-light italic opacity-55 max-w-[36ch] leading-relaxed',
+                theme.fontBody,
+                theme.lineHeight,
+              )}
+            >
+              {ending.text}
+            </p>
+          )}
+
+          {/* Ornamental separator */}
+          <div className="flex items-center gap-2 py-2">
+            <div className="h-px w-6 bg-current opacity-15" />
+            <div className="w-[3px] h-[3px] rounded-full bg-current opacity-20" />
+            <div className="h-px w-6 bg-current opacity-15" />
+          </div>
+
+          {ending.signature && (
+            <p className={cn('text-[10px] uppercase tracking-[0.4em] opacity-35', theme.fontBody)}>
+              {ending.signature}
+            </p>
+          )}
+
+          {ending.date && (
+            <p className={cn('text-[9px] uppercase tracking-[0.38em] opacity-20', theme.fontBody)}>
+              {ending.date}
+            </p>
+          )}
+        </Animate>
+
+        {/* Bottom ornament */}
+        <Animate
+          trigger="mount"
+          direction="none"
+          delay={hasImage ? 0.45 : 0.3}
+          className="w-full flex items-center gap-4 mt-16 @md:mt-20"
+        >
           <div className="h-px flex-1 bg-current opacity-10" />
           <div className="w-1 h-1 rounded-full bg-current opacity-15" />
           <div className="h-px flex-1 bg-current opacity-10" />
-        </div>
+        </Animate>
       </div>
     </SectionWrapper>
   )

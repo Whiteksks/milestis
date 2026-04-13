@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -8,6 +7,7 @@ import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-i
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
+import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 
 interface GallerySoleilProps {
   sectionContent: PhotobookSectionContent
@@ -16,6 +16,7 @@ interface GallerySoleilProps {
 
 export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
   const { gallery } = sectionContent
+  const num = usePhotobookSectionNum('gallery')
   const images = gallery.images ?? []
 
   return (
@@ -28,7 +29,9 @@ export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
       {/* Header */}
       <div className="flex items-end justify-between gap-4 mb-12 @md:mb-16">
         <div className="space-y-4">
-          <SectionLabel num={4} label="Gallery" theme={theme} variant="rule-label" />
+        {gallery.label && (
+          <SectionLabel num={num} label={gallery.label} theme={theme} variant="rule-label" />
+        )}
           {gallery.title && (
             <h2
               className={cn(

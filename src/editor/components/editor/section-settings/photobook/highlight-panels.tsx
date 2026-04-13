@@ -28,6 +28,10 @@ export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-1">
+        <label className={editorialLabel}>Section Label</label>
+        <Input value={highlight.label || ""} onChange={(e) => updatePhotobookSection("highlight", { label: e.target.value })} placeholder="Section label (e.g. Highlight)" className={cn(editorialInput, "text-sm text-muted-foreground")} maxLength={LIMITS.label} />
+      </div>
+      <div className="space-y-1">
         <div className="flex items-center justify-between">
           <label className={editorialLabel}>Title</label>
           <CharCounter value={highlight.title || ""} limit={LIMITS.title} />

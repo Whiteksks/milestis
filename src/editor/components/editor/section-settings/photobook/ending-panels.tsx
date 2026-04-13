@@ -17,16 +17,28 @@ export function EndingMessagePanel({ dense = false }: { dense?: boolean }) {
   }))
 
   return (
-    <div className="space-y-1 py-2">
-      {!dense && <label className={editorialLabel}>Message</label>}
-      <Textarea
-        value={ending.text || ""}
-        onChange={(e) => updatePhotobookSection("ending", { text: e.target.value })}
-        placeholder="Thank you for watching..."
-        rows={4}
-        className={dense ? ps.pbTextarea : cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
-        maxLength={LIMITS.description}
-      />
+    <div className="space-y-4 py-2">
+      <div className="space-y-1">
+        {!dense && <label className={editorialLabel}>Title</label>}
+        <Input
+          value={ending.title || ""}
+          onChange={(e) => updatePhotobookSection("ending", { title: e.target.value })}
+          placeholder="The End"
+          className={dense ? ps.pbInput : cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
+          maxLength={LIMITS.title}
+        />
+      </div>
+      <div className="space-y-1">
+        {!dense && <label className={editorialLabel}>Message</label>}
+        <Textarea
+          value={ending.text || ""}
+          onChange={(e) => updatePhotobookSection("ending", { text: e.target.value })}
+          placeholder="Thank you for watching..."
+          rows={4}
+          className={dense ? ps.pbTextarea : cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
+          maxLength={LIMITS.description}
+        />
+      </div>
     </div>
   )
 }

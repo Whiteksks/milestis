@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
@@ -48,15 +47,17 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
         <div className="relative z-10 px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-16 space-y-4 max-w-4xl">
           <div className="flex items-center gap-3">
             <div className={cn('h-px w-8', hasImage ? 'bg-white/40' : theme.accent)} />
-            <span
-              className={cn(
-                'text-[9px] uppercase tracking-[0.3em]',
-                hasImage ? 'text-white/50' : 'opacity-40',
-                theme.fontBody,
-              )}
-            >
-              Highlight
-            </span>
+            {highlight.label && (
+              <span
+                className={cn(
+                  'text-[9px] uppercase tracking-[0.3em]',
+                  hasImage ? 'text-white/50' : 'opacity-40',
+                  theme.fontBody,
+                )}
+              >
+                {highlight.label}
+              </span>
+            )}
           </div>
 
           {highlight.title && (

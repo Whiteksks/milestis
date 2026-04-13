@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
@@ -29,12 +28,14 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
       <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-36">
 
         {/* Section label */}
-        <Animate direction="up" distance={20} className="flex items-center gap-4 mb-16 @md:mb-20">
-          <div className={cn('h-px w-12', theme.accent)} />
-          <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
-            Introduction
-          </span>
-        </Animate>
+        {introduction.label && (
+          <Animate direction="up" distance={20} className="flex items-center gap-4 mb-16 @md:mb-20">
+            <div className={cn('h-px w-12', theme.accent)} />
+            <span className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
+              {introduction.label}
+            </span>
+          </Animate>
+        )}
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 items-start">
 
           {/* Left РІР‚вЂњ text */}
@@ -87,6 +88,11 @@ export function IntroMemoir({ sectionContent, theme }: IntroMemoirProps) {
                 sizes="(max-width: 768px) 80vw, 35vw"
                 className={theme.shadow}
               />
+              {imageBlock?.caption && (
+                <p className={cn('mt-2.5 text-[10px] uppercase tracking-wide opacity-35', theme.fontBody)}>
+                  {imageBlock.caption}
+                </p>
+              )}
             </Animate>
           )}
         </div>

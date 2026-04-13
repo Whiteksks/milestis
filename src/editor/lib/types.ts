@@ -231,6 +231,7 @@ export interface PhotobookSectionContent {
   }
 
   introduction: {
+    label?: string
     title?: string
     quote?: string
     dedication?: string
@@ -238,6 +239,7 @@ export interface PhotobookSectionContent {
   }
 
   story: {
+    label?: string
     title?: string
     date?: string
     location?: string
@@ -245,12 +247,14 @@ export interface PhotobookSectionContent {
   }
 
   gallery: {
+    label?: string
     title?: string
     description?: string
     images?: PhotoBlock[]
   }
 
   highlight: {
+    label?: string
     title?: string
     description?: string
     quote?: string
@@ -259,6 +263,8 @@ export interface PhotobookSectionContent {
   }
 
   ending: {
+    title?: string
+    label?: string
     text?: string
     date?: string
     signature?: string

@@ -1,5 +1,4 @@
 'use client'
-"use client"
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
@@ -25,7 +24,7 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
       id="cover"
       themeForeground={theme.foreground}
       className={cn(
-        '@container relative min-h-screen flex flex-col overflow-hidden',       
+        'relative min-h-screen flex flex-col overflow-hidden',       
         theme.background,
       )}
     >
@@ -46,63 +45,39 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
         </div>
       )}
 
-      {/* Masthead top bar */}
-      <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-8 @md:pt-10">
-        {/* Left вЂ” publication name */}
-        <span
-          className={cn(
-            'text-[10px] uppercase tracking-[0.4em] font-bold',
-            hasImage ? 'text-white/60' : 'opacity-40',
-            theme.letterSpacing,
-            theme.fontBody,
-          )}
-        >
-          Photobook
-        </span>
-
-        {/* Right вЂ” date / location */}
-        <div className="flex items-center gap-6">
-          {cover.date && (
-            <span
-              className={cn(
-                'text-[9px] uppercase tracking-[0.2em]',
-                hasImage ? 'text-white/40' : 'opacity-25',
-                theme.fontBody,
-              )}
-            >
-              {cover.date}
-            </span>
-          )}
-          {cover.location && (
-            <span
-              className={cn(
-                'text-[9px] uppercase tracking-[0.2em]',
-                hasImage ? 'text-white/40' : 'opacity-25',
-                theme.fontBody,
-              )}
-            >
-              {cover.location}
-            </span>
-          )}
-        </div>
+      {/* Top editorial bar */}
+      <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-10 @md:pt-12">
+        <div className={cn('h-px w-16 @md:w-24 shrink-0', hasImage ? 'bg-white/25' : 'bg-current opacity-15')} />
+        {(cover.date || cover.location) && (
+          <p
+            className={cn(
+              'text-[9px] uppercase tracking-[0.3em]',
+              hasImage ? 'text-white/40' : 'opacity-25',
+              theme.fontBody,
+            )}
+          >
+            {[cover.location, cover.date].filter(Boolean).join('  ·  ')}
+          </p>
+        )}
       </Animate>
 
       {/* Bottom title block */}
       <div className="relative z-10 flex-1 flex flex-col justify-end px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-20 @lg:pb-28">
 
-        {/* Top thin rule above title */}
-        <Animate trigger="mount" direction="none" className={cn(
-            'h-px origin-left mb-8',
-            hasImage ? 'bg-white/25' : theme.accent,
-          )}
+        {/* Thin horizontal accent rule */}
+        <Animate
+          trigger="mount"
+          direction="none"
+          delay={0.1}
+          className={cn('h-px w-full origin-left mb-8 @md:mb-10', hasImage ? 'bg-white/20' : theme.accent)}
         />
 
         {/* Alternate solid / outline title words */}
-        <Animate trigger="mount" delay={0.2} distance={44}>
+        <Animate trigger="mount" delay={0.25} distance={48}>
           <h1
             className={cn(
-              'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[8rem]',
-              'font-bold tracking-tighter leading-[0.88] uppercase',
+              'text-5xl @sm:text-6xl @md:text-7xl @lg:text-[8.5rem]',
+              'font-bold tracking-tighter leading-[0.85] uppercase',
               theme.fontTitle,
             )}
           >
@@ -130,15 +105,35 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
           </h1>
 
           {/* Subtitle / tagline */}
-          {(cover.subtitle || cover.tagline) && (
-            <Animate as="p" trigger="mount" direction="none" delay={0.55} className={cn(
-                'mt-6 text-sm @md:text-base font-light max-w-[36ch]',
-                hasImage ? 'text-white/50' : 'opacity-50',
+          {cover.subtitle && (
+            <Animate
+              as="p"
+              trigger="mount"
+              direction="none"
+              delay={0.5}
+              className={cn(
+                'mt-6 @md:mt-8 text-sm @md:text-base font-light max-w-[40ch] border-l-2 pl-4 @md:pl-5',
+                hasImage ? 'text-white/55 border-white/25' : 'opacity-55 border-current/20',
                 theme.lineHeight,
                 theme.fontBody,
               )}
             >
-              {cover.subtitle || cover.tagline}
+              {cover.subtitle}
+            </Animate>
+          )}
+          {cover.tagline && (
+            <Animate
+              as="p"
+              trigger="mount"
+              direction="none"
+              delay={0.6}
+              className={cn(
+                'mt-3 text-sm font-light italic max-w-[44ch] pl-4 @md:pl-5',
+                hasImage ? 'text-white/40' : 'opacity-40',
+                theme.fontBody,
+              )}
+            >
+              {cover.tagline}
             </Animate>
           )}
         </Animate>

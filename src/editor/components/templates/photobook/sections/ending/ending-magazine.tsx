@@ -1,8 +1,8 @@
 'use client'
-"use client"
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -21,76 +21,117 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
     <SectionWrapper
       id="ending"
       themeForeground={theme.foreground}
-      className={cn('overflow-hidden', theme.background)}
-    >      <div className="max-w-5xl mx-auto py-20 @md:py-32 px-6 @md:px-12">        {/* Р’РµСЂС…РЅСЏСЏ Р»РёРЅРёСЏ СЃ РЅРѕРјРµСЂРѕРј СЃС‚СЂР°РЅРёС†С‹ РёР»Рё РїРѕРјРµС‚РєРѕР№ "FIN" */}
-        <div className="flex justify-between items-baseline mb-12 border-b border-current/10 pb-4">
-          <span className="text-[10px] uppercase tracking-[0.3em] opacity-50">Editorial Archive</span>
-          <span className={cn("text-xs italic", theme.fontBody)}>Finis</span>
+      className={cn('@container relative min-h-screen flex flex-col overflow-hidden', theme.background)}
+    >
+      {/* Full-bleed background — mirrors the cover */}
+      {hasImage && (
+        <div className="absolute inset-0">
+          <SiteImage
+            fillParent
+            unoptimized
+            src={imageUrl}
+            alt={ending.text ?? 'Closing'}
+            sizes="100vw"
+            imageClassName="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/50" />
         </div>
+      )}
 
-        <div className="grid grid-cols-1 @lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Р›РµРІР°СЏ РєРѕР»РѕРЅРєР°: РўРµРєСЃС‚ */}
-          <div className="@lg:col-span-7 flex flex-col">
-            <h2
-              className={cn(
-                'text-5xl @md:text-6xl @lg:text-7xl font-bold leading-[0.9] tracking-tighter mb-8 uppercase',
-                theme.fontTitle,
-              )}
-            >
-              {ending.text || "The End"}
-              <span className={cn("block text-xl @md:text-2xl mt-4 font-light normal-case tracking-normal italic opacity-70", theme.fontBody)}>
-                of this chapter
-              </span>
-            </h2>
+      {/* Top rule */}
+      <Animate
+        trigger="mount"
+        direction="none"
+        className="relative z-10 px-8 @md:px-14 @lg:px-20 pt-10 @md:pt-12"
+      >
+        <div className={cn('h-px', hasImage ? 'bg-white/15' : 'bg-current opacity-10')} />
+      </Animate>
 
-            <div className="max-w-sm">
+      {/* Main content — centered vertically */}
+      <div className="relative z-10 flex-1 flex flex-col justify-center px-8 @md:px-14 @lg:px-20 py-12">
+        <Animate trigger="mount" delay={0.2} distance={32}>
+          <div className="max-w-2xl space-y-8 @md:space-y-10">
+
+            {ending.label && (
+              <p
+                className={cn(
+                  'text-[9px] uppercase tracking-[0.4em]',
+                  hasImage ? 'text-white/35' : 'opacity-30',
+                  theme.fontBody,
+                )}
+              >
+                {ending.label}
+              </p>
+            )}
+
+            {ending.title && (
+              <h2
+                className={cn(
+                  'text-4xl @sm:text-5xl @md:text-6xl @lg:text-7xl font-bold tracking-tighter leading-none',
+                  hasImage ? 'text-white' : '',
+                  theme.fontTitle,
+                )}
+              >
+                {ending.title}
+              </h2>
+            )}
+
+            {ending.text && (
+              <p
+                className={cn(
+                  'text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl font-light italic leading-snug',
+                  hasImage ? 'text-white/80' : 'opacity-70',
+                  theme.fontTitle,
+                )}
+              >
+                {ending.text}
+              </p>
+            )}
+
+            <div className={cn('h-px w-16', hasImage ? 'bg-white/30' : theme.accent)} />
+
+            <div className="space-y-2">
               {ending.signature && (
-                <p className={cn('text-lg leading-relaxed mb-6 opacity-80', theme.fontBody)}>
-                  {ending.signature}
+                <p
+                  className={cn(
+                    'text-sm @md:text-base font-light',
+                    hasImage ? 'text-white/60' : 'opacity-55',
+                    theme.fontBody,
+                  )}
+                >
+                  — {ending.signature}
                 </p>
               )}
-              
               {ending.date && (
-                <div className="flex items-center gap-4">
-                   <div className={cn('h-px w-8', theme.accent)} />
-                   <span className="text-[10px] uppercase tracking-widest opacity-40">{ending.date}</span>
-                </div>
+                <p
+                  className={cn(
+                    'text-[10px] uppercase tracking-[0.35em]',
+                    hasImage ? 'text-white/35' : 'opacity-30',
+                    theme.fontBody,
+                  )}
+                >
+                  {ending.date}
+                </p>
               )}
             </div>
           </div>
-
-          {/* РџСЂР°РІР°СЏ РєРѕР»РѕРЅРєР°: РР·РѕР±СЂР°Р¶РµРЅРёРµ */}
-          {hasImage && (
-            <div className="@lg:col-span-5 relative">
-              <div className="relative aspect-[3/4] @lg:aspect-[4/5] overflow-hidden bg-current/5 shadow-2xl">
-                <SiteImage
-                  fillParent
-                  unoptimized
-                  src={imageUrl}
-                  alt={ending.text ?? 'Closing'}
-                  sizes="(max-width: 1024px) 90vw, 40vw"
-                  imageClassName="object-cover transition-transform duration-700 hover:scale-105"
-                />
-              </div>
-              {/* Р”РµРєРѕСЂР°С‚РёРІРЅС‹Р№ СЌР»РµРјРµРЅС‚ "Magazine" */}
-              <div className={cn(
-                "absolute -bottom-6 -right-4 text-6xl opacity-10 pointer-events-none select-none font-serif italic",
-                theme.fontTitle
-              )}>
-                &
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* РќРёР¶РЅРёР№ РєРѕР»РѕРЅС‚РёС‚СѓР» */}
-        <div className="mt-20 flex justify-center">
-           <div className={cn('h-1.5 w-1.5 rounded-full mx-1', theme.accent)} />
-           <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-40', theme.accent)} />
-           <div className={cn('h-1.5 w-1.5 rounded-full mx-1 opacity-20', theme.accent)} />
-        </div>
+        </Animate>
       </div>
+
+      {/* Bottom bar — mirrors cover top bar */}
+      <Animate
+        trigger="mount"
+        direction="none"
+        delay={0.4}
+        className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pb-10 @md:pb-12"
+      >
+        <div className={cn('h-px w-16 @md:w-24', hasImage ? 'bg-white/20' : 'bg-current opacity-10')} />
+        <div className="flex items-center gap-2">
+          <div className={cn('w-1.5 h-1.5 rounded-full', hasImage ? 'bg-white/30' : 'bg-current opacity-25')} />
+          <div className={cn('w-1.5 h-1.5 rounded-full', hasImage ? 'bg-white/15' : 'bg-current opacity-12')} />
+          <div className={cn('w-1.5 h-1.5 rounded-full', hasImage ? 'bg-white/07' : 'bg-current opacity-07')} />
+        </div>
+      </Animate>
     </SectionWrapper>
   )
 }
