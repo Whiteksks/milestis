@@ -359,10 +359,16 @@ export const exportProject = onRequest(
 			}
 			writeBatch.update(projectRef, projectDocUpdate);
 
+			const userStatUpdates: Record<string, unknown> = {};
 			if (freedBytes > 0) {
-				writeBatch.update(userRef, {
-					"stats.storageUsedBytes": FieldValue.increment(-freedBytes),
-				});
+				userStatUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedBytes);
+			}
+			// Free the active project slot when archiving for the first time.
+			if (projectData.status === "active") {
+				userStatUpdates["stats.projectsInProgress"] = FieldValue.increment(-1);
+			}
+			if (Object.keys(userStatUpdates).length > 0) {
+				writeBatch.update(userRef, userStatUpdates);
 			}
 
 			await writeBatch.commit();

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
@@ -82,7 +83,7 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
                         sizes="(max-width: 768px) 100vw, 58vw"
                       />
                     ) : (
-                      <div className={cn('w-full aspect-[4/3]', theme.background, 'opacity-50')} />
+                      <ProjectPlaceholder seed={block.id} className="w-full aspect-[4/3]" />
                     )}
                   </div>
 

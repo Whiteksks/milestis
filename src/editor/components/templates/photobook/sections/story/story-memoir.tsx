@@ -2,6 +2,7 @@
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -75,7 +76,7 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                 >
                   {/* Photo */}
                   <div className={cn(isEven ? '@md:order-1' : '@md:order-2')}>
-                    {imageUrl && (
+                    {imageUrl ? (
                       <SiteImage
                         src={imageUrl}
                         alt={block.label ?? story.title ?? 'Story'}
@@ -86,6 +87,8 @@ export function StoryMemoir({ sectionContent, theme }: StoryMemoirProps) {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className={theme.shadow}
                       />
+                    ) : (
+                      <ProjectPlaceholder seed={block.id} className="w-full aspect-video" />
                     )}
                     {block.caption && (
                       <p className={cn('mt-3 text-xs opacity-40', theme.fontBody)}>

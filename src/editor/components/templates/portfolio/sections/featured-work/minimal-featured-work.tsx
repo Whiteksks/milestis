@@ -3,6 +3,7 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
@@ -43,8 +44,13 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                 )}
               >
                 {/* Image */}
-                {project.image && (
-                  <div className="@lg:w-[42%] w-full shrink-0 group">
+                <div className="@lg:w-[42%] w-full shrink-0 group">
+                  {!project.image && (
+                    <div className="w-full" style={{ aspectRatio: '16/9' }}>
+                      <ProjectPlaceholder seed={project.id} className="w-full h-full" />
+                    </div>
+                  )}
+                  {project.image && (
                     <SiteImage
                       unoptimized
                       src={project.image}
@@ -55,8 +61,8 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                       sizes="(max-width: 768px) 100vw, 42vw"
                       imageClassName="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
                     />
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Content */}
                 <div className="@lg:w-2/5 flex flex-col justify-between gap-8">

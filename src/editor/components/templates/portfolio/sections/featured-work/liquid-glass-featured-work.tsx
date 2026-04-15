@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { Animate } from '../../../primitives/animate'
 
 export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
@@ -61,13 +62,15 @@ function ProjectCard({ project, index, theme }: { project: PortfolioTemplateProp
       )}
     >
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {project.image && (
+        {project.image ? (
           <SiteImage
             fillParent
             src={project.image}
             alt={project.title}
             imageClassName="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.2,1,0.3,1)] group-hover:scale-103"
           />
+        ) : (
+          <ProjectPlaceholder seed={project.id} className="absolute inset-0 opacity-40" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
       </div>

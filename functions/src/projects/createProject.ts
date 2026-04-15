@@ -164,9 +164,9 @@ export const createProject = onRequest(
 
         const userData = userSnap.data()!;
         const maxProjects: number = userData.subscription?.features?.maxProjects ?? 5;
-        const totalProjects: number = userData.stats?.totalProjects ?? 0;
+        const projectsInProgress: number = userData.stats?.projectsInProgress ?? 0;
 
-        if (totalProjects >= maxProjects) {
+        if (projectsInProgress >= maxProjects) {
           throw new LimitError(maxProjects);
         }
 

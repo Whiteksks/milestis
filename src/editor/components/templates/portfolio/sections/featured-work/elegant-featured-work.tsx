@@ -3,6 +3,7 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
@@ -44,8 +45,10 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
               viewport={{ once: true, margin: '-80px' }}
             >
               {/* Full-width image */}
-              {project.image && (
-                <div className="relative overflow-hidden w-full mb-8 group">
+              <div className="relative overflow-hidden w-full mb-8 group">
+                {!project.image ? (
+                  <ProjectPlaceholder seed={project.id} className="w-full" style={{ aspectRatio: '16/9' }} />
+                ) : (
                   <SiteImage
                     unoptimized
                     src={project.image}
@@ -56,8 +59,8 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                     sizes="(max-width: 768px) 100vw, 80vw"
                     imageClassName="object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-out"
                   />
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Caption row РІР‚вЂќ two columns: title left, meta right */}
               <div className="flex flex-col @md:flex-row @md:items-end justify-between gap-6">

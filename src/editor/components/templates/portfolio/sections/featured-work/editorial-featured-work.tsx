@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
@@ -88,15 +89,19 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
                         getFrameStyle(project.frameStyle || 'none'),
                       )}
                     >
-                      <SiteImage
-                        fillParent
-                        unoptimized
-                        src={project.image || '/placeholder.svg?height=600&width=1000'}
-                        alt={project.title}
-                        sizes="(max-width: 768px) 100vw, 58vw"
-                        cropData={project.cropData}
-                        imageClassName="object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700 ease-out scale-[1.04] group-hover:scale-100"
-                      />
+                      {!project.image ? (
+                        <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
+                      ) : (
+                        <SiteImage
+                          fillParent
+                          unoptimized
+                          src={project.image}
+                          alt={project.title}
+                          sizes="(max-width: 768px) 100vw, 58vw"
+                          cropData={project.cropData}
+                          imageClassName="object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700 ease-out scale-[1.04] group-hover:scale-100"
+                        />
+                      )}
                       {/* Hover overlay РІР‚вЂќ subtle darkening from bottom */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>

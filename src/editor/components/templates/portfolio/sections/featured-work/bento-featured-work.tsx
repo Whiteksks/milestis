@@ -6,6 +6,7 @@ import type { FrameStyle } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
@@ -13,6 +14,7 @@ import { Animate } from '../../../primitives/animate'
 type BentoFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
 type Project = {
+  id?: string
   title: string
   description: string
   image: string
@@ -59,7 +61,7 @@ function ProjectCard({
           )}
         />
       ) : (
-        <div className="absolute inset-0 bg-current/5" />
+        <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
       )}
 
       {/* Always-visible gradient */}

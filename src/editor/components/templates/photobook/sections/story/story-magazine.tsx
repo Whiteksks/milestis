@@ -2,6 +2,7 @@
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -75,7 +76,7 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
               return (
                 <Animate key={block.id} direction="up" distance={32} delay={0.05}>
                   <div>
-                    {imageUrl && (
+                    {imageUrl ? (
                       <SiteImage
                         src={imageUrl}
                         alt={block.label ?? story.title ?? 'Story'}
@@ -85,6 +86,8 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
                         unoptimized
                         sizes="(max-width: 768px) 100vw, 80vw"
                       />
+                    ) : (
+                      <ProjectPlaceholder seed={block.id} className="w-full aspect-video" />
                     )}
 
                     {/* Editorial caption bar */}

@@ -2,6 +2,7 @@
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -109,7 +110,7 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
 
                   {/* Photo + Description */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
-                    {imageUrl && (
+                    {imageUrl ? (
                       <SiteImage
                         src={imageUrl}
                         alt={block.label ?? story.title ?? `Story ${index + 1}`}
@@ -120,6 +121,8 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
                         sizes="(max-width: 768px) 90vw, 70vw"
                         className={theme.shadow}
                       />
+                    ) : (
+                      <ProjectPlaceholder seed={block.id} className="w-full aspect-square" />
                     )}
                     {block.caption && (
                       <p className={cn('mt-2 text-xs opacity-40 italic', theme.fontBody)}>

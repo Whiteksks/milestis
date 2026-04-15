@@ -3,6 +3,7 @@
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
@@ -41,16 +42,20 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
             >
               {/* Image Wrapper */}
               <div className="relative overflow-hidden">
-                <SiteImage
-                  unoptimized
-                  src={project.image || '/placeholder.svg?height=800&width=600'}
-                  alt={project.title || ''}
-                  aspectRatio={project.aspectRatio || 'poster'}
-                  frameStyle={project.frameStyle || 'none'}
-                  cropData={project.cropData}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                />
+                {!project.image ? (
+                  <ProjectPlaceholder seed={project.id} className="w-full" style={{ aspectRatio: '3/4' }} />
+                ) : (
+                  <SiteImage
+                    unoptimized
+                    src={project.image}
+                    alt={project.title || ''}
+                    aspectRatio={project.aspectRatio || 'poster'}
+                    frameStyle={project.frameStyle || 'none'}
+                    cropData={project.cropData}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  />
+                )}
                 
                 {/* Р СњР С•Р СР ВµРЎР‚ Р С—РЎР‚Р С•Р ВµР С”РЎвЂљР В° Р С—РЎР‚Р С‘ Р Р…Р В°Р Р†Р ВµР Т‘Р ВµР Р…Р С‘Р С‘ (Р С•Р С—РЎвЂ Р С‘Р С•Р Р…Р В°Р В»РЎРЉР Р…Р С•) */}
                 <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">

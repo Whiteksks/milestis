@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 
 type ShowcaseFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
 
@@ -45,6 +46,9 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
         {featured && (
           <Animate as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
             <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
+              {!featured.image && (
+                <ProjectPlaceholder seed={featured.id} className="absolute inset-0" />
+              )}
               {featured.image && (
                 <SiteImage
                   fillParent
@@ -118,6 +122,9 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                     getFrameStyle(project.frameStyle || 'none'),
                   )}
                 >
+                  {!project.image && (
+                    <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
+                  )}
                   {project.image && (
                     <SiteImage
                       fillParent

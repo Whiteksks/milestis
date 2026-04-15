@@ -1,6 +1,7 @@
 'use client'
 
 import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -69,8 +70,8 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                   <div className="flex flex-col items-center">
 
                     {/* Film-framed photo — generous width */}
-                    {imageUrl && (
-                      <div className="w-full border border-current/10 p-[3px] mb-5">
+                    <div className="w-full border border-current/10 p-[3px] mb-5">
+                      {imageUrl ? (
                         <SiteImage
                           src={imageUrl}
                           alt={block.label ?? story.title ?? 'Story'}
@@ -80,8 +81,10 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
                           unoptimized
                           sizes="(max-width: 768px) 95vw, 65vw"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <ProjectPlaceholder seed={block.id} className="w-full aspect-square" />
+                      )}
+                    </div>
 
                     {/* Caption strip — left rule + meta */}
                     {(block.label || block.caption || description) && (
