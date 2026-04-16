@@ -193,30 +193,52 @@ export type PublishVariables = {
 export function usePublishMutation() {
   const queryClient = useQueryClient()
   const uid = useUid()
-
+  const updateBalance = useUserStore((s) => s.updateBalance)
   return useMutation({
-    mutationFn: async ({ projectId, slug, accessToken }: PublishVariables) => {
-      const promise = publishProject(projectId, slug, accessToken)
-      toastProject.publish(promise)
-      await promise
-    },
+    mutationFn: ({ projectId, slug, accessToken }: PublishVariables) =>
+      publishProject(projectId, slug, accessToken),
     onMutate: async ({ projectId, slug }) => {
       if (!uid) return
       await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
+
       const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
-      queryClient.setQueryData<DashboardProject[]>(
-        projectKeys.active(uid),
-        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: true, publishedSlug: slug } : p) ?? [],
-      )
-      return { prevActive }
+      const prevArchived = queryClient.getQueryData<DashboardProject[]>(projectKeys.archived(uid))
+
+      const project = prevActive?.find((p) => p.id === projectId)
+      if (project) {
+        const archived: DashboardProject = {
+          ...project,
+          status: 'archived',
+          isPublished: true,
+          publishedSlug: slug,
+        }
+        queryClient.setQueryData<DashboardProject[]>(
+          projectKeys.active(uid),
+          (prev) => prev?.filter((p) => p.id !== projectId) ?? [],
+        )
+        queryClient.setQueryData<DashboardProject[]>(
+          projectKeys.archived(uid),
+          (prev) => (prev ? [archived, ...prev] : [archived]),
+        )
+      }
+
+      return { prevActive, prevArchived }
+    },
+    onSuccess: (result) => {
+      if (updateBalance) updateBalance(result.balance)
     },
     onError: (_err, _vars, context) => {
       if (!uid || !context) return
       if (context.prevActive !== undefined)
         queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
+      if (context.prevArchived !== undefined)
+        queryClient.setQueryData(projectKeys.archived(uid), context.prevArchived)
     },
     onSettled: () => {
-      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+      if (uid) {
+        void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+        void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
+      }
     },
   })
 }
@@ -235,21 +257,21 @@ export function useUnpublishMutation() {
     },
     onMutate: async (projectId) => {
       if (!uid) return
-      await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
-      const prevActive = queryClient.getQueryData<DashboardProject[]>(projectKeys.active(uid))
+      await queryClient.cancelQueries({ queryKey: projectKeys.archived(uid) })
+      const prevArchived = queryClient.getQueryData<DashboardProject[]>(projectKeys.archived(uid))
       queryClient.setQueryData<DashboardProject[]>(
-        projectKeys.active(uid),
-        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false, publishedSlug: null } : p) ?? [],
+        projectKeys.archived(uid),
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false, publishedSlug: null, publishedAccessToken: null } : p) ?? [],
       )
-      return { prevActive }
+      return { prevArchived }
     },
     onError: (_err, _id, context) => {
       if (!uid || !context) return
-      if (context.prevActive !== undefined)
-        queryClient.setQueryData(projectKeys.active(uid), context.prevActive)
+      if (context.prevArchived !== undefined)
+        queryClient.setQueryData(projectKeys.archived(uid), context.prevArchived)
     },
     onSettled: () => {
-      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
     },
   })
 }

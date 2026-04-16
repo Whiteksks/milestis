@@ -7,7 +7,7 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, Download } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
@@ -15,9 +15,7 @@ import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ExportModal } from '@/editor/components/modals/export-modal'
-import { PublishExportedModal } from '@/editor/components/modals/publish-exported-modal'
-import { getProjectConfig } from '@/lib/projects/project-type-config'
+import { PublishModal } from '@/editor/components/modals/publish-modal'
 
 interface EditorHeaderProps {
   projectId: string
@@ -27,7 +25,6 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const params = useParams()
   const router = useRouter()
@@ -41,7 +38,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const {
     deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean,
     isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode,
-    isExported, setIsPreviewOpen,
+    setIsPreviewOpen,
   } = useUiSelector((state) => ({
     deviceView: state.deviceView,
     setDeviceView: state.setDeviceView,
@@ -55,7 +52,6 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     publishedSlug: state.publishedSlug,
     publishedAccessToken: state.publishedAccessToken,
     editorMode: state.editorMode,
-    isExported: state.isExported,
     setIsPreviewOpen: state.setIsPreviewOpen,
   }))
 
@@ -103,8 +99,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     }
   }
 
-  async function handleOpenExportModal() {
-    // Auto-save before opening the export modal (photobook only).
+  async function handleOpenPublishModal() {
+    // Auto-save before publishing.
     if (isDirty) {
       setSaveState('saving')
       try {
@@ -114,13 +110,13 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         invalidateProjectsCache()
         setTimeout(() => setSaveState('idle'), 2000)
       } catch (err) {
-        console.error('[Export] Save before export failed:', err)
+        console.error('[Publish] Save before publish failed:', err)
         setSaveState('error')
         setTimeout(() => setSaveState('idle'), 2000)
         return
       }
     }
-    setIsExportModalOpen(true)
+    setIsPublishModalOpen(true)
   }
 
   function handleUnpublish() {
@@ -302,78 +298,32 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                     View site
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={handleOpenExportModal}>
-                  {editorMode === 'portfolio' ? <Globe className="size-4" /> : <Download className="size-4" />}
-                  {getProjectConfig(editorMode as 'portfolio' | 'photobook').republishLabel}
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
                   <EyeOff className="size-4" />
                   Unpublish
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : editorMode === 'portfolio' ? (
-            // Portfolio: paid publish modal
+          ) : (
             <Button
               size="sm"
-              onClick={handleOpenExportModal}
+              onClick={handleOpenPublishModal}
               disabled={saveState === 'saving'}
               className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
             >
               <Globe className="h-3 w-3" />
               <span className="hidden sm:inline">Publish</span>
             </Button>
-          ) : isExported ? (
-            // Photobook exported but not published
-            <div className="flex items-center gap-1.5">
-              <Button
-                size="sm"
-                onClick={() => setIsPublishModalOpen(true)}
-                className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
-              >
-                <Globe className="h-3 w-3" />
-                <span className="hidden sm:inline">Publish</span>
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleOpenExportModal}
-                disabled={saveState === 'saving'}
-                className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
-              >
-                <Download className="h-3 w-3" />
-                <span className="hidden sm:inline">Re-export</span>
-              </Button>
-            </div>
-          ) : (
-            // Photobook not yet exported
-            <Button
-              size="sm"
-              onClick={handleOpenExportModal}
-              disabled={saveState === 'saving'}
-              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
-            >
-              <Download className="h-3 w-3" />
-              <span className="hidden sm:inline">Export PDF</span>
-            </Button>
           )}
         </div>
       </div>
 
-      {/* Export / Publish modal (both modes, costs credits) */}
-      <ExportModal
-        open={isExportModalOpen}
-        onOpenChange={setIsExportModalOpen}
-        projectId={projectId}
-        mode={editorMode as 'portfolio' | 'photobook'}
-        isExported={isExported}
-      />
-      {/* Photobook: publish after export (free) */}
-      <PublishExportedModal
-        open={isPublishModalOpen && editorMode === 'photobook'}
+      {/* Publish modal (both modes, costs credits) */}
+      <PublishModal
+        open={isPublishModalOpen}
         onOpenChange={setIsPublishModalOpen}
         projectId={projectId}
-        mode="photobook"
+        mode={editorMode as 'portfolio' | 'photobook'}
       />
     </header>
   )

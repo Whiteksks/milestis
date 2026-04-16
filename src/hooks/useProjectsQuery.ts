@@ -12,7 +12,6 @@ export interface DashboardProject {
   mode: 'portfolio' | 'photobook'
   status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
-  isExported?: boolean
   publishedSlug?: string | null
   /** Plaintext access token stored on the project doc (photobooks only). */
   publishedAccessToken?: string | null
@@ -64,7 +63,6 @@ export function mapProjectDoc(data: DocumentData, id: string): DashboardProject 
     mode: data.mode,
     status: data.status,
     isPublished: data.isPublished ?? false,
-    isExported: data.isExported ?? false,
     publishedSlug: data.publishedSlug ?? null,
     publishedAccessToken: data.publishedAccessToken ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),

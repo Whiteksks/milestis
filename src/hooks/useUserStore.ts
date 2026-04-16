@@ -26,6 +26,7 @@ interface UserState {
   setProfile: (data: UserProfile | null) => void;
   clearProfile: () => void;
   setLoading: (loading: boolean) => void;
+  updateBalance: (balance: UserBalance) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -34,4 +35,8 @@ export const useUserStore = create<UserState>((set) => ({
   setProfile: (data) => set({ profile: data, loading: false }),
   clearProfile: () => set({ profile: null, loading: false }),
   setLoading: (loading) => set({ loading }),
+  updateBalance: (balance) =>
+    set((state) =>
+      state.profile ? { profile: { ...state.profile, balance } } : {},
+    ),
 }));

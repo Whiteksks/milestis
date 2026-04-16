@@ -1,60 +1,8 @@
 import { createHash } from "crypto";
 import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions/v2";
-import type { ExportPublishInput } from "./types";
+import type { PublishInput } from "./types";
 import type { ProjectMode } from "../projectInterface";
-
-// ─── Ghost Mode ───────────────────────────────────────────────────────────────
-
-/**
- * Creates or updates the published_projects document in "ghost" state:
- * data is there, but isPublished = false and slug is absent.
- *
- * This lets the user activate publication later just by providing a slug,
- * without needing to re-export.
- *
- * Safe to call even if a published doc already exists — it will NOT overwrite
- * isPublished: true or an existing slug (uses merge so live docs are untouched).
- */
-export async function writeGhostEntry(
-	db: Firestore,
-	projectId: string,
-	uid: string,
-	mode: ProjectMode,
-	projectName: string,
-	content: {
-		theme: Record<string, unknown> | null;
-		content: Record<string, unknown> | null;
-	},
-): Promise<void> {
-	const ref = db.collection("published_projects").doc(projectId);
-	const snap = await ref.get();
-
-	// Never downgrade an already-published document to ghost state.
-	if (snap.exists && snap.data()?.isPublished === true) {
-		// Still refresh the content snapshot (images now point to public/).
-		await ref.update({
-			theme: content.theme,
-			content: content.content,
-		});
-		logger.info(`[ghost] Refreshed content for already-published project ${projectId}.`);
-		return;
-	}
-
-	await ref.set(
-		{
-			ownerId: uid,
-			name: projectName,
-			mode,
-			theme: content.theme,
-			content: content.content,
-			isPublished: false,
-			exportedAt: FieldValue.serverTimestamp(),
-		},
-		{ merge: true },
-	);
-	logger.info(`[ghost] Ghost entry written for project ${projectId}.`);
-}
 
 // ─── Errors ───────────────────────────────────────────────────────────────────
 
@@ -85,7 +33,7 @@ export async function applyPublish(
 	projectId: string,
 	uid: string,
 	mode: ProjectMode,
-	input: ExportPublishInput,
+	input: Pick<PublishInput, "slug" | "accessToken">,
 	contentSnapshot: {
 		theme: Record<string, unknown> | null;
 		content: Record<string, unknown> | null;

@@ -74,14 +74,8 @@ env:
       - BUILD
       - RUNTIME
 
-  - variable: NEXT_PUBLIC_EXPORT_PROJECT_URL
-    value: https://exportProject-5h4wes5waq-ez.a.run.app
-    availability:
-      - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_PUBLISH_EXPORTED_PROJECT_URL
-    value: https://publishexportedproject-5h4wes5waq-ez.a.run.app
+  - variable: NEXT_PUBLIC_PUBLISH_PROJECT_URL
+    value: https://publishproject-5h4wes5waq-ez.a.run.app
     availability:
       - BUILD
       - RUNTIME

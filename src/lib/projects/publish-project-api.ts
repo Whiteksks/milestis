@@ -1,5 +1,16 @@
 import { auth } from "../firebase/firebase"
 
+export interface PublishProjectResult {
+  ok: true
+  publishedSlug: string
+  balance: {
+    total: number
+    purchased: number
+    subscription: number
+    bonus: number
+  }
+}
+
 export class PublishProjectError extends Error {
   constructor(public readonly code: string, message: string) {
     super(message)
@@ -10,7 +21,7 @@ export async function publishProject(
   projectId: string,
   slug: string,
   accessToken?: string,
-): Promise<void> {
+): Promise<PublishProjectResult> {
   const user = auth.currentUser
   if (!user) throw new PublishProjectError("UNAUTHORIZED", "Not authenticated")
 
@@ -32,4 +43,6 @@ export async function publishProject(
   if (!res.ok) {
     throw new PublishProjectError(data.error ?? "UNKNOWN", data.message ?? "Failed to publish project")
   }
+
+  return data as PublishProjectResult
 }

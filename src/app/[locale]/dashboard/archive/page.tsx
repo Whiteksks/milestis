@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Download, ArrowUpRight, Globe } from "lucide-react"
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { useProjectExportsQuery, useArchivedProjectsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
-import { PublishExportedModal } from "@/editor/components/modals/publish-exported-modal"
 import { cn } from "@/lib/utils"
 import { getProjectConfig } from "@/lib/projects/project-type-config"
 
@@ -106,7 +105,6 @@ export default function ExportsPage() {
   const locale = params.locale as string
   const { data: exports = [], isLoading } = useProjectExportsQuery()
   const { data: archivedProjects = [] } = useArchivedProjectsQuery()
-  const [publishTarget, setPublishTarget] = useState<{ projectId: string; mode: 'photobook' } | null>(null)
 
   // Map projectId → project info from archived query
   const archivedMap = useMemo(() => {
@@ -184,20 +182,6 @@ export default function ExportsPage() {
                         </a>
                       )
                     }
-                    // Photobook-only: two-step flow — exported but not yet published.
-                    // Portfolio is always published atomically via exportProject.
-                    if (p.mode !== 'portfolio') {
-                      return (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 px-2 text-[9px] uppercase tracking-[0.15em] font-medium text-muted-foreground hover:text-foreground"
-                          onClick={() => setPublishTarget({ projectId, mode: 'photobook' })}
-                        >
-                          <Globe className="size-2.5 mr-1" /> Publish
-                        </Button>
-                      )
-                    }
                     return null
                   })()}
                   <Link
@@ -221,15 +205,6 @@ export default function ExportsPage() {
         </div>
       )}
 
-      {/* Publish modal */}
-      {publishTarget && (
-        <PublishExportedModal
-          open={!!publishTarget}
-          onOpenChange={(open) => { if (!open) setPublishTarget(null) }}
-          projectId={publishTarget.projectId}
-          mode={publishTarget.mode}
-        />
-      )}
     </div>
   )
 }

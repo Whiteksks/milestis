@@ -28,11 +28,15 @@ import {
   ExternalLink,
   Link2,
   ShieldCheck,
+  Coins,
+  AlertTriangle,
 } from 'lucide-react'
 import { usePublishModal } from '@/hooks/usePublishModal'
 import { usePublishMutation } from '@/hooks/useProjectMutations'
 import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useUserStore } from '@/hooks/useUserStore'
+import { getProjectConfig } from '@/lib/projects/project-type-config'
 
 interface PublishModalProps {
   open: boolean
@@ -47,12 +51,17 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
     setPublishedInfo: s.setPublishedInfo,
   }))
 
+  const balance = useUserStore((s) => s.profile?.balance?.total ?? 0)
+  const config = getProjectConfig(mode)
+  const creditCost = config.creditCost
+  const hasEnoughCredits = balance >= creditCost
+
   const publishMutation = usePublishMutation()
   const modalData = usePublishModal(projectId, mode)
   const isMobile = useIsMobile()
 
   function handlePublish() {
-    if (!modalData.canPublish) return
+    if (!modalData.canPublish || !hasEnoughCredits) return
     publishMutation.mutate(
       { projectId, slug: modalData.slug, accessToken: mode === 'photobook' ? modalData.accessToken : undefined },
       {
@@ -81,10 +90,11 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
             </DrawerDescription>
           </DrawerHeader>
           <PublishForm mode={mode} data={modalData} />
+          <CreditCostRow creditCost={creditCost} balance={balance} />
           <DrawerFooter className="px-0 pt-2">
             <Button
               onClick={handlePublish}
-              disabled={!modalData.canPublish || publishMutation.isPending}
+              disabled={!modalData.canPublish || !hasEnoughCredits || publishMutation.isPending}
               className="gap-2 w-full"
             >
               <PublishButtonIcon isPending={publishMutation.isPending} hasUrl={!!modalData.portfolioUrl || !!modalData.photobookUrl} />
@@ -114,6 +124,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           </DialogDescription>
         </DialogHeader>
         <PublishForm mode={mode} data={modalData} />
+        <CreditCostRow creditCost={creditCost} balance={balance} />
         <DialogFooter className="gap-2">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} disabled={publishMutation.isPending}>
             Cancel
@@ -121,7 +132,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           <Button
             size="sm"
             onClick={handlePublish}
-            disabled={!modalData.canPublish || publishMutation.isPending}
+            disabled={!modalData.canPublish || !hasEnoughCredits || publishMutation.isPending}
             className="gap-2"
           >
             <PublishButtonIcon isPending={publishMutation.isPending} hasUrl={!!modalData.portfolioUrl || !!modalData.photobookUrl} />
@@ -200,6 +211,25 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
     </div>
   )
 }
+function CreditCostRow({ creditCost, balance }: { creditCost: number; balance: number }) {
+  const insufficient = balance < creditCost
+  return (
+    <div className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 border text-xs font-medium ${insufficient ? 'border-destructive/30 bg-destructive/5' : 'border-border/50 bg-muted/30'}`}>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        <Coins className="size-3.5" />
+        Cost
+      </span>
+      <div className="flex items-center gap-2">
+        {insufficient && <AlertTriangle className="size-3 text-destructive" />}
+        <span className={insufficient ? 'text-destructive' : 'text-foreground'}>
+          {creditCost} credits
+          <span className="text-muted-foreground/60 ml-1.5 font-normal">(balance: {balance})</span>
+        </span>
+      </div>
+    </div>
+  )
+}
+
 function PublishButtonIcon({ isPending, hasUrl }: { isPending: boolean; hasUrl: boolean }) {
   if (isPending) return <Loader2 className="size-3 animate-spin" />
   if (hasUrl) return <ExternalLink className="size-3" />

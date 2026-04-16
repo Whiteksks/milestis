@@ -40,6 +40,15 @@
         { "fieldPath": "slug", "order": "ASCENDING" },
         { "fieldPath": "mode", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "creditLots",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "bucket", "order": "ASCENDING" },
+        { "fieldPath": "expiresAtMillis", "order": "ASCENDING" },
+        { "fieldPath": "createdAtMillis", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
