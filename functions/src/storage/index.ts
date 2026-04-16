@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
+import { getStorage } from "firebase-admin/storage";
 import { logger } from "firebase-functions/v2";
 import { db } from "../lib/firebaseAdmin";
 import { makeResizeFunction, OutputFile } from "./resizeImage";
@@ -89,6 +90,29 @@ export const resizeProjectImage = makeResizeFunction({
     const imageId = parts[5];
     if (!uid || !projectId || !imageId) {
       logger.error("resizeProjectImage: invalid storage path in onComplete", { path: event.data.name });
+      return;
+    }
+
+    // ── Storage limit check ───────────────────────────────────────────────
+    const userSnap = await db.collection("users").doc(uid).get();
+    const userData = userSnap.data();
+    const maxStorageBytes: number = userData?.subscription?.features?.maxStorageBytes ?? 0;
+    const usedStorageBytes: number = userData?.stats?.storageUsedBytes ?? 0;
+
+    if (maxStorageBytes > 0 && usedStorageBytes + meta.generatedSizeBytes > maxStorageBytes) {
+      logger.warn(`[resizeProjectImage] Storage limit exceeded for user ${uid}. Deleting generated files.`, {
+        usedStorageBytes,
+        generatedSizeBytes: meta.generatedSizeBytes,
+        maxStorageBytes,
+      });
+      // Delete all generated files to avoid silent quota creep
+      const bucket = getStorage().bucket();
+      const basePath = `users/${uid}/projects/${projectId}/images/${imageId}`;
+      await Promise.allSettled(
+        Object.keys(urls).map((name) =>
+          bucket.file(`${basePath}/${name}`).delete().catch(() => undefined),
+        ),
+      );
       return;
     }
 

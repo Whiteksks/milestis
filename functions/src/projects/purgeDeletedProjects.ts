@@ -3,6 +3,7 @@ import { logger } from "firebase-functions/v2";
 import { Timestamp, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
+import { deleteProjectImageDocs } from "./projectUtils";
 
 /**
  * Runs at 00:00 UTC on the 1st of every month.
@@ -41,26 +42,15 @@ export const purgeDeletedProjects = onSchedule(
     const bucket = storage.bucket();
 
     for (const projectDoc of snapshot.docs) {
-      const { ownerId } = projectDoc.data() as { ownerId: string };
+      const projectData = projectDoc.data() as { ownerId: string; isExported?: boolean };
+      const { ownerId } = projectData;
       const projectId = projectDoc.id;
 
-      try {
-        // 1. Delete all Firestore image metadata documents for this project
-        const imagesSnap = await db
-          .collection("images")
-          .where("projectId", "==", projectId)
-          .get();
+      let freedStorageBytes = 0;
 
-        if (!imagesSnap.empty) {
-          const imgBatch = db.batch();
-          for (const imgDoc of imagesSnap.docs) {
-            imgBatch.delete(imgDoc.ref);
-          }
-          await imgBatch.commit();
-          logger.info(
-            `[purgeDeletedProjects] Deleted ${imagesSnap.size} image doc(s) for project ${projectId}.`
-          );
-        }
+      try {
+        // 1. Delete all Firestore image metadata documents + sum freed storage
+        freedStorageBytes = await deleteProjectImageDocs(projectId, "[purgeDeletedProjects]");
 
         // 2. Delete editor content subcollection document
         const contentRef = db
@@ -89,15 +79,24 @@ export const purgeDeletedProjects = onSchedule(
         // Continue purging other projects even if one fails
       }
 
-      // 5. Delete project doc + published snapshot + decrement user counter
+      // 5. Delete project doc + published snapshot + decrement user counters
       const userRef = db.collection("users").doc(ownerId);
       const publishedRef = db.collection("published_projects").doc(projectId);
       const deleteBatch = db.batch();
       deleteBatch.delete(projectDoc.ref);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      deleteBatch.update(userRef, {
+
+      const userUpdates: Record<string, unknown> = {
         "stats.totalProjects": FieldValue.increment(-1),
-      });
+      };
+      if (freedStorageBytes > 0) {
+        userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
+      }
+      // If the project was never exported, the active slot was never freed — do it now.
+      if (!projectData.isExported) {
+        userUpdates["stats.projectsInProgress"] = FieldValue.increment(-1);
+      }
+      deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();
       logger.info(`[purgeDeletedProjects] Deleted project document ${projectId}.`);
     }

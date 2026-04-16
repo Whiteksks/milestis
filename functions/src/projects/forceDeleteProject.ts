@@ -4,6 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
+import { deleteProjectImageDocs } from "./projectUtils";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -94,20 +95,8 @@ export const forceDeleteProject = onRequest(
 
     // ── Cleanup ───────────────────────────────────────────────────────────
     try {
-      // 1. Delete image metadata from Firestore
-      const imagesSnap = await db
-        .collection("images")
-        .where("projectId", "==", projectId)
-        .get();
-
-      if (!imagesSnap.empty) {
-        const batch = db.batch();
-        for (const imgDoc of imagesSnap.docs) {
-          batch.delete(imgDoc.ref);
-        }
-        await batch.commit();
-        logger.info(`[forceDeleteProject] Deleted ${imagesSnap.size} image doc(s) for ${projectId}.`);
-      }
+      // 1. Delete image metadata from Firestore + sum freed storage
+      const freedStorageBytes = await deleteProjectImageDocs(projectId, "[forceDeleteProject]");
 
       // 2. Delete editor content subcollection
       const contentRef = projectRef.collection("data").doc("content");
@@ -135,15 +124,24 @@ export const forceDeleteProject = onRequest(
       });
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);
 
-      // 6. Delete project doc + published snapshot + decrement user counter
+      // 6. Delete project doc + published snapshot + decrement user counters
       const userRef = db.collection("users").doc(uid);
       const publishedRef = db.collection("published_projects").doc(projectId);
       const deleteBatch = db.batch();
       deleteBatch.delete(projectRef);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      deleteBatch.update(userRef, {
+
+      const userUpdates: Record<string, unknown> = {
         "stats.totalProjects": FieldValue.increment(-1),
-      });
+      };
+      if (freedStorageBytes > 0) {
+        userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
+      }
+      // If the project was never exported, the active slot was never freed — do it now.
+      if (!data.isExported) {
+        userUpdates["stats.projectsInProgress"] = FieldValue.increment(-1);
+      }
+      deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();
       logger.info(`[forceDeleteProject] Project ${projectId} permanently deleted by user ${uid}.`);
 
