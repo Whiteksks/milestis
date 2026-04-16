@@ -3,6 +3,7 @@ import { auth } from "../firebase/firebase"
 export interface PublishProjectResult {
   ok: true
   publishedSlug: string
+  transactionId: string
   balance: {
     total: number
     purchased: number

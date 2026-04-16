@@ -381,7 +381,10 @@ export async function processTransaction(
 						).next;
 					}
 				} else {
-					// Spend/expire by consuming lots first (best-effort) then updating snapshot
+					// Spend/expire by consuming lots first (best-effort) then updating snapshot.
+					// consumeLots is wrapped in try-catch: if the query fails (e.g. index not yet
+					// built or user has no lots), we skip lot tracking but still commit the balance
+					// debit below. This keeps the transaction atomic even on fresh deployments.
 					const { next, debited } = debitFromBuckets(
 						currentBalance,
 						amount,
@@ -389,17 +392,22 @@ export async function processTransaction(
 					);
 					nextBalance = next;
 
-					// Attempt to reflect debits into lots. If lots are missing (legacy users), balance still stays consistent.
 					for (const bucket of bucketOrder) {
 						const bucketDebit = debited[bucket];
 						if (bucketDebit <= 0) continue;
-						await consumeLots(tx, {
-							uid: input.uid,
-							bucket,
-							amount: bucketDebit,
-							nowMillis,
-							mode: credit.type === "expire" ? "expire" : "spend",
-						});
+						try {
+							await consumeLots(tx, {
+								uid: input.uid,
+								bucket,
+								amount: bucketDebit,
+								nowMillis,
+								mode: credit.type === "expire" ? "expire" : "spend",
+							});
+						} catch (lotsErr) {
+							// Non-fatal: lot tracking is best-effort. Balance is still debited below.
+							// This can happen when the creditLots index is not yet built.
+							console.warn(`[engine] consumeLots failed for bucket ${bucket} (skipped):`, lotsErr);
+						}
 					}
 				}
 			}
@@ -437,8 +445,8 @@ export async function processTransaction(
 				balanceSnapshot,
 				currency: billing.currency,
 				amountMinor: billing.amountMinor,
-				refundedTxId: billing.refundedTxId,
-				meta: billing.meta,
+				...(billing.refundedTxId ? { refundedTxId: billing.refundedTxId } : {}),
+				...(billing.meta ? { meta: billing.meta } : {}),
 			};
 		} else {
 			const credit = input.credit!;
@@ -452,8 +460,8 @@ export async function processTransaction(
 				idempotencyKey: input.idempotencyKey,
 				balanceSnapshot,
 				amount: credit.amount,
-				billingTid: credit.billingTid,
-				meta: credit.meta,
+				...(credit.billingTid ? { billingTid: credit.billingTid } : {}),
+				...(credit.meta ? { meta: credit.meta } : {}),
 			};
 		}
 

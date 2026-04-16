@@ -12,6 +12,10 @@ export interface DashboardProject {
   mode: 'portfolio' | 'photobook'
   status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
+  publishJobState?: 'processing' | 'failed'
+  publishLastErrorCode?: string | null
+  publishLastErrorMessage?: string | null
+  publishTransactionId?: string | null
   publishedSlug?: string | null
   /** Plaintext access token stored on the project doc (photobooks only). */
   publishedAccessToken?: string | null
@@ -63,6 +67,10 @@ export function mapProjectDoc(data: DocumentData, id: string): DashboardProject 
     mode: data.mode,
     status: data.status,
     isPublished: data.isPublished ?? false,
+    publishJobState: data.publishJobState ?? undefined,
+    publishLastErrorCode: data.publishLastErrorCode ?? null,
+    publishLastErrorMessage: data.publishLastErrorMessage ?? null,
+    publishTransactionId: data.publishTransactionId ?? null,
     publishedSlug: data.publishedSlug ?? null,
     publishedAccessToken: data.publishedAccessToken ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),

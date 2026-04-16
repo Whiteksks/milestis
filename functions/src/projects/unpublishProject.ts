@@ -83,17 +83,22 @@ export const unpublishProject = onRequest(
 
       // 1. Mark published_projects doc as hidden (keep data for re-publish).
       const publishedRef = db.collection("published_projects").doc(projectId);
-      batch.update(publishedRef, {
+      batch.set(publishedRef, {
         isPublished: false,
         slug: FieldValue.delete(),
         accessToken: FieldValue.delete(),
-      });
+        unpublishedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
 
       // 2. Clear publish fields on the project doc.
       batch.update(projectRef, {
         isPublished: false,
         publishedSlug: FieldValue.delete(),
         publishedAccessToken: FieldValue.delete(),
+        publishJobState: FieldValue.delete(),
+        publishJobLeaseExpiresAtMillis: FieldValue.delete(),
+        publishLastErrorCode: FieldValue.delete(),
+        publishLastErrorMessage: FieldValue.delete(),
         updatedAt: FieldValue.serverTimestamp(),
       });
 

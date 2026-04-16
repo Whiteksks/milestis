@@ -51,15 +51,14 @@ export const PROJECT_TYPE_CONFIG = {
   photobook: {
     label: 'Photobook',
 
-    primaryActionLabel: 'Export PDF',
-    republishLabel: 'Re-export',
+    primaryActionLabel: 'Publish',
+    republishLabel: 'Republish',
 
-    archiveBadge: 'PDF',
-    archiveRecordTitle: 'Document Archive',
-    /** Photobook export generates a PDF that can be downloaded */
-    canDownloadFile: true,
+    archiveBadge: 'BOOK',
+    archiveRecordTitle: 'Published Photobook',
+    canDownloadFile: false,
 
-    requiresSlug: false,
+    requiresSlug: true,
     getShareUrl: (slug: string, accessToken?: string) =>
       accessToken
         ? `https://milestis.site/${slug}?token=${accessToken}`
@@ -67,20 +66,15 @@ export const PROJECT_TYPE_CONFIG = {
 
     creditCost: 10,
 
-    // ── Publish / Export modal ─────────────────────────────────────────────
     modal: {
-      title: 'Export PDF',
-      description: 'Download your photobook as a print-ready PDF.',
-      costLabel: 'PDF Export',
-      costDescription: 'Print-ready PDF',
-      actionLabel: 'Export PDF',
-      actionLabelWithPublish: 'Export & Publish',
-      pendingLabel: 'Exporting…',
-      /** Shown when re-exporting an already-exported photobook */
-      republishWarning: 'This will replace your previous export. Download the current PDF first if you still need it.',
-      /** Label for the optional online-publish section */
-      publishToggleLabel: 'Publish online',
-      publishToggleDescription: 'Share a private link to your photobook.',
+      title: 'Publish Photobook',
+      description: 'Share a private link to your photobook. Only people with the link can view it.',
+      costLabel: 'Photobook Publish',
+      costDescription: 'Migrate media & publish photobook',
+      actionLabel: 'Publish Photobook',
+      pendingLabel: 'Publishing…',
+      republishWarning: 'Your current photobook link will be replaced. Visitors with the old link will see the updated version.',
+      addressLabel: 'Your photobook address',
     },
   },
 } as const

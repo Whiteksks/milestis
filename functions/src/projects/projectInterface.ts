@@ -32,6 +32,16 @@ export interface ProjectMetadata {
   updatedAt: FieldValue;
   schemaVersion: number;
   isPublished?: boolean;  // Set by the publish function; absent until first publish action
+  /** Runtime status of the publish job, used for diagnostics and safe retries. */
+  publishJobState?: "processing" | "failed";
+  /** Soft lease for the current publish attempt so crashed jobs can be retried later. */
+  publishJobLeaseExpiresAtMillis?: number;
+  /** Machine-readable reason from the last failed publish attempt. */
+  publishLastErrorCode?: string;
+  /** Human-readable reason from the last failed publish attempt. */
+  publishLastErrorMessage?: string;
+  /** Last successful debit transaction id for the publish flow. */
+  publishTransactionId?: string;
   template?: {
     id: string;
   };  // Optional template reference for future use

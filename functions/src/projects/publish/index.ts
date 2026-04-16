@@ -4,7 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../../lib/firebaseAdmin";
 import { migrateProjectMedia, deletePrivateProjectMedia } from "./migrate";
-import { applyPublish, PublishValidationError } from "./publish";
+import { applyPublish, preparePublishInput, PublishValidationError } from "./publish";
 import { processTransaction, TransactionEngineError } from "../../transactions/engine";
 import { getPublishConfig } from "./config";
 import type { ProjectMode } from "../projectInterface";
@@ -24,8 +24,80 @@ const ERROR = {
 	INVALID_SLUG:             "INVALID_SLUG",
 	SLUG_TAKEN:               "SLUG_TAKEN",
 	INSUFFICIENT_FUNDS:       "INSUFFICIENT_FUNDS",
+	PUBLISH_IN_PROGRESS:      "PUBLISH_IN_PROGRESS",
+	PUBLISH_FAILED:           "PUBLISH_FAILED",
 	INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
 } as const;
+
+const PUBLISH_JOB_LEASE_MS = 15 * 60 * 1000;
+const EMPTY_BALANCE = { total: 0, purchased: 0, subscription: 0, bonus: 0 };
+
+class PublishFlowError extends Error {
+	constructor(
+		public readonly code: typeof ERROR[keyof typeof ERROR],
+		public readonly status: number,
+		message: string,
+	) {
+		super(message);
+	}
+}
+
+async function claimPublishJob(projectId: string, uid: string) {
+	const projectRef = db.collection("projects").doc(projectId);
+	return db.runTransaction(async (tx) => {
+		const projectSnap = await tx.get(projectRef);
+		if (!projectSnap.exists) {
+			throw new PublishFlowError(ERROR.NOT_FOUND, 404, "Project not found.");
+		}
+
+		const projectData = projectSnap.data()!;
+		if (projectData.ownerId !== uid) {
+			throw new PublishFlowError(ERROR.FORBIDDEN, 403, "You do not own this project.");
+		}
+		if (projectData.status !== "active") {
+			throw new PublishFlowError(ERROR.NOT_ACTIVE, 400, "Only active projects can be published.");
+		}
+		if (projectData.isPublished === true) {
+			throw new PublishFlowError(ERROR.ALREADY_PUBLISHED, 409, "Project is already published. Unpublish first to change the slug.");
+		}
+
+		const currentLease =
+			typeof projectData.publishJobLeaseExpiresAtMillis === "number"
+				? projectData.publishJobLeaseExpiresAtMillis
+				: 0;
+		if (projectData.publishJobState === "processing" && currentLease > Date.now()) {
+			throw new PublishFlowError(
+				ERROR.PUBLISH_IN_PROGRESS,
+				409,
+				"A publish is already in progress for this project. Please wait a moment and try again.",
+			);
+		}
+
+		tx.update(projectRef, {
+			publishJobState: "processing",
+			publishJobLeaseExpiresAtMillis: Date.now() + PUBLISH_JOB_LEASE_MS,
+			publishLastErrorCode: FieldValue.delete(),
+			publishLastErrorMessage: FieldValue.delete(),
+			updatedAt: FieldValue.serverTimestamp(),
+		});
+
+		return projectData;
+	});
+}
+
+async function markPublishJobFailed(
+	projectId: string,
+	errorCode: string,
+	message: string,
+) {
+	await db.collection("projects").doc(projectId).update({
+		publishJobState: "failed",
+		publishJobLeaseExpiresAtMillis: FieldValue.delete(),
+		publishLastErrorCode: errorCode,
+		publishLastErrorMessage: message,
+		updatedAt: FieldValue.serverTimestamp(),
+	});
+}
 
 // ─── Payload validation ───────────────────────────────────────────────────────
 
@@ -123,15 +195,14 @@ export const publishProject = onRequest(
 			return;
 		}
 
-		const projectData = projectSnap.data()!;
+		const initialProjectData = projectSnap.data()!;
 
-		if (projectData.ownerId !== uid) {
+		if (initialProjectData.ownerId !== uid) {
 			res.status(403).json({ error: ERROR.FORBIDDEN });
 			return;
 		}
 
-		// ── Status guards ─────────────────────────────────────────────────
-		if (projectData.status !== "active") {
+		if (initialProjectData.status !== "active") {
 			res.status(400).json({
 				error: ERROR.NOT_ACTIVE,
 				message: "Only active projects can be published.",
@@ -139,7 +210,7 @@ export const publishProject = onRequest(
 			return;
 		}
 
-		if (projectData.isPublished === true) {
+		if (initialProjectData.isPublished === true) {
 			res.status(409).json({
 				error: ERROR.ALREADY_PUBLISHED,
 				message: "Project is already published. Unpublish first to change the slug.",
@@ -147,7 +218,7 @@ export const publishProject = onRequest(
 			return;
 		}
 
-		const mode = projectData.mode as ProjectMode;
+		const mode = initialProjectData.mode as ProjectMode;
 		const config = getPublishConfig(mode);
 
 		// ── Access token guard ────────────────────────────────────────────
@@ -170,6 +241,36 @@ export const publishProject = onRequest(
 				error: ERROR.INSUFFICIENT_FUNDS,
 				message: `Publishing costs ${config.creditCost} credits. Your balance: ${currentBalance}.`,
 			});
+			return;
+		}
+
+		let preparedInput;
+		try {
+			preparedInput = await preparePublishInput(db, projectId, mode, { slug, accessToken });
+		} catch (err) {
+			if (err instanceof PublishValidationError) {
+				const errorCode =
+					err.code === "SLUG_TAKEN" ? ERROR.SLUG_TAKEN :
+					err.code === "INVALID_SLUG" ? ERROR.INVALID_SLUG :
+					ERROR.INVALID_PAYLOAD;
+				res.status(409).json({ error: errorCode, message: err.message });
+				return;
+			}
+			logger.error(`[publishProject] preparePublishInput failed for ${projectId}:`, err);
+			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
+			return;
+		}
+
+		let projectData: FirebaseFirestore.DocumentData;
+		try {
+			projectData = await claimPublishJob(projectId, uid);
+		} catch (err) {
+			if (err instanceof PublishFlowError) {
+				res.status(err.status).json({ error: err.code, message: err.message });
+				return;
+			}
+			logger.error(`[publishProject] Failed to claim publish job for ${projectId}:`, err);
+			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
 		}
 
@@ -196,6 +297,7 @@ export const publishProject = onRequest(
 			({ urlMapping, freedBytes } = await migrateProjectMedia(uid, projectId, contentJson));
 		} catch (err) {
 			logger.error(`[publishProject] Media migration failed for ${projectId}:`, err);
+			await markPublishJobFailed(projectId, ERROR.PUBLISH_FAILED, "Failed to migrate project media.");
 			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
 		}
@@ -218,25 +320,64 @@ export const publishProject = onRequest(
 			content: migratedData.content,
 		};
 
-		// ── Publish (update published_projects + projects isPublished/slug) ──
+		// ── Debit credits before the project goes live ──────────────────────
+		let balanceSnapshot: PublishOutput["balance"];
+		let transactionId: string;
 		try {
-			await applyPublish(db, projectId, uid, mode, { slug, accessToken }, contentSnapshot, projectData.name);
+			const result = await processTransaction({
+				uid,
+				idempotencyKey: `publish:${projectId}`,
+				category: "credit",
+				direction: "out",
+				credit: {
+					type: "spend",
+					amount: config.creditCost,
+					meta: { projectId, mode, slug: preparedInput.slug },
+				},
+			});
+			balanceSnapshot = result.balanceSnapshot;
+			transactionId = result.tid;
 		} catch (err) {
-			if (err instanceof PublishValidationError) {
-				const errorCode =
-					err.code === "SLUG_TAKEN"     ? ERROR.SLUG_TAKEN :
-					err.code === "INVALID_SLUG"   ? ERROR.INVALID_SLUG :
-					ERROR.INVALID_PAYLOAD;
-				res.status(409).json({ error: errorCode, message: err.message });
-				return;
-			}
-			logger.error(`[publishProject] applyPublish failed for ${projectId}:`, err);
-			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
+			const message =
+				err instanceof TransactionEngineError && err.code === "insufficient_funds"
+					? `Publishing costs ${config.creditCost} credits. Your balance is no longer sufficient.`
+					: "Credit debit failed before the project could be published.";
+			await markPublishJobFailed(
+				projectId,
+				err instanceof TransactionEngineError ? err.code : ERROR.PUBLISH_FAILED,
+				message,
+			);
+			logger.error(`[publishProject] Credit debit failed for ${projectId}:`, err);
+			res.status(err instanceof TransactionEngineError && err.code === "insufficient_funds" ? 402 : 500).json({
+				error: err instanceof TransactionEngineError && err.code === "insufficient_funds"
+					? ERROR.INSUFFICIENT_FUNDS
+					: ERROR.INTERNAL_SERVER_ERROR,
+				message,
+			});
 			return;
 		}
 
-		// ── Delete private media (storage quota freed) ────────────────────
-		await deletePrivateProjectMedia(uid, projectId);
+		// ── Publish (update published_projects + projects isPublished/slug) ──
+		try {
+			await applyPublish(db, projectId, uid, mode, preparedInput, contentSnapshot, projectData.name);
+		} catch (err) {
+			const errorCode =
+				err instanceof PublishValidationError
+					? err.code === "SLUG_TAKEN"
+						? ERROR.SLUG_TAKEN
+						: err.code === "INVALID_SLUG"
+							? ERROR.INVALID_SLUG
+							: ERROR.INVALID_PAYLOAD
+					: ERROR.PUBLISH_FAILED;
+			const message =
+				err instanceof PublishValidationError
+					? `${err.message} Credits were already reserved for this project. Retry publish to resume the same attempt.`
+					: "Project debit succeeded, but final publish activation failed. Retry publish to resume safely without a second charge.";
+			await markPublishJobFailed(projectId, errorCode, message);
+			logger.error(`[publishProject] applyPublish failed for ${projectId}:`, err);
+			res.status(err instanceof PublishValidationError ? 409 : 500).json({ error: errorCode, message });
+			return;
+		}
 
 		// ── Archive project + update user stats ───────────────────────────
 		const previewHeroUrl: string | undefined = projectData.preview?.heroImageUrl;
@@ -245,6 +386,11 @@ export const publishProject = onRequest(
 		const projectUpdate: Record<string, unknown> = {
 			status: "archived",
 			publishedAt: FieldValue.serverTimestamp(),
+			publishJobState: FieldValue.delete(),
+			publishJobLeaseExpiresAtMillis: FieldValue.delete(),
+			publishLastErrorCode: FieldValue.delete(),
+			publishLastErrorMessage: FieldValue.delete(),
+			publishTransactionId: transactionId,
 			updatedAt: FieldValue.serverTimestamp(),
 		};
 		if (newPreviewUrl && newPreviewUrl !== previewHeroUrl) {
@@ -277,44 +423,37 @@ export const publishProject = onRequest(
 			createdAt: FieldValue.serverTimestamp(),
 		};
 		archiveBatch.set(exportsRef, exportRecord);
-
-		await archiveBatch.commit();
-
-		// ── Debit credits ─────────────────────────────────────────────────
-		let balanceSnapshot: PublishOutput["balance"];
 		try {
-			const result = await processTransaction({
-				uid,
-				idempotencyKey: `publish:${projectId}`,
-				category: "credit",
-				direction: "out",
-				credit: {
-					type: "spend",
-					amount: config.creditCost,
-					meta: { projectId, mode, slug },
-				},
-			});
-			balanceSnapshot = result.balanceSnapshot;
+			await archiveBatch.commit();
 		} catch (err) {
-			if (err instanceof TransactionEngineError && err.code === "idempotency_conflict") {
-				// Already debited — idempotent replay, safe to continue.
-				logger.warn(`[publishProject] Idempotent credit debit for ${projectId}.`);
-				balanceSnapshot = userData.balance ?? { total: 0, purchased: 0, subscription: 0, bonus: 0 };
-			} else {
-				// Real failure (index missing, Firestore error, etc.) — project is already
-				// published at this point, so log and return success with stale balance
-				// rather than leaving the user confused.
-				logger.error(`[publishProject] Credit debit failed for ${projectId} (project is already live):`, err);
-				balanceSnapshot = userData.balance ?? { total: 0, purchased: 0, subscription: 0, bonus: 0 };
-			}
+			await markPublishJobFailed(
+				projectId,
+				ERROR.PUBLISH_FAILED,
+				"The project was charged, but final archive state could not be committed. Retry publish to resume safely without a second charge.",
+			);
+			logger.error(`[publishProject] Archive commit failed for ${projectId}:`, err);
+			res.status(500).json({
+				error: ERROR.INTERNAL_SERVER_ERROR,
+				message: "The project charge succeeded, but final publish state could not be committed. Retry publish to resume the same attempt.",
+			});
+			return;
 		}
 
-		logger.info(`[publishProject] Project ${projectId} published by ${uid} with slug "${slug}".`, {
+		// ── Delete private media after durable success ────────────────────
+		await deletePrivateProjectMedia(uid, projectId);
+
+		logger.info(`[publishProject] Project ${projectId} published by ${uid} with slug "${preparedInput.slug}".`, {
 			mode,
 			creditCost: config.creditCost,
 			freedBytes,
+			transactionId,
 		});
 
-		res.status(200).json({ ok: true, publishedSlug: slug, balance: balanceSnapshot } satisfies PublishOutput);
+		res.status(200).json({
+			ok: true,
+			publishedSlug: preparedInput.slug,
+			balance: balanceSnapshot ?? userData.balance ?? EMPTY_BALANCE,
+			transactionId,
+		} satisfies PublishOutput);
 	},
 );

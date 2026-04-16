@@ -17,4 +17,6 @@ export interface PublishOutput {
 	publishedSlug: string;
 	/** Updated balance after the credit deduction. */
 	balance: BalanceSnapshot;
+	/** Debit transaction id recorded for this publish. */
+	transactionId: string;
 }

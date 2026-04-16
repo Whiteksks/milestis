@@ -195,8 +195,11 @@ export function usePublishMutation() {
   const uid = useUid()
   const updateBalance = useUserStore((s) => s.updateBalance)
   return useMutation({
-    mutationFn: ({ projectId, slug, accessToken }: PublishVariables) =>
-      publishProject(projectId, slug, accessToken),
+    mutationFn: ({ projectId, slug, accessToken }: PublishVariables) => {
+      const promise = publishProject(projectId, slug, accessToken)
+      toastProject.publish(promise)
+      return promise
+    },
     onMutate: async ({ projectId, slug }) => {
       if (!uid) return
       await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
