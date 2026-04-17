@@ -4,10 +4,10 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../../lib/firebaseAdmin";
 import { migrateProjectMedia, deletePrivateProjectMedia } from "./migrate";
-import { applyPublish, preparePublishInput, PublishValidationError } from "./publish";
-import { processTransaction, TransactionEngineError } from "../../transactions/engine";
+import { commitPublish, logPublishedProject, preparePublishInput, PublishValidationError } from "./publish";
+import { TransactionEngineError } from "../../transactions/engine";
 import { getPublishConfig } from "./config";
-import type { ProjectMode } from "../projectInterface";
+import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import type { PublishInput, PublishOutput } from "./types";
 
 // ─── Error codes ──────────────────────────────────────────────────────────────
@@ -21,16 +21,16 @@ const ERROR = {
 	FORBIDDEN:                "FORBIDDEN",
 	ALREADY_PUBLISHED:        "ALREADY_PUBLISHED",
 	NOT_ACTIVE:               "NOT_ACTIVE",
+	NOT_PUBLISHABLE:          "NOT_PUBLISHABLE",
 	INVALID_SLUG:             "INVALID_SLUG",
 	SLUG_TAKEN:               "SLUG_TAKEN",
 	INSUFFICIENT_FUNDS:       "INSUFFICIENT_FUNDS",
 	PUBLISH_IN_PROGRESS:      "PUBLISH_IN_PROGRESS",
-	PUBLISH_FAILED:           "PUBLISH_FAILED",
 	INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
 } as const;
 
 const PUBLISH_JOB_LEASE_MS = 15 * 60 * 1000;
-const EMPTY_BALANCE = { total: 0, purchased: 0, subscription: 0, bonus: 0 };
+const BODY_SIZE_LIMIT_BYTES = 4096;
 
 class PublishFlowError extends Error {
 	constructor(
@@ -62,10 +62,10 @@ async function claimPublishJob(projectId: string, uid: string) {
 		}
 
 		const currentLease =
-			typeof projectData.publishJobLeaseExpiresAtMillis === "number"
-				? projectData.publishJobLeaseExpiresAtMillis
+			typeof projectData.publishLockExpiresAtMillis === "number"
+				? projectData.publishLockExpiresAtMillis
 				: 0;
-		if (projectData.publishJobState === "processing" && currentLease > Date.now()) {
+		if (currentLease > Date.now()) {
 			throw new PublishFlowError(
 				ERROR.PUBLISH_IN_PROGRESS,
 				409,
@@ -74,10 +74,7 @@ async function claimPublishJob(projectId: string, uid: string) {
 		}
 
 		tx.update(projectRef, {
-			publishJobState: "processing",
-			publishJobLeaseExpiresAtMillis: Date.now() + PUBLISH_JOB_LEASE_MS,
-			publishLastErrorCode: FieldValue.delete(),
-			publishLastErrorMessage: FieldValue.delete(),
+			publishLockExpiresAtMillis: Date.now() + PUBLISH_JOB_LEASE_MS,
 			updatedAt: FieldValue.serverTimestamp(),
 		});
 
@@ -85,16 +82,9 @@ async function claimPublishJob(projectId: string, uid: string) {
 	});
 }
 
-async function markPublishJobFailed(
-	projectId: string,
-	errorCode: string,
-	message: string,
-) {
+async function releasePublishLock(projectId: string) {
 	await db.collection("projects").doc(projectId).update({
-		publishJobState: "failed",
-		publishJobLeaseExpiresAtMillis: FieldValue.delete(),
-		publishLastErrorCode: errorCode,
-		publishLastErrorMessage: message,
+		publishLockExpiresAtMillis: FieldValue.delete(),
 		updatedAt: FieldValue.serverTimestamp(),
 	});
 }
@@ -102,6 +92,19 @@ async function markPublishJobFailed(
 // ─── Payload validation ───────────────────────────────────────────────────────
 
 class ValidationError extends Error {}
+
+function getHttpStatusForValidationError(code: PublishValidationError["code"]): number {
+	switch (code) {
+		case "SLUG_TAKEN":
+			return 409;
+		case "FORBIDDEN":
+			return 403;
+		case "NOT_PUBLISHABLE":
+			return 409;
+		default:
+			return 400;
+	}
+}
 
 function validatePayload(body: unknown): PublishInput {
 	const b = body as Record<string, unknown> | null | undefined;
@@ -158,6 +161,13 @@ export const publishProject = onRequest(
 			return;
 		}
 
+		// ── Body size guard ──────────────────────────────────────────────
+		const contentLength = parseInt(req.headers["content-length"] ?? "0", 10);
+		if (contentLength > BODY_SIZE_LIMIT_BYTES) {
+			res.status(413).json({ error: ERROR.INVALID_PAYLOAD, message: "Request body too large." });
+			return;
+		}
+
 		// ── Auth ──────────────────────────────────────────────────────────
 		const authHeader = req.headers.authorization;
 		if (!authHeader?.startsWith("Bearer ")) {
@@ -186,74 +196,16 @@ export const publishProject = onRequest(
 
 		const { projectId, slug, accessToken } = payload;
 
-		// ── Load project ──────────────────────────────────────────────────
-		const projectRef = db.collection("projects").doc(projectId);
-		const projectSnap = await projectRef.get();
-
-		if (!projectSnap.exists) {
-			res.status(404).json({ error: ERROR.NOT_FOUND });
-			return;
-		}
-
-		const initialProjectData = projectSnap.data()!;
-
-		if (initialProjectData.ownerId !== uid) {
-			res.status(403).json({ error: ERROR.FORBIDDEN });
-			return;
-		}
-
-		if (initialProjectData.status !== "active") {
-			res.status(400).json({
-				error: ERROR.NOT_ACTIVE,
-				message: "Only active projects can be published.",
-			});
-			return;
-		}
-
-		if (initialProjectData.isPublished === true) {
-			res.status(409).json({
-				error: ERROR.ALREADY_PUBLISHED,
-				message: "Project is already published. Unpublish first to change the slug.",
-			});
-			return;
-		}
-
-		const mode = initialProjectData.mode as ProjectMode;
-		const config = getPublishConfig(mode);
-
-		// ── Access token guard ────────────────────────────────────────────
-		if (config.requiresAccessToken && !accessToken) {
-			res.status(400).json({
-				error: ERROR.INVALID_PAYLOAD,
-				message: "accessToken is required for photobook projects.",
-			});
-			return;
-		}
-
-		// ── Balance check ─────────────────────────────────────────────────
-		const userRef = db.collection("users").doc(uid);
-		const userSnap = await userRef.get();
-		const userData = userSnap.data() ?? {};
-		const currentBalance = userData.balance?.total ?? 0;
-
-		if (currentBalance < config.creditCost) {
-			res.status(402).json({
-				error: ERROR.INSUFFICIENT_FUNDS,
-				message: `Publishing costs ${config.creditCost} credits. Your balance: ${currentBalance}.`,
-			});
-			return;
-		}
-
-		let preparedInput;
+		let preparedInput: ReturnType<typeof preparePublishInput>;
 		try {
-			preparedInput = await preparePublishInput(db, projectId, mode, { slug, accessToken });
+			preparedInput = preparePublishInput({ slug, accessToken });
 		} catch (err) {
 			if (err instanceof PublishValidationError) {
 				const errorCode =
 					err.code === "SLUG_TAKEN" ? ERROR.SLUG_TAKEN :
 					err.code === "INVALID_SLUG" ? ERROR.INVALID_SLUG :
 					ERROR.INVALID_PAYLOAD;
-				res.status(409).json({ error: errorCode, message: err.message });
+				res.status(getHttpStatusForValidationError(err.code)).json({ error: errorCode, message: err.message });
 				return;
 			}
 			logger.error(`[publishProject] preparePublishInput failed for ${projectId}:`, err);
@@ -262,6 +214,7 @@ export const publishProject = onRequest(
 		}
 
 		let projectData: FirebaseFirestore.DocumentData;
+		let publishCommitted = false;
 		try {
 			projectData = await claimPublishJob(projectId, uid);
 		} catch (err) {
@@ -274,186 +227,129 @@ export const publishProject = onRequest(
 			return;
 		}
 
-		// ── Load editor content ───────────────────────────────────────────
-		const contentSnap = await db
-			.collection("projects")
-			.doc(projectId)
-			.collection("data")
-			.doc("content")
-			.get();
-
-		const editorData = contentSnap.exists ? contentSnap.data()! : {};
-		const rawTheme = editorData.theme ?? null;
-		const rawContent = editorData.content ?? null;
-
-		// Serialize to JSON for URL extraction / rewriting in migrate step.
-		const contentJson = JSON.stringify({ theme: rawTheme, content: rawContent });
-
-		// ── Media migration ───────────────────────────────────────────────
-		let freedBytes: number;
-		let urlMapping: Map<string, string>;
-
-		try {
-			({ urlMapping, freedBytes } = await migrateProjectMedia(uid, projectId, contentJson));
-		} catch (err) {
-			logger.error(`[publishProject] Media migration failed for ${projectId}:`, err);
-			await markPublishJobFailed(projectId, ERROR.PUBLISH_FAILED, "Failed to migrate project media.");
+		const rawMode = projectData.mode;
+		if (!VALID_MODES.includes(rawMode as ProjectMode)) {
+			logger.error(`[publishProject] Invalid project mode "${rawMode}" for ${projectId}`);
 			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
 		}
+		const mode = rawMode as ProjectMode;
+		const config = getPublishConfig(mode);
 
-		// Rewrite all private URLs in content to their new public equivalents.
-		const migratedJson = contentJson.replace(
-			/"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\\]+)"/g,
-			(_match, url: string) => {
-				const mapped = urlMapping.get(url);
-				return mapped ? `"${mapped}"` : `"${url}"`;
-			},
-		);
-		const migratedData = JSON.parse(migratedJson) as {
-			theme: Record<string, unknown> | null;
-			content: Record<string, unknown> | null;
-		};
-
-		const contentSnapshot = {
-			theme: migratedData.theme,
-			content: migratedData.content,
-		};
-
-		// ── Debit credits before the project goes live ──────────────────────
-		let balanceSnapshot: PublishOutput["balance"];
-		let transactionId: string;
 		try {
-			const result = await processTransaction({
-				uid,
-				idempotencyKey: `publish:${projectId}`,
-				category: "credit",
-				direction: "out",
-				credit: {
-					type: "spend",
-					amount: config.creditCost,
-					meta: { projectId, mode, slug: preparedInput.slug },
+			const userSnap = await db.collection("users").doc(uid).get();
+			const userData = userSnap.data() ?? {};
+			const currentBalance = userData.balance?.total ?? 0;
+			if (currentBalance < config.creditCost) {
+				res.status(402).json({
+					error: ERROR.INSUFFICIENT_FUNDS,
+					message: `Publishing costs ${config.creditCost} credits. Your balance: ${currentBalance}.`,
+				});
+				return;
+			}
+
+			// ── Mode-specific validation (before expensive migration) ─────────
+			if (mode === "photobook" && !preparedInput.accessToken) {
+				res.status(400).json({
+					error: ERROR.INVALID_PAYLOAD,
+					message: "accessToken is required for photobook projects.",
+				});
+				return;
+			}
+
+			const contentSnap = await db
+				.collection("projects")
+				.doc(projectId)
+				.collection("data")
+				.doc("content")
+				.get();
+
+			const editorData = contentSnap.exists ? contentSnap.data()! : {};
+			const rawTheme = editorData.theme ?? null;
+			const rawContent = editorData.content ?? null;
+			const contentJson = JSON.stringify({ theme: rawTheme, content: rawContent });
+
+			const { urlMapping, freedBytes } = await migrateProjectMedia(uid, projectId, contentJson);
+
+			const migratedJson = contentJson.replace(
+				/"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\\]+)"/g,
+				(_match, url: string) => {
+					const mapped = urlMapping.get(url);
+					return mapped ? `"${mapped}"` : `"${url}"`;
 				},
-			});
-			balanceSnapshot = result.balanceSnapshot;
-			transactionId = result.tid;
-		} catch (err) {
-			const message =
-				err instanceof TransactionEngineError && err.code === "insufficient_funds"
-					? `Publishing costs ${config.creditCost} credits. Your balance is no longer sufficient.`
-					: "Credit debit failed before the project could be published.";
-			await markPublishJobFailed(
-				projectId,
-				err instanceof TransactionEngineError ? err.code : ERROR.PUBLISH_FAILED,
-				message,
 			);
-			logger.error(`[publishProject] Credit debit failed for ${projectId}:`, err);
-			res.status(err instanceof TransactionEngineError && err.code === "insufficient_funds" ? 402 : 500).json({
-				error: err instanceof TransactionEngineError && err.code === "insufficient_funds"
-					? ERROR.INSUFFICIENT_FUNDS
-					: ERROR.INTERNAL_SERVER_ERROR,
-				message,
-			});
-			return;
-		}
+			const migratedData = JSON.parse(migratedJson) as {
+				theme: Record<string, unknown> | null;
+				content: Record<string, unknown> | null;
+			};
 
-		// ── Publish (update published_projects + projects isPublished/slug) ──
-		try {
-			await applyPublish(db, projectId, uid, mode, preparedInput, contentSnapshot, projectData.name);
-		} catch (err) {
-			const errorCode =
-				err instanceof PublishValidationError
-					? err.code === "SLUG_TAKEN"
-						? ERROR.SLUG_TAKEN
-						: err.code === "INVALID_SLUG"
-							? ERROR.INVALID_SLUG
-							: ERROR.INVALID_PAYLOAD
-					: ERROR.PUBLISH_FAILED;
-			const message =
-				err instanceof PublishValidationError
-					? `${err.message} Credits were already reserved for this project. Retry publish to resume the same attempt.`
-					: "Project debit succeeded, but final publish activation failed. Retry publish to resume safely without a second charge.";
-			await markPublishJobFailed(projectId, errorCode, message);
-			logger.error(`[publishProject] applyPublish failed for ${projectId}:`, err);
-			res.status(err instanceof PublishValidationError ? 409 : 500).json({ error: errorCode, message });
-			return;
-		}
-
-		// ── Archive project + update user stats ───────────────────────────
-		const previewHeroUrl: string | undefined = projectData.preview?.heroImageUrl;
-		const newPreviewUrl = previewHeroUrl ? (urlMapping.get(previewHeroUrl) ?? previewHeroUrl) : undefined;
-
-		const projectUpdate: Record<string, unknown> = {
-			status: "archived",
-			publishedAt: FieldValue.serverTimestamp(),
-			publishJobState: FieldValue.delete(),
-			publishJobLeaseExpiresAtMillis: FieldValue.delete(),
-			publishLastErrorCode: FieldValue.delete(),
-			publishLastErrorMessage: FieldValue.delete(),
-			publishTransactionId: transactionId,
-			updatedAt: FieldValue.serverTimestamp(),
-		};
-		if (newPreviewUrl && newPreviewUrl !== previewHeroUrl) {
-			projectUpdate["preview.heroImageUrl"] = newPreviewUrl;
-		}
-
-		const userStatUpdates: Record<string, unknown> = {
-			"stats.projectsInProgress": FieldValue.increment(-1),
-			"stats.projectsPublished": FieldValue.increment(1),
-		};
-		if (freedBytes > 0) {
-			userStatUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedBytes);
-		}
-
-		const archiveBatch = db.batch();
-		archiveBatch.update(projectRef, projectUpdate);
-		archiveBatch.update(userRef, userStatUpdates);
-
-		// ── Write export record (feeds the archive page) ──────────────────
-		const exportsRef = projectRef.collection("exports").doc();
-		const exportRecord: Record<string, unknown> = {
-			exportId: exportsRef.id,
-			projectId,
-			projectName: projectData.name,
-			ownerId: uid,
-			versionNumber: 1,
-			mode,
-			creditCost: config.creditCost,
-			publishedSlug: slug,
-			createdAt: FieldValue.serverTimestamp(),
-		};
-		archiveBatch.set(exportsRef, exportRecord);
-		try {
-			await archiveBatch.commit();
-		} catch (err) {
-			await markPublishJobFailed(
+			const result = await commitPublish(db, {
 				projectId,
-				ERROR.PUBLISH_FAILED,
-				"The project was charged, but final archive state could not be committed. Retry publish to resume safely without a second charge.",
-			);
-			logger.error(`[publishProject] Archive commit failed for ${projectId}:`, err);
-			res.status(500).json({
-				error: ERROR.INTERNAL_SERVER_ERROR,
-				message: "The project charge succeeded, but final publish state could not be committed. Retry publish to resume the same attempt.",
+				uid,
+				mode,
+				projectName: projectData.name,
+				prepared: preparedInput,
+				contentSnapshot: {
+					theme: migratedData.theme,
+					content: migratedData.content,
+				},
+				creditCost: config.creditCost,
+				freedBytes,
+				previewHeroUrl: projectData.preview?.heroImageUrl
+					? (urlMapping.get(projectData.preview.heroImageUrl) ?? projectData.preview.heroImageUrl)
+					: undefined,
 			});
+			publishCommitted = true;
+
+			try {
+				await deletePrivateProjectMedia(uid, projectId);
+			} catch (err) {
+				logger.warn(`[publishProject] Private media cleanup failed for ${projectId}:`, err);
+			}
+
+			logPublishedProject(projectId, result.publishedSlug);
+			logger.info(`[publishProject] Project ${projectId} published by ${uid} with slug "${result.publishedSlug}".`, {
+				mode,
+				creditCost: config.creditCost,
+				freedBytes,
+				transactionId: result.transactionId,
+			});
+
+			res.status(200).json({
+				ok: true,
+				publishedSlug: result.publishedSlug,
+				balance: result.balanceSnapshot,
+			} satisfies PublishOutput);
+		} catch (err) {
+			logger.error(`[publishProject] Publish failed for ${projectId}:`, err);
+			if (err instanceof TransactionEngineError && err.code === "insufficient_funds") {
+				res.status(402).json({
+					error: ERROR.INSUFFICIENT_FUNDS,
+					message: `Publishing costs ${config.creditCost} credits. Your balance is no longer sufficient.`,
+				});
+				return;
+			}
+			if (err instanceof PublishValidationError) {
+				const errorCode =
+					err.code === "SLUG_TAKEN" ? ERROR.SLUG_TAKEN :
+					err.code === "INVALID_SLUG" ? ERROR.INVALID_SLUG :
+					err.code === "FORBIDDEN" ? ERROR.FORBIDDEN :
+					err.code === "NOT_PUBLISHABLE" ? ERROR.NOT_PUBLISHABLE :
+					err.code === "MISSING_ACCESS_TOKEN" ? ERROR.INVALID_PAYLOAD :
+					ERROR.INVALID_PAYLOAD;
+				res.status(getHttpStatusForValidationError(err.code)).json({ error: errorCode, message: err.message });
+				return;
+			}
+			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
+		} finally {
+			if (!publishCommitted) {
+				try {
+					await releasePublishLock(projectId);
+				} catch (lockErr) {
+					logger.warn(`[publishProject] Failed to release publish lock for ${projectId}:`, lockErr);
+				}
+			}
 		}
-
-		// ── Delete private media after durable success ────────────────────
-		await deletePrivateProjectMedia(uid, projectId);
-
-		logger.info(`[publishProject] Project ${projectId} published by ${uid} with slug "${preparedInput.slug}".`, {
-			mode,
-			creditCost: config.creditCost,
-			freedBytes,
-			transactionId,
-		});
-
-		res.status(200).json({
-			ok: true,
-			publishedSlug: preparedInput.slug,
-			balance: balanceSnapshot ?? userData.balance ?? EMPTY_BALANCE,
-			transactionId,
-		} satisfies PublishOutput);
 	},
 );

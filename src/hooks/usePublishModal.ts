@@ -34,7 +34,7 @@ export function usePublishModal(projectId: string, mode: 'portfolio' | 'photoboo
         setSlugStatus('idle')
         return
       }
-      if (value.length > 63 || !SLUG_REGEX.test(value)) {
+      if (value.length > 24 || !SLUG_REGEX.test(value)) {
         setSlugStatus('invalid')
         return
       }

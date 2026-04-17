@@ -3,6 +3,8 @@ import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
+import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import type { ProjectMode } from "./projectInterface";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -79,6 +81,7 @@ export const unpublishProject = onRequest(
     }
 
     try {
+      const projectData = projectSnap.data()!
       const batch = db.batch();
 
       // 1. Mark published_projects doc as hidden (keep data for re-publish).
@@ -89,16 +92,19 @@ export const unpublishProject = onRequest(
         accessToken: FieldValue.delete(),
         unpublishedAt: FieldValue.serverTimestamp(),
       }, { merge: true });
+      if (typeof projectData.publishedSlug === "string" && typeof projectData.mode === "string") {
+        const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
+          getPublishedSlugReservationDocId(projectData.mode as ProjectMode, projectData.publishedSlug),
+        )
+        batch.delete(slugRef)
+      }
 
       // 2. Clear publish fields on the project doc.
       batch.update(projectRef, {
         isPublished: false,
         publishedSlug: FieldValue.delete(),
         publishedAccessToken: FieldValue.delete(),
-        publishJobState: FieldValue.delete(),
-        publishJobLeaseExpiresAtMillis: FieldValue.delete(),
-        publishLastErrorCode: FieldValue.delete(),
-        publishLastErrorMessage: FieldValue.delete(),
+        publishLockExpiresAtMillis: FieldValue.delete(),
         updatedAt: FieldValue.serverTimestamp(),
       });
 

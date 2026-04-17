@@ -1,14 +1,18 @@
 import { createHash } from "crypto";
 import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions/v2";
+import { processTransactionInFirestoreTransaction } from "../../transactions/engine";
+import type { BalanceSnapshot } from "../../transactions/types";
+import type { CommitPublishInput, PreparedPublishInput } from "./types";
 import type { PublishInput } from "./types";
 import type { ProjectMode } from "../projectInterface";
+import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./slug";
 
 // ─── Errors ───────────────────────────────────────────────────────────────────
 
 export class PublishValidationError extends Error {
 	constructor(
-		public readonly code: "INVALID_SLUG" | "SLUG_TAKEN" | "MISSING_ACCESS_TOKEN",
+		public readonly code: "INVALID_SLUG" | "SLUG_TAKEN" | "MISSING_ACCESS_TOKEN" | "FORBIDDEN" | "NOT_PUBLISHABLE",
 		message: string,
 	) {
 		super(message);
@@ -17,46 +21,20 @@ export class PublishValidationError extends Error {
 
 const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
 
-export interface PreparedPublishInput {
-	slug: string;
-	accessToken?: string;
-	hashedToken?: string;
-}
-
-export async function preparePublishInput(
-	db: Firestore,
-	projectId: string,
-	mode: ProjectMode,
+export function preparePublishInput(
 	input: Pick<PublishInput, "slug" | "accessToken">,
-): Promise<PreparedPublishInput> {
+): PreparedPublishInput {
 	const { slug, accessToken } = input;
 
-	if (!slug || slug.length < 3 || slug.length > 63 || !SLUG_REGEX.test(slug)) {
+	if (!slug || slug.length < 3 || slug.length > 24 || !SLUG_REGEX.test(slug)) {
 		throw new PublishValidationError(
 			"INVALID_SLUG",
-			"slug must be 3–63 lowercase alphanumeric characters or hyphens.",
+			"slug must be 3–24 lowercase alphanumeric characters or hyphens.",
 		);
 	}
 
-	const existing = await db
-		.collection("published_projects")
-		.where("slug", "==", slug)
-		.where("mode", "==", mode)
-		.limit(2)
-		.get();
-	const takenByOther = existing.docs.some((doc) => doc.id !== projectId);
-	if (takenByOther) {
-		throw new PublishValidationError("SLUG_TAKEN", "This slug is already taken.");
-	}
-
 	let hashedToken: string | undefined;
-	if (mode === "photobook") {
-		if (!accessToken) {
-			throw new PublishValidationError(
-				"MISSING_ACCESS_TOKEN",
-				"accessToken is required for photobook projects.",
-			);
-		}
+	if (accessToken) {
 		hashedToken = createHash("sha256").update(accessToken).digest("hex");
 	}
 
@@ -67,56 +45,121 @@ export async function preparePublishInput(
 	};
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+function ensurePublishableProject(project: Record<string, unknown>, uid: string): void {
+	if (project.ownerId !== uid) {
+		throw new PublishValidationError("FORBIDDEN", "You do not own this project.");
+	}
+	if (project.status !== "active" || project.isPublished === true) {
+		throw new PublishValidationError("NOT_PUBLISHABLE", "Project is not publishable.");
+	}
+}
 
-/**
- * Validates the publish payload, writes the published_projects document, and
- * updates the project document (isPublished, slug, token).
- *
- * The content snapshot MUST already use public Storage URLs (post-migration).
- *
- * Throws PublishValidationError for business-logic failures (invalid slug,
- * slug taken, missing token). Other errors propagate as-is.
- */
-export async function applyPublish(
+function ensureAccessToken(mode: ProjectMode, accessToken?: string): void {
+	if (mode === "photobook" && !accessToken) {
+		throw new PublishValidationError(
+			"MISSING_ACCESS_TOKEN",
+			"accessToken is required for photobook projects.",
+		);
+	}
+}
+
+export async function commitPublish(
 	db: Firestore,
-	projectId: string,
-	uid: string,
-	mode: ProjectMode,
-	prepared: PreparedPublishInput,
-	contentSnapshot: {
-		theme: Record<string, unknown> | null;
-		content: Record<string, unknown> | null;
-	},
-	projectName: string,
-): Promise<void> {
-	const { slug, accessToken, hashedToken } = prepared;
+	input: CommitPublishInput,
+): Promise<{ balanceSnapshot: BalanceSnapshot; publishedSlug: string; transactionId: string }> {
+	const { projectId, uid, mode, projectName, prepared, contentSnapshot, creditCost, freedBytes, previewHeroUrl } = input;
 
-	const batch = db.batch();
+	return await db.runTransaction(async (tx) => {
+		const projectRef = db.collection("projects").doc(projectId);
+		const publishedRef = db.collection("published_projects").doc(projectId);
+		const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
+			getPublishedSlugReservationDocId(mode, prepared.slug),
+		);
+		const exportRef = projectRef.collection("exports").doc();
 
-	const publishedData: Record<string, unknown> = {
-		ownerId: uid,
-		slug,
-		name: projectName,
-		mode,
-		isPublished: true,
-		theme: contentSnapshot.theme,
-		content: contentSnapshot.content,
-		publishedAt: FieldValue.serverTimestamp(),
-	};
-	if (hashedToken) publishedData.accessToken = hashedToken;
-	batch.set(db.collection("published_projects").doc(projectId), publishedData);
+		const [projectSnap, slugSnap] = await Promise.all([tx.get(projectRef), tx.get(slugRef)]);
+		if (!projectSnap.exists) {
+			throw new PublishValidationError("NOT_PUBLISHABLE", "Project not found.");
+		}
+		const projectData = projectSnap.data() as Record<string, unknown>;
+		ensurePublishableProject(projectData, uid);
+		ensureAccessToken(mode, prepared.accessToken);
 
-	const projectUpdate: Record<string, unknown> = {
-		isPublished: true,
-		publishedSlug: slug,
-		updatedAt: FieldValue.serverTimestamp(),
-	};
-	// Store the plaintext token so the dashboard can reconstruct the share URL.
-	// The projects collection is owner-restricted; this does not expose the token publicly.
-	if (accessToken) projectUpdate.publishedAccessToken = accessToken;
-	batch.update(db.collection("projects").doc(projectId), projectUpdate);
+		if (slugSnap.exists) {
+			const slugData = slugSnap.data() as Record<string, unknown>;
+			if (slugData.projectId !== projectId) {
+				throw new PublishValidationError("SLUG_TAKEN", "This slug is already taken.");
+			}
+		}
 
-	await batch.commit();
+		const debit = await processTransactionInFirestoreTransaction(tx, {
+			uid,
+			idempotencyKey: `publish:${projectId}`,
+			category: "credit",
+			direction: "out",
+			credit: {
+				type: "spend",
+				amount: creditCost,
+				meta: { projectId, mode, slug: prepared.slug },
+			},
+		});
+
+		const publishedData: Record<string, unknown> = {
+			ownerId: uid,
+			slug: prepared.slug,
+			name: projectName,
+			mode,
+			isPublished: true,
+			theme: contentSnapshot.theme,
+			content: contentSnapshot.content,
+			publishedAt: FieldValue.serverTimestamp(),
+		};
+		if (prepared.hashedToken) publishedData.accessToken = prepared.hashedToken;
+
+		tx.set(slugRef, {
+			projectId,
+			ownerId: uid,
+			mode,
+			slug: prepared.slug,
+			updatedAt: FieldValue.serverTimestamp(),
+		});
+		tx.set(publishedRef, publishedData);
+		tx.update(projectRef, {
+			isPublished: true,
+			publishedSlug: prepared.slug,
+			...(prepared.accessToken ? { publishedAccessToken: prepared.accessToken } : {}),
+			status: "archived",
+			publishedAt: FieldValue.serverTimestamp(),
+			publishLockExpiresAtMillis: FieldValue.delete(),
+			publishTransactionId: debit.tid,
+			...(previewHeroUrl ? { "preview.heroImageUrl": previewHeroUrl } : {}),
+			updatedAt: FieldValue.serverTimestamp(),
+		});
+		tx.update(db.collection("users").doc(uid), {
+			"stats.projectsInProgress": FieldValue.increment(-1),
+			"stats.projectsPublished": FieldValue.increment(1),
+			...(freedBytes > 0 ? { "stats.storageUsedBytes": FieldValue.increment(-freedBytes) } : {}),
+		});
+		tx.set(exportRef, {
+			exportId: exportRef.id,
+			projectId,
+			projectName,
+			ownerId: uid,
+			versionNumber: 1,
+			mode,
+			creditCost,
+			publishedSlug: prepared.slug,
+			createdAt: FieldValue.serverTimestamp(),
+		});
+
+		return {
+			balanceSnapshot: debit.balanceSnapshot,
+			publishedSlug: prepared.slug,
+			transactionId: debit.tid,
+		};
+	});
+}
+
+export function logPublishedProject(projectId: string, slug: string): void {
 	logger.info(`[publish] Project ${projectId} published with slug "${slug}".`);
 }

@@ -5,6 +5,8 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 import { deleteProjectImageDocs } from "./projectUtils";
+import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import type { ProjectMode } from "./projectInterface";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -130,6 +132,13 @@ export const forceDeleteProject = onRequest(
       const deleteBatch = db.batch();
       deleteBatch.delete(projectRef);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
+      if (typeof data.publishedSlug === "string" && typeof data.mode === "string") {
+        deleteBatch.delete(
+          db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
+            getPublishedSlugReservationDocId(data.mode as ProjectMode, data.publishedSlug),
+          ),
+        );
+      }
 
       const userUpdates: Record<string, unknown> = {
         "stats.totalProjects": FieldValue.increment(-1),

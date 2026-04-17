@@ -59,7 +59,7 @@ export type ProcessTransactionInput = {
 	};
 };
 
-type ProcessTransactionResult = {
+export type ProcessTransactionResult = {
 	tid: string;
 	transaction: Transaction;
 	balanceSnapshot: BalanceSnapshot;
@@ -239,7 +239,8 @@ async function createCreditLot(
 	});
 }
 
-export async function processTransaction(
+export async function processTransactionInFirestoreTransaction(
+	tx: FirebaseFirestore.Transaction,
 	input: ProcessTransactionInput,
 ): Promise<ProcessTransactionResult> {
 	if (!input.uid) {
@@ -256,49 +257,47 @@ export async function processTransaction(
 	const idemRef = db.collection(IDEMPOTENCY_COLLECTION).doc(idemId);
 
 	const createdAtIso = input.createdAtIso ?? nowIso();
-
-	return await db.runTransaction(async (tx) => {
-		const idemSnap = await tx.get(idemRef);
-		if (idemSnap.exists) {
-			const existingTid = (idemSnap.data() as Record<string, unknown>)?.tid as string | undefined;
-			if (!existingTid) {
-				throw new TransactionEngineError(
-					"idempotency_conflict",
-					"Idempotency record is missing tid",
-				);
-			}
-			const existingTxRef = db.collection(TRANSACTIONS_COLLECTION).doc(existingTid);
-			const existingTxSnap = await tx.get(existingTxRef);
-			if (!existingTxSnap.exists) {
-				throw new TransactionEngineError(
-					"idempotency_conflict",
-					"Idempotency points to missing transaction",
-				);
-			}
-			const existing = existingTxSnap.data() as Transaction;
-			return {
-				tid: existingTid,
-				transaction: existing,
-				balanceSnapshot: existing.balanceSnapshot,
-				idempotent: true,
-			};
+	const idemSnap = await tx.get(idemRef);
+	if (idemSnap.exists) {
+		const existingTid = (idemSnap.data() as Record<string, unknown>)?.tid as string | undefined;
+		if (!existingTid) {
+			throw new TransactionEngineError(
+				"idempotency_conflict",
+				"Idempotency record is missing tid",
+			);
 		}
-
-		const userRef = db.collection(USERS_COLLECTION).doc(input.uid);
-		const userSnap = await tx.get(userRef);
-		if (!userSnap.exists) {
-			throw new TransactionEngineError("user_not_found", "User not found");
+		const existingTxRef = db.collection(TRANSACTIONS_COLLECTION).doc(existingTid);
+		const existingTxSnap = await tx.get(existingTxRef);
+		if (!existingTxSnap.exists) {
+			throw new TransactionEngineError(
+				"idempotency_conflict",
+				"Idempotency points to missing transaction",
+			);
 		}
+		const existing = existingTxSnap.data() as Transaction;
+		return {
+			tid: existingTid,
+			transaction: existing,
+			balanceSnapshot: existing.balanceSnapshot,
+			idempotent: true,
+		};
+	}
 
-		const userData = userSnap.data() as Record<string, unknown>;
-		const currentBalance = normalizeBalance(userData?.balance);
-		let nextBalance = { ...currentBalance };
-		const nowMillis = Date.now();
+	const userRef = db.collection(USERS_COLLECTION).doc(input.uid);
+	const userSnap = await tx.get(userRef);
+	if (!userSnap.exists) {
+		throw new TransactionEngineError("user_not_found", "User not found");
+	}
 
-		const txRef = db.collection(TRANSACTIONS_COLLECTION).doc();
-		const tid = txRef.id;
+	const userData = userSnap.data() as Record<string, unknown>;
+	const currentBalance = normalizeBalance(userData?.balance);
+	let nextBalance = { ...currentBalance };
+	const nowMillis = Date.now();
 
-		if (input.category === "credit") {
+	const txRef = db.collection(TRANSACTIONS_COLLECTION).doc();
+	const tid = txRef.id;
+
+	if (input.category === "credit") {
 			const credit = input.credit;
 			if (!credit) {
 				throw new TransactionEngineError(
@@ -411,7 +410,7 @@ export async function processTransaction(
 					}
 				}
 			}
-		} else if (input.category === "billing") {
+	} else if (input.category === "billing") {
 			const billing = input.billing;
 			if (!billing) {
 				throw new TransactionEngineError(
@@ -429,10 +428,10 @@ export async function processTransaction(
 			nextBalance = currentBalance;
 		}
 
-		const balanceSnapshot: BalanceSnapshot = nextBalance;
+	const balanceSnapshot: BalanceSnapshot = nextBalance;
 
-		let txDoc: Transaction;
-		if (input.category === "billing") {
+	let txDoc: Transaction;
+	if (input.category === "billing") {
 			const billing = input.billing!;
 			txDoc = {
 				tid,
@@ -448,7 +447,7 @@ export async function processTransaction(
 				...(billing.refundedTxId ? { refundedTxId: billing.refundedTxId } : {}),
 				...(billing.meta ? { meta: billing.meta } : {}),
 			};
-		} else {
+	} else {
 			const credit = input.credit!;
 			txDoc = {
 				tid,
@@ -463,32 +462,38 @@ export async function processTransaction(
 				...(credit.billingTid ? { billingTid: credit.billingTid } : {}),
 				...(credit.meta ? { meta: credit.meta } : {}),
 			};
-		}
+	}
 
-		tx.set(txRef, txDoc);
-		tx.set(idemRef, {
+	tx.set(txRef, txDoc);
+	tx.set(idemRef, {
 			tid,
 			uid: input.uid,
 			idempotencyKey: input.idempotencyKey,
 			createdAt: FieldValue.serverTimestamp(),
-		});
+	});
 
-		// Update user balance snapshot
-		const userUpdates: Record<string, unknown> = {
-			balance: balanceSnapshot,
-		};
-		if (input.category === "credit" && input.direction === "out") {
-			userUpdates["stats.totalCreditsSpent"] = FieldValue.increment(
-				input.credit?.amount ?? 0,
-			);
-		}
-		tx.update(userRef, userUpdates);
+	const userUpdates: Record<string, unknown> = {
+		balance: balanceSnapshot,
+	};
+	if (input.category === "credit" && input.direction === "out") {
+		userUpdates["stats.totalCreditsSpent"] = FieldValue.increment(
+			input.credit?.amount ?? 0,
+		);
+	}
+	tx.update(userRef, userUpdates);
 
-		return {
-			tid,
-			transaction: txDoc,
-			balanceSnapshot,
-			idempotent: false,
-		};
+	return {
+		tid,
+		transaction: txDoc,
+		balanceSnapshot,
+		idempotent: false,
+	};
+}
+
+export async function processTransaction(
+	input: ProcessTransactionInput,
+): Promise<ProcessTransactionResult> {
+	return await db.runTransaction(async (tx) => {
+		return await processTransactionInFirestoreTransaction(tx, input);
 	});
 }
