@@ -5,6 +5,7 @@ import {
   getSlugModePolicy,
   getSlugReservationDocId,
   getSlugValidationError,
+  isSlugBlocked,
   isSlugMode,
   normalizeSlug,
   PUBLISHED_PROJECT_SLUGS_COLLECTION,
@@ -18,6 +19,10 @@ export async function GET(req: NextRequest) {
 
   if (getSlugValidationError(slug)) {
     return NextResponse.json({ available: false, error: "INVALID_SLUG" })
+  }
+
+  if (isSlugBlocked(slug)) {
+    return NextResponse.json({ available: false, error: "RESERVED_SLUG" })
   }
 
   if (!isSlugMode(rawMode)) {

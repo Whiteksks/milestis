@@ -8,7 +8,7 @@ import {
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 
-type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
 
 function generateToken(): string {
   const bytes = new Uint8Array(16)
@@ -45,6 +45,10 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
           return
         }
         const data = await res.json()
+        if (data.error === 'RESERVED_SLUG') {
+          setSlugStatus('reserved')
+          return
+        }
         setSlugStatus(data.available ? 'available' : 'taken')
       } catch {
         setSlugStatus('idle')
@@ -80,6 +84,7 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     slug.length >= 3 &&
     slugStatus !== 'taken' &&
     slugStatus !== 'invalid' &&
+    slugStatus !== 'reserved' &&
     slugStatus !== 'checking'
 
   return {

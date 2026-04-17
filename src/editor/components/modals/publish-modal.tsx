@@ -245,6 +245,7 @@ function SlugStatusIcon({ status }: { status: ReturnType<typeof usePublishModal>
   if (status === 'available') return <Check className="size-3.5 text-emerald-500" />
   if (status === 'taken') return <X className="size-3.5 text-destructive" />
   if (status === 'invalid') return <X className="size-3.5 text-destructive" />
+  if (status === 'reserved') return <X className="size-3.5 text-amber-500" />
   return null
 }
 
@@ -259,6 +260,8 @@ function SlugStatusMessage({
     return <p className="text-xs text-destructive">This subdomain is already taken.</p>
   if (status === 'invalid')
     return <p className="text-xs text-destructive">Lowercase letters, numbers, hyphens (3–24 chars).</p>
+  if (status === 'reserved')
+    return <p className="text-xs text-amber-600 dark:text-amber-400">This name is reserved and cannot be used.</p>
   if (status === 'available' && mode === 'portfolio')
     return <p className="text-xs text-emerald-600 dark:text-emerald-400">Subdomain is available!</p>
   return null

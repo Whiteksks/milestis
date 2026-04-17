@@ -6,4 +6,4 @@ export {
 } from "./constants";
 export { getSlugModePolicy } from "./policy";
 export { getSlugReservationDocId } from "./reservation";
-export { getSlugValidationError, isSlugValid, normalizeSlug } from "./validation";
+export { getSlugValidationError, isSlugBlocked, isSlugValid, normalizeSlug } from "./validation";

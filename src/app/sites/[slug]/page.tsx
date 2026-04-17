@@ -84,7 +84,7 @@ async function getPublishedProjectByToken(slug: string, mode: "photobook", plain
 
 // --- SEO metadata ---
 
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const reqHeaders = await headers()
   const rawMode = reqHeaders.get("x-milestis-mode")

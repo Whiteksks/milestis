@@ -1,4 +1,4 @@
-import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_REGEX } from "./constants";
+import { SLUG_BLOCKLIST, SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_REGEX } from "./constants";
 
 export function normalizeSlug(raw: string): string {
 	return raw
@@ -7,6 +7,10 @@ export function normalizeSlug(raw: string): string {
 		.replace(/[^a-z0-9-]/g, "-")
 		.replace(/-+/g, "-")
 		.replace(/^-+|-+$/g, "");
+}
+
+export function isSlugBlocked(slug: string): boolean {
+	return SLUG_BLOCKLIST.has(slug);
 }
 
 export function getSlugValidationError(slug: string): string | null {

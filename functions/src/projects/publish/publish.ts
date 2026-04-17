@@ -9,6 +9,7 @@ import type { ProjectMode } from "../projectInterface";
 import {
 	getSlugReservationDocId,
 	getSlugValidationError,
+	isSlugBlocked,
 	normalizeSlug,
 	PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from "./slug/index";
@@ -34,6 +35,13 @@ export function preparePublishInput(
 		throw new PublishValidationError(
 			"INVALID_SLUG",
 			slugValidationError,
+		);
+	}
+
+	if (isSlugBlocked(normalizedSlug)) {
+		throw new PublishValidationError(
+			"INVALID_SLUG",
+			`"${normalizedSlug}" is a reserved slug and cannot be used.`,
 		);
 	}
 
