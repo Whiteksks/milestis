@@ -34,6 +34,15 @@ const BLOCKED_PAGES = [
   'api/internal'
 ];
 
+const APP_PATH_PREFIXES = [
+  '/api',
+  '/auth',
+  '/account',
+  '/dashboard',
+  '/design',
+  '/sites',
+];
+
 /** Strip leading locale segment, e.g. /en/dashboard → /dashboard */
 function stripLocale(pathname: string): string {
   for (const locale of LOCALES) {
@@ -42,6 +51,19 @@ function stripLocale(pathname: string): string {
     }
   }
   return pathname;
+}
+
+function isPublishedPhotobookPath(pathname: string): boolean {
+  const barePath = stripLocale(pathname);
+  if (barePath === '/' || barePath === '') {
+    return false;
+  }
+  if (APP_PATH_PREFIXES.some((prefix) => barePath === prefix || barePath.startsWith(`${prefix}/`))) {
+    return false;
+  }
+
+  const segments = barePath.split('/').filter(Boolean);
+  return segments.length === 1;
 }
 
 /** Routes that require authentication */
@@ -56,6 +78,11 @@ export function proxy(request: NextRequest) {
   // ── Bot / scanner trap — return bare 404 before any processing ───────────
   if (TRASH_PATTERNS.some((re) => re.test(pathname))) {
     return new NextResponse(null, { status: 404 });
+  }
+
+  // API routes are not locale-aware and must bypass next-intl rewrites.
+  if (pathname === '/api' || pathname.startsWith('/api/')) {
+    return NextResponse.next();
   }
 
   // Firebase App Hosting may rewrite the Host header — check x-forwarded-host first
@@ -84,7 +111,12 @@ export function proxy(request: NextRequest) {
     if (pathname === '/' || pathname === '') {
       return NextResponse.redirect('https://milestis.com');
     }
-    // /my-slug (and anything deeper) → /sites/my-slug
+
+    if (!isPublishedPhotobookPath(pathname)) {
+      return intlMiddleware(request);
+    }
+
+    // /my-slug → /sites/my-slug
     const url = request.nextUrl.clone();
     url.pathname = `/sites${pathname}`;
     const reqHeaders = new Headers(request.headers);

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { adminDb } from "@/lib/firebase/admin"
+import { db } from "@/lib/firebase/firebase"
+import { doc, getDoc } from "firebase/firestore"
 import {
+  getSlugModePolicy,
   getSlugReservationDocId,
   getSlugValidationError,
   isSlugMode,
@@ -22,13 +24,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ available: false, error: "INVALID_MODE" })
   }
 
-  try {
-    const snap = await adminDb
-      .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
-      .doc(getSlugReservationDocId(rawMode, slug))
-      .get()
+  // Token-namespace modes don't reserve by slug — slug is cosmetic, always available
+  const policy = getSlugModePolicy(rawMode)
+  if (policy.namespace === "token") {
+    return NextResponse.json({ available: true })
+  }
 
-    const takenByOther = snap.exists && snap.data()?.projectId !== excludeProjectId
+  try {
+    const snap = await getDoc(
+      doc(db, PUBLISHED_PROJECT_SLUGS_COLLECTION, getSlugReservationDocId(rawMode, slug)),
+    )
+
+    const takenByOther = snap.exists() && snap.data()?.projectId !== excludeProjectId
     return NextResponse.json({ available: !takenByOther })
   } catch {
     return NextResponse.json({ available: false, error: "SERVER_ERROR" }, { status: 500 })

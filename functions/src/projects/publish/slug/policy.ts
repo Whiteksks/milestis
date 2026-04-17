@@ -1,6 +1,6 @@
 import type { ProjectMode } from "../../projectInterface";
 
-export type SlugNamespace = "global" | "mode";
+export type SlugNamespace = "global" | "token";
 
 export interface SlugModePolicy {
 	namespace: SlugNamespace;
@@ -13,7 +13,7 @@ export const SLUG_MODE_POLICY = {
 		routeKind: "subdomain",
 	},
 	photobook: {
-		namespace: "mode",
+		namespace: "token",
 		routeKind: "path",
 	},
 } as const satisfies Record<ProjectMode, SlugModePolicy>;

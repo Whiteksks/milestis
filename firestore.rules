@@ -112,6 +112,14 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Slug reservations ────────────────────────────────────────────────
+    // Used to check slug availability before publishing. Authenticated users
+    // may read to verify uniqueness. Written only by Cloud Functions.
+    match /published_project_slugs/{slugId} {
+      allow read: if isAuthed();
+      allow write: if false;
+    }
+
     // ─── Export records ───────────────────────────────────────────────────
     // Stored at projects/{projectId}/exports/{exportId}.
     // The wildcard recursive path is required so collectionGroup queries work.

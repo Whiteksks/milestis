@@ -40,6 +40,10 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
       try {
         const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
         const res = await fetch(`/api/projects/check-slug?${params}`)
+        if (!res.ok) {
+          setSlugStatus('idle')
+          return
+        }
         const data = await res.json()
         setSlugStatus(data.available ? 'available' : 'taken')
       } catch {

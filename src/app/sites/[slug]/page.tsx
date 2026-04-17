@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
 import {
+  getSlugModePolicy,
   getSlugReservationDocId,
   isSlugMode,
   PUBLISHED_PROJECT_SLUGS_COLLECTION,
@@ -17,9 +18,9 @@ interface Props {
   searchParams: Promise<Record<string, string | string[]>>
 }
 
-// --- Lookup by slug + mode (slug reservation -> published project) ---
+// --- Lookup helpers ---
 
-async function getPublishedProjectBySlug(slug: string, mode: "portfolio" | "photobook") {
+async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") {
   const slugSnap = await adminDb
     .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
     .doc(getSlugReservationDocId(mode, slug))
@@ -34,45 +35,72 @@ async function getPublishedProjectBySlug(slug: string, mode: "portfolio" | "phot
   if (!doc.exists) return null
 
   const data = doc.data()
-  if (!data || data.isPublished !== true || data.slug !== slug || data.mode !== mode) {
-    return null
-  }
+  if (!data || data.isPublished !== true || data.slug !== slug || data.mode !== mode) return null
 
   return {
     id: doc.id,
     slug: data.slug as string,
     name: data.name as string,
-    mode: data.mode as "portfolio" | "photobook",
-    accessToken: (data.accessToken as string | undefined) ?? null,
+    mode: data.mode as "portfolio",
+    accessToken: null as null,
     content: data.content ?? null,
     theme: data.theme ?? null,
   }
 }
 
-function verifyToken(incoming: string, stored: string): boolean {
-  const hashed = createHash("sha256").update(incoming).digest("hex")
-  return hashed === stored
+/**
+ * Lookup for token-namespace modes (e.g. photobook).
+ * The reservation doc ID is sha256(accessToken), not mode:slug.
+ * We verify the slug in the URL matches what was published (cosmetic check).
+ */
+async function getPublishedProjectByToken(slug: string, mode: "photobook", plainToken: string) {
+  const hashedToken = createHash("sha256").update(plainToken).digest("hex")
+
+  const slugSnap = await adminDb
+    .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
+    .doc(hashedToken)
+    .get()
+
+  if (!slugSnap.exists) return null
+
+  const slugData = slugSnap.data() as { projectId?: string; slug?: string } | undefined
+  if (!slugData?.projectId) return null
+
+  const doc = await adminDb.collection("published_projects").doc(slugData.projectId).get()
+  if (!doc.exists) return null
+
+  const data = doc.data()
+  if (!data || data.isPublished !== true || data.mode !== mode) return null
+
+  return {
+    id: doc.id,
+    slug: (data.slug as string | undefined) ?? slug,
+    name: data.name as string,
+    mode: data.mode as "photobook",
+    content: data.content ?? null,
+    theme: data.theme ?? null,
+  }
 }
 
 // --- SEO metadata ---
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params
   const reqHeaders = await headers()
   const rawMode = reqHeaders.get("x-milestis-mode")
   if (!isSlugMode(rawMode)) return { title: "Not found" }
 
   const mode = rawMode
-  const project = await getPublishedProjectBySlug(slug, mode)
+  const policy = getSlugModePolicy(mode)
 
-  if (!project) return { title: "Not found" }
-
-  // No rich metadata for token-protected photobooks
-  if (project.mode === "photobook") {
-    return { title: project.name, robots: "noindex" }
+  if (policy.namespace === "global") {
+    const project = await getPublishedProjectBySlugGlobal(slug, mode as "portfolio")
+    if (!project) return { title: "Not found" }
+    return { title: project.name }
   }
 
-  return { title: project.name }
+  // token-namespace: no rich metadata without a token — keep minimal and noindex
+  return { robots: "noindex" }
 }
 
 // --- Page ---
@@ -84,21 +112,13 @@ export default async function SitePage({ params, searchParams }: Props) {
   if (!isSlugMode(rawMode)) notFound()
 
   const mode = rawMode
-  const project = await getPublishedProjectBySlug(slug, mode)
+  const policy = getSlugModePolicy(mode)
 
-  if (!project) notFound()
+  // ── Global-namespace (subdomain) modes ────────────────────────────────
+  if (policy.namespace === "global") {
+    const project = await getPublishedProjectBySlugGlobal(slug, mode as "portfolio")
+    if (!project) notFound()
 
-  // Token gate for photobooks
-  if (project.mode === "photobook" && project.accessToken) {
-    const { token } = await searchParams
-    const tokenString = Array.isArray(token) ? token[0] : token
-    if (!tokenString || !verifyToken(tokenString, project.accessToken)) {
-      return <TokenGateForm slug={slug} />
-    }
-  }
-
-  // Portfolio rendering
-  if (project.mode === "portfolio") {
     const content = project.content ?? {}
     const theme = project.theme ?? {}
     return (
@@ -114,7 +134,22 @@ export default async function SitePage({ params, searchParams }: Props) {
     )
   }
 
-  // Photobook (token already verified above)
+  // ── Token-namespace (path+token) modes ────────────────────────────────
+  const { share } = await searchParams
+  const tokenString = Array.isArray(share) ? share[0] : share
+
+  // No token in URL → show gate immediately (don't reveal project existence)
+  if (!tokenString) {
+    return <TokenGateForm slug={slug} />
+  }
+
+  const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
+  if (!project) {
+    // Token is wrong or project doesn't exist — show gate again
+    return <TokenGateForm slug={slug} />
+  }
+
+  // Token verified — render photobook
   if (project.mode === "photobook") {
     const content = project.content ?? {}
     const theme = project.theme ?? {}

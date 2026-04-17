@@ -1,9 +1,10 @@
+import { createHash } from "crypto";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
 import { VALID_MODES, type ProjectMode } from "./projectInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 
@@ -104,8 +105,15 @@ export const unpublishProject = onRequest(
         const mode = rawMode as ProjectMode;
         const publishedSlug = projectData.publishedSlug;
         if (typeof publishedSlug === "string" && publishedSlug) {
+          const publishedAccessToken =
+            typeof projectData.publishedAccessToken === "string" && projectData.publishedAccessToken
+              ? projectData.publishedAccessToken
+              : undefined;
+          const hashedToken = publishedAccessToken
+            ? createHash("sha256").update(publishedAccessToken).digest("hex")
+            : undefined;
           const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-            getSlugReservationDocId(mode, publishedSlug),
+            getSlugReservationDocId(mode, publishedSlug, hashedToken),
           );
           tx.delete(slugRef);
         }

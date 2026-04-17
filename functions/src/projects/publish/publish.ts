@@ -11,7 +11,7 @@ import {
 	getSlugValidationError,
 	normalizeSlug,
 	PUBLISHED_PROJECT_SLUGS_COLLECTION,
-} from "./slug";
+} from "./slug/index";
 
 // ─── Errors ───────────────────────────────────────────────────────────────────
 
@@ -77,7 +77,7 @@ export async function commitPublish(
 		const projectRef = db.collection("projects").doc(projectId);
 		const publishedRef = db.collection("published_projects").doc(projectId);
 		const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-			getSlugReservationDocId(mode, prepared.slug),
+			getSlugReservationDocId(mode, prepared.slug, prepared.hashedToken),
 		);
 		const exportRef = projectRef.collection("exports").doc();
 

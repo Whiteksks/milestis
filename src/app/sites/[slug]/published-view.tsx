@@ -111,7 +111,7 @@ export function TokenGateForm({ slug: _slug }: TokenGateFormProps) {
     e.preventDefault()
     if (!value.trim()) return
     setError(false)
-    router.push(`?token=${encodeURIComponent(value.trim())}`)
+    router.push(`?share=${encodeURIComponent(value.trim())}`)
   }
 
   return (

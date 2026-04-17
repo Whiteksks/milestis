@@ -4,7 +4,7 @@ import { Timestamp, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 import { deleteProjectImageDocs } from "./projectUtils";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
 import { VALID_MODES, type ProjectMode } from "./projectInterface";
 
 /**

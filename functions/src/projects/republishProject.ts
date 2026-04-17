@@ -4,7 +4,7 @@ import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
 import { getPublishConfig } from "./publish/config";
 import { processTransactionInFirestoreTransaction } from "../transactions/engine";
 import { TransactionEngineError } from "../transactions/engine";
@@ -121,23 +121,26 @@ export const republishProject = onRequest(
 					throw new FlowError(409, ERROR.NOT_REPUBLISHABLE, "No published slug found. Please publish the project fresh.");
 				}
 
-				// ── Slug reservation ───────────────────────────────────────────
-				const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-					getSlugReservationDocId(mode, publishedSlug),
-				);
-				const slugSnap = await tx.get(slugRef);
-
-				if (slugSnap.exists && slugSnap.data()?.projectId !== projectId.trim()) {
-					// Another project claimed this slug while it was hidden.
-					throw new FlowError(409, ERROR.SLUG_TAKEN, "Your previous slug has been taken. Please publish with a new slug.");
-				}
-
 				const publishedAccessToken =
 					typeof projectData.publishedAccessToken === "string" && projectData.publishedAccessToken
 						? projectData.publishedAccessToken
 						: undefined;
 				if (config.requiresAccessToken && !publishedAccessToken) {
 					throw new FlowError(409, ERROR.NOT_REPUBLISHABLE, "Photobook access token is missing. Please publish the project fresh.");
+				}
+
+				// ── Slug reservation ───────────────────────────────────────────
+				const hashedToken = publishedAccessToken
+					? createHash("sha256").update(publishedAccessToken).digest("hex")
+					: undefined;
+				const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
+					getSlugReservationDocId(mode, publishedSlug, hashedToken),
+				);
+				const slugSnap = await tx.get(slugRef);
+
+				if (slugSnap.exists && slugSnap.data()?.projectId !== projectId.trim()) {
+					// Another project claimed this slug while it was hidden.
+					throw new FlowError(409, ERROR.SLUG_TAKEN, "Your previous slug has been taken. Please publish with a new slug.");
 				}
 
 				// ── Optional credit deduction (future repricing hook) ──────────

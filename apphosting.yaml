@@ -63,13 +63,19 @@ env:
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FORCE_DELETE_PROJECT_URL
-    value: https://forceDeleteProject-5h4wes5waq-ez.a.run.app
+    value: https://forcedeleteproject-5h4wes5waq-ez.a.run.app
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_UNPUBLISH_PROJECT_URL
-    value: https://unpublishProject-5h4wes5waq-ez.a.run.app
+    value: https://unpublishproject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_REPUBLISH_PROJECT_URL
+    value: https://republishproject-5h4wes5waq-ez.a.run.app
     availability:
       - BUILD
       - RUNTIME
