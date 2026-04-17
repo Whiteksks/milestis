@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/firebase/firebase"
-import { doc, getDoc } from "firebase/firestore"
+import { adminDb } from "@/lib/firebase/admin"
 
 // Portfolio slugs must be unique within the portfolio namespace (they become subdomains).
 // Photobook slugs must be unique within the photobook namespace (they become URL paths).
@@ -29,13 +28,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const snap = await getDoc(
-      doc(
-        db,
-        PUBLISHED_PROJECT_SLUGS_COLLECTION,
-        getPublishedSlugReservationDocId(mode, slug),
-      ),
-    )
+    const snap = await adminDb
+      .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
+      .doc(getPublishedSlugReservationDocId(mode, slug))
+      .get()
 
     const takenByOther = snap.exists() && snap.data()?.projectId !== excludeProjectId
     return NextResponse.json({ available: !takenByOther })

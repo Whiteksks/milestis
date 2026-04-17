@@ -92,9 +92,11 @@ export async function commitPublish(
 			}
 		}
 
+		const publishVersion = typeof projectData.publishVersion === "number" ? projectData.publishVersion : 0;
+
 		const debit = await processTransactionInFirestoreTransaction(tx, {
 			uid,
-			idempotencyKey: `publish:${projectId}`,
+			idempotencyKey: `publish:${projectId}:v${publishVersion + 1}`,
 			category: "credit",
 			direction: "out",
 			credit: {
@@ -130,13 +132,14 @@ export async function commitPublish(
 			...(prepared.accessToken ? { publishedAccessToken: prepared.accessToken } : {}),
 			status: "archived",
 			publishedAt: FieldValue.serverTimestamp(),
+			publishLockId: FieldValue.delete(),
 			publishLockExpiresAtMillis: FieldValue.delete(),
 			publishTransactionId: debit.tid,
+			publishVersion: FieldValue.increment(1),
 			...(previewHeroUrl ? { "preview.heroImageUrl": previewHeroUrl } : {}),
 			updatedAt: FieldValue.serverTimestamp(),
 		});
 		tx.update(db.collection("users").doc(uid), {
-			"stats.projectsInProgress": FieldValue.increment(-1),
 			"stats.projectsPublished": FieldValue.increment(1),
 			...(freedBytes > 0 ? { "stats.storageUsedBytes": FieldValue.increment(-freedBytes) } : {}),
 		});

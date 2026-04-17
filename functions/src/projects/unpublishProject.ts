@@ -4,7 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
 import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
-import type { ProjectMode } from "./projectInterface";
+import { VALID_MODES, type ProjectMode } from "./projectInterface";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -66,53 +66,63 @@ export const unpublishProject = onRequest(
       return;
     }
 
-    // ── Load project & ownership check ────────────────────────────────────
-    const projectRef = db.collection("projects").doc(projectId);
-    const projectSnap = await projectRef.get();
-
-    if (!projectSnap.exists) {
-      res.status(404).json({ error: ERROR.NOT_FOUND });
-      return;
-    }
-
-    if (projectSnap.data()!.ownerId !== uid) {
-      res.status(403).json({ error: ERROR.FORBIDDEN });
-      return;
-    }
-
     try {
-      const projectData = projectSnap.data()!
-      const batch = db.batch();
+      await db.runTransaction(async (tx) => {
+        const projectRef = db.collection("projects").doc(projectId.trim());
+        const projectSnap = await tx.get(projectRef);
 
-      // 1. Mark published_projects doc as hidden (keep data for re-publish).
-      const publishedRef = db.collection("published_projects").doc(projectId);
-      batch.set(publishedRef, {
-        isPublished: false,
-        slug: FieldValue.delete(),
-        accessToken: FieldValue.delete(),
-        unpublishedAt: FieldValue.serverTimestamp(),
-      }, { merge: true });
-      if (typeof projectData.publishedSlug === "string" && typeof projectData.mode === "string") {
-        const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-          getPublishedSlugReservationDocId(projectData.mode as ProjectMode, projectData.publishedSlug),
-        )
-        batch.delete(slugRef)
-      }
+        if (!projectSnap.exists) {
+          throw Object.assign(new Error(), { status: 404, code: ERROR.NOT_FOUND });
+        }
 
-      // 2. Clear publish fields on the project doc.
-      batch.update(projectRef, {
-        isPublished: false,
-        publishedSlug: FieldValue.delete(),
-        publishedAccessToken: FieldValue.delete(),
-        publishLockExpiresAtMillis: FieldValue.delete(),
-        updatedAt: FieldValue.serverTimestamp(),
+        const projectData = projectSnap.data()!;
+
+        if (projectData.ownerId !== uid) {
+          throw Object.assign(new Error(), { status: 403, code: ERROR.FORBIDDEN });
+        }
+
+        if (projectData.isPublished !== true) {
+          throw Object.assign(new Error(), { status: 409, code: ERROR.INVALID_PAYLOAD, message: "Project is not published." });
+        }
+
+        // Release the slug reservation atomically.
+        const rawMode = projectData.mode;
+        const publishedSlug = projectData.publishedSlug;
+        if (VALID_MODES.includes(rawMode as ProjectMode) && typeof publishedSlug === "string") {
+          const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
+            getPublishedSlugReservationDocId(rawMode as ProjectMode, publishedSlug),
+          );
+          tx.delete(slugRef);
+        }
+
+        // Hide published_projects doc (keep content for re-publish).
+        const publishedRef = db.collection("published_projects").doc(projectId.trim());
+        tx.set(publishedRef, {
+          isPublished: false,
+          slug: FieldValue.delete(),
+          accessToken: FieldValue.delete(),
+          unpublishedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+
+        // Clear publish fields on the project doc.
+        tx.update(projectRef, {
+          isPublished: false,
+          publishedSlug: FieldValue.delete(),
+          publishedAccessToken: FieldValue.delete(),
+          publishLockId: FieldValue.delete(),
+          publishLockExpiresAtMillis: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
       });
-
-      await batch.commit();
 
       logger.info(`[unpublishProject] Project ${projectId} unpublished by user ${uid}.`);
       res.status(200).json({ ok: true });
-    } catch (err) {
+    } catch (err: unknown) {
+      const e = err as { status?: number; code?: string; message?: string };
+      if (e.status && e.code) {
+        res.status(e.status).json({ error: e.code, ...(e.message ? { message: e.message } : {}) });
+        return;
+      }
       logger.error(`[unpublishProject] Error unpublishing project ${projectId}:`, err);
       res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
     }

@@ -146,10 +146,6 @@ export const forceDeleteProject = onRequest(
       if (freedStorageBytes > 0) {
         userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
       }
-      // If the project was never exported, the active slot was never freed — do it now.
-      if (!data.isExported) {
-        userUpdates["stats.projectsInProgress"] = FieldValue.increment(-1);
-      }
       deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();
       logger.info(`[forceDeleteProject] Project ${projectId} permanently deleted by user ${uid}.`);

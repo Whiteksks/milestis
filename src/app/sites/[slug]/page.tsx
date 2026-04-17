@@ -7,25 +7,37 @@ import { PublishedView, TokenGateForm } from "./published-view"
 import type { ThemeCustomizations } from "@/editor/lib/store-theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 
+const PUBLISHED_PROJECT_SLUGS_COLLECTION = "published_project_slugs"
+
+function getPublishedSlugReservationDocId(mode: "portfolio" | "photobook", slug: string) {
+  return `${mode}:${slug}`
+}
+
 interface Props {
   params: Promise<{ slug: string }>
   searchParams: Promise<Record<string, string | string[]>>
 }
 
-// --- Lookup by slug + mode (Firestore query) ---
+// --- Lookup by slug + mode (slug reservation -> published project) ---
 
 async function getPublishedProjectBySlug(slug: string, mode: "portfolio" | "photobook") {
-  const snap = await adminDb
-    .collection("published_projects")
-    .where("slug", "==", slug)
-    .where("mode", "==", mode)
-    .limit(1)
+  const slugSnap = await adminDb
+    .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
+    .doc(getPublishedSlugReservationDocId(mode, slug))
     .get()
 
-  if (snap.empty) return null
+  if (!slugSnap.exists) return null
 
-  const doc = snap.docs[0]
+  const slugData = slugSnap.data() as { projectId?: string } | undefined
+  if (!slugData?.projectId) return null
+
+  const doc = await adminDb.collection("published_projects").doc(slugData.projectId).get()
+  if (!doc.exists) return null
+
   const data = doc.data()
+  if (!data || data.isPublished !== true || data.slug !== slug || data.mode !== mode) {
+    return null
+  }
 
   return {
     id: doc.id,

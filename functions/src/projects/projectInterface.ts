@@ -32,6 +32,8 @@ export interface ProjectMetadata {
   updatedAt: FieldValue;
   schemaVersion: number;
   isPublished?: boolean;  // Set by the publish function; absent until first publish action
+  /** Unique attempt id for the current publish lock owner. */
+  publishLockId?: string;
   /** Soft lease for the current publish attempt to avoid concurrent publishes. */
   publishLockExpiresAtMillis?: number;
   /** Last successful debit transaction id for the publish flow. */

@@ -164,9 +164,14 @@ export const createProject = onRequest(
 
         const userData = userSnap.data()!;
         const maxProjects: number = userData.subscription?.features?.maxProjects ?? 5;
-        const projectsInProgress: number = userData.stats?.projectsInProgress ?? 0;
+        const projectsSnap = await tx.get(
+          db.collection("projects")
+            .where("ownerId", "==", uid)
+            .where("status", "==", "active"),
+        );
+        const activeProjectsCount = projectsSnap.size;
 
-        if (projectsInProgress >= maxProjects) {
+        if (activeProjectsCount >= maxProjects) {
           throw new LimitError(maxProjects);
         }
 
@@ -175,7 +180,6 @@ export const createProject = onRequest(
         tx.create(projectRef, projectDoc);
         tx.update(userRef, {
           "stats.totalProjects": FieldValue.increment(1),
-          "stats.projectsInProgress": FieldValue.increment(1),
         });
       });
 

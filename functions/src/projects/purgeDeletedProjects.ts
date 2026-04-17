@@ -46,7 +46,6 @@ export const purgeDeletedProjects = onSchedule(
     for (const projectDoc of snapshot.docs) {
       const projectData = projectDoc.data() as {
         ownerId: string;
-        isExported?: boolean;
         mode?: ProjectMode;
         publishedSlug?: string;
       };
@@ -105,10 +104,6 @@ export const purgeDeletedProjects = onSchedule(
       };
       if (freedStorageBytes > 0) {
         userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
-      }
-      // If the project was never exported, the active slot was never freed — do it now.
-      if (!projectData.isExported) {
-        userUpdates["stats.projectsInProgress"] = FieldValue.increment(-1);
       }
       deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();

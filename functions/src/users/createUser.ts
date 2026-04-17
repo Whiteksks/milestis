@@ -71,7 +71,6 @@ export const createUser = onRequest(
         stats: {
           totalProjects: 0,
           projectsPublished: 0,
-          projectsInProgress: 0,
           storageUsedBytes: 0,
           totalCreditsSpent: 0,
         },

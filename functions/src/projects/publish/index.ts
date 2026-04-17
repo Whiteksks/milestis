@@ -1,5 +1,6 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { randomUUID } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../../lib/firebaseAdmin";
@@ -44,6 +45,7 @@ class PublishFlowError extends Error {
 
 async function claimPublishJob(projectId: string, uid: string) {
 	const projectRef = db.collection("projects").doc(projectId);
+	const attemptId = randomUUID();
 	return db.runTransaction(async (tx) => {
 		const projectSnap = await tx.get(projectRef);
 		if (!projectSnap.exists) {
@@ -74,18 +76,33 @@ async function claimPublishJob(projectId: string, uid: string) {
 		}
 
 		tx.update(projectRef, {
+			publishLockId: attemptId,
 			publishLockExpiresAtMillis: Date.now() + PUBLISH_JOB_LEASE_MS,
 			updatedAt: FieldValue.serverTimestamp(),
 		});
 
-		return projectData;
+		return { projectData, attemptId };
 	});
 }
 
-async function releasePublishLock(projectId: string) {
-	await db.collection("projects").doc(projectId).update({
-		publishLockExpiresAtMillis: FieldValue.delete(),
-		updatedAt: FieldValue.serverTimestamp(),
+async function releasePublishLock(projectId: string, attemptId: string) {
+	const projectRef = db.collection("projects").doc(projectId);
+	await db.runTransaction(async (tx) => {
+		const projectSnap = await tx.get(projectRef);
+		if (!projectSnap.exists) {
+			return;
+		}
+
+		const projectData = projectSnap.data() ?? {};
+		if (projectData.publishLockId !== attemptId) {
+			return;
+		}
+
+		tx.update(projectRef, {
+			publishLockId: FieldValue.delete(),
+			publishLockExpiresAtMillis: FieldValue.delete(),
+			updatedAt: FieldValue.serverTimestamp(),
+		});
 	});
 }
 
@@ -214,9 +231,12 @@ export const publishProject = onRequest(
 		}
 
 		let projectData: FirebaseFirestore.DocumentData;
+		let publishAttemptId: string | null = null;
 		let publishCommitted = false;
 		try {
-			projectData = await claimPublishJob(projectId, uid);
+			const claim = await claimPublishJob(projectId, uid);
+			projectData = claim.projectData;
+			publishAttemptId = claim.attemptId;
 		} catch (err) {
 			if (err instanceof PublishFlowError) {
 				res.status(err.status).json({ error: err.code, message: err.message });
@@ -343,9 +363,9 @@ export const publishProject = onRequest(
 			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
 		} finally {
-			if (!publishCommitted) {
+			if (!publishCommitted && publishAttemptId) {
 				try {
-					await releasePublishLock(projectId);
+					await releasePublishLock(projectId, publishAttemptId);
 				} catch (lockErr) {
 					logger.warn(`[publishProject] Failed to release publish lock for ${projectId}:`, lockErr);
 				}

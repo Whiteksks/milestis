@@ -47,9 +47,10 @@ export interface UserProfileTemplate {
 }
 
 export interface UserStats {
+  /** Current number of project docs that still exist, including trashed ones awaiting purge. */
   totalProjects: number;
+  /** Lifetime count of successful publish commits. */
   projectsPublished: number;
-  projectsInProgress: number;
   storageUsedBytes: number;
   totalCreditsSpent: number;
 }
