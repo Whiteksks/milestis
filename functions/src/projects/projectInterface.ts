@@ -38,6 +38,12 @@ export interface ProjectMetadata {
   publishLockExpiresAtMillis?: number;
   /** Last successful debit transaction id for the publish flow. */
   publishTransactionId?: string;
+  /** Incremented on every publish/republish — used as idempotency key suffix. */
+  publishVersion?: number;
+  /** The slug used when the project was last published. Preserved on unpublish for safe republish. */
+  publishedSlug?: string;
+  /** Plaintext access token for the owner's share link. Preserved on unpublish. Photobooks only. */
+  publishedAccessToken?: string;
   template?: {
     id: string;
   };  // Optional template reference for future use

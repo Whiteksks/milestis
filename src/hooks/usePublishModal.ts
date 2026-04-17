@@ -1,17 +1,14 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import {
+  buildPublishedProjectUrl,
+  getSlugValidationError,
+  normalizeSlug,
+} from '@/lib/slug'
+import type { SlugMode } from '@/lib/slug'
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
-
-const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/
-
-function normSlug(raw: string): string {
-  return raw
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, '-')
-    .replace(/-+/g, '-')
-}
 
 function generateToken(): string {
   const bytes = new Uint8Array(16)
@@ -19,7 +16,7 @@ function generateToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export function usePublishModal(projectId: string, mode: 'portfolio' | 'photobook') {
+export function usePublishModal(projectId: string, mode: SlugMode) {
   const [slug, setSlug] = useState('')
   const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
   // Stable token per modal instance — generated once for photobooks
@@ -34,7 +31,7 @@ export function usePublishModal(projectId: string, mode: 'portfolio' | 'photoboo
         setSlugStatus('idle')
         return
       }
-      if (value.length > 24 || !SLUG_REGEX.test(value)) {
+      if (getSlugValidationError(value)) {
         setSlugStatus('invalid')
         return
       }
@@ -54,7 +51,7 @@ export function usePublishModal(projectId: string, mode: 'portfolio' | 'photoboo
 
   const handleSlugChange = useCallback(
     (value: string) => {
-      const normalized = normSlug(value)
+      const normalized = normalizeSlug(value)
       setSlug(normalized)
       setSlugStatus('idle')
       if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -65,12 +62,12 @@ export function usePublishModal(projectId: string, mode: 'portfolio' | 'photoboo
 
   const portfolioUrl =
     mode === 'portfolio' && slug
-      ? `https://${slug}.milestis.site`
+      ? buildPublishedProjectUrl(mode, slug)
       : null
 
   const photobookUrl =
     mode === 'photobook' && slug
-      ? `https://milestis.site/${slug}?token=${accessToken}`
+      ? buildPublishedProjectUrl(mode, slug, accessToken)
       : null
 
   // Client-side check is UX feedback only — server always validates uniqueness.

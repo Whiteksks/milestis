@@ -3,6 +3,7 @@ import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
+import { ALLOWED_ORIGINS } from "../lib/cors";
 import {
   CreateProjectPayload,
   ProjectMetadata,
@@ -110,7 +111,7 @@ export const createProject = onRequest(
     concurrency: 20,
     timeoutSeconds: 60,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
+    cors: ALLOWED_ORIGINS,
   },
   async (req, res) => {
     let uid: string | undefined;

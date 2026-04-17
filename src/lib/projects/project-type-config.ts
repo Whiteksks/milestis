@@ -6,6 +6,8 @@
  * this file only describes what to show and what actions are available.
  */
 
+import { buildPublishedProjectUrl } from '@/lib/slug'
+
 export const PROJECT_TYPE_CONFIG = {
   portfolio: {
     /** Human-readable label */
@@ -28,7 +30,7 @@ export const PROJECT_TYPE_CONFIG = {
     // ── Sharing ───────────────────────────────────────────────────────────
     requiresSlug: true,
     /** Build the canonical public URL for a published project */
-    getShareUrl: (slug: string) => `https://${slug}.milestis.site`,
+    getShareUrl: (slug: string) => buildPublishedProjectUrl('portfolio', slug),
 
     // ── Billing ───────────────────────────────────────────────────────────
     creditCost: 10,
@@ -60,9 +62,7 @@ export const PROJECT_TYPE_CONFIG = {
 
     requiresSlug: true,
     getShareUrl: (slug: string, accessToken?: string) =>
-      accessToken
-        ? `https://milestis.site/${slug}?token=${accessToken}`
-        : `https://milestis.site/${slug}`,
+      buildPublishedProjectUrl('photobook', slug, accessToken),
 
     creditCost: 10,
 

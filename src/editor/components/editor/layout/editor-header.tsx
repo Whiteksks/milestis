@@ -16,6 +16,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
+import { buildPublishedProjectUrl } from '@/lib/slug'
 
 interface EditorHeaderProps {
   projectId: string
@@ -287,10 +288,11 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 {publishedSlug && (
                   <DropdownMenuItem
                     onClick={() => {
-                      const url =
-                        editorMode === 'portfolio'
-                          ? `https://${publishedSlug}.milestis.site`
-                          : `https://milestis.site/${publishedSlug}?token=${publishedAccessToken ?? ''}`
+                      const url = buildPublishedProjectUrl(
+                        editorMode as 'portfolio' | 'photobook',
+                        publishedSlug,
+                        publishedAccessToken,
+                      )
                       window.open(url, '_blank')
                     }}
                   >

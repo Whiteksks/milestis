@@ -96,6 +96,16 @@ export const toastProject = {
     })
   },
 
+  /** Re-publish a previously hidden project using the saved slug. */
+  republish<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Republishing…",
+      success: "Project is live again!",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to republish project",
+    })
+  },
+
   /** Export / publish project. For photobooks: downloads a PDF. For portfolios: publishes the site. */
   export<T>(promise: Promise<T>) {
     return toast.promise(promise, {

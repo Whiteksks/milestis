@@ -10,6 +10,7 @@ import {createProject} from "./projects/createProject";
 import {forceDeleteProject} from "./projects/forceDeleteProject";
 import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 import {unpublishProject} from "./projects/unpublishProject";
+import {republishProject} from "./projects/republishProject";
 import {publishProject} from "./projects/publish";
 
 export {
@@ -20,5 +21,6 @@ export {
 	forceDeleteProject,
 	purgeDeletedProjects,
 	unpublishProject,
+	republishProject,
 	publishProject,
 };

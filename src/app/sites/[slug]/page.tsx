@@ -3,15 +3,14 @@ import { createHash } from "crypto"
 import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
+import {
+  getSlugReservationDocId,
+  isSlugMode,
+  PUBLISHED_PROJECT_SLUGS_COLLECTION,
+} from "@/lib/slug"
 import { PublishedView, TokenGateForm } from "./published-view"
 import type { ThemeCustomizations } from "@/editor/lib/store-theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
-
-const PUBLISHED_PROJECT_SLUGS_COLLECTION = "published_project_slugs"
-
-function getPublishedSlugReservationDocId(mode: "portfolio" | "photobook", slug: string) {
-  return `${mode}:${slug}`
-}
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -23,7 +22,7 @@ interface Props {
 async function getPublishedProjectBySlug(slug: string, mode: "portfolio" | "photobook") {
   const slugSnap = await adminDb
     .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
-    .doc(getPublishedSlugReservationDocId(mode, slug))
+    .doc(getSlugReservationDocId(mode, slug))
     .get()
 
   if (!slugSnap.exists) return null
@@ -60,7 +59,10 @@ function verifyToken(incoming: string, stored: string): boolean {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const reqHeaders = await headers()
-  const mode = (reqHeaders.get('x-milestis-mode') ?? 'portfolio') as "portfolio" | "photobook"
+  const rawMode = reqHeaders.get("x-milestis-mode")
+  if (!isSlugMode(rawMode)) return { title: "Not found" }
+
+  const mode = rawMode
   const project = await getPublishedProjectBySlug(slug, mode)
 
   if (!project) return { title: "Not found" }
@@ -78,7 +80,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function SitePage({ params, searchParams }: Props) {
   const { slug } = await params
   const reqHeaders = await headers()
-  const mode = (reqHeaders.get('x-milestis-mode') ?? 'portfolio') as "portfolio" | "photobook"
+  const rawMode = reqHeaders.get("x-milestis-mode")
+  if (!isSlugMode(rawMode)) notFound()
+
+  const mode = rawMode
   const project = await getPublishedProjectBySlug(slug, mode)
 
   if (!project) notFound()

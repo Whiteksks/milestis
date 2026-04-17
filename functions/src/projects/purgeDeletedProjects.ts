@@ -4,8 +4,8 @@ import { Timestamp, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 import { deleteProjectImageDocs } from "./projectUtils";
-import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
-import type { ProjectMode } from "./projectInterface";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { VALID_MODES, type ProjectMode } from "./projectInterface";
 
 /**
  * Runs at 00:00 UTC on the 1st of every month.
@@ -91,10 +91,10 @@ export const purgeDeletedProjects = onSchedule(
       const deleteBatch = db.batch();
       deleteBatch.delete(projectDoc.ref);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      if (typeof projectData.publishedSlug === "string" && typeof projectData.mode === "string") {
+      if (typeof projectData.publishedSlug === "string" && VALID_MODES.includes(projectData.mode as ProjectMode)) {
         deleteBatch.delete(
           db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-            getPublishedSlugReservationDocId(projectData.mode as ProjectMode, projectData.publishedSlug),
+			getSlugReservationDocId(projectData.mode as ProjectMode, projectData.publishedSlug),
           ),
         );
       }

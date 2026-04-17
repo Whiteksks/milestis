@@ -3,10 +3,14 @@ import type { ProjectMode } from "../projectInterface";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface PublishModeConfig {
-	/** Credits deducted from the user's balance on publish. */
+	/** Credits deducted from the user's balance on first publish. */
 	creditCost: number;
-	/** Whether a slug is required in the publish request. Always true for now. */
-	requiresSlug: true;
+	/**
+	 * Credits deducted on re-publish (showing a previously hidden project).
+	 * 0 = free re-publish. Can be changed per-mode in the future to support
+	 * dynamic repricing (e.g. based on photo count or updated content).
+	 */
+	republishCreditCost: number;
 	/**
 	 * Whether an access token is required.
 	 * Portfolios are public — no token.
@@ -20,12 +24,12 @@ export interface PublishModeConfig {
 export const PUBLISH_MODE_CONFIG = {
 	portfolio: {
 		creditCost: 10,
-		requiresSlug: true,
+		republishCreditCost: 0,
 		requiresAccessToken: false,
 	},
 	photobook: {
 		creditCost: 10,
-		requiresSlug: true,
+		republishCreditCost: 0,
 		requiresAccessToken: true,
 	},
 } as const satisfies Record<ProjectMode, PublishModeConfig>;

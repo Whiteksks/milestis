@@ -6,7 +6,12 @@ import type { BalanceSnapshot } from "../../transactions/types";
 import type { CommitPublishInput, PreparedPublishInput } from "./types";
 import type { PublishInput } from "./types";
 import type { ProjectMode } from "../projectInterface";
-import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./slug";
+import {
+	getSlugReservationDocId,
+	getSlugValidationError,
+	normalizeSlug,
+	PUBLISHED_PROJECT_SLUGS_COLLECTION,
+} from "./slug";
 
 // ─── Errors ───────────────────────────────────────────────────────────────────
 
@@ -18,18 +23,17 @@ export class PublishValidationError extends Error {
 		super(message);
 	}
 }
-
-const SLUG_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
-
 export function preparePublishInput(
 	input: Pick<PublishInput, "slug" | "accessToken">,
 ): PreparedPublishInput {
 	const { slug, accessToken } = input;
+	const normalizedSlug = normalizeSlug(slug);
 
-	if (!slug || slug.length < 3 || slug.length > 24 || !SLUG_REGEX.test(slug)) {
+	const slugValidationError = getSlugValidationError(normalizedSlug);
+	if (slugValidationError) {
 		throw new PublishValidationError(
 			"INVALID_SLUG",
-			"slug must be 3–24 lowercase alphanumeric characters or hyphens.",
+			slugValidationError,
 		);
 	}
 
@@ -39,7 +43,7 @@ export function preparePublishInput(
 	}
 
 	return {
-		slug,
+		slug: normalizedSlug,
 		...(accessToken ? { accessToken } : {}),
 		...(hashedToken ? { hashedToken } : {}),
 	};
@@ -73,7 +77,7 @@ export async function commitPublish(
 		const projectRef = db.collection("projects").doc(projectId);
 		const publishedRef = db.collection("published_projects").doc(projectId);
 		const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-			getPublishedSlugReservationDocId(mode, prepared.slug),
+			getSlugReservationDocId(mode, prepared.slug),
 		);
 		const exportRef = projectRef.collection("exports").doc();
 

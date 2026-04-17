@@ -24,6 +24,7 @@ import type { DashboardProject } from "@/hooks/useProjectsQuery"
 import { useSoftDeleteMutation, useRestoreMutation, useForceDeleteMutation, useUnpublishMutation } from "@/hooks/useProjectMutations"
 import { TemplatePreview } from "@/components/shared/template-preview"
 import { useTranslations } from "next-intl"
+import { getPublishedProjectShareUrl } from "@/lib/slug"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -88,11 +89,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
-  const viewUrl = project.publishedSlug
-    ? project.mode === 'portfolio'
-      ? `https://${project.publishedSlug}.milestis.site`
-      : null  // photobook link has token — only shareable from the modal at publish time
-    : null
+  const viewUrl = getPublishedProjectShareUrl(project)
 
   const thumbnail = useMemo(
     () => (

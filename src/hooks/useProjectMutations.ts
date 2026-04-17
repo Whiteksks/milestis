@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
-import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject, publishProject, unpublishProject } from '@/lib/projects'
+import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject, publishProject, unpublishProject, republishProject } from '@/lib/projects'
 import { toastProject } from '@/lib/toast'
 
 function useUid() {
@@ -200,7 +200,7 @@ export function usePublishMutation() {
       toastProject.publish(promise)
       return promise
     },
-    onMutate: async ({ projectId, slug }) => {
+    onMutate: async ({ projectId, slug, accessToken }) => {
       if (!uid) return
       await queryClient.cancelQueries({ queryKey: projectKeys.active(uid) })
 
@@ -214,6 +214,7 @@ export function usePublishMutation() {
           status: 'archived',
           isPublished: true,
           publishedSlug: slug,
+          publishedAccessToken: accessToken ?? null,
         }
         queryClient.setQueryData<DashboardProject[]>(
           projectKeys.active(uid),
@@ -264,7 +265,40 @@ export function useUnpublishMutation() {
       const prevArchived = queryClient.getQueryData<DashboardProject[]>(projectKeys.archived(uid))
       queryClient.setQueryData<DashboardProject[]>(
         projectKeys.archived(uid),
-        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false, publishedSlug: null, publishedAccessToken: null } : p) ?? [],
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: false } : p) ?? [],
+      )
+      return { prevArchived }
+    },
+    onError: (_err, _id, context) => {
+      if (!uid || !context) return
+      if (context.prevArchived !== undefined)
+        queryClient.setQueryData(projectKeys.archived(uid), context.prevArchived)
+    },
+    onSettled: () => {
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
+    },
+  })
+}
+
+// ─── Republish ─────────────────────────────────────────────────────────
+
+export function useRepublishMutation() {
+  const queryClient = useQueryClient()
+  const uid = useUid()
+
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const promise = republishProject(projectId)
+      toastProject.republish(promise)
+      await promise
+    },
+    onMutate: async (projectId) => {
+      if (!uid) return
+      await queryClient.cancelQueries({ queryKey: projectKeys.archived(uid) })
+      const prevArchived = queryClient.getQueryData<DashboardProject[]>(projectKeys.archived(uid))
+      queryClient.setQueryData<DashboardProject[]>(
+        projectKeys.archived(uid),
+        (prev) => prev?.map((p) => p.id === projectId ? { ...p, isPublished: true } : p) ?? [],
       )
       return { prevArchived }
     },

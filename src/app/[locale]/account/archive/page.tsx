@@ -18,8 +18,7 @@ import { useForceDeleteMutation } from "@/hooks/useProjectMutations"
 import { projectKeys } from "@/hooks/useProjectsQuery"
 import { useQueryClient } from "@tanstack/react-query"
 import { useUserStore } from "@/hooks/useUserStore"
-
-const BASE_DOMAIN = "milestis.site"
+import { getPublishedProjectShareUrl } from "@/lib/slug"
 
 const modeConfig = {
   portfolio: { icon: Layout, label: "Portfolio" },
@@ -27,9 +26,7 @@ const modeConfig = {
 }
 
 function getShareUrl(project: DashboardProject): string | null {
-  if (!project.isPublished || !project.publishedSlug) return null
-  if (project.mode === "portfolio") return `https://${project.publishedSlug}.${BASE_DOMAIN}`
-  return `https://${BASE_DOMAIN}/${project.publishedSlug}`
+  return getPublishedProjectShareUrl(project)
 }
 
 // ─── Row ──────────────────────────────────────────────────────────────────────

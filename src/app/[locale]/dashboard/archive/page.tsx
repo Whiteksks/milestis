@@ -10,10 +10,9 @@ import { Badge } from "@/components/ui/badge"
 import { useProjectExportsQuery, useArchivedProjectsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
 import { cn } from "@/lib/utils"
 import { getProjectConfig } from "@/lib/projects/project-type-config"
+import { buildPublishedProjectUrl, getPublishedProjectShareUrl } from "@/lib/slug"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const BASE_DOMAIN = "milestis.site"
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString(undefined, {
@@ -72,7 +71,7 @@ function ExportRow({ record }: { record: ProjectExportRecord }) {
             className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
             asChild
           >
-            <a href={config.getShareUrl(record.publishedSlug)} target="_blank" rel="noopener noreferrer">
+			<a href={buildPublishedProjectUrl(record.mode, record.publishedSlug)} target="_blank" rel="noopener noreferrer">
               <Globe className="size-3.5 sm:mr-2" />
               <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">View site</span>
             </a>
@@ -168,9 +167,8 @@ export default function ExportsPage() {
                     const p = archivedMap.get(projectId)
                     if (!p) return null
                     if (p.isPublished) {
-                      const shareUrl = p.mode === 'portfolio'
-                        ? `https://${p.publishedSlug}.${BASE_DOMAIN}`
-                        : `https://${BASE_DOMAIN}/${p.publishedSlug}`
+					  const shareUrl = getPublishedProjectShareUrl(p)
+					  if (!shareUrl) return null
                       return (
                         <a
                           href={shareUrl}

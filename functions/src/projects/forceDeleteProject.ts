@@ -5,8 +5,9 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
 import { deleteProjectImageDocs } from "./projectUtils";
-import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
-import type { ProjectMode } from "./projectInterface";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { VALID_MODES, type ProjectMode } from "./projectInterface";
+import { ALLOWED_ORIGINS } from "../lib/cors";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -38,7 +39,7 @@ export const forceDeleteProject = onRequest(
     concurrency: 20,
     timeoutSeconds: 120,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
+    cors: ALLOWED_ORIGINS,
   },
   async (req, res) => {
     // ── Method guard ──────────────────────────────────────────────────────
@@ -132,10 +133,10 @@ export const forceDeleteProject = onRequest(
       const deleteBatch = db.batch();
       deleteBatch.delete(projectRef);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      if (typeof data.publishedSlug === "string" && typeof data.mode === "string") {
+      if (typeof data.publishedSlug === "string" && VALID_MODES.includes(data.mode as ProjectMode)) {
         deleteBatch.delete(
           db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-            getPublishedSlugReservationDocId(data.mode as ProjectMode, data.publishedSlug),
+			getSlugReservationDocId(data.mode as ProjectMode, data.publishedSlug),
           ),
         );
       }

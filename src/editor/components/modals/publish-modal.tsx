@@ -37,6 +37,7 @@ import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useUserStore } from '@/hooks/useUserStore'
 import { getProjectConfig } from '@/lib/projects/project-type-config'
+import { getSlugInputChrome } from '@/lib/slug'
 
 interface PublishModalProps {
   open: boolean
@@ -146,6 +147,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
 export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; data: ReturnType<typeof usePublishModal> }) {
   const { slug, handleSlugChange, slugStatus } = data
   const maxLength = 24
+  const chrome = getSlugInputChrome(mode)
 
   return (
     <div className="space-y-4 py-2">
@@ -165,7 +167,7 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
           
           {/* Левая часть (Префикс) */}
           <div className="flex items-center px-4 h-13 bg-muted/30 border-r border-border/40 text-muted-foreground/70 text-sm font-medium select-none shrink-0 italic font-serif">
-            {mode === 'portfolio' ? 'https://' : 'https://milestis.site/'}
+            {chrome.prefix}
           </div>
           
           <div className="relative flex-1 min-w-0 flex items-center bg-background/50">
@@ -184,9 +186,9 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
           </div>
 
           {/* Правая часть (только для портфолио) */}
-          {mode === 'portfolio' && (
+          {chrome.suffix && (
             <div className="flex items-center px-4 h-13 bg-muted/30 border-l border-border/40 text-muted-foreground/70 text-sm font-medium select-none shrink-0 tracking-tight">
-              .milestis.site
+              {chrome.suffix}
             </div>
           )}
         </div>

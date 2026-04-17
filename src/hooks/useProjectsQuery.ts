@@ -3,13 +3,15 @@ import { type DocumentData, collection, collectionGroup, getDocs, orderBy, query
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
+import { getPublishedProjectShareUrl } from '@/lib/slug'
+import type { SlugMode } from '@/lib/slug'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 export interface DashboardProject {
   id: string
   name: string
-  mode: 'portfolio' | 'photobook'
+  mode: SlugMode
   status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
   publishedSlug?: string | null
@@ -158,8 +160,6 @@ export function useRecentProjectsQuery(limitCount = 4) {
 
 // ─── Published projects ────────────────────────────────────────────────────
 
-const BASE_DOMAIN = 'milestis.site'
-
 /**
  * Returns the canonical share URL for a published project.
  * - Portfolio: https://{slug}.milestis.site
@@ -167,14 +167,7 @@ const BASE_DOMAIN = 'milestis.site'
  *   (token is absent if the project was published before the token-persistence change)
  */
 export function getProjectShareUrl(project: DashboardProject): string | null {
-  if (!project.isPublished || !project.publishedSlug) return null
-  if (project.mode === 'portfolio') {
-    return `https://${project.publishedSlug}.${BASE_DOMAIN}`
-  }
-  const base = `https://${BASE_DOMAIN}/${project.publishedSlug}`
-  return project.publishedAccessToken
-    ? `${base}?token=${project.publishedAccessToken}`
-    : base
+  return getPublishedProjectShareUrl(project)
 }
 
 /**
@@ -196,7 +189,7 @@ export interface ProjectExportRecord {
   projectName: string
   ownerId: string
   versionNumber: number
-  mode: 'portfolio' | 'photobook'
+  mode: SlugMode
   creditCost: number
   /** PDF download URL — photobook only. Undefined for portfolio. */
   fileDownloadUrl?: string

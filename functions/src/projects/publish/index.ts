@@ -10,6 +10,7 @@ import { TransactionEngineError } from "../../transactions/engine";
 import { getPublishConfig } from "./config";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import type { PublishInput, PublishOutput } from "./types";
+import { ALLOWED_ORIGINS } from "../../lib/cors";
 
 // ─── Error codes ──────────────────────────────────────────────────────────────
 
@@ -169,7 +170,7 @@ export const publishProject = onRequest(
 		timeoutSeconds: 300,
 		memory: "1GiB",
 		maxInstances: 20,
-		cors: [/localhost/, /milestis\.com$/, /milestis\.app$/, /milestis\.site$/, /\.hosted\.app$/],
+		cors: ALLOWED_ORIGINS,
 	},
 	async (req, res) => {
 		// ── Method guard ──────────────────────────────────────────────────
@@ -231,7 +232,7 @@ export const publishProject = onRequest(
 		}
 
 		let projectData: FirebaseFirestore.DocumentData;
-		let publishAttemptId: string | null = null;
+		let publishAttemptId: string | undefined;
 		let publishCommitted = false;
 		try {
 			const claim = await claimPublishJob(projectId, uid);

@@ -3,8 +3,9 @@ import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
-import { getPublishedSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
 import { VALID_MODES, type ProjectMode } from "./projectInterface";
+import { ALLOWED_ORIGINS } from "../lib/cors";
 
 const ERROR = {
   METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -16,10 +17,20 @@ const ERROR = {
   INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
 } as const;
 
+class FlowError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly code: typeof ERROR[keyof typeof ERROR],
+    message?: string,
+  ) {
+    super(message);
+  }
+}
+
 /**
  * Unpublishes a project (hides it from the internet without deleting data):
  *   1. Sets isPublished: false + removes slug/token from published_projects/{id}
- *   2. Clears isPublished, publishedSlug, publishedAccessToken on projects/{id}
+ *   2. Clears isPublished on projects/{id} but keeps slug/token for safe re-publish
  *
  * Storage files under public/{projectId}/ are intentionally NOT deleted.
  * The project content and export files must remain accessible so the user
@@ -34,7 +45,7 @@ export const unpublishProject = onRequest(
     concurrency: 10,
     timeoutSeconds: 60,
     maxInstances: 10,
-    cors: [/localhost/, /milestis\.com$/, /milestis\.site$/, /\.hosted\.app$/],
+    cors: ALLOWED_ORIGINS,
   },
   async (req, res) => {
     // ── Method guard ──────────────────────────────────────────────────────
@@ -72,25 +83,29 @@ export const unpublishProject = onRequest(
         const projectSnap = await tx.get(projectRef);
 
         if (!projectSnap.exists) {
-          throw Object.assign(new Error(), { status: 404, code: ERROR.NOT_FOUND });
+          throw new FlowError(404, ERROR.NOT_FOUND);
         }
 
         const projectData = projectSnap.data()!;
 
         if (projectData.ownerId !== uid) {
-          throw Object.assign(new Error(), { status: 403, code: ERROR.FORBIDDEN });
+          throw new FlowError(403, ERROR.FORBIDDEN);
         }
 
         if (projectData.isPublished !== true) {
-          throw Object.assign(new Error(), { status: 409, code: ERROR.INVALID_PAYLOAD, message: "Project is not published." });
+          throw new FlowError(409, ERROR.INVALID_PAYLOAD, "Project is not published.");
         }
 
         // Release the slug reservation atomically.
         const rawMode = projectData.mode;
+        if (!VALID_MODES.includes(rawMode as ProjectMode)) {
+          throw new FlowError(500, ERROR.INTERNAL_SERVER_ERROR);
+        }
+        const mode = rawMode as ProjectMode;
         const publishedSlug = projectData.publishedSlug;
-        if (VALID_MODES.includes(rawMode as ProjectMode) && typeof publishedSlug === "string") {
+        if (typeof publishedSlug === "string" && publishedSlug) {
           const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-            getPublishedSlugReservationDocId(rawMode as ProjectMode, publishedSlug),
+            getSlugReservationDocId(mode, publishedSlug),
           );
           tx.delete(slugRef);
         }
@@ -107,8 +122,6 @@ export const unpublishProject = onRequest(
         // Clear publish fields on the project doc.
         tx.update(projectRef, {
           isPublished: false,
-          publishedSlug: FieldValue.delete(),
-          publishedAccessToken: FieldValue.delete(),
           publishLockId: FieldValue.delete(),
           publishLockExpiresAtMillis: FieldValue.delete(),
           updatedAt: FieldValue.serverTimestamp(),
@@ -118,9 +131,8 @@ export const unpublishProject = onRequest(
       logger.info(`[unpublishProject] Project ${projectId} unpublished by user ${uid}.`);
       res.status(200).json({ ok: true });
     } catch (err: unknown) {
-      const e = err as { status?: number; code?: string; message?: string };
-      if (e.status && e.code) {
-        res.status(e.status).json({ error: e.code, ...(e.message ? { message: e.message } : {}) });
+      if (err instanceof FlowError) {
+        res.status(err.status).json({ error: err.code, ...(err.message ? { message: err.message } : {}) });
         return;
       }
       logger.error(`[unpublishProject] Error unpublishing project ${projectId}:`, err);
