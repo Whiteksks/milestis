@@ -20,6 +20,7 @@ export class PublishProjectError extends Error {
 export async function publishProject(
   projectId: string,
   slug: string,
+  quoteId: string,
   accessToken?: string,
 ): Promise<PublishProjectResult> {
   const user = auth.currentUser
@@ -35,6 +36,7 @@ export async function publishProject(
     body: JSON.stringify({
       projectId,
       slug,
+      quoteId,
       ...(accessToken ? { accessToken } : {}),
     }),
   })

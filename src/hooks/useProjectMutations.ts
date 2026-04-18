@@ -187,6 +187,7 @@ export function useRenameMutation() {
 export type PublishVariables = {
   projectId: string
   slug: string
+  quoteId: string
   accessToken?: string
 }
 
@@ -195,8 +196,8 @@ export function usePublishMutation() {
   const uid = useUid()
   const updateBalance = useUserStore((s) => s.updateBalance)
   return useMutation({
-    mutationFn: ({ projectId, slug, accessToken }: PublishVariables) => {
-      const promise = publishProject(projectId, slug, accessToken)
+    mutationFn: ({ projectId, slug, quoteId, accessToken }: PublishVariables) => {
+      const promise = publishProject(projectId, slug, quoteId, accessToken)
       toastProject.publish(promise)
       return promise
     },

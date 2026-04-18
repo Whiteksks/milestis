@@ -7,7 +7,6 @@ import { db } from "../../lib/firebaseAdmin";
 import { migrateProjectMedia, deletePrivateProjectMedia } from "./migrate";
 import { commitPublish, logPublishedProject, preparePublishInput, PublishValidationError } from "./publish";
 import { TransactionEngineError } from "../../transactions/engine";
-import { getPublishConfig } from "./config";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import type { PublishInput, PublishOutput } from "./types";
 import { ALLOWED_ORIGINS } from "../../lib/cors";
@@ -28,6 +27,8 @@ const ERROR = {
 	SLUG_TAKEN:               "SLUG_TAKEN",
 	INSUFFICIENT_FUNDS:       "INSUFFICIENT_FUNDS",
 	PUBLISH_IN_PROGRESS:      "PUBLISH_IN_PROGRESS",
+	QUOTE_INVALID:            "QUOTE_INVALID",
+	QUOTE_EXPIRED:            "QUOTE_EXPIRED",
 	INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
 } as const;
 
@@ -107,6 +108,58 @@ async function releasePublishLock(projectId: string, attemptId: string) {
 	});
 }
 
+// ─── Quote validation ─────────────────────────────────────────────────────────
+
+interface QuoteData {
+	projectId: string;
+	uid: string;
+	slug: string;
+	creditCost: number;
+	expiresAt: FirebaseFirestore.Timestamp;
+}
+
+class QuoteError extends Error {
+	constructor(
+		public readonly code: "QUOTE_INVALID" | "QUOTE_EXPIRED",
+		message: string,
+	) {
+		super(message);
+	}
+}
+
+/**
+ * Validates that the quote exists, belongs to this uid+projectId+slug, and
+ * has not expired. Returns the quote data so the caller can use creditCost.
+ *
+ * The quote document is deleted AFTER a successful publish commit — not here —
+ * to avoid leaving the project in an unpublishable state if the commit fails.
+ */
+async function validateQuote(quoteId: string, uid: string, projectId: string, slug: string): Promise<QuoteData> {
+	const quoteRef = db.collection("publish_quotes").doc(quoteId);
+	const quoteSnap = await quoteRef.get();
+
+	if (!quoteSnap.exists) {
+		throw new QuoteError("QUOTE_INVALID", "Publish quote not found. Please go back and start again.");
+	}
+
+	const data = quoteSnap.data() as QuoteData;
+
+	if (data.uid !== uid || data.projectId !== projectId) {
+		throw new QuoteError("QUOTE_INVALID", "Publish quote does not match this project or user.");
+	}
+
+	if (data.slug !== slug) {
+		throw new QuoteError("QUOTE_INVALID", "Publish quote was issued for a different slug. Please go back and start again.");
+	}
+
+	const expiresAtMs = data.expiresAt.toMillis();
+	if (Date.now() > expiresAtMs) {
+		throw new QuoteError("QUOTE_EXPIRED", "Publish quote has expired. Please go back and start again.");
+	}
+
+	return data;
+}
+
 // ─── Payload validation ───────────────────────────────────────────────────────
 
 class ValidationError extends Error {}
@@ -129,7 +182,7 @@ function validatePayload(body: unknown): PublishInput {
 
 	if (!b || typeof b !== "object") throw new ValidationError("Request body must be a JSON object.");
 
-	const { projectId, slug, accessToken } = b;
+	const { projectId, slug, accessToken, quoteId } = b;
 
 	if (typeof projectId !== "string" || !projectId.trim())
 		throw new ValidationError("'projectId' must be a non-empty string.");
@@ -140,10 +193,14 @@ function validatePayload(body: unknown): PublishInput {
 	if (accessToken !== undefined && typeof accessToken !== "string")
 		throw new ValidationError("'accessToken' must be a string when provided.");
 
+	if (typeof quoteId !== "string" || !quoteId.trim())
+		throw new ValidationError("'quoteId' must be a non-empty string. Call analyzeProject first.");
+
 	return {
 		projectId: projectId.trim(),
 		slug: slug.trim(),
 		accessToken: typeof accessToken === "string" ? accessToken : undefined,
+		quoteId: quoteId.trim(),
 	};
 }
 
@@ -255,19 +312,27 @@ export const publishProject = onRequest(
 			return;
 		}
 		const mode = rawMode as ProjectMode;
-		const config = getPublishConfig(mode);
+		// creditCost comes from the validated quote — no need to read config here.
 
 		try {
-			const userSnap = await db.collection("users").doc(uid).get();
-			const userData = userSnap.data() ?? {};
-			const currentBalance = userData.balance?.total ?? 0;
-			if (currentBalance < config.creditCost) {
-				res.status(402).json({
-					error: ERROR.INSUFFICIENT_FUNDS,
-					message: `Publishing costs ${config.creditCost} credits. Your balance: ${currentBalance}.`,
-				});
-				return;
+			// ── Validate quote (must happen before expensive migration) ─────────
+			let quoteData: Awaited<ReturnType<typeof validateQuote>>;
+			try {
+				quoteData = await validateQuote(payload.quoteId, uid, projectId, payload.slug);
+			} catch (err) {
+				if (err instanceof QuoteError) {
+					res.status(err.code === "QUOTE_EXPIRED" ? 410 : 400).json({
+						error: ERROR[err.code],
+						message: err.message,
+					});
+					return;
+				}
+				throw err;
 			}
+
+			// Use creditCost from the quote (authoritative — set by analyzeProject).
+			// The transaction engine performs the definitive balance check atomically.
+			const quotedCreditCost = quoteData.creditCost;
 
 			// ── Mode-specific validation (before expensive migration) ─────────
 			if (mode === "photobook" && !preparedInput.accessToken) {
@@ -314,13 +379,20 @@ export const publishProject = onRequest(
 					theme: migratedData.theme,
 					content: migratedData.content,
 				},
-				creditCost: config.creditCost,
+				creditCost: quotedCreditCost,
 				freedBytes,
 				previewHeroUrl: projectData.preview?.heroImageUrl
 					? (urlMapping.get(projectData.preview.heroImageUrl) ?? projectData.preview.heroImageUrl)
 					: undefined,
 			});
 			publishCommitted = true;
+
+			// Quote is single-use — delete it after a successful commit.
+			try {
+				await db.collection("publish_quotes").doc(payload.quoteId).delete();
+			} catch (err) {
+				logger.warn(`[publishProject] Failed to delete quote ${payload.quoteId}:`, err);
+			}
 
 			try {
 				await deletePrivateProjectMedia(uid, projectId);
@@ -331,7 +403,7 @@ export const publishProject = onRequest(
 			logPublishedProject(projectId, result.publishedSlug);
 			logger.info(`[publishProject] Project ${projectId} published by ${uid} with slug "${result.publishedSlug}".`, {
 				mode,
-				creditCost: config.creditCost,
+				creditCost: quotedCreditCost,
 				freedBytes,
 				transactionId: result.transactionId,
 			});
@@ -346,7 +418,7 @@ export const publishProject = onRequest(
 			if (err instanceof TransactionEngineError && err.code === "insufficient_funds") {
 				res.status(402).json({
 					error: ERROR.INSUFFICIENT_FUNDS,
-					message: `Publishing costs ${config.creditCost} credits. Your balance is no longer sufficient.`,
+					message: "Insufficient credits. Your balance is no longer sufficient to publish.",
 				});
 				return;
 			}

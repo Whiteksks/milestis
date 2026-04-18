@@ -32,9 +32,6 @@ export const PROJECT_TYPE_CONFIG = {
     /** Build the canonical public URL for a published project */
     getShareUrl: (slug: string) => buildPublishedProjectUrl('portfolio', slug),
 
-    // ── Billing ───────────────────────────────────────────────────────────
-    creditCost: 10,
-
     // ── Publish / Export modal ─────────────────────────────────────────────
     modal: {
       title: 'Publish Portfolio',
@@ -63,8 +60,6 @@ export const PROJECT_TYPE_CONFIG = {
     requiresSlug: true,
     getShareUrl: (slug: string, accessToken?: string) =>
       buildPublishedProjectUrl('photobook', slug, accessToken),
-
-    creditCost: 10,
 
     modal: {
       title: 'Publish Photobook',

@@ -12,6 +12,7 @@ import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 import {unpublishProject} from "./projects/unpublishProject";
 import {republishProject} from "./projects/republishProject";
 import {publishProject} from "./projects/publish";
+import {analyzeProject} from "./projects/publish/analyzeProject";
 
 export {
 	createUser,
@@ -23,4 +24,5 @@ export {
 	unpublishProject,
 	republishProject,
 	publishProject,
+	analyzeProject,
 };

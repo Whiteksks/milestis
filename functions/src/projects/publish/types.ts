@@ -9,6 +9,8 @@ export interface PublishInput {
 	slug: string;
 	/** Plaintext access token — required for photobooks, ignored for portfolios. */
 	accessToken?: string;
+	/** Quote ID returned by analyzeProject — must be valid and not expired. */
+	quoteId: string;
 }
 
 // ─── Output ───────────────────────────────────────────────────────────────────

@@ -7,8 +7,10 @@ import {
   normalizeSlug,
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
+import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
+export type PublishStep = 'slug' | 'review'
 
 function generateToken(): string {
   const bytes = new Uint8Array(16)
@@ -17,12 +19,19 @@ function generateToken(): string {
 }
 
 export function usePublishModal(projectId: string, mode: SlugMode) {
+  const [step, setStep] = useState<PublishStep>('slug')
   const [slug, setSlug] = useState('')
   const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
   // Stable token per modal instance — generated once for photobooks
   const [accessToken] = useState<string>(() =>
     mode === 'photobook' ? generateToken() : '',
   )
+
+  // Step 2 state
+  const [quoteData, setQuoteData] = useState<AnalyzeProjectResult | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null)
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const checkAvailability = useCallback(
@@ -68,6 +77,51 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     [checkAvailability],
   )
 
+  // Step 1: ready to proceed to review
+  const canProceedToReview =
+    slug.length >= 3 &&
+    slugStatus !== 'taken' &&
+    slugStatus !== 'invalid' &&
+    slugStatus !== 'reserved' &&
+    slugStatus !== 'checking' &&
+    !isAnalyzing
+
+  // Transition to step 2: immediately show review pane with loading state,
+  // then populate with server response. Also used for retry on error.
+  const advanceToReview = useCallback(async () => {
+    if (!canProceedToReview) return
+    setStep('review')
+    setIsAnalyzing(true)
+    setAnalyzeError(null)
+    setQuoteData(null)
+    try {
+      const result = await analyzeProject(projectId, slug)
+      setQuoteData(result)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to analyze project. Please try again.'
+      setAnalyzeError(message)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }, [canProceedToReview, projectId, slug])
+
+  const goBack = useCallback(() => {
+    setStep('slug')
+    setQuoteData(null)
+    setAnalyzeError(null)
+  }, [])
+
+  // Reset all state — called when the modal closes
+  const reset = useCallback(() => {
+    setStep('slug')
+    setSlug('')
+    setSlugStatus('idle')
+    setQuoteData(null)
+    setIsAnalyzing(false)
+    setAnalyzeError(null)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+  }, [])
+
   const portfolioUrl =
     mode === 'portfolio' && slug
       ? buildPublishedProjectUrl(mode, slug)
@@ -78,22 +132,28 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
       ? buildPublishedProjectUrl(mode, slug, accessToken)
       : null
 
-  // Client-side check is UX feedback only — server always validates uniqueness.
-  // Block only on explicit 'taken' or 'invalid' statuses.
+  // Step 2: ready to publish — requires a valid quote with sufficient balance
   const canPublish =
-    slug.length >= 3 &&
-    slugStatus !== 'taken' &&
-    slugStatus !== 'invalid' &&
-    slugStatus !== 'reserved' &&
-    slugStatus !== 'checking'
+    step === 'review' &&
+    quoteData !== null &&
+    !isAnalyzing &&
+    quoteData.userBalance >= quoteData.creditCost
 
   return {
+    step,
     slug,
     handleSlugChange,
     slugStatus,
     accessToken,
     portfolioUrl,
     photobookUrl,
+    canProceedToReview,
+    advanceToReview,
+    isAnalyzing,
+    analyzeError,
+    quoteData,
+    goBack,
+    reset,
     canPublish,
   }
 }
