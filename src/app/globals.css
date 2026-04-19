@@ -36,3 +36,10 @@
 .editor-scroll::-webkit-scrollbar-thumb:hover {
   background: color-mix(in oklch, var(--border) 75%, transparent);
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

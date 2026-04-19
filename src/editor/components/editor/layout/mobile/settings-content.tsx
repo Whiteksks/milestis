@@ -30,9 +30,9 @@ export function SettingsContent() {
   }
 
   return (
-    <div>
+    <div className='p-2'>
       {sections.length > 0 && (
-        <header className="sticky top-0 z-10 px-4 py-3 border-b border-border/40 bg-card/95 backdrop-blur-md">
+        <header className="sticky top-2 z-10 px-4 p-1 border-b border-border/40 bg-card/95 backdrop-blur-sm border rounded-sm">
           <div className="flex items-end justify-between gap-4">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>

@@ -34,9 +34,10 @@ export const FloatingToolbar = memo(function FloatingToolbar({
 
   return (
     // Static container — fixed to bottom, no layout animation
+    // hidden on mobile — MobileEditorSheet snap-2 replaces this
     <div
       className={cn(
-        "fixed bottom-0 left-0 z-50 flex justify-center pointer-events-none w-full",
+        "fixed bottom-0 left-0 z-50 hidden md:flex justify-center pointer-events-none w-full",
         className,
       )}
       style={{ right: "var(--canvas-scrollbar-width, 0px)" }}

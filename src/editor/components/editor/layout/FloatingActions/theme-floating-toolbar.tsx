@@ -2,16 +2,14 @@
 
 import type { ComponentType } from 'react'
 import type { EditorMode } from '@/editor/lib/types'
-import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
-import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
-import { MOOD_OPTIONS, TEXTURE_OPTIONS } from '../background-layers/overlays/registry'
-import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
+import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { Moon, Sun, RotateCcw } from 'lucide-react'
 import { EffectCard } from '../sidebar/effect-card'
+import { usePortfolioThemeToolbar, usePhotobookThemeToolbar } from '@/editor/hooks/use-theme-toolbar'
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
 
@@ -37,30 +35,13 @@ export function ThemeFloatingToolbar() {
 // ─── Portfolio toolbar ────────────────────────────────────────────────────────
 
 function PortfolioFloatingToolbar() {
-  const { themeCustomizations, updateThemeCustomization } = useThemeSelector((s) => ({
-    themeCustomizations: s.themeCustomizations,
-    updateThemeCustomization: s.updateThemeCustomization,
-  }))
-
   const {
-    depthEffect: depth = 'none',
-    raysEffect: rays = 'none',
-    textureEffect: texture = 'none',
-    backgroundLayersTheme: layersTheme = 'dark',
-    backgroundScrollMode: scrollMode = 'fixed',
-  } = themeCustomizations
-
-  const isDark = layersTheme === 'dark'
-  const isFixed = scrollMode === 'fixed'
-
-  const handleReset = () =>
-    updateThemeCustomization({
-      depthEffect: 'none',
-      raysEffect: 'none',
-      textureEffect: 'none',
-      backgroundLayersTheme: 'dark',
-      backgroundScrollMode: 'fixed',
-    })
+    depth, rays, texture,
+    isDark, isFixed, canReset,
+    handleReset, toggleDarkLight, toggleScrollMode,
+    setDepth, setRays, setTexture,
+    depthOptions, raysOptions, textureOptions,
+  } = usePortfolioThemeToolbar()
 
   return (
     <div className="h-10 px-1 flex items-center gap-0">
@@ -71,11 +52,7 @@ function PortfolioFloatingToolbar() {
         variant="ghost"
         title={isDark ? 'Switch to light background' : 'Switch to dark background'}
         className={cn(ICON_BTN)}
-        onClick={() =>
-          updateThemeCustomization({
-            backgroundLayersTheme: (isDark ? 'light' : 'dark') as BackgroundLayersTheme,
-          })
-        }
+        onClick={toggleDarkLight}
       >
         {isDark ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
       </Button>
@@ -91,11 +68,7 @@ function PortfolioFloatingToolbar() {
             ? 'text-foreground hover:bg-muted/80'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
         )}
-        onClick={() =>
-          updateThemeCustomization({
-            backgroundScrollMode: (isFixed ? 'scroll' : 'fixed') as BackgroundScrollMode,
-          })
-        }
+        onClick={toggleScrollMode}
       >
         {isFixed ? 'Fixed' : 'Scroll'}
       </Button>
@@ -106,24 +79,24 @@ function PortfolioFloatingToolbar() {
       <EffectPopover
         label="Depth"
         value={depth}
-        options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
-        onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
+        options={depthOptions}
+        onChange={setDepth}
       />
 
       {/* Rays effect */}
       <EffectPopover
         label="Rays"
         value={rays}
-        options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
-        onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
+        options={raysOptions}
+        onChange={setRays}
       />
 
       {/* Texture effect */}
       <EffectPopover
         label="Texture"
         value={texture}
-        options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
-        onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
+        options={textureOptions}
+        onChange={setTexture}
       />
 
       {/* Reset */}
@@ -132,7 +105,7 @@ function PortfolioFloatingToolbar() {
         type="button"
         variant="ghost"
         title="Reset all effects"
-        disabled={depth === 'none' && rays === 'none' && texture === 'none'}
+        disabled={!canReset}
         className={cn(ICON_BTN, 'disabled:opacity-30')}
         onClick={handleReset}
       >
@@ -145,34 +118,29 @@ function PortfolioFloatingToolbar() {
 // ─── Photobook toolbar ────────────────────────────────────────────────────────
 
 function PhotobookFloatingToolbar() {
-  const { themeCustomizations, updateThemeCustomization } = useThemeSelector((s) => ({
-    themeCustomizations: s.themeCustomizations,
-    updateThemeCustomization: s.updateThemeCustomization,
-  }))
-
-  const mood = themeCustomizations.photobookMood ?? 'none'
-  const texture = themeCustomizations.photobookTexture ?? 'none'
-
-  const handleReset = () =>
-    updateThemeCustomization({ photobookMood: 'none', photobookTexture: 'none' })
+  const {
+    mood, texture, canReset,
+    handleReset, setMood, setTexture,
+    moodOptions, textureOptions,
+  } = usePhotobookThemeToolbar()
 
   return (
     <div className="h-10 px-1 flex items-center gap-0">
 
-      {/* Colour mood — MOOD_OPTIONS already includes {id:'none'} as first item */}
+      {/* Colour mood — moodOptions already includes {id:'none'} as first item */}
       <EffectPopover
         label="Mood"
         value={mood}
-        options={MOOD_OPTIONS}
-        onChange={(v) => updateThemeCustomization({ photobookMood: v as PhotobookMood })}
+        options={moodOptions}
+        onChange={setMood}
       />
 
-      {/* Photo overlay — TEXTURE_OPTIONS already includes {id:'none'} as first item */}
+      {/* Photo overlay — textureOptions already includes {id:'none'} as first item */}
       <EffectPopover
         label="Overlay"
         value={texture}
-        options={TEXTURE_OPTIONS}
-        onChange={(v) => updateThemeCustomization({ photobookTexture: v as PhotobookTexture })}
+        options={textureOptions}
+        onChange={setTexture}
       />
 
       {/* Reset */}
@@ -181,7 +149,7 @@ function PhotobookFloatingToolbar() {
         type="button"
         variant="ghost"
         title="Reset all overlays"
-        disabled={mood === 'none' && texture === 'none'}
+        disabled={!canReset}
         className={cn(ICON_BTN, 'disabled:opacity-30')}
         onClick={handleReset}
       >

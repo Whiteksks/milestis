@@ -96,19 +96,18 @@ export function Canvas({
   const decorationAnimation = themeCustomizations.decorationAnimation ?? previewDecorations?.animation ?? 'fade'
 
   // Only the decorations panel depends on runtime data; sections and theme panels
-  // are now stable memo components, so this object only updates when decorations change.
+  // are now stable memo components, so this object only updates when scrollContainerRef changes.
   const floatingToolbarPanels = useMemo(
     () => ({
       decorations: (
         <DecorationsFloatingToolbar
-          decorations={allDecorations}
           scrollContainerRef={scrollContainerRef}
         />
       ),
       sections: <StableSectionsPanel />,
       background: <StableThemePanel />,
     }),
-    [allDecorations, scrollContainerRef]
+    [scrollContainerRef]
   )
 
   useLayoutEffect(() => {

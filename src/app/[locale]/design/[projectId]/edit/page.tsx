@@ -12,11 +12,7 @@ import { FloatingActions } from '@/editor/components/editor/layout/floating-desi
 import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/media-library-modal'
 import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/design-catalog-modal'
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
-import { MobileBottomNav } from '@/editor/components/editor/layout/mobile/mobile-bottom-nav'
-import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
-import { SettingsContent } from '@/editor/components/editor/layout/mobile/settings-content'
-import { ThemeSettingsPanel } from '@/editor/components/editor/layout/sidebar/theme-settings-panel'
-import { DecorationsSettingsPanel } from '@/editor/components/editor/layout/sidebar/decorations-settings-panel'
+import { MobileEditorSheet } from '@/editor/components/editor/layout/mobile/mobile-editor-sheet'
 import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs'
 import { useUiSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store-content'
@@ -144,13 +140,6 @@ export default function EditorPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileEditorTab>('sections')
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const { openDesignModal, editorMode, designModalSection, setSelectedDecorationId } = useUiSelector((state) => ({
-    openDesignModal: state.openDesignModal,
-    editorMode: state.editorMode,
-    designModalSection: state.designModalSection,
-    setSelectedDecorationId: state.setSelectedDecorationId,
-  }))
 
   if (loadState === 'loading') {
     return (
@@ -184,38 +173,12 @@ export default function EditorPage() {
     )
   }
 
-  const handleMobileTabChange = (tab: 'sections' | 'background' | 'decorations' | 'design') => {
+  const handleMobileTabChange = (tab: MobileEditorTab) => {
     setMobileActiveTab(tab)
-
-    // If the last action isn't Decorations, drop decoration selection/focus.
-    if (tab !== 'decorations') {
-      setSelectedDecorationId(null)
-    }
-
-    // Keep FloatingToolbar in sync with the last pressed mobile tab.
+    // Keep FloatingToolbar (desktop) in sync with mobile tab
     if (tab === 'sections' || tab === 'background' || tab === 'decorations') {
       setDesktopActiveTab(tab)
     }
-
-    if (tab === 'design') {
-      // Map the catalog's last section to the closest FloatingToolbar tab.
-      setDesktopActiveTab(designModalSection === 'backgrounds' ? 'decorations' : 'background')
-      setIsDrawerOpen(false)
-      // Reopen the Design Catalog on the last-used section.
-      openDesignModal(designModalSection)
-      return
-    }
-
-    setIsDrawerOpen(true)
-  }
-
-  const getDrawerTitle = () => {
-    if (mobileActiveTab === 'sections') {
-      return editorMode === 'photobook' ? 'Photobook Sections' : 'Page Sections'
-    }
-    if (mobileActiveTab === 'background') return 'Background'
-    if (mobileActiveTab === 'decorations') return 'Decorations'
-    return 'Settings'
   }
 
   return (
@@ -226,27 +189,17 @@ export default function EditorPage() {
           <Canvas scrollContainerRef={scrollContainerRef} desktopActiveTab={desktopActiveTab} />
           <SectionsSidebar activeTab={desktopActiveTab} onTabChange={setDesktopActiveTab} />
 
-          {/* Mobile bottom navigation — inside provider so it can read canvas scroll state */}
-          <MobileBottomNav
+          {/* Mobile unified sheet — inside provider so it can read canvas scroll state */}
+          <MobileEditorSheet
             activeTab={mobileActiveTab}
             onTabChange={handleMobileTabChange}
+            scrollContainerRef={scrollContainerRef}
           />
         </CanvasScrollProvider>
       </div>
 
-      {/* Desktop floating actions */}
+      {/* Desktop floating actions (left side panel — desktop only) */}
       <FloatingActions />
-      
-      {/* Mobile bottom sheet */}
-      <MobileDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        title={getDrawerTitle()}
-      >
-        {mobileActiveTab === 'sections' && <SettingsContent />}
-        {mobileActiveTab === 'background' && <ThemeSettingsPanel />}
-        {mobileActiveTab === 'decorations' && <DecorationsSettingsPanel />}
-      </MobileDrawer>
 
       {/* Modals */}
       <DesignCatalogModal />

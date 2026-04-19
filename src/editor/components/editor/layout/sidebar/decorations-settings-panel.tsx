@@ -22,9 +22,7 @@ const createDecorationId = (prefix = 'decoration') => {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
       return `${prefix}-${crypto.randomUUID()}`
     }
-  } catch {
-    // ignore
-  }
+  } catch {}
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 }
 
@@ -83,18 +81,12 @@ export function DecorationsSettingsPanel() {
       const contentRect = contentRoot.getBoundingClientRect()
       if (contentRect.width <= 0 || contentRect.height <= 0) return { top: '10%', left: '10%' }
 
-      const centerClientX = scrollerRect.left + scroller.clientWidth / 2
-      const centerClientY = scrollerRect.top + scroller.clientHeight / 2
-
-      const xInContent = centerClientX - contentRect.left
-      const yInContent = centerClientY - contentRect.top
-
-      const leftPct = clamp((xInContent / contentRect.width) * 90, 0, 100)
-      const topPct = clamp((yInContent / contentRect.height) * 95, 0, 100)
+      const xInContent = (scrollerRect.left + scroller.clientWidth / 2) - contentRect.left
+      const yInContent = (scrollerRect.top + scroller.clientHeight / 2) - contentRect.top
 
       return {
-        top: `${topPct.toFixed(2)}%`,
-        left: `${leftPct.toFixed(2)}%`,
+        top: `${clamp((yInContent / contentRect.height) * 95, 0, 100).toFixed(2)}%`,
+        left: `${clamp((xInContent / contentRect.width) * 90, 0, 100).toFixed(2)}%`,
       }
     })()
 
@@ -113,12 +105,6 @@ export function DecorationsSettingsPanel() {
     setSelectedDecorationId(newDecoration.id)
   }, [canvasScrollRef, decorations, addDecoration, setSelectedDecorationId])
 
-  const handleSelectDecoration = useCallback((id: string) => {
-    if (selectedDecorationId !== id) {
-      setSelectedDecorationId(id)
-    }
-  }, [selectedDecorationId, setSelectedDecorationId])
-
   const handleRemoveDecoration = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     const id = event.currentTarget.dataset.decorationRemoveId
     if (!id) return
@@ -127,55 +113,43 @@ export function DecorationsSettingsPanel() {
     if (selectedDecorationId === id) setSelectedDecorationId(null)
   }, [removeDecoration, selectedDecorationId, setSelectedDecorationId])
 
-  const handleClearDecorations = useCallback(() => {
-    resetDecorations()
-    setSelectedDecorationId(null)
-  }, [resetDecorations, setSelectedDecorationId])
-
   return (
     <div className="h-full flex flex-col">
       <MediaPickerModal ownerId={quickPlacementOwnerId} onSelectImages={handleQuickPlacement} />
-      {/* Header */}
-      <div className="px-5 pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-foreground tracking-tight">Decorations</h3>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {decorations.length > 0 ? (
-                  <span className="text-primary">{decorations.length} element{decorations.length > 1 ? 's' : ''}</span>
-                ) : (
-                  'Visual accents & assets'
-                )}
-              </p>
-            </div>
+      
+      <div className="px-5 pb-4 pt-2">
+        <div className="flex items-center gap-3 p-1">
+          <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/10 border border-primary/20">
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground tracking-tight">Decorations</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {decorations.length > 0 ? (
+                <span className="text-primary">{decorations.length} element{decorations.length > 1 ? 's' : ''}</span>
+              ) : 'Visual accents'}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Divider */}
       <div className="h-px bg-border/40 mx-5" />
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 space-y-8">
-        {/* Controls: Animation & Add Button */}
-        <div className="flex items-end gap-3 mt-2">
-          <div className="flex-1 space-y-2">
-            <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Animation</Label>
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+        {/* Animation & Add Button */}
+        <div className="flex items-end gap-3 mt-4">
+          <div className="flex-1 space-y-1.5">
+            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Animation</Label>
             <Select
               value={themeCustomizations.decorationAnimation || 'fade'}
               onValueChange={(value) => updateThemeCustomization({ decorationAnimation: value as DecorationAnimation })}
             >
-              <SelectTrigger className="h-9 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/40 focus:ring-1 focus:ring-primary/30 text-[12px] transition-all">
+              <SelectTrigger className="h-9 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/30 transition-colors text-[12px]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="rounded-sm border-border/20">
+              <SelectContent>
                 {decorationAnimationOptions.map((opt) => (
-                  <SelectItem key={opt.id} value={opt.id} className="text-[12px] rounded-sm">
-                    {opt.label}
-                  </SelectItem>
+                  <SelectItem key={opt.id} value={opt.id} className="text-[12px]">{opt.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -184,8 +158,7 @@ export function DecorationsSettingsPanel() {
             size="sm"
             onClick={handleAddDecoration}
             disabled={decorations.length >= LIMITS.decorations}
-            title={decorations.length >= LIMITS.decorations ? `Maximum ${LIMITS.decorations} decorations` : undefined}
-            className="h-9 px-4 text-[12px] font-medium rounded-sm bg-foreground text-background hover:bg-foreground/90 shadow-sm shrink-0 transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="h-9 px-4 text-[12px] font-medium rounded-sm active:scale-[0.98] transition-transform"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Add New
@@ -197,127 +170,83 @@ export function DecorationsSettingsPanel() {
             size="sm"
             variant="outline"
             onClick={() => openMediaPicker(quickPlacementOwnerId)}
-            className="w-full h-9 text-[12px] font-medium rounded-sm border-border/30 hover:bg-muted/40 transition-colors"
+            className="w-full h-9 text-[12px] border-border/30 hover:bg-muted/40 transition-colors"
           >
             <Shuffle className="w-3.5 h-3.5 mr-1.5" />
             Quick Placement
           </Button>
         )}
 
-        {/* Decoration List */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between mb-4">
-            <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-              Elements <span className="text-muted-foreground/40 font-normal ml-1">({decorations.length}/{LIMITS.decorations})</span>
+          <div className="flex items-center justify-between">
+            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              Elements ({decorations.length}/{LIMITS.decorations})
             </Label>
             {decorations.length > 0 && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleClearDecorations}
-                className="h-6 text-[11px] text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-full px-2.5 transition-colors"
+              <button
+                onClick={() => { resetDecorations(); setSelectedDecorationId(null); }}
+                className="text-[10px] text-muted-foreground/60 hover:text-destructive transition-colors"
               >
                 Clear All
-              </Button>
+              </button>
             )}
           </div>
 
-          {decorations.length > 0 ? (
-            <div className="space-y-2">
-              {decorations.map((decoration) => {
-                const isSelected = selectedDecorationId === decoration.id;
-                
-                return (
-                  <div
-                    key={decoration.id}
-                    className={cn(
-                      'group relative rounded-xs border transition-all duration-300 overflow-hidden cursor-pointer',
-                      isSelected
-                        ? 'bg-background border-border/80 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)]'
-                        : 'bg-muted/10 border-border/20 hover:bg-muted/30'
-                    )}
-                    onClick={() => handleSelectDecoration(decoration.id)}
-                  >
-                    <div className="flex items-center p-2.5 gap-3">
-                      {/* Image Preview */}
-                      <div className={cn(
-                        "w-12 h-12 rounded-xl overflow-hidden shrink-0 relative border transition-colors",
-                        isSelected ? "border-border/40 bg-muted/20" : "border-border/10 bg-muted/10"
-                      )}>
-                        <Image
-                          src={decoration.image || '/placeholder.svg'}
-                          alt={decoration.name || "Decoration"}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0 py-0.5">
-                        {/* 🌟 Главное изменение: Всегда видимый "Figma-style" Input */}
-                        <Input
-                          value={decoration.name || ''}
-                          onChange={(e) => updateDecoration(decoration.id, { name: e.target.value })}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectDecoration(decoration.id);
-                          }}
-                          placeholder="Unnamed Decoration"
-                          className={cn(
-                            "h-7 px-2 -ml-2 text-[13px] font-medium transition-all shadow-none rounded-2xs",
-                            "bg-transparent border-transparent",
-                            // Hover & Focus states
-                            "hover:bg-muted/50 hover:border-border/30",
-                            "focus-visible:bg-background focus-visible:border-primary/40 focus-visible:ring-1 focus-visible:ring-primary/20",
-                            // Text color based on selection
-                            isSelected ? "text-foreground" : "text-foreground/80"
-                          )}
-                        />
-
-                        {/* Scale and Opacity info */}
-                        <div className="flex items-center gap-2 mt-0.5 px-0.5">
-                          <span className="text-[10px] text-muted-foreground/70 font-medium tracking-wide">
-                            Scale: {Math.round((decoration.scale ?? 1) * 100)}%
-                          </span>
-                          <span className="w-1 h-1 rounded-full bg-border/50" />
-                          <span className="text-[10px] text-muted-foreground/70 font-medium tracking-wide">
-                            Opacity: {Math.round(decoration.opacity * 100)}%
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Delete Button - Появляется при ховере группы (или если выбрано на мобилках) */}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        data-decoration-remove-id={decoration.id}
-                        onClick={handleRemoveDecoration}
-                        className={cn(
-                          "h-8 w-8 p-0 rounded-full shrink-0 transition-all duration-200",
-                          "text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10",
-                          "opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 focus-visible:opacity-100 focus-visible:translate-x-0",
-                          isSelected && "opacity-100 translate-x-0 text-muted-foreground/70"
-                        )}
-                        aria-label="Delete decoration"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+          <div className="space-y-2">
+            {decorations.map((decoration) => {
+              const isSelected = selectedDecorationId === decoration.id;
+              return (
+                <div
+                  key={decoration.id}
+                  onClick={() => setSelectedDecorationId(decoration.id)}
+                  className={cn(
+                    'group relative rounded-xs border overflow-hidden cursor-pointer transition-colors',
+                    isSelected ? 'bg-background border-border/80 shadow-sm' : 'bg-muted/5 border-border/10 hover:bg-muted/20'
+                  )}
+                >
+                  <div className="flex items-center p-2 gap-3">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative border border-border/10">
+                      <Image
+                        src={decoration.image || '/placeholder.svg'}
+                        alt=""
+                        fill
+                        className="object-cover unoptimized"
+                      />
                     </div>
+
+                    <div className="flex-1 min-w-0">
+                      <Input
+                        value={decoration.name || ''}
+                        onChange={(e) => updateDecoration(decoration.id, { name: e.target.value })}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Unnamed"
+                        className="h-6 px-1 -ml-1 text-[12px] font-medium bg-transparent border-transparent shadow-none hover:bg-muted/40 focus-visible:bg-background transition-colors"
+                      />
+                      <div className="flex items-center gap-2 mt-0.5 text-[9px] text-muted-foreground/60 font-medium uppercase tracking-tight">
+                        <span>S: {Math.round((decoration.scale ?? 1) * 100)}%</span>
+                        <span className="w-0.5 h-0.5 rounded-full bg-border" />
+                        <span>O: {Math.round(decoration.opacity * 100)}%</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      data-decoration-remove-id={decoration.id}
+                      onClick={handleRemoveDecoration}
+                      className={cn(
+                        "h-8 w-8 p-0 rounded-full shrink-0 transition-opacity",
+                        "text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10",
+                        isSelected || "group-hover:opacity-100 opacity-0"
+                      )}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-10 px-4 text-center border border-dashed border-border/40 rounded-2xl bg-muted/10">
-              <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center mb-3">
-                <ImageIcon className="w-4 h-4 text-muted-foreground/50" />
-              </div>
-              <p className="text-[12px] font-medium text-foreground/80 mb-1">No decorations yet</p>
-              <p className="text-[11px] text-muted-foreground/60 max-w-[180px]">
-                Add visual accents to your canvas to make it stand out.
-              </p>
-            </div>
-          )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
