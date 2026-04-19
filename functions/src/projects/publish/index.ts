@@ -394,6 +394,65 @@ export const publishProject = onRequest(
 				logger.warn(`[publishProject] Failed to delete quote ${payload.quoteId}:`, err);
 			}
 
+			// ── Fix #1: rewrite projects/{id}/data/content with public URLs ────
+			// The Firestore content doc still holds private users/ URLs.
+			// After deletePrivateProjectMedia those links go dead, so overwrite
+			// the doc with the already-migrated content before deleting originals.
+			try {
+				const contentRef = db
+					.collection("projects")
+					.doc(projectId)
+					.collection("data")
+					.doc("content");
+				await contentRef.set({
+					theme: migratedData.theme,
+					content: migratedData.content,
+				});
+			} catch (err) {
+				logger.warn(`[publishProject] Failed to rewrite content doc with public URLs for ${projectId}:`, err);
+			}
+
+			// ── Fix #2: rewrite images/{imageId}.urls with public URLs ──────────
+			// The images/ collection is the editor's media library source of truth.
+			// Without this, reopening the editor after unpublish shows broken images.
+			if (urlMapping.size > 0) {
+				try {
+					const imagesSnap = await db
+						.collection("images")
+						.where("projectId", "==", projectId)
+						.get();
+					if (!imagesSnap.empty) {
+						const imagesBatch = db.batch();
+						let patchCount = 0;
+						for (const imageDoc of imagesSnap.docs) {
+							const data = imageDoc.data() as { urls?: Record<string, string> };
+							if (!data.urls) continue;
+							const newUrls: Record<string, string> = {};
+							let changed = false;
+							for (const [variant, url] of Object.entries(data.urls)) {
+								const mapped = urlMapping.get(url);
+								if (mapped) {
+									newUrls[variant] = mapped;
+									changed = true;
+								} else {
+									newUrls[variant] = url;
+								}
+							}
+							if (changed) {
+								imagesBatch.update(imageDoc.ref, { urls: newUrls });
+								patchCount++;
+							}
+						}
+						if (patchCount > 0) {
+							await imagesBatch.commit();
+							logger.info(`[publishProject] Rewrote public URLs in ${patchCount} image doc(s) for ${projectId}.`);
+						}
+					}
+				} catch (err) {
+					logger.warn(`[publishProject] Failed to rewrite images collection for ${projectId}:`, err);
+				}
+			}
+
 			try {
 				await deletePrivateProjectMedia(uid, projectId);
 			} catch (err) {

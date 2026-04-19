@@ -76,14 +76,24 @@ function validatePayload(body: unknown): AnalyzeInput {
 }
 
 /**
- * Counts unique Firebase Storage image URLs inside the project content blob.
- * All URLs are collected via a single JSON.stringify pass — no deep traversal needed.
+ * Counts unique photos placed in the project content.
+ * Extracts imageId from each Firebase Storage path (images/{imageId}/variant.ext)
+ * so that multiple variants of the same photo (full, middle, thumb) count as one.
  */
 function countUniquePhotos(content: unknown): number {
 	const json = JSON.stringify(content);
-	const matches = json.match(/"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+"/g);
-	if (!matches) return 0;
-	const unique = new Set(matches.map((m) => m.slice(1, -1)));
+	const unique = new Set<string>();
+	const re = /"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+\/images%2F([^%"]+)%2F[^"]+"/g;
+	let m: RegExpExecArray | null;
+	while ((m = re.exec(json)) !== null) {
+		unique.add(m[1]);
+	}
+	// Fallback: if paths don't follow the images/{imageId}/ structure,
+	// count unique URLs so the result is never zero when photos exist.
+	if (unique.size === 0) {
+		const urls = json.match(/"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+"/g);
+		return urls ? new Set(urls).size : 0;
+	}
 	return unique.size;
 }
 

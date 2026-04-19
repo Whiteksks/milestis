@@ -143,51 +143,63 @@ export async function migrateProjectMedia(
 		}
 	}
 
-	// ── Pass 2: full private folder scan ────────────────────────────────────
-	// Some variants (e.g. middle.webp, print.jpg) are stored only in the
-	// Firestore images collection and are NOT directly referenced in the editor
-	// content JSON.  We must:
-	//   a) copy them to public/
-	//   b) add their old URL → new URL to urlMapping so Step 6 (images
-	//      collection update) rewrites them in Firestore as well.
-	try {
-		const [privateFiles] = await bucket.getFiles({ prefix: usersPrefix });
-		await Promise.all(
-			privateFiles.map(async (file) => {
-				const relativePath = file.name.slice(usersPrefix.length);
-				const newPath = `${publicPrefix}${relativePath}`;
-				if (newPublicPaths.has(newPath)) return; // already handled in pass 1
-				try {
-					// Read the old download token BEFORE copying so we can build the old URL.
-					const [oldMeta] = await file.getMetadata();
-					const oldToken = (oldMeta.metadata as Record<string, string> | undefined)
-						?.firebaseStorageDownloadTokens;
-
-					await file.copy(bucket.file(newPath));
-					newPublicPaths.add(newPath);
-
-					// Build new public download URL and register in urlMapping.
-					const newToken = await ensureDownloadToken(bucket, newPath);
-					const newUrl = makeDownloadUrl(bucketName, newPath, newToken);
-					if (oldToken) {
-						const oldUrl = makeDownloadUrl(bucketName, file.name, oldToken);
-						urlMapping.set(oldUrl, newUrl);
-					}
-
-					// Count bytes freed for quota tracking.
-					const size =
-						typeof oldMeta.size === "string"
-							? parseInt(oldMeta.size, 10)
-							: (oldMeta.size as number | undefined) ?? 0;
-					if (!isNaN(size)) freedBytes += size;
-				} catch (err) {
-					logger.warn(`[migrate] Pass 2: failed to copy ${file.name} → ${newPath}`, err);
-				}
-			}),
-		);
-	} catch (err) {
-		logger.warn("[migrate] Pass 2 full-folder scan failed — skipping", err);
+	// ── Pass 2: used-image variant scan ────────────────────────────────────
+	// Content JSON only references one variant per image (e.g. full.webp).
+	// The images/ collection also stores middle.webp, print.jpg etc.
+	// We extract the imageIds that are actually placed in the content and
+	// migrate only their variant files — skipping unused/orphaned uploads.
+	const usedImageIds = new Set<string>();
+	for (const oldPath of urlToPath.values()) {
+		if (oldPath.startsWith(usersPrefix)) {
+			// Path: users/{uid}/projects/{projectId}/images/{imageId}/variant.ext
+			const relative = oldPath.slice(usersPrefix.length);
+			const parts = relative.split("/");
+			if (parts[0] === "images" && parts[1]) {
+				usedImageIds.add(parts[1]);
+			}
+		}
 	}
+
+	await Promise.all(
+		[...usedImageIds].map(async (imageId) => {
+			const imagePrefix = `${usersPrefix}images/${imageId}/`;
+			try {
+				const [variantFiles] = await bucket.getFiles({ prefix: imagePrefix });
+				await Promise.all(
+					variantFiles.map(async (file) => {
+						const relativePath = file.name.slice(usersPrefix.length);
+						const newPath = `${publicPrefix}${relativePath}`;
+						if (newPublicPaths.has(newPath)) return; // already handled in pass 1
+						try {
+							const [oldMeta] = await file.getMetadata();
+							const oldToken = (oldMeta.metadata as Record<string, string> | undefined)
+								?.firebaseStorageDownloadTokens;
+
+							await file.copy(bucket.file(newPath));
+							newPublicPaths.add(newPath);
+
+							const newToken = await ensureDownloadToken(bucket, newPath);
+							const newUrl = makeDownloadUrl(bucketName, newPath, newToken);
+							if (oldToken) {
+								const oldUrl = makeDownloadUrl(bucketName, file.name, oldToken);
+								urlMapping.set(oldUrl, newUrl);
+							}
+
+							const size =
+								typeof oldMeta.size === "string"
+									? parseInt(oldMeta.size, 10)
+									: (oldMeta.size as number | undefined) ?? 0;
+							if (!isNaN(size)) freedBytes += size;
+						} catch (err) {
+							logger.warn(`[migrate] Pass 2: failed to copy ${file.name} → ${newPath}`, err);
+						}
+					}),
+				);
+			} catch (err) {
+				logger.warn(`[migrate] Pass 2: failed to scan variants for imageId ${imageId}`, err);
+			}
+		}),
+	);
 
 	// ── Prune orphans ────────────────────────────────────────────────────────
 	// Delete public files from a previous export that are no longer in use.
