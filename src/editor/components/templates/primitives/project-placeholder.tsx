@@ -4,7 +4,7 @@ import type React from 'react'
 import { getPlaceholderGradient } from '@/hooks/usePlaceholderGradient'
 
 interface ProjectPlaceholderProps {
-  /** Project or block id for deterministic gradient. Falls back to 'abc123'. */
+  /** Project or block id for deterministic gradient. Falls back to 'verycoolseed'. */
   seed?: string
   className?: string
   style?: React.CSSProperties
@@ -16,7 +16,7 @@ interface ProjectPlaceholderProps {
  * Fill your container with `position: absolute; inset: 0` or use `h-full w-full`.
  */
 export function ProjectPlaceholder({ seed, className, style }: ProjectPlaceholderProps) {
-  const { background } = getPlaceholderGradient(seed ?? 'abc123')
+  const { background } = getPlaceholderGradient(seed ?? 'verycoolseed')
 
   return (
     <div

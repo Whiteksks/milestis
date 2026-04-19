@@ -37,7 +37,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
             <SiteImage
               fillParent
               unoptimized
-              src={sectionContent.bio.image || '/placeholder.svg?height=480&width=360'}
+              src={sectionContent.bio.image}
               alt={sectionContent.bio.title || 'Profile'}
               sizes="(max-width: 768px) 100vw, 33vw"
               imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"

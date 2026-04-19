@@ -10,7 +10,7 @@ import { getAspectRatioClass, ASPECT_RATIO_NUM } from "@/editor/lib/aspect-ratio
 
 interface SiteImageProps {
   /** Original image URL — always the unmodified source, never a cropped blob. */
-  src: string
+  src?: string | null
   alt?: string
   aspectRatio?: AspectRatio
   frameStyle?: FrameStyle
@@ -64,6 +64,10 @@ export function SiteImage({
   sizes,
   fillParent = false,
 }: SiteImageProps) {
+  const resolvedSrc = src?.trim() ?? ""
+
+  if (!resolvedSrc) return null
+
   const frameClass = getFrameStyle(frameStyle)
   const isCircle = frameStyle === "circle"
 
@@ -77,7 +81,7 @@ export function SiteImage({
   const innerContent = cropData ? (
     <div style={getCropWrapperStyle(cropData)}>
       <Image
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         fill
         priority={priority}
@@ -89,7 +93,7 @@ export function SiteImage({
     </div>
   ) : (
     <Image
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       fill
       priority={priority}

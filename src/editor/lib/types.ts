@@ -153,10 +153,16 @@ export interface DecorationTransform {
   flipY?: boolean
 }
 
+export type DecorationKind = 'image' | 'bubble'
+export type DecorationBubbleStyle = 'soft' | 'glass' | 'memory'
+
 /** Single unified decoration model — used in theme presets, DecorationsConfig, and the editor UI. */
 export interface DecorationElement {
   id?: string
-  image: string
+  kind?: DecorationKind
+  image?: string
+  bubbleSeed?: string
+  bubbleStyle?: DecorationBubbleStyle
   position?: DecorationPosition
   size?: 'small' | 'medium' | 'large' | 'xlarge'
   scale?: number

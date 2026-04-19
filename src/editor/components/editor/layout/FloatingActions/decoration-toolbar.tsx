@@ -41,6 +41,7 @@ import { cn } from "@/lib/utils"
 import type { DecorationElement } from "../decorationEdit/decorationTypes"
 import { clamp } from "../decorationEdit/utils"
 import { useDecorationToolbar } from "../../../../hooks/use-decoration-toolbar"
+import { BUBBLE_STYLE_OPTIONS } from "../decorationEdit/decoration-visual"
 
 // Module-level constants — не пересоздаются при каждом рендере
 const ICON_BTN = "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
@@ -166,6 +167,8 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   const editorMode = useUiStore((s) => s.editorMode)
   const isPhotobook = editorMode === 'photobook'
+  const imageButtonLabel = decoration?.kind === 'bubble' ? 'Add image' : 'Replace image'
+  const bubbleStyle = decoration?.bubbleStyle ?? 'soft'
 
   const {
     isExpanded,
@@ -327,7 +330,8 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             <Button
               variant="ghost"
               onClick={() => openMediaPicker(ownerId)}
-              aria-label="Replace image"
+              aria-label={imageButtonLabel}
+              title={imageButtonLabel}
               className={ICON_BTN}
             >
               <ImageIcon className="h-4 w-4" />
@@ -354,6 +358,39 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                 </div>
 
                 <Separator className="mb-4 bg-border/40" />
+
+                {decoration?.kind === 'bubble' && (
+                  <>
+                    <div className="mb-4">
+                      <Label className="text-xs text-muted-foreground mb-2 block">Bubble style</Label>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
+                          >
+                            <span>{BUBBLE_STYLE_OPTIONS.find((option) => option.id === bubbleStyle)?.label ?? 'Soft Orb'}</span>
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="top" sideOffset={8} className="w-56 rounded-xl">
+                          <DropdownMenuRadioGroup
+                            value={bubbleStyle}
+                            onValueChange={(value) => onUpdate?.({ bubbleStyle: value as DecorationElement['bubbleStyle'] })}
+                          >
+                            {BUBBLE_STYLE_OPTIONS.map((option) => (
+                              <DropdownMenuRadioItem key={option.id} value={option.id}>
+                                {option.label}
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <Separator className="mb-4 bg-border/40" />
+                  </>
+                )}
 
                 {/* Mobile Adaptation */}
                 <label className="flex items-center justify-between gap-3 py-1 cursor-pointer">

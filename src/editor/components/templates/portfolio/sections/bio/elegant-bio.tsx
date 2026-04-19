@@ -27,7 +27,7 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
           >
             <SiteImage
               unoptimized
-              src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
+              src={sectionContent.bio.image}
               alt={sectionContent.bio.title || 'Profile image'}
               aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
               frameStyle={sectionContent.bio.frameStyle || 'soft'}

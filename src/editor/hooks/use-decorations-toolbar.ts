@@ -8,6 +8,8 @@ import { useEditorDecorations } from "@/editor/hooks/use-editor-decorations"
 import { loadImageAspectRatio } from "@/editor/components/editor/layout/decorationEdit/utils"
 import { LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
+const DEFAULT_BUBBLE_STYLES = ["soft", "glass", "memory"] as const
+
 /**
  * Shared logic for the Decorations toolbar.
  * Used by both the desktop pill (DecorationsFloatingToolbar) and the mobile sheet.
@@ -56,7 +58,7 @@ export function useDecorationsToolbar(
     async (url: string) => {
       if (!selectedId) return
       const aspectRatio = await loadImageAspectRatio(url)
-      handleUpdate(selectedId, { image: url, aspectRatio })
+      handleUpdate(selectedId, { kind: "image", image: url, aspectRatio })
     },
     [handleUpdate, selectedId],
   )
@@ -126,13 +128,16 @@ export function useDecorationsToolbar(
 
     const newDecoration: ThemeCustomDecorations = {
       id,
+      kind: "bubble",
+      bubbleSeed: id,
+      bubbleStyle: DEFAULT_BUBBLE_STYLES[normalizedDecorations.length % DEFAULT_BUBBLE_STYLES.length],
       position: { top, left },
-      image: "/placeholder.svg?height=150&width=150",
       opacity: 1,
       scale: 1,
       responsiveScale: true,
       zIndex: 20,
       name: `Decoration ${normalizedDecorations.length + 1}`,
+      aspectRatio: 1,
     }
 
     addDecoration(newDecoration)

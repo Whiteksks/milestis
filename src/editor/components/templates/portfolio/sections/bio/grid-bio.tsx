@@ -19,7 +19,6 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
         
-        {/* Р С›РЎРѓР Р…Р С•Р Р†Р Р…Р В°РЎРЏ Р С•Р В±Р С•Р В»Р С•РЎвЂЎР С”Р В°-Р С”Р В°РЎР‚РЎвЂљР С•РЎвЂЎР С”Р В° */}
         <Animate
           direction="up"
           distance={20}
@@ -28,12 +27,10 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
             theme.card
           )}
         >
-          {/* Р вЂќР ВµР С”Р С•РЎР‚Р В°РЎвЂљР С‘Р Р†Р Р…РЎвЂ№Р в„– РЎРЊР В»Р ВµР СР ВµР Р…РЎвЂљ Р Р…Р В° РЎвЂћР С•Р Р…Р Вµ (Р С•Р С—РЎвЂ Р С‘Р С•Р Р…Р В°Р В»РЎРЉР Р…Р С•) */}
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-current/5 blur-[80px] pointer-events-none" />
 
           <div className="grid grid-cols-1 @lg:grid-cols-12 gap-8 @lg:gap-16 items-center relative z-10 w-full">
             
-            {/* [A] Р вЂєР ВµР Р†Р В°РЎРЏ Р С”Р С•Р В»Р С•Р Р…Р С”Р В°: Р С™Р С•Р СР С—Р В°Р С”РЎвЂљР Р…Р С•Р Вµ РЎвЂћР С•РЎвЂљР С• */}
             <Animate 
               direction="up"
               distance={10}
@@ -42,7 +39,7 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
             >
               <SiteImage
                 unoptimized
-                src={sectionContent.bio.image || '/placeholder.svg?height=600&width=480'}
+                src={sectionContent.bio.image}
                 alt={sectionContent.bio.title || 'Profile'}
                 aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
                 frameStyle={sectionContent.bio.frameStyle || 'none'}

@@ -28,7 +28,7 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
         <Animate direction="none" delay={0.1} type="scale" scaleOffset={0.95} className="flex-shrink-0">
           <SiteImage
             unoptimized
-            src={sectionContent.bio.image || '/placeholder.svg?height=176&width=128'}
+            src={sectionContent.bio.image}
             alt={sectionContent.bio.title || 'Profile'}
             aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
             frameStyle={sectionContent.bio.frameStyle || 'none'}

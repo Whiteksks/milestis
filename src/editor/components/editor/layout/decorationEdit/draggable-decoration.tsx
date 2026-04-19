@@ -2,12 +2,10 @@
 
 import { memo, useCallback, useMemo } from "react"
 import { motion, type MotionValue, type TargetAndTransition } from "framer-motion"
-import Image, { type ImageLoader } from "next/image"
 import { cn } from "@/lib/utils"
 import type { DecorationElement } from "./decorationTypes"
 import { getBaseSizePx } from "./utils"
-
-const passthroughLoader: ImageLoader = ({ src }) => src
+import { DecorationVisual } from "./decoration-visual"
 
 export interface DraggableDecorationProps {
   decoration: DecorationElement
@@ -93,15 +91,7 @@ export const DraggableDecoration = memo(function DraggableDecoration({
       onClick={handleClick}
     >
       <div className="relative w-full h-full" style={{ transform: flipTransform }}>
-        <Image
-          loader={passthroughLoader}
-          unoptimized
-          src={image || "/placeholder.svg"}
-          alt=""
-          fill
-          sizes="200px"
-          className="object-contain"
-        />
+        <DecorationVisual decoration={decoration} />
       </div>
     </motion.div>
   )

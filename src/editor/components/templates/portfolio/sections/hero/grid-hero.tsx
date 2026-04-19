@@ -72,6 +72,7 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
               <div className="w-full transition-transform duration-500 hover:-translate-y-1">
                 {heroImage ? (
                   <SiteImage
+                    unoptimized
                     src={heroImage}
                     alt={sectionContent.hero.title || 'Hero Image'}
                     aspectRatio={sectionContent.hero.aspectRatio || 'square'}
