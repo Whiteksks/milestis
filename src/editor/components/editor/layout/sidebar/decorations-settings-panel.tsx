@@ -2,11 +2,16 @@
 
 import { useThemeSelector, useUiSelector, useUiStore, type ThemeCustomDecorations } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu' // Путь к вашему файлу дропдауна
 import { MediaPickerModal } from '@/editor/components/editor/layout/Modals/media-picker-modal'
-import { Plus, Trash2, Image as ImageIcon, Sparkles, Shuffle } from 'lucide-react'
+import { Plus, Trash2, Sparkles, Shuffle, ChevronDown, Check } from 'lucide-react'
 import { useCallback, useId, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
@@ -57,6 +62,8 @@ export function DecorationsSettingsPanel() {
   }))
 
   const decorations = customDecorations
+  const currentAnimationId = themeCustomizations.decorationAnimation || 'fade'
+  const currentAnimationLabel = decorationAnimationOptions.find(opt => opt.id === currentAnimationId)?.label
 
   const handleQuickPlacement = useCallback(
     async (urls: string[]) => {
@@ -142,25 +149,37 @@ export function DecorationsSettingsPanel() {
 
       <div className="h-px bg-border/40 mx-5" />
 
-      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
-        {/* Animation & Add Button */}
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 custom-scrollbar">
+        {/* Dropdown Animation & Add Button */}
         <div className="flex items-end gap-3 mt-4">
           <div className="flex-1 space-y-1.5">
             <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Animation</Label>
-            <Select
-              value={themeCustomizations.decorationAnimation || 'fade'}
-              onValueChange={(value) => updateThemeCustomization({ decorationAnimation: value as DecorationAnimation })}
-            >
-              <SelectTrigger className="h-9 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/30 transition-colors text-[12px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-9 justify-between px-3 rounded-sm border-border/20 bg-muted/20 hover:bg-muted/30 transition-colors text-[12px] font-normal"
+                >
+                  <span className="truncate">{currentAnimationLabel}</span>
+                  <ChevronDown className="w-3.5 h-3.5 opacity-50 shrink-0 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-[160px]">
                 {decorationAnimationOptions.map((opt) => (
-                  <SelectItem key={opt.id} value={opt.id} className="text-[12px]">{opt.label}</SelectItem>
+                  <DropdownMenuItem 
+                    key={opt.id} 
+                    onClick={() => updateThemeCustomization({ decorationAnimation: opt.id as DecorationAnimation })}
+                    className="justify-between"
+                  >
+                    {opt.label}
+                    {currentAnimationId === opt.id && <Check className="w-3.5 h-3.5 text-primary" />}
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
           <Button
             size="sm"
             onClick={handleAddDecoration}
@@ -212,7 +231,7 @@ export function DecorationsSettingsPanel() {
                   )}
                 >
                   <div className="flex items-center p-2 gap-3">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative border border-border/10">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative border border-border/10 bg-muted/20">
                       <DecorationVisual decoration={decoration} imageClassName="object-cover" />
                     </div>
 

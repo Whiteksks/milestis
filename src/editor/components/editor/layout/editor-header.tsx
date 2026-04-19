@@ -159,7 +159,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
   return (
     <header className="relative h-16 border-b border-border bg-editor-surface z-50">
-      <div className="h-full flex items-center px-6 justify-between">
+      <div className="h-full flex items-center px-2 md:px-6 justify-between">
         {/* LEFT */}
         <div className="flex items-center gap-2 min-w-0">
           <Button
@@ -171,10 +171,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           >
             <Home className="size-4" />
           </Button>
-          <span className="font-serif text-base font-medium text-foreground tracking-tight select-none shrink-0">
+          <span className="hidden sm:inline font-serif text-base font-medium text-foreground tracking-tight select-none shrink-0">
             Milestis
           </span>
-          <ChevronRight className="size-4 text-muted-foreground/50 shrink-0" />
+          <ChevronRight className="hidden sm:block size-4 text-muted-foreground/50 shrink-0" />
           <input
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
@@ -185,7 +185,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }
             }}
             placeholder="Untitled"
-            className="min-w-0 w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border  focus:outline-none transition-colors truncate"
+            className="min-w-0 w-24 sm:w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border focus:outline-none transition-colors truncate"
           />
           {/* Inline save icon — always visible, color reflects save state */}
           <Button
@@ -258,10 +258,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             variant="ghost"
             size="sm"
             onClick={() => setIsPreviewOpen(true)}
-            className="gap-2 text-muted-foreground hover:text-foreground hidden sm:inline-flex rounded-full h-8 px-4 transition-all text-xs font-medium"
+            className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
           >
             <Eye className="h-3.5 w-3.5" />
-            Preview
+            <span className="hidden sm:inline">Preview</span>
           </Button>
 
           <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />

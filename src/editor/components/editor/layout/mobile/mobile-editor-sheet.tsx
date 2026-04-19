@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { motion, useTransform } from "framer-motion"
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
@@ -60,6 +60,8 @@ function MobileEditorSheetContent({
   scrollContainerRef,
 }: MobileEditorSheetContentProps) {
   const { dragHandleProps, snapHeights, sheetHeight } = useSnapBottomSheet()
+  const quickActionsRef = useRef<HTMLDivElement | null>(null)
+  const fullContentRef = useRef<HTMLDivElement | null>(null)
   const actionsHeight = Math.max(0, (snapHeights[1] ?? 0) - (snapHeights[0] ?? 0))
   const quickActionsTransition = useSnapBottomSheetTransition({
     enterBetween: [0, 1],
@@ -69,6 +71,7 @@ function MobileEditorSheetContent({
     enterBetween: [1, 2],
   })
   const showQuickActions = snap !== SNAP_NAV && !isFullOpen
+  const isFullContentVisible = isFullOpen && activeTab !== "design"
   const quickActionsHeight = useTransform(
     quickActionsTransition.visibilityProgress,
     (value) => actionsHeight * value,
@@ -87,6 +90,32 @@ function MobileEditorSheetContent({
     [0, 0, 0.75, 1],
   )
   const fullContentY = useTransform(fullContentTransition.visibilityProgress, [0, 1], [18, 0])
+
+  useEffect(() => {
+    if (!quickActionsRef.current) return
+
+    quickActionsRef.current.inert = !showQuickActions
+
+    if (showQuickActions) return
+
+    const activeElement = document.activeElement
+    if (activeElement instanceof HTMLElement && quickActionsRef.current.contains(activeElement)) {
+      activeElement.blur()
+    }
+  }, [showQuickActions])
+
+  useEffect(() => {
+    if (!fullContentRef.current) return
+
+    fullContentRef.current.inert = !isFullContentVisible
+
+    if (isFullContentVisible) return
+
+    const activeElement = document.activeElement
+    if (activeElement instanceof HTMLElement && fullContentRef.current.contains(activeElement)) {
+      activeElement.blur()
+    }
+  }, [isFullContentVisible])
 
   return (
     <div onPointerDown={(e) => e.stopPropagation()} className="flex h-full flex-col overflow-hidden">
@@ -130,6 +159,7 @@ function MobileEditorSheetContent({
         </motion.div>
 
         <motion.div
+          ref={quickActionsRef}
           className={cn(
             "shrink-0 overflow-hidden border-t border-border/30",
             !showQuickActions && "pointer-events-none",
@@ -139,16 +169,20 @@ function MobileEditorSheetContent({
             opacity: quickActionsOpacity,
             y: quickActionsY,
           }}
-          aria-hidden={!showQuickActions}
         >
-          {activeTab === "sections" && <SectionsSheetActions />}
-          {activeTab === "background" && <ThemeSheetActions />}
-          {activeTab === "decorations" && (
-            <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
-          )}
+          <div className="h-full overflow-x-auto overscroll-x-contain no-scrollbar">
+            <div className="min-w-max">
+              {activeTab === "sections" && <SectionsSheetActions />}
+              {activeTab === "background" && <ThemeSheetActions />}
+              {activeTab === "decorations" && (
+                <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
+              )}
+            </div>
+          </div>
         </motion.div>
 
         <motion.div
+          ref={fullContentRef}
           className={cn(
             "min-h-0 flex-1 overflow-hidden border-t border-border/30",
             !isFullOpen && "pointer-events-none",
@@ -157,7 +191,6 @@ function MobileEditorSheetContent({
             opacity: fullContentOpacity,
             y: fullContentY,
           }}
-          aria-hidden={!isFullOpen || activeTab === "design"}
         >
           <div className="h-full overflow-y-auto overscroll-contain">
             {activeTab === "sections" && <SettingsContent />}

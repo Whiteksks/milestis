@@ -1,29 +1,27 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { motion, useReducedMotion, HTMLMotionProps } from 'framer-motion'
 import { useBaseTransition, useDisabled } from './animation-context'
-
-// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Types РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 /**
  * How the animation entry is triggered:
- *  - 'scroll'  РІР‚вЂќ fires when the element enters the viewport (whileInView). Default.
- *  - 'mount'   РІР‚вЂќ fires immediately on component mount (animate). Use for above-the-fold
+ *  - 'scroll' fires when the element enters the viewport (whileInView). Default.
+ *  - 'mount'  fires immediately on component mount (animate). Use for above-the-fold
  *                content (cover sections, hero) that is visible before any scrolling.
  */
 export type AnimateTrigger = 'scroll' | 'mount'
 
 /**
  * Visual style of the entrance animation.
- * Add new values here as the design system evolves РІР‚вЂќ all existing usages
+ * Add new values here as the design system evolves all existing usages
  * keep working because they don't pass `type` explicitly (defaults to 'fade').
  *
- *  - 'fade'   РІР‚вЂќ opacity + optional translate/scale. Current behaviour.
- *  - 'rise'   РІР‚вЂќ stronger translate-up, no opacity change (decorative text, big numbers).
- *  - 'scale'  РІР‚вЂќ scale from scaleOffset to 1 at origin-center, mild opacity.
- *  - 'blur'   РІР‚вЂќ opacity + blur(8pxРІвЂ вЂ™0). Soft, editorial.
- *  - 'slide'  РІР‚вЂќ pure translate, no opacity. Bold, magazine-like.
+ *  - 'fade'   opacity + optional translate/scale. Current behaviour.
+ *  - 'rise'   stronger translate-up, no opacity change (decorative text, big numbers).
+ *  - 'scale'  scale from scaleOffset to 1 at origin-center, mild opacity.
+ *  - 'blur'   opacity + blur(8pxРІвЂ вЂ™0). Soft, editorial.
+ *  - 'slide'  pure translate, no opacity. Bold, magazine-like.
  */
 export type AnimateType = 'fade' | 'rise' | 'scale' | 'blur' | 'slide'
 
@@ -48,7 +46,6 @@ interface AnimateProps extends Omit<HTMLMotionProps<'div'>, 'direction'> {
   [key: string]: unknown
 }
 
-// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Derive initial/animate variants from type РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 function buildVariants(
   type: AnimateType,
@@ -105,7 +102,6 @@ function buildVariants(
   }
 }
 
-// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Component РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
 
 export function Animate({
   children,
@@ -122,14 +118,16 @@ export function Animate({
   // Memoize so React doesn't unmount/remount the DOM node on every render РІР‚вЂќ
   // which would break animations during text input in the editor.
   const MotionComponent = useMemo(
-    () => motion(Component as React.ComponentType<Record<string, unknown>>) as React.ComponentType<Record<string, unknown>>,
+    () => motion.create(Component as string | React.ComponentType<Record<string, unknown>>) as React.ComponentType<Record<string, unknown>>,
     [Component]
   )
 
   const disabled = useDisabled()
+  const reducedMotion = useReducedMotion()
   const transition = useBaseTransition(delay)
+  const animationsDisabled = disabled || Boolean(reducedMotion)
 
-  if (disabled) {
+  if (animationsDisabled) {
     return <Component className={className} {...(props as Record<string, unknown>)}>{children}</Component>
   }
 

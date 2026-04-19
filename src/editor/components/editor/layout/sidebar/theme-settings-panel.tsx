@@ -79,7 +79,7 @@ export function ThemeSettingsPanel() {
   const activeCount = modeConfig.getActiveEffectsCount(themeCustomizations)
 
   return (
-    <div className="h-full flex flex-col bg-editor-surface overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="px-5 pb-4 pt-2">
         <div className="flex items-center justify-between">
