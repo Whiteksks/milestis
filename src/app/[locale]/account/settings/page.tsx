@@ -1,13 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { signOut } from "firebase/auth"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Globe, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
-import { saveUserProfile } from "@/lib/user"
+import { auth } from "@/lib/firebase/firebase"
+import { deleteAccount, downloadAccountData, downloadProjectMetadata, saveUserProfile } from "@/lib/user"
 import { toastUser } from "@/lib/toast"
 import { useTranslations } from "next-intl"
 
@@ -54,7 +57,10 @@ type NotificationKey = typeof notificationItems[number]["key"]
 
 export default function AccountSettings() {
   const t = useTranslations("account.settings")
-  const { profile } = useUserStore()
+  const router = useRouter()
+  const params = useParams()
+  const locale = params.locale as string
+  const { profile, clearProfile } = useUserStore()
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     project_updates: true,
     project_reminders: false,
@@ -64,6 +70,9 @@ export default function AccountSettings() {
     seasonal_specials: false,
   })
   const [saving, setSaving] = useState(false)
+  const [exportingAccountData, setExportingAccountData] = useState(false)
+  const [exportingProjectData, setExportingProjectData] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
 
   useEffect(() => {
     if (!profile?.settings?.notifications) return
@@ -90,6 +99,44 @@ export default function AccountSettings() {
       )
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleExportAccountData = async () => {
+    setExportingAccountData(true)
+    try {
+      await toastUser.exportData(downloadAccountData())
+    } finally {
+      setExportingAccountData(false)
+    }
+  }
+
+  const handleExportProjectMetadata = async () => {
+    setExportingProjectData(true)
+    try {
+      await toastUser.exportData(downloadProjectMetadata())
+    } finally {
+      setExportingProjectData(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(`${t("danger.deleteTitle")}\n\n${t("danger.deleteDescription")}`)
+    if (!confirmed) return
+
+    setDeletingAccount(true)
+    try {
+      await toastUser.deleteAccount(deleteAccount())
+      clearProfile()
+      try {
+        await signOut(auth)
+      } catch {
+        // The auth user may already be invalid after server-side deletion.
+      }
+      router.push(`/${locale}`)
+      router.refresh()
+    } finally {
+      setDeletingAccount(false)
     }
   }
 
@@ -178,11 +225,21 @@ export default function AccountSettings() {
         </div>
         <div className="rounded-2xl bg-card p-6 shadow-sm space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-full bg-transparent">
+            <Button
+              variant="outline"
+              className="flex-1 justify-start gap-2 rounded-full bg-transparent"
+              onClick={handleExportAccountData}
+              disabled={exportingAccountData || exportingProjectData || deletingAccount}
+            >
               <Download className="h-4 w-4" />
               {t("data.downloadAccountData")}
             </Button>
-            <Button variant="outline" className="flex-1 justify-start gap-2 rounded-full bg-transparent">
+            <Button
+              variant="outline"
+              className="flex-1 justify-start gap-2 rounded-full bg-transparent"
+              onClick={handleExportProjectMetadata}
+              disabled={exportingProjectData || exportingAccountData || deletingAccount}
+            >
               <FileText className="h-4 w-4" />
               {t("data.exportProjectMetadata")}
             </Button>
@@ -206,6 +263,8 @@ export default function AccountSettings() {
             <Button
               variant="outline"
               className="shrink-0 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount || exportingAccountData || exportingProjectData}
             >
               {t("danger.deleteButton")}
             </Button>

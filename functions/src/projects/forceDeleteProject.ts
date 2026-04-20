@@ -4,9 +4,12 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
-import { deleteProjectImageDocs } from "./projectUtils";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
-import { VALID_MODES, type ProjectMode } from "./projectInterface";
+import {
+  buildStorageUsedBytesReleaseUpdate,
+  deleteProjectImageDocs,
+  deleteProjectSlugReservations,
+  projectHasPrivateMedia,
+} from "./projectUtils";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 
 const ERROR = {
@@ -98,8 +101,12 @@ export const forceDeleteProject = onRequest(
 
     // ── Cleanup ───────────────────────────────────────────────────────────
     try {
+      const shouldReleaseStorageBytes = await projectHasPrivateMedia(uid, projectId);
+
       // 1. Delete image metadata from Firestore + sum freed storage
-      const freedStorageBytes = await deleteProjectImageDocs(projectId, "[forceDeleteProject]");
+      const freedStorageBytes = await deleteProjectImageDocs(projectId, "[forceDeleteProject]", {
+        countFreedBytes: shouldReleaseStorageBytes,
+      });
 
       // 2. Delete editor content subcollection
       const contentRef = projectRef.collection("data").doc("content");
@@ -133,20 +140,12 @@ export const forceDeleteProject = onRequest(
       const deleteBatch = db.batch();
       deleteBatch.delete(projectRef);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      if (typeof data.publishedSlug === "string" && VALID_MODES.includes(data.mode as ProjectMode)) {
-        deleteBatch.delete(
-          db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-			getSlugReservationDocId(data.mode as ProjectMode, data.publishedSlug),
-          ),
-        );
-      }
+      await deleteProjectSlugReservations(projectId);
 
       const userUpdates: Record<string, unknown> = {
         "stats.totalProjects": FieldValue.increment(-1),
+        ...buildStorageUsedBytesReleaseUpdate(freedStorageBytes),
       };
-      if (freedStorageBytes > 0) {
-        userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
-      }
       deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();
       logger.info(`[forceDeleteProject] Project ${projectId} permanently deleted by user ${uid}.`);

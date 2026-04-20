@@ -1,35 +1,25 @@
-import { logger } from "firebase-functions/v2";
 import { db } from "../lib/firebaseAdmin";
+import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
 
-/**
- * Deletes all Firestore `images` documents for a given project and returns
- * the total number of storage bytes freed (sum of meta.generatedSizeBytes).
- *
- * Call this before deleting the project document so the image metadata is
- * still available for byte accounting.
- */
-export async function deleteProjectImageDocs(
-  projectId: string,
-  logPrefix: string,
-): Promise<number> {
-  const imagesSnap = await db
-    .collection("images")
+export {
+  buildStorageUsedBytesReleaseUpdate,
+  deleteProjectImageDocs,
+  projectHasPrivateMedia,
+} from "./projectStorageAccounting";
+
+export async function deleteProjectSlugReservations(projectId: string): Promise<number> {
+  const reservationsSnap = await db
+    .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
     .where("projectId", "==", projectId)
     .get();
 
-  if (imagesSnap.empty) return 0;
+  if (reservationsSnap.empty) return 0;
 
-  let freedBytes = 0;
   const batch = db.batch();
-  for (const imgDoc of imagesSnap.docs) {
-    freedBytes += (imgDoc.data().meta?.generatedSizeBytes ?? 0) as number;
-    batch.delete(imgDoc.ref);
+  for (const reservationDoc of reservationsSnap.docs) {
+    batch.delete(reservationDoc.ref);
   }
   await batch.commit();
 
-  logger.info(
-    `${logPrefix} Deleted ${imagesSnap.size} image doc(s) for project ${projectId}, freed ${freedBytes} bytes.`,
-  );
-
-  return freedBytes;
+  return reservationsSnap.size;
 }

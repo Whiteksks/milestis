@@ -6,6 +6,7 @@ import type { BalanceSnapshot } from "../../transactions/types";
 import type { CommitPublishInput, PreparedPublishInput } from "./types";
 import type { PublishInput } from "./types";
 import type { ProjectMode } from "../projectInterface";
+import { buildStorageUsedBytesReleaseUpdate } from "../projectStorageAccounting";
 import {
 	getSlugReservationDocId,
 	getSlugValidationError,
@@ -153,7 +154,7 @@ export async function commitPublish(
 		});
 		tx.update(db.collection("users").doc(uid), {
 			"stats.projectsPublished": FieldValue.increment(1),
-			...(freedBytes > 0 ? { "stats.storageUsedBytes": FieldValue.increment(-freedBytes) } : {}),
+			...buildStorageUsedBytesReleaseUpdate(freedBytes),
 		});
 		tx.set(exportRef, {
 			exportId: exportRef.id,

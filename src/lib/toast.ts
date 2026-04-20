@@ -177,6 +177,24 @@ export const toastUser = {
         err instanceof Error ? err.message : "Failed to save settings",
     })
   },
+
+  exportData<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Preparing download…",
+      success: "Download started",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to export data",
+    })
+  },
+
+  deleteAccount<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Deleting account…",
+      success: "Account deleted",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to delete account",
+    })
+  },
 }
 
 // ─── Generic helpers ───────────────────────────────────────────────────────

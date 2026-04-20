@@ -1,4 +1,5 @@
 export { saveUserProfile, changeUserEmail } from "./user-profile"
+export { deleteAccount, downloadAccountData, downloadProjectMetadata, UserAccountError } from "./account-api"
 export type { UserProfileUpdate } from "./user-profile"
 export type {
   UserDocument,

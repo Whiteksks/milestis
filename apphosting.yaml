@@ -86,6 +86,30 @@ env:
       - BUILD
       - RUNTIME
 
+  - variable: NEXT_PUBLIC_ANALYZE_PROJECT_URL
+    value: https://analyzeproject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_EXPORT_USER_DATA_URL
+    value: https://exportuserdata-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_EXPORT_PROJECT_METADATA_URL
+    value: https://exportprojectmetadata-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_DELETE_USER_ACCOUNT_URL
+    value: https://deleteuseraccount-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_APP_URL
     value: https://milestis.com
     availability:

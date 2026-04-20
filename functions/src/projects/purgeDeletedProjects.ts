@@ -3,9 +3,12 @@ import { logger } from "firebase-functions/v2";
 import { Timestamp, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { db } from "../lib/firebaseAdmin";
-import { deleteProjectImageDocs } from "./projectUtils";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
-import { VALID_MODES, type ProjectMode } from "./projectInterface";
+import {
+  buildStorageUsedBytesReleaseUpdate,
+  deleteProjectImageDocs,
+  deleteProjectSlugReservations,
+  projectHasPrivateMedia,
+} from "./projectUtils";
 
 /**
  * Runs at 00:00 UTC on the 1st of every month.
@@ -46,8 +49,6 @@ export const purgeDeletedProjects = onSchedule(
     for (const projectDoc of snapshot.docs) {
       const projectData = projectDoc.data() as {
         ownerId: string;
-        mode?: ProjectMode;
-        publishedSlug?: string;
       };
       const { ownerId } = projectData;
       const projectId = projectDoc.id;
@@ -55,8 +56,12 @@ export const purgeDeletedProjects = onSchedule(
       let freedStorageBytes = 0;
 
       try {
+        const shouldReleaseStorageBytes = await projectHasPrivateMedia(ownerId, projectId);
+
         // 1. Delete all Firestore image metadata documents + sum freed storage
-        freedStorageBytes = await deleteProjectImageDocs(projectId, "[purgeDeletedProjects]");
+        freedStorageBytes = await deleteProjectImageDocs(projectId, "[purgeDeletedProjects]", {
+          countFreedBytes: shouldReleaseStorageBytes,
+        });
 
         // 2. Delete editor content subcollection document
         const contentRef = db
@@ -91,20 +96,12 @@ export const purgeDeletedProjects = onSchedule(
       const deleteBatch = db.batch();
       deleteBatch.delete(projectDoc.ref);
       deleteBatch.delete(publishedRef);  // no-op if project was never published
-      if (typeof projectData.publishedSlug === "string" && VALID_MODES.includes(projectData.mode as ProjectMode)) {
-        deleteBatch.delete(
-          db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-			getSlugReservationDocId(projectData.mode as ProjectMode, projectData.publishedSlug),
-          ),
-        );
-      }
+      await deleteProjectSlugReservations(projectId);
 
       const userUpdates: Record<string, unknown> = {
         "stats.totalProjects": FieldValue.increment(-1),
+        ...buildStorageUsedBytesReleaseUpdate(freedStorageBytes),
       };
-      if (freedStorageBytes > 0) {
-        userUpdates["stats.storageUsedBytes"] = FieldValue.increment(-freedStorageBytes);
-      }
       deleteBatch.update(userRef, userUpdates);
       await deleteBatch.commit();
       logger.info(`[purgeDeletedProjects] Deleted project document ${projectId}.`);
