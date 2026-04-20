@@ -5,7 +5,7 @@ setGlobalOptions({
 });
 
 import {createUser} from "./users/createUser";
-import {deleteUserAccount, exportProjectMetadata, exportUserData} from "./users/account";
+import {deleteUserAccount, exportProjectContent, exportUserData} from "./users/account";
 import {resizeAvatar, resizeProjectImage} from "./storage";
 import {createProject} from "./projects/createProject";
 import {forceDeleteProject} from "./projects/forceDeleteProject";
@@ -18,7 +18,7 @@ import {analyzeProject} from "./projects/publish/analyzeProject";
 export {
 	createUser,
 	exportUserData,
-	exportProjectMetadata,
+	exportProjectContent,
 	deleteUserAccount,
 	resizeAvatar,
 	resizeProjectImage,

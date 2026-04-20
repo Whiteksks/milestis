@@ -104,6 +104,7 @@ env:
       - BUILD
       - RUNTIME
 
+
   - variable: NEXT_PUBLIC_DELETE_USER_ACCOUNT_URL
     value: https://deleteuseraccount-5h4wes5waq-ez.a.run.app
     availability:

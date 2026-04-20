@@ -76,6 +76,29 @@ export async function downloadProjectMetadata(): Promise<void> {
   await triggerDownloadFromResponse(res, "milestis-project-metadata.json")
 }
 
+export async function downloadProjectContent(projectId: string): Promise<void> {
+  const url = process.env.NEXT_PUBLIC_EXPORT_PROJECT_CONTENT_URL
+  const user = auth.currentUser
+  if (!user) throw new UserAccountError("UNAUTHORIZED", "Not authenticated")
+  if (!url) throw new UserAccountError("CONFIG_ERROR", "Export project content URL not configured")
+
+  const idToken = await user.getIdToken()
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ projectId }),
+  })
+
+  if (!res.ok) {
+    await handleErrorResponse(res, "Failed to export project content")
+  }
+
+  await triggerDownloadFromResponse(res, `milestis-project-${projectId}.json`)
+}
+
 export async function deleteAccount(): Promise<void> {
   const url = process.env.NEXT_PUBLIC_DELETE_USER_ACCOUNT_URL
   const res = await postWithAuth(url ?? "", "Delete user account URL not configured")

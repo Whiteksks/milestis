@@ -6,13 +6,18 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Globe, Download, FileText, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Globe, Download, Package, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
 import { auth } from "@/lib/firebase/firebase"
-import { deleteAccount, downloadAccountData, downloadProjectMetadata, saveUserProfile } from "@/lib/user"
+import { deleteAccount, downloadAccountData, downloadProjectContent, saveUserProfile } from "@/lib/user"
 import { toastUser } from "@/lib/toast"
 import { useTranslations } from "next-intl"
+import { useQuery } from "@tanstack/react-query"
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import { projectKeys, mapProjectDoc } from "@/hooks/useProjectsQuery"
 
 const notificationItems = [
   {
@@ -71,8 +76,26 @@ export default function AccountSettings() {
   })
   const [saving, setSaving] = useState(false)
   const [exportingAccountData, setExportingAccountData] = useState(false)
-  const [exportingProjectData, setExportingProjectData] = useState(false)
+  const [exportingProjectContent, setExportingProjectContent] = useState(false)
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("")
   const [deletingAccount, setDeletingAccount] = useState(false)
+
+  const { data: exportableProjects = [] } = useQuery({
+    queryKey: profile?.uid ? [...projectKeys.all(profile.uid), "export-list"] : ["no-user"],
+    enabled: !!profile?.uid,
+    queryFn: async () => {
+      const uid = profile!.uid
+      const snap = await getDocs(
+        query(
+          collection(db, "projects"),
+          where("ownerId", "==", uid),
+          where("status", "in", ["active", "archived"]),
+          orderBy("updatedAt", "desc"),
+        ),
+      )
+      return snap.docs.map((d) => mapProjectDoc(d.data(), d.id))
+    },
+  })
 
   useEffect(() => {
     if (!profile?.settings?.notifications) return
@@ -94,7 +117,7 @@ export default function AccountSettings() {
   const handleSaveSettings = async () => {
     setSaving(true)
     try {
-      await toastUser.saveSettings(
+      toastUser.saveSettings(
         saveUserProfile({ settings: { notifications } })
       )
     } finally {
@@ -105,18 +128,19 @@ export default function AccountSettings() {
   const handleExportAccountData = async () => {
     setExportingAccountData(true)
     try {
-      await toastUser.exportData(downloadAccountData())
+      toastUser.exportData(downloadAccountData())
     } finally {
       setExportingAccountData(false)
     }
   }
 
-  const handleExportProjectMetadata = async () => {
-    setExportingProjectData(true)
+  const handleExportProjectContent = async () => {
+    if (!selectedProjectId) return
+    setExportingProjectContent(true)
     try {
-      await toastUser.exportData(downloadProjectMetadata())
+      toastUser.exportData(downloadProjectContent(selectedProjectId))
     } finally {
-      setExportingProjectData(false)
+      setExportingProjectContent(false)
     }
   }
 
@@ -126,7 +150,7 @@ export default function AccountSettings() {
 
     setDeletingAccount(true)
     try {
-      await toastUser.deleteAccount(deleteAccount())
+      toastUser.deleteAccount(deleteAccount())
       clearProfile()
       try {
         await signOut(auth)
@@ -224,25 +248,46 @@ export default function AccountSettings() {
           <p className="mt-1 text-muted-foreground">{t("data.description")}</p>
         </div>
         <div className="rounded-2xl bg-card p-6 shadow-sm space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              variant="outline"
-              className="flex-1 justify-start gap-2 rounded-full bg-transparent"
-              onClick={handleExportAccountData}
-              disabled={exportingAccountData || exportingProjectData || deletingAccount}
-            >
-              <Download className="h-4 w-4" />
-              {t("data.downloadAccountData")}
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1 justify-start gap-2 rounded-full bg-transparent"
-              onClick={handleExportProjectMetadata}
-              disabled={exportingProjectData || exportingAccountData || deletingAccount}
-            >
-              <FileText className="h-4 w-4" />
-              {t("data.exportProjectMetadata")}
-            </Button>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2 rounded-full bg-transparent sm:w-auto"
+            onClick={handleExportAccountData}
+            disabled={exportingAccountData || exportingProjectContent || deletingAccount}
+          >
+            <Download className="h-4 w-4" />
+            {t("data.downloadAccountData")}
+          </Button>
+
+          {exportableProjects.length > 0 && (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Select
+                value={selectedProjectId}
+                onValueChange={setSelectedProjectId}
+                disabled={exportingProjectContent || deletingAccount}
+              >
+                <SelectTrigger className="h-9 flex-1 rounded-full text-sm">
+                  <SelectValue placeholder={t("data.selectProject")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {exportableProjects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                className="shrink-0 gap-2 rounded-full bg-transparent"
+                onClick={handleExportProjectContent}
+                disabled={!selectedProjectId || exportingProjectContent || deletingAccount}
+              >
+                <Package className="h-4 w-4" />
+                {t("data.exportProjectContent")}
+              </Button>
+            </div>
+          )}
           </div>
           <p className="text-xs text-muted-foreground">{t("data.descriptionLong")}</p>
         </div>
@@ -264,7 +309,7 @@ export default function AccountSettings() {
               variant="outline"
               className="shrink-0 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
               onClick={handleDeleteAccount}
-              disabled={deletingAccount || exportingAccountData || exportingProjectData}
+              disabled={deletingAccount || exportingAccountData || exportingProjectContent}
             >
               {t("danger.deleteButton")}
             </Button>

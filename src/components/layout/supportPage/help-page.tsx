@@ -7,8 +7,6 @@ import {
   BookOpen,
   Share2,
   Coins,
-  ShieldCheck,
-  Archive,
   Clock,
   MessageCircle,
   ChevronRight,

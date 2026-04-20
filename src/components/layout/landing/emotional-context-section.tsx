@@ -1,4 +1,4 @@
-import { BookOpen, Camera, Briefcase, Sparkles, LayoutTemplate, Link2 } from "lucide-react"
+import { Briefcase, Sparkles, Link2 } from "lucide-react"
 
 const contexts = [
   {

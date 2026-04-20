@@ -59,7 +59,7 @@ function MobileEditorSheetContent({
   onTabPress,
   scrollContainerRef,
 }: MobileEditorSheetContentProps) {
-  const { dragHandleProps, snapHeights, sheetHeight } = useSnapBottomSheet()
+  const { dragHandleProps, snapHeights } = useSnapBottomSheet()
   const quickActionsRef = useRef<HTMLDivElement | null>(null)
   const fullContentRef = useRef<HTMLDivElement | null>(null)
   const actionsHeight = Math.max(0, (snapHeights[1] ?? 0) - (snapHeights[0] ?? 0))

@@ -6,6 +6,16 @@ import type { Request, Response } from "express";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../projects/publish/slug";
+import {
+  mapAuthPayload,
+  mapUserDocument,
+  mapTransaction,
+  mapCreditLot,
+  mapProjectDocument,
+  mapPublishedSnapshotWithContent,
+  mapImageMetadata,
+  mapExportRecord,
+} from "./exportSchemas";
 
 const ERROR = {
   METHOD_NOT_ALLOWED: "METHOD_NOT_ALLOWED",
@@ -24,10 +34,6 @@ const USER_FUNCTION_OPTIONS = {
 };
 
 const DELETE_BATCH_SIZE = 400;
-
-function withDocId(snapshot: FirebaseFirestore.DocumentSnapshot | FirebaseFirestore.QueryDocumentSnapshot) {
-  return { id: snapshot.id, ...(snapshot.data() ?? {}) };
-}
 
 function sendJsonDownload(res: Response, filename: string, payload: unknown): void {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -162,13 +168,11 @@ export const exportUserData = onRequest(USER_FUNCTION_OPTIONS, async (req, res) 
 
   try {
     const userRef = db.collection("users").doc(uid);
-    const [authUser, userSnap, privateSnap, creditLotsSnap, transactionsSnap, idemSnap] = await Promise.all([
+    const [authUser, userSnap, creditLotsSnap, transactionsSnap] = await Promise.all([
       getAuth().getUser(uid),
       userRef.get(),
-      userRef.collection("private").doc("data").get(),
       userRef.collection("creditLots").get(),
       db.collection("transactions").where("uid", "==", uid).get(),
-      db.collection("transactionIdempotency").where("uid", "==", uid).get(),
     ]);
 
     if (!userSnap.exists) {
@@ -180,84 +184,19 @@ export const exportUserData = onRequest(USER_FUNCTION_OPTIONS, async (req, res) 
       kind: "user-data-export",
       exportedAt: new Date().toISOString(),
       uid,
-      auth: {
-        uid: authUser.uid,
-        email: authUser.email ?? null,
-        emailVerified: authUser.emailVerified,
-        displayName: authUser.displayName ?? null,
-        photoURL: authUser.photoURL ?? null,
-        disabled: authUser.disabled,
-        phoneNumber: authUser.phoneNumber ?? null,
-        providerData: authUser.providerData,
-        metadata: authUser.metadata,
-      },
-      user: withDocId(userSnap),
-      privateData: privateSnap.exists ? withDocId(privateSnap) : null,
-      moderation: userSnap.data()?.moderation ?? null,
-      creditLots: creditLotsSnap.docs.map(withDocId),
-      transactions: transactionsSnap.docs.map(withDocId),
-      transactionIdempotency: idemSnap.docs.map(withDocId),
+      auth: mapAuthPayload(authUser),
+      user: mapUserDocument(userSnap),
+      creditLots: creditLotsSnap.docs.map(mapCreditLot),
+      transactions: transactionsSnap.docs.map(mapTransaction),
       summary: {
         creditLots: creditLotsSnap.size,
         transactions: transactionsSnap.size,
-        idempotencyKeys: idemSnap.size,
       },
     };
 
     sendJsonDownload(res, `milestis-user-data-${uid}.json`, payload);
   } catch (err) {
     logger.error(`[exportUserData] Failed for ${uid}:`, err);
-    res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
-  }
-});
-
-export const exportProjectMetadata = onRequest(USER_FUNCTION_OPTIONS, async (req, res) => {
-  if (rejectNonPost(req, res)) return;
-
-  const uid = await authenticateRequest(req, res);
-  if (!uid) return;
-
-  try {
-    const [projectsSnap, imagesSnap, publishedSnap] = await Promise.all([
-      db.collection("projects").where("ownerId", "==", uid).get(),
-      db.collection("images").where("ownerId", "==", uid).get(),
-      db.collection("published_projects").where("ownerId", "==", uid).get(),
-    ]);
-
-    const projectBundles = await Promise.all(
-      projectsSnap.docs.map(async (projectDoc) => {
-        const projectId = projectDoc.id;
-        const exportsSnap = await projectDoc.ref.collection("exports").get();
-        const projectImages = imagesSnap.docs
-          .filter((imageDoc) => imageDoc.data().projectId === projectId)
-          .map(withDocId);
-        const publishedProject = publishedSnap.docs.find((doc) => doc.id === projectId);
-
-        return {
-          project: withDocId(projectDoc),
-          exportRecords: exportsSnap.docs.map(withDocId),
-          imageMetadata: projectImages,
-          publishedSnapshot: publishedProject ? withDocId(publishedProject) : null,
-        };
-      }),
-    );
-
-    const payload = {
-      kind: "project-metadata-export",
-      exportedAt: new Date().toISOString(),
-      uid,
-      projects: projectBundles,
-      summary: {
-        projects: projectsSnap.size,
-        images: imagesSnap.size,
-        publishedProjects: publishedSnap.size,
-        exportRecords: projectBundles.reduce((total, project) => total + project.exportRecords.length, 0),
-      },
-    };
-
-    sendJsonDownload(res, `milestis-project-metadata-${uid}.json`, payload);
-  } catch (err) {
-    logger.error(`[exportProjectMetadata] Failed for ${uid}:`, err);
     res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
   }
 });
@@ -345,6 +284,62 @@ export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, re
     });
   } catch (err) {
     logger.error(`[deleteUserAccount] Failed for ${uid}:`, err);
+    res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
+  }
+});
+
+export const exportProjectContent = onRequest(USER_FUNCTION_OPTIONS, async (req, res) => {
+  if (rejectNonPost(req, res)) return;
+
+  const uid = await authenticateRequest(req, res);
+  if (!uid) return;
+
+  const { projectId } = req.body as { projectId?: string };
+  if (!projectId || typeof projectId !== "string") {
+    res.status(400).json({ error: "INVALID_ARGUMENT", message: "projectId is required." });
+    return;
+  }
+
+  try {
+    const projectRef = db.collection("projects").doc(projectId);
+    const [projectSnap, publishedSnap, exportsSnap, imagesSnap] = await Promise.all([
+      projectRef.get(),
+      db.collection("published_projects").doc(projectId).get(),
+      projectRef.collection("exports").get(),
+      db.collection("images").where("projectId", "==", projectId).get(),
+    ]);
+
+    if (!projectSnap.exists) {
+      res.status(404).json({ error: ERROR.NOT_FOUND, message: "Project not found." });
+      return;
+    }
+
+    const projectData = projectSnap.data() as Record<string, unknown>;
+    if (projectData.ownerId !== uid) {
+      res.status(403).json({ error: ERROR.UNAUTHORIZED, message: "Access denied." });
+      return;
+    }
+
+    const payload = {
+      kind: "project-content-export",
+      exportedAt: new Date().toISOString(),
+      uid,
+      projectId,
+      project: mapProjectDocument(projectSnap as FirebaseFirestore.QueryDocumentSnapshot),
+      publishedContent: publishedSnap.exists
+        ? mapPublishedSnapshotWithContent(publishedSnap as FirebaseFirestore.QueryDocumentSnapshot)
+        : null,
+      exportRecords: exportsSnap.docs.map(mapExportRecord),
+      imageMetadata: imagesSnap.docs.map(mapImageMetadata),
+    };
+
+    const safeName = (projectData.name as string ?? projectId)
+      .replace(/[^a-z0-9_-]/gi, "-")
+      .toLowerCase()
+      .slice(0, 40);
+    sendJsonDownload(res, `milestis-project-${safeName}.json`, payload);
+  } catch (err) {
+    logger.error(`[exportProjectContent] Failed for ${uid}/${projectId}:`, err);
     res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
   }
 });

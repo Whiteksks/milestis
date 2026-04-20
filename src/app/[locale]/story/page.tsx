@@ -1,6 +1,6 @@
 import React from 'react';
 import { CTAButton } from '@/components/shared/cta-button';
-import { Heart, Sparkles, Infinity, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Heart, Sparkles, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';

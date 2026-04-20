@@ -339,8 +339,9 @@
         "title": "Data & Export",
         "description": "Download your account information and project data",
         "downloadAccountData": "Download Account Data",
-        "exportProjectMetadata": "Export Project Metadata",
-        "descriptionLong": "Account data includes your profile, preferences, and usage history."
+        "selectProject": "Select a project…",
+        "exportProjectContent": "Export Project",
+        "descriptionLong": "Account data includes your profile, preferences, and usage history. Project export includes design content and publish history."
       },
       "danger": {
         "title": "Danger Zone",

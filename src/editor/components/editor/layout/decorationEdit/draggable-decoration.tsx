@@ -33,7 +33,6 @@ export const DraggableDecoration = memo(function DraggableDecoration({
 }: DraggableDecorationProps) {
   const {
     id,
-    image,
     position,
     size,
     scale = 1,

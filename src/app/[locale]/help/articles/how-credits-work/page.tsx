@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
-import { Info, Lightbulb, Link } from "lucide-react"
+import { Info, Lightbulb } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "How credits work — Milestis Help",
