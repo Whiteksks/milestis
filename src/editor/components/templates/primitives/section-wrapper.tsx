@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
+import { motion, type HTMLMotionProps } from 'framer-motion'
 import { useBaseTransition, useDisabled } from './animation-context'
 
 interface SectionWrapperProps extends HTMLMotionProps<'section'> {
@@ -31,9 +31,7 @@ export function SectionWrapper({
   )
 
   const disabled = useDisabled()
-  const reducedMotion = useReducedMotion()
   const transition = useBaseTransition()
-  const animationsDisabled = disabled || Boolean(reducedMotion)
 
   // Footers are always the last element on the page.
   // Framer Motion's whileInView uses IntersectionObserver against the window
@@ -43,7 +41,7 @@ export function SectionWrapper({
   const isFooter = id === 'footer'
 
   const animationProps =
-    !animationsDisabled && !isFooter
+    !disabled && !isFooter
       ? {
           initial: { opacity: 0, y: 30 },
           whileInView: { opacity: 1, y: 0 },
@@ -52,7 +50,7 @@ export function SectionWrapper({
         }
       : {}
 
-  if (animationsDisabled) {
+  if (disabled) {
     return (
       <Component
         id={id}

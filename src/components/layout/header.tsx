@@ -34,7 +34,7 @@ function useIsAuthenticated() {
 
 const NAVIGATION = [
   { title: 'Features', href: '/features' },
-  { title: 'Examples', href: '/examples' },
+  { title: 'Our Story', href: '/story' },
   { title: 'Pricing', href: '/pricing' },
   { title: 'Help Center', href: '/help' }
 ]

@@ -1,25 +1,25 @@
-import { ImagePlus, PenLine, LayoutGrid, Share2 } from "lucide-react"
+import { LayoutTemplate, ImagePlus, Sparkles, Share2 } from "lucide-react"
 
 const steps = [
   {
+    icon: LayoutTemplate,
+    title: "Pick a template",
+    description: "Choose from premium rigid layouts — professionally designed so the result always looks stunning, no matter the content.",
+  },
+  {
     icon: ImagePlus,
-    title: "Choose photos and moments",
-    description: "Select the memories you want to preserve",
+    title: "Add your content",
+    description: "Upload visuals, write your copy, select a curated color palette. The structure handles itself.",
   },
   {
-    icon: PenLine,
-    title: "Add stories, music and effects",
-    description: "Bring your memories to life with personal touches",
-  },
-  {
-    icon: LayoutGrid,
-    title: "Arrange pages like a memory book",
-    description: "Design your story page by page",
+    icon: Sparkles,
+    title: "Add your personal touch",
+    description: "Place decorative elements freely, add depth effects and light layers — make the project unmistakably yours.",
   },
   {
     icon: Share2,
-    title: "Share with family",
-    description: "Send a private link to your loved ones",
+    title: "Publish and share",
+    description: "One link. Anyone you send it to opens a fully interactive digital experience — no app, no download, any device.",
   },
 ]
 
@@ -28,7 +28,8 @@ export function HowItWorksSection() {
     <section className="bg-card px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-balance">How Milestis works</h2>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-balance">From content to finished project in 4 steps</h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">No design skills. No guesswork. Quality is guaranteed by the platform.</p>
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

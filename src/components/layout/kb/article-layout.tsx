@@ -28,7 +28,7 @@ export function ArticleLayout({ meta, toc, children, related }: ArticleLayoutPro
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
         {/* Breadcrumb */}
-        <nav className="mb-8 mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <nav className="my-8 flex items-center gap-1.5 text-sm text-muted-foreground">
           <Link href="/help" className="hover:text-foreground transition-colors">
             Help
           </Link>

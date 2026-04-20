@@ -4,142 +4,145 @@ import { Lightbulb } from "lucide-react"
 import Link from "next/link" // Добавили импорт
 
 export const metadata: Metadata = {
-  title: "Getting started with Milestis — Milestis Help",
-  description: "Create your first memory book in minutes — a beginner's guide.",
+  title: "Create and edit your first project — Milestis Help",
+  description: "Learn how to create a project, add content, refine the design, and preview the result.",
 }
 
 const toc = [
-  { id: "create-account", label: "Create an account" },
-  { id: "start-project", label: "Start a new project" },
-  { id: "add-photos", label: "Add photos" },
-  { id: "arrange-layouts", label: "Arrange layouts" },
-  { id: "add-text", label: "Add text & captions" },
-  { id: "preview-publish", label: "Preview & publish" },
-  { id: "next-steps", label: "Next steps" },
+  { id: "start-from-dashboard", label: "Start from the dashboard" },
+  { id: "choose-format", label: "Choose a format" },
+  { id: "edit-content", label: "Edit your content" },
+  { id: "refine-design", label: "Refine the design" },
+  { id: "save-preview", label: "Save and preview" },
+  { id: "before-publishing", label: "Before publishing" },
 ]
 
 const meta = {
-  title: "Getting started with Milestis",
+  title: "Create and edit your first project",
   description:
-    "Everything you need to create your first photobook from scratch — from signing up to sharing the final result.",
+    "A practical guide to creating your first Milestis project and shaping it into a finished result.",
   category: "Basics",
   readTime: "5 min read",
-  updatedAt: "January 2026",
+  updatedAt: "April 2026",
 }
 
 const related = [
+  { title: "What is Milestis", href: "/help/articles/what-is-milestis" },
   { title: "Publish & share projects", href: "/help/articles/publish-share" },
-  { title: "Customize your portfolio", href: "/help/articles/customize-portfolio" },
-  { title: "How credits work", href: "/help/articles/how-credits-work" },
 ]
 
 export default function GettingStartedPage() {
   return (
     <ArticleLayout meta={meta} toc={toc} related={related}>
-      <h2 id="create-account">Create an account</h2>
+      <h2 id="start-from-dashboard">Start from the dashboard</h2>
       <p>
-        Go to <Link href="/">milestis.com</Link> and click <strong>Get started free</strong>. You can
-        sign up with your Google account, Apple ID, or an email address and password. No credit
-        card is required for the free plan.
+        Once you sign in to <Link href="/">Milestis</Link>, your dashboard becomes the starting
+        point for every project. This is where you create new work, return to drafts, and manage
+        published or archived results.
       </p>
       <p>
-        After signing in you will land on your <strong>Dashboard</strong> — the central place for
-        all your projects.
+        Click <strong>New Project</strong> to begin. Milestis opens a small project picker instead
+        of a complicated setup flow, so you can get into the editor quickly.
       </p>
 
-      <h2 id="start-project">Start a new project</h2>
+      <h2 id="choose-format">Choose a format</h2>
       <p>
-        Click the <strong>+ New project</strong> button on the Dashboard. You will be asked to
-        choose a project type:
+        You will choose between two formats:
       </p>
       <ul>
         <li>
-          <strong>Photobook</strong> — a paginated book layout, great for events and holidays.
+          <strong>Memory Book</strong> — best for milestones, gifts, family stories, and emotional
+          photo collections.
         </li>
         <li>
-          <strong>Portfolio</strong> — a public website showcasing your photography or artwork.
-        </li>
-        <li>
-          <strong>Memory book</strong> — a personal timeline combining photos, notes, and music.
+          <strong>Portfolio Site</strong> — best for creators who want to present their work as a
+          polished website.
         </li>
       </ul>
       <p>
-        Select a size (A4, square, or custom), give your project a name, and click{" "}
-        <strong>Create</strong>. The editor opens automatically.
+        After you choose a format, Milestis creates the project and opens the editor automatically.
+        You can rename the project later, so there is no need to overthink the starting point.
       </p>
 
-      <h2 id="add-photos">Add photos</h2>
+      <h2 id="edit-content">Edit your content</h2>
       <p>
-        In the editor, click the <strong>Photos</strong> panel on the left sidebar. You can:
+        Inside the editor, the main task is simple: replace placeholders with real content and shape
+        the story or presentation you want to publish.
       </p>
       <ul>
-        <li>Drag and drop files from your computer directly onto the canvas.</li>
         <li>
-          Click <strong>Upload photos</strong> and select files from your device.
+          Add your photos and choose the images that matter most.
         </li>
-        <li>Connect Google Photos or Dropbox for instant access to your library.</li>
+        <li>
+          Edit titles, subtitles, captions, and other text blocks so the project feels personal and
+          complete.
+        </li>
+        <li>
+          Reorder sections or pages until the flow feels right for the final viewer.
+        </li>
       </ul>
       <p>
-        Supported formats are JPEG, PNG, and HEIC. We recommend photos of at least{" "}
-        <strong>1500 × 1500 px</strong> for best print quality.
+        The most important mindset is not to fill every space. Milestis works best when you choose
+        strong content intentionally and let the structure do the visual work.
       </p>
 
       <div className="kb-callout">
         <Lightbulb className="kb-callout-icon text-amber-500" />
         <span>
-          Photos are stored securely and never shared publicly unless you explicitly publish the
-          project.
+          Start with fewer, stronger photos first. It is usually faster to build a clean first
+          version and refine it than to overload the project on the first pass.
         </span>
       </div>
 
-      <h2 id="arrange-layouts">Arrange layouts</h2>
+      <h2 id="refine-design">Refine the design</h2>
       <p>
-        Each page can hold one or more photos in a grid, collage, or full-bleed layout. To change a
-        page layout, click the page and select a template from the <strong>Layouts</strong> panel.
+        Milestis is built on rigid design principles, so refining the look is about choosing the
+        right atmosphere, not rebuilding the layout from scratch.
       </p>
       <p>
-        You can drag photos between slots to rearrange them, resize individual slots by dragging
-        their handles, and rotate or crop any photo with a double-click.
+        As you edit, focus on the elements Milestis is designed to make easy:
       </p>
-
-      <h2 id="add-text">Add text & captions</h2>
-      <p>
-        Click any text placeholder to start typing, or add a new text block via{" "}
-        <strong>Insert → Text</strong>. You can choose from a set of curated font pairings in the{" "}
-        <strong>Style</strong> panel to keep your typography consistent.
-      </p>
-      <p>
-        Want AI help? Click <strong>Write with AI</strong> inside any text block to generate a
-        caption automatically based on the photos on that page. This uses credits.
-      </p>
-
-      <h2 id="preview-publish">Preview & publish</h2>
-      <p>
-        Click <strong>Preview</strong> in the top bar at any time to see how your project looks in
-        its final form. When you are happy with the result, click <strong>Publish</strong>. You
-        will get a shareable link you can send to anyone — no account required to view.
-      </p>
-      <p>
-        To download a PDF for printing, go to <strong>File → Export → PDF</strong>. High-resolution
-        export is available on Pro and Family plans.
-      </p>
-
-      <h2 id="next-steps">Next steps</h2>
-      <p>Now that your first project is live, here are some things to explore:</p>
       <ul>
         <li>
-          <Link href="/help/articles/customize-portfolio">Set up your public portfolio</Link> to showcase
-          your work.
+          <strong>Template choice</strong> — select the structure that best fits the content.
         </li>
         <li>
-          <Link href="/help/articles/publish-share">Learn all the sharing options</Link> — custom domains,
-          password protection, and more.
+          <strong>Palette and mood</strong> — choose the visual direction that matches the story.
         </li>
         <li>
-          <Link href="/help/articles/how-credits-work">Understand how AI credits work</Link> so you never
-          run out at the wrong moment.
+          <strong>Depth and decoration</strong> — use textures, light, and decorative details to add
+          identity without making the composition messy.
         </li>
       </ul>
+
+      <h2 id="save-preview">Save and preview</h2>
+      <p>
+        Milestis keeps your editor state safe while you work and provides a real preview so you can
+        see the result the way a viewer will see it after publishing.
+      </p>
+      <p>
+        Use <strong>Preview</strong> before publishing to check pacing, readability, and overall
+        atmosphere. This is the best moment to make small adjustments to titles, image choices, and
+        visual balance.
+      </p>
+
+      <h2 id="before-publishing">Before publishing</h2>
+      <p>Before you make the project live, quickly check the essentials:</p>
+      <ul>
+        <li>
+          The project name reflects what you want to share.
+        </li>
+        <li>
+          The first screen or cover makes a strong impression.
+        </li>
+        <li>
+          Text is concise and free of placeholder copy.
+        </li>
+        <li>The final rhythm feels intentional from start to finish.</li>
+      </ul>
+      <p>
+        When the project feels ready, continue with <Link href="/help/articles/publish-share">publishing and sharing</Link>.
+      </p>
     </ArticleLayout>
   )
 }

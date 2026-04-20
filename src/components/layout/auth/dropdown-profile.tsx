@@ -33,7 +33,7 @@ const MENU_GROUPS = [
     id: 'support',
     items: [
       { label: 'Help Center', href: '/help', icon: HelpCircleIcon },
-      { label: 'Privacy Policy', href: '/privacy', icon: ShieldCheckIcon },
+      { label: 'Privacy Policy', href: '/policies/legal', icon: ShieldCheckIcon },
     ]
   }
 ]

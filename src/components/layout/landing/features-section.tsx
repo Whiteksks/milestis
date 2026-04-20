@@ -1,35 +1,35 @@
-import { Sparkles, Music, BookText, Link2, Smartphone, Lock } from "lucide-react"
+import { ShieldCheck, Layers, MousePointer2, Palette, Sparkles, Link2 } from "lucide-react"
 
 const features = [
   {
+    icon: ShieldCheck,
+    title: "Design you can't break",
+    description: "Rigid layouts lock in professional structure. You only change the content — premium quality is baked into every template.",
+  },
+  {
+    icon: Layers,
+    title: "Depth & atmosphere",
+    description: "Light rays, cinematic textures and layered shadows make every visual look like it belongs in a high-end production.",
+  },
+  {
+    icon: MousePointer2,
+    title: "Freeform decorations",
+    description: "Drag and place decorative elements anywhere on the page. Add personality without disrupting the underlying layout.",
+  },
+  {
+    icon: Palette,
+    title: "Curated color palettes",
+    description: "Handcrafted palettes engineered for aesthetic harmony. Pick one — the entire project falls into place automatically.",
+  },
+  {
     icon: Sparkles,
-    title: "Animated memory pages",
-    description: "Gentle animations bring your photos and stories to life",
-  },
-  {
-    icon: Music,
-    title: "Music for atmosphere",
-    description: "Add meaningful songs that set the mood",
-  },
-  {
-    icon: BookText,
-    title: "Story-first layouts",
-    description: "Designed to let your stories shine",
+    title: "Interactive animations",
+    description: "Every project comes alive with smooth motion powered by Framer Motion — the kind of feel that rivals native apps.",
   },
   {
     icon: Link2,
-    title: "Personal shareable links",
-    description: "One link to share with everyone who matters",
-  },
-  {
-    icon: Smartphone,
-    title: "Works everywhere",
-    description: "Beautiful on phone, tablet and desktop",
-  },
-  {
-    icon: Lock,
-    title: "Privacy control",
-    description: "You decide who can see your memories",
+    title: "Share with one link",
+    description: "Publish and send. The recipient opens a live interactive experience on any device — no app, no download.",
   },
 ]
 
@@ -38,9 +38,9 @@ export function FeaturesSection() {
     <section className="px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-balance">Made for what matters</h2>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-balance">Everything your project deserves</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Features designed with feelings in mind, not specs
+            Built around one principle: the result should always look premium — regardless of who made it
           </p>
         </div>
 

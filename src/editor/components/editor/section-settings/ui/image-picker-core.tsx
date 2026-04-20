@@ -132,7 +132,6 @@ if (dense) {
           </div>
         ) : (
           <div className="flex items-center gap-3 p-2 rounded-xl border border-border/50 bg-muted/20 group">
-            {/* Тхумбнаил как основная кнопка выбора */}
             <button
               type="button"
               onClick={onOpenMediaPicker}

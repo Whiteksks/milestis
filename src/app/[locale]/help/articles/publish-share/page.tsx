@@ -3,120 +3,134 @@ import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, AlertCircle } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Publish & share projects — Milestis Help",
-  description: "All the ways to share your photobooks and portfolios with the world.",
+  title: "Publish and share your project — Milestis Help",
+  description: "Learn how publishing works in Milestis, what kind of link each project gets, and how to share it confidently.",
 }
 
 const toc = [
-  { id: "shareable-link", label: "Shareable link" },
-  { id: "password-protection", label: "Password protection" },
-  { id: "custom-domain", label: "Custom domain" },
-  { id: "embed", label: "Embed on another site" },
-  { id: "download-pdf", label: "Download as PDF" },
-  { id: "unpublish", label: "Unpublish a project" },
+  { id: "what-publish-means", label: "What publishing means" },
+  { id: "memory-book-links", label: "Memory Book links" },
+  { id: "portfolio-links", label: "Portfolio links" },
+  { id: "publish-cost", label: "Credits and publish cost" },
+  { id: "unpublish-republish", label: "Unpublish and republish" },
+  { id: "sharing-best-practices", label: "Sharing best practices" },
 ]
 
 const meta = {
-  title: "Publish & share projects",
+  title: "Publish and share your project",
   description:
-    "From private links to custom domains — here are all the options to get your work in front of the right people.",
+    "A clear guide to making your project live and understanding how access works for Memory Books and Portfolio Sites.",
   category: "Sharing",
   readTime: "4 min read",
-  updatedAt: "January 2026",
+  updatedAt: "April 2026",
 }
 
 const related = [
-  { title: "Getting started with Milestis", href: "/help/articles/getting-started" },
-  { title: "Customize your portfolio", href: "/help/articles/customize-portfolio" },
+  { title: "What is Milestis", href: "/help/articles/what-is-milestis" },
+  { title: "Create and edit your first project", href: "/help/articles/getting-started" },
 ]
 
 export default function PublishSharePage() {
   return (
     <ArticleLayout meta={meta} toc={toc} related={related}>
-      <h2 id="shareable-link">Shareable link</h2>
+      <h2 id="what-publish-means">What publishing means</h2>
       <p>
-        Every published project gets a unique <strong>milestis.com/p/your-slug</strong> URL. Click{" "}
-        <strong>Publish</strong> in the editor top bar to generate it. Anyone with the link can view
-        the project — no account required.
+        In Milestis, publishing means turning your in-editor project into a live web experience that
+        can be opened outside the editor. Once published, your project gets a real shareable address
+        and can be viewed on any device.
       </p>
       <p>
-        You can customise the slug at any time from <strong>Project Settings → Sharing</strong>. The
-        old link will redirect to the new one automatically.
+        The exact link and access model depend on the format you chose when the project was created.
       </p>
 
       <div className="kb-callout">
         <Info className="kb-callout-icon text-primary" />
         <span>
-          The shareable link is private by default — it won&apos;t appear in search engines unless
-          you turn on <strong>Public visibility</strong>.
+          Publishing does not mean losing control. You can still take a project offline later and
+          bring it back again when needed.
         </span>
       </div>
 
-      <h2 id="password-protection">Password protection</h2>
+      <h2 id="memory-book-links">Memory Book links</h2>
       <p>
-        To restrict who can open the link, go to <strong>Project Settings → Sharing → Password</strong>{" "}
-        and set a password. Viewers will be prompted to enter it before they can see the project.
-        You can change or remove the password at any time.
+        A <strong>Memory Book</strong> is published as a private share link. The published URL includes
+        a viewing token, so the link itself becomes the key to access.
       </p>
       <p>
-        Password protection is available on <strong>Pro and Family plans</strong>.
-      </p>
-
-      <h2 id="custom-domain">Custom domain</h2>
-      <p>
-        On the <strong>Family plan</strong> you can serve your project or portfolio from your own
-        domain (e.g. <code>book.yourname.com</code>). To set it up:
-      </p>
-      <ol>
-        <li>
-          Go to <strong>Account Settings → Domains</strong> and click <strong>Add domain</strong>.
-        </li>
-        <li>Enter the domain or subdomain you want to use.</li>
-        <li>
-          Add a <code>CNAME</code> record pointing to <code>cname.milestis.com</code> in your DNS
-          provider.
-        </li>
-        <li>Wait up to 24 hours for DNS to propagate, then click <strong>Verify</strong>.</li>
-      </ol>
-      <p>
-        SSL is provisioned automatically — your visitors will always get a secure HTTPS connection.
+        This makes Memory Books feel appropriate for personal stories, gifts, family moments, and
+        emotionally sensitive content. Anyone who receives the full link can open the project, but
+        it is not meant to behave like a public showcase page.
       </p>
 
-      <h2 id="embed">Embed on another site</h2>
+      <h2 id="portfolio-links">Portfolio links</h2>
       <p>
-        You can embed any published project as an interactive iframe. In{" "}
-        <strong>Project Settings → Sharing</strong>, click <strong>Get embed code</strong> and copy
-        the HTML snippet. Paste it into any website builder, WordPress, or Notion page.
+        A <strong>Portfolio Site</strong> is published as a public web address. This is the right
+        format when you want people to visit your work, evaluate your style, and share the site more
+        openly.
       </p>
+      <p>
+        Before publishing, Milestis asks you to choose a slug. That slug becomes part of the live
+        address people will use to open your site, so it is worth choosing something clean,
+        readable, and close to your name or brand.
+      </p>
+
       <div className="kb-callout">
         <AlertCircle className="kb-callout-icon text-amber-500" />
         <span>
-          Embedding is only possible for projects with <strong>Public visibility</strong> turned on.
+          Slugs are part of the public address. Keep them short, clear, and easy to type or share.
         </span>
       </div>
 
-      <h2 id="download-pdf">Download as PDF</h2>
+      <h2 id="publish-cost">Credits and publish cost</h2>
       <p>
-        Go to <strong>File → Export → PDF</strong>. You can choose between:
+        Publishing uses credits, and the cost depends on the type of project:
       </p>
       <ul>
         <li>
-          <strong>Screen quality</strong> (72 dpi) — fast download, ideal for sharing digitally.
-          Available on all plans.
+          <strong>Portfolio Site</strong> uses a fixed publish cost.
         </li>
         <li>
-          <strong>Print quality</strong> (300 dpi) — full-resolution for professional printing.
-          Available on Pro and Family plans.
+          <strong>Memory Book</strong> uses a tiered cost based on how many photos are included.
         </li>
       </ul>
-      <p>Large projects may take a minute to generate. You will receive a download link by email
-      once it&apos;s ready.</p>
-
-      <h2 id="unpublish">Unpublish a project</h2>
       <p>
-        To take a project offline, open <strong>Project Settings → Sharing</strong> and click{" "}
-        <strong>Unpublish</strong>. The link will immediately return a 404 for all visitors. Your
-        project and all its content are preserved — you can re-publish at any time.
+        Before the final publish step, Milestis analyzes the project and shows the expected cost.
+        This gives you a chance to confirm the result, the final link, and the credit usage before
+        making the project live.
+      </p>
+
+      <h2 id="unpublish-republish">Unpublish and republish</h2>
+      <p>
+        If you need to take a project offline, you can <strong>unpublish</strong> it. This removes
+        public access while keeping the project data intact.
+      </p>
+      <p>
+        Later, you can <strong>republish</strong> the project again. This is useful when you want to
+        hide a project temporarily, revise it, or bring back an archived result without rebuilding
+        everything from the start.
+      </p>
+
+      <h2 id="sharing-best-practices">Sharing best practices</h2>
+      <p>Before sending a link to someone else, make one last check:</p>
+      <ul>
+        <li>
+          Open the live preview and make sure the first screen or cover feels finished.
+        </li>
+        <li>
+          Double-check project titles, dates, and visible text for small mistakes.
+        </li>
+        <li>
+          For Memory Books, copy the full link so the recipient gets the access token as part of the
+          URL.
+        </li>
+        <li>
+          For Portfolio Sites, choose a slug you will still be comfortable sharing later in your bio,
+          messages, or client communication.
+        </li>
+      </ul>
+      <p>
+        Good publishing in Milestis is not only about making the project live. It is about making
+        sure the first viewer experiences it exactly the way you intended.
       </p>
     </ArticleLayout>
   )

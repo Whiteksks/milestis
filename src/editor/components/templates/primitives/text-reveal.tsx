@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useT, useDisabled } from './animation-context'
 
@@ -19,8 +19,6 @@ export function TextReveal({
 }: TextRevealProps) {
   const t = useT()
   const disabled = useDisabled()
-  const reducedMotion = useReducedMotion()
-  const animationsDisabled = disabled || Boolean(reducedMotion)
 
   const lineVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -31,7 +29,7 @@ export function TextReveal({
     },
   } as const
 
-  if (animationsDisabled) {
+  if (disabled) {
     return <Component className={className}>{text}</Component>
   }
 

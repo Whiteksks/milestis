@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion, useReducedMotion, HTMLMotionProps } from 'framer-motion'
+import { motion, HTMLMotionProps } from 'framer-motion'
 import { useBaseTransition, useDisabled } from './animation-context'
 
 /**
@@ -123,11 +123,9 @@ export function Animate({
   )
 
   const disabled = useDisabled()
-  const reducedMotion = useReducedMotion()
   const transition = useBaseTransition(delay)
-  const animationsDisabled = disabled || Boolean(reducedMotion)
 
-  if (animationsDisabled) {
+  if (disabled) {
     return <Component className={className} {...(props as Record<string, unknown>)}>{children}</Component>
   }
 

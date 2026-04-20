@@ -1,6 +1,7 @@
 import './globals.css';
 
 import { FirebaseInitializer } from '@/lib/firebase';
+import { ThemeProvider } from '@/components/theme/theme-provider';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 
@@ -74,7 +75,15 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <FirebaseInitializer />
-        {children}
+        <ThemeProvider
+          attribute="class"
+          themes={["light", "dark", "cozy"]}
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

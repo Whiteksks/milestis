@@ -1,4 +1,3 @@
-import { ThemeProvider } from '@/components/theme/theme-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { Toaster } from '@/components/ui/sonner';
@@ -19,16 +18,8 @@ export default async function RootLayout({
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Providers>
-        <ThemeProvider
-          attribute="class"
-          themes={["light", "dark", "cozy"]}
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="bottom-right" richColors closeButton />
-        </ThemeProvider>
+        {children}
+        <Toaster position="bottom-right" richColors closeButton />
       </Providers>
     </NextIntlClientProvider>
   );

@@ -65,7 +65,6 @@ export function SiteImage({
   fillParent = false,
 }: SiteImageProps) {
   const resolvedSrc = src?.trim() ?? ""
-  const resolvedSizes = sizes ?? "100vw"
 
   if (!resolvedSrc) return null
 
@@ -87,7 +86,7 @@ export function SiteImage({
         fill
         priority={priority}
         unoptimized={unoptimized}
-        sizes={resolvedSizes}
+        sizes={sizes}
         style={{ objectFit: "fill" }}
         className={imageClassName}
       />
@@ -99,7 +98,7 @@ export function SiteImage({
       fill
       priority={priority}
       unoptimized={unoptimized}
-      sizes={resolvedSizes}
+      sizes={sizes}
       style={{ objectFit: "cover" }}
       className={cn("transition-transform duration-500", imageClassName)}
     />

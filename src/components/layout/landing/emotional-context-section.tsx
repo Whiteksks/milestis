@@ -1,30 +1,26 @@
-import { Heart, Cake, HeartHandshake, Users } from "lucide-react"
+import { BookOpen, Camera, Briefcase, Sparkles, LayoutTemplate, Link2 } from "lucide-react"
 
 const contexts = [
   {
-    icon: HeartHandshake,
-    label: "Weddings",
+    icon: Sparkles,
+    label: "Event stories",
   },
   {
-    icon: Cake,
-    label: "Birthdays",
+    icon: Briefcase,
+    label: "Client gifts",
   },
   {
-    icon: Heart,
-    label: "Love stories",
-  },
-  {
-    icon: Users,
-    label: "Family memories",
+    icon: Link2,
+    label: "Shareable links",
   },
 ]
 
 export function EmotionalContextSection() {
   return (
-    <section className="px-4 py-16 md:py-24">
+    <section className="px-4 py-12">
       <div className="mx-auto max-w-4xl">
         <p className="mb-10 text-center text-lg text-muted-foreground">
-          Perfect for capturing life&apos;s most meaningful moments
+          One platform. Every format. Always premium.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
           {contexts.map((context) => (
