@@ -136,13 +136,20 @@
         "description": "Соңғы кредит қолдану және шоттар",
         "noCredits": "Кредит қолдану тарихы әлі жоқ.",
         "noInvoices": "Төлем тарихы жоқ.",
+        "unavailable": "Биллинг тарихы уақытша қолжетімсіз.",
         "balanceAfter": "Операциядан кейінгі баланс: {total} кредит",
+        "project": "Жоба: {name}",
         "reference": "ID {id}",
         "direction": {
           "in": "Қосылды",
           "out": "Жұмсалды",
           "charge": "Төлем",
           "refund": "Қайтарым"
+        },
+        "pagination": {
+          "previous": "Артқа",
+          "next": "Келесі",
+          "page": "Бет {current} / {total}"
         },
         "types": {
           "credit": "Кредит операциясы",

@@ -74,6 +74,7 @@ export const createPhotobook = onCall(
 					amount: cost,
 					meta: {
 						projectId: data.projectId,
+						projectName: data.projectTitle,
 						projectTitle: data.projectTitle,
 						itemType: "photobook",
 						reason: "create_photobook",

@@ -17,13 +17,14 @@ export function SettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
   const t = useTranslations()
+  const locale = pathname.split("/").filter(Boolean)[0] ?? ""
 
   const getIsActive = (itemPath: string) => {
     return pathname === itemPath || pathname.endsWith(itemPath)
   }
 
   const handleNavigation = (targetPath: string) => {
-    router.push(targetPath) 
+    router.push(locale ? `/${locale}${targetPath}` : targetPath)
   }
 
   return (

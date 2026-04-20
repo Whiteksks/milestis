@@ -115,7 +115,7 @@ export async function commitPublish(
 			credit: {
 				type: "spend",
 				amount: creditCost,
-				meta: { projectId, mode, slug: prepared.slug },
+				meta: { projectId, projectName, mode, slug: prepared.slug },
 			},
 		});
 

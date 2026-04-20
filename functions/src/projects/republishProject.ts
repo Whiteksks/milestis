@@ -158,7 +158,13 @@ export const republishProject = onRequest(
 						credit: {
 							type: "spend",
 							amount: config.republishCreditCost,
-							meta: { projectId: projectId.trim(), mode, slug: publishedSlug, action: "republish" },
+							meta: {
+								projectId: projectId.trim(),
+								projectName: typeof projectData.name === "string" ? projectData.name : undefined,
+								mode,
+								slug: publishedSlug,
+								action: "republish",
+							},
 						},
 					});
 				}

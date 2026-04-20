@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from "zustand/react/shallow"
-import { db } from '@/lib/firebase'
+import { auth, db } from '@/lib/firebase'
 import { useUserStore } from "@/hooks/useUserStore"
 import {
   planDisplayName,
@@ -65,6 +65,11 @@ interface FirestoreTransactionData {
   currency?: string
   amountMinor?: number
   amount?: number
+  tid?: string
+}
+
+interface ExportUserDataResponse {
+  transactions?: FirestoreTransactionData[]
 }
 
 function parseTransactionDate(value: FirestoreTransactionData['createdAt']): Date {
@@ -120,6 +125,14 @@ function normalizeBrand(value: string | null): BillingPaymentMethod['brand'] {
 }
 
 async function fetchTransactions(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
+  try {
+    return await fetchTransactionsFromFirestore(uid)
+  } catch {
+    return await fetchTransactionsFromExport(uid)
+  }
+}
+
+async function fetchTransactionsFromFirestore(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
   const transactionsQuery = query(
     collection(db, 'transactions'),
     where('uid', '==', uid),
@@ -131,37 +144,72 @@ async function fetchTransactions(uid: string): Promise<Array<BillingInvoiceItem 
 
   return snapshot.docs.flatMap((docSnap) => {
     const data = docSnap.data() as FirestoreTransactionData
-    const base = {
-      id: docSnap.id,
-      direction: data.direction === 'in' ? 'in' : 'out',
-      createdAt: parseTransactionDate(data.createdAt),
-      balanceSnapshot: normalizeBalanceSnapshot(data.balanceSnapshot),
-      meta: data.meta,
-    } satisfies BillingTransactionBase
-
-    if (data.category === 'billing') {
-      if (typeof data.amountMinor !== 'number') return []
-      return [{
-        ...base,
-        category: 'billing' as const,
-        type: (data.type as BillingTransactionType) ?? 'buy_credits',
-        currency: typeof data.currency === 'string' && data.currency ? data.currency : 'USD',
-        amountMinor: data.amountMinor,
-      }]
-    }
-
-    if (data.category === 'credit') {
-      if (typeof data.amount !== 'number') return []
-      return [{
-        ...base,
-        category: 'credit' as const,
-        type: (data.type as CreditTransactionType) ?? 'grant',
-        amount: data.amount,
-      }]
-    }
-
-    return []
+    return mapTransactionRecord(data, docSnap.id)
   })
+}
+
+async function fetchTransactionsFromExport(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
+  const url = process.env.NEXT_PUBLIC_EXPORT_USER_DATA_URL
+  const user = auth.currentUser
+
+  if (!url || !user) {
+    return []
+  }
+
+  const idToken = await user.getIdToken()
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch billing history')
+  }
+
+  const payload = await response.json() as ExportUserDataResponse
+  const transactions = Array.isArray(payload.transactions) ? payload.transactions : []
+
+  return transactions
+    .filter((transaction) => typeof transaction === 'object' && transaction !== null)
+    .flatMap((transaction, index) => mapTransactionRecord(transaction, transaction.tid ?? `${uid}-${index}`))
+}
+
+function mapTransactionRecord(
+  data: FirestoreTransactionData,
+  id: string,
+): Array<BillingInvoiceItem | BillingCreditHistoryItem> {
+  const base = {
+    id,
+    direction: data.direction === 'in' ? 'in' : 'out',
+    createdAt: parseTransactionDate(data.createdAt),
+    balanceSnapshot: normalizeBalanceSnapshot(data.balanceSnapshot),
+    meta: data.meta,
+  } satisfies BillingTransactionBase
+
+  if (data.category === 'billing') {
+    if (typeof data.amountMinor !== 'number') return []
+    return [{
+      ...base,
+      category: 'billing' as const,
+      type: (data.type as BillingTransactionType) ?? 'buy_credits',
+      currency: typeof data.currency === 'string' && data.currency ? data.currency : 'USD',
+      amountMinor: data.amountMinor,
+    }]
+  }
+
+  if (data.category === 'credit') {
+    if (typeof data.amount !== 'number') return []
+    return [{
+      ...base,
+      category: 'credit' as const,
+      type: (data.type as CreditTransactionType) ?? 'grant',
+      amount: data.amount,
+    }]
+  }
+
+  return []
 }
 
 function extractPaymentMethod(invoices: BillingInvoiceItem[]): BillingPaymentMethod | null {
@@ -234,7 +282,9 @@ export function useBilling() {
   const paymentMethod = extractPaymentMethod(invoiceHistory)
 
   return {
-    loading: loading || transactionsQuery.isLoading,
+    loading,
+    historyLoading: transactionsQuery.isLoading,
+    historyError: transactionsQuery.error,
     subscription,
     balance,
     creditsData,

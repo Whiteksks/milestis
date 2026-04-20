@@ -426,13 +426,20 @@
         "description": "Your recent credit usage and invoices",
         "noCredits": "No credit usage history yet.",
         "noInvoices": "No billing history available.",
+        "unavailable": "Billing history is temporarily unavailable.",
         "balanceAfter": "Balance after: {total} credits",
+        "project": "Project: {name}",
         "reference": "Ref {id}",
         "direction": {
           "in": "Added",
           "out": "Used",
           "charge": "Charge",
           "refund": "Refund"
+        },
+        "pagination": {
+          "previous": "Previous",
+          "next": "Next",
+          "page": "Page {current} of {total}"
         },
         "types": {
           "credit": "Credit update",

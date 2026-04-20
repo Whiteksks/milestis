@@ -1,14 +1,19 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreditsCard } from "@/components/layout/settings/credits-card"
 import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
 import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useBilling } from "@/hooks/useBilling"
 import { cn } from "@/lib/utils"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
+
+const HISTORY_PAGE_SIZE = 5
 
 function formatCurrency(locale: string, amountMinor: number, currency: string) {
   return new Intl.NumberFormat(locale, {
@@ -49,11 +54,33 @@ function getInvoiceLabel(t: ReturnType<typeof useTranslations>, type: string) {
   }
 }
 
+function getCreditProjectName(meta: Record<string, unknown> | undefined) {
+  if (typeof meta?.projectName === "string" && meta.projectName.trim()) {
+    return meta.projectName.trim()
+  }
+
+  if (typeof meta?.projectTitle === "string" && meta.projectTitle.trim()) {
+    return meta.projectTitle.trim()
+  }
+
+  return null
+}
+
+function clampPage(page: number, totalItems: number) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / HISTORY_PAGE_SIZE))
+  return Math.min(page, totalPages)
+}
+
 export default function BillingSettings() {
   const t = useTranslations("account.billing")
   const locale = useLocale()
+  const [activeTab, setActiveTab] = useState<"credits" | "billing">("credits")
+  const [creditPage, setCreditPage] = useState(1)
+  const [invoicePage, setInvoicePage] = useState(1)
   const {
     loading,
+    historyLoading,
+    historyError,
     creditsData,
     planName,
     planDesc,
@@ -69,6 +96,24 @@ export default function BillingSettings() {
     month: "short",
     year: "numeric",
   })
+  const creditTotalPages = Math.max(1, Math.ceil(creditHistory.length / HISTORY_PAGE_SIZE))
+  const invoiceTotalPages = Math.max(1, Math.ceil(invoiceHistory.length / HISTORY_PAGE_SIZE))
+  const visibleCreditHistory = creditHistory.slice(
+    (creditPage - 1) * HISTORY_PAGE_SIZE,
+    creditPage * HISTORY_PAGE_SIZE,
+  )
+  const visibleInvoiceHistory = invoiceHistory.slice(
+    (invoicePage - 1) * HISTORY_PAGE_SIZE,
+    invoicePage * HISTORY_PAGE_SIZE,
+  )
+
+  useEffect(() => {
+    setCreditPage((currentPage) => clampPage(currentPage, creditHistory.length))
+  }, [creditHistory.length])
+
+  useEffect(() => {
+    setInvoicePage((currentPage) => clampPage(currentPage, invoiceHistory.length))
+  }, [invoiceHistory.length])
 
   if (loading) {
     return (
@@ -142,16 +187,31 @@ export default function BillingSettings() {
           <p className="mt-1 text-muted-foreground">{t("history.description")}</p>
         </div>
 
-        <Tabs defaultValue="credits" className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "credits" | "billing")} className="w-full">
             <TabsList className="rounded-full bg-muted p-1">
             <TabsTrigger value="credits" className="rounded-full px-6 text-sm">{t("tabs.credits")}</TabsTrigger>
             <TabsTrigger value="billing" className="rounded-full px-6 text-sm">{t("tabs.invoices")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="credits" className="mt-6">
-            {creditHistory.length > 0 ? (
+              {historyLoading ? (
+                <div className="rounded-2xl bg-card p-4 shadow-sm">
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((item) => (
+                      <Skeleton key={item} className="h-16 rounded-xl" />
+                    ))}
+                  </div>
+                </div>
+              ) : historyError ? (
+                <p className="py-8 text-center text-muted-foreground">{t("history.unavailable")}</p>
+              ) : creditHistory.length > 0 ? (
+              <div className="space-y-4">
               <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
-                {creditHistory.map((item, index) => (
+                {visibleCreditHistory.map((item, index) => (
+                  (() => {
+                    const projectName = getCreditProjectName(item.meta)
+
+                    return (
                   <div
                     key={item.id}
                     className={cn(
@@ -169,6 +229,11 @@ export default function BillingSettings() {
                       <p className="mt-1 text-sm text-muted-foreground">
                         {dateFormatter.format(item.createdAt)}
                       </p>
+                      {projectName ? (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {t("history.project", { name: projectName })}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="text-left sm:text-right">
                       <p className="font-semibold tabular-nums">
@@ -179,7 +244,37 @@ export default function BillingSettings() {
                       </p>
                     </div>
                   </div>
+                    )
+                  })()
                 ))}
+              </div>
+              {creditTotalPages > 1 ? (
+                <div className="flex items-center justify-between gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setCreditPage((page) => Math.max(1, page - 1))}
+                    disabled={creditPage === 1}
+                  >
+                    <ChevronLeft className="size-4" />
+                    {t("history.pagination.previous")}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    {t("history.pagination.page", { current: creditPage, total: creditTotalPages })}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setCreditPage((page) => Math.min(creditTotalPages, page + 1))}
+                    disabled={creditPage === creditTotalPages}
+                  >
+                    {t("history.pagination.next")}
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              ) : null}
               </div>
             ) : (
               <p className="py-8 text-center text-muted-foreground">{t("history.noCredits")}</p>
@@ -187,9 +282,20 @@ export default function BillingSettings() {
           </TabsContent>
 
           <TabsContent value="billing" className="mt-6">
-            {invoiceHistory.length > 0 ? (
+            {historyLoading ? (
+              <div className="rounded-2xl bg-card p-4 shadow-sm">
+                <div className="space-y-3">
+                  {[1, 2, 3, 4, 5].map((item) => (
+                    <Skeleton key={item} className="h-16 rounded-xl" />
+                  ))}
+                </div>
+              </div>
+            ) : historyError ? (
+              <p className="py-8 text-center text-muted-foreground">{t("history.unavailable")}</p>
+            ) : invoiceHistory.length > 0 ? (
+              <div className="space-y-4">
               <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
-                {invoiceHistory.map((item, index) => {
+                {visibleInvoiceHistory.map((item, index) => {
                   const reference = typeof item.meta?.paddleTransactionId === "string"
                     ? item.meta.paddleTransactionId
                     : null
@@ -223,6 +329,34 @@ export default function BillingSettings() {
                     </div>
                   )
                 })}
+              </div>
+              {invoiceTotalPages > 1 ? (
+                <div className="flex items-center justify-between gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setInvoicePage((page) => Math.max(1, page - 1))}
+                    disabled={invoicePage === 1}
+                  >
+                    <ChevronLeft className="size-4" />
+                    {t("history.pagination.previous")}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    {t("history.pagination.page", { current: invoicePage, total: invoiceTotalPages })}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setInvoicePage((page) => Math.min(invoiceTotalPages, page + 1))}
+                    disabled={invoicePage === invoiceTotalPages}
+                  >
+                    {t("history.pagination.next")}
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              ) : null}
               </div>
             ) : (
               <p className="py-8 text-center text-muted-foreground">{t("history.noInvoices")}</p>
