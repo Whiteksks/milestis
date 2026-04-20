@@ -49,6 +49,14 @@
         { "fieldPath": "expiresAtMillis", "order": "ASCENDING" },
         { "fieldPath": "createdAtMillis", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

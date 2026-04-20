@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useCallback, useEffect, useRef } from "react"
-import { motion, useTransform } from "framer-motion"
+import { memo, useState, useCallback, useEffect, useMemo, useRef } from "react"
+import { motion, useTransform, type MotionValue } from "framer-motion"
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -11,7 +11,7 @@ import {
   SnapBottomSheet,
   useSnapBottomSheet,
   useSnapBottomSheetTransition,
-} from "../../../../../components/ui/custom/snap-bottom-sheet"
+} from "@/components/ui/custom/snap-bottom-sheet"
 
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"
 import { ThemeSheetActions } from "./sheet-actions/theme-sheet-actions"
@@ -38,6 +38,34 @@ const TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = 
   { id: "design", icon: LayoutTemplate, label: "Design" },
 ]
 
+const StableSectionsSheetActions = memo(function StableSectionsSheetActions() {
+  return <SectionsSheetActions />
+})
+
+const StableThemeSheetActions = memo(function StableThemeSheetActions() {
+  return <ThemeSheetActions />
+})
+
+const StableDecorationsSheetActions = memo(function StableDecorationsSheetActions({
+  scrollContainerRef,
+}: {
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>
+}) {
+  return <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
+})
+
+const StableSettingsContent = memo(function StableSettingsContent() {
+  return <SettingsContent />
+})
+
+const StableThemeSettingsPanel = memo(function StableThemeSettingsPanel() {
+  return <ThemeSettingsPanel />
+})
+
+const StableDecorationsSettingsPanel = memo(function StableDecorationsSettingsPanel() {
+  return <DecorationsSettingsPanel />
+})
+
 interface MobileEditorSheetProps {
   activeTab: MobileEditorTab
   onTabChange: (tab: MobileEditorTab) => void
@@ -51,6 +79,163 @@ interface MobileEditorSheetContentProps {
   onTabPress: (tab: MobileEditorTab) => void
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }
+
+function useManagedInert(
+  ref: React.RefObject<HTMLDivElement | null>,
+  isActive: boolean,
+) {
+  useEffect(() => {
+    if (!ref.current) return
+
+    ref.current.inert = !isActive
+
+    if (isActive) return
+
+    const activeElement = document.activeElement
+    if (activeElement instanceof HTMLElement && ref.current.contains(activeElement)) {
+      activeElement.blur()
+    }
+  }, [isActive, ref])
+}
+
+const MobileSheetNav = memo(function MobileSheetNav({
+  activeTab,
+  onTabPress,
+  dragHandleProps,
+  headerOpacity,
+  handleScale,
+}: {
+  activeTab: MobileEditorTab
+  onTabPress: (tab: MobileEditorTab) => void
+  dragHandleProps: React.HTMLAttributes<HTMLDivElement>
+  headerOpacity: MotionValue<number>
+  handleScale: MotionValue<number>
+}) {
+  return (
+    <motion.div className="relative shrink-0" style={{ opacity: headerOpacity }}>
+      <div
+        {...dragHandleProps}
+        className={cn(
+          dragHandleProps.className,
+          "absolute inset-x-0 top-0 z-10 h-8 -translate-y-2 cursor-grab active:cursor-grabbing",
+        )}
+        aria-label="Drag editor sheet"
+      />
+
+      <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
+        <motion.div className="w-10 h-1 rounded-full bg-foreground/20" style={{ scaleX: handleScale }} />
+      </div>
+
+      <div className="grid h-12 shrink-0 grid-cols-4 pb-2 mb-2">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            aria-label={tab.label}
+            aria-current={activeTab === tab.id ? "page" : undefined}
+            onClick={(e) => {
+              e.currentTarget.blur()
+              onTabPress(tab.id)
+            }}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 transition-colors",
+              activeTab === tab.id ? "text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <tab.icon className="w-4 h-4" aria-hidden="true" />
+            <span className="text-[12px] font-medium tracking-tight">{tab.label}</span>
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  )
+})
+
+const MobileSheetQuickActions = memo(function MobileSheetQuickActions({
+  activeTab,
+  scrollContainerRef,
+  showQuickActions,
+  quickActionsRef,
+  quickActionsHeight,
+  quickActionsOpacity,
+  quickActionsY,
+}: {
+  activeTab: MobileEditorTab
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>
+  showQuickActions: boolean
+  quickActionsRef: React.RefObject<HTMLDivElement | null>
+  quickActionsHeight: MotionValue<number>
+  quickActionsOpacity: MotionValue<number>
+  quickActionsY: MotionValue<number>
+}) {
+  const quickActionPanels = useMemo(
+    () => ({
+      sections: <StableSectionsSheetActions />,
+      background: <StableThemeSheetActions />,
+      decorations: <StableDecorationsSheetActions scrollContainerRef={scrollContainerRef} />,
+    }),
+    [scrollContainerRef],
+  )
+
+  return (
+    <motion.div
+      ref={quickActionsRef}
+      className={cn(
+        "shrink-0 overflow-hidden border-t border-border/30",
+        !showQuickActions && "pointer-events-none",
+      )}
+      style={{
+        height: quickActionsHeight,
+        opacity: quickActionsOpacity,
+        y: quickActionsY,
+      }}
+    >
+      <div className="h-full overflow-x-auto overscroll-x-contain no-scrollbar">
+        <div className="min-w-max">{activeTab !== "design" && quickActionPanels[activeTab]}</div>
+      </div>
+    </motion.div>
+  )
+})
+
+const MobileSheetFullContent = memo(function MobileSheetFullContent({
+  activeTab,
+  isFullOpen,
+  fullContentRef,
+  fullContentOpacity,
+  fullContentY,
+}: {
+  activeTab: MobileEditorTab
+  isFullOpen: boolean
+  fullContentRef: React.RefObject<HTMLDivElement | null>
+  fullContentOpacity: MotionValue<number>
+  fullContentY: MotionValue<number>
+}) {
+  const fullSettingsPanels = useMemo(
+    () => ({
+      sections: <StableSettingsContent />,
+      background: <StableThemeSettingsPanel />,
+      decorations: <StableDecorationsSettingsPanel />,
+    }),
+    [],
+  )
+
+  return (
+    <motion.div
+      ref={fullContentRef}
+      className={cn(
+        "min-h-0 flex-1 overflow-hidden border-t border-border/30",
+        !isFullOpen && "pointer-events-none",
+      )}
+      style={{
+        opacity: fullContentOpacity,
+        y: fullContentY,
+      }}
+    >
+      <div className="h-full overflow-y-auto overscroll-contain">
+        {activeTab !== "design" && fullSettingsPanels[activeTab]}
+      </div>
+    </motion.div>
+  )
+})
 
 function MobileEditorSheetContent({
   activeTab,
@@ -91,113 +276,37 @@ function MobileEditorSheetContent({
   )
   const fullContentY = useTransform(fullContentTransition.visibilityProgress, [0, 1], [18, 0])
 
-  useEffect(() => {
-    if (!quickActionsRef.current) return
-
-    quickActionsRef.current.inert = !showQuickActions
-
-    if (showQuickActions) return
-
-    const activeElement = document.activeElement
-    if (activeElement instanceof HTMLElement && quickActionsRef.current.contains(activeElement)) {
-      activeElement.blur()
-    }
-  }, [showQuickActions])
-
-  useEffect(() => {
-    if (!fullContentRef.current) return
-
-    fullContentRef.current.inert = !isFullContentVisible
-
-    if (isFullContentVisible) return
-
-    const activeElement = document.activeElement
-    if (activeElement instanceof HTMLElement && fullContentRef.current.contains(activeElement)) {
-      activeElement.blur()
-    }
-  }, [isFullContentVisible])
+  useManagedInert(quickActionsRef, showQuickActions)
+  useManagedInert(fullContentRef, isFullContentVisible)
 
   return (
     <div onPointerDown={(e) => e.stopPropagation()} className="flex h-full flex-col overflow-hidden">
       <div className="flex h-full flex-col overflow-hidden">
-        <motion.div className="relative shrink-0" style={{ opacity: headerOpacity }}>
-          <div
-            {...dragHandleProps}
-            className={cn(
-              dragHandleProps.className,
-              "absolute inset-x-0 top-0 z-10 h-8 -translate-y-2 cursor-grab active:cursor-grabbing",
-            )}
-            aria-label="Drag editor sheet"
-          />
+        <MobileSheetNav
+          activeTab={activeTab}
+          onTabPress={onTabPress}
+          dragHandleProps={dragHandleProps}
+          headerOpacity={headerOpacity}
+          handleScale={handleScale}
+        />
 
-          <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
-            <motion.div className="w-10 h-1 rounded-full bg-foreground/20" style={{ scaleX: handleScale }} />
-          </div>
+        <MobileSheetQuickActions
+          activeTab={activeTab}
+          scrollContainerRef={scrollContainerRef}
+          showQuickActions={showQuickActions}
+          quickActionsRef={quickActionsRef}
+          quickActionsHeight={quickActionsHeight}
+          quickActionsOpacity={quickActionsOpacity}
+          quickActionsY={quickActionsY}
+        />
 
-          <div className="grid h-12 shrink-0 grid-cols-4 pb-2 mb-2">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                aria-label={tab.label}
-                aria-current={activeTab === tab.id ? "page" : undefined}
-                onClick={(e) => {
-                  e.currentTarget.blur()
-                  onTabPress(tab.id)
-                }}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 transition-colors",
-                  activeTab === tab.id ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                <tab.icon className="w-4 h-4" aria-hidden="true" />
-                <span className="text-[12px] font-medium tracking-tight">
-                  {tab.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          ref={quickActionsRef}
-          className={cn(
-            "shrink-0 overflow-hidden border-t border-border/30",
-            !showQuickActions && "pointer-events-none",
-          )}
-          style={{
-            height: quickActionsHeight,
-            opacity: quickActionsOpacity,
-            y: quickActionsY,
-          }}
-        >
-          <div className="h-full overflow-x-auto overscroll-x-contain no-scrollbar">
-            <div className="min-w-max">
-              {activeTab === "sections" && <SectionsSheetActions />}
-              {activeTab === "background" && <ThemeSheetActions />}
-              {activeTab === "decorations" && (
-                <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          ref={fullContentRef}
-          className={cn(
-            "min-h-0 flex-1 overflow-hidden border-t border-border/30",
-            !isFullOpen && "pointer-events-none",
-          )}
-          style={{
-            opacity: fullContentOpacity,
-            y: fullContentY,
-          }}
-        >
-          <div className="h-full overflow-y-auto overscroll-contain">
-            {activeTab === "sections" && <SettingsContent />}
-            {activeTab === "background" && <ThemeSettingsPanel />}
-            {activeTab === "decorations" && <DecorationsSettingsPanel />}
-          </div>
-        </motion.div>
+        <MobileSheetFullContent
+          activeTab={activeTab}
+          isFullOpen={isFullOpen}
+          fullContentRef={fullContentRef}
+          fullContentOpacity={fullContentOpacity}
+          fullContentY={fullContentY}
+        />
 
         <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />
       </div>

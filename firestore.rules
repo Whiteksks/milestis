@@ -129,5 +129,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Transactions ─────────────────────────────────────────────────────
+    // Billing and credit history for the current user. Written by Cloud Functions.
+    match /transactions/{transactionId} {
+      allow read: if isAuthed() && isOwner(resource.data.uid);
+      allow write: if false;
+    }
+
   }
 }

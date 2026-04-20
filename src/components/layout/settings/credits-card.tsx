@@ -12,7 +12,7 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
   const t = useTranslations("account.billing.credits")
   const totalCredits = (monthly.total - monthly.used) + bonus.amount + purchased.amount
   const monthlyRemaining = monthly.total - monthly.used
-  const monthlyPercentage = (monthly.used / monthly.total) * 100
+  const monthlyPercentage = monthly.total > 0 ? (monthly.used / monthly.total) * 100 : 0
 
   const types = [
     {
@@ -43,10 +43,10 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
     <div className="rounded-2xl bg-card p-6 shadow-sm">
       {/* Big total */}
       <div className="mb-8">
-        <p className="text-sm text-muted-foreground">Total available</p>
+        <p className="text-sm text-muted-foreground">{t("totalAvailable")}</p>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="font-serif text-5xl font-bold leading-none">{totalCredits}</span>
-          <span className="text-lg text-muted-foreground">credits</span>
+          <span className="text-lg text-muted-foreground">{t("creditsLabel")}</span>
         </div>
       </div>
 

@@ -22,7 +22,7 @@ const PricingPage = () => {
         </div>
       </header>
 
-      <section className="py-12 px-6">
+      <section id="plans" className="py-12 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Explorer Tier */}

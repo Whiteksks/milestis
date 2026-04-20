@@ -1,19 +1,22 @@
 import { Button } from "@/components/ui/button"
 import { CreditCard, MoreHorizontal } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
 
 interface PaymentMethodProps {
   type: string
   last4: string
   expiry: string
   brand?: "visa" | "mastercard" | "amex" | "default"
+  manageHref?: string
 }
 
 export function PaymentMethodCard({
-  type: _type = "Credit Card",
-  last4 = "4242",
-  expiry = "12/24",
-  brand = "visa",
+  type,
+  last4,
+  expiry,
+  brand = "default",
+  manageHref,
 }: PaymentMethodProps) {
   const t = useTranslations("account.billing.payment")
   return (
@@ -31,13 +34,18 @@ export function PaymentMethodCard({
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{brand}</span>
           </div>
           <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">{type}</p>
             <p className="text-sm font-medium">•••• {last4}</p>
             <p className="text-xs text-muted-foreground">{t("expires", { expiry })}</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
-          <MoreHorizontal className="size-4" />
-        </Button>
+        {manageHref ? (
+          <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+            <Link href={manageHref} aria-label={t("manage") ?? "Manage payment method"}>
+              <MoreHorizontal className="size-4" />
+            </Link>
+          </Button>
+        ) : null}
       </div>
     </div>
   )

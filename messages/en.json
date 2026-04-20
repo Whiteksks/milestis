@@ -405,6 +405,7 @@
         "title": "Payment Method",
         "description": "Used for plan upgrades and credit purchases",
         "expires": "Expires {expiry}",
+        "manage": "Manage payment method",
         "type": { "creditCard": "Credit Card" }
       },
       "credits": {
@@ -424,7 +425,27 @@
         "title": "History",
         "description": "Your recent credit usage and invoices",
         "noCredits": "No credit usage history yet.",
-        "noInvoices": "No billing history available."
+        "noInvoices": "No billing history available.",
+        "balanceAfter": "Balance after: {total} credits",
+        "reference": "Ref {id}",
+        "direction": {
+          "in": "Added",
+          "out": "Used",
+          "charge": "Charge",
+          "refund": "Refund"
+        },
+        "types": {
+          "credit": "Credit update",
+          "creditGrant": "Credits added",
+          "creditSpend": "Credits spent",
+          "creditExpire": "Credits expired",
+          "creditAdjustmentIn": "Manual credit increase",
+          "creditAdjustmentOut": "Manual credit decrease",
+          "invoice": "Billing entry",
+          "buyCredits": "Credit purchase",
+          "subscriptionPayment": "Subscription payment",
+          "refund": "Refund"
+        }
       },
       "tabs": { "credits": "Credits Usage", "invoices": "Invoices" }
     },

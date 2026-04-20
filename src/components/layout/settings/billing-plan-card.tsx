@@ -2,17 +2,24 @@ import { Button } from "@/components/ui/button"
 import { Sparkles, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
 
 interface BillingPlanCardProps {
   planName: string
   planDescription: string
   isPro?: boolean
+  upgradeHref: string
+  manageHref: string
+  compareHref: string
 }
 
 export function BillingPlanCard({
   planName = "Free Plan",
   planDescription = "Perfect for trying out Milestis. Create beautiful photo books and share your memories.",
   isPro = false,
+  upgradeHref,
+  manageHref,
+  compareHref,
 }: BillingPlanCardProps) {
   const t = useTranslations("account.billing.plan")
   return (
@@ -32,17 +39,19 @@ export function BillingPlanCard({
 
       <div className="mt-6 flex flex-wrap gap-3">
         {!isPro ? (
-          <Button className="rounded-full gap-2 px-6" size="sm">
-            <Sparkles className="size-3.5" />
-            {t("upgrade")}
+          <Button asChild className="rounded-full gap-2 px-6" size="sm">
+            <Link href={upgradeHref}>
+              <Sparkles className="size-3.5" />
+              {t("upgrade")}
+            </Link>
           </Button>
         ) : (
-          <Button variant="outline" className="rounded-full px-6" size="sm">
-            {t("manage")}
+          <Button asChild variant="outline" className="rounded-full px-6" size="sm">
+            <Link href={manageHref}>{t("manage")}</Link>
           </Button>
         )}
-        <Button variant="ghost" size="sm" className="rounded-full px-6 text-muted-foreground hover:text-foreground">
-          {t("compare")}
+        <Button asChild variant="ghost" size="sm" className="rounded-full px-6 text-muted-foreground hover:text-foreground">
+          <Link href={compareHref}>{t("compare")}</Link>
         </Button>
       </div>
     </div>

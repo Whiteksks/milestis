@@ -15,6 +15,7 @@ import {
   User,
   Plus,
   CrownIcon,
+  Archive,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -36,7 +37,7 @@ function withLocale(locale: string | undefined, href: string) {
 const mainNavItems = [
   { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
   { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
-  { id: "upgrade", labelKey: "nav.upgrade", icon: CrownIcon, href: "/pricing" },
+  { id: "archive", labelKey: "nav.archive", icon: Archive, href: "/dashboard/archive" },
 ]
 
 const settingsLinks = [

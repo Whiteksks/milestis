@@ -101,5 +101,66 @@
     "edited": "Өзгертілді",
     "publish": "Жариялау",
     "unpublish": "Жариялауды алу"
+  },
+  "account": {
+    "billing": {
+      "plan": {
+        "title": "Сіздің жоспарыңыз",
+        "description": "Жазылым мен төлем әдісін басқарыңыз",
+        "upgrade": "Pro-ға өту",
+        "manage": "Жазылымды басқару",
+        "compare": "Жоспарларды салыстыру"
+      },
+      "payment": {
+        "title": "Төлем әдісі",
+        "description": "Жазылым және кредит сатып алу үшін қолданылады",
+        "expires": "Мерзімі {expiry} дейін",
+        "manage": "Төлем әдісін басқару",
+        "type": { "creditCard": "Банк картасы" }
+      },
+      "credits": {
+        "title": "Кредиттер",
+        "description": "Кредиттер фотоальбом жарияланған сайын пайдаланылады",
+        "unavailable": "Кредиттер туралы ақпарат қолжетімсіз.",
+        "totalAvailable": "Барлығы қолжетімді",
+        "creditsLabel": "кредит",
+        "usedOrder": "Пайдалану реті: бонус → айлық → сатып алынған",
+        "items": {
+          "monthly": { "label": "Айлық", "sub": "{total} ішінен · жаңару {resetDate}" },
+          "bonus": { "label": "Бонустық", "sub": "Мерзімсіз" },
+          "purchased": { "label": "Сатып алынған", "sub": "Шектеусіз жарамды" }
+        }
+      },
+      "history": {
+        "title": "Тарих",
+        "description": "Соңғы кредит қолдану және шоттар",
+        "noCredits": "Кредит қолдану тарихы әлі жоқ.",
+        "noInvoices": "Төлем тарихы жоқ.",
+        "balanceAfter": "Операциядан кейінгі баланс: {total} кредит",
+        "reference": "ID {id}",
+        "direction": {
+          "in": "Қосылды",
+          "out": "Жұмсалды",
+          "charge": "Төлем",
+          "refund": "Қайтарым"
+        },
+        "types": {
+          "credit": "Кредит операциясы",
+          "creditGrant": "Кредиттер қосылды",
+          "creditSpend": "Кредиттер жұмсалды",
+          "creditExpire": "Кредиттердің мерзімі бітті",
+          "creditAdjustmentIn": "Қолмен кредит қосу",
+          "creditAdjustmentOut": "Қолмен кредит азайту",
+          "invoice": "Төлем жазбасы",
+          "buyCredits": "Кредит сатып алу",
+          "subscriptionPayment": "Жазылым төлемі",
+          "refund": "Қайтарым"
+        }
+      },
+      "tabs": {
+        "credits": "Кредиттер қолданылуы",
+        "invoices": "Шоттар"
+      }
+    }
   }
 }
