@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useState, useCallback, useEffect, useMemo, useRef } from "react"
-import { motion, useTransform, type MotionValue } from "framer-motion"
+import { motion } from "framer-motion"
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -10,7 +10,6 @@ import type { MobileEditorTab } from "@/editor/lib/editor-tabs"
 import {
   SnapBottomSheet,
   useSnapBottomSheet,
-  useSnapBottomSheetTransition,
 } from "@/components/ui/custom/snap-bottom-sheet"
 
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"
@@ -30,6 +29,11 @@ const SNAP_NAV = "68px"
 const SNAP_ACTIONS = "132px"
 const SNAP_FULL = 0.9
 const SNAPS: (string | number)[] = [SNAP_NAV, SNAP_ACTIONS, SNAP_FULL]
+
+const PANEL_TRANSITION = {
+  duration: 0.24,
+  ease: [0.32, 0.72, 0, 1] as const,
+} as const
 
 const TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
   { id: "sections", icon: Layers, label: "Sections" },
@@ -102,17 +106,19 @@ const MobileSheetNav = memo(function MobileSheetNav({
   activeTab,
   onTabPress,
   dragHandleProps,
-  headerOpacity,
-  handleScale,
+  isExpanded,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
   dragHandleProps: React.HTMLAttributes<HTMLDivElement>
-  headerOpacity: MotionValue<number>
-  handleScale: MotionValue<number>
+  isExpanded: boolean
 }) {
   return (
-    <motion.div className="relative shrink-0" style={{ opacity: headerOpacity }}>
+    <motion.div
+      className="relative shrink-0"
+      animate={{ opacity: isExpanded ? 1 : 0.96 }}
+      transition={PANEL_TRANSITION}
+    >
       <div
         {...dragHandleProps}
         className={cn(
@@ -123,7 +129,11 @@ const MobileSheetNav = memo(function MobileSheetNav({
       />
 
       <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
-        <motion.div className="w-10 h-1 rounded-full bg-foreground/20" style={{ scaleX: handleScale }} />
+        <motion.div
+          className="w-10 h-1 rounded-full bg-foreground/20"
+          animate={{ scaleX: isExpanded ? 1 : 0.94 }}
+          transition={PANEL_TRANSITION}
+        />
       </div>
 
       <div className="grid h-12 shrink-0 grid-cols-4 pb-2 mb-2">
@@ -154,18 +164,16 @@ const MobileSheetQuickActions = memo(function MobileSheetQuickActions({
   activeTab,
   scrollContainerRef,
   showQuickActions,
+  isFullOpen,
   quickActionsRef,
-  quickActionsHeight,
-  quickActionsOpacity,
-  quickActionsY,
+  actionsHeight,
 }: {
   activeTab: MobileEditorTab
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
   showQuickActions: boolean
+  isFullOpen: boolean
   quickActionsRef: React.RefObject<HTMLDivElement | null>
-  quickActionsHeight: MotionValue<number>
-  quickActionsOpacity: MotionValue<number>
-  quickActionsY: MotionValue<number>
+  actionsHeight: number
 }) {
   const quickActionPanels = useMemo(
     () => ({
@@ -180,14 +188,15 @@ const MobileSheetQuickActions = memo(function MobileSheetQuickActions({
     <motion.div
       ref={quickActionsRef}
       className={cn(
-        "shrink-0 overflow-hidden border-t border-border/30",
+        "shrink-0 overflow-hidden border-t border-border/30 transform-gpu [will-change:transform,opacity]",
         !showQuickActions && "pointer-events-none",
       )}
-      style={{
-        height: quickActionsHeight,
-        opacity: quickActionsOpacity,
-        y: quickActionsY,
+      animate={{
+        height: isFullOpen ? 0 : actionsHeight,
+        opacity: showQuickActions ? 1 : 0,
+        y: isFullOpen ? -8 : showQuickActions ? 0 : 10,
       }}
+      transition={PANEL_TRANSITION}
     >
       <div className="h-full overflow-x-auto overscroll-x-contain no-scrollbar">
         <div className="min-w-max">{activeTab !== "design" && quickActionPanels[activeTab]}</div>
@@ -200,14 +209,10 @@ const MobileSheetFullContent = memo(function MobileSheetFullContent({
   activeTab,
   isFullOpen,
   fullContentRef,
-  fullContentOpacity,
-  fullContentY,
 }: {
   activeTab: MobileEditorTab
   isFullOpen: boolean
   fullContentRef: React.RefObject<HTMLDivElement | null>
-  fullContentOpacity: MotionValue<number>
-  fullContentY: MotionValue<number>
 }) {
   const fullSettingsPanels = useMemo(
     () => ({
@@ -222,13 +227,14 @@ const MobileSheetFullContent = memo(function MobileSheetFullContent({
     <motion.div
       ref={fullContentRef}
       className={cn(
-        "min-h-0 flex-1 overflow-hidden border-t border-border/30",
+        "min-h-0 flex-1 overflow-hidden border-t border-border/30 transform-gpu [will-change:transform,opacity]",
         !isFullOpen && "pointer-events-none",
       )}
-      style={{
-        opacity: fullContentOpacity,
-        y: fullContentY,
+      animate={{
+        opacity: isFullOpen && activeTab !== "design" ? 1 : 0,
+        y: isFullOpen ? 0 : 18,
       }}
+      transition={PANEL_TRANSITION}
     >
       <div className="h-full overflow-y-auto overscroll-contain">
         {activeTab !== "design" && fullSettingsPanels[activeTab]}
@@ -248,33 +254,9 @@ function MobileEditorSheetContent({
   const quickActionsRef = useRef<HTMLDivElement | null>(null)
   const fullContentRef = useRef<HTMLDivElement | null>(null)
   const actionsHeight = Math.max(0, (snapHeights[1] ?? 0) - (snapHeights[0] ?? 0))
-  const quickActionsTransition = useSnapBottomSheetTransition({
-    enterBetween: [0, 1],
-    collapseOnUpperSnap: true,
-  })
-  const fullContentTransition = useSnapBottomSheetTransition({
-    enterBetween: [1, 2],
-  })
   const showQuickActions = snap !== SNAP_NAV && !isFullOpen
+  const isExpanded = snap !== SNAP_NAV
   const isFullContentVisible = isFullOpen && activeTab !== "design"
-  const quickActionsHeight = useTransform(
-    quickActionsTransition.visibilityProgress,
-    (value) => actionsHeight * value,
-  )
-  const headerOpacity = useTransform(quickActionsTransition.enterProgress, [0, 1], [0.94, 1])
-  const handleScale = useTransform(quickActionsTransition.enterProgress, [0, 1], [0.94, 1])
-  const quickActionsOpacity = useTransform(
-    quickActionsTransition.visibilityProgress,
-    [0, 0.6, 1],
-    [0, 0.88, 1],
-  )
-  const quickActionsY = useTransform(quickActionsTransition.visibilityProgress, [0, 1], [10, 0])
-  const fullContentOpacity = useTransform(
-    fullContentTransition.visibilityProgress,
-    [0, 0.18, 0.5, 1],
-    [0, 0, 0.75, 1],
-  )
-  const fullContentY = useTransform(fullContentTransition.visibilityProgress, [0, 1], [18, 0])
 
   useManagedInert(quickActionsRef, showQuickActions)
   useManagedInert(fullContentRef, isFullContentVisible)
@@ -286,26 +268,22 @@ function MobileEditorSheetContent({
           activeTab={activeTab}
           onTabPress={onTabPress}
           dragHandleProps={dragHandleProps}
-          headerOpacity={headerOpacity}
-          handleScale={handleScale}
+          isExpanded={isExpanded}
         />
 
         <MobileSheetQuickActions
           activeTab={activeTab}
           scrollContainerRef={scrollContainerRef}
           showQuickActions={showQuickActions}
+          isFullOpen={isFullOpen}
           quickActionsRef={quickActionsRef}
-          quickActionsHeight={quickActionsHeight}
-          quickActionsOpacity={quickActionsOpacity}
-          quickActionsY={quickActionsY}
+          actionsHeight={actionsHeight}
         />
 
         <MobileSheetFullContent
           activeTab={activeTab}
           isFullOpen={isFullOpen}
           fullContentRef={fullContentRef}
-          fullContentOpacity={fullContentOpacity}
-          fullContentY={fullContentY}
         />
 
         <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />

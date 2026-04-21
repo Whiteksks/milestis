@@ -14,7 +14,6 @@ import {
   Shield,
   User,
   Plus,
-  CrownIcon,
   Archive,
 } from "lucide-react"
 

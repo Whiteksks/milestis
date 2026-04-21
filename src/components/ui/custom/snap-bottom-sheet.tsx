@@ -16,11 +16,13 @@ import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
 
-const SHEET_SPRING = {
+const VAUL_EASE = [0.32, 0.72, 0, 1] as const
+
+const SHEET_SNAP_TRANSITION = {
   type: "spring",
-  stiffness: 260,
-  damping: 32,
-  mass: 1.05,
+  stiffness: 300,
+  damping: 30,
+  restDelta: 0.01,
 } as const
 
 const SNAP_VELOCITY_THRESHOLD = 720
@@ -302,7 +304,7 @@ export function SnapBottomSheet<T extends SnapPoint>({
     if (isDraggingRef.current) return
 
     animationRef.current?.stop()
-    animationRef.current = animate(sheetHeight, targetHeight, SHEET_SPRING)
+    animationRef.current = animate(sheetHeight, targetHeight, SHEET_SNAP_TRANSITION)
   }, [isMounted, open, targetHeight, sheetHeight])
 
   useEffect(() => {
@@ -329,7 +331,7 @@ export function SnapBottomSheet<T extends SnapPoint>({
       velocityRef.current = 0
 
       animationRef.current?.stop()
-      animationRef.current = animate(sheetHeight, nextHeight, SHEET_SPRING)
+      animationRef.current = animate(sheetHeight, nextHeight, SHEET_SNAP_TRANSITION)
 
       if (!Object.is(nextPoint, activeSnapPoint)) {
         setActiveSnapPoint(nextPoint)
@@ -412,12 +414,14 @@ export function SnapBottomSheet<T extends SnapPoint>({
       <motion.div
         aria-label={ariaLabel}
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 flex flex-col overflow-hidden pointer-events-auto md:hidden [will-change:transform]",
+          "fixed bottom-0 left-0 right-0 z-50 flex flex-col overflow-hidden pointer-events-auto md:hidden transform-gpu [will-change:transform]",
           className,
         )}
         style={{
           height: maxSnapHeight,
           maxHeight: maxSnapHeight,
+          backdropFilter: isDragging ? "none" : undefined,
+          WebkitBackdropFilter: isDragging ? "none" : undefined,
           y: sheetOffset,
         }}
       >
