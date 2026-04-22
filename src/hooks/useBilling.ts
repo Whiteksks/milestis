@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from "zustand/react/shallow"
 import { auth, db } from '@/lib/firebase'
-import { useUserStore } from "@/hooks/useUserStore"
+import { selectCurrentUid, selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
 import {
   planDisplayName,
   planDescription,
@@ -238,7 +238,11 @@ function extractPaymentMethod(invoices: BillingInvoiceItem[]): BillingPaymentMet
 
 export function useBilling() {
   const { profile, loading, uid } = useUserStore(
-    useShallow((s) => ({ profile: s.profile, loading: s.loading, uid: s.profile?.uid ?? null }))
+    useShallow((s) => ({
+      profile: s.profile,
+      loading: selectProfileHydrating(s),
+      uid: selectCurrentUid(s),
+    }))
   )
 
   const subscription = profile?.subscription ?? null

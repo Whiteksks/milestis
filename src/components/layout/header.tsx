@@ -20,17 +20,9 @@ import {
 } from '@/components/ui/navigation-menu'
 
 import { cn } from '@/lib/utils'
+import { useUserStore } from '@/hooks/useUserStore'
 import HeaderAuthButton from './auth/auth-open-button'
 import Logo from './logo'
-
-function useIsAuthenticated() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  useEffect(() => {
-    const match = document.cookie.match(/(?:^|;\s*)milestis_session=([^;]*)/)
-    setIsAuthenticated(match?.[1] === '1')
-  }, [])
-  return isAuthenticated
-}
 
 const NAVIGATION = [
   { title: 'Features', href: '/features' },
@@ -49,7 +41,8 @@ const Header = ({
   showAuthButton = true,
 }: HeaderProps) => {
 
-  const isAuthenticated = useIsAuthenticated()
+  const profile = useUserStore((state) => state.profile)
+  const isAuthenticated = Boolean(profile)
   const logoHref = isAuthenticated ? '/about' : '/'
   const pathname = usePathname()
   const { scrollY } = useScroll()

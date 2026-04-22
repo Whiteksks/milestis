@@ -8,7 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/dashboard/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
-import { useUserStore } from "@/hooks/useUserStore"
+import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
 import { prefetchActiveProjects } from "@/hooks/useProjectsQuery"
 
 const headerTitles: Record<string, string> = {
@@ -31,16 +31,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const segments = useSelectedLayoutSegments()
   const queryClient = useQueryClient()
-  const { uid, userLoading } = useUserStore(
-    useShallow((s) => ({ uid: s.profile?.uid ?? null, userLoading: s.loading }))
+  const { uid, authLoading } = useUserStore(
+    useShallow((state) => ({ uid: selectCurrentUid(state), authLoading: selectAuthLoading(state) }))
   )
 
   // Kick off the projects fetch as early as possible — before child pages mount.
   // prefetchQuery respects staleTime: if data is fresh it's a no-op.
   useEffect(() => {
-    if (userLoading || !uid) return
+    if (authLoading || !uid) return
     void prefetchActiveProjects(queryClient, uid)
-  }, [uid, userLoading, queryClient])
+  }, [uid, authLoading, queryClient])
 
   const firstSegment = segments[0] ?? ""
   const activeItem = firstSegment === "" ? "dashboard" : firstSegment

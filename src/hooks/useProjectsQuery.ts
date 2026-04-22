@@ -2,7 +2,7 @@ import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { type DocumentData, collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
-import { useUserStore } from '@/hooks/useUserStore'
+import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
 import { getPublishedProjectShareUrl } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 
@@ -91,9 +91,9 @@ async function fetchProjectsByStatus(
 // ─── Internal hook ─────────────────────────────────────────────────────────
 
 function useUidAndLoading() {
-  return useUserStore(useShallow((s) => ({
-    uid: s.profile?.uid ?? null,
-    userLoading: s.loading,
+  return useUserStore(useShallow((state) => ({
+    uid: selectCurrentUid(state),
+    userLoading: selectAuthLoading(state),
   })))
 }
 

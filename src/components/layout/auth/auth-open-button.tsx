@@ -4,15 +4,18 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import ProfileDropdown from "@/components/layout/auth/dropdown-profile"
 import AuthDialogController from "./AuthDialogController"
-import { useUserStore } from "@/hooks/useUserStore"
+import { selectAuthLoading, useUserStore } from "@/hooks/useUserStore"
 import { UserAvatar } from "@/components/shared/user-avatar"
 
 const HeaderAuthButton = () => {
   const [open, setOpen] = useState(false)
-  const { profile, loading } = useUserStore()
+  const { profile, authLoading } = useUserStore((state) => ({
+    profile: state.profile,
+    authLoading: selectAuthLoading(state),
+  }))
 
   // Пока данные грузятся — ничего не показываем во избежание мерцания
-  if (loading) return null
+  if (authLoading) return null
 
   if (profile) {
     return (

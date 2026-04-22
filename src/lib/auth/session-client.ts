@@ -1,0 +1,19 @@
+'use client'
+
+export async function syncServerSession(idToken: string) {
+  await fetch('/api/auth/session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ idToken }),
+    credentials: 'same-origin',
+  })
+}
+
+export async function clearServerSession() {
+  await fetch('/api/auth/session', {
+    method: 'DELETE',
+    credentials: 'same-origin',
+  })
+}

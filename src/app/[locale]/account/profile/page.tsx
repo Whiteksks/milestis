@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { useUserStore } from "@/hooks/useUserStore"
+import { selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,10 @@ import { toastUser } from "@/lib/toast"
 
 export default function ProfileSettings() {
   const t = useTranslations()
-  const { profile, loading } = useUserStore()
+  const { profile, loading } = useUserStore((state) => ({
+    profile: state.profile,
+    loading: selectProfileHydrating(state),
+  }))
   const [publicName, setPublicName] = useState("")
   const [location, setLocation] = useState("")
   const [bio, setBio] = useState("")
@@ -38,8 +41,7 @@ export default function ProfileSettings() {
       profile.profileTemplate?.sociallinks?.link3 ?? "",
       profile.profileTemplate?.sociallinks?.link4 ?? "",
     ] as SocialLinksTuple)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.uid])
+  }, [profile])
 
   const handleEditOpen = () => {
     setEditName(profile?.displayName ?? "")

@@ -16,8 +16,6 @@ import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
 
-const VAUL_EASE = [0.32, 0.72, 0, 1] as const
-
 const SHEET_SNAP_TRANSITION = {
   type: "spring",
   stiffness: 300,

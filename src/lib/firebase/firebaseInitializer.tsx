@@ -1,71 +1,92 @@
 'use client'
 
 import { useEffect } from 'react'
-import { onAuthStateChanged } from 'firebase/auth'
+import { type User, onIdTokenChanged } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
+import { clearServerSession, syncServerSession } from '@/lib/auth/session-client'
 import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
 
-const SESSION_COOKIE = 'milestis_session'
-
-function setSessionCookie(value: '1' | '0') {
-  if (value === '1') {
-    document.cookie = `${SESSION_COOKIE}=1; path=/; SameSite=Lax`
-  } else {
-    document.cookie = `${SESSION_COOKIE}=0; path=/; max-age=0; SameSite=Lax`
+function buildFallbackProfile(user: User) {
+  return {
+    uid: user.uid,
+    displayName: user.displayName ?? 'Без имени',
+    email: user.email ?? null,
+    photoURL: user.photoURL ?? null,
   }
 }
 
 export default function FirebaseInitializer() {
-  const setProfile = useUserStore((state) => state.setProfile)
+  const setAuthLoading = useUserStore((state) => state.setAuthLoading)
+  const setAuthenticatedProfile = useUserStore((state) => state.setAuthenticatedProfile)
   const clearProfile = useUserStore((state) => state.clearProfile)
-  const setLoading = useUserStore((state) => state.setLoading)
 
   useEffect(() => {
-    setLoading(true)
+    setAuthLoading()
 
     let unsubscribeUserDoc: (() => void) | null = null
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (unsubscribeUserDoc) {
+    let currentUserUid: string | null = null
+
+    const unsubscribeAuth = onIdTokenChanged(auth, (user) => {
+      const nextUid = user?.uid ?? null
+
+      if (currentUserUid !== nextUid && unsubscribeUserDoc) {
         unsubscribeUserDoc()
         unsubscribeUserDoc = null
       }
 
+      const isTokenRotation = currentUserUid === nextUid && nextUid !== null
+      currentUserUid = nextUid
+
       if (!user) {
         clearProfile()
-        setSessionCookie('0')
+        void clearServerSession()
         return
       }
 
-      setLoading(true)
+      // On token rotation — only refresh the server session cookie, keep UI state intact.
+      void user.getIdToken().then(
+        (idToken) => syncServerSession(idToken),
+        (err) => {
+          console.error('Ошибка при синхронизации серверной сессии:', err)
+        },
+      )
+
+      if (isTokenRotation) {
+        return
+      }
+
+      const fallbackProfile = buildFallbackProfile(user)
+      setAuthenticatedProfile(fallbackProfile, 'loading')
+
+      if (unsubscribeUserDoc) {
+        return
+      }
+
       const userDocRef = doc(db, 'users', user.uid)
       unsubscribeUserDoc = onSnapshot(
         userDocRef,
         (userSnapshot) => {
           if (userSnapshot.exists()) {
             const data = userSnapshot.data()
-            setProfile({
-              uid: user.uid,
-              displayName: data.displayName ?? user.displayName ?? 'Без имени',
-              email: data.email ?? user.email ?? null,
-              photoURL: data.photoURL ?? user.photoURL ?? null,
+            setAuthenticatedProfile({
+              ...fallbackProfile,
+              displayName: data.displayName ?? fallbackProfile.displayName,
+              email: data.email ?? fallbackProfile.email,
+              photoURL: data.photoURL ?? fallbackProfile.photoURL,
               profileTemplate: data.profileTemplate,
               settings: data.settings,
               subscription: data.subscription,
               balance: data.balance,
               stats: data.stats,
-            })
-            setSessionCookie('1')
+            }, 'ready')
           } else {
-            // Документ ещё не существует — это переходное состояние между
-            // регистрацией и созданием документа через createUser cloud function.
-            // Оставляем loading: true, onSnapshot сработает снова при создании.
-            setLoading(true)
+            setAuthenticatedProfile(fallbackProfile, 'ready')
           }
         },
         (err) => {
           console.error('Ошибка при получении профиля пользователя:', err)
-          clearProfile()
+          setAuthenticatedProfile(fallbackProfile, 'ready')
         }
       )
     })
@@ -74,7 +95,7 @@ export default function FirebaseInitializer() {
       if (unsubscribeUserDoc) unsubscribeUserDoc()
       unsubscribeAuth()
     }
-  }, [setProfile, clearProfile, setLoading])
+  }, [setAuthLoading, setAuthenticatedProfile, clearProfile])
 
   return null
 }

@@ -7,6 +7,7 @@ import { HowItWorksSection } from "@/components/layout/landing/how-it-works-sect
 import { UseCasesSection } from "@/components/layout/landing/use-cases-section";
 import { FeaturesSection } from "@/components/layout/landing/features-section";
 import Header from "@/components/layout/header";
+import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect";
 
 export async function generateMetadata({
   params,
@@ -42,6 +43,7 @@ export async function generateMetadata({
 export default function Home() {
   return (
     <div className="relative">
+      <AuthenticatedRedirect />
       <Header />
       <HeroSection />
       <EmotionalContextSection />

@@ -134,7 +134,7 @@ export function proxy(request: NextRequest) {
   }
 
   // ── Auth-based redirects (main domain only) ───────────────────────────────
-  const isAuthenticated = request.cookies.get(SESSION_COOKIE)?.value === '1';
+  const isAuthenticated = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
   const bare = stripLocale(pathname); // path without locale prefix
 
   // Detect locale for redirect targets

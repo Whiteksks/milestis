@@ -1,4 +1,5 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app"
+import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 
 // Инициализация один раз (Next.js может переиспользовать модуль между запросами)
@@ -20,3 +21,4 @@ if (!getApps().length) {
 }
 
 export const adminDb = getFirestore()
+export const adminAuth = getAuth()

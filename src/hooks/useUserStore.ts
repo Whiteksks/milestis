@@ -8,7 +8,10 @@ import type {
   UserStats,
 } from '@/lib/user';
 
-interface UserProfile {
+export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
+export type ProfileStatus = 'idle' | 'loading' | 'ready';
+
+export interface UserProfile {
   uid: string | null;
   email: string | null;
   displayName: string | null;
@@ -20,21 +23,37 @@ interface UserProfile {
   stats?: UserStats;
 }
 
-interface UserState {
+export interface UserState {
   profile: UserProfile | null;
-  loading: boolean;
-  setProfile: (data: UserProfile | null) => void;
+  authStatus: AuthStatus;
+  profileStatus: ProfileStatus;
+  setAuthLoading: () => void;
+  setAuthenticatedProfile: (data: UserProfile, profileStatus?: Exclude<ProfileStatus, 'idle'>) => void;
   clearProfile: () => void;
-  setLoading: (loading: boolean) => void;
   updateBalance: (balance: UserBalance) => void;
 }
 
+export const selectCurrentUid = (state: UserState) => state.profile?.uid ?? null;
+export const selectAuthLoading = (state: UserState) => state.authStatus === 'loading';
+export const selectProfileHydrating = (state: UserState) =>
+  state.authStatus === 'loading' ||
+  (state.authStatus === 'authenticated' && state.profileStatus === 'loading');
+
 export const useUserStore = create<UserState>((set) => ({
   profile: null,
-  loading: true,
-  setProfile: (data) => set({ profile: data, loading: false }),
-  clearProfile: () => set({ profile: null, loading: false }),
-  setLoading: (loading) => set({ loading }),
+  authStatus: 'loading',
+  profileStatus: 'idle',
+  setAuthLoading: () => set({ profile: null, authStatus: 'loading', profileStatus: 'idle' }),
+  setAuthenticatedProfile: (data, profileStatus = 'ready') => set({
+    profile: data,
+    authStatus: 'authenticated',
+    profileStatus,
+  }),
+  clearProfile: () => set({
+    profile: null,
+    authStatus: 'unauthenticated',
+    profileStatus: 'idle',
+  }),
   updateBalance: (balance) =>
     set((state) =>
       state.profile ? { profile: { ...state.profile, balance } } : {},

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { doc, getDoc } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
-import { useUserStore } from '@/hooks/useUserStore'
+import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
 import { Canvas } from '@/editor/components/editor/canvas'
 import { EditorHeader } from '@/editor/components/editor/layout/editor-header'
 import { FloatingActions } from '@/editor/components/editor/layout/floating-design-buttons'
@@ -30,8 +30,8 @@ export default function EditorPage() {
   const projectId = params.projectId as string
   const locale = params.locale as string
 
-  const { uid, loading: userLoading } = useUserStore(
-    useShallow((s) => ({ uid: s.profile?.uid ?? null, loading: s.loading }))
+  const { uid, authLoading } = useUserStore(
+    useShallow((state) => ({ uid: selectCurrentUid(state), authLoading: selectAuthLoading(state) }))
   )
 
   const setEditorMode = useUiSelector((state) => state.setEditorMode)
@@ -42,7 +42,7 @@ export default function EditorPage() {
   const [loadState, setLoadState] = useState<LoadState>('loading')
 
   useEffect(() => {
-    if (userLoading) return
+    if (authLoading) return
     if (!uid) {
       router.replace(`/${locale}/auth`)
       return
@@ -135,7 +135,7 @@ export default function EditorPage() {
 
     loadProject()
     return () => { cancelled = true; setProjectId(null); setProjectName(null); setIsPublished(false) }
-  }, [projectId, uid, userLoading, locale, router, setEditorMode, setProjectId, setProjectName, setIsPublished])
+  }, [projectId, uid, authLoading, locale, router, setEditorMode, setProjectId, setProjectName, setIsPublished])
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')

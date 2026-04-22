@@ -7,7 +7,7 @@ import { Download, ArrowUpRight, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
-import { useProjectExportsQuery, useArchivedProjectsQuery, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
+import { useProjectExportsQuery, useArchivedProjectsQuery, type DashboardProject, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
 import { cn } from "@/lib/utils"
 import { getProjectConfig } from "@/lib/projects/project-type-config"
 import { getPublishedProjectShareUrl } from "@/lib/slug"
@@ -29,7 +29,7 @@ function ExportRow({
   project 
 }: { 
   record: ProjectExportRecord; 
-  project?: any 
+  project?: DashboardProject 
 }) {
   const config = getProjectConfig(record.mode)
   

@@ -65,7 +65,10 @@ export default function AccountSettings() {
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
-  const { profile, clearProfile } = useUserStore()
+  const { profile, clearProfile } = useUserStore((state) => ({
+    profile: state.profile,
+    clearProfile: state.clearProfile,
+  }))
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     project_updates: true,
     project_reminders: false,
@@ -108,8 +111,7 @@ export default function AccountSettings() {
       personalized_recommendations: n.personalized_recommendations ?? true,
       seasonal_specials: n.seasonal_specials ?? false,
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.uid])
+  }, [profile?.settings?.notifications])
 
   const toggle = (key: NotificationKey, value: boolean) =>
     setNotifications((prev) => ({ ...prev, [key]: value }))

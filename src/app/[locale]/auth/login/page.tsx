@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { CheckCircle2, ArrowLeft, Shield, Zap, Lock, ArrowRight } from "lucide-react"
 import Header from "@/components/layout/header"
+import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect"
 import { sendSignInLinkToEmail } from "@/lib/auth"
 
 export default function LoginPage() {
@@ -51,6 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary/10 flex flex-col">
+      <AuthenticatedRedirect />
       <Header className="absolute top-0 w-full bg-transparent z-50" showAuthButton={false} />
       
       {/* ИНТЕРЕСНЫЙ ФОН:
