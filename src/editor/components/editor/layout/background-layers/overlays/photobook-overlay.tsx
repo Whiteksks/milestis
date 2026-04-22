@@ -95,7 +95,6 @@ const TEXTURES: Record<Exclude<PhotobookTexture, 'none'>, React.CSSProperties> =
       'repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 4px)',
     ].join(', '),
     backgroundColor: 'rgba(250, 248, 245, 0.03)',
-    backgroundAttachment: 'fixed',
     mixBlendMode: 'multiply',
   },
   canvas: {
@@ -106,7 +105,6 @@ const TEXTURES: Record<Exclude<PhotobookTexture, 'none'>, React.CSSProperties> =
       'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
     ].join(', '),
     backgroundColor: 'rgba(253, 251, 248, 0.05)',
-    backgroundAttachment: 'fixed',
     mixBlendMode: 'multiply',
   },
   grain: {
