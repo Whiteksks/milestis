@@ -221,7 +221,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   if (isMobile) {
     return (
-      <MobileDrawer isOpen={isMediaLibraryOpen} onClose={closeMediaLibrary} title="Media Library">
+      <MobileDrawer open={isMediaLibraryOpen} onOpenChange={(v) => { if (!v) closeMediaLibrary() }} title="Media Library" showHeader>
         <div className="flex flex-col gap-4 pb-6">
           {galleryContent}
           <div className="flex justify-end gap-3 pt-4 border-t border-border/50">

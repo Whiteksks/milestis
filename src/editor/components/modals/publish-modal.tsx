@@ -8,14 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-} from '@/components/ui/drawer'
+import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -93,70 +86,64 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
     : 'Choose a memorable link identifier for your photobook.'
 
   if (isMobile) {
+    const mobileFooter = modalData.step === 'slug' ? (
+      <>
+        <Button
+          onClick={modalData.advanceToReview}
+          disabled={!modalData.canProceedToReview}
+          className="gap-2 w-full"
+        >
+          {modalData.isAnalyzing
+            ? <><Loader2 className="size-3 animate-spin" /> Checking…</>
+            : <>Continue <ArrowRight className="size-3" /></>
+          }
+        </Button>
+        <Button variant="ghost" onClick={() => handleClose(false)} className="w-full">
+          Cancel
+        </Button>
+      </>
+    ) : (
+      <>
+        <Button
+          onClick={handlePublish}
+          disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing}
+          className="gap-2 w-full"
+        >
+          {publishMutation.isPending
+            ? <><Loader2 className="size-3 animate-spin" /> Publishing…</>
+            : <><ExternalLink className="size-3" /> Publish</>
+          }
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={modalData.analyzeError ? modalData.advanceToReview : modalData.goBack}
+          disabled={publishMutation.isPending || modalData.isAnalyzing}
+          className="gap-1.5 w-full"
+        >
+          {modalData.analyzeError
+            ? <><RefreshCw className="size-3" /> Try again</>
+            : <><ArrowLeft className="size-3" /> Back</>
+          }
+        </Button>
+      </>
+    )
+
     return (
-      <Drawer open={open} onOpenChange={handleClose}>
-        <DrawerContent className="px-4 pb-2 min-h-96">
-          <DrawerHeader className="px-0 pt-2 pb-0 text-left">
-            <DrawerTitle className="flex items-center gap-2 text-base">
-              {modeIcon}
-              {modalData.step === 'slug' ? step1Title : 'Review & Confirm'}
-            </DrawerTitle>
-            <DrawerDescription className="text-xs sr-only">
-              {modalData.step === 'slug' ? step1Description : 'Review publication details before confirming.'}
-            </DrawerDescription>
-          </DrawerHeader>
-
-          {modalData.step === 'slug' ? (
-            <PublishForm mode={mode} data={modalData} />
-          ) : (
-            <ReviewPane data={modalData} />
-          )}
-
-          <DrawerFooter className="px-0 pt-2">
-            {modalData.step === 'slug' ? (
-              <>
-                <Button
-                  onClick={modalData.advanceToReview}
-                  disabled={!modalData.canProceedToReview}
-                  className="gap-2 w-full"
-                >
-                  {modalData.isAnalyzing
-                    ? <><Loader2 className="size-3 animate-spin" /> Checking…</>
-                    : <>Continue <ArrowRight className="size-3" /></>
-                  }
-                </Button>
-                <Button variant="ghost" onClick={() => handleClose(false)} className="w-full">
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={handlePublish}
-                  disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing}
-                  className="gap-2 w-full"
-                >
-                  {publishMutation.isPending
-                    ? <><Loader2 className="size-3 animate-spin" /> Publishing…</>
-                    : <><ExternalLink className="size-3" /> Publish</>
-                  }
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={modalData.analyzeError ? modalData.advanceToReview : modalData.goBack}
-                  disabled={publishMutation.isPending || modalData.isAnalyzing}
-                  className="gap-1.5 w-full"
-                >
-                  {modalData.analyzeError
-                    ? <><RefreshCw className="size-3" /> Try again</>
-                    : <><ArrowLeft className="size-3" /> Back</>
-                  }
-                </Button>
-              </>
-            )}
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <MobileDrawer
+        open={open}
+        onOpenChange={handleClose}
+        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : 'Review & Confirm'}</span>}
+        description={modalData.step === 'slug' ? step1Description : 'Review publication details before confirming.'}
+        showHeader
+        footer={mobileFooter}
+        bodyClassName="px-2 min-h-64"
+      >
+        {modalData.step === 'slug' ? (
+          <PublishForm mode={mode} data={modalData} />
+        ) : (
+          <ReviewPane data={modalData} />
+        )}
+      </MobileDrawer>
     )
   }
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/firebase/firebase"
-import { doc, getDoc } from "firebase/firestore"
+import { adminDb } from "@/lib/firebase/admin"
 import {
   getSlugModePolicy,
   getSlugReservationDocId,
@@ -36,11 +35,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const snap = await getDoc(
-      doc(db, PUBLISHED_PROJECT_SLUGS_COLLECTION, getSlugReservationDocId(rawMode, slug)),
-    )
+    const snap = await adminDb
+      .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
+      .doc(getSlugReservationDocId(rawMode, slug))
+      .get()
 
-    const takenByOther = snap.exists() && snap.data()?.projectId !== excludeProjectId
+    const takenByOther = snap.exists && snap.data()?.projectId !== excludeProjectId
     return NextResponse.json({ available: !takenByOther })
   } catch {
     return NextResponse.json({ available: false, error: "SERVER_ERROR" }, { status: 500 })

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "ID_TOKEN_REQUIRED" }, { status: 400 })
     }
 
-    await adminAuth.verifyIdToken(idToken, true)
+    await adminAuth.verifyIdToken(idToken)
     const sessionCookie = await adminAuth.createSessionCookie(idToken, {
       expiresIn: SESSION_EXPIRES_MS,
     })
@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
       sessionCookie,
       Math.floor(SESSION_EXPIRES_MS / 1000),
     )
-  } catch {
+  } catch (error) {
+    console.error('[api/auth/session] Failed to create session cookie:', error)
     return NextResponse.json({ error: "INVALID_OR_EXPIRED_TOKEN" }, { status: 401 })
   }
 }

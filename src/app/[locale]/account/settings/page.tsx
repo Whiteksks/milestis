@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useShallow } from "zustand/react/shallow"
 import { signOut } from "firebase/auth"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -65,10 +66,12 @@ export default function AccountSettings() {
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
-  const { profile, clearProfile } = useUserStore((state) => ({
-    profile: state.profile,
-    clearProfile: state.clearProfile,
-  }))
+  const { profile, clearProfile } = useUserStore(
+    useShallow((state) => ({
+      profile: state.profile,
+      clearProfile: state.clearProfile,
+    }))
+  )
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     project_updates: true,
     project_reminders: false,

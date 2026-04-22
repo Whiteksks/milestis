@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
+import { useShallow } from "zustand/react/shallow"
 import { selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
 import { saveUserProfile } from "@/lib/user"
 import { Button } from "@/components/ui/button"
@@ -16,10 +17,12 @@ import { toastUser } from "@/lib/toast"
 
 export default function ProfileSettings() {
   const t = useTranslations()
-  const { profile, loading } = useUserStore((state) => ({
-    profile: state.profile,
-    loading: selectProfileHydrating(state),
-  }))
+  const { profile, loading } = useUserStore(
+    useShallow((state) => ({
+      profile: state.profile,
+      loading: selectProfileHydrating(state),
+    }))
+  )
   const [publicName, setPublicName] = useState("")
   const [location, setLocation] = useState("")
   const [bio, setBio] = useState("")
