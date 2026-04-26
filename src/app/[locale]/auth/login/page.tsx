@@ -5,16 +5,19 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
-import { CheckCircle2, ArrowLeft, Shield, Zap, Lock, ArrowRight } from "lucide-react"
+import { CheckCircle2, ArrowLeft, Zap, ArrowRight, Share, Palette, FlaskConical } from "lucide-react"
 import Header from "@/components/layout/header"
 import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect"
-import { sendSignInLinkToEmail } from "@/lib/auth"
+import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
+import Link from "next/link"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [password, setPassword] = useState("")
 
   const handleSendMagicLink = async () => {
     if (!email) return
@@ -32,53 +35,51 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  const handleSignInWithPassword = async () => {
+    if (!email || !password) return
+    setLoading(true)
+    setError(null)
+    const { success, error } = await signInWithPassword(email, password)
+    if (!success && error) {
+      setError(error)
+    }
+    setLoading(false)
+  }
+
   const features = [
     {
       icon: Zap,
-      title: "Design in 5 Minutes",
-      description: "No passwords required—just a single click to enter."
+      title: "Instant creation",
+      description: "From a collection of moments to a finished story in just five minutes."
     },
     {
-      icon: Shield,
-      title: "Modern Security",
-      description: "Passwordless authentication for the modern web."
+      icon: Palette,
+      title: "Rigid design",
+      description: "Pre-defined aesthetic structures ensure a professional look every single time."
     },
     {
-      icon: Lock,
-      title: "Your Legacy, Protected",
-      description: "Your data and memories belong to you. Safe & secure."
+      icon: Share,
+      title: "Shareable link",
+      description: "Transform your memories into an interactive experience ready for the web."
     }
   ]
-
+  
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary/10 flex flex-col">
       <AuthenticatedRedirect />
       <Header className="absolute top-0 w-full bg-transparent z-50" showAuthButton={false} />
       
-      {/* ИНТЕРЕСНЫЙ ФОН:
-        Мы используем псевдоэлементы для создания мягкого, абстрактного градиента.
-        Radial-gradient создает "пятна" света, а backdrop-blur добавляет глубины.
-      */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div className="hidden md:flex absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-muted rounded-full blur-[100px]" />
-        
-        {/* Subtle noise pattern (optional, requires a small noise png or svg) */}
-        {/* <div className="absolute inset-0 bg-noise opacity-[0.02]" /> */}
       </div>
 
-      {/* Основной контейнер, центрирующий карточку */}
       <main className="flex-1 flex items-center justify-center p-2 md:pt-28 relative z-10">
         
-        {/* FLOATING CARD:
-          Центральная карточка. Мы используем backdrop-blur для эффекта матового стекла,
-          border-border/40 для очень тонкой границы и rounded-3xl для мягкости.
-          Сетка разделяет её на две части на больших экранах.
-        */}
         <Card className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-background/60 backdrop-blur-xl border-border/40 rounded-lg shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-300">
           
           {/* Левая часть (Split): Branding & Features */}
-          <aside className="p-10 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-border/40">
+          <aside className="hidden lg:flex lg:p-16 flex-col justify-between border-b lg:border-b-0 lg:border-r border-border/40">
             <div className="space-y-8">
               <div className="space-y-5 text-center lg:text-left">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
@@ -89,7 +90,7 @@ export default function LoginPage() {
                 </p>
               </div>  
 
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-6 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 pt-6">
                 {features.map((feature, index) => (
                   <div key={index} className="flex gap-4 items-start group p-4 rounded-2xl border border-border/20 bg-background/30 hover:bg-background/50 transition-colors">
                     <div className="w-10 h-10 rounded-xl bg-background border border-border/60 flex items-center justify-center text-primary shrink-0 transition-colors group-hover:border-primary/40">
@@ -108,7 +109,7 @@ export default function LoginPage() {
 
             <div className="pt-10 mt-10 lg:mt-0 border-t border-border/40 text-center lg:text-left">
               <p className="text-xs text-muted-foreground font-light italic font-serif">
-                Trusted by 5,000+ creators globally.
+                Built for digital photobooks, gift links, and client-ready portfolios with a clear visual standard.
               </p>
             </div>
           </aside>
@@ -119,11 +120,25 @@ export default function LoginPage() {
               {!sent ? (
                 <div className="space-y-8">
                   <div className="space-y-2 text-center">
-                    <h2 className="text-3xl font-bold tracking-tight">Sign In</h2>
+                    <h2 className="text-3xl font-bold tracking-tight">Sign In To Milestis</h2>
                     <p className="text-muted-foreground font-light italic font-serif">
                       Enter your email to start creating.
                     </p>
                   </div>
+
+                  {/* Toggle: Test Account */}
+                  <button
+                    type="button"
+                    onClick={() => { setShowPasswordForm(!showPasswordForm); setPassword(""); setError(null); }}
+                    className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-sm font-medium transition-all ${
+                      showPasswordForm
+                        ? "bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400"
+                        : "bg-muted/30 border-border/40 text-muted-foreground hover:text-foreground hover:border-border/70"
+                    }`}
+                  >
+                    <FlaskConical className="w-4 h-4" />
+                    {showPasswordForm ? "Back to Magic Link" : "Test Account"}
+                  </button>
 
                   <div className="space-y-5">
                     <div className="space-y-2">
@@ -141,6 +156,7 @@ export default function LoginPage() {
                       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
                     </div>
 
+                    {!showPasswordForm && (
                     <Button 
                       onClick={handleSendMagicLink}
                       disabled={loading || !email}
@@ -149,35 +165,41 @@ export default function LoginPage() {
                       {loading ? "Sending..." : "Send Magic Link"}
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
+                    )}
 
-                    <div className="relative py-4">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border/40" />
+                    {showPasswordForm && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        <div className="space-y-2">
+                          <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
+                            Password
+                          </Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
+                            className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
+                          />
+                        </div>
+                        <Button
+                          onClick={handleSignInWithPassword}
+                          disabled={loading || !email || !password}
+                          className="w-full h-12 text-base font-semibold rounded-xl bg-amber-500 hover:bg-amber-500/90 text-white shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-all active:scale-95 group"
+                        >
+                          {loading ? "Signing in..." : "Sign In with Password"}
+                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-transparent px-4 text-muted-foreground/40 tracking-widest">
-                          Or continue with
-                        </span>
-                      </div>
-                    </div>
+                    )}
 
-                    <Button 
-                      variant="outline" 
-                      className="w-full h-12 rounded-xl border-border/60 bg-background/50 backdrop-blur-sm hover:bg-muted/30 transition-colors"
-                    >
-                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                      </svg>
-                      Google Account
-                    </Button>
+
                   </div>
 
                   <p className="text-center text-xs text-muted-foreground font-light leading-relaxed pt-6">
                     By signing in, you agree to our <br />
-                    <a href="#" className="underline underline-offset-4 hover:text-foreground">Terms</a> and <a href="#" className="underline underline-offset-4 hover:text-foreground">Privacy Policy</a>.
+                    <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground">Terms</Link> and <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground">Privacy Policy</Link>.
                   </p>
                 </div>
               ) : (

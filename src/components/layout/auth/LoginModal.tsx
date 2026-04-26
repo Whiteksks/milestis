@@ -6,10 +6,9 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Mail, CheckCircle2, ArrowLeft, Sparkles } from "lucide-react"
-import { sendSignInLinkToEmail } from "@/lib/auth"
-import { useTranslations } from "next-intl"
+import { CheckCircle2, ArrowLeft, ArrowRight, FlaskConical } from "lucide-react"
+import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
+import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface LoginModalProps {
@@ -20,7 +19,6 @@ interface LoginModalProps {
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const menuRef = useRef<HTMLDivElement>(null)
   
-  const t = useTranslations()
   const isMobile = useIsMobile()
   const [email, setEmail] = useState("")
 
@@ -31,6 +29,8 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [password, setPassword] = useState("")
 
   const handleSendMagicLink = async () => {
     if (!email) return
@@ -42,7 +42,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     if (success) {
       setSent(true)
     } else if (error) {
-      setError(t(error))
+      setError(error)
     }
 
     setLoading(false)
@@ -53,12 +53,25 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     setError(null)
   }
 
+  const handleSignInWithPassword = async () => {
+    if (!email || !password) return
+    setLoading(true)
+    setError(null)
+    const { success, error } = await signInWithPassword(email, password)
+    if (!success && error) {
+      setError(error)
+    }
+    setLoading(false)
+  }
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setEmail("")
       setSent(false)
       setError(null)
       setLoading(false)
+      setShowPasswordForm(false)
+      setPassword("")
     }
     onOpenChange(open)
   }
@@ -66,105 +79,133 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const innerContent = (
     <div className="p-8">
       {!sent ? (
-        <>
-          <div className="space-y-3 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-              <Sparkles className="h-7 w-7 text-primary" />
-            </div>
-            <h2 className="font-serif text-2xl font-semibold">
-              {t("loginModal.title")}
+        <div className="space-y-8">
+          <div className="space-y-2 text-center">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Sign In To Milestis
             </h2>
-            <p className="text-sm text-muted-foreground">
-              {t("loginModal.description")}
+            <p className="text-muted-foreground font-light italic font-serif">
+              Enter your email to start creating.
             </p>
           </div>
 
-          <div className="mt-8 space-y-4">
+          {/* Toggle: Test Account */}
+          <button
+            type="button"
+            onClick={() => { setShowPasswordForm(!showPasswordForm); setPassword(""); setError(null); }}
+            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-sm font-medium transition-all ${
+              showPasswordForm
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400"
+                : "bg-muted/30 border-border/40 text-muted-foreground hover:text-foreground hover:border-border/70"
+            }`}
+          >
+            <FlaskConical className="w-4 h-4" />
+            {showPasswordForm ? "Back to Magic Link" : "Test Account"}
+          </button>
+
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">{t("loginModal.emailLabel")}</Label>
+              <Label
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70"
+              >
+                Email Address
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t("loginModal.emailPlaceholder")}
+                placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 rounded-xl border-border/50 bg-background px-4"
+                onKeyDown={(e) => e.key === "Enter" && handleSendMagicLink()}
+                className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
               />
               {error && (
-                <p className="text-xs text-destructive">{error}</p>
+                <p className="text-xs text-destructive mt-1">{error}</p>
               )}
-              <p className="text-xs text-muted-foreground">
-                {t("loginModal.noPasswordRequired")}
-              </p>
             </div>
 
+            {!showPasswordForm && (
             <Button
               onClick={handleSendMagicLink}
               disabled={loading || !email}
-              className="h-11 w-full rounded-xl font-medium shadow-sm shadow-primary/20 disabled:opacity-50"
+              className="w-full h-12 text-base font-semibold rounded-xl shadow-lg shadow-primary/5 hover:scale-[1.01] transition-all active:scale-95 group"
             >
-              <Mail className="mr-2 h-4 w-4" />
-              {loading ? t("loginModal.sendingButton") : t("loginModal.sendButton")}
+              {loading ? "Sending..." : "Send Magic Link"}
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
+            )}
 
-            <div className="relative flex items-center py-1">
-              <Separator className="flex-1" />
-              <span className="px-4 text-xs text-muted-foreground">
-                {t("loginModal.orSeparator")}
-              </span>
-              <Separator className="flex-1" />
-            </div>
+            {showPasswordForm && (
+              <div className="space-y-3 animate-in fade-in duration-200">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="password"
+                    className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70"
+                  >
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
+                    className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
+                  />
+                </div>
+                <Button
+                  onClick={handleSignInWithPassword}
+                  disabled={loading || !email || !password}
+                  className="w-full h-12 text-base font-semibold rounded-xl bg-amber-500 hover:bg-amber-500/90 text-white shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-all active:scale-95 group"
+                >
+                  {loading ? "Signing in..." : "Sign In with Password"}
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </div>
+            )}
+          </div>
 
+          <p className="text-center text-xs text-muted-foreground font-light leading-relaxed">
+            By signing in, you agree to our{" "}
+            <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+              Terms
+            </Link>{" "}and{" "}
+            <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>.
+          </p>
+        </div>
+      ) : (
+        <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 mx-auto border border-primary/10 relative">
+            <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl scale-125" />
+            <CheckCircle2 className="h-10 w-10 text-primary relative z-10" />
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Check your inbox
+            </h2>
+            <p className="text-muted-foreground font-light leading-relaxed italic font-serif">
+              We&apos;ve sent a magic link to{" "}
+              <span className="text-foreground not-italic font-sans font-medium">{email}</span>
+            </p>
+          </div>
+
+          <div className="space-y-3">
             <Button
               variant="outline"
-              className="h-11 w-full rounded-xl border-border/50 bg-background font-medium"
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              {t("loginModal.googleButton")}
-            </Button>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10">
-            <CheckCircle2 className="h-7 w-7 text-emerald-600" />
-          </div>
-
-          <h2 className="mt-6 font-serif text-2xl font-semibold">
-            {t("loginModal.checkEmailTitle")}
-          </h2>
-
-          <p className="mt-3 text-muted-foreground">
-            {t("loginModal.checkEmailDescription", { email })}
-          </p>
-
-          <p className="mt-3 text-xs text-muted-foreground/60">
-            {t("loginModal.checkEmailSpam")}
-          </p>
-
-          <div className="mt-8 w-full space-y-2">
-            <Button
-              onClick={handleSendMagicLink}
-              disabled={loading}
-              className="h-11 w-full rounded-xl font-medium"
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              {t("loginModal.resendButton")}
-            </Button>
-
-            <Button
-              variant="ghost"
               onClick={handleChangeEmail}
-              className="h-11 w-full rounded-xl"
+              className="w-full h-12 rounded-xl border-border/60 bg-background/50 hover:bg-muted/30 transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("loginModal.differentEmailButton")}
+              Change Email
             </Button>
+            <p className="text-xs text-muted-foreground font-light">
+              Didn&apos;t receive it? Check your spam folder or try again in a minute.
+            </p>
           </div>
         </div>
       )}

@@ -98,8 +98,8 @@ env:
       - BUILD
       - RUNTIME
 
-  - variable: NEXT_PUBLIC_EXPORT_PROJECT_METADATA_URL
-    value: https://exportprojectmetadata-5h4wes5waq-ez.a.run.app
+  - variable: NEXT_PUBLIC_EXPORT_PROJECT_CONTENT_URL
+    value: https://exportprojectcontent-5h4wes5waq-ez.a.run.app
     availability:
       - BUILD
       - RUNTIME

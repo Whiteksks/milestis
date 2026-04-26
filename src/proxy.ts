@@ -6,6 +6,7 @@ const intlMiddleware = createMiddleware(routing);
 
 const LOCALES = ['en', 'ru', 'kz'];
 const SESSION_COOKIE = 'milestis_session';
+const LOCALE_COOKIE = 'NEXT_LOCALE';
 
 /**
  * Bot/scanner trap patterns — instant 404, no page rendering.
@@ -66,6 +67,11 @@ function isPublishedPhotobookPath(pathname: string): boolean {
   return segments.length === 1;
 }
 
+function getRequestLocale(request: NextRequest): string {
+  const locale = request.cookies.get(LOCALE_COOKIE)?.value;
+  return locale && LOCALES.includes(locale) ? locale : routing.defaultLocale;
+}
+
 /** Routes that require authentication */
 const AUTH_REQUIRED = ['/dashboard', '/account', '/design'];
 
@@ -78,6 +84,14 @@ export function proxy(request: NextRequest) {
   // ── Bot / scanner trap — return bare 404 before any processing ───────────
   if (TRASH_PATTERNS.some((re) => re.test(pathname))) {
     return new NextResponse(null, { status: 404 });
+  }
+
+  // Firebase email action links land on /__/auth/action on the custom domain.
+  // Route them into the app's existing localized completion page.
+  if (pathname === '/__/auth/action') {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${getRequestLocale(request)}/auth/finish`;
+    return NextResponse.rewrite(url);
   }
 
   // API routes are not locale-aware and must bypass next-intl rewrites.

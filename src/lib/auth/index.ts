@@ -1,4 +1,4 @@
-export { sendSignInLinkToEmail, signOutUser } from "./auth"
+export { sendSignInLinkToEmail, signOutUser, signInWithPassword } from "./auth"
 export {
   GOOGLE_PROVIDER_ID,
   EMAIL_PROVIDER_ID,

@@ -1,5 +1,5 @@
 import { auth } from "../firebase/firebase";
-import { AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail, signOut } from "firebase/auth";
+import { AuthError, sendSignInLinkToEmail as firebaseSendSignInLinkToEmail, signOut, signInWithEmailAndPassword as firebaseSignInWithEmailAndPassword } from "firebase/auth";
 import { getFirebaseAuthErrorTranslationKey } from "../firebase/firebase-errors";
 
 export const sendSignInLinkToEmail = async (email: string) => {
@@ -15,6 +15,17 @@ export const sendSignInLinkToEmail = async (email: string) => {
     const authError = error as AuthError;
     const translationKey = getFirebaseAuthErrorTranslationKey(authError.code);
     console.log(translationKey);
+    return { success: false, error: translationKey };
+  }
+};
+
+export const signInWithPassword = async (email: string, password: string) => {
+  try {
+    await firebaseSignInWithEmailAndPassword(auth, email, password);
+    return { success: true, error: null };
+  } catch (error) {
+    const authError = error as AuthError;
+    const translationKey = getFirebaseAuthErrorTranslationKey(authError.code);
     return { success: false, error: translationKey };
   }
 };

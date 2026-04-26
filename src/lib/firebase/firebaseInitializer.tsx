@@ -66,23 +66,37 @@ export default function FirebaseInitializer() {
       const userDocRef = doc(db, 'users', user.uid)
       unsubscribeUserDoc = onSnapshot(
         userDocRef,
-        (userSnapshot) => {
-          if (userSnapshot.exists()) {
-            const data = userSnapshot.data()
-            setAuthenticatedProfile({
-              ...fallbackProfile,
-              displayName: data.displayName ?? fallbackProfile.displayName,
-              email: data.email ?? fallbackProfile.email,
-              photoURL: data.photoURL ?? fallbackProfile.photoURL,
-              profileTemplate: data.profileTemplate,
-              settings: data.settings,
-              subscription: data.subscription,
-              balance: data.balance,
-              stats: data.stats,
-            }, 'ready')
-          } else {
-            setAuthenticatedProfile(fallbackProfile, 'ready')
+        async (userSnapshot) => {
+          if (!userSnapshot.exists()) {
+            // Document missing — likely registration failed mid-flight.
+            // Call createUser Cloud Function to self-heal; it handles duplicates gracefully (409).
+            try {
+              const idToken = await user.getIdToken()
+              const url = process.env.NEXT_PUBLIC_CREATEUSER_URL
+              if (url) {
+                await fetch(url, {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${idToken}` },
+                })
+              }
+            } catch (err) {
+              console.error('Failed to self-heal user document:', err)
+            }
+            // onSnapshot will fire again once the document is created
+            return
           }
+          const data = userSnapshot.data()
+          setAuthenticatedProfile({
+            ...fallbackProfile,
+            displayName: data.displayName ?? fallbackProfile.displayName,
+            email: data.email ?? fallbackProfile.email,
+            photoURL: data.photoURL ?? fallbackProfile.photoURL,
+            profileTemplate: data.profileTemplate,
+            settings: data.settings,
+            subscription: data.subscription,
+            balance: data.balance,
+            stats: data.stats,
+          }, 'ready')
         },
         (err) => {
           console.error('Ошибка при получении профиля пользователя:', err)

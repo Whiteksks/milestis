@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { ref as storageRef, uploadBytesResumable } from "firebase/storage"
 import { Camera, Loader2 } from "lucide-react"
+import BoringAvatar from "boring-avatars"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUserStore } from "@/hooks/useUserStore"
 import { auth, storage } from "@/lib/firebase"
@@ -40,14 +41,6 @@ const SIZE_CLASSES: Record<AvatarSize, string> = {
   xl: "size-25",
 }
 
-const TEXT_SIZES: Record<AvatarSize, string> = {
-  xs: "text-[8px]",
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-xl",
-  xl: "text-2xl",
-}
-
 /**
  * Universal user avatar component.
  *
@@ -72,13 +65,7 @@ export function UserAvatar({
 
   const displayName = profile?.displayName ?? ""
   const photoURL = profile?.photoURL ?? ""
-  const initials =
-    displayName
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || ""
+  const avatarSeed = profile?.uid ?? displayName ?? "default"
 
   const rounded = shape === "square" ? "rounded-2xl" : "rounded-full"
 
@@ -122,10 +109,13 @@ export function UserAvatar({
     <div className={cn("relative group shrink-0", SIZE_CLASSES[size], className)}>
       <Avatar className={cn("size-full", rounded)}>
         <AvatarImage src={photoURL || undefined} alt={displayName || "Avatar"} />
-        <AvatarFallback
-          className={cn(rounded, "font-semibold bg-secondary text-primary", TEXT_SIZES[size])}
-        >
-          {initials}
+        <AvatarFallback className={cn(rounded, "overflow-hidden")}>
+          <BoringAvatar
+            size="100%"
+            name={avatarSeed}
+            variant="beam"
+            colors={["#F4A8C0", "#F9C784", "#C4B5E0", "#9ECFB8", "#89C4D4"]}
+          />
         </AvatarFallback>
       </Avatar>
 
