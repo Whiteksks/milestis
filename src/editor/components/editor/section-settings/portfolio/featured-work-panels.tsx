@@ -310,6 +310,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                     aspectRatio: (activeProject.aspectRatio || "square") as AspectRatio,
                     frameStyle: activeProject.frameStyle,
                     cropData: activeProject.cropData,
+                    aspectRatioBeforeLock: activeProject.aspectRatioBeforeLock,
                   }}
                   onChange={updateActiveProject}
                   onOpenMediaPicker={() => openMediaPicker(ownerId)}

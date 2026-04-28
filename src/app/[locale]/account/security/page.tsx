@@ -151,7 +151,7 @@ export default function SecuritySettings() {
             </div>
 
             {/* ── Google row ── */}
-            <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            {false && <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
                   <FaChrome className="size-5 text-primary" />
@@ -175,7 +175,7 @@ export default function SecuritySettings() {
                       {t("google.cannotDisconnectNote")}
                     </p>
                   )}
-                  {googleError && <p className="text-sm text-destructive mt-1">{g(googleError)}</p>}
+                  {/* {googleError && <p className="text-sm text-destructive mt-1">{g(googleError)}</p>} */}
                 </div>
               </div>
               <div className="shrink-0">
@@ -202,7 +202,7 @@ export default function SecuritySettings() {
                 )}
               </div>
             </div>
-
+            }
           </div>
         </div>
 

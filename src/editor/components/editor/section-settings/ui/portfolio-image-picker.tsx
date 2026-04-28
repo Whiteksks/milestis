@@ -14,6 +14,7 @@ export interface PortfolioImagePickerValue {
   aspectRatio?: AspectRatio
   frameStyle?: FrameStyle
   cropData?: ImageCropData
+  aspectRatioBeforeLock?: AspectRatio
 }
 
 interface PortfolioImagePickerProps {
@@ -42,6 +43,7 @@ export function PortfolioImagePicker({
         aspectRatio: value.aspectRatio ?? "portrait",
         frameStyle: value.frameStyle ?? "soft",
         cropData: value.cropData,
+        aspectRatioBeforeLock: value.aspectRatioBeforeLock,
       }}
       onChange={(patch) => onChange({ ...value, ...patch })}
       onOpenMediaPicker={onOpenMediaPicker}

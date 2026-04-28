@@ -33,6 +33,8 @@ export interface ImagePickerCoreValue {
   cropData?: ImageCropData
   caption?: string
   description?: string
+  /** Ratio saved before entering a locked frame style (e.g. diamond). Restored on exit. */
+  aspectRatioBeforeLock?: AspectRatio
 }
 
 export interface ImagePickerCoreProps {
@@ -61,6 +63,24 @@ export function ImagePickerCore({
   restrictions = {},
 }: ImagePickerCoreProps) {
   const [showStylePicker, setShowStylePicker] = useState(false)
+
+  const handleFrameStyleChange = (newStyle: FrameStyle) => {
+    const currentlyLocked = !!getFrameStyleRestrictions(value.frameStyle).lockedAspectRatio
+    const nextLocked = !!getFrameStyleRestrictions(newStyle).lockedAspectRatio
+
+    const patch = buildFrameStylePatch(newStyle)
+
+    if (!currentlyLocked && nextLocked) {
+      // Entering a locked style — persist current ratio so we can restore it later
+      onChange({ ...patch, aspectRatioBeforeLock: value.aspectRatio })
+    } else if (currentlyLocked && !nextLocked) {
+      // Leaving a locked style — restore the ratio that was active before the lock
+      const restore = value.aspectRatioBeforeLock ?? value.aspectRatio
+      onChange({ ...patch, aspectRatio: restore, aspectRatioBeforeLock: undefined })
+    } else {
+      onChange(patch)
+    }
+  }
 
   const {
     showCrop, setShowCrop,
@@ -125,9 +145,10 @@ if (dense) {
               image={value.image}
               value={value.frameStyle}
               aspectRatio={value.aspectRatio}
-              onChange={(val) => onChange(buildFrameStylePatch(val))}
+              onChange={handleFrameStyleChange}
               onAspectRatioChange={(val) => onChange({ aspectRatio: val, cropData: undefined })}
               onBack={() => setShowStylePicker(false)}
+              restrictions={restrictions}
             />
           </div>
         ) : (
@@ -277,9 +298,10 @@ if (dense) {
             image={value.image}
             value={value.frameStyle}
             aspectRatio={value.aspectRatio}
-            onChange={(val) => onChange(buildFrameStylePatch(val))}
+            onChange={handleFrameStyleChange}
             onAspectRatioChange={(val) => onChange({ aspectRatio: val, cropData: undefined })}
             onBack={() => setShowStylePicker(false)}
+            restrictions={restrictions}
           />
         ) : (
           <>

@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { frameStyles, FRAME_STYLE_CATEGORIES, type FrameStyleConfig } from "@/editor/lib/frame-styles"
 import { getFrameStyleRestrictions } from "@/editor/lib/restrictions/frame-style-restrictions"
+import { type SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
 import type { FrameStyle, FrameStyleCategory, AspectRatio } from "@/editor/lib/types"
 import Image from "next/image"
@@ -19,11 +20,12 @@ interface InlineStylePanelProps {
   onChange: (value: FrameStyle) => void
   onAspectRatioChange: (value: AspectRatio) => void
   onBack: () => void
+  restrictions?: SectionImageRestrictions
 }
 
 type Tab = FrameStyleCategory | "all"
 
-export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspectRatioChange, onBack }: InlineStylePanelProps) {
+export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspectRatioChange, onBack, restrictions = {} }: InlineStylePanelProps) {
   const [tab, setTab] = React.useState<Tab>("all")
 
   const visibleStyles = React.useMemo(() => {
@@ -51,29 +53,31 @@ export function InlineStylePanel({ image, value, aspectRatio, onChange, onAspect
             {frameStyles[value]?.name || "Select style"}
           </span>
         </div>
-        {/* Aspect ratio switcher */}
-        <div className="flex items-center gap-0.5 shrink-0">
-          {(() => {
-            const locked = !!getFrameStyleRestrictions(value).lockedAspectRatio
-            return (Object.keys(aspectRatios) as AspectRatio[]).map((r) => (
-              <Button
-                key={r}
-                variant="ghost"
-                size="sm"
-                onClick={() => onAspectRatioChange(r)}
-                disabled={locked}
-                className={cn(
-                  "px-2 py-1 h-auto text-[11px] font-medium",
-                  aspectRatio === r
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
-              >
-                {RATIO_LABELS[r]}
-              </Button>
-            ))
-          })()}
-        </div>
+        {/* Aspect ratio switcher — hidden when template restricts aspectRatio */}
+        {!restrictions.hideAspectRatio && (
+          <div className="flex items-center gap-0.5 shrink-0">
+            {(() => {
+              const locked = !!getFrameStyleRestrictions(value).lockedAspectRatio
+              return (Object.keys(aspectRatios) as AspectRatio[]).map((r) => (
+                <Button
+                  key={r}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onAspectRatioChange(r)}
+                  disabled={locked}
+                  className={cn(
+                    "px-2 py-1 h-auto text-[11px] font-medium",
+                    aspectRatio === r
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  {RATIO_LABELS[r]}
+                </Button>
+              ))
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Categories */}

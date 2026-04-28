@@ -121,6 +121,7 @@ export function HeroImagePanel() {
             aspectRatio: hero.aspectRatio,
             frameStyle: hero.frameStyle,
             cropData: hero.cropData,
+            aspectRatioBeforeLock: hero.aspectRatioBeforeLock,
           }}
           onChange={(value) =>
             updateSectionContent("hero", {
@@ -128,6 +129,7 @@ export function HeroImagePanel() {
               aspectRatio: value.aspectRatio,
               frameStyle: value.frameStyle,
               cropData: value.cropData,
+              aspectRatioBeforeLock: value.aspectRatioBeforeLock,
             })
           }
           onOpenMediaPicker={() => openMediaPicker(ownerId)}

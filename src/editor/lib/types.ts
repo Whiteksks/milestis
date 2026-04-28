@@ -91,6 +91,7 @@ export interface SectionContent {
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
     cropData?: import('./crop-data').ImageCropData
+    aspectRatioBeforeLock?: AspectRatio
   }
   bio: {
     title: string
@@ -100,6 +101,7 @@ export interface SectionContent {
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
     cropData?: import('./crop-data').ImageCropData
+    aspectRatioBeforeLock?: AspectRatio
     achievements?: string[]
   }
   featuredWork: {
@@ -114,6 +116,7 @@ export interface SectionContent {
       aspectRatio?: AspectRatio
       frameStyle?: FrameStyle
       cropData?: import('./crop-data').ImageCropData
+      aspectRatioBeforeLock?: AspectRatio
     }>
   }
   video: {
@@ -221,6 +224,7 @@ export interface PhotoBlock {
     aspectRatio?: AspectRatio
     frameStyle?: FrameStyle
     cropData?: import('./crop-data').ImageCropData
+    aspectRatioBeforeLock?: AspectRatio
   }>
 }
 

@@ -45,6 +45,7 @@ export function PhotobookImagePicker({
   const aspectRatio = (settings.aspectRatio as AspectRatio) ?? "square"
   const frameStyle = (settings.frameStyle as FrameStyle) ?? "none"
   const cropData = settings.cropData as ImageCropData | undefined
+  const aspectRatioBeforeLock = settings.aspectRatioBeforeLock as AspectRatio | undefined
 
   return (
     <ImagePickerCore
@@ -57,6 +58,7 @@ export function PhotobookImagePicker({
         aspectRatio,
         frameStyle,
         cropData,
+        aspectRatioBeforeLock,
         caption: value.caption,
         description: value.description,
       }}
@@ -67,6 +69,7 @@ export function PhotobookImagePicker({
           frameStyle: patch.frameStyle ?? frameStyle,
           // 'cropData' in patch handles { cropData: undefined } (reset) correctly
           cropData: "cropData" in patch ? (patch.cropData as ImageCropData | undefined) : cropData,
+          aspectRatioBeforeLock: "aspectRatioBeforeLock" in patch ? patch.aspectRatioBeforeLock : aspectRatioBeforeLock,
         }
         onChange({
           ...value,

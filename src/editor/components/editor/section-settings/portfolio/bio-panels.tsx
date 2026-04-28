@@ -81,8 +81,8 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
       <div className={ps.root(true)}>
         <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
         <PortfolioImagePicker
-          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData }}
-          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData })}
+          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData, aspectRatioBeforeLock: bio.aspectRatioBeforeLock }}
+          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData, aspectRatioBeforeLock: value.aspectRatioBeforeLock })}
           onOpenMediaPicker={() => openMediaPicker(ownerId)}
           restrictions={bioRestrictions}
         />
@@ -106,8 +106,8 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
         <div className="absolute -inset-2 rounded-[2rem] bg-muted/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity pointer-events-none" />
         <PortfolioImagePicker
           label=""
-          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData }}
-          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData })}
+          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData, aspectRatioBeforeLock: bio.aspectRatioBeforeLock }}
+          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData, aspectRatioBeforeLock: value.aspectRatioBeforeLock })}
           onOpenMediaPicker={() => openMediaPicker(ownerId)}
           restrictions={bioRestrictions}
         />

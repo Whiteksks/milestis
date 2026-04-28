@@ -9,6 +9,7 @@ import { useUserStore } from "@/hooks/useUserStore"
 import { auth, storage } from "@/lib/firebase"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
+import { Skeleton } from "../ui/skeleton"
 
 
 const AVATAR_MAX_BYTES = 10 * 1024 * 1024 // 10 MB — Cloud Function handles the resize
@@ -58,7 +59,7 @@ export function UserAvatar({
   className,
   onUploaded,
 }: UserAvatarProps) {
-  const { profile } = useUserStore()
+  const { profile, profileStatus } = useUserStore()
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -66,6 +67,10 @@ export function UserAvatar({
   const displayName = profile?.displayName ?? ""
   const photoURL = profile?.photoURL ?? ""
   const avatarSeed = profile?.uid ?? displayName ?? "default"
+  // While waiting for Firestore to hydrate the profile, the seed would temporarily
+  // change from "default" to uid, causing a visible BoringAvatar re-render.
+  // Show a neutral skeleton instead until the profile is fully ready.
+  const isHydrating = profileStatus === 'loading'
 
   const rounded = shape === "square" ? "rounded-2xl" : "rounded-full"
 
@@ -110,12 +115,16 @@ export function UserAvatar({
       <Avatar className={cn("size-full", rounded)}>
         <AvatarImage src={photoURL || undefined} alt={displayName || "Avatar"} />
         <AvatarFallback className={cn(rounded, "overflow-hidden")}>
-          <BoringAvatar
-            size="100%"
-            name={avatarSeed}
-            variant="beam"
-            colors={["#F4A8C0", "#F9C784", "#C4B5E0", "#9ECFB8", "#89C4D4"]}
-          />
+          {isHydrating ? (
+            <Skeleton className="size-full" />
+          ) : (
+            <BoringAvatar
+              size="100%"
+              name={avatarSeed}
+              variant="beam"
+              colors={["#F4A8C0", "#F9C784", "#C4B5E0", "#9ECFB8", "#89C4D4"]}
+            />
+          )}
         </AvatarFallback>
       </Avatar>
 

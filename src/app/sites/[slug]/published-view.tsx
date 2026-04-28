@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { getTheme } from '@/editor/lib/themes'
 import { MODE_REGISTRY } from '@/editor/lib/modes'
@@ -34,6 +35,8 @@ export function PublishedView({
   visibility,
 }: PublishedViewProps) {
   const theme = getTheme(themeId)
+  const isMobile = useIsMobile()
+  const deviceView = isMobile === true ? 'mobile' : 'desktop'
 
   const handleAnchorClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -82,7 +85,7 @@ export function PublishedView({
         <DecorationsLayer
           decorations={decorations}
           selectedId={null}
-          deviceView="desktop"
+          deviceView={deviceView}
           animation={decorationAnimation}
           onUpdate={() => {}}
           onRemove={() => {}}
