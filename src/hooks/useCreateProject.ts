@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { createProject } from "@/lib/projects"
@@ -45,23 +45,26 @@ export function useCreateProject() {
   const queryClient = useQueryClient()
   const uid = useUserStore((s) => s.profile?.uid ?? null)
 
-  const [loadingMode, setLoadingMode] = useState<ProjectMode | null>(null)
+  const [pendingMode, setPendingMode] = useState<ProjectMode | null>(null)
+  const [isPending, startTransition] = useTransition()
 
-  async function handleCreate(mode: ProjectMode) {
-    if (loadingMode) return
-    setLoadingMode(mode)
-    const promise = createProject(randomProjectName(), mode)
-    toastProject.create(promise)
-    try {
-      const projectId = await promise
-      if (uid) {
-        void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+  function handleCreate(mode: ProjectMode) {
+    if (isPending) return
+    setPendingMode(mode)
+    startTransition(async () => {
+      const promise = createProject(randomProjectName(), mode)
+      toastProject.create(promise)
+      try {
+        const projectId = await promise
+        if (uid) {
+          void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+        }
+        router.push(`/${locale}/design/${projectId}/edit`)
+      } catch {
+        setPendingMode(null)
       }
-      router.push(`/${locale}/design/${projectId}/edit`)
-    } catch {
-      setLoadingMode(null)
-    }
+    })
   }
 
-  return { handleCreate, loadingMode }
+  return { handleCreate, loadingMode: isPending ? pendingMode : null }
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, Suspense, useTransition, ViewTransition } from "react"
 import { Search, Plus, Trash2, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -109,6 +109,7 @@ function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string
 
 export default function ProjectsPage() {
   const [view, setView] = useState<"active" | "trash" | "archive">("active")
+  const [, startTransition] = useTransition()
   // Used only for counts/badges — shares the same cache entries as Suspense inner components
   const { data: activeProjects = [] } = useActiveProjectsQuery()
   const { data: trashedProjects = [] } = useTrashedProjectsQuery({ enabled: view === "trash" })
@@ -184,7 +185,7 @@ export default function ProjectsPage() {
                     variant={view === "archive" ? "secondary" : "ghost"}
                     size="icon"
                     className="size-8 rounded-full text-muted-foreground relative"
-                    onClick={() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }}
+                    onClick={() => { startTransition(() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }) }}
                   >
                     <Archive className="size-4" />
                     {archivedProjects.length > 0 && view !== "archive" && (
@@ -198,7 +199,7 @@ export default function ProjectsPage() {
                     variant={view === "trash" ? "secondary" : "ghost"}
                     size="icon"
                     className="size-8 rounded-full text-muted-foreground"
-                    onClick={() => { setView((v) => v === "trash" ? "active" : "trash"); setSearchQuery("") }}
+                    onClick={() => { startTransition(() => { setView((v) => v === "trash" ? "active" : "trash"); setSearchQuery("") }) }}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -213,11 +214,13 @@ export default function ProjectsPage() {
         {userLoading || !uid ? (
           <ProjectsGridSkeleton />
         ) : (
-          <Suspense key={view} fallback={<ProjectsGridSkeleton />}>
-            {view === "active" && <ActiveContent uid={uid} typeFilter={typeFilter} searchQuery={searchQuery} />}
-            {view === "trash" && <TrashContent uid={uid} searchQuery={searchQuery} />}
-            {view === "archive" && <ArchiveContent uid={uid} searchQuery={searchQuery} />}
-          </Suspense>
+          <ViewTransition>
+            <Suspense key={view} fallback={<ProjectsGridSkeleton />}>
+              {view === "active" && <ActiveContent uid={uid} typeFilter={typeFilter} searchQuery={searchQuery} />}
+              {view === "trash" && <TrashContent uid={uid} searchQuery={searchQuery} />}
+              {view === "archive" && <ArchiveContent uid={uid} searchQuery={searchQuery} />}
+            </Suspense>
+          </ViewTransition>
         )}
       </main>
 

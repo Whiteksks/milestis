@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, ViewTransition } from "react"
 import { usePathname, useSelectedLayoutSegments } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { useShallow } from "zustand/react/shallow"
@@ -59,7 +59,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DashboardHeader title={headerTitle} />
           </div>
 
-          <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">{children}</main>
+          <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">
+            <ViewTransition>{children}</ViewTransition>
+          </main>
         </div>
       </SidebarInset>
       <MobileBottomNav activeItem={activeItem} locale={locale} />

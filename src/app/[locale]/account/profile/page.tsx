@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { useShallow } from "zustand/react/shallow"
 import { selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
@@ -27,10 +27,10 @@ export default function ProfileSettings() {
   const [location, setLocation] = useState("")
   const [bio, setBio] = useState("")
   const [socialLinks, setSocialLinks] = useState<SocialLinksTuple>(["" , "", "", ""])
-  const [saving, setSaving] = useState(false)
+  const [isSavingProfile, startSaveProfile] = useTransition()
   const [editing, setEditing] = useState(false)
   const [editName, setEditName] = useState("")
-  const [editSaving, setEditSaving] = useState(false)
+  const [isSavingEdit, startSaveEdit] = useTransition()
   const [editError, setEditError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -52,19 +52,18 @@ export default function ProfileSettings() {
     setEditing(true)
   }
 
-  const handleEditSave = async () => {
-    setEditSaving(true)
+  const handleEditSave = () => {
     setEditError(null)
-    try {
-      if (editName !== (profile?.displayName ?? "")) {
-        await toastUser.saveName(saveUserProfile({ displayName: editName }))
+    startSaveEdit(async () => {
+      try {
+        if (editName !== (profile?.displayName ?? "")) {
+          await toastUser.saveName(saveUserProfile({ displayName: editName }))
+        }
+        setEditing(false)
+      } catch (err: unknown) {
+        setEditError((err as Error).message)
       }
-      setEditing(false)
-    } catch (err: unknown) {
-      setEditError((err as Error).message)
-    } finally {
-      setEditSaving(false)
-    }
+    })
   }
 
   if (loading) {
@@ -74,9 +73,8 @@ export default function ProfileSettings() {
   const displayName = profile?.displayName ?? ""
   const email = profile?.email ?? ""
 
-  const handleSave = async () => {
-    setSaving(true)
-    try {
+  const handleSave = () => {
+    startSaveProfile(async () => {
       await toastUser.saveProfile(
         saveUserProfile({
           profileTemplate: {
@@ -92,9 +90,7 @@ export default function ProfileSettings() {
           },
         })
       )
-    } finally {
-      setSaving(false)
-    }
+    })
   }
 
   return (
@@ -125,11 +121,11 @@ export default function ProfileSettings() {
               </div>
 
               <div className="flex gap-2 shrink-0">
-                <Button variant="outline" size="sm" className="rounded-full px-4" onClick={() => setEditing(false)} disabled={editSaving}>
+                <Button variant="outline" size="sm" className="rounded-full px-4" onClick={() => setEditing(false)} disabled={isSavingEdit}>
                   {t('account.profile.cancel')}
                 </Button>
-                <Button size="sm" className="rounded-full px-4" onClick={handleEditSave} disabled={editSaving}>
-                  {editSaving ? t('account.profile.saving') : t('account.profile.save')}
+                <Button size="sm" className="rounded-full px-4" onClick={handleEditSave} disabled={isSavingEdit}>
+                  {isSavingEdit ? t('account.profile.saving') : t('account.profile.save')}
                 </Button>
               </div>
             </div>
@@ -208,8 +204,8 @@ export default function ProfileSettings() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button className="rounded-full px-8" onClick={handleSave} disabled={saving}>
-              {saving ? t('account.profile.saving') : t('account.profile.saveChanges')}
+            <Button className="rounded-full px-8" onClick={handleSave} disabled={isSavingProfile}>
+              {isSavingProfile ? t('account.profile.saving') : t('account.profile.saveChanges')}
             </Button>
           </div>
         </div>
