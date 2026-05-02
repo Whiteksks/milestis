@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useState } from "react"
 import type { DecorationElement } from "@/editor/lib/types"
 import { useUiStore } from "@/editor/lib/store-ui"
 import { useThemeSelector, useUiSelector, type ThemeCustomDecorations } from "@/editor/lib/store"
@@ -26,10 +26,7 @@ export function useDecorationsToolbar(
     customDecorations: s.customDecorations,
     addDecoration: s.addDecoration,
   }))
-  const allDecorations = useMemo<DecorationElement[]>(
-    () => [...(previewDecorations?.elements ?? []), ...customDecorations],
-    [previewDecorations, customDecorations],
-  )
+  const allDecorations: DecorationElement[] = [...(previewDecorations?.elements ?? []), ...customDecorations]
 
   const { normalizedDecorations, selectedId, handleUpdate, handleRemove } =
     useEditorDecorations(allDecorations)
@@ -38,7 +35,7 @@ export function useDecorationsToolbar(
     return selectedId ?? normalizedDecorations[0]?.id ?? null
   })
 
-  const activeDecorationId = useMemo(() => {
+  const activeDecorationId = (() => {
     if (selectedId) return selectedId
     if (!normalizedDecorations.length) return null
     if (
@@ -47,23 +44,17 @@ export function useDecorationsToolbar(
     )
       return preferredDecorationId
     return normalizedDecorations[0]!.id
-  }, [preferredDecorationId, selectedId, normalizedDecorations])
+  })()
 
-  const selectedDecoration = useMemo(
-    () => normalizedDecorations.find((d) => d.id === selectedId),
-    [selectedId, normalizedDecorations],
-  )
+  const selectedDecoration = normalizedDecorations.find((d) => d.id === selectedId)
 
-  const handleImageSelect = useCallback(
-    async (url: string) => {
-      if (!selectedId) return
-      const aspectRatio = await loadImageAspectRatio(url)
-      handleUpdate(selectedId, { kind: "image", image: url, aspectRatio })
-    },
-    [handleUpdate, selectedId],
-  )
+  const handleImageSelect = async (url: string) => {
+    if (!selectedId) return
+    const aspectRatio = await loadImageAspectRatio(url)
+    handleUpdate(selectedId, { kind: "image", image: url, aspectRatio })
+  }
 
-  const handleLocate = useCallback(() => {
+  const handleLocate = () => {
     if (!selectedDecoration) return
 
     const scroller = scrollContainerRef.current
@@ -83,9 +74,9 @@ export function useDecorationsToolbar(
     const centeredScrollY = targetScrollY - viewportHeight / 2
 
     scroller.scrollTo({ top: Math.max(0, centeredScrollY), behavior: "smooth" })
-  }, [scrollContainerRef, selectedDecoration])
+  }
 
-  const handleAddDecoration = useCallback(() => {
+  const handleAddDecoration = () => {
     if (normalizedDecorations.length >= LIMITS.decorations) return
 
     const scroller = scrollContainerRef.current
@@ -142,7 +133,7 @@ export function useDecorationsToolbar(
 
     addDecoration(newDecoration)
     setSelectedDecorationId(newDecoration.id)
-  }, [scrollContainerRef, normalizedDecorations.length, addDecoration, setSelectedDecorationId])
+  }
 
   return {
     normalizedDecorations,

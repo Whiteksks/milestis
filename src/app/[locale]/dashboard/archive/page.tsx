@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Download, ArrowUpRight, Globe } from "lucide-react"
@@ -112,21 +111,16 @@ export default function ExportsPage() {
   const { data: exports = [], isLoading } = useProjectExportsQuery()
   const { data: archivedProjects = [] } = useArchivedProjectsQuery()
 
-  const archivedMap = useMemo(() => {
-    const m = new Map<string, typeof archivedProjects[number]>()
-    for (const p of archivedProjects) m.set(p.id, p)
-    return m
-  }, [archivedProjects])
+  const archivedMap = new Map<string, typeof archivedProjects[number]>()
+  for (const p of archivedProjects) archivedMap.set(p.id, p)
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, { projectName: string; records: ProjectExportRecord[] }>()
-    for (const record of exports) {
-      const existing = map.get(record.projectId)
-      if (existing) existing.records.push(record)
-      else map.set(record.projectId, { projectName: record.projectName, records: [record] })
-    }
-    return Array.from(map.entries())
-  }, [exports])
+  const groupedMap = new Map<string, { projectName: string; records: ProjectExportRecord[] }>()
+  for (const record of exports) {
+    const existing = groupedMap.get(record.projectId)
+    if (existing) existing.records.push(record)
+    else groupedMap.set(record.projectId, { projectName: record.projectName, records: [record] })
+  }
+  const grouped = Array.from(groupedMap.entries())
 
   return (
     <div className="mx-auto max-w-5xl md:px-4 md:py-8">

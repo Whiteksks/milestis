@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useRef } from 'react'
 import {
   buildPublishedProjectUrl,
   getSlugValidationError,
@@ -34,48 +34,42 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const checkAvailability = useCallback(
-    async (value: string) => {
-      if (!value || value.length < 3) {
-        setSlugStatus('idle')
-        return
-      }
-      if (getSlugValidationError(value)) {
-        setSlugStatus('invalid')
-        return
-      }
-      // Photobooks: uniqueness is checked within the photobook namespace
-      setSlugStatus('checking')
-      try {
-        const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
-        const res = await fetch(`/api/projects/check-slug?${params}`)
-        if (!res.ok) {
-          setSlugStatus('idle')
-          return
-        }
-        const data = await res.json()
-        if (data.error === 'RESERVED_SLUG') {
-          setSlugStatus('reserved')
-          return
-        }
-        setSlugStatus(data.available ? 'available' : 'taken')
-      } catch {
-        setSlugStatus('idle')
-      }
-    },
-    [projectId, mode],
-  )
-
-  const handleSlugChange = useCallback(
-    (value: string) => {
-      const normalized = normalizeSlug(value)
-      setSlug(normalized)
+  const checkAvailability = async (value: string) => {
+    if (!value || value.length < 3) {
       setSlugStatus('idle')
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-      debounceRef.current = setTimeout(() => checkAvailability(normalized), 500)
-    },
-    [checkAvailability],
-  )
+      return
+    }
+    if (getSlugValidationError(value)) {
+      setSlugStatus('invalid')
+      return
+    }
+    // Photobooks: uniqueness is checked within the photobook namespace
+    setSlugStatus('checking')
+    try {
+      const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
+      const res = await fetch(`/api/projects/check-slug?${params}`)
+      if (!res.ok) {
+        setSlugStatus('idle')
+        return
+      }
+      const data = await res.json()
+      if (data.error === 'RESERVED_SLUG') {
+        setSlugStatus('reserved')
+        return
+      }
+      setSlugStatus(data.available ? 'available' : 'taken')
+    } catch {
+      setSlugStatus('idle')
+    }
+  }
+
+  const handleSlugChange = (value: string) => {
+    const normalized = normalizeSlug(value)
+    setSlug(normalized)
+    setSlugStatus('idle')
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => checkAvailability(normalized), 500)
+  }
 
   // Step 1: ready to proceed to review
   const canProceedToReview =
@@ -88,7 +82,7 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
 
   // Transition to step 2: immediately show review pane with loading state,
   // then populate with server response. Also used for retry on error.
-  const advanceToReview = useCallback(async () => {
+  const advanceToReview = async () => {
     if (!canProceedToReview) return
     setStep('review')
     setIsAnalyzing(true)
@@ -103,16 +97,16 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     } finally {
       setIsAnalyzing(false)
     }
-  }, [canProceedToReview, projectId, slug])
+  }
 
-  const goBack = useCallback(() => {
+  const goBack = () => {
     setStep('slug')
     setQuoteData(null)
     setAnalyzeError(null)
-  }, [])
+  }
 
   // Reset all state — called when the modal closes
-  const reset = useCallback(() => {
+  const reset = () => {
     setStep('slug')
     setSlug('')
     setSlugStatus('idle')
@@ -120,7 +114,7 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     setIsAnalyzing(false)
     setAnalyzeError(null)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-  }, [])
+  }
 
   const portfolioUrl =
     mode === 'portfolio' && slug

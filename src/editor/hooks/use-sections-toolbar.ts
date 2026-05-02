@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useModeSections } from "@/editor/hooks/use-mode-sections"
 import { useUiStore } from "@/editor/lib/store"
 import { getSectionQuickActions } from "@/editor/components/editor/section-settings/quick-actions/section-quick-actions"
@@ -23,15 +23,9 @@ export function useSectionsToolbar() {
   const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false)
   const [activeQuickActionId, setActiveQuickActionId] = useState<string | null>(null)
 
-  const currentSection = useMemo(
-    () => sections.find((s) => s.id === resolvedActiveSectionId),
-    [resolvedActiveSectionId, sections],
-  )
+  const currentSection = sections.find((s) => s.id === resolvedActiveSectionId)
 
-  const quickActions = useMemo(
-    () => getSectionQuickActions(editorMode, resolvedActiveSectionId),
-    [editorMode, resolvedActiveSectionId],
-  )
+  const quickActions = getSectionQuickActions(editorMode, resolvedActiveSectionId)
 
   const isQuickActionOpen = (id: string) => activeQuickActionId === id
 

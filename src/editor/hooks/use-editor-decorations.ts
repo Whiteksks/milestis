@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
 import { useUiStore } from "@/editor/lib/store-ui"
 import { useThemeStore } from "@/editor/lib/store-theme"
 import type { DecorationElement, DecorationUpdatePayload } from "@/editor/lib/types"
@@ -23,16 +22,10 @@ export function useEditorDecorations(rawDecorations: DecorationElement[]) {
   const removeDecoration = useThemeStore((s) => s.removeDecoration)
 
   /** Set of ids that belong to user-added (editable) decorations */
-  const editableIdSet = useMemo(
-    () => new Set(customDecorations.map((d) => d.id)),
-    [customDecorations],
-  )
+  const editableIdSet = new Set(customDecorations.map((d) => d.id))
 
   /** Raw decorations normalised so every element has a definite id. */
-  const normalizedDecorations = useMemo(
-    () => rawDecorations.map((d, i) => ({ ...d, id: d.id ?? `decoration-${i}` })),
-    [rawDecorations],
-  )
+  const normalizedDecorations = rawDecorations.map((d, i) => ({ ...d, id: d.id ?? `decoration-${i}` }))
 
   /**
    * The currently selected decoration id, but only when it belongs to the
@@ -43,28 +36,19 @@ export function useEditorDecorations(rawDecorations: DecorationElement[]) {
       ? selectedDecorationId
       : null
 
-  const handleUpdate = useCallback(
-    (id: string, updates: DecorationUpdatePayload) => {
-      if (!editableIdSet.has(id)) return
-      updateDecoration(id, updates as never)
-    },
-    [editableIdSet, updateDecoration],
-  )
+  const handleUpdate = (id: string, updates: DecorationUpdatePayload) => {
+    if (!editableIdSet.has(id)) return
+    updateDecoration(id, updates as never)
+  }
 
-  const handleRemove = useCallback(
-    (id: string) => {
-      if (!editableIdSet.has(id)) return
-      removeDecoration(id)
-    },
-    [editableIdSet, removeDecoration],
-  )
+  const handleRemove = (id: string) => {
+    if (!editableIdSet.has(id)) return
+    removeDecoration(id)
+  }
 
-  const handleSelect = useCallback(
-    (id: string | null) => {
-      setSelectedDecorationId(id)
-    },
-    [setSelectedDecorationId],
-  )
+  const handleSelect = (id: string | null) => {
+    setSelectedDecorationId(id)
+  }
 
   return {
     normalizedDecorations,

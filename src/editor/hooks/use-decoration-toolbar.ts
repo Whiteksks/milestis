@@ -1,4 +1,3 @@
-import { useCallback } from "react"
 import type { DecorationElement } from "../components/editor/layout/decorationEdit/decorationTypes"
 import { clamp, round2 } from "../components/editor/layout/decorationEdit/utils"
 
@@ -34,48 +33,36 @@ export function useDecorationToolbar({
   const opacityPercent = Math.round(clamp(normalizedOpacity, 0, 1) * 100)
   const isFront = zIndex >= 20
 
-  const toggleFlipX = useCallback(() => {
+  const toggleFlipX = () => {
     onUpdate?.({ transform: { ...transform, flipX: !transform?.flipX } })
-  }, [transform, onUpdate])
+  }
 
-  const toggleFlipY = useCallback(() => {
+  const toggleFlipY = () => {
     onUpdate?.({ transform: { ...transform, flipY: !transform?.flipY } })
-  }, [transform, onUpdate])
+  }
 
-  const handleDecorationPick = useCallback(
-    (id: string) => {
-      onActiveDecorationChange(id)
-      onSelectDecoration?.(id)
-    },
-    [onActiveDecorationChange, onSelectDecoration],
-  )
+  const handleDecorationPick = (id: string) => {
+    onActiveDecorationChange(id)
+    onSelectDecoration?.(id)
+  }
 
-  const handleScaleChange = useCallback(
-    (value: number) => {
-      onUpdate?.({
-        scale: round2(clamp(value / 100, MIN_SCALE, MAX_SCALE)),
-      })
-    },
-    [onUpdate],
-  )
+  const handleScaleChange = (value: number) => {
+    onUpdate?.({
+      scale: round2(clamp(value / 100, MIN_SCALE, MAX_SCALE)),
+    })
+  }
 
-  const handleOpacityChange = useCallback(
-    (value: number) => {
-      onUpdate?.({ opacity: round2(clamp(value / 100, 0, 1)) })
-    },
-    [onUpdate],
-  )
+  const handleOpacityChange = (value: number) => {
+    onUpdate?.({ opacity: round2(clamp(value / 100, 0, 1)) })
+  }
 
-  const toggleZIndex = useCallback(() => {
+  const toggleZIndex = () => {
     onUpdate?.({ zIndex: isFront ? 5 : 20 })
-  }, [isFront, onUpdate])
+  }
 
-  const handleResponsiveScaleChange = useCallback(
-    (checked: boolean) => {
-      onUpdate?.({ responsiveScale: checked })
-    },
-    [onUpdate],
-  )
+  const handleResponsiveScaleChange = (checked: boolean) => {
+    onUpdate?.({ responsiveScale: checked })
+  }
 
   return {
     isExpanded,

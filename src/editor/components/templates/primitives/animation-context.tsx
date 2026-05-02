@@ -11,7 +11,7 @@
  * No prop-threading required.
  */
 
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext } from 'react'
 import { MotionConfig, type Transition } from 'framer-motion'
 
 // РІвЂќР‚РІвЂќР‚ Template IDs РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
@@ -126,19 +126,13 @@ export function AnimationProvider({
 }: AnimationProviderProps) {
   const { ease: baseEase } = TEMPLATE_CONFIG[templateId] ?? TEMPLATE_CONFIG['editorial']
 
-  const t = useMemo<AnimationContextValue['t']>(
-    () =>
-      (duration, delay = 0, ease) =>
-        disabled
-          ? { duration: 0, delay: 0 }
-          : { duration, ...(delay > 0 ? { delay } : {}), ease: ease ?? baseEase },
-    [disabled, baseEase],
-  )
+  const t: AnimationContextValue['t'] =
+    (duration, delay = 0, ease) =>
+      disabled
+        ? { duration: 0, delay: 0 }
+        : { duration, ...(delay > 0 ? { delay } : {}), ease: ease ?? baseEase }
 
-  const value = useMemo<AnimationContextValue>(
-    () => ({ disabled, templateId, t }),
-    [disabled, templateId, t],
-  )
+  const value: AnimationContextValue = { disabled, templateId, t }
 
   return (
     <AnimationContext.Provider value={value}>

@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -38,15 +38,12 @@ export function PublishedView({
   const isMobile = useIsMobile()
   const deviceView = isMobile === true ? 'mobile' : 'desktop'
 
-  const handleAnchorClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      if (href.startsWith('#')) {
-        e.preventDefault()
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-      }
-    },
-    [],
-  )
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault()
+      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   const template = MODE_REGISTRY[mode].renderPublished({
     templateId,
@@ -58,10 +55,7 @@ export function PublishedView({
   })
 
   // Ensure every decoration has a stable id (same normalisation as the editor)
-  const decorations = useMemo(
-    () => customDecorations.map((d, i) => ({ ...d, id: d.id ?? `decoration-${i}` })),
-    [customDecorations],
-  )
+  const decorations = customDecorations.map((d, i) => ({ ...d, id: d.id ?? `decoration-${i}` }))
 
   const decorationAnimation = (themeCustomizations.decorationAnimation ?? 'fade') as DecorationAnimation
 

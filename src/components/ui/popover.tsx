@@ -104,23 +104,19 @@ function PopoverContent({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   const viewportPadding = useVisualViewportPadding()
-  const resolvedCollisionPadding = React.useMemo(() => {
-    if (typeof collisionPadding === "number") {
-      return {
+  const resolvedCollisionPadding = typeof collisionPadding === "number"
+    ? {
         top: Math.max(collisionPadding, viewportPadding.top),
         right: Math.max(collisionPadding, viewportPadding.right),
         bottom: Math.max(collisionPadding, viewportPadding.bottom),
         left: Math.max(collisionPadding, viewportPadding.left),
       }
-    }
-
-    return {
-      top: Math.max(collisionPadding?.top ?? 0, viewportPadding.top),
-      right: Math.max(collisionPadding?.right ?? 0, viewportPadding.right),
-      bottom: Math.max(collisionPadding?.bottom ?? 0, viewportPadding.bottom),
-      left: Math.max(collisionPadding?.left ?? 0, viewportPadding.left),
-    }
-  }, [collisionPadding, viewportPadding])
+    : {
+        top: Math.max(collisionPadding?.top ?? 0, viewportPadding.top),
+        right: Math.max(collisionPadding?.right ?? 0, viewportPadding.right),
+        bottom: Math.max(collisionPadding?.bottom ?? 0, viewportPadding.bottom),
+        left: Math.max(collisionPadding?.left ?? 0, viewportPadding.left),
+      }
 
   return (
     <PopoverPrimitive.Portal>

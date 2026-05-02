@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo, useLayoutEffect, useState, useEffect, memo, type CSSProperties } from 'react'
+import { useRef, useLayoutEffect, useState, useEffect, memo, type CSSProperties } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
 import { useUiStore } from '@/editor/lib/store-ui'
 import { getTheme } from '@/editor/lib/themes'
@@ -72,43 +72,34 @@ export function Canvas({
     themeCustomizations: state.themeCustomizations,
   }))
 
-  // Memoize so the theme object reference is stable — prevents templateNode from
-  // re-rendering when unrelated state (e.g. deviceView) changes.
-  const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
+  const theme = getTheme(currentTheme)
   // Each mode's canvasDataSelector subscribes only to its own content slices.
   // Adding a new mode never causes canvas to re-render on unrelated store changes.
   const modeEntry = MODE_REGISTRY[editorMode]
   const modeCanvasData = useContentSelector(modeEntry.canvasDataSelector)
 
-  const templateNode = useMemo(() => {
-    return modeEntry.renderCanvas({
-      templateId: currentTemplateId,
-      theme,
-      ...modeCanvasData,
-    })
-  }, [modeEntry, currentTemplateId, theme, modeCanvasData])
+  const templateNode = modeEntry.renderCanvas({
+    templateId: currentTemplateId,
+    theme,
+    ...modeCanvasData,
+  })
 
-  const allDecorations = useMemo(() => [
+  const allDecorations = [
     ...(previewDecorations?.elements || []),
     ...customDecorations
-  ], [previewDecorations, customDecorations])
+  ]
 
   const decorationAnimation = themeCustomizations.decorationAnimation ?? previewDecorations?.animation ?? 'fade'
 
-  // Only the decorations panel depends on runtime data; sections and theme panels
-  // are now stable memo components, so this object only updates when scrollContainerRef changes.
-  const floatingToolbarPanels = useMemo(
-    () => ({
-      decorations: (
-        <DecorationsFloatingToolbar
-          scrollContainerRef={scrollContainerRef}
-        />
-      ),
-      sections: <StableSectionsPanel />,
-      background: <StableThemePanel />,
-    }),
-    [scrollContainerRef]
-  )
+  const floatingToolbarPanels = {
+    decorations: (
+      <DecorationsFloatingToolbar
+        scrollContainerRef={scrollContainerRef}
+      />
+    ),
+    sections: <StableSectionsPanel />,
+    background: <StableThemePanel />,
+  }
 
   useLayoutEffect(() => {
     const container = scrollContainerRef.current

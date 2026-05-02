@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Search, Plus, Trash2, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -55,23 +55,15 @@ export default function ProjectsPage() {
   const [typeFilter, setTypeFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredActive = useMemo(() => 
-    activeProjects.filter((p) => {
-      const matchesType = typeFilter === "all" || p.mode === typeFilter.replace('s', '')
-      const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesType && matchesSearch
-    }), [activeProjects, typeFilter, searchQuery]
-  )
+  const filteredActive = activeProjects.filter((p) => {
+    const matchesType = typeFilter === "all" || p.mode === typeFilter.replace('s', '')
+    const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesType && matchesSearch
+  })
 
-  const filteredTrash = useMemo(() => 
-    trashedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [trashedProjects, searchQuery]
-  )
+  const filteredTrash = trashedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  const filteredArchive = useMemo(() =>
-    archivedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [archivedProjects, searchQuery]
-  )
+  const filteredArchive = archivedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 md:px-4 md:py-8">

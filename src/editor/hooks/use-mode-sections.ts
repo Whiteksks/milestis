@@ -3,7 +3,6 @@
 import { useContentSelector, useUiSelector, useUiStore, useContentStore } from '@/editor/lib/store'
 import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
 import type { ContentStore } from '@/editor/lib/store-content'
-import { useCallback, useMemo } from 'react'
 
 export function useModeSections() {
   const { editorMode, activeSectionId } = useUiSelector((state) => ({
@@ -12,7 +11,7 @@ export function useModeSections() {
   }))
   const setActiveSectionId = useUiStore((s) => s.setActiveSectionId)
 
-  const modeEntry = useMemo(() => MODE_REGISTRY[editorMode], [editorMode])
+  const modeEntry = MODE_REGISTRY[editorMode]
 
   // Subscribe only to this mode's visibility slice — no cross-mode store subscriptions
   const visibility = useContentSelector(
@@ -24,24 +23,20 @@ export function useModeSections() {
   )
 
   // Map sections with their visibility state
-  const sections = useMemo(
-    () =>
-      modeEntry.sections.map((section) => ({
-        ...section,
-        visible: Boolean(visibility[section.toggleKey]),
-      })),
-    [modeEntry, visibility],
-  )
+  const sections = modeEntry.sections.map((section) => ({
+    ...section,
+    visible: Boolean(visibility[section.toggleKey]),
+  }))
 
   // Unified toggle
-  const toggleVisibility = useCallback((key: string) => {
+  const toggleVisibility = (key: string) => {
     toggle(key)
-  }, [toggle])
+  }
 
-  const resolvedActiveSectionId = useMemo(() => {
+  const resolvedActiveSectionId = (() => {
     if (activeSectionId && sections.some((s) => s.id === activeSectionId)) return activeSectionId
     return modeEntry.defaultActiveSectionId
-  }, [activeSectionId, modeEntry.defaultActiveSectionId, sections])
+  })()
 
   return {
     editorMode,
