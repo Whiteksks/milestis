@@ -3,6 +3,7 @@
 import { getTheme } from '@/editor/lib/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
 import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
+import type { ImageCropData } from '@/editor/lib/crop-data'
 import { previewTheme, type PreviewColors } from './theme-extract'
 import { ScaledWrapper } from './scaled-wrapper'
 import { PORTFOLIO_PREVIEW_REGISTRY, PHOTOBOOK_PREVIEW_REGISTRY } from './template-registry'
@@ -20,12 +21,13 @@ function Fallback({ c }: { c: PC }) {
 
 // ─── sectionContent builders ──────────────────────────────────────────────────
 
-function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio, frameStyle }: {
+function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio, frameStyle, cropData }: {
   title?: string
   subtitle?: string
   heroImageUrl?: string
   aspectRatio?: string
   frameStyle?: string
+  cropData?: ImageCropData
 }): SectionContent {
   return {
     hero: {
@@ -35,15 +37,19 @@ function buildPreviewSectionContent({ title, subtitle, heroImageUrl, aspectRatio
       image: heroImageUrl,
       aspectRatio: (aspectRatio as AspectRatio) ?? 'portrait',
       frameStyle: (frameStyle as FrameStyle) ?? 'none',
+      cropData,
     },
   } as SectionContent
 }
 
-function buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl }: {
+function buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl, aspectRatio, frameStyle, cropData }: {
   title?: string
   subtitle?: string
   date?: string
   heroImageUrl?: string
+  aspectRatio?: string
+  frameStyle?: string
+  cropData?: ImageCropData
 }): PhotobookSectionContent {
   return {
     cover: {
@@ -51,7 +57,15 @@ function buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageU
       subtitle: subtitle,
       date: date,
       images: heroImageUrl
-        ? { id: 'preview', image: heroImageUrl, imageSettings: [{ aspectRatio: 'portrait' as AspectRatio, frameStyle: 'none' as FrameStyle }] }
+        ? {
+            id: 'preview',
+            image: heroImageUrl,
+            imageSettings: [{
+              aspectRatio: (aspectRatio as AspectRatio) ?? 'portrait',
+              frameStyle: (frameStyle as FrameStyle) ?? 'none',
+              cropData,
+            }],
+          }
         : undefined,
     },
     introduction: {},
@@ -73,11 +87,12 @@ interface TemplatePreviewProps {
   date?: string
   aspectRatio?: string
   frameStyle?: string
+  cropData?: ImageCropData
   /** Zoom multiplier for the scaled wrapper. Default 3. Use 4 for smaller cards. */
   zoom?: number
 }
 
-export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subtitle, date, aspectRatio, frameStyle, zoom = 3 }: TemplatePreviewProps) {
+export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subtitle, date, aspectRatio, frameStyle, cropData, zoom = 3 }: TemplatePreviewProps) {
   const c = previewTheme(themeId ?? 'parchment')
   const theme = getTheme(themeId ?? 'parchment')
   const img = heroImageUrl || undefined
@@ -88,7 +103,7 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
   // Portfolio templates
   const HeroComponent = PORTFOLIO_PREVIEW_REGISTRY[templateId ?? '']
   if (HeroComponent) {
-    const sectionContent = buildPreviewSectionContent({ title, subtitle, heroImageUrl: img, aspectRatio, frameStyle })
+    const sectionContent = buildPreviewSectionContent({ title, subtitle, heroImageUrl: img, aspectRatio, frameStyle, cropData })
     return (
       <ScaledWrapper zoom={zoom} background={theme.background}>
         <AnimationProvider templateId={(normalizedId || 'editorial') as TemplateId} disabled>
@@ -101,7 +116,7 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
   // Photobook templates
   const CoverComponent = PHOTOBOOK_PREVIEW_REGISTRY[templateId ?? '']
   if (CoverComponent) {
-    const sectionContent = buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl: img })
+    const sectionContent = buildPreviewPhotobookSectionContent({ title, subtitle, date, heroImageUrl: img, aspectRatio, frameStyle, cropData })
     return (
       <ScaledWrapper zoom={zoom} background={theme.background}>
         <AnimationProvider templateId={(normalizedId || 'lumiere') as TemplateId} disabled>

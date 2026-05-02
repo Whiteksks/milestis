@@ -112,7 +112,8 @@ export function SiteImage({
     ? `${cropData.area.width} / ${cropData.area.height}`
     : `${ASPECT_RATIO_NUM[aspectRatio]}`
 
-  // cropData branch: pure CSS crop using <img> so styles are in SSR HTML from first paint.
+  // Both branches use plain <img> so inline styles are present in SSR HTML from first paint,
+  // preventing the hydration jump that Next.js <Image fill> causes on reload.
   const innerContent = cropData ? (
     <div style={getCropWrapperStyle(cropData)}>
       <FillImg
@@ -124,14 +125,11 @@ export function SiteImage({
       />
     </div>
   ) : (
-    <Image
+    <FillImg
       src={resolvedSrc}
       alt={alt}
-      fill
+      objectFit="cover"
       priority={priority}
-      unoptimized={unoptimized}
-      sizes={sizes}
-      style={{ objectFit: "cover" }}
       className={cn("transition-transform duration-500", imageClassName)}
     />
   )

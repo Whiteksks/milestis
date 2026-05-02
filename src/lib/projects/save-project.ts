@@ -61,7 +61,7 @@ export async function saveProject(
     const payload: Record<string, unknown> = {}
 
     if (updateDashboardMeta) {
-      const preview: Record<string, string> = {
+      const preview: Record<string, unknown> = {
         themeId: currentTheme,
         templateId: currentTemplateId,
       }
@@ -75,6 +75,7 @@ export async function saveProject(
         if (sectionContent.hero.subtitle) preview.subtitle = sectionContent.hero.subtitle
         if (sectionContent.hero.aspectRatio) preview.aspectRatio = sectionContent.hero.aspectRatio
         if (sectionContent.hero.frameStyle) preview.frameStyle = sectionContent.hero.frameStyle
+        if (sectionContent.hero.cropData) preview.cropData = sectionContent.hero.cropData
       } else {
         if (photobookSectionContent.cover.title) preview.title = photobookSectionContent.cover.title
         if (photobookSectionContent.cover.subtitle) preview.subtitle = photobookSectionContent.cover.subtitle
@@ -84,6 +85,9 @@ export async function saveProject(
         }
         if (photobookSectionContent.cover.images?.imageSettings?.[0]?.frameStyle) {
           preview.frameStyle = photobookSectionContent.cover.images.imageSettings[0].frameStyle
+        }
+        if (photobookSectionContent.cover.images?.imageSettings?.[0]?.cropData) {
+          preview.cropData = photobookSectionContent.cover.images.imageSettings[0].cropData
         }
       }
 

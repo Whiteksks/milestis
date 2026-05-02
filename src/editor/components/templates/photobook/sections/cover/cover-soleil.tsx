@@ -19,6 +19,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
   const imageSettings = cover.images?.imageSettings?.[0]
   const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
   const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const cropData = imageSettings?.cropData
 
   return (
     <SectionWrapper
@@ -59,7 +60,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
               className="w-full @sm:w-[70%] @md:w-[40%] @lg:w-[35%] shrink-0"
             >
               <div className={cn(
-                'relative w-full aspect-[3/4] overflow-hidden rounded-[2px] ring-1 ring-current/5',
+                'relative w-full aspect-[4/5] overflow-hidden rounded-[2px] ring-1 ring-current/5',
                 theme.shadow
               )}>
                 <SiteImage
@@ -67,7 +68,6 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
                   alt={cover.title ?? 'Cover'}
                   aspectRatio={aspectRatio}
                   frameStyle={frameStyle}
-                  cropData={imageSettings?.cropData}
                   unoptimized
                   sizes="(max-width: 768px) 80vw, 30vw"
                   priority

@@ -103,6 +103,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
         date={project.preview?.date}
         aspectRatio={project.preview?.aspectRatio}
         frameStyle={project.preview?.frameStyle}
+        cropData={project.preview?.cropData}
         zoom={zoom ?? 3.55}
       />
     ),
@@ -115,6 +116,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
       project.preview?.date,
       project.preview?.aspectRatio,
       project.preview?.frameStyle,
+      project.preview?.cropData,
       zoom,
     ]
   )
