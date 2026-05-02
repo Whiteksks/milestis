@@ -16,6 +16,40 @@ export default function FinishPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  async function completeSignIn(userEmail: string) {
+    try {
+      const credential = await signInWithEmailLink(auth, userEmail, window.location.href);
+      window.localStorage.removeItem('emailForSignIn');
+
+      const idToken = await credential.user.getIdToken();
+      const createUserUrl = process.env.NEXT_PUBLIC_CREATEUSER_URL!;
+      await fetch(createUserUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      setStatus('success');
+      const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
+      setTimeout(() => router.push(isLinkingFlow ? '/account/security' : '/'), 2000);
+    } catch (err: unknown) {
+      setError((err as Error).message);
+      setStatus('error');
+    }
+  }
+
+  async function completeLinkEmail(userEmail: string) {
+    const { success, error } = await completeLinkWithEmailLink(userEmail);
+    if (success) {
+      setStatus('link-success');
+      setTimeout(() => router.push('/account/security'), 2000);
+    } else {
+      setError(error ?? 'An error occurred while linking.');
+      setStatus('error');
+    }
+  }
+
   useEffect(() => {
     if (!isSignInWithEmailLink(auth, window.location.href)) {
       setError('Invalid sign-in link.');
@@ -55,40 +89,6 @@ export default function FinishPage() {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const completeSignIn = async (userEmail: string) => {
-    try {
-      const credential = await signInWithEmailLink(auth, userEmail, window.location.href);
-      window.localStorage.removeItem('emailForSignIn');
-
-      const idToken = await credential.user.getIdToken();
-      const createUserUrl = process.env.NEXT_PUBLIC_CREATEUSER_URL!;
-      await fetch(createUserUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-      });
-
-      setStatus('success');
-      const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';
-      setTimeout(() => router.push(isLinkingFlow ? '/account/security' : '/'), 2000);
-    } catch (err: unknown) {
-      setError((err as Error).message);
-      setStatus('error');
-    }
-  };
-
-  const completeLinkEmail = async (userEmail: string) => {
-    const { success, error } = await completeLinkWithEmailLink(userEmail);
-    if (success) {
-      setStatus('link-success');
-      setTimeout(() => router.push('/account/security'), 2000);
-    } else {
-      setError(error ?? 'An error occurred while linking.');
-      setStatus('error');
-    }
-  };
 
   const handleManualEmailSubmit = async () => {
     if (!email) {

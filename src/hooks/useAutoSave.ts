@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useUiStore } from '@/editor/lib/store-ui'
 import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
@@ -39,7 +39,7 @@ export function useAutoSave(projectId: string) {
   }, [markDirty])
 
   // ── Core save ─────────────────────────────────────────────────────────
-  const save = async () => {
+  const save = useCallback(async () => {
     if (savingRef.current || !useUiStore.getState().isDirty) return
     savingRef.current = true
     try {
@@ -50,7 +50,7 @@ export function useAutoSave(projectId: string) {
     } finally {
       savingRef.current = false
     }
-  }
+  }, [projectId, markClean])
 
   // ── visibilitychange: save when tab loses focus ───────────────────────
   useEffect(() => {

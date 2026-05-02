@@ -59,7 +59,7 @@ export function UserAvatar({
   className,
   onUploaded,
 }: UserAvatarProps) {
-  const { profile, profileStatus } = useUserStore()
+  const { profile, profileStatus, authStatus } = useUserStore()
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -67,10 +67,9 @@ export function UserAvatar({
   const displayName = profile?.displayName ?? ""
   const photoURL = profile?.photoURL ?? ""
   const avatarSeed = profile?.uid ?? displayName ?? "default"
-  // While waiting for Firestore to hydrate the profile, the seed would temporarily
-  // change from "default" to uid, causing a visible BoringAvatar re-render.
-  // Show a neutral skeleton instead until the profile is fully ready.
-  const isHydrating = profileStatus === 'loading'
+  // Show skeleton until auth + profile are both fully resolved, so BoringAvatar
+  // never renders with a temporary seed (e.g. "default" before uid is known).
+  const isHydrating = authStatus === 'loading' || (authStatus === 'authenticated' && profileStatus === 'loading')
 
   const rounded = shape === "square" ? "rounded-2xl" : "rounded-full"
 

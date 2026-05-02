@@ -1,15 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { Search, Plus, Trash2, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useShallow } from "zustand/react/shallow"
 import { ProjectCard } from "@/components/layout/dashboard/project-card"
 import { EmptyState } from "@/components/layout/dashboard/empty-state"
 import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
-import { useActiveProjectsQuery, useTrashedProjectsQuery, useArchivedProjectsQuery } from "@/hooks/useProjectsQuery"
+import {
+  useActiveProjectsQuery,
+  useArchivedProjectsQuery,
+  useTrashedProjectsQuery,
+  useSuspenseActiveProjectsQuery,
+  useSuspenseDeletedProjectsQuery,
+  useSuspenseArchivedProjectsQuery,
+} from "@/hooks/useProjectsQuery"
+import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
 
 function NoResults() {
   return (
@@ -46,24 +55,71 @@ function ArchiveEmpty() {
     </div>
   )
 }
-export default function ProjectsPage() {
-  const [view, setView] = useState<"active" | "trash" | "archive">("active")
-  const { data: activeProjects = [], isLoading } = useActiveProjectsQuery()
-  const { data: trashedProjects = [], isLoading: trashLoading } = useTrashedProjectsQuery({ enabled: view === "trash" })
-  const { data: archivedProjects = [], isLoading: archiveLoading } = useArchivedProjectsQuery({ enabled: view === "archive" })
-  const [modalOpen, setModalOpen] = useState(false)
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredActive = activeProjects.filter((p) => {
+function ProjectsGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ActiveContent({ uid, typeFilter, searchQuery }: { uid: string; typeFilter: string; searchQuery: string }) {
+  const { data: projects } = useSuspenseActiveProjectsQuery(uid)
+  const filtered = projects.filter((p) => {
     const matchesType = typeFilter === "all" || p.mode === typeFilter.replace('s', '')
     const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesType && matchesSearch
   })
+  if (projects.length === 0) return <EmptyState />
+  if (filtered.length === 0) return <NoResults />
+  return (
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
+    </div>
+  )
+}
 
-  const filteredTrash = trashedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+function TrashContent({ uid, searchQuery }: { uid: string; searchQuery: string }) {
+  const { data: projects } = useSuspenseDeletedProjectsQuery(uid)
+  const filtered = projects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  if (filtered.length === 0) return <TrashEmpty />
+  return (
+    <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+      {filtered.map((p) => <ProjectCard key={p.id} project={p} trash />)}
+    </div>
+  )
+}
 
-  const filteredArchive = archivedProjects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string }) {
+  const { data: projects } = useSuspenseArchivedProjectsQuery(uid)
+  const filtered = projects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  if (filtered.length === 0) return <ArchiveEmpty />
+  return (
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      {filtered.map((p) => <ProjectCard key={p.id} project={p} archive />)}
+    </div>
+  )
+}
+
+export default function ProjectsPage() {
+  const [view, setView] = useState<"active" | "trash" | "archive">("active")
+  // Used only for counts/badges — shares the same cache entries as Suspense inner components
+  const { data: activeProjects = [] } = useActiveProjectsQuery()
+  const { data: trashedProjects = [] } = useTrashedProjectsQuery({ enabled: view === "trash" })
+  const { data: archivedProjects = [] } = useArchivedProjectsQuery({ enabled: view === "archive" })
+  const [modalOpen, setModalOpen] = useState(false)
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const { uid, userLoading } = useUserStore(
+    useShallow((state) => ({ uid: selectCurrentUid(state), userLoading: selectAuthLoading(state) }))
+  )
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 md:px-4 md:py-8">
@@ -154,35 +210,14 @@ export default function ProjectsPage() {
 
       {/* Контентная область */}
       <main className="min-h-[400px]">
-        {isLoading || (view === "trash" && trashLoading) || (view === "archive" && archiveLoading) ? (
-          <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))}
-          </div>
-        ) : view === "trash" ? (
-          filteredTrash.length === 0 ? <TrashEmpty /> : (
-            <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
-              {filteredTrash.map((p) => <ProjectCard key={p.id} project={p} trash />)}
-            </div>
-          )
-        ) : view === "archive" ? (
-          filteredArchive.length === 0 ? <ArchiveEmpty /> : (
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-              {filteredArchive.map((p) => <ProjectCard key={p.id} project={p} archive />)}
-            </div>
-          )
-        ) : activeProjects.length === 0 ? (
-          <EmptyState />
-        ) : filteredActive.length === 0 ? (
-          <NoResults />
+        {userLoading || !uid ? (
+          <ProjectsGridSkeleton />
         ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            {filteredActive.map((p) => <ProjectCard key={p.id} project={p} />)}
-          </div>
+          <Suspense key={view} fallback={<ProjectsGridSkeleton />}>
+            {view === "active" && <ActiveContent uid={uid} typeFilter={typeFilter} searchQuery={searchQuery} />}
+            {view === "trash" && <TrashContent uid={uid} searchQuery={searchQuery} />}
+            {view === "archive" && <ArchiveContent uid={uid} searchQuery={searchQuery} />}
+          </Suspense>
         )}
       </main>
 

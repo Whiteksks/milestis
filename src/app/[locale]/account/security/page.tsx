@@ -24,7 +24,7 @@ export default function SecuritySettings() {
 
   // Google sign-in method state
   const [googleLoading, setGoogleLoading] = useState(false)
-  const [googleError, setGoogleError] = useState<string | null>(null)
+  const [_googleError, setGoogleError] = useState<string | null>(null)
 
   // Email linking state (used when the account was created via Google)
   const [emailInput, setEmailInput] = useState("")

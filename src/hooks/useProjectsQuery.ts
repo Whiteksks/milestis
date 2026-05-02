@@ -1,4 +1,4 @@
-import { useQuery, type QueryClient } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery, type QueryClient } from '@tanstack/react-query'
 import { type DocumentData, collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
@@ -110,9 +110,41 @@ export function getActiveProjectsQueryOptions(uid: string) {
   } as const
 }
 
+export function getDeletedProjectsQueryOptions(uid: string) {
+  return {
+    queryKey: projectKeys.deleted(uid),
+    queryFn: () => fetchProjectsByStatus(uid, 'deleted'),
+    staleTime: STALE_TIME,
+  } as const
+}
+
+export function getArchivedProjectsQueryOptions(uid: string) {
+  return {
+    queryKey: projectKeys.archived(uid),
+    queryFn: () => fetchProjectsByStatus(uid, 'archived'),
+    staleTime: STALE_TIME,
+  } as const
+}
+
 /** Prefetch active projects into the query cache. No-op if data is still fresh. */
 export function prefetchActiveProjects(queryClient: QueryClient, uid: string) {
   return queryClient.prefetchQuery(getActiveProjectsQueryOptions(uid))
+}
+
+// ─── Suspense queries ──────────────────────────────────────────────────────
+// Use these inside components wrapped with <Suspense>. The uid must be
+// non-null (guard with an auth check before rendering these components).
+
+export function useSuspenseActiveProjectsQuery(uid: string) {
+  return useSuspenseQuery(getActiveProjectsQueryOptions(uid))
+}
+
+export function useSuspenseDeletedProjectsQuery(uid: string) {
+  return useSuspenseQuery(getDeletedProjectsQueryOptions(uid))
+}
+
+export function useSuspenseArchivedProjectsQuery(uid: string) {
+  return useSuspenseQuery(getArchivedProjectsQueryOptions(uid))
 }
 
 // ─── Queries ───────────────────────────────────────────────────────────────
