@@ -14,6 +14,7 @@ import { DecorationsFloatingToolbar } from '@/editor/components/editor/layout/Fl
 import { SectionsToolbarPanel } from '@/editor/components/editor/layout/FloatingActions/sections-floating-menu'
 import { ThemeFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/theme-floating-toolbar'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { SectionRegistryProvider } from '@/editor/lib/section-registry-context'
 
 // Stable panel components — defined outside Canvas so they are never recreated on re-render.
 // SectionsToolbarPanel and ThemeFloatingToolbar have no props that change per Canvas render.
@@ -152,6 +153,7 @@ export function Canvas({
         />
 
         <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
+            <SectionRegistryProvider>
             <div
               data-canvas-content-root="true"
               className={cn(
@@ -177,6 +179,7 @@ export function Canvas({
               */}
               <div className="h-20 md:h-12 pointer-events-none select-none" aria-hidden="true" />
             </div>
+            </SectionRegistryProvider>
         </div>
       </div>
     </div>

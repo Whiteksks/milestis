@@ -13,6 +13,12 @@ export interface UseDecorationDragOptions {
   boundsRef: RefObject<HTMLElement | null>
   /** Callback to commit position as percentages, optionally with the detected section anchor. */
   onCommit: (position: DecorationPosition, sectionId?: string) => void
+  /**
+   * Returns the registered canvas sections so commitDrag can detect which
+   * section a decoration was dropped onto without traversing the DOM.
+   * When omitted, section detection is skipped.
+   */
+  getSections?: () => Array<{ id: string; getRect: () => DOMRect | null }>
 }
 
 export interface UseDecorationDragReturn {
@@ -22,51 +28,46 @@ export interface UseDecorationDragReturn {
   commitDrag: (element: HTMLElement) => void
 }
 
+/** All mutable state for a single drag session. Null when not dragging. */
+type DragSession = {
+  constraints: DragBox
+  activeEl: HTMLElement
+  scrollEl: HTMLElement | null
+  pointerId: number
+  startClientX: number
+  startClientY: number
+  lastClientX: number
+  lastClientY: number
+  startDragX: number
+  startDragY: number
+  startScrollLeft: number
+  startScrollTop: number
+  autoScrollVX: number
+  autoScrollVY: number
+  autoScrollRafId: number | null
+  abortController: AbortController
+}
+
 const EDGE_SCROLL_THRESHOLD_PX = 48
 const EDGE_SCROLL_MAX_PX_PER_FRAME = 16
 
-export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDecorationDragOptions): UseDecorationDragReturn {
+export function useDecorationDrag({ decorationId, boundsRef, onCommit, getSections }: UseDecorationDragOptions): UseDecorationDragReturn {
   const dragX = useMotionValue(0)
   const dragY = useMotionValue(0)
 
-  const constraintsRef = useRef<DragBox | undefined>(undefined)
-  const activeElRef = useRef<HTMLElement | null>(null)
-  const scrollElRef = useRef<HTMLElement | null>(null)
-  const cleanupRef = useRef<(() => void) | null>(null)
-  const autoScrollRafRef = useRef<number | null>(null)
-  const autoScrollVXRef = useRef(0)
-  const autoScrollVYRef = useRef(0)
-
-  const isDraggingRef = useRef(false)
-  const pointerIdRef = useRef<number | null>(null)
-
-  const startClientXRef = useRef(0)
-  const startClientYRef = useRef(0)
-  const lastClientXRef = useRef(0)
-  const lastClientYRef = useRef(0)
-
-  const startDragXRef = useRef(0)
-  const startDragYRef = useRef(0)
-
-  const startScrollLeftRef = useRef(0)
-  const startScrollTopRef = useRef(0)
+  // Single ref that holds all per-session state.
+  // null = not dragging; presence = active drag session.
+  const dragSessionRef = useRef<DragSession | null>(null)
 
   const stopDragging = useCallback(() => {
-    cleanupRef.current?.()
-    cleanupRef.current = null
-
-    if (autoScrollRafRef.current !== null) {
-      cancelAnimationFrame(autoScrollRafRef.current)
-      autoScrollRafRef.current = null
+    const session = dragSessionRef.current
+    if (!session) return
+    // Abort all event listeners registered with this session's signal.
+    session.abortController.abort()
+    if (session.autoScrollRafId !== null) {
+      cancelAnimationFrame(session.autoScrollRafId)
     }
-    autoScrollVXRef.current = 0
-    autoScrollVYRef.current = 0
-
-    isDraggingRef.current = false
-    pointerIdRef.current = null
-    activeElRef.current = null
-    scrollElRef.current = null
-    constraintsRef.current = undefined
+    dragSessionRef.current = null
   }, [])
 
   useEffect(() => {
@@ -119,43 +120,33 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
     return null
   }, [])
 
-  const getScrollPosition = useCallback(() => {
-    const el = scrollElRef.current
-    if (el) return { left: el.scrollLeft, top: el.scrollTop }
-    return { left: window.scrollX, top: window.scrollY }
-  }, [])
-
   const updateFromPointer = useCallback(
     (clientX: number, clientY: number) => {
-      if (!isDraggingRef.current) return
+      const session = dragSessionRef.current
+      if (!session) return
 
-      const constraints = constraintsRef.current
-      if (!constraints) return
+      const { constraints, scrollEl, startClientX, startClientY, startDragX, startDragY, startScrollLeft, startScrollTop } = session
 
-      const { left: scrollLeft, top: scrollTop } = getScrollPosition()
-      const scrollDx = scrollLeft - startScrollLeftRef.current
-      const scrollDy = scrollTop - startScrollTopRef.current
+      const currentScrollLeft = scrollEl ? scrollEl.scrollLeft : window.scrollX
+      const currentScrollTop = scrollEl ? scrollEl.scrollTop : window.scrollY
+      const scrollDx = currentScrollLeft - startScrollLeft
+      const scrollDy = currentScrollTop - startScrollTop
 
-      const dx = clientX - startClientXRef.current
-      const dy = clientY - startClientYRef.current
-
-      const rawX = startDragXRef.current + dx + scrollDx
-      const rawY = startDragYRef.current + dy + scrollDy
+      const rawX = startDragX + (clientX - startClientX) + scrollDx
+      const rawY = startDragY + (clientY - startClientY) + scrollDy
 
       dragX.set(clamp(rawX, constraints.left, constraints.right))
       dragY.set(clamp(rawY, constraints.top, constraints.bottom))
     },
-    [dragX, dragY, getScrollPosition],
+    [dragX, dragY],
   )
 
   const applyAutoScroll = useCallback(function applyAutoScrollLoop() {
-    if (!isDraggingRef.current) return
+    const session = dragSessionRef.current
+    if (!session) return
 
-    const vx = autoScrollVXRef.current
-    const vy = autoScrollVYRef.current
+    const { autoScrollVX: vx, autoScrollVY: vy, scrollEl } = session
     if (vx === 0 && vy === 0) return
-
-    const scrollEl = scrollElRef.current
 
     try {
       if (scrollEl) {
@@ -169,14 +160,17 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
     }
 
     // After scroll movement, recompute drag position for the latest pointer.
-    updateFromPointer(lastClientXRef.current, lastClientYRef.current)
+    updateFromPointer(session.lastClientX, session.lastClientY)
 
-    autoScrollRafRef.current = requestAnimationFrame(applyAutoScrollLoop)
+    session.autoScrollRafId = requestAnimationFrame(applyAutoScrollLoop)
   }, [updateFromPointer])
 
   const updateAutoScrollVelocity = useCallback(
     (clientX: number, clientY: number) => {
-      const scrollEl = scrollElRef.current
+      const session = dragSessionRef.current
+      if (!session) return
+
+      const { scrollEl } = session
 
       let rectLeft = 0
       let rectTop = 0
@@ -214,17 +208,16 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
             ? Math.round(EDGE_SCROLL_MAX_PX_PER_FRAME * (1 - distRight / EDGE_SCROLL_THRESHOLD_PX))
             : 0
 
-      autoScrollVXRef.current = nextVX
-      autoScrollVYRef.current = nextVY
+      session.autoScrollVX = nextVX
+      session.autoScrollVY = nextVY
 
       const shouldRun = nextVX !== 0 || nextVY !== 0
-      if (shouldRun && autoScrollRafRef.current === null) {
-        autoScrollRafRef.current = requestAnimationFrame(applyAutoScroll)
+      if (shouldRun && session.autoScrollRafId === null) {
+        session.autoScrollRafId = requestAnimationFrame(applyAutoScroll)
       }
-
-      if (!shouldRun && autoScrollRafRef.current !== null) {
-        cancelAnimationFrame(autoScrollRafRef.current)
-        autoScrollRafRef.current = null
+      if (!shouldRun && session.autoScrollRafId !== null) {
+        cancelAnimationFrame(session.autoScrollRafId)
+        session.autoScrollRafId = null
       }
     },
     [applyAutoScroll],
@@ -242,18 +235,17 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
       const elRect = element.getBoundingClientRect()
 
       // Detect section the decoration was dropped onto (metadata only).
-      const contentRoot = container.parentElement
       let detectedSectionId: string | undefined
 
-      if (contentRoot) {
+      if (getSections) {
         const rawTop = elRect.top - containerRect.top
-        const sections = contentRoot.querySelectorAll<HTMLElement>('[data-section-id]')
-        for (const section of sections) {
-          const sectionRect = section.getBoundingClientRect()
+        for (const { id, getRect } of getSections()) {
+          const sectionRect = getRect()
+          if (!sectionRect) continue
           const sectionTop = sectionRect.top - containerRect.top
           const sectionBottom = sectionRect.bottom - containerRect.top
           if (rawTop >= sectionTop - 1 && rawTop < sectionBottom) {
-            detectedSectionId = section.dataset.sectionId
+            detectedSectionId = id
             break
           }
         }
@@ -281,23 +273,18 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
       dragY.set(0)
       stopDragging()
     },
-    [boundsRef, decorationId, dragX, dragY, onCommit, stopDragging],
+    [boundsRef, decorationId, dragX, dragY, getSections, onCommit, stopDragging],
   )
 
   const startDrag = useCallback(
     (e: React.PointerEvent, element: HTMLElement) => {
       if (!decorationId) return
 
-      // Reset any previous drag session
+      // Cancel any previous drag session before starting a new one.
       stopDragging()
 
       const constraints = computeConstraints(element)
       if (!constraints) return
-      constraintsRef.current = constraints
-
-      activeElRef.current = element
-      isDraggingRef.current = true
-      pointerIdRef.current = e.pointerId
 
       // Capture pointer so movement continues outside the canvas.
       try {
@@ -307,56 +294,58 @@ export function useDecorationDrag({ decorationId, boundsRef, onCommit }: UseDeco
       }
 
       const scrollEl = findScrollParent(element)
-      scrollElRef.current = scrollEl
+      const startScrollLeft = scrollEl ? scrollEl.scrollLeft : window.scrollX
+      const startScrollTop = scrollEl ? scrollEl.scrollTop : window.scrollY
 
-      const { left: startScrollLeft, top: startScrollTop } = scrollEl
-        ? { left: scrollEl.scrollLeft, top: scrollEl.scrollTop }
-        : { left: window.scrollX, top: window.scrollY }
-      startScrollLeftRef.current = startScrollLeft
-      startScrollTopRef.current = startScrollTop
+      const ac = new AbortController()
+      const { signal } = ac
 
-      startClientXRef.current = e.clientX
-      startClientYRef.current = e.clientY
-      lastClientXRef.current = e.clientX
-      lastClientYRef.current = e.clientY
+      const session: DragSession = {
+        constraints,
+        activeEl: element,
+        scrollEl,
+        pointerId: e.pointerId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        lastClientX: e.clientX,
+        lastClientY: e.clientY,
+        startDragX: dragX.get(),
+        startDragY: dragY.get(),
+        startScrollLeft,
+        startScrollTop,
+        autoScrollVX: 0,
+        autoScrollVY: 0,
+        autoScrollRafId: null,
+        abortController: ac,
+      }
 
-      startDragXRef.current = dragX.get()
-      startDragYRef.current = dragY.get()
+      dragSessionRef.current = session
 
-      const onPointerMove = (ev: PointerEvent) => {
-        if (!isDraggingRef.current) return
-        if (pointerIdRef.current !== null && ev.pointerId !== pointerIdRef.current) return
-        lastClientXRef.current = ev.clientX
-        lastClientYRef.current = ev.clientY
+      window.addEventListener("pointermove", (ev: PointerEvent) => {
+        const s = dragSessionRef.current
+        if (!s || ev.pointerId !== s.pointerId) return
+        s.lastClientX = ev.clientX
+        s.lastClientY = ev.clientY
         updateAutoScrollVelocity(ev.clientX, ev.clientY)
         updateFromPointer(ev.clientX, ev.clientY)
-      }
+      }, { passive: true, signal })
 
       const onPointerUp = (ev: PointerEvent) => {
-        if (pointerIdRef.current !== null && ev.pointerId !== pointerIdRef.current) return
+        const s = dragSessionRef.current
+        if (!s || ev.pointerId !== s.pointerId) return
         updateAutoScrollVelocity(0, 0)
-        const activeEl = activeElRef.current
-        if (activeEl) commitDrag(activeEl)
+        commitDrag(s.activeEl)
       }
+      window.addEventListener("pointerup", onPointerUp, { signal })
+      window.addEventListener("pointercancel", onPointerUp, { signal })
 
       const onScroll = () => {
-        if (!isDraggingRef.current) return
-        updateFromPointer(lastClientXRef.current, lastClientYRef.current)
+        const s = dragSessionRef.current
+        if (!s) return
+        updateFromPointer(s.lastClientX, s.lastClientY)
       }
-
-      window.addEventListener("pointermove", onPointerMove, { passive: true })
-      window.addEventListener("pointerup", onPointerUp)
-      window.addEventListener("pointercancel", onPointerUp)
-      window.addEventListener("scroll", onScroll, { passive: true })
-      if (scrollEl) scrollEl.addEventListener("scroll", onScroll, { passive: true })
-
-      cleanupRef.current = () => {
-        window.removeEventListener("pointermove", onPointerMove)
-        window.removeEventListener("pointerup", onPointerUp)
-        window.removeEventListener("pointercancel", onPointerUp)
-        window.removeEventListener("scroll", onScroll)
-        if (scrollEl) scrollEl.removeEventListener("scroll", onScroll)
-      }
+      window.addEventListener("scroll", onScroll, { passive: true, signal })
+      if (scrollEl) scrollEl.addEventListener("scroll", onScroll, { passive: true, signal })
 
       // Initial placement
       updateAutoScrollVelocity(e.clientX, e.clientY)

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, Suspense, useTransition, ViewTransition } from "react"
-import { Search, Plus, Trash2, Archive } from "lucide-react"
+import { useState, Suspense, useDeferredValue } from "react"
+import { Search, Plus, Trash2, Archive, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -19,6 +19,55 @@ import {
   useSuspenseArchivedProjectsQuery,
 } from "@/hooks/useProjectsQuery"
 import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
+import { QueryErrorBoundary } from "@/components/shared/query-error-boundary"
+
+type View = "active" | "trash" | "archive"
+
+function ViewToggleButton({
+  id,
+  label,
+  activeWidth,
+  icon: Icon,
+  currentView,
+  onToggle,
+  badge,
+}: {
+  id: View
+  label: string
+  activeWidth: string
+  icon: React.ElementType
+  currentView: View
+  onToggle: () => void
+  badge?: number
+}) {
+  const isActive = currentView === id
+  return (
+    <Button
+      variant={isActive ? "secondary" : "ghost"}
+      size="sm"
+      className={`rounded-full text-muted-foreground relative h-8 overflow-hidden transition-all duration-200 ${
+        isActive ? `${activeWidth} px-2.5` : "w-8 px-0"
+      }`}
+      onClick={onToggle}
+    >
+      <span className="shrink-0">
+        {isActive ? <X className="size-3.5" /> : <Icon className="size-4" />}
+      </span>
+
+      {/* Рендерим текст только если кнопка активна */}
+      {isActive && (
+        <span className="text-xs font-medium whitespace-nowrap ml-1.5 transition-all duration-200">
+          {label}
+        </span>
+      )}
+      {badge !== undefined && badge > 0 && !isActive && (
+        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground border-2 border-background">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      )}
+    </Button>
+  )
+}
 
 function NoResults() {
   return (
@@ -108,8 +157,7 @@ function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string
 }
 
 export default function ProjectsPage() {
-  const [view, setView] = useState<"active" | "trash" | "archive">("active")
-  const [, startTransition] = useTransition()
+  const [view, setView] = useState<View>("active")
   // Used only for counts/badges — shares the same cache entries as Suspense inner components
   const { data: activeProjects = [] } = useActiveProjectsQuery()
   const { data: trashedProjects = [] } = useTrashedProjectsQuery({ enabled: view === "trash" })
@@ -117,6 +165,7 @@ export default function ProjectsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [typeFilter, setTypeFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const deferredSearch = useDeferredValue(searchQuery)
 
   const { uid, userLoading } = useUserStore(
     useShallow((state) => ({ uid: selectCurrentUid(state), userLoading: selectAuthLoading(state) }))
@@ -129,7 +178,9 @@ export default function ProjectsPage() {
         <div className="flex flex-col gap-4 border-b pb-6">
           {/* Row 1: Title and Count */}
           <div className="flex items-baseline gap-3">
-            <h1 className="font-serif text-3xl md:text-5xl tracking-tight">Projects</h1>
+            <h1 className="font-serif text-3xl md:text-5xl tracking-tight">
+              {view === "active" ? "Projects" : view === "archive" ? "Archive" : "Trash"}
+            </h1>
             <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full">
               {view === "active" ? activeProjects.length : view === "trash" ? trashedProjects.length : archivedProjects.length} Total
             </span>
@@ -150,7 +201,7 @@ export default function ProjectsPage() {
             </div>
 
             {/* Controls Row: Filter (Left) and Actions (Right) */}
-            <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto">
+            <div className={`flex items-center ${view === "active" ? "justify-between" : "justify-end"} md:justify-end gap-2 w-full md:w-auto`}>
               
               {/* Type Filter */}
               {view === "active" ? (
@@ -164,16 +215,14 @@ export default function ProjectsPage() {
                     <SelectItem value="portfolios">Portfolios</SelectItem>
                   </SelectContent>
                 </Select>
-              ) : (
-                <div /> // Spacer to keep icons on the right when filter is hidden
-              )}
+              ) : null}
 
               {/* Action Buttons */}
               <div className="flex items-center gap-1">
                 {view === "active" && (
                   <Button
                     size="icon"
-                    className="size-10 rounded-full shadow-md transition-transform active:scale-95"
+                    className="size-10 rounded-full shadow-md"
                     onClick={() => setModalOpen(true)}
                   >
                     <Plus className="size-5" />
@@ -181,28 +230,23 @@ export default function ProjectsPage() {
                 )}
                 
                 <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-full ml-1">
-                  <Button
-                    variant={view === "archive" ? "secondary" : "ghost"}
-                    size="icon"
-                    className="size-8 rounded-full text-muted-foreground relative"
-                    onClick={() => { startTransition(() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }) }}
-                  >
-                    <Archive className="size-4" />
-                    {archivedProjects.length > 0 && view !== "archive" && (
-                      <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground border-2 border-background">
-                        {archivedProjects.length > 9 ? "9+" : archivedProjects.length}
-                      </span>
-                    )}
-                  </Button>
-
-                  <Button
-                    variant={view === "trash" ? "secondary" : "ghost"}
-                    size="icon"
-                    className="size-8 rounded-full text-muted-foreground"
-                    onClick={() => { startTransition(() => { setView((v) => v === "trash" ? "active" : "trash"); setSearchQuery("") }) }}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <ViewToggleButton
+                    id="archive"
+                    label="Archive"
+                    activeWidth="w-[82px]"
+                    icon={Archive}
+                    currentView={view}
+                    onToggle={() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }}
+                    badge={archivedProjects.length}
+                  />
+                  <ViewToggleButton
+                    id="trash"
+                    label="Trash"
+                    activeWidth="w-[68px]"
+                    icon={Trash2}
+                    currentView={view}
+                    onToggle={() => { setView((v) => v === "trash" ? "active" : "trash"); setSearchQuery("") }}
+                  />
                 </div>
               </div>
             </div>
@@ -214,13 +258,13 @@ export default function ProjectsPage() {
         {userLoading || !uid ? (
           <ProjectsGridSkeleton />
         ) : (
-          <ViewTransition>
-            <Suspense key={view} fallback={<ProjectsGridSkeleton />}>
-              {view === "active" && <ActiveContent uid={uid} typeFilter={typeFilter} searchQuery={searchQuery} />}
-              {view === "trash" && <TrashContent uid={uid} searchQuery={searchQuery} />}
-              {view === "archive" && <ArchiveContent uid={uid} searchQuery={searchQuery} />}
+          <QueryErrorBoundary>
+            <Suspense fallback={<ProjectsGridSkeleton />}>
+              {view === "active" && <ActiveContent uid={uid} typeFilter={typeFilter} searchQuery={deferredSearch} />}
+              {view === "trash" && <TrashContent uid={uid} searchQuery={deferredSearch} />}
+              {view === "archive" && <ArchiveContent uid={uid} searchQuery={deferredSearch} />}
             </Suspense>
-          </ViewTransition>
+          </QueryErrorBoundary>
         )}
       </main>
 

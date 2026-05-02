@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import type { DecorationElement } from '@/editor/lib/types'
 import { useUiStore } from '@/editor/lib/store-ui'
 import { useEditorDecorations } from '@/editor/hooks/use-editor-decorations'
@@ -18,40 +17,33 @@ const normalizeAnimation = (animation?: string): DecorationAnimation | undefined
   return undefined
 }
 
-// Delay before decorations appear, giving the canvas content time to lay out
-// so that percentage-based positions resolve correctly (no teleport on load).
-const DECORATION_MOUNT_DELAY_MS = 500
-
 export function DecorationsLayer({ decorations, animation }: DecorationsLayerProps) {
   const deviceView = useUiStore((s) => s.deviceView)
   const { normalizedDecorations, selectedId, handleUpdate, handleRemove, handleSelect } =
     useEditorDecorations(decorations)
 
-  const [visible, setVisible] = useState(false)
+  // Delay rendering until the canvas layout has settled so decorations don't
+  // jump from the top to their final percentage-based position during load.
+  // Decorations start at opacity:0 (framer-motion initial), so the extra
+  // 300 ms is invisible to the user.
+  const [layoutReady, setLayoutReady] = useState(false)
   useEffect(() => {
-    const id = setTimeout(() => setVisible(true), DECORATION_MOUNT_DELAY_MS)
+    const id = setTimeout(() => setLayoutReady(true), 300)
     return () => clearTimeout(id)
   }, [])
 
-  if (!visible) return null
+  if (!layoutReady) return null
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="absolute inset-0 pointer-events-none"
-    >
-      <OptimizedDecorationsLayer
-        decorations={normalizedDecorations}
-        selectedId={selectedId}
-        deviceView={deviceView}
-        animation={normalizeAnimation(animation)}
-        onUpdate={handleUpdate}
-        onRemove={handleRemove}
-        onSelect={handleSelect}
-      />
-    </motion.div>
+    <OptimizedDecorationsLayer
+      decorations={normalizedDecorations}
+      selectedId={selectedId}
+      deviceView={deviceView}
+      animation={normalizeAnimation(animation)}
+      onUpdate={handleUpdate}
+      onRemove={handleRemove}
+      onSelect={handleSelect}
+    />
   )
 }
 

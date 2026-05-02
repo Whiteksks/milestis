@@ -1,6 +1,7 @@
 "use client"
 
 import { memo, useMemo, useState } from "react"
+import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -137,21 +138,22 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
 
   if (archive) {
     return (
-      <div
-        className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md cursor-pointer"
-        onClick={() => router.push(editUrl)}
+      <Link
+        href={editUrl}
+        prefetch
+        className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md block"
       >
         <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
           <div className="absolute inset-0">{thumbnail}</div>
           <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); router.push(editUrl) }}>
+            <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(editUrl) }}>
               <Edit className="mr-1.5 size-3.5" />
               {t('project.edit')}
             </Button>
           </div>
           <div
             className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.preventDefault()}
           >
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -190,7 +192,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
           <p className="truncate text-sm font-medium">{project.name}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
         </CardContent>
-      </div>
+      </Link>
     )
   }
 
@@ -294,9 +296,10 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   }
 
   return (
-    <div
-      className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md cursor-pointer"
-      onClick={() => router.push(editUrl)}
+    <Link
+      href={editUrl}
+      prefetch
+      className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md block"
     >
       {/* Thumbnail area */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
@@ -304,12 +307,12 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
 
         {/* Hover action overlay — desktop only */}
         <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); router.push(editUrl) }}>
+          <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(editUrl) }}>
             <Edit className="mr-1.5 size-3.5" />
             {t('project.edit')}
           </Button>
           {project.isPublished && viewUrl && (
-            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={(e) => { e.stopPropagation(); window.open(viewUrl, '_blank') }}>
+            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(viewUrl, '_blank') }}>
               <Eye className="mr-1.5 size-3.5" />
               {t('project.view')}
             </Button>
@@ -319,7 +322,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
         {/* More menu — always visible on mobile, hover on desktop */}
         <div
           className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => e.preventDefault()}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -371,7 +374,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
         <p className="truncate text-sm font-medium">{project.name}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
-    </div>
+    </Link>
   )
 }
 

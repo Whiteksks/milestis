@@ -1,15 +1,14 @@
 "use client"
 
-import { useCallback, useMemo, useRef } from "react"
-import { AnimatePresence } from "framer-motion"
+import { useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import type { DecorationElement, DecorationUpdatePayload } from "./decorationTypes"
 import type { DeviceView } from "@/editor/lib/types"
 import { getResponsiveFactor } from "./utils"
 import { useDecorationDrag } from "../../../../hooks/use-decoration-drag"
 import { DraggableDecoration } from "./draggable-decoration"
-import { DecorationHandle } from "./decoration-handle"
 import { getDecorationAnimationVariants, type DecorationAnimation } from "@/editor/lib/decoration-animations"
+import { useSectionRegistry } from "@/editor/lib/section-registry-context"
 
 export interface DecorationsLayerProps {
   decorations: DecorationElement[]
@@ -34,11 +33,7 @@ export function DecorationsLayer({
   const boundsRef = useRef<HTMLDivElement>(null)
   const animationVariants = getDecorationAnimationVariants(animation)
   const responsiveFactor = getResponsiveFactor(deviceView)
-
-  const selectedDecoration = useMemo(
-    () => decorations.find((d) => d.id === selectedId),
-    [decorations, selectedId],
-  )
+  const registry = useSectionRegistry()
 
   const handleCommitPosition = useCallback(
     (position: DecorationElement["position"], sectionId?: string) => {
@@ -51,6 +46,7 @@ export function DecorationsLayer({
     decorationId: selectedId,
     boundsRef,
     onCommit: handleCommitPosition,
+    getSections: registry?.getSections,
   })
 
   const handleCanvasSelect = useCallback(
@@ -63,35 +59,22 @@ export function DecorationsLayer({
   if (!decorations.length) return null
 
   return (
-    <>
-      <div ref={boundsRef} className={cn("absolute inset-0 pointer-events-none", className)}>
-        {decorations.map((decoration, index) => (
-          <DraggableDecoration
-            key={decoration.id}
-            decoration={decoration}
-            isSelected={decoration.id === selectedId}
-            responsiveFactor={responsiveFactor}
-            dragX={decoration.id === selectedId ? dragX : undefined}
-            dragY={decoration.id === selectedId ? dragY : undefined}
-            animationVariants={animationVariants}
-            animationDelay={index * 0.15}
-            onClick={(id) => handleCanvasSelect(id)}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {selectedDecoration && (
-          <DecorationHandle
-            decoration={selectedDecoration}
-            responsiveFactor={responsiveFactor}
-            dragX={dragX}
-            dragY={dragY}
-            onStartDrag={startDrag}
-          />
-        )}
-      </AnimatePresence>
-    </>
+    <div ref={boundsRef} className={cn("absolute inset-0 pointer-events-none", className)}>
+      {decorations.map((decoration, index) => (
+        <DraggableDecoration
+          key={decoration.id}
+          decoration={decoration}
+          isSelected={decoration.id === selectedId}
+          responsiveFactor={responsiveFactor}
+          dragX={decoration.id === selectedId ? dragX : undefined}
+          dragY={decoration.id === selectedId ? dragY : undefined}
+          animationVariants={animationVariants}
+          animationDelay={index * 0.15}
+          onClick={(id) => handleCanvasSelect(id)}
+          onStartDrag={decoration.id === selectedId ? startDrag : undefined}
+        />
+      ))}
+    </div>
   )
 }
 

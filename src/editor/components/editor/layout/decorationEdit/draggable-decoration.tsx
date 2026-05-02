@@ -1,7 +1,10 @@
 "use client"
 
-import { memo, useCallback, useMemo } from "react"
-import { motion, type MotionValue, type TargetAndTransition } from "framer-motion"
+import type React from "react"
+
+import { memo, useCallback, useMemo, useRef } from "react"
+import { motion, AnimatePresence, type MotionValue, type TargetAndTransition } from "framer-motion"
+import { Move } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DecorationElement } from "./decorationTypes"
 import { getBaseSizePx } from "./utils"
@@ -19,6 +22,8 @@ export interface DraggableDecorationProps {
   }
   animationDelay?: number
   onClick?: (id: string) => void
+  /** When provided, renders a drag handle inside the decoration when selected. */
+  onStartDrag?: (e: React.PointerEvent, element: HTMLElement) => void
 }
 
 export const DraggableDecoration = memo(function DraggableDecoration({
@@ -30,7 +35,12 @@ export const DraggableDecoration = memo(function DraggableDecoration({
   animationVariants = { initial: { opacity: 0 }, animate: { opacity: 1 } },
   animationDelay = 0,
   onClick,
+  onStartDrag,
 }: DraggableDecorationProps) {
+  // Ref on the outer div — passed to startDrag so commitDrag reads the
+  // decoration's own bounding rect, not a separate overlay element.
+  const outerRef = useRef<HTMLDivElement>(null)
+
   const {
     id,
     position,
@@ -66,8 +76,16 @@ export const DraggableDecoration = memo(function DraggableDecoration({
     if (onClick && id) onClick(id)
   }, [onClick, id])
 
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (outerRef.current) onStartDrag?.(e, outerRef.current)
+    },
+    [onStartDrag],
+  )
+
   return (
     <motion.div
+      ref={outerRef}
       data-decoration-id={id}
       initial={animationVariants.initial}
       animate={isSelected ? { opacity } : { ...animationVariants.animate, opacity }}
@@ -92,6 +110,34 @@ export const DraggableDecoration = memo(function DraggableDecoration({
       <div className="relative w-full h-full" style={{ transform: flipTransform }}>
         <DecorationVisual decoration={decoration} />
       </div>
+
+      <AnimatePresence>
+        {isSelected && onStartDrag && (
+          <motion.button
+            key="drag-handle"
+            type="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className={cn(
+              "absolute inset-0",
+              "rounded-xl",
+              "ring-1 ring-slate-900/10",
+              "flex items-center justify-center",
+              "cursor-grab active:cursor-grabbing",
+              "text-slate-800/40 hover:text-slate-900",
+              "touch-none select-none pointer-events-auto",
+              "transition-colors",
+            )}
+            onPointerDown={handlePointerDown}
+            onContextMenu={(e) => e.preventDefault()}
+            aria-label="Drag decoration"
+          >
+            <Move className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 })

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import { useBaseTransition, useDisabled } from './animation-context'
+import { useSectionRegistration } from '@/editor/lib/section-registry-context'
 
 interface SectionWrapperProps extends HTMLMotionProps<'section'> {
   id: string
@@ -20,7 +21,7 @@ export function SectionWrapper({
   themeForeground,
   as: Component = 'section',
   ...props
-}: SectionWrapperProps) {
+}: SectionWrapperProps) {  useSectionRegistration(id)
   // Build a stable motion-capable component for the given `as` element type.
   const MotionComponent = useMemo(
     () =>

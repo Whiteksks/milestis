@@ -47,7 +47,6 @@ const settingsLinks = [
 
 const helpLinks = [
   { labelKey: "nav.helpCenter", href: "/help", icon: FileText },
-  { labelKey: "nav.contactSupport", href: "/help/contact", icon: MessageCircle },
 ]
 
 export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBottomNavProps) {
