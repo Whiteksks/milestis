@@ -8,6 +8,43 @@ import { getCropWrapperStyle } from "@/editor/lib/crop-data"
 import { getFrameStyle } from "@/editor/lib/frame-styles"
 import { getAspectRatioClass, ASPECT_RATIO_NUM } from "@/editor/lib/aspect-ratios"
 
+/**
+ * Plain <img> wrapper for fill/crop modes where Next.js Image brings no benefit
+ * (unoptimized Firebase URLs) but causes a hydration gap that makes images jump.
+ * Inline styles are present in the SSR HTML from the very first paint.
+ */
+function FillImg({
+  src,
+  alt,
+  objectFit = "cover",
+  priority,
+  className,
+}: {
+  src: string
+  alt: string
+  objectFit?: "cover" | "fill"
+  priority?: boolean
+  className?: string
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
+      className={className}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit,
+      }}
+    />
+  )
+}
+
 interface SiteImageProps {
   /** Original image URL — always the unmodified source, never a cropped blob. */
   src?: string | null
@@ -71,23 +108,18 @@ export function SiteImage({
   const frameClass = getFrameStyle(frameStyle)
   const isCircle = frameStyle === "circle"
 
-  // When cropData is present, derive the aspect ratio from the actual crop
-  // pixels so it's always pixel-perfect even if the caller passes a different
-  // aspectRatio prop (should not happen, but defensive).
   const containerAspect = cropData
     ? `${cropData.area.width} / ${cropData.area.height}`
     : `${ASPECT_RATIO_NUM[aspectRatio]}`
 
+  // cropData branch: pure CSS crop using <img> so styles are in SSR HTML from first paint.
   const innerContent = cropData ? (
     <div style={getCropWrapperStyle(cropData)}>
-      <Image
+      <FillImg
         src={resolvedSrc}
         alt={alt}
-        fill
+        objectFit="fill"
         priority={priority}
-        unoptimized={unoptimized}
-        sizes={sizes}
-        style={{ objectFit: "fill" }}
         className={imageClassName}
       />
     </div>
@@ -104,9 +136,32 @@ export function SiteImage({
     />
   )
 
+  // fillParent branch: <img> so styles are in SSR HTML — no hydration jump on fullscreen photos.
   if (fillParent) {
     return (
       <div className={cn("absolute inset-0 overflow-hidden", className)}>
+        <FillImg
+          src={resolvedSrc}
+          alt={alt}
+          objectFit="cover"
+          priority={priority}
+          className={cn("transition-transform duration-500", imageClassName)}
+        />
+      </div>
+    )
+  }
+
+  if (cropData) {
+    return (
+      <div
+        className={cn(
+          "relative w-full overflow-hidden",
+          isCircle && "rounded-full",
+          frameClass,
+          className,
+        )}
+        style={{ aspectRatio: containerAspect }}
+      >
         {innerContent}
       </div>
     )
@@ -116,14 +171,11 @@ export function SiteImage({
     <div
       className={cn(
         "relative w-full overflow-hidden",
-        // Only apply Tailwind aspect-ratio class when there's no cropData;
-        // with cropData we set it via inline style for pixel accuracy.
-        !cropData && getAspectRatioClass(aspectRatio),
+        getAspectRatioClass(aspectRatio),
         isCircle && "rounded-full",
         frameClass,
         className,
       )}
-      style={cropData ? { aspectRatio: containerAspect } : undefined}
     >
       {innerContent}
     </div>
