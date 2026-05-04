@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 
-type LiquidGlassHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type LiquidGlassHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidGlassHeroProps) {
+  const heroImage = imageContent?.hero
   const { primary, secondary, accent2 } = theme.bgEffectColors
   return (
     <section
@@ -23,7 +23,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           #07070e`,
       }}
     >
-      {/* Deep background orbs РІР‚вЂќ slow, organic drift */}
+      {/* Deep background orbs   slow, organic drift */}
       <motion.div
         animate={{ x: [0, 50, 18, 0], y: [0, -35, 14, 0], scale: [1, 1.12, 0.96, 1] }}
         transition={{ repeat: Infinity, duration: 18, ease: 'easeInOut' }}
@@ -58,10 +58,11 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
       {/* Hero image (behind glass) */}
       {heroImage && (
         <Animate trigger="mount" type="scale" scaleOffset={1.06} className="absolute inset-0">
-          <SiteImage
+          <SlotImage
+            slotId={heroImage.slotId}
+            value={heroImage.value}
+            templateId="liquid-glass"
             fillParent
-            unoptimized
-            src={heroImage}
             alt={sectionContent.hero.title}
             sizes="100vw"
             imageClassName="object-cover object-center opacity-20"
@@ -74,7 +75,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
         </Animate>
       )}
 
-      {/* РІвЂќР‚РІвЂќР‚ Content layout РІвЂќР‚РІвЂќР‚ */}
+      {/*   Content layout   */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 @md:px-14 pt-28 pb-20 @md:py-32 flex flex-col gap-8">
 
         {/* Floating subtitle chip */}
@@ -118,7 +119,7 @@ export function LiquidGlassHero({ theme, sectionContent }: LiquidGlassHeroProps)
           {sectionContent.hero.title}
         </Animate>
 
-        {/* Glass info card РІР‚вЂќ description + accent row */}
+        {/* Glass info card   description + accent row */}
         <div className="relative max-w-xl">
           <div
             className="relative rounded-2xl overflow-hidden p-6 @md:p-7"

@@ -118,7 +118,7 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
     return <PortfolioTemplateShell Design={Design} />
   },
 
-  renderPublished: ({ templateId, theme, content, visibility, handleAnchorClick }) => {
+  renderPublished: ({ templateId, theme, content, imageContent, visibility, handleAnchorClick }) => {
     const id = templateId as PortfolioTemplateId
     const Design =
       portfolioTemplateComponents[id] ??
@@ -129,6 +129,7 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
       <Design
         theme={theme}
         sectionContent={content as SectionContent}
+        imageContent={imageContent as PortfolioTemplateProps['imageContent']}
         sectionVisibility={visibility as SectionVisibility}
         handleAnchorClick={handleAnchorClick}
       />

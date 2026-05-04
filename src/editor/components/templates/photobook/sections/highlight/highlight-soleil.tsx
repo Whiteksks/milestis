@@ -3,7 +3,8 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
@@ -12,18 +13,14 @@ import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 interface HighlightSoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function HighlightSoleil({ sectionContent, theme }: HighlightSoleilProps) {
+export function HighlightSoleil({ sectionContent, theme, imageContent }: HighlightSoleilProps) {
   const { highlight } = sectionContent
   const num = usePhotobookSectionNum('highlight')
-  const imageUrl = highlight.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const imageSettings = highlight.images?.imageSettings?.[0]
-  
-  // Используем 'wide' или 'video' для меньшей высоты, чтобы фото не давило
-  const aspectRatio = imageSettings?.aspectRatio ?? 'wide'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const highlightImage = imageContent?.highlight
+  const hasImage = Boolean(highlightImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -39,17 +36,13 @@ export function HighlightSoleil({ sectionContent, theme }: HighlightSoleilProps)
         </div>
       )}
 
-      {hasImage && (
+      {hasImage && highlightImage && (
         <div className="px-8 max-w-5xl mx-auto @md:px-14 @lg:px-24 mb-16 @md:mb-24">
           <Animate className="overflow-hidden rounded-sm ring-1 ring-current/5 shadow-sm">
-            <SiteImage
-              src={imageUrl}
+            <SlotImage
+              slotId={highlightImage.slotId}
+              value={highlightImage.value}
               alt={highlight.title ?? 'Highlight'}
-              // Принудительно ограничиваем через aspect-ratio в контейнере, если нужно
-              aspectRatio={aspectRatio}
-              frameStyle={frameStyle}
-              cropData={imageSettings?.cropData}
-              unoptimized
               sizes="(max-width: 1024px) 100vw, 80vw"
               imageClassName="transition-transform duration-1000 ease-out hover:scale-[1.03]"
             />

@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage } from '../image-helpers'
 import { Animate } from '../../../primitives/animate'
 
-export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
+export function LiquidGlassFeaturedWork({ theme, sectionContent, imageContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
   const { primary, secondary } = theme.bgEffectColors
 
@@ -37,7 +38,7 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
 
           <div className="grid grid-cols-1 @md:grid-cols-12 gap-6 @md:gap-10 items-stretch">
             {projects.map((project, i) => (
-            <ProjectCard key={i} project={project} index={i} theme={theme} />
+            <ProjectCard key={i} project={project} projectImage={getPortfolioFeaturedWorkImage(imageContent, project.id)} index={i} theme={theme} />
           ))}
         </div>
       </div>
@@ -45,7 +46,7 @@ export function LiquidGlassFeaturedWork({ theme, sectionContent }: Pick<Portfoli
   )
 }
 
-function ProjectCard({ project, index, theme }: { project: PortfolioTemplateProps['sectionContent']['featuredWork']['projects'][number], index: number, theme: PortfolioTemplateProps['theme'] }) {
+function ProjectCard({ project, projectImage, index, theme }: { project: PortfolioTemplateProps['sectionContent']['featuredWork']['projects'][number], projectImage?: import('@/editor/image/portfolio/types').PortfolioManagedImage, index: number, theme: PortfolioTemplateProps['theme'] }) {
   const [showInfo, setShowInfo] = useState(false)
   const isFeatured = index % 3 === 0
   const hasDescription = !!project.description && project.description.trim() !== ''
@@ -62,11 +63,14 @@ function ProjectCard({ project, index, theme }: { project: PortfolioTemplateProp
       )}
     >
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {project.image ? (
-          <SiteImage
+        {projectImage ? (
+          <SlotImage
+            slotId={projectImage.slotId}
+            value={projectImage.value}
+            templateId="liquid-glass"
             fillParent
-            src={project.image}
             alt={project.title}
+            className={projectImage.value.presentation?.frameStyle ? 'overflow-hidden' : undefined}
             imageClassName="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.2,1,0.3,1)] group-hover:scale-103"
           />
         ) : (

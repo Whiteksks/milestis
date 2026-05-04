@@ -25,6 +25,7 @@ export function EditorialTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -40,15 +41,15 @@ export function EditorialTemplateDesign({
       )}
 
       {sectionVisibility.showHero && (
-        <EditorialHero theme={theme} sectionContent={sectionContent} />
+        <EditorialHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showBio && (
-        <EditorialBio theme={theme} sectionContent={sectionContent} />
+        <EditorialBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showFeaturedWork && (
-        <EditorialFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <EditorialFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showVideo && (

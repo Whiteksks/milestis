@@ -25,6 +25,7 @@ export function ShowcaseTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -35,20 +36,21 @@ export function ShowcaseTemplateDesign({
         <ShowcaseHeader
           theme={theme}
           sectionContent={sectionContent}
+          imageContent={imageContent}
           handleAnchorClick={handleAnchorClick}
         />
       )}
 
       {sectionVisibility.showHero && (
-        <ShowcaseHero theme={theme} sectionContent={sectionContent} />
+        <ShowcaseHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showBio && (
-        <ShowcaseBio theme={theme} sectionContent={sectionContent} />
+        <ShowcaseBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showFeaturedWork && (
-        <ShowcaseFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <ShowcaseFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showVideo && (

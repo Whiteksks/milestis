@@ -1,8 +1,9 @@
 'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,11 +11,12 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface GalleryMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
+export function GalleryMemoir({ sectionContent, theme, imageContent }: GalleryMemoirProps) {
   const { gallery } = sectionContent
-  const photos = gallery.images ?? []
+  const photos = gallery.photos ?? []
   const [hero, ...rest] = photos
 
   return (
@@ -60,17 +62,20 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
             {/* Hero photo — full-width, cinematic 3:2 */}
             {hero && (
               <Animate direction="up" distance={30} className="group">
+                {(() => {
+                  const heroImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', hero.id) : undefined
+
+                  return (
                 <div className="bg-current/[0.04] p-2 @md:p-3">
                   <div className="relative aspect-[3/2] @md:aspect-[16/9] overflow-hidden bg-current/5">
-                    {hero.image ? (
-                      <SiteImage
+                    {heroImage?.value.asset.src ? (
+                      <SlotImage
+                        slotId={heroImage.slotId}
+                        value={heroImage.value}
                         fillParent
-                        unoptimized
-                        src={hero.image}
                         alt={hero.caption ?? 'Gallery photo'}
                         sizes="100vw"
                         imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-                        cropData={hero.imageSettings?.[0]?.cropData}
                       />
                     ) : (
                       <div className="absolute inset-0 bg-current/5" />
@@ -83,6 +88,8 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
                     )}
                   </div>
                 </div>
+                  )
+                })()}
               </Animate>
             )}
 
@@ -97,17 +104,20 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
                     key={block.id}
                     className="group"
                   >
+                    {(() => {
+                      const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', block.id) : undefined
+
+                      return (
                     <div className="bg-current/[0.04] p-1.5 @md:p-2">
                       <div className="relative aspect-[4/5] overflow-hidden bg-current/5">
-                        {block.image ? (
-                          <SiteImage
+                        {galleryImage?.value.asset.src ? (
+                          <SlotImage
+                            slotId={galleryImage.slotId}
+                            value={galleryImage.value}
                             fillParent
-                            unoptimized
-                            src={block.image}
                             alt={block.caption ?? `Photo ${i + 2}`}
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
                             imageClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                            cropData={block.imageSettings?.[0]?.cropData}
                           />
                         ) : (
                           <div className="absolute inset-0 bg-current/5" />
@@ -122,6 +132,8 @@ export function GalleryMemoir({ sectionContent, theme }: GalleryMemoirProps) {
                         )}
                       </div>
                     </div>
+                      )
+                    })()}
                   </Animate>
                 ))}
               </div>

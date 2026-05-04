@@ -2,14 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type MinimalBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type MinimalBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio
+export function MinimalBio({ theme, sectionContent, imageContent }: MinimalBioProps) {
+  const { title, subtitle, description, achievements } = sectionContent.bio
+  const bioImage = imageContent?.bio
   return (
     <SectionWrapper
       id="bio"
@@ -28,17 +29,15 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
           </Animate>
         </div>
 
-        {/* Identity block РІР‚вЂќ centered, stacked: photo РІвЂ вЂ™ name РІвЂ вЂ™ subtitle */}
+        {/* Identity block   centered, stacked: photo РІвЂ вЂ™ name РІвЂ вЂ™ subtitle */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
-          {image && (
+          {bioImage && (
             <Animate direction="none" scaleOffset={0.96} delay={0.1}>
-              <SiteImage
-                unoptimized
-                src={image}
+              <SlotImage
+                slotId={bioImage.slotId}
+                value={bioImage.value}
+                templateId="minimal"
                 alt={title || 'Profile'}
-                aspectRatio={aspectRatio || 'portrait'}
-                frameStyle={frameStyle || 'none'}
-                cropData={cropData}
                 sizes="160px"
                 className="w-[160px]"
                 imageClassName="object-cover"
@@ -69,7 +68,7 @@ export function MinimalBio({ theme, sectionContent }: MinimalBioProps) {
           </div>
         </div>
 
-        {/* Description block РІР‚вЂќ centered container, left-aligned text */}
+        {/* Description block   centered container, left-aligned text */}
         <div className="max-w-xl mx-auto space-y-10">
           <Animate
             direction="up"

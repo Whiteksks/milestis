@@ -8,7 +8,6 @@ import {
   FolderOpen,
   MoreHorizontal,
   Globe,
-  MessageCircle,
   FileText,
   CreditCard,
   Shield,

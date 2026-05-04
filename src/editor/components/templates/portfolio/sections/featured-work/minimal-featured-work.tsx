@@ -2,14 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage } from '../image-helpers'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type MinimalFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type MinimalFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWorkProps) {
+export function MinimalFeaturedWork({ theme, sectionContent, imageContent }: MinimalFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   return (
     <SectionWrapper
@@ -30,9 +31,12 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
           </Animate>
         </div>
 
-        {/* Project list РІР‚вЂќ alternating editorial layout */}
+        {/* Project list   alternating editorial layout */}
         <div className="space-y-0">
           {projects.map((project, i) => (
+            (() => {
+              const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
+              return (
             <div key={i} className="border-t border-current/10 last:border-b">
               <Animate
                 direction="up"
@@ -45,19 +49,17 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
               >
                 {/* Image */}
                 <div className="@lg:w-[42%] w-full shrink-0 group">
-                  {!project.image && (
+                  {!projectImage && (
                     <div className="w-full" style={{ aspectRatio: '16/9' }}>
                       <ProjectPlaceholder seed={project.id} className="w-full h-full" />
                     </div>
                   )}
-                  {project.image && (
-                    <SiteImage
-                      unoptimized
-                      src={project.image}
+                  {projectImage && (
+                    <SlotImage
+                      slotId={projectImage.slotId}
+                      value={projectImage.value}
+                      templateId="minimal"
                       alt={project.title}
-                      aspectRatio={project.aspectRatio || 'wide'}
-                      frameStyle={project.frameStyle || 'none'}
-                      cropData={project.cropData}
                       sizes="(max-width: 768px) 100vw, 42vw"
                       imageClassName="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
                     />
@@ -96,6 +98,8 @@ export function MinimalFeaturedWork({ theme, sectionContent }: MinimalFeaturedWo
                 </div>
               </Animate>
             </div>
+              )
+            })()
           ))}
         </div>
       </div>

@@ -2,14 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage } from '../image-helpers'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type ElegantFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ElegantFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWorkProps) {
+export function ElegantFeaturedWork({ theme, sectionContent, imageContent }: ElegantFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   return (
     <SectionWrapper
@@ -19,7 +20,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
     >
       <div className="max-w-5xl mx-auto px-6 @md:px-10 @lg:px-16 py-24 @md:py-36">
 
-        {/* Section heading РІР‚вЂќ left-aligned, sparse */}
+        {/* Section heading   left-aligned, sparse */}
         <Animate
           direction="up"
           distance={12}
@@ -34,9 +35,12 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
           </h2>
         </Animate>
 
-        {/* Projects РІР‚вЂќ full-width catalog layout */}
+        {/* Projects   full-width catalog layout */}
         <div className="space-y-32 @md:space-y-44">
           {projects.map((project, i) => (
+            (() => {
+              const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
+              return (
             <Animate
               key={i}
               direction="up"
@@ -46,23 +50,21 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
             >
               {/* Full-width image */}
               <div className="relative overflow-hidden w-full mb-8 group">
-                {!project.image ? (
+                {!projectImage ? (
                   <ProjectPlaceholder seed={project.id} className="w-full" style={{ aspectRatio: '16/9' }} />
                 ) : (
-                  <SiteImage
-                    unoptimized
-                    src={project.image}
+                  <SlotImage
+                    slotId={projectImage.slotId}
+                    value={projectImage.value}
+                    templateId="elegant"
                     alt={project.title || 'Project image'}
-                    aspectRatio={project.aspectRatio || 'wide'}
-                    frameStyle={project.frameStyle || 'none'}
-                    cropData={project.cropData}
                     sizes="(max-width: 768px) 100vw, 80vw"
                     imageClassName="object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-out"
                   />
                 )}
               </div>
 
-              {/* Caption row РІР‚вЂќ two columns: title left, meta right */}
+              {/* Caption row   two columns: title left, meta right */}
               <div className="flex flex-col @md:flex-row @md:items-end justify-between gap-6">
                 <div className="space-y-2 max-w-lg">
                   <h3 className={cn(
@@ -76,7 +78,7 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                   </p>
                 </div>
 
-                {/* Tags РІР‚вЂќ right-aligned, stacked */}
+                {/* Tags   right-aligned, stacked */}
                 {(project.tags ?? []).length > 0 && (
                   <div className="flex flex-wrap @md:flex-col @md:items-end gap-2 @md:gap-1.5 shrink-0">
                     {(project.tags ?? []).slice(0, 4).map((tag, idx) => (
@@ -91,6 +93,8 @@ export function ElegantFeaturedWork({ theme, sectionContent }: ElegantFeaturedWo
                 )}
               </div>
             </Animate>
+              )
+            })()
           ))}
         </div>
       </div>

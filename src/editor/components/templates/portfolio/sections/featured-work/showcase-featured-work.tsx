@@ -6,14 +6,16 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage, toCanonicalAspectRatio } from '../image-helpers'
 
-type ShowcaseFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ShowcaseFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeaturedWorkProps) {
+export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: ShowcaseFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   const [featured, ...rest] = projects
+  const featuredImage = featured ? getPortfolioFeaturedWorkImage(imageContent, featured.id) : undefined
 
   return (
     <SectionWrapper
@@ -42,21 +44,21 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
           </span>
         </div>
 
-        {/* Featured project РІР‚вЂќ full-width cinema card */}
+        {/* Featured project   full-width cinema card */}
         {featured && (
           <Animate as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
-            <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(featured.aspectRatio || 'wide'))}>
-              {!featured.image && (
+            <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(toCanonicalAspectRatio(featuredImage?.value.presentation?.ratio, 'wide')))}>
+              {!featuredImage && (
                 <ProjectPlaceholder seed={featured.id} className="absolute inset-0" />
               )}
-              {featured.image && (
-                <SiteImage
+              {featuredImage && (
+                <SlotImage
+                  slotId={featuredImage.slotId}
+                  value={featuredImage.value}
+                  templateId="showcase"
                   fillParent
-                  unoptimized
-                  src={featured.image}
                   alt={featured.title}
                   sizes="100vw"
-                  cropData={featured.cropData}
                   imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                 />
               )}
@@ -109,30 +111,33 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
           </Animate>
         )}
 
-        {/* Remaining projects РІР‚вЂќ 2-column grid */}
+        {/* Remaining projects   2-column grid */}
         {rest.length > 0 && (
           <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
             {rest.map((project, i) => (
+              (() => {
+                const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
+                return (
               <Animate as="article" key={i + 1} direction="up" distance={30} delay={i * 0.1} className="group">
                 {/* Image */}
                 <div
                   className={cn(
                     'relative overflow-hidden mb-5 bg-current/5',
-                    getAspectRatioClass(project.aspectRatio || 'wide'),
-                    getFrameStyle(project.frameStyle || 'none'),
+                    getAspectRatioClass(toCanonicalAspectRatio(projectImage?.value.presentation?.ratio, 'wide')),
+                    getFrameStyle(projectImage?.value.presentation?.frameStyle || 'none'),
                   )}
                 >
-                  {!project.image && (
+                  {!projectImage && (
                     <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
                   )}
-                  {project.image && (
-                    <SiteImage
+                  {projectImage && (
+                    <SlotImage
+                      slotId={projectImage.slotId}
+                      value={projectImage.value}
+                      templateId="showcase"
                       fillParent
-                      unoptimized
-                      src={project.image}
                       alt={project.title}
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      cropData={project.cropData}
                       imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                     />
                   )}
@@ -170,6 +175,8 @@ export function ShowcaseFeaturedWork({ theme, sectionContent }: ShowcaseFeatured
                   </div>
                 </div>
               </Animate>
+                )
+              })()
             ))}
           </div>
         )}

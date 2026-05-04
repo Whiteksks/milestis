@@ -23,33 +23,34 @@ export function TemplateSoleilDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   disableAnimations = false,
 }: PhotobookTemplateProps) {
   return (
     <AnimationProvider templateId="soleil" disabled={disableAnimations}>
       <div className={cn('min-h-screen overflow-x-clip', theme.background, theme.foreground)}>
         {sectionVisibility.showCover && (
-          <CoverSoleil sectionContent={sectionContent} theme={theme} />
+          <CoverSoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showIntroduction && (
-          <IntroSoleil sectionContent={sectionContent} theme={theme} />
+          <IntroSoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showStory && (
-          <StorySoleil sectionContent={sectionContent} theme={theme} />
+          <StorySoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showGallery && (
-          <GallerySoleil sectionContent={sectionContent} theme={theme} />
+          <GallerySoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showHighlight && (
-          <HighlightSoleil sectionContent={sectionContent} theme={theme} />
+          <HighlightSoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showEnding && (
-          <EndingSoleil sectionContent={sectionContent} theme={theme} />
+          <EndingSoleil sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
       </div>
     </AnimationProvider>

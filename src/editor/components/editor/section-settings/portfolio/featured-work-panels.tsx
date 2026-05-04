@@ -1,16 +1,16 @@
 "use client"
 
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { ps } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Plus, Shuffle, Trash2, Wand2 } from "lucide-react"
-import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
+import type { AspectRatio } from "@/editor/lib/types"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { useCallback, useId, useMemo, useState } from "react"
+import { ImagePicker, createPortfolioRepeatingImage, type ImageValue } from "@/editor/image"
 
 import {
   Select,
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select"
 
 import { aspectRatios, RATIO_LABELS } from "@/editor/lib/aspect-ratios"
-import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
 
 import { LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
@@ -74,13 +73,23 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   const ownerId = useId()
   const quickPlacementOwnerId = useId()
 
-  const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
+  const {
+    featuredWork,
+    portfolioImageContent,
+    updateSectionContent,
+    appendPortfolioRepeatingImage,
+    replacePortfolioRepeatingImage,
+    removePortfolioRepeatingImage,
+  } = useContentSelector((state) => ({
     featuredWork: state.sectionContent.featuredWork,
+    portfolioImageContent: state.portfolioImageContent,
     updateSectionContent: state.updateSectionContent,
+    appendPortfolioRepeatingImage: state.appendPortfolioRepeatingImage,
+    replacePortfolioRepeatingImage: state.replacePortfolioRepeatingImage,
+    removePortfolioRepeatingImage: state.removePortfolioRepeatingImage,
   }))
 
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const featuredWorkRestrictions = useSectionRestrictions('featuredWork')
 
   const projects = useMemo(() => featuredWork.projects ?? [], [featuredWork.projects])
 
@@ -95,6 +104,11 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
 
   const activeProject =
     normalizedIndex >= 0 ? projects[normalizedIndex] : null
+  const activeManagedImage = activeProject
+    ? portfolioImageContent.featuredWork.find((entry) => entry.id === activeProject.id)
+    : undefined
+  const emptyValue: ImageValue = useMemo(() => ({ asset: { src: "", width: 0, height: 0 } }), [])
+  const pickerValue = activeManagedImage?.value ?? emptyValue
 
   const updateActiveProject = useCallback(
     (patch: Partial<(typeof projects)[0]>) => {
@@ -106,23 +120,59 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
     [normalizedIndex, projects, updateSectionContent],
   )
 
-  const handleImageSelect = (url: string) => {
-    updateActiveProject({ image: url })
-  }
+  const handleImageSelect = useCallback(async (url: string, thumbUrl?: string) => {
+    if (!activeProject) return
+    const image = await createPortfolioRepeatingImage({
+      id: activeProject.id,
+      sectionId: 'featured-work',
+      src: url,
+      blurDataUrl: thumbUrl,
+      alt: activeProject.title,
+      description: activeProject.description,
+    })
+    if (activeManagedImage) {
+      replacePortfolioRepeatingImage('featured-work', activeProject.id, image)
+      return
+    }
+    appendPortfolioRepeatingImage('featured-work', image)
+  }, [activeManagedImage, activeProject, appendPortfolioRepeatingImage, replacePortfolioRepeatingImage])
 
   const handleQuickPlacement = useCallback(
-    (urls: string[]) => {
+    async (urls: string[]) => {
       if (!urls.length || !projects.length) return
-      updateSectionContent("featuredWork", {
-        projects: projects.map((p, i) => ({ ...p, image: urls[i % urls.length] })),
-      })
+      for (let i = 0; i < projects.length; i += 1) {
+        const project = projects[i]
+        const url = urls[i % urls.length]
+        const image = await createPortfolioRepeatingImage({
+          id: project.id,
+          sectionId: 'featured-work',
+          src: url,
+          alt: project.title,
+          description: project.description,
+        })
+        const existing = portfolioImageContent.featuredWork.find((entry) => entry.id === project.id)
+        if (existing) {
+          replacePortfolioRepeatingImage('featured-work', project.id, image)
+        } else {
+          appendPortfolioRepeatingImage('featured-work', image)
+        }
+      }
     },
-    [projects, updateSectionContent],
+    [appendPortfolioRepeatingImage, portfolioImageContent.featuredWork, projects, replacePortfolioRepeatingImage],
   )
 
   const applyAspectRatioToAll = (ratio: AspectRatio) => {
-    updateSectionContent("featuredWork", {
-      projects: projects.map((p) => ({ ...p, aspectRatio: ratio })),
+    portfolioImageContent.featuredWork.forEach((image) => {
+      replacePortfolioRepeatingImage('featured-work', image.id, {
+        ...image,
+        value: {
+          ...image.value,
+          presentation: {
+            ...image.value.presentation,
+            ratio,
+          },
+        },
+      })
     })
   }
 
@@ -134,10 +184,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
         id: crypto.randomUUID(),
         title: "New Project",
         description: "",
-        image: "",
         tags: [],
-        aspectRatio: "landscape" as AspectRatio,
-        frameStyle: "soft" as FrameStyle,
       },
     ]
     updateSectionContent("featuredWork", { projects: next })
@@ -145,8 +192,12 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
   }
 
   const deleteProject = (idx: number) => {
+    const project = projects[idx]
     const next = projects.filter((_, i) => i !== idx)
     updateSectionContent("featuredWork", { projects: next })
+    if (project) {
+      removePortfolioRepeatingImage('featured-work', project.id)
+    }
     setActiveProjectIndex(next.length ? Math.min(idx, next.length - 1) : -1)
   }
 
@@ -302,19 +353,26 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   />
                 </div>
 
-                <PortfolioImagePicker
+                <ImagePicker
                   label="Cover Image"
                   dense={dense}
-                  value={{
-                    image: activeProject.image,
-                    aspectRatio: (activeProject.aspectRatio || "square") as AspectRatio,
-                    frameStyle: activeProject.frameStyle,
-                    cropData: activeProject.cropData,
-                    aspectRatioBeforeLock: activeProject.aspectRatioBeforeLock,
+                  slotId="portfolio.featured-work.item"
+                  value={pickerValue}
+                  onChange={(next) => {
+                    if (!activeProject) return
+                    if (!next.asset.src) {
+                      removePortfolioRepeatingImage('featured-work', activeProject.id)
+                      return
+                    }
+                    if (activeManagedImage) {
+                      replacePortfolioRepeatingImage('featured-work', activeProject.id, {
+                        ...activeManagedImage,
+                        value: next,
+                      })
+                    }
                   }}
-                  onChange={updateActiveProject}
                   onOpenMediaPicker={() => openMediaPicker(ownerId)}
-                  restrictions={featuredWorkRestrictions}
+                  showCaption={false}
                 />
               </div>
             )}

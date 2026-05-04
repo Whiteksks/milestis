@@ -1,9 +1,10 @@
 'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
@@ -12,12 +13,13 @@ import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 interface GallerySoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
+export function GallerySoleil({ sectionContent, theme, imageContent }: GallerySoleilProps) {
   const { gallery } = sectionContent
   const num = usePhotobookSectionNum('gallery')
-  const images = gallery.images ?? []
+  const images = gallery.photos ?? []
 
   return (
     <SectionWrapper
@@ -65,10 +67,7 @@ export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
       {images.length > 0 ? (
         <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
           {images.map((photo, index) => {
-            const imageUrl = photo.image ?? ''
-            const imageSettings = photo.imageSettings?.[0]
-            const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-            const frameStyle = imageSettings?.frameStyle ?? 'none'
+            const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', photo.id) : undefined
 
             return (
               <Animate
@@ -79,14 +78,11 @@ export function GallerySoleil({ sectionContent, theme }: GallerySoleilProps) {
                 className="group"
               >
                 <div className="overflow-hidden rounded-sm">
-                  {imageUrl ? (
-                    <SiteImage
-                      src={imageUrl}
+                  {galleryImage?.value.asset.src ? (
+                    <SlotImage
+                      slotId={galleryImage.slotId}
+                      value={galleryImage.value}
                       alt={photo.caption ?? `Photo ${index + 1}`}
-                      aspectRatio={aspectRatio}
-                      frameStyle={frameStyle}
-                      cropData={imageSettings?.cropData}
-                      unoptimized
                       sizes="(max-width: 640px) 95vw, (max-width: 1024px) 48vw, 32vw"
                       imageClassName="transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                     />

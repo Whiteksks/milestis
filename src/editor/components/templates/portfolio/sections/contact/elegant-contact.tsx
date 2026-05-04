@@ -74,7 +74,7 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
                     theme.fontBody,
                   )}
                 >
-                  <p>{status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}</p>
+                  <p>{status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}</p>
                 </Animate>
               )}
               <div className="grid @md:grid-cols-2 grid-cols-1 gap-8">

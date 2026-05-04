@@ -4,14 +4,8 @@ import { useCallback, useId, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import { PanelLabel, ps, editorialInput, editorialLabel, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
-import type { SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import {
   Select,
   SelectContent,
@@ -19,10 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { PanelLabel, ps, editorialInput, editorialLabel, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
+import { ImagePicker, createPhotobookRepeatingImage, replacePhotobookManagedImageAsset, type ImageValue, type PhotobookManagedImage } from "@/editor/image"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
+import type { PhotobookSectionContent, PhotobookStoryMoment } from "@/editor/lib/types"
+import { cn } from "@/lib/utils"
 
-import type { PhotoBlock, PhotobookSectionContent } from "@/editor/lib/types"
-
-// --- Shared Hooks ---
+const EMPTY_IMAGE_VALUE: ImageValue = {
+  asset: { src: "", width: 0, height: 0 },
+}
 
 function useStoryData() {
   return useContentSelector((state) => ({
@@ -33,7 +33,7 @@ function useStoryData() {
 
 export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   const { story, updatePhotobookSection } = useStoryData()
-  const update = (fields: Partial<PhotobookSectionContent['story']>) => updatePhotobookSection("story", fields)
+  const update = (fields: Partial<PhotobookSectionContent["story"]>) => updatePhotobookSection("story", fields)
 
   return (
     <div className="py-2">
@@ -93,37 +93,30 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
   )
 }
 
-// --- Single moment item — has its own MediaPickerModal so image can be replaced ---
-
 function StoryMomentItem({
   block,
+  managedImage,
   dense = false,
   onUpdate,
   onDelete,
-  restrictions,
+  onSelectImage,
+  onImageChange,
 }: {
-  block: PhotoBlock
+  block: PhotobookStoryMoment
+  managedImage?: PhotobookManagedImage
   dense?: boolean
-  onUpdate: (patch: Partial<PhotoBlock>) => void
+  onUpdate: (patch: Partial<PhotobookStoryMoment>) => void
   onDelete: () => void
-  restrictions?: SectionImageRestrictions
+  onSelectImage: (url: string, thumbUrl?: string) => void
+  onImageChange: (next: ImageValue) => void
 }) {
   const ownerId = useId()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+  const pickerValue = managedImage?.value ?? EMPTY_IMAGE_VALUE
 
   return (
     <div className="space-y-3">
-      <MediaPickerModal
-        ownerId={ownerId}
-        onSelectImage={(url) =>
-          onUpdate({
-            image: url,
-            imageSettings: block.imageSettings?.length
-              ? block.imageSettings
-              : [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
-          })
-        }
-      />
+      <MediaPickerModal ownerId={ownerId} onSelectImage={onSelectImage} />
 
       <div className="flex items-center gap-2">
         <div className="flex-1 space-y-1">
@@ -146,15 +139,37 @@ function StoryMomentItem({
         </button>
       </div>
 
+      <div className="space-y-1">
+        <label className={editorialLabel}>Caption</label>
+        <Input
+          value={block.caption || ""}
+          onChange={(e) => onUpdate({ caption: e.target.value })}
+          placeholder="Optional caption"
+          className={cn(editorialInput, "text-sm")}
+          maxLength={LIMITS.caption}
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className={editorialLabel}>Description</label>
+        <Textarea
+          value={block.description || ""}
+          onChange={(e) => onUpdate({ description: e.target.value })}
+          placeholder="Optional description"
+          rows={4}
+          className={ps.pbTextarea}
+          maxLength={LIMITS.description}
+        />
+      </div>
+
       <ImagePicker
-        label=""
-        value={block}
+        slotId="photobook.story.block"
+        value={pickerValue}
         dense={dense}
-        onChange={(next) => onUpdate(next)}
+        onChange={onImageChange}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
-        showCaption
-        showDescription
-        restrictions={restrictions}
+        showCaption={false}
+        showDescription={false}
       />
     </div>
   )
@@ -162,16 +177,30 @@ function StoryMomentItem({
 
 export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   const addOwnerId = useId()
-  const { story, updatePhotobookSection } = useStoryData()
+  const {
+    story,
+    photobookStoryImages,
+    updatePhotobookSection,
+    appendPhotobookRepeatingImage,
+    replacePhotobookRepeatingImage,
+    removePhotobookRepeatingImage,
+  } = useContentSelector((state) => ({
+    story: state.photobookSectionContent.story,
+    photobookStoryImages: state.photobookImageContent.story,
+    updatePhotobookSection: state.updatePhotobookSection,
+    appendPhotobookRepeatingImage: state.appendPhotobookRepeatingImage,
+    replacePhotobookRepeatingImage: state.replacePhotobookRepeatingImage,
+    removePhotobookRepeatingImage: state.removePhotobookRepeatingImage,
+  }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const storyRestrictions = useSectionRestrictions('story')
 
-  const images: PhotoBlock[] = useMemo(() => story.images || [], [story.images])
-  const updateImages = (next: PhotoBlock[]) => updatePhotobookSection("story", { images: next })
-
-  const [activeImageIndex, setActiveImageIndex] = useState<number>(() =>
-    images.length ? 0 : -1
+  const images = useMemo(() => story.moments || [], [story.moments])
+  const updateImages = useCallback(
+    (next: PhotobookStoryMoment[]) => updatePhotobookSection("story", { moments: next }),
+    [updatePhotobookSection],
   )
+
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(() => (images.length ? 0 : -1))
 
   const normalizedIndex = useMemo(() => {
     if (!images.length) return -1
@@ -179,52 +208,110 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
   }, [activeImageIndex, images.length])
 
   const activeImage = normalizedIndex >= 0 ? images[normalizedIndex] : null
+  const activeManagedImage = activeImage
+    ? photobookStoryImages.find((image) => image.id === activeImage.id)
+    : undefined
 
   const updateActiveImage = useCallback(
-    (patch: Partial<PhotoBlock>) => {
+    (patch: Partial<PhotobookStoryMoment>) => {
       if (normalizedIndex < 0) return
-      updatePhotobookSection("story", {
-        images: images.map((b, i) => (i === normalizedIndex ? { ...b, ...patch } : b)),
-      })
+      updateImages(images.map((entry, index) => (index === normalizedIndex ? { ...entry, ...patch } : entry)))
     },
-    [normalizedIndex, images, updatePhotobookSection],
+    [images, normalizedIndex, updateImages],
   )
 
-  const handleMultiAdd = (urls: string[]) => {
+  const handleActiveImageSelect = useCallback(
+    (url: string, thumbUrl?: string) => {
+      if (!activeImage) return
+
+      if (activeManagedImage) {
+        replacePhotobookRepeatingImage("story", activeImage.id, replacePhotobookManagedImageAsset(activeManagedImage, { src: url, blurDataUrl: thumbUrl }))
+        return
+      }
+
+      appendPhotobookRepeatingImage("story", createPhotobookRepeatingImage({
+        id: activeImage.id,
+        sectionId: "story",
+        src: url,
+        blurDataUrl: thumbUrl,
+        alt: activeImage.label,
+        caption: activeImage.caption,
+        description: activeImage.description,
+      }))
+    },
+    [activeImage, activeManagedImage, appendPhotobookRepeatingImage, replacePhotobookRepeatingImage],
+  )
+
+  const handleActiveImageChange = useCallback(
+    (next: ImageValue) => {
+      if (!activeImage) return
+
+      if (!next.asset.src) {
+        removePhotobookRepeatingImage("story", activeImage.id)
+        return
+      }
+
+      if (activeManagedImage) {
+        replacePhotobookRepeatingImage("story", activeImage.id, { ...activeManagedImage, value: next })
+      }
+    },
+    [activeImage, activeManagedImage, removePhotobookRepeatingImage, replacePhotobookRepeatingImage],
+  )
+
+  const handleMultiAdd = useCallback((urls: string[]) => {
     if (!urls.length) return
-    const ts = Date.now()
+
     const remaining = LIMITS.storyImages - images.length
     if (remaining <= 0) return
-    const newBlocks: PhotoBlock[] = urls.slice(0, remaining).map((url, i) => ({
-      id: `story-${ts}-${i}`,
-      image: url,
+
+    const selectedUrls = urls.slice(0, remaining)
+    const timestamp = Date.now()
+    const newBlocks: PhotobookStoryMoment[] = selectedUrls.map((_, index) => ({
+      id: `story-${timestamp}-${index}`,
       label: "",
       caption: "",
-      imageSettings: [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
+      description: "",
     }))
-    const next = [...images, ...newBlocks]
-    updateImages(next)
-    setActiveImageIndex(next.length - 1)
-  }
+
+    updateImages([...images, ...newBlocks])
+
+    const managedImages = newBlocks.map((block, index) =>
+      createPhotobookRepeatingImage({
+        id: block.id,
+        sectionId: "story",
+        src: selectedUrls[index],
+        alt: block.label,
+        caption: block.caption,
+        description: block.description,
+      }),
+    )
+
+    managedImages.forEach((image) => appendPhotobookRepeatingImage("story", image))
+    setActiveImageIndex(images.length + newBlocks.length - 1)
+  }, [appendPhotobookRepeatingImage, images, updateImages])
 
   const addEmpty = () => {
     if (images.length >= LIMITS.storyImages) return
-    const newBlock: PhotoBlock = {
+
+    const newBlock: PhotobookStoryMoment = {
       id: `story-${Date.now()}`,
-      image: "",
       label: "",
       caption: "",
-      imageSettings: [{ aspectRatio: "square" as const, frameStyle: "none" as const }],
+      description: "",
     }
     const next = [...images, newBlock]
     updateImages(next)
     setActiveImageIndex(next.length - 1)
   }
 
-  const deleteImage = (idx: number) => {
-    const next = images.filter((_, i) => i !== idx)
+  const deleteImage = (indexToDelete: number) => {
+    const imageId = images[indexToDelete]?.id
+    const next = images.filter((_, index) => index !== indexToDelete)
     updateImages(next)
-    setActiveImageIndex(next.length ? Math.min(idx, next.length - 1) : -1)
+    if (imageId) {
+      removePhotobookRepeatingImage("story", imageId)
+    }
+    setActiveImageIndex(next.length ? Math.min(indexToDelete, next.length - 1) : -1)
   }
 
   return (
@@ -246,17 +333,12 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
       </div>
 
       {images.length === 0 ? (
-        <button
-          type="button"
-          onClick={() => openMediaPicker(addOwnerId)}
-          className={ps.emptyZone}
-        >
+        <button type="button" onClick={() => openMediaPicker(addOwnerId)} className={ps.emptyZone}>
           <Plus className={ps.emptyIcon} />
           {!dense && <span className={ps.emptyText}>Click to add story photos</span>}
         </button>
       ) : (
         <div className="space-y-4">
-          {/* Switcher */}
           <div className="flex items-center justify-between gap-2">
             {!dense && (
               <span className="text-[11px] text-muted-foreground/60 tabular-nums">
@@ -276,17 +358,14 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
                 <ChevronLeft className="w-4 h-4" />
               </Button>
 
-              <Select
-                value={String(normalizedIndex)}
-                onValueChange={(v) => setActiveImageIndex(parseInt(v, 10))}
-              >
+              <Select value={String(normalizedIndex)} onValueChange={(value) => setActiveImageIndex(parseInt(value, 10))}>
                 <SelectTrigger className="h-8 text-xs bg-background rounded-xl w-44">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {images.map((img, idx) => (
-                    <SelectItem key={img.id} value={String(idx)}>
-                      {img.label?.trim() ? img.label : `Photo ${idx + 1}`}
+                  {images.map((image, index) => (
+                    <SelectItem key={image.id} value={String(index)}>
+                      {image.label?.trim() ? image.label : `Photo ${index + 1}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -305,15 +384,16 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
             </div>
           </div>
 
-          {/* Active item editor */}
           {activeImage && (
             <StoryMomentItem
               key={activeImage.id}
               block={activeImage}
+              managedImage={activeManagedImage}
               dense={dense}
               onUpdate={updateActiveImage}
               onDelete={() => deleteImage(normalizedIndex)}
-              restrictions={storyRestrictions}
+              onSelectImage={handleActiveImageSelect}
+              onImageChange={handleActiveImageChange}
             />
           )}
         </div>

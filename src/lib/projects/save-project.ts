@@ -28,8 +28,10 @@ export async function saveProject(
     const {
       sectionVisibility,
       sectionContent,
+      portfolioImageContent,
       photobookSectionVisibility,
       photobookSectionContent,
+      photobookImageContent,
     } = useContentStore.getState()
 
     const {
@@ -50,13 +52,21 @@ export async function saveProject(
 
     const content =
       editorMode === 'portfolio'
-        ? { sectionVisibility, sectionContent }
-        : { sectionVisibility: photobookSectionVisibility, sectionContent: photobookSectionContent }
+        ? {
+            sectionVisibility,
+            sectionContent,
+            imageContent: portfolioImageContent,
+          }
+        : {
+            sectionVisibility: photobookSectionVisibility,
+            sectionContent: photobookSectionContent,
+            imageContent: photobookImageContent,
+          }
 
     const rawHeroThumb =
       editorMode === 'portfolio'
-        ? sectionContent.hero.heroThumb
-        : photobookSectionContent.cover.images?.thumbUrl
+        ? portfolioImageContent.hero?.value.asset.blurDataUrl ?? portfolioImageContent.hero?.value.asset.src
+        : photobookImageContent.cover?.value.asset.blurDataUrl ?? photobookImageContent.cover?.value.asset.src
 
     const payload: Record<string, unknown> = {}
 
@@ -73,21 +83,17 @@ export async function saveProject(
       if (editorMode === 'portfolio') {
         if (sectionContent.hero.title) preview.title = sectionContent.hero.title
         if (sectionContent.hero.subtitle) preview.subtitle = sectionContent.hero.subtitle
-        if (sectionContent.hero.aspectRatio) preview.aspectRatio = sectionContent.hero.aspectRatio
-        if (sectionContent.hero.frameStyle) preview.frameStyle = sectionContent.hero.frameStyle
-        if (sectionContent.hero.cropData) preview.cropData = sectionContent.hero.cropData
+        if (portfolioImageContent.hero?.value.presentation?.ratio) preview.aspectRatio = portfolioImageContent.hero.value.presentation.ratio
+        if (portfolioImageContent.hero?.value.presentation?.frameStyle) preview.frameStyle = portfolioImageContent.hero.value.presentation.frameStyle
       } else {
         if (photobookSectionContent.cover.title) preview.title = photobookSectionContent.cover.title
         if (photobookSectionContent.cover.subtitle) preview.subtitle = photobookSectionContent.cover.subtitle
         if (photobookSectionContent.cover.date) preview.date = photobookSectionContent.cover.date
-        if (photobookSectionContent.cover.images?.imageSettings?.[0]?.aspectRatio) {
-          preview.aspectRatio = photobookSectionContent.cover.images.imageSettings[0].aspectRatio
+        if (photobookImageContent.cover?.value.presentation?.ratio) {
+          preview.aspectRatio = photobookImageContent.cover.value.presentation.ratio
         }
-        if (photobookSectionContent.cover.images?.imageSettings?.[0]?.frameStyle) {
-          preview.frameStyle = photobookSectionContent.cover.images.imageSettings[0].frameStyle
-        }
-        if (photobookSectionContent.cover.images?.imageSettings?.[0]?.cropData) {
-          preview.cropData = photobookSectionContent.cover.images.imageSettings[0].cropData
+        if (photobookImageContent.cover?.value.presentation?.frameStyle) {
+          preview.frameStyle = photobookImageContent.cover.value.presentation.frameStyle
         }
       }
 

@@ -1,24 +1,22 @@
 'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
 
 interface HighlightMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps) {
+export function HighlightMemoir({ sectionContent, theme, imageContent }: HighlightMemoirProps) {
   const { highlight } = sectionContent
-  const imageBlock = highlight.images
-  const imageUrl = imageBlock?.image ?? ''
-  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'square'
-  const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const highlightImage = imageContent?.highlight
+  const hasImage = Boolean(highlightImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -32,28 +30,18 @@ export function HighlightMemoir({ sectionContent, theme }: HighlightMemoirProps)
 
           {/* Left вЂ“ Photo (order-2 on mobile в†’ shows below text) */}
           <div className="order-2 @md:order-1">
-            <div
-              className={cn(
-                'relative overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none',
-                getAspectRatioClass(aspectRatio),
-                getFrameStyle(frameStyle),
-                theme.shadow,
-                theme.elementGlow,
-              )}
-            >
-              {imageUrl ? (
-                <SiteImage
-                  fillParent
-                  unoptimized
-                  src={imageUrl}
+            {hasImage && highlightImage ? (
+              <div className={cn('overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none', theme.shadow, theme.elementGlow)}>
+                <SlotImage
+                  slotId={highlightImage.slotId}
+                  value={highlightImage.value}
                   alt={highlight.title ?? 'Highlight'}
                   sizes="(max-width: 768px) 90vw, 45vw"
-                  cropData={imageBlock?.imageSettings?.[0]?.cropData}
                 />
-              ) : (
-                <div className={cn('absolute inset-0', theme.background)} />
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className={cn('aspect-square bg-current/5', theme.background)} />
+            )}
           </div>
 
           {/* Right вЂ“ Content (order-1 on mobile в†’ shows above photo) */}

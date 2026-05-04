@@ -1,7 +1,8 @@
 'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -10,12 +11,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface StoryChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
+export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChronicleProps) {
   const { story } = sectionContent
   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅ пїЅ StoryMemoir
-  const moments = story.images ?? []
+  const moments = story.moments ?? []
 
   return (
     <SectionWrapper
@@ -63,11 +65,9 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
         {moments.length > 0 && (
           <div className="space-y-20 @md:space-y-28">
             {moments.map((block, index) => {
-              const imageUrl = block.image
+              const storyImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'story', block.id) : undefined
               const isEven = index % 2 === 0
               const slotNum = String(index + 1).padStart(2, '0')
-              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'square'
-              const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
               const description = block.description ?? ''
 
               return (
@@ -110,14 +110,11 @@ export function StoryChronicle({ sectionContent, theme }: StoryChronicleProps) {
 
                   {/* Photo + Description */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
-                    {imageUrl ? (
-                      <SiteImage
-                        src={imageUrl}
+                    {storyImage?.value.asset.src ? (
+                      <SlotImage
+                        slotId={storyImage.slotId}
+                        value={storyImage.value}
                         alt={block.label ?? story.title ?? `Story ${index + 1}`}
-                        aspectRatio={aspectRatio}
-                        frameStyle={frameStyle}
-                        cropData={block.imageSettings?.[0]?.cropData}
-                        unoptimized
                         sizes="(max-width: 768px) 90vw, 70vw"
                         className={theme.shadow}
                       />

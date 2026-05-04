@@ -1,20 +1,22 @@
 'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
 
 interface HighlightChronicleProps {
   sectionContent: PhotobookSectionContent
+  imageContent?: PhotobookImageContent
   theme: ThemeConfig
 }
 
-export function HighlightChronicle({ sectionContent, theme }: HighlightChronicleProps) {
+export function HighlightChronicle({ sectionContent, theme, imageContent }: HighlightChronicleProps) {
   const { highlight } = sectionContent
-  const imageUrl = highlight.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const highlightImage = imageContent?.highlight
+  const hasImage = Boolean(highlightImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -27,15 +29,14 @@ export function HighlightChronicle({ sectionContent, theme }: HighlightChronicle
       <div className="relative min-h-[60vh] @md:min-h-[75vh] flex flex-col justify-end overflow-hidden">
 
         {/* Background image + gradient overlay */}
-        {hasImage ? (
+        {hasImage && highlightImage ? (
           <div className="absolute inset-0">
-            <SiteImage
+            <SlotImage
               fillParent
-              unoptimized
-              src={imageUrl}
+              slotId={highlightImage.slotId}
+              value={highlightImage.value}
               alt={highlight.title ?? 'Highlight'}
               sizes="100vw"
-              imageClassName="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
           </div>

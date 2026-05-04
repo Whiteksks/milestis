@@ -19,7 +19,7 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* РІвЂќР‚РІвЂќР‚ Cinematic video card РІвЂќР‚РІвЂќР‚ */}
+        {/*   Cinematic video card   */}
         <Animate
           delay={0}
           direction="up"

@@ -2,15 +2,16 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type BentoBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type BentoBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function BentoBio({ theme, sectionContent }: BentoBioProps) {
+export function BentoBio({ theme, sectionContent, imageContent }: BentoBioProps) {
   const achievements = sectionContent.bio.achievements ?? []
+  const bioImage = imageContent?.bio
 
   return (
     <SectionWrapper
@@ -22,7 +23,7 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
 
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
-          {/* [A] Photo card РІР‚вЂќ tall, 4/12 */}
+          {/* [A] Photo card   tall, 4/12 */}
           <Animate
             delay={0}
             direction="up"
@@ -34,18 +35,21 @@ export function BentoBio({ theme, sectionContent }: BentoBioProps) {
               theme.card,
             )}
           >
-            <SiteImage
-              fillParent
-              unoptimized
-              src={sectionContent.bio.image}
-              alt={sectionContent.bio.title || 'Profile'}
-              sizes="(max-width: 768px) 100vw, 33vw"
-              imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
-            />
+            {bioImage && (
+              <SlotImage
+                slotId={bioImage.slotId}
+                value={bioImage.value}
+                templateId="bento"
+                fillParent
+                alt={sectionContent.bio.title || 'Profile'}
+                sizes="(max-width: 768px) 100vw, 33vw"
+                imageClassName="object-cover transition-transform duration-700 hover:scale-[1.03]"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
           </Animate>
 
-          {/* [B] Content column РІР‚вЂќ 8/12 */}
+          {/* [B] Content column   8/12 */}
           <div className="@lg:col-span-8 @md:col-span-4 col-span-1 flex flex-col gap-3">
 
             {/* [B1] Name + subtitle + description */}

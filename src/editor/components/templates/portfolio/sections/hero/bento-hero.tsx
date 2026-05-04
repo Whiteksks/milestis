@@ -2,15 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type BentoHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type BentoHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProps) {
+  const heroImage = imageContent?.hero
   const initials = sectionContent.hero.title
     ? sectionContent.hero.title
         .split(' ')
@@ -28,7 +28,7 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* РІвЂќР‚РІвЂќР‚ Bento grid: Row 1 РІвЂќР‚РІвЂќР‚ */}
+        {/*   Bento grid: Row 1   */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
 
           {/* [A] Title / intro card */}
@@ -85,12 +85,11 @@ export function BentoHero({ theme, sectionContent }: BentoHeroProps) {
           >
             {heroImage ? (
               <>
-                <SiteImage
-                  src={heroImage}
+                <SlotImage
+                  slotId={heroImage.slotId}
+                  value={heroImage.value}
+                  templateId="bento"
                   alt={sectionContent.hero.title}
-                  aspectRatio={sectionContent.hero.aspectRatio || 'portrait'}
-                  frameStyle={sectionContent.hero.frameStyle || 'none'}
-                  cropData={sectionContent.hero.cropData}
                   className="transition-transform duration-700 hover:scale-[1.03]"
                   priority
                 />

@@ -129,6 +129,7 @@ export default async function SitePage({ params, searchParams }: Props) {
         themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
         customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
         content={(content.sectionContent ?? {}) as Record<string, unknown>}
+        imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
         visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
       />
     )
@@ -161,6 +162,7 @@ export default async function SitePage({ params, searchParams }: Props) {
         themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
         customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
         content={(content.sectionContent ?? {}) as Record<string, unknown>}
+        imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
         visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
       />
     )

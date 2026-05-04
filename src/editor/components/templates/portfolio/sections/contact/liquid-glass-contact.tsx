@@ -55,7 +55,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
           <div className="absolute top-0 left-8 right-8 h-px pointer-events-none" style={{ background: `linear-gradient(to right, transparent, ${primary}85, ${secondary}70, transparent)` }} />
 
           <div className="relative grid grid-cols-1 @lg:grid-cols-2 gap-0">
-            {/* Left РІР‚вЂќ headline */}
+            {/* Left   headline */}
             <div className="p-8 @md:p-12 @lg:p-14 flex flex-col justify-center gap-6 @lg:border-r border-r-0 border-b @lg:border-b-0 border-white/8">
               <Animate
                 direction="up"
@@ -107,7 +107,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
               </div>
             </div>
 
-            {/* Right РІР‚вЂќ form */}
+            {/* Right   form */}
             <form onSubmit={handleSubmit} className="p-8 @md:p-12 @lg:p-14 space-y-0">
               {status !== 'idle' && (
                 <motion.div
@@ -122,7 +122,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                     theme.fontBody,
                   )}
                 >
-                  {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
+                  {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
                 </motion.div>
               )}
               {/* Name + Email */}
@@ -177,7 +177,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                 />
               </div>
 
-              {/* Submit РІР‚вЂќ glass button */}
+              {/* Submit   glass button */}
               <div className="pt-7">
                 <button
                   type="submit"

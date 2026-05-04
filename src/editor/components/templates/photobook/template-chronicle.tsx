@@ -23,33 +23,34 @@ export function TemplateChronicleDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   disableAnimations = false,
 }: PhotobookTemplateProps) {
   return (
     <AnimationProvider templateId="chronicle" disabled={disableAnimations}>
       <div className={cn('min-h-screen overflow-x-clip', theme.background, theme.foreground)}>
       {sectionVisibility.showCover && (
-        <CoverChronicle sectionContent={sectionContent} theme={theme} />
+        <CoverChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showIntroduction && (
-        <IntroChronicle sectionContent={sectionContent} theme={theme} />
+        <IntroChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showStory && (
-        <StoryChronicle sectionContent={sectionContent} theme={theme} />
+        <StoryChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showGallery && (
-        <GalleryChronicle sectionContent={sectionContent} theme={theme} />
+        <GalleryChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showHighlight && (
-        <HighlightChronicle sectionContent={sectionContent} theme={theme} />
+        <HighlightChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showEnding && (
-          <EndingChronicle sectionContent={sectionContent} theme={theme} />
+          <EndingChronicle sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
       </div>
     </AnimationProvider>

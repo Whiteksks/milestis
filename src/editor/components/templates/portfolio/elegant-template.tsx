@@ -25,6 +25,7 @@ export function ElegantTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -40,17 +41,18 @@ export function ElegantTemplateDesign({
       )}
 
       {sectionVisibility.showHero && (
-        <ElegantHero theme={theme} sectionContent={sectionContent} />
+        <ElegantHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showBio && (
-        <ElegantBio theme={theme} sectionContent={sectionContent} />
+        <ElegantBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showFeaturedWork && (
         <ElegantFeaturedWork
           theme={theme}
           sectionContent={sectionContent}
+          imageContent={imageContent}
         />
       )}
 

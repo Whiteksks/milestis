@@ -1,4 +1,17 @@
 import type { StateCreator } from 'zustand'
+import {
+  appendPortfolioRepeatingImage,
+  createEmptyPortfolioImageContent,
+  removePortfolioRepeatingImage,
+  replacePortfolioRepeatingImage,
+  setPortfolioSingleImage,
+  type PortfolioImageContent,
+} from '@/editor/image/portfolio/content'
+import type {
+  PortfolioManagedImage,
+  PortfolioRepeatingImageSectionId,
+  PortfolioSingleImageSectionId,
+} from '@/editor/image/portfolio/types'
 import type { MediaImage, SectionContent, SectionVisibility } from './types'
 // type-only circular import — erased at runtime, safe in TypeScript
 import type { ContentStore } from './store-content'
@@ -30,18 +43,12 @@ export const defaultPortfolioContent: SectionContent = {
     subtitle: 'Visual Artist & Creator',
     description:
       'Crafting minimalist, impactful visuals that bridge the gap between creative vision and meaningful reality. Focused on clarity, aesthetics, and timeless form.',
-    image: '',
-    aspectRatio: 'portrait',
-    frameStyle: 'soft',
   },
   bio: {
     title: 'Focusing on the essence of craft',
     subtitle: 'About Me',
     description:
       'Based in Europe, I specialize in creating cohesive visual narratives for brands and individuals. My approach is rooted in observation and refinement — balancing clean aesthetics with emotional depth.\n\nWhether it’s a digital interface, a photographic series, or a brand identity, I prioritize work that feels honest, intentional, and lasting.',
-    image: '',
-    aspectRatio: 'portrait',
-    frameStyle: 'soft',
     achievements: [
       'Featured in leading international creative showcases',
       'Collaborated with diverse clients across 10+ countries',
@@ -71,11 +78,15 @@ export const defaultPortfolioContent: SectionContent = {
     socialLinks: [],
   },
 }
+
+export const defaultPortfolioImageContent: PortfolioImageContent = createEmptyPortfolioImageContent()
+
 // ─── Slice interface ───────────────────────────────────────────────────────
 
 export interface PortfolioSlice {
   sectionVisibility: SectionVisibility
   sectionContent: SectionContent
+  portfolioImageContent: PortfolioImageContent
   mediaLibrary: MediaImage[]
 
   toggleSection: (section: keyof SectionVisibility) => void
@@ -83,6 +94,15 @@ export interface PortfolioSlice {
     section: K,
     content: Partial<SectionContent[K]>,
   ) => void
+  setPortfolioImageContent: (content: PortfolioImageContent) => void
+  setPortfolioSingleImage: (section: PortfolioSingleImageSectionId, image?: PortfolioManagedImage) => void
+  appendPortfolioRepeatingImage: (section: PortfolioRepeatingImageSectionId, image: PortfolioManagedImage) => void
+  replacePortfolioRepeatingImage: (
+    section: PortfolioRepeatingImageSectionId,
+    imageId: string,
+    image: PortfolioManagedImage,
+  ) => void
+  removePortfolioRepeatingImage: (section: PortfolioRepeatingImageSectionId, imageId: string) => void
   addMediaImage: (image: MediaImage) => void
   removeMediaImage: (id: string) => void
 }
@@ -92,6 +112,7 @@ export interface PortfolioSlice {
 export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioSlice> = (set) => ({
   sectionVisibility: defaultPortfolioVisibility,
   sectionContent: defaultPortfolioContent,
+  portfolioImageContent: defaultPortfolioImageContent,
   mediaLibrary: [],
 
   toggleSection: (section) =>
@@ -108,6 +129,31 @@ export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioS
         ...state.sectionContent,
         [section]: { ...state.sectionContent[section], ...content },
       },
+    })),
+
+  setPortfolioImageContent: (content) =>
+    set(() => ({
+      portfolioImageContent: content,
+    })),
+
+  setPortfolioSingleImage: (section, image) =>
+    set((state) => ({
+      portfolioImageContent: setPortfolioSingleImage(state.portfolioImageContent, section, image),
+    })),
+
+  appendPortfolioRepeatingImage: (section, image) =>
+    set((state) => ({
+      portfolioImageContent: appendPortfolioRepeatingImage(state.portfolioImageContent, image),
+    })),
+
+  replacePortfolioRepeatingImage: (section, imageId, image) =>
+    set((state) => ({
+      portfolioImageContent: replacePortfolioRepeatingImage(state.portfolioImageContent, imageId, image),
+    })),
+
+  removePortfolioRepeatingImage: (section, imageId) =>
+    set((state) => ({
+      portfolioImageContent: removePortfolioRepeatingImage(state.portfolioImageContent, imageId),
     })),
 
   addMediaImage: (image) =>

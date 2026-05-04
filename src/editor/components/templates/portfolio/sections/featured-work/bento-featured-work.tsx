@@ -2,36 +2,29 @@
 
 import { ArrowUpRight } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
-import type { FrameStyle } from '@/editor/lib/types'
 import { cn } from '@/lib/utils'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage } from '../image-helpers'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type BentoFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type BentoFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-type Project = {
-  id?: string
-  title: string
-  description: string
-  image: string
-  tags?: string[]
-  frameStyle?: FrameStyle
-}
-
-// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Reusable project card РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
+type Project = BentoFeaturedWorkProps['sectionContent']['featuredWork']['projects'][number]
 
 function ProjectCard({
   project,
+  projectImage,
   index,
   className,
   imgSizes = '(max-width: 768px) 100vw, 50vw',
   titleSize = 'text-sm',
 }: {
   project: Project
+  projectImage?: PortfolioTemplateProps['imageContent'] extends infer T ? T extends { featuredWork: infer _ } ? import('@/editor/image/portfolio/types').PortfolioManagedImage : never : never
   index: number
   className?: string
   imgSizes?: string
@@ -48,16 +41,17 @@ function ProjectCard({
       )}
     >
       {/* Image */}
-      {project.image ? (
-        <SiteImage
+      {projectImage ? (
+        <SlotImage
+          slotId={projectImage.slotId}
+          value={projectImage.value}
+          templateId="bento"
           fillParent
-          unoptimized
-          src={project.image}
           alt={project.title || 'Project'}
           sizes={imgSizes}
+          className={getFrameStyle(projectImage.value.presentation?.frameStyle || 'none')}
           imageClassName={cn(
             'object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.07]',
-            getFrameStyle(project.frameStyle || 'none'),
           )}
         />
       ) : (
@@ -70,7 +64,7 @@ function ProjectCard({
       {/* Hover: darken whole card slightly */}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
 
-      {/* Top row РІР‚вЂќ tags & arrow (appears on hover) */}
+      {/* Top row   tags & arrow (appears on hover) */}
       <div className={cn(
         'absolute top-0 left-0 right-0 p-4 flex items-start justify-between gap-2',
         'opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0',
@@ -112,9 +106,9 @@ function ProjectCard({
   )
 }
 
-// РІвЂќР‚РІвЂќР‚РІвЂќР‚ Main component РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚РІвЂќР‚
+//   Main component  
 
-export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkProps) {
+export function BentoFeaturedWork({ theme, sectionContent, imageContent }: BentoFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
   const [p1, p2, p3, ...rest] = projects
 
@@ -126,7 +120,7 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
     >
       <div className="max-w-6xl mx-auto space-y-3 w-full">
 
-        {/* РІвЂќР‚РІвЂќР‚ Header РІвЂќР‚РІвЂќР‚ */}
+        {/*   Header   */}
         <Animate
           delay={0}
           direction="up"
@@ -147,13 +141,14 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
 
         </Animate>
 
-        {/* РІвЂќР‚РІвЂќР‚ Bento grid РІвЂќР‚РІвЂќР‚ */}
+        {/*   Bento grid   */}
         {projects.length > 0 && (
           <>
-            {/* РІвЂќР‚ 1 project: full-width hero РІвЂќР‚ */}
+            {/*   1 project: full-width hero   */}
             {projects.length === 1 && p1 && (
               <ProjectCard
                 project={p1}
+                projectImage={getPortfolioFeaturedWorkImage(imageContent, p1.id)}
                 index={0}
                 imgSizes="100vw"
                 titleSize="text-xl"
@@ -161,13 +156,14 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
               />
             )}
 
-            {/* РІвЂќР‚ 2 projects: equal halves РІвЂќР‚ */}
+            {/*   2 projects: equal halves   */}
             {projects.length === 2 && (
               <div className="grid @md:grid-cols-2 grid-cols-1 gap-3">
                 {[p1, p2].map((p, i) => p && (
                   <ProjectCard
                     key={i}
                     project={p}
+                    projectImage={getPortfolioFeaturedWorkImage(imageContent, p.id ?? '')}
                     index={i}
                     imgSizes="(max-width: 768px) 100vw, 50vw"
                     titleSize="text-base"
@@ -177,14 +173,15 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
               </div>
             )}
 
-            {/* РІвЂќР‚ 3+ projects: true 2D bento РІвЂќР‚ */}
+            {/*   3+ projects: true 2D bento   */}
             {projects.length >= 3 && (
               <div className="grid @lg:grid-cols-12 @md:grid-cols-2 grid-cols-1 gap-3">
 
-                {/* [1] Featured РІР‚вЂќ 8 cols, row-span-2 */}
+                {/* [1] Featured   8 cols, row-span-2 */}
                 {p1 && (
                   <ProjectCard
                     project={p1}
+                    projectImage={getPortfolioFeaturedWorkImage(imageContent, p1.id)}
                     index={0}
                     imgSizes="(max-width: 768px) 100vw, 67vw"
                     titleSize="text-base"
@@ -196,10 +193,11 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [2] Top-right РІР‚вЂќ 4 cols */}
+                {/* [2] Top-right   4 cols */}
                 {p2 && (
                   <ProjectCard
                     project={p2}
+                    projectImage={getPortfolioFeaturedWorkImage(imageContent, p2.id)}
                     index={1}
                     imgSizes="(max-width: 768px) 100vw, 33vw"
                     titleSize="text-sm"
@@ -211,10 +209,11 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [3] Bottom-right РІР‚вЂќ 4 cols */}
+                {/* [3] Bottom-right   4 cols */}
                 {p3 && (
                   <ProjectCard
                     project={p3}
+                    projectImage={getPortfolioFeaturedWorkImage(imageContent, p3.id)}
                     index={2}
                     imgSizes="(max-width: 768px) 100vw, 33vw"
                     titleSize="text-sm"
@@ -226,13 +225,14 @@ export function BentoFeaturedWork({ theme, sectionContent }: BentoFeaturedWorkPr
                   />
                 )}
 
-                {/* [4+] Bottom row РІР‚вЂќ equal thirds */}
+                {/* [4+] Bottom row   equal thirds */}
                 {rest.length > 0 && (
                   <div className="@lg:col-span-12 @md:col-span-2 col-span-1 grid @lg:grid-cols-3 @md:grid-cols-2 grid-cols-1 gap-3">
                     {rest.map((project, i) => (
                       <ProjectCard
                         key={i}
                         project={project}
+                        projectImage={getPortfolioFeaturedWorkImage(imageContent, project.id ?? '')}
                         index={i + 3}
                         imgSizes="(max-width: 768px) 100vw, 33vw"
                         titleSize="text-sm"

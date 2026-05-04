@@ -11,9 +11,10 @@ interface PhotobookTemplateShellProps {
 }
 
 export function PhotobookTemplateShell({ Design }: PhotobookTemplateShellProps) {
-  const { photobookSectionVisibility, photobookSectionContent } = useContentSelector((state) => ({
+  const { photobookSectionVisibility, photobookSectionContent, photobookImageContent } = useContentSelector((state) => ({
     photobookSectionVisibility: state.photobookSectionVisibility,
     photobookSectionContent: state.photobookSectionContent,
+    photobookImageContent: state.photobookImageContent,
   }))
 
   const { currentTheme, themeCustomizations } = useThemeSelector((state) => ({
@@ -38,6 +39,7 @@ export function PhotobookTemplateShell({ Design }: PhotobookTemplateShellProps) 
         theme={theme}
         sectionVisibility={photobookSectionVisibility}
         sectionContent={photobookSectionContent}
+        imageContent={photobookImageContent}
       />
       <PhotobookTextureOverlay texture={texture} />
     </div>

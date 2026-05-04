@@ -25,6 +25,7 @@ export function GridTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -39,13 +40,13 @@ export function GridTemplateDesign({
         />
       )}
       {sectionVisibility.showHero && (
-        <GridHero theme={theme} sectionContent={sectionContent} />
+        <GridHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showBio && (
-        <GridBio theme={theme} sectionContent={sectionContent} />
+        <GridBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showFeaturedWork && (
-        <GridFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <GridFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showVideo && (
         <GridVideo theme={theme} sectionContent={sectionContent} />

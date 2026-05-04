@@ -96,20 +96,22 @@ export function TemplatesSection({
 
   const heroTitle = useContentStore((s) => s.sectionContent.hero.title)
   const heroSubtitle = useContentStore((s) => s.sectionContent.hero.subtitle)
-  const heroImage = useContentStore((s) => s.sectionContent.hero.image)
-  const heroAspectRatio = useContentStore((s) => s.sectionContent.hero.aspectRatio)
-  const heroFrameStyle = useContentStore((s) => s.sectionContent.hero.frameStyle)
+  const heroImage = useContentStore((s) => s.portfolioImageContent.hero?.value.asset.src)
+  const heroAspectRatio = useContentStore((s) => s.portfolioImageContent.hero?.value.presentation?.ratio)
+  const heroFrameStyle = useContentStore((s) => s.portfolioImageContent.hero?.value.presentation?.frameStyle)
 
   const coverTitle = useContentStore((s) => s.photobookSectionContent.cover.title)
   const coverSubtitle = useContentStore((s) => s.photobookSectionContent.cover.subtitle)
-  const coverImage = useContentStore((s) => s.photobookSectionContent.cover.images?.image)
+  const coverImage = useContentStore((s) => s.photobookImageContent.cover?.value.asset.src)
+  const coverAspectRatio = useContentStore((s) => s.photobookImageContent.cover?.value.presentation?.ratio)
+  const coverFrameStyle = useContentStore((s) => s.photobookImageContent.cover?.value.presentation?.frameStyle)
   const coverDate = useContentStore((s) => s.photobookSectionContent.cover.date)
 
   const title = isPhotobook ? coverTitle : heroTitle
   const subtitle = isPhotobook ? coverSubtitle : heroSubtitle
   const heroImageUrl = isPhotobook ? coverImage : heroImage
-  const aspectRatio = isPhotobook ? undefined : heroAspectRatio
-  const frameStyle = isPhotobook ? undefined : heroFrameStyle
+  const aspectRatio = isPhotobook ? coverAspectRatio : heroAspectRatio
+  const frameStyle = isPhotobook ? coverFrameStyle : heroFrameStyle
   const date = isPhotobook ? coverDate : undefined
 
   return (

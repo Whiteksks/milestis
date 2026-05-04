@@ -86,7 +86,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
               </motion.div>
             )}
             <div className="border-b border-current/10 py-4">

@@ -21,6 +21,8 @@ import type {
   ThemeCustomDecorations,
 } from './types'
 import type { ThemeCustomizations } from './store-theme'
+import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────
 
@@ -51,16 +53,13 @@ export interface ProjectThemeData {
 export interface PortfolioProjectContent {
   sectionVisibility: SectionVisibility
   sectionContent: SectionContent
-  /**
-   * Images are stored in Firebase Storage and their metadata lives in
-   * users/{userId}/media — not inside the project document.
-   * Section fields like hero.image / bio.image store a download URL reference.
-   */
+  imageContent?: PortfolioImageContent
 }
 
 export interface PhotobookProjectContent {
   sectionVisibility: PhotobookSectionVisibility
   sectionContent: PhotobookSectionContent
+  imageContent?: PhotobookImageContent
 }
 
 // ─── Full project document (discriminated union) ──────────────────────────

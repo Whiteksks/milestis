@@ -3,23 +3,21 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface CoverSoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
+export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleilProps) {
   const { cover } = sectionContent
-  const imageUrl = cover.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const imageSettings = cover.images?.imageSettings?.[0]
-  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
-  const cropData = imageSettings?.cropData
+  const coverImage = imageContent?.cover
+  const hasImage = Boolean(coverImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -48,10 +46,10 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
 
       {/* 2. Основной контент */}
       <div className="flex-1 flex items-center justify-center px-6 @md:px-12">
-        {hasImage ? (
+        {hasImage && coverImage ? (
           <div className="flex flex-col @md:flex-row items-center justify-center gap-12 @md:gap-20 @lg:gap-32 w-full max-w-7xl">
-            
-            {/* Контейнер с фото (Уменьшен и отцентрован) */}
+
+            {/* Фото — ratio 4/5 форсируется политикой */}
             <Animate
               trigger="mount"
               delay={0.1}
@@ -59,19 +57,14 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
               direction="up"
               className="w-full @sm:w-[70%] @md:w-[40%] @lg:w-[35%] shrink-0"
             >
-              <div className={cn(
-                'relative w-full aspect-[4/5] overflow-hidden rounded-[2px] ring-1 ring-current/5',
-                theme.shadow
-              )}>
-                <SiteImage
-                  src={imageUrl}
+              <div className={cn('rounded-[2px] ring-1 ring-current/5', theme.shadow)}>
+                <SlotImage
+                  slotId={coverImage.slotId}
+                  value={coverImage.value}
+                  templateId="photobook-soleil"
                   alt={cover.title ?? 'Cover'}
-                  aspectRatio={aspectRatio}
-                  frameStyle={frameStyle}
-                  unoptimized
                   sizes="(max-width: 768px) 80vw, 30vw"
                   priority
-                  className="w-full h-full object-cover"
                 />
               </div>
             </Animate>
@@ -89,7 +82,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
                 )}>
                   {cover.title}
                 </h1>
-                
+
                 {cover.subtitle && (
                   <p className={cn(
                     'text-base @lg:text-lg font-light opacity-50 max-w-[30ch]',
@@ -117,7 +110,7 @@ export function CoverSoleil({ sectionContent, theme }: CoverSoleilProps) {
             </Animate>
           </div>
         ) : (
-          /* Вариант без изображения (Поэтичный центр) */
+          /* Вариант без изображения */
           <Animate trigger="mount" delay={0.1} className="text-center space-y-8">
             <h1 className={cn('text-6xl @md:text-8xl font-light tracking-tighter', theme.fontTitle)}>
               {cover.title}

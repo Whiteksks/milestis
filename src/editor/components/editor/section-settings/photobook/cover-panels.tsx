@@ -1,8 +1,7 @@
 "use client"
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
+import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { ps, editorialInput, editorialLabel, PanelLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -97,31 +96,30 @@ export function CoverMetadataPanel({ dense = false }: { dense?: boolean }) {
 
 export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
-  const { cover, updatePhotobookSection } = useContentSelector((state) => ({
-    cover: state.photobookSectionContent.cover,
-    updatePhotobookSection: state.updatePhotobookSection,
+  const { coverImage, setPhotobookSingleImage } = useContentSelector((state) => ({
+    coverImage: state.photobookImageContent.cover,
+    setPhotobookSingleImage: state.setPhotobookSingleImage,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const coverRestrictions = useSectionRestrictions('cover')
+
+  // Provide a stable empty ImageValue so ImagePicker renders its "add image" state
+  // even before any image has been picked.
+  const emptyValue: ImageValue = {
+    asset: { src: '', width: 0, height: 0 },
+  }
+  const pickerValue = coverImage?.value ?? emptyValue
 
   return (
     <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url, thumbUrl) =>
-          updatePhotobookSection("cover", {
-            images: {
-              id: cover.images?.id || "cover-main",
-              image: url,
-              thumbUrl,
-              caption: cover.images?.caption || "",
-              imageSettings:
-                cover.images?.imageSettings?.length
-                  ? cover.images.imageSettings
-                  : [{ aspectRatio: "square", frameStyle: "soft" }],
-            },
-          })
-        }
+        onSelectImage={(url, thumbUrl) => {
+          if (coverImage) {
+            setPhotobookSingleImage('cover', replacePhotobookManagedImageAsset(coverImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPhotobookSingleImage('cover', createPhotobookSectionImage({ id: 'cover-main', sectionId: 'cover', src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
       />
 
       {!dense && (
@@ -132,11 +130,20 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
       )}
 
       <ImagePicker
-        label=""
-        value={cover.images}
-        onChange={(next) => updatePhotobookSection("cover", { images: next })}
+        slotId="photobook.cover.primary"
+        value={pickerValue}
+        onChange={(next) => {
+          if (!next.asset.src) {
+            // Image removed
+            setPhotobookSingleImage('cover', undefined)
+            return
+          }
+          if (coverImage) {
+            setPhotobookSingleImage('cover', { ...coverImage, value: next })
+          }
+        }}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
-        restrictions={coverRestrictions}
+        dense={dense}
         showCaption={false}
       />
     </div>

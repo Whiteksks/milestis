@@ -1,21 +1,23 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface CoverChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
+export function CoverChronicle({ sectionContent, theme, imageContent }: CoverChronicleProps) {
   const { cover } = sectionContent
-  const imageUrl = cover.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const coverImage = imageContent?.cover
+  const hasImage = Boolean(coverImage?.value.asset.src)
 
   // Константы стилей для уменьшения вложенности в JSX
   const textContrast = hasImage ? 'text-white' : ''
@@ -32,15 +34,14 @@ export function CoverChronicle({ sectionContent, theme }: CoverChronicleProps) {
       )}
     >
       {/* Background Layer */}
-      {hasImage && (
+      {hasImage && coverImage && (
         <div className="absolute inset-0 z-0">
-          <SiteImage
+          <SlotImage
+            slotId={coverImage.slotId}
+            value={coverImage.value}
             fillParent
-            unoptimized
-            src={imageUrl}
             alt={cover.title ?? 'Cover'}
             sizes="100vw"
-            imageClassName="object-cover"
             priority
           />
           <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />

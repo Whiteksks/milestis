@@ -1,21 +1,23 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface CoverMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
+export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMagazineProps) {
   const { cover } = sectionContent
-  const imageUrl = cover.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const coverImage = imageContent?.cover
+  const hasImage = Boolean(coverImage?.value.asset.src)
 
   // Split title into words вЂ” alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
@@ -29,15 +31,14 @@ export function CoverMagazine({ sectionContent, theme }: CoverMagazineProps) {
       )}
     >
       {/* Full-bleed background */}
-      {hasImage && (
+      {hasImage && coverImage && (
         <div className="absolute inset-0">
-          <SiteImage
+          <SlotImage
+            slotId={coverImage.slotId}
+            value={coverImage.value}
             fillParent
-            unoptimized
-            src={imageUrl}
             alt={cover.title ?? 'Cover'}
             sizes="100vw"
-            imageClassName="object-cover"
             priority
           />
           {/* Gradient: darken bottom 60%, slight top vignette */}

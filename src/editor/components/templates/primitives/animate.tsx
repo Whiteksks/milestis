@@ -115,7 +115,7 @@ export function Animate({
   type = 'fade',
   ...props
 }: AnimateProps) {
-  // Memoize so React doesn't unmount/remount the DOM node on every render РІР‚вЂќ
+  // Memoize so React doesn't unmount/remount the DOM node on every render  
   // which would break animations during text input in the editor.
   const MotionComponent = useMemo(
     () => motion.create(Component as string | React.ComponentType<Record<string, unknown>>) as React.ComponentType<Record<string, unknown>>,

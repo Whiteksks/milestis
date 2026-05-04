@@ -1,13 +1,12 @@
 "use client"
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
+import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { PanelLabel, ps, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { useContentSelector, useUiSelector } from "@/editor/lib/store"
+import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
 export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
@@ -59,32 +58,26 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
 
 export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
-  const { introduction, updatePhotobookSection } = useContentSelector((state) => ({
-    introduction: state.photobookSectionContent.introduction,
-    updatePhotobookSection: state.updatePhotobookSection,
+  const { introImage, setPhotobookSingleImage } = useContentSelector((state) => ({
+    introImage: state.photobookImageContent.introduction,
+    setPhotobookSingleImage: state.setPhotobookSingleImage,
   }))
-  const { openMediaPicker } = useUiSelector((state) => ({
-    openMediaPicker: state.openMediaPicker,
-  }))
-  const introductionRestrictions = useSectionRestrictions('introduction')
+  const openMediaPicker = useUiStore((s) => s.openMediaPicker)
+
+  const emptyValue: ImageValue = { asset: { src: '', width: 0, height: 0 } }
+  const pickerValue = introImage?.value ?? emptyValue
 
   return (
     <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url) =>
-          updatePhotobookSection("introduction", {
-            images: {
-              id: introduction.images?.id || "intro-main",
-              image: url,
-              caption: introduction.images?.caption || "",
-              imageSettings:
-                introduction.images?.imageSettings?.length
-                  ? introduction.images.imageSettings
-                  : [{ aspectRatio: "portrait", frameStyle: "soft" }],
-            },
-          })
-        }
+        onSelectImage={(url, thumbUrl) => {
+          if (introImage) {
+            setPhotobookSingleImage('introduction', replacePhotobookManagedImageAsset(introImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPhotobookSingleImage('introduction', createPhotobookSectionImage({ id: 'intro-main', sectionId: 'introduction', src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
       />
 
       {!dense && (
@@ -95,11 +88,20 @@ export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
       )}
 
       <ImagePicker
-        label=""
-        value={introduction.images}
-        onChange={(next) => updatePhotobookSection("introduction", { images: next })}
+        slotId="photobook.introduction.primary"
+        value={pickerValue}
+        onChange={(next) => {
+          if (!next.asset.src) {
+            setPhotobookSingleImage('introduction', undefined)
+            return
+          }
+          if (introImage) {
+            setPhotobookSingleImage('introduction', { ...introImage, value: next })
+          }
+        }}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
-        restrictions={introductionRestrictions}
+        dense={dense}
+        showCaption={false}
       />
     </div>
   )

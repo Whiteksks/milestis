@@ -59,7 +59,7 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
           </p>
         )}
 
-        {/* Video РІР‚вЂќ cinematic aspect ratio, no border-radius */}
+        {/* Video   cinematic aspect ratio, no border-radius */}
         <Animate direction="none" scaleOffset={0.98} delay={0.2} className="relative aspect-video w-full overflow-hidden bg-current/5">
           {sectionContent.video.videoUrl ? (
             <iframe

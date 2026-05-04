@@ -2,12 +2,13 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'       
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage } from '../image-helpers'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'>) {
+export function GridFeaturedWork({ theme, sectionContent, imageContent }: Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'>) {
   const projects = sectionContent.featuredWork.projects ?? []
 
   return (
@@ -33,6 +34,9 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
         </Animate>
         <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 gap-x-6 gap-y-12">
           {projects.map((project, index) => (
+            (() => {
+              const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
+              return (
             <Animate
               key={index}
               direction="up"
@@ -42,16 +46,14 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
             >
               {/* Image Wrapper */}
               <div className="relative overflow-hidden">
-                {!project.image ? (
+                {!projectImage ? (
                   <ProjectPlaceholder seed={project.id} className="w-full" style={{ aspectRatio: '3/4' }} />
                 ) : (
-                  <SiteImage
-                    unoptimized
-                    src={project.image}
+                  <SlotImage
+                    slotId={projectImage.slotId}
+                    value={projectImage.value}
+                    templateId="grid"
                     alt={project.title || ''}
-                    aspectRatio={project.aspectRatio || 'poster'}
-                    frameStyle={project.frameStyle || 'none'}
-                    cropData={project.cropData}
                     sizes="(max-width: 768px) 100vw, 33vw"
                     imageClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
@@ -89,6 +91,8 @@ export function GridFeaturedWork({ theme, sectionContent }: Pick<PortfolioTempla
                 </p>
               </div>
             </Animate>
+              )
+            })()
           ))}
         </div>
       </div>

@@ -7,15 +7,15 @@ import { Menu, X } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
-type ShowcaseHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
+type ShowcaseHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent' | 'handleAnchorClick'> 
 
-export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: ShowcaseHeaderProps) {
+export function ShowcaseHeader({ theme, sectionContent, imageContent, handleAnchorClick }: ShowcaseHeaderProps) {
   const t = useT();
   const disabled = useDisabled()
   const [isOpen, setIsOpen] = useState(false)
   const [heroVisible, setHeroVisible] = useState(true)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
-  const hasHeroImage = !!sectionContent.hero.image
+  const hasHeroImage = !!imageContent?.hero?.value.asset.src
 
   // White text only while the hero section is still intersecting the viewport
   const isOverHero = hasHeroImage && heroVisible
@@ -57,7 +57,7 @@ export function ShowcaseHeader({ theme, sectionContent, handleAnchorClick }: Sho
           {sectionContent.header.title}
         </motion.a>
 
-        {/* Nav РІР‚вЂќ desktop */}
+        {/* Nav   desktop */}
         <motion.nav
           initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}

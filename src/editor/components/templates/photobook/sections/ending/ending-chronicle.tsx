@@ -1,7 +1,8 @@
 ﻿'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -9,14 +10,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface EndingChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps) {
+export function EndingChronicle({ sectionContent, theme, imageContent }: EndingChronicleProps) {
   const { ending } = sectionContent
-  const imageBlock = ending.images
-  const imageUrl = imageBlock?.image ?? ''
-  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'square'
-  const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const endingImage = imageContent?.ending
+  const hasImage = Boolean(endingImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -82,15 +82,12 @@ export function EndingChronicle({ sectionContent, theme }: EndingChronicleProps)
           </div>
 
           {/* Right вЂ” optional closing photo */}
-          {imageUrl && (
+          {hasImage && endingImage && (
             <div className="w-full @md:w-64 @lg:w-80 shrink-0">
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={endingImage.slotId}
+                value={endingImage.value}
                 alt={ending.signature ?? 'Ending'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageBlock?.imageSettings?.[0]?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 80vw, 320px"
                 className={theme.shadow}
               />

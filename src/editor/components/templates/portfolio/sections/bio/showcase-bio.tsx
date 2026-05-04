@@ -4,12 +4,13 @@ import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
-type ShowcaseBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ShowcaseBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
-  const { title, subtitle, description, image, aspectRatio, frameStyle, achievements, cropData } = sectionContent.bio
+export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBioProps) {
+  const { title, subtitle, description, achievements } = sectionContent.bio
+  const bioImage = imageContent?.bio
 
   return (
     <SectionWrapper
@@ -28,15 +29,13 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
         {/* Main grid: image + content */}
         <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 @lg:gap-20 items-start">
           {/* Image */}
-          {image && (
+          {bioImage && (
             <Animate direction="up" distance={30} delay={0.1} className="@lg:col-span-4 flex justify-start">
-              <SiteImage
-                  unoptimized
-                  src={image}
+              <SlotImage
+                  slotId={bioImage.slotId}
+                  value={bioImage.value}
+                  templateId="showcase"
                   alt={title || 'Profile'}
-                  aspectRatio={aspectRatio || 'portrait'}
-                  frameStyle={frameStyle || 'none'}
-                  cropData={cropData}
                   sizes="(max-width: 768px) 58vw, 33vw"
                   className={cn('w-[58vw] max-w-[220px] @md:w-full @md:max-w-xs @lg:max-w-none', theme.shadow)}
                   imageClassName="object-cover"
@@ -45,7 +44,7 @@ export function ShowcaseBio({ theme, sectionContent }: ShowcaseBioProps) {
           )}
 
           {/* Content */}
-          <Animate direction="up" distance={30} delay={0.2} className={cn(image ? '@lg:col-span-8' : '@lg:col-span-12', 'space-y-8')}>
+          <Animate direction="up" distance={30} delay={0.2} className={cn(bioImage ? '@lg:col-span-8' : '@lg:col-span-12', 'space-y-8')}>
             {/* Name / title */}
             <h2
               className={cn(

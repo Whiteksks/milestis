@@ -101,7 +101,7 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
     return <PhotobookTemplateShell Design={Design} />
   },
 
-  renderPublished: ({ templateId, theme, themeCustomizations, content, visibility }) => {
+  renderPublished: ({ templateId, theme, themeCustomizations, content, imageContent, visibility }) => {
     const id = templateId as PhotobookTemplateId
     const Design =
       photobookTemplateComponents[id] ??
@@ -120,6 +120,7 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
         <Design
           theme={theme}
           sectionContent={content as PhotobookSectionContent}
+          imageContent={imageContent as PhotobookTemplateProps['imageContent']}
           sectionVisibility={visibility as PhotobookSectionVisibility}
         />
         <PhotobookTextureOverlay texture={texture} />

@@ -1,7 +1,8 @@
 'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -9,11 +10,12 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface GalleryChronicleProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProps) {
+export function GalleryChronicle({ sectionContent, theme, imageContent }: GalleryChronicleProps) {
   const { gallery } = sectionContent
-  const photos = gallery.images ?? []
+  const photos = gallery.photos ?? []
   const [feature, ...rest] = photos
 
   return (
@@ -53,18 +55,22 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
             {feature && (
               <div className="group">
                 <div className="relative aspect-[16/7] @md:aspect-[21/9] overflow-hidden">
-                  {feature.image ? (
-                    <SiteImage
+                  {(() => {
+                    const featureImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', feature.id) : undefined
+
+                    return featureImage?.value.asset.src ? (
+                    <SlotImage
+                      slotId={featureImage.slotId}
+                      value={featureImage.value}
                       fillParent
-                      unoptimized
-                      src={feature.image}
                       alt={feature.caption ?? 'Feature'}
                       sizes="100vw"
                       imageClassName="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
-                  ) : (
+                    ) : (
                     <div className={cn('absolute inset-0', theme.muted)} />
-                  )}
+                    )
+                  })()}
                 </div>
                 {feature.caption && (
                   <p className={cn('mt-2 text-[10px] uppercase tracking-wide opacity-35', theme.fontBody)}>
@@ -81,18 +87,22 @@ export function GalleryChronicle({ sectionContent, theme }: GalleryChronicleProp
                     className="group"
                   >
                     <div className="relative aspect-[4/5] overflow-hidden">
-                      {block.image ? (
-                        <SiteImage
+                      {(() => {
+                        const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', block.id) : undefined
+
+                        return galleryImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={galleryImage.slotId}
+                          value={galleryImage.value}
                           fillParent
-                          unoptimized
-                          src={block.image}
                           alt={block.caption ?? `Photo ${index + 2}`}
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           imageClassName="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                         />
-                      ) : (
+                        ) : (
                         <div className={cn('absolute inset-0', theme.muted)} />
-                      )}
+                        )
+                      })()}
                     </div>
                     {block.caption && (
                       <p className={cn('mt-2 text-[10px] uppercase tracking-wide opacity-30', theme.fontBody)}>

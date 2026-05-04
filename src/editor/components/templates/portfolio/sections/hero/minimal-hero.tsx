@@ -2,14 +2,14 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type MinimalHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type MinimalHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function MinimalHero({ theme, sectionContent, imageContent }: MinimalHeroProps) {
+  const heroImage = imageContent?.hero
   return (
     <SectionWrapper
       id="hero"
@@ -60,12 +60,11 @@ export function MinimalHero({ theme, sectionContent }: MinimalHeroProps) {
 
           {heroImage && (
             <Animate direction="up" distance={20} delay={0.3} scaleOffset={0.98}>
-              <SiteImage
-                src={heroImage}
+              <SlotImage
+                slotId={heroImage.slotId}
+                value={heroImage.value}
+                templateId="minimal"
                 alt={sectionContent.hero.title}
-                aspectRatio={sectionContent.hero.aspectRatio || 'portrait'}
-                frameStyle={sectionContent.hero.frameStyle || 'none'}
-                cropData={sectionContent.hero.cropData}
                 priority
               />
             </Animate>

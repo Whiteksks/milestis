@@ -2,7 +2,7 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
 // Primitives: The basic building blocks for templates
 import { SectionWrapper } from '../../../primitives/section-wrapper'
@@ -10,9 +10,10 @@ import { Animate } from '../../../primitives/animate'
 import { EditorialLabel, EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-type EditorialBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type EditorialBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
+export function EditorialBio({ theme, sectionContent, imageContent }: EditorialBioProps) {
+  const bioImage = imageContent?.bio
   return (
     <SectionWrapper id="bio" themeForeground={theme.foreground}>
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-16 @md:py-14 py-10">
@@ -25,19 +26,19 @@ export function EditorialBio({ theme, sectionContent }: EditorialBioProps) {
       <div className="flex @md:flex-row flex-col gap-10 @lg:gap-16 items-start">
         
         {/* Photo Block (Fixed size) */}
-        <Animate direction="none" delay={0.1} type="scale" scaleOffset={0.95} className="flex-shrink-0">
-          <SiteImage
-            unoptimized
-            src={sectionContent.bio.image}
-            alt={sectionContent.bio.title || 'Profile'}
-            aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
-            frameStyle={sectionContent.bio.frameStyle || 'none'}
-            cropData={sectionContent.bio.cropData}
-            sizes="(max-width: 768px) 112px, 128px"
-            className={cn('w-48 bg-neutral-100', theme.shadow)}
-            imageClassName="object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out"
-          />
-        </Animate>
+        {bioImage && (
+          <Animate direction="none" delay={0.1} type="scale" scaleOffset={0.95} className="flex-shrink-0">
+            <SlotImage
+              slotId={bioImage.slotId}
+              value={bioImage.value}
+              templateId="editorial"
+              alt={sectionContent.bio.title || 'Profile'}
+              sizes="(max-width: 768px) 112px, 128px"
+              className={cn('w-48 bg-neutral-100', theme.shadow)}
+              imageClassName="object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out"
+            />
+          </Animate>
+        )}
 
         {/* Content Block */}
         <div className="flex-1 min-w-0">

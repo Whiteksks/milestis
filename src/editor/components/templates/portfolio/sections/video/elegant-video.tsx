@@ -46,7 +46,7 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
             )}
           </div>
 
-          {/* Video frame РІР‚вЂќ thin ornamental border */}
+          {/* Video frame   thin ornamental border */}
           <Animate
             direction="up"
             distance={16}

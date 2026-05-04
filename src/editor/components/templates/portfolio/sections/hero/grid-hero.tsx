@@ -2,15 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type GridHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type GridHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function GridHero({ theme, sectionContent }: GridHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function GridHero({ theme, sectionContent, imageContent }: GridHeroProps) {
+  const heroImage = imageContent?.hero
   const initials = sectionContent.hero.title
     ? sectionContent.hero.title
         .split(' ')
@@ -67,17 +67,15 @@ export function GridHero({ theme, sectionContent }: GridHeroProps) {
 
             </div>
 
-            {/* [RIGHT] Photo РІР‚вЂќ large */}
+            {/* [RIGHT] Photo   large */}
             <div className="@lg:col-span-6 flex justify-center @lg:justify-end">
               <div className="w-full transition-transform duration-500 hover:-translate-y-1">
                 {heroImage ? (
-                  <SiteImage
-                    unoptimized
-                    src={heroImage}
+                  <SlotImage
+                    slotId={heroImage.slotId}
+                    value={heroImage.value}
+                    templateId="grid"
                     alt={sectionContent.hero.title || 'Hero Image'}
-                    aspectRatio={sectionContent.hero.aspectRatio || 'square'}
-                    frameStyle={sectionContent.hero.frameStyle || 'none'}
-                    cropData={sectionContent.hero.cropData}
                     priority
                   />
                 ) : (

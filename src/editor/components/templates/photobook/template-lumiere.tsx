@@ -23,33 +23,34 @@ export function TemplateLumiereDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   disableAnimations = false,
 }: PhotobookTemplateProps) {
   return (
     <AnimationProvider templateId="lumiere" disabled={disableAnimations}>
       <div className={cn('min-h-screen overflow-x-clip', theme.background, theme.foreground)}>
         {sectionVisibility.showCover && (
-          <CoverLumiere sectionContent={sectionContent} theme={theme} />
+          <CoverLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showIntroduction && (
-          <IntroLumiere sectionContent={sectionContent} theme={theme} />
+          <IntroLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showStory && (
-          <StoryLumiere sectionContent={sectionContent} theme={theme} />
+          <StoryLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showGallery && (
-          <GalleryLumiere sectionContent={sectionContent} theme={theme} />
+          <GalleryLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showHighlight && (
-          <HighlightLumiere sectionContent={sectionContent} theme={theme} />
+          <HighlightLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showEnding && (
-          <EndingLumiere sectionContent={sectionContent} theme={theme} />
+          <EndingLumiere sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
       </div>
     </AnimationProvider>

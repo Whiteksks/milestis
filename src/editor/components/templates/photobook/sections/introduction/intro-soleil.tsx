@@ -3,7 +3,8 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { SectionLabel } from '../../../primitives/section-label'
@@ -12,20 +13,15 @@ import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 interface IntroSoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function IntroSoleil({ sectionContent, theme }: IntroSoleilProps) {
+export function IntroSoleil({ sectionContent, theme, imageContent }: IntroSoleilProps) {
   const { introduction } = sectionContent
   const num = usePhotobookSectionNum('introduction')
-  
-  // Безопасное извлечение данных изображения
-  const imageData = introduction.images
-  const imageUrl = imageData?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  
-  const imageSettings = imageData?.imageSettings?.[0]
-  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+
+  const introImage = imageContent?.introduction
+  const hasImage = Boolean(introImage?.value.asset.src)
 
   // Общие стили для шрифтов, чтобы не дублировать cn()
   const bodyFontStyles = cn(
@@ -89,29 +85,26 @@ export function IntroSoleil({ sectionContent, theme }: IntroSoleilProps) {
             </div>
 
             {/* Правая колонка: Фото */}
-            {hasImage && (
+            {hasImage && introImage && (
               <div className="order-1 @md:order-2 @md:col-span-5">
                 <Animate delay={0.15} direction="up" distance={30}>
                   <div className="group relative">
                     <div className="overflow-hidden rounded-sm shadow-sm transition-shadow duration-500 group-hover:shadow-xl">
-                      <SiteImage
-                        src={imageUrl}
+                      <SlotImage
+                        slotId={introImage.slotId}
+                        value={introImage.value}
                         alt={introduction.title ?? 'Introduction'}
-                        aspectRatio={aspectRatio}
-                        frameStyle={frameStyle}
-                        cropData={imageSettings?.cropData}
-                        unoptimized
                         sizes="(max-width: 768px) 90vw, 40vw"
                         className="transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
-                    
-                    {imageData?.caption && (
+
+                    {introImage.value.caption && (
                       <p className={cn(
                         'mt-4 text-[9px] uppercase tracking-widest opacity-30 italic',
                         theme.fontBody
                       )}>
-                        {imageData.caption}
+                        {introImage.value.caption}
                       </p>
                     )}
                   </div>

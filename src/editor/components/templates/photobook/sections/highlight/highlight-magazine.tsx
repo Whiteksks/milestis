@@ -1,7 +1,8 @@
 'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -10,12 +11,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface HighlightMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function HighlightMagazine({ sectionContent, theme }: HighlightMagazineProps) {
+export function HighlightMagazine({ sectionContent, theme, imageContent }: HighlightMagazineProps) {
   const { highlight } = sectionContent
-  const imageUrl = highlight.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const highlightImage = imageContent?.highlight
+  const hasImage = Boolean(highlightImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -25,16 +27,15 @@ export function HighlightMagazine({ sectionContent, theme }: HighlightMagazinePr
     >
       {/* Full-bleed cinematic photo panel */}
       <div className="relative min-h-[60vh] @md:min-h-[75vh] overflow-hidden">
-        {hasImage ? (
+        {hasImage && highlightImage ? (
           <>
             <div className="absolute inset-0">
-              <SiteImage
+              <SlotImage
                 fillParent
-                unoptimized
-                src={imageUrl}
+                slotId={highlightImage.slotId}
+                value={highlightImage.value}
                 alt={highlight.title ?? 'Highlight'}
                 sizes="100vw"
-                imageClassName="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20" />
             </div>

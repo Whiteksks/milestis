@@ -1,9 +1,10 @@
 ﻿'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
@@ -13,12 +14,13 @@ import { usePhotobookSectionNum } from '@/editor/hooks/usePhotobookSectionNum'
 interface StorySoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
+export function StorySoleil({ sectionContent, theme, imageContent }: StorySoleilProps) {
   const { story } = sectionContent
   const num = usePhotobookSectionNum('story')
-  const moments = story.images ?? []
+  const moments = story.moments ?? []
 
   return (
     <SectionWrapper
@@ -56,10 +58,7 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
       {moments.length > 0 && (
         <div className="space-y-16 @md:space-y-24">
           {moments.map((block, index) => {
-            const imageUrl = block.image
-            const imageSettings = block.imageSettings?.[0]
-            const aspectRatio = imageSettings?.aspectRatio ?? 'wide'
-            const frameStyle = imageSettings?.frameStyle ?? 'none'
+            const storyImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'story', block.id) : undefined
             const isEven = index % 2 === 0
 
             return (
@@ -72,14 +71,11 @@ export function StorySoleil({ sectionContent, theme }: StorySoleilProps) {
                 >
                   {/* Photo */}
                   <div className={cn('overflow-hidden rounded-sm', !isEven && '@md:order-2')}>
-                    {imageUrl ? (
-                      <SiteImage
-                        src={imageUrl}
+                    {storyImage?.value.asset.src ? (
+                      <SlotImage
+                        slotId={storyImage.slotId}
+                        value={storyImage.value}
                         alt={block.label ?? story.title ?? 'Story'}
-                        aspectRatio={aspectRatio}
-                        frameStyle={frameStyle}
-                        cropData={imageSettings?.cropData}
-                        unoptimized
                         sizes="(max-width: 768px) 100vw, 58vw"
                       />
                     ) : (

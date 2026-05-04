@@ -34,7 +34,7 @@ const ACTIONS_BY_SECTION: Partial<Record<string, PhotobookSectionQuickAction[]>>
   ],
   gallery: [
     { id: "gallery.header", title: "Header", Icon: Type, Panel: GalleryHeaderPanel },
-    { id: "gallery.images", title: "Images", Icon: ImageIcon, Panel: GalleryImagesPanel },
+    { id: "gallery.photos", title: "Photos", Icon: ImageIcon, Panel: GalleryImagesPanel },
   ],
   highlight: [
     { id: "highlight.text", title: "Text", Icon: AlignLeft, Panel: HighlightTextPanel },

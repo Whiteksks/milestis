@@ -17,14 +17,12 @@ import { buildFrameStylePatch, getFrameStyleRestrictions, getEffectiveAspectRati
 import { type SectionImageRestrictions } from "@/editor/lib/restrictions/template-restrictions"
 import { InlineCropPanel } from "@/editor/components/editor/section-settings/ui/inline-crop-panel"
 import { InlineStylePanel } from "@/editor/components/editor/section-settings/ui/inline-style-panel"
-import Image from "next/image"
 import { Crop, ImageIcon, Palette, Plus, Settings2, Trash2, X } from "lucide-react"
 import { editorialLabel } from "./panel-ui"
 
 /**
  * Flat value that ImagePickerCore operates on.
- * Adapters (PortfolioImagePicker, PhotobookImagePicker) normalise their
- * domain-specific types to/from this shape.
+ * Adapter components normalize their domain-specific types to/from this shape.
  */
 export interface ImagePickerCoreValue {
   image: string
@@ -156,12 +154,14 @@ if (dense) {
             <button
               type="button"
               onClick={onOpenMediaPicker}
-              className="relative shrink-0 h-14 w-14 rounded-lg overflow-hidden border border-border shadow-sm bg-background hover:ring-2 ring-primary/20 transition-all"
+              className="rounded-lg border border-border shadow-sm bg-background hover:ring-2 ring-primary/20 transition-all"
+              style={{ position: 'relative', flexShrink: 0, width: 56, height: 56, overflow: 'hidden' }}
               aria-label="Pick image"
             >
               {value.image ? (
                 <>
-                  <Image src={value.image} alt="" fill unoptimized className="object-cover" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={value.image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <ImageIcon className="w-4 h-4 text-white" />
                   </div>
@@ -306,16 +306,14 @@ if (dense) {
         ) : (
           <>
             {/* Photo area */}
-            <div className="relative w-full h-64 overflow-hidden bg-muted/50">
+            <div className="bg-muted/50" style={{ position: 'relative', width: '100%', height: 256, overflow: 'hidden' }}>
               {value.image ? (
                 <>
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={value.image}
                     alt={label}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    style={{ filter: "blur(2px)" }}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(2px)' }}
                   />
 
                   {/* Change button — centered pill with backdrop blur */}

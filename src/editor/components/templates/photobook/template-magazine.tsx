@@ -23,33 +23,34 @@ export function TemplateMagazineDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   disableAnimations = false,
 }: PhotobookTemplateProps) {
   return (
     <AnimationProvider templateId="magazine" disabled={disableAnimations}>
       <div className={cn('min-h-screen overflow-x-clip', theme.background, theme.foreground)}>
         {sectionVisibility.showCover && (
-          <CoverMagazine sectionContent={sectionContent} theme={theme} />
+          <CoverMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showIntroduction && (
-          <IntroMagazine sectionContent={sectionContent} theme={theme} />
+          <IntroMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showStory && (
-          <StoryMagazine sectionContent={sectionContent} theme={theme} />
+          <StoryMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showGallery && (
-          <GalleryMagazine sectionContent={sectionContent} theme={theme} />
+          <GalleryMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showHighlight && (
-          <HighlightMagazine sectionContent={sectionContent} theme={theme} />
+          <HighlightMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
 
         {sectionVisibility.showEnding && (
-          <EndingMagazine sectionContent={sectionContent} theme={theme} />
+          <EndingMagazine sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
       </div>
     </AnimationProvider>

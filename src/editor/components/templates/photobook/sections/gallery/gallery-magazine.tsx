@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -11,12 +12,17 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface GalleryMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps) {
+export function GalleryMagazine({ sectionContent, theme, imageContent }: GalleryMagazineProps) {
   const { gallery } = sectionContent
-  const photos = gallery.images ?? []
+  const photos = gallery.photos ?? []
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  const selectedPhoto = selectedImage !== null ? photos[selectedImage] : undefined
+  const selectedManagedImage = selectedPhoto && imageContent
+    ? findPhotobookRepeatingImage(imageContent, 'gallery', selectedPhoto.id)
+    : undefined
 
   // Распределяем фото по редакционной сетке
   const [feature, second, third, ...rest] = photos
@@ -79,18 +85,26 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
           {/* 1. Hero Section - Cinematic 21:9 */}
           {feature && (
             <Animate trigger="mount" direction="up" distance={40}>
+              {(() => {
+                const featureImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', feature.id) : undefined
+
+                return (
               <div 
                 className="group relative cursor-zoom-in"
                 onClick={() => setSelectedImage(0)}
               >
                 <div className="relative aspect-[21/9] overflow-hidden bg-muted">
-                  <SiteImage
+                  {featureImage?.value.asset.src ? (
+                  <SlotImage
+                    slotId={featureImage.slotId}
+                    value={featureImage.value}
                     fillParent
-                    unoptimized
-                    src={feature.image}
                     alt={feature.caption ?? ''}
                     imageClassName="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                   />
+                  ) : (
+                    <div className="absolute inset-0 bg-muted" />
+                  )}
                 </div>
                 <div className="mt-6 flex justify-between items-start">
                   <div className="flex items-center gap-4">
@@ -104,6 +118,8 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
                   )}
                 </div>
               </div>
+                )
+              })()}
             </Animate>
           )}
 
@@ -113,14 +129,23 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
               {second && (
                 <div className="@md:col-span-7">
                   <Animate direction="up" delay={0.1}>
+                    {(() => {
+                      const secondImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', second.id) : undefined
+
+                      return (
                     <div className="group cursor-zoom-in" onClick={() => setSelectedImage(1)}>
                       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                        <SiteImage
+                        {secondImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={secondImage.slotId}
+                          value={secondImage.value}
                           fillParent
-                          src={second.image}
                           alt={second.caption ?? ''}
                           imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                        ) : (
+                          <div className="absolute inset-0 bg-muted" />
+                        )}
                       </div>
                       <div className="mt-4 flex items-center gap-3">
                         <span className="text-[9px] opacity-20 font-mono text-current">02</span>
@@ -131,20 +156,31 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
                         )}
                       </div>
                     </div>
+                      )
+                    })()}
                   </Animate>
                 </div>
               )}
               {third && (
                 <div className="@md:col-span-5 @md:mt-32">
                   <Animate direction="up" delay={0.2}>
+                    {(() => {
+                      const thirdImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', third.id) : undefined
+
+                      return (
                     <div className="group cursor-zoom-in" onClick={() => setSelectedImage(2)}>
                       <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                        <SiteImage
+                        {thirdImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={thirdImage.slotId}
+                          value={thirdImage.value}
                           fillParent
-                          src={third.image}
                           alt={third.caption ?? ''}
                           imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                        ) : (
+                          <div className="absolute inset-0 bg-muted" />
+                        )}
                       </div>
                       <div className="mt-4 flex items-center gap-3">
                         <span className="text-[9px] opacity-20 font-mono text-current">03</span>
@@ -155,6 +191,8 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
                         )}
                       </div>
                     </div>
+                      )
+                    })()}
                   </Animate>
                 </div>
               )}
@@ -166,6 +204,7 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
             <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-x-8 gap-y-20 @md:gap-y-32">
               {rest.map((block, index) => {
                 const isTall = index % 3 === 1;
+                const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', block.id) : undefined
                 return (
                   <Animate 
                     key={block.id} 
@@ -178,12 +217,17 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
                       onClick={() => setSelectedImage(index + 3)}
                     >
                       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-                        <SiteImage
+                        {galleryImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={galleryImage.slotId}
+                          value={galleryImage.value}
                           fillParent
-                          src={block.image}
                           alt={block.caption ?? ''}
                           imageClassName="object-cover transition-transform duration-700 group-hover:scale-110"
                         />
+                        ) : (
+                          <div className="absolute inset-0 bg-muted" />
+                        )}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
                            {block.caption && (
                              <p className="text-white text-[10px] uppercase tracking-widest leading-relaxed">
@@ -231,11 +275,15 @@ export function GalleryMagazine({ sectionContent, theme }: GalleryMagazineProps)
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative w-full h-full max-w-7xl max-h-[85vh]">
-            <SiteImage
-              fillParent
-              src={photos[selectedImage].image}
-              imageClassName="object-contain"
-            />
+            {selectedManagedImage?.value.asset.src && (
+              <SlotImage
+                fillParent
+                slotId={selectedManagedImage.slotId}
+                value={selectedManagedImage.value}
+                alt={selectedPhoto?.caption ?? ''}
+                imageClassName="object-contain"
+              />
+            )}
           </div>
           <div className="absolute bottom-10 left-10 right-10 flex justify-between items-center text-white/50">
             <p className="text-[10px] uppercase tracking-widest">

@@ -3,22 +3,21 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface EndingSoleilProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
+export function EndingSoleil({ sectionContent, theme, imageContent }: EndingSoleilProps) {
   const { ending } = sectionContent
-  const imageUrl = ending.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const imageSettings = ending.images?.imageSettings?.[0]
-  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const endingImage = imageContent?.ending
+  const hasImage = Boolean(endingImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -51,18 +50,14 @@ export function EndingSoleil({ sectionContent, theme }: EndingSoleilProps) {
         )}
 
         {/* Large closing photo */}
-        {hasImage && (
+        {hasImage && endingImage && (
           <Animate trigger="mount" delay={0.2} distance={32} className="w-full max-w-sm @md:max-w-md mb-14 @md:mb-18">
             <div className="overflow-hidden rounded-sm">
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={endingImage.slotId}
+                value={endingImage.value}
                 alt={ending.signature ?? 'Closing'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageSettings?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 80vw, 400px"
-                className="w-full"
               />
             </div>
           </Animate>

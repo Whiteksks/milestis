@@ -28,6 +28,12 @@ export function PreviewOverlay() {
       : s.photobookSectionContent as unknown as Record<string, unknown>,
   )
 
+  const imageContent = useContentStore((s) =>
+    editorMode === 'portfolio'
+      ? s.portfolioImageContent as unknown as Record<string, unknown>
+      : s.photobookImageContent as unknown as Record<string, unknown>,
+  )
+
   const visibility = useContentStore((s) =>
     editorMode === 'portfolio'
       ? s.sectionVisibility as unknown as Record<string, unknown>
@@ -63,6 +69,7 @@ export function PreviewOverlay() {
         themeCustomizations={themeCustomizations}
         customDecorations={customDecorations}
         content={content}
+        imageContent={imageContent}
         visibility={visibility}
       />
 

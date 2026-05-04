@@ -3,20 +3,20 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface CoverMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
+export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoirProps) {
   const { cover } = sectionContent
-  const imageSettings = cover.images?.imageSettings?.[0]
-  const imageUrl = cover.images?.image ?? ''
+  const coverImage = imageContent?.cover
 
   // Стили вынесены для чистоты JSX
   const containerStyles = "max-w-screen-2xl mx-auto w-full flex-1 grid grid-cols-1 @md:grid-cols-[1.2fr_1fr] items-stretch"
@@ -82,22 +82,16 @@ export function CoverMemoir({ sectionContent, theme }: CoverMemoirProps) {
           className="flex items-center justify-center p-8 @md:p-12 @lg:p-20 bg-black/[0.02]"
         >
           <div className="w-full max-w-[420px] relative">
-            {imageUrl ? (
-              <SiteImage
-                src={imageUrl}
+          {coverImage ? (
+              <SlotImage
+                slotId={coverImage.slotId}
+                value={coverImage.value}
                 alt={cover.title}
-                aspectRatio={imageSettings?.aspectRatio ?? 'portrait'}
-                frameStyle={imageSettings?.frameStyle ?? 'none'}
-                cropData={imageSettings?.cropData}
                 className={cn('w-full transition-transform duration-700 hover:scale-[1.02]', theme.shadow, theme.elementGlow)}
                 priority
               />
             ) : (
-              <div className={cn(
-                'w-full',
-                getAspectRatioClass(imageSettings?.aspectRatio ?? 'portrait'),
-                theme.muted
-              )} />
+              <div className={cn('w-full aspect-[3/4]', theme.muted)} />
             )}
           </div>
         </Animate>

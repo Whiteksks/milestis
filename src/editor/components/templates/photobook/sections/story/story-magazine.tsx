@@ -1,7 +1,8 @@
 'use client'
 
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
@@ -11,11 +12,12 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface StoryMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
+export function StoryMagazine({ sectionContent, theme, imageContent }: StoryMagazineProps) {
   const { story } = sectionContent
-  const moments = story.images ?? []
+  const moments = story.moments ?? []
 
   return (
     <SectionWrapper
@@ -68,22 +70,17 @@ export function StoryMagazine({ sectionContent, theme }: StoryMagazineProps) {
         {moments.length > 0 && (
           <div className="space-y-20 @md:space-y-28">
             {moments.map((block, index) => {
-              const imageUrl = block.image
-              const aspectRatio = block.imageSettings?.[0]?.aspectRatio ?? 'wide'
-              const frameStyle = block.imageSettings?.[0]?.frameStyle ?? 'none'
+              const storyImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'story', block.id) : undefined
               const description = block.description ?? ''
 
               return (
                 <Animate key={block.id} direction="up" distance={32} delay={0.05}>
                   <div>
-                    {imageUrl ? (
-                      <SiteImage
-                        src={imageUrl}
+                    {storyImage?.value.asset.src ? (
+                      <SlotImage
+                        slotId={storyImage.slotId}
+                        value={storyImage.value}
                         alt={block.label ?? story.title ?? 'Story'}
-                        aspectRatio={aspectRatio}
-                        frameStyle={frameStyle}
-                        cropData={block.imageSettings?.[0]?.cropData}
-                        unoptimized
                         sizes="(max-width: 768px) 100vw, 80vw"
                       />
                     ) : (

@@ -61,7 +61,9 @@ export function getImageNaturalSize(src: string): Promise<{ width: number; heigh
     const img = new window.Image()
     img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
     img.onerror = reject
-    img.crossOrigin = 'anonymous'
+    // No crossOrigin — we only read naturalWidth/naturalHeight, no canvas access needed.
+    // Setting crossOrigin='anonymous' causes CORS failures for storage URLs
+    // that don't serve the Access-Control-Allow-Origin header.
     img.src = src
   })
 }

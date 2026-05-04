@@ -19,10 +19,10 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/* РІвЂќР‚РІвЂќР‚ Row 1: CTA cells РІвЂќР‚РІвЂќР‚ */}
+        {/*   Row 1: CTA cells   */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3 mb-3">
 
-          {/* [A] Headline card РІР‚вЂќ 7/12 */}
+          {/* [A] Headline card   7/12 */}
           <Animate
             delay={0}
             direction="up"
@@ -46,7 +46,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
             )}
           </Animate>
 
-          {/* [B] Email card РІР‚вЂќ 5/12 */}
+          {/* [B] Email card   5/12 */}
           <Animate
             delay={0.07}
             direction="up"
@@ -81,7 +81,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
 
         </div>
 
-        {/* РІвЂќР‚РІвЂќР‚ Row 2: Form card РІвЂќР‚РІвЂќР‚ */}
+        {/*   Row 2: Form card   */}
         <Animate
           delay={0.1}
           direction="up"
@@ -102,7 +102,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
               </div>
             )}
             <div className="grid @md:grid-cols-3 grid-cols-1 gap-3 mb-3">

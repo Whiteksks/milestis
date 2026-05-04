@@ -17,6 +17,8 @@ export type PublishedRenderArgs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: Record<string, any>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  imageContent?: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   visibility: Record<string, any>
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
 }

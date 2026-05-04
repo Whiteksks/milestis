@@ -25,6 +25,7 @@ export function LiquidGlassTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -39,13 +40,13 @@ export function LiquidGlassTemplateDesign({
         />
       )}
       {sectionVisibility.showHero && (
-        <LiquidGlassHero theme={theme} sectionContent={sectionContent} />
+        <LiquidGlassHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showBio && (
-        <LiquidGlassBio theme={theme} sectionContent={sectionContent} />
+        <LiquidGlassBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showFeaturedWork && (
-        <LiquidGlassFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <LiquidGlassFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showVideo && (
         <LiquidGlassVideo theme={theme} sectionContent={sectionContent} />

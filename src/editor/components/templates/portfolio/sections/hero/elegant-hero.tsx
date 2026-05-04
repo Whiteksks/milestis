@@ -2,14 +2,14 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type ElegantHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ElegantHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function ElegantHero({ theme, sectionContent, imageContent }: ElegantHeroProps) {
+  const heroImage = imageContent?.hero
   
   return (
     <SectionWrapper
@@ -61,12 +61,11 @@ export function ElegantHero({ theme, sectionContent }: ElegantHeroProps) {
               delay={0.55}
               className="pt-6"
             >
-              <SiteImage
-                src={heroImage}
+              <SlotImage
+                slotId={heroImage.slotId}
+                value={heroImage.value}
+                templateId="elegant"
                 alt={sectionContent.hero.title}
-                aspectRatio={sectionContent.hero.aspectRatio || 'wide'}
-                frameStyle={sectionContent.hero.frameStyle || 'none'}
-                cropData={sectionContent.hero.cropData}
               />
             </Animate>
           )}

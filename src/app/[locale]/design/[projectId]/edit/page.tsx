@@ -17,8 +17,16 @@ import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs
 import { useUiSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store-content'
 import { useThemeStore } from '@/editor/lib/store-theme'
-import { defaultPortfolioContent, defaultPortfolioVisibility } from '@/editor/lib/store-content-portfolio'
-import { defaultPhotobookContent, defaultPhotobookVisibility } from '@/editor/lib/store-content-photobook'
+import {
+  defaultPortfolioContent,
+  defaultPortfolioImageContent,
+  defaultPortfolioVisibility,
+} from '@/editor/lib/store-content-portfolio'
+import {
+  defaultPhotobookContent,
+  defaultPhotobookImageContent,
+  defaultPhotobookVisibility,
+} from '@/editor/lib/store-content-photobook'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
 
@@ -105,11 +113,13 @@ export default function EditorPage() {
             useContentStore.setState({
               sectionVisibility: editorData.content.sectionVisibility,
               sectionContent: editorData.content.sectionContent,
+              portfolioImageContent: editorData.content.imageContent ?? defaultPortfolioImageContent,
             })
           } else {
             useContentStore.setState({
               photobookSectionVisibility: editorData.content.sectionVisibility,
               photobookSectionContent: editorData.content.sectionContent,
+              photobookImageContent: editorData.content.imageContent ?? defaultPhotobookImageContent,
             })
           }
         } else {
@@ -118,11 +128,13 @@ export default function EditorPage() {
             useContentStore.setState({
               sectionVisibility: defaultPortfolioVisibility,
               sectionContent: defaultPortfolioContent,
+              portfolioImageContent: defaultPortfolioImageContent,
             })
           } else {
             useContentStore.setState({
               photobookSectionVisibility: defaultPhotobookVisibility,
               photobookSectionContent: defaultPhotobookContent,
+              photobookImageContent: defaultPhotobookImageContent,
             })
           }
         }

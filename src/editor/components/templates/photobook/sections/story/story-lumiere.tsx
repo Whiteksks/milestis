@@ -1,6 +1,7 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -11,11 +12,12 @@ import { Animate } from '../../../primitives/animate'
 interface StoryLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
+export function StoryLumiere({ sectionContent, theme, imageContent }: StoryLumiereProps) {
   const { story } = sectionContent
-  const moments = story.images ?? []
+  const moments = story.moments ?? []
 
   return (
     <SectionWrapper
@@ -59,10 +61,7 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
         {moments.length > 0 && (
           <div className="space-y-16 @md:space-y-20">
             {moments.map((block, index) => {
-              const imageUrl = block.image
-              const imageSettings = block.imageSettings?.[0]
-              const aspectRatio = imageSettings?.aspectRatio ?? 'square'
-              const frameStyle = imageSettings?.frameStyle ?? 'none'
+                const storyImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'story', block.id) : undefined
               const description = block.description ?? ''
 
               return (
@@ -71,14 +70,11 @@ export function StoryLumiere({ sectionContent, theme }: StoryLumiereProps) {
 
                     {/* Film-framed photo — generous width */}
                     <div className="w-full border border-current/10 p-[3px] mb-5">
-                      {imageUrl ? (
-                        <SiteImage
-                          src={imageUrl}
+                      {storyImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={storyImage.slotId}
+                          value={storyImage.value}
                           alt={block.label ?? story.title ?? 'Story'}
-                          aspectRatio={aspectRatio}
-                          frameStyle={frameStyle}
-                          cropData={imageSettings?.cropData}
-                          unoptimized
                           sizes="(max-width: 768px) 95vw, 65vw"
                         />
                       ) : (

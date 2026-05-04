@@ -2,7 +2,8 @@
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,15 +11,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface EndingMemoirProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
+export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemoirProps) {
   const { ending } = sectionContent
-  const imageBlock = ending.images
-  const imageUrl = imageBlock?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'portrait'
-  const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const endingImage = imageContent?.ending
+  const hasImage = Boolean(endingImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -73,18 +72,14 @@ export function EndingMemoir({ sectionContent, theme }: EndingMemoirProps) {
         )}
 
         {/* Optional closing photo */}
-        {hasImage && (
+        {hasImage && endingImage && (
           <Animate direction="up" distance={24} delay={0.2} className="mb-12 @md:mb-16">
             <div className={cn('w-full max-w-xs @md:max-w-sm overflow-hidden', theme.shadow)}>
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={endingImage.slotId}
+                value={endingImage.value}
                 alt={ending.signature ?? 'Ending'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageBlock?.imageSettings?.[0]?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 70vw, 400px"
-                className="w-full"
               />
             </div>
           </Animate>

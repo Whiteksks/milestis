@@ -3,13 +3,14 @@
 import { motion } from 'framer-motion'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 
-type LiquidGlassBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type LiquidGlassBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
-  const { title, subtitle, description, image, achievements } = sectionContent.bio
+export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGlassBioProps) {
+  const { title, subtitle, description, achievements } = sectionContent.bio
+  const bioImage = imageContent?.bio
   const { primary, secondary, accent2 } = theme.bgEffectColors
 
   return (
@@ -55,14 +56,13 @@ export function LiquidGlassBio({ theme, sectionContent }: LiquidGlassBioProps) {
 
           <div className="flex flex-col @md:flex-row gap-0">
             {/* Image panel */}
-            {image && (
+            {bioImage && (
               <div className="shrink-0 relative @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl overflow-hidden">
-                <SiteImage
-                  unoptimized
-                  src={image}
+                <SlotImage
+                  slotId={bioImage.slotId}
+                  value={bioImage.value}
+                  templateId="liquid-glass"
                   alt={title || 'Profile'}
-                  aspectRatio="poster"
-                  cropData={sectionContent.bio.cropData}
                   sizes="(max-width: 768px) 100vw, 320px"
                   className="@md:w-64 @lg:w-80 w-full"
                   imageClassName="object-cover"

@@ -1,6 +1,7 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,11 +11,12 @@ import { Animate } from '../../../primitives/animate'
 interface GalleryLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
+export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryLumiereProps) {
   const { gallery } = sectionContent
-  const images = gallery.images ?? []
+  const images = gallery.photos ?? []
 
   return (
     <SectionWrapper
@@ -60,10 +62,7 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
         {images.length > 0 ? (
           <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 space-y-4 @md:space-y-6  ">
             {images.map((photo, index) => {
-              const imageUrl = photo.image ?? ''
-              const imageSettings = photo.imageSettings?.[0]
-              const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-              const frameStyle = imageSettings?.frameStyle ?? 'none'
+              const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', photo.id) : undefined
               const photoNum = String(index + 1).padStart(2, '0')
 
               return (
@@ -81,14 +80,11 @@ export function GalleryLumiere({ sectionContent, theme }: GalleryLumiereProps) {
                   {/* Фото в "паспарту" или с тонкой рамкой */}
                   <div className="group relative bg-white/[0.02] p-2 transition-transform duration-700 hover:scale-[1.02]">
                     <div className="overflow-hidden border border-current/5">
-                      {imageUrl && (
-                        <SiteImage
-                          src={imageUrl}
+                      {galleryImage?.value.asset.src && (
+                        <SlotImage
+                          slotId={galleryImage.slotId}
+                          value={galleryImage.value}
                           alt={photo.caption ?? `Photo ${photoNum}`}
-                          aspectRatio={aspectRatio}
-                          frameStyle={frameStyle}
-                          cropData={imageSettings?.cropData}
-                          unoptimized
                           className="grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0"
                           sizes="(max-width: 640px) 95vw, (max-width: 1024px) 45vw, 30vw"
                         />

@@ -24,6 +24,7 @@ export function MinimalTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -39,15 +40,15 @@ export function MinimalTemplateDesign({
       )}
 
       {sectionVisibility.showHero && (
-        <MinimalHero theme={theme} sectionContent={sectionContent} />
+        <MinimalHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showBio && (
-        <MinimalBio theme={theme} sectionContent={sectionContent} />
+        <MinimalBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showFeaturedWork && (
-        <MinimalFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <MinimalFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showVideo && (

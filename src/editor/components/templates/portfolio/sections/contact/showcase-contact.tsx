@@ -28,7 +28,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
 
         {/* Main layout */}
         <div className="grid grid-cols-1 @lg:grid-cols-2 gap-16 @lg:gap-24 items-start">
-          {/* Left РІР‚вЂќ statement */}
+          {/* Left   statement */}
           <Animate direction="left" distance={20} delay={0.1} className="space-y-8">
             <h2
               className={cn(
@@ -72,7 +72,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
             )}
           </Animate>
 
-          {/* Right РІР‚вЂќ form */}
+          {/* Right   form */}
           <Animate as="form" onSubmit={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)} direction="right" distance={20} delay={0.2} className="space-y-0">
             {status !== 'idle' && (
               <motion.div
@@ -87,7 +87,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
                   theme.fontBody,
                 )}
               >
-                {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
+                {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
               </motion.div>
             )}
 

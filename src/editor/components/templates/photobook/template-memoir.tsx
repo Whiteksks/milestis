@@ -23,33 +23,34 @@ export function TemplateMemoirDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   disableAnimations = false,
 }: PhotobookTemplateProps) {
   return (
     <AnimationProvider templateId="memoir" disabled={disableAnimations}>
       <div className={cn('min-h-screen overflow-x-clip', theme.background, theme.foreground)}>
       {sectionVisibility.showCover && (
-        <CoverMemoir sectionContent={sectionContent} theme={theme} />
+        <CoverMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showIntroduction && (
-        <IntroMemoir sectionContent={sectionContent} theme={theme} />
+        <IntroMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showStory && (
-        <StoryMemoir sectionContent={sectionContent} theme={theme} />
+        <StoryMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showGallery && (
-        <GalleryMemoir sectionContent={sectionContent} theme={theme} />
+        <GalleryMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showHighlight && (
-        <HighlightMemoir sectionContent={sectionContent} theme={theme} />
+        <HighlightMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
       )}
 
       {sectionVisibility.showEnding && (
-          <EndingMemoir sectionContent={sectionContent} theme={theme} />
+          <EndingMemoir sectionContent={sectionContent} theme={theme} imageContent={imageContent} />
         )}
       </div>
     </AnimationProvider>

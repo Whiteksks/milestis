@@ -1,16 +1,20 @@
 import type { ComponentType } from 'react'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
+import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
 import { getModeTemplates } from '@/editor/lib/mode-registry'
 
 export type HeroPreviewComponent = ComponentType<{
   theme: ThemeConfig
   sectionContent: SectionContent
+  imageContent?: PortfolioImageContent
 }>
 
 export type CoverPreviewComponent = ComponentType<{
   theme: ThemeConfig
   sectionContent: PhotobookSectionContent
+  imageContent?: PhotobookImageContent
   disableAnimations?: boolean
 }>
 

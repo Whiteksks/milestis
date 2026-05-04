@@ -19,7 +19,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
       <div className="@lg:px-6 @md:px-5 px-4 py-3">
         <div className="max-w-6xl mx-auto space-y-3">
 
-          {/* РІвЂќР‚РІвЂќР‚ Cinematic video card РІвЂќР‚РІвЂќР‚ */}
+          {/*   Cinematic video card   */}
           <Animate
             direction="up"
             distance={5}
@@ -55,7 +55,7 @@ export function GridVideo({ theme, sectionContent }: GridVideoProps) {
             </div>
           </Animate>
 
-          {/* РІвЂќР‚РІвЂќР‚ Info row РІвЂќР‚РІвЂќР‚ */}
+          {/*   Info row   */}
           <div className={cn(
             'rounded-2xl border border-current/8 px-6 py-4',
             'grid @lg:grid-cols-[1fr,1fr,auto] @md:grid-cols-2 grid-cols-1 gap-4 items-start',

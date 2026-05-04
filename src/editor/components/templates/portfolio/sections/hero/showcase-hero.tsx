@@ -4,13 +4,13 @@ import { motion } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 
-type ShowcaseHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ShowcaseHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
-  const heroImage = sectionContent.hero.image
+export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHeroProps) {
+  const heroImage = imageContent?.hero
   return (
     <section
       id="hero"
@@ -23,10 +23,11 @@ export function ShowcaseHero({ theme, sectionContent }: ShowcaseHeroProps) {
       {/* Background image */}
       {heroImage && (
         <Animate trigger="mount" type="scale" scaleOffset={1.05} className="absolute inset-0">
-          <SiteImage
+          <SlotImage
+            slotId={heroImage.slotId}
+            value={heroImage.value}
+            templateId="showcase"
             fillParent
-            unoptimized
-            src={heroImage}
             alt={sectionContent.hero.title}
             sizes="100vw"
             imageClassName="object-cover object-center"

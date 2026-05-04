@@ -1,7 +1,8 @@
 'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -10,14 +11,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface IntroMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
+export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMagazineProps) {
   const { introduction } = sectionContent
-  const imageBlock = introduction.images
-  const imageUrl = imageBlock?.image ?? ''
-  const aspectRatio = imageBlock?.imageSettings?.[0]?.aspectRatio ?? 'portrait'
-  const frameStyle = imageBlock?.imageSettings?.[0]?.frameStyle ?? 'none'
+  const introImage = imageContent?.introduction
+  const hasImage = Boolean(introImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -94,21 +94,18 @@ export function IntroMagazine({ sectionContent, theme }: IntroMagazineProps) {
           </div>
 
           {/* Right — image */}
-          {imageUrl && (
+          {hasImage && introImage && (
             <Animate delay={0.15} type="scale" scaleOffset={0.97}>
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={introImage.slotId}
+                value={introImage.value}
                 alt={introduction.title ?? 'Introduction'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageBlock?.imageSettings?.[0]?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 90vw, 38vw"
                 className={theme.shadow}
               />
-              {imageBlock?.caption && (
+              {introImage.value.caption && (
                 <p className={cn('mt-3 text-[9px] uppercase tracking-widest opacity-30', theme.fontBody)}>
-                  {imageBlock.caption}
+                  {introImage.value.caption}
                 </p>
               )}
             </Animate>

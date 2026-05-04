@@ -84,7 +84,7 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
                       theme.fontBody,
                     )}
                   >
-                    {status === 'sent' ? 'Message sent РІР‚вЂќ check your email client.' : 'Please fill in all required fields.'}
+                    {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
                   </Animate>
                 )}
                 <div className="space-y-4 flex-1">

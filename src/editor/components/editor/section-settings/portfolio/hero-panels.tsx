@@ -1,12 +1,11 @@
 "use client"
 
 import { useId } from "react"
+import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { ImagePicker, createPortfolioSectionImage, replacePortfolioManagedImageAsset, type ImageValue } from "@/editor/image"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
-import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { cn } from "@/lib/utils"
 import { LIMITS, editorialInput, editorialLabel, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
@@ -87,23 +86,33 @@ export function HeroDescriptionPanel() {
 
 export function HeroImagePanel() {
   const ownerId = useId()
-  const { hero, updateSectionContent } = useContentSelector((state) => ({
-    hero: state.sectionContent.hero,
-    updateSectionContent: state.updateSectionContent,
+  const { heroImage, setPortfolioSingleImage } = useContentSelector((state) => ({
+    heroImage: state.portfolioImageContent.hero,
+    setPortfolioSingleImage: state.setPortfolioSingleImage,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const heroRestrictions = useSectionRestrictions('hero')
+
+  const emptyValue: ImageValue = {
+    asset: { src: "", width: 0, height: 0 },
+  }
+  const pickerValue = heroImage?.value ?? emptyValue
 
   return (
     <div className="py-6 space-y-4">
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url, thumbUrl) => updateSectionContent("hero", { image: url, heroThumb: thumbUrl })}
+        onSelectImage={(url, thumbUrl) => {
+          if (heroImage) {
+            setPortfolioSingleImage("hero", replacePortfolioManagedImageAsset(heroImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPortfolioSingleImage("hero", createPortfolioSectionImage({ id: "hero-primary", sectionId: "hero", src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
       />
-      
+
       <div className="flex items-baseline justify-between">
         <label className={editorialLabel}>Visual Frame</label>
-        <button 
+        <button
           onClick={() => openMediaPicker(ownerId)}
           className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors border-b border-muted-foreground/30 pb-0.5"
         >
@@ -111,29 +120,23 @@ export function HeroImagePanel() {
         </button>
       </div>
 
-      {/* Обертка для ImagePicker — максимально легкая */}
       <div className="relative group transition-all duration-500">
         <div className="absolute -inset-2 rounded-[2rem] bg-muted/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity pointer-events-none" />
-        <PortfolioImagePicker
+        <ImagePicker
           label=""
-          value={{
-            image: hero.image || "",
-            aspectRatio: hero.aspectRatio,
-            frameStyle: hero.frameStyle,
-            cropData: hero.cropData,
-            aspectRatioBeforeLock: hero.aspectRatioBeforeLock,
+          slotId="portfolio.hero.primary"
+          value={pickerValue}
+          onChange={(next) => {
+            if (!next.asset.src) {
+              setPortfolioSingleImage("hero", undefined)
+              return
+            }
+            if (heroImage) {
+              setPortfolioSingleImage("hero", { ...heroImage, value: next })
+            }
           }}
-          onChange={(value) =>
-            updateSectionContent("hero", {
-              image: value.image,
-              aspectRatio: value.aspectRatio,
-              frameStyle: value.frameStyle,
-              cropData: value.cropData,
-              aspectRatioBeforeLock: value.aspectRatioBeforeLock,
-            })
-          }
           onOpenMediaPicker={() => openMediaPicker(ownerId)}
-          restrictions={heroRestrictions}
+          showCaption={false}
         />
       </div>
     </div>

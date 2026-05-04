@@ -2,13 +2,14 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type ElegantBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type ElegantBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
+export function ElegantBio({ theme, sectionContent, imageContent }: ElegantBioProps) {
+  const bioImage = imageContent?.bio
   return (
     <SectionWrapper
       id="bio"
@@ -19,24 +20,24 @@ export function ElegantBio({ theme, sectionContent }: ElegantBioProps) {
         <div className="flex flex-col @lg:flex-row items-start gap-12 @lg:gap-20">
           
           {/* Р В¤Р С•РЎвЂљР С•: Р С•РЎРѓРЎвЂљР В°Р ВµРЎвЂљРЎРѓРЎРЏ Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…РЎвЂ№Р С (240px), Р Р…Р С• Р С—Р В»Р С•РЎвЂљР Р…Р С• Р С—РЎР‚Р С‘Р В¶Р В°РЎвЂљР С• Р С” РЎРѓР ВµРЎвЂљР С”Р Вµ */}
-          <Animate
-            delay={0.1}
-            direction="right"
-            distance={20}
-            className="shrink-0 @lg:sticky @lg:top-32"
-          >
-            <SiteImage
-              unoptimized
-              src={sectionContent.bio.image}
-              alt={sectionContent.bio.title || 'Profile image'}
-              aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
-              frameStyle={sectionContent.bio.frameStyle || 'soft'}
-              cropData={sectionContent.bio.cropData}
-              sizes="(max-width: 768px) 100vw, 240px"
-              className="w-[180px] @md:w-[220px] @lg:w-[240px] shadow-sm"
-              imageClassName="object-cover"
-            />
-          </Animate>
+          {bioImage && (
+            <Animate
+              delay={0.1}
+              direction="right"
+              distance={20}
+              className="shrink-0 @lg:sticky @lg:top-32"
+            >
+              <SlotImage
+                slotId={bioImage.slotId}
+                value={bioImage.value}
+                templateId="elegant"
+                alt={sectionContent.bio.title || 'Profile image'}
+                sizes="(max-width: 768px) 100vw, 240px"
+                className="w-[180px] @md:w-[220px] @lg:w-[240px] shadow-sm"
+                imageClassName="object-cover"
+              />
+            </Animate>
+          )}
 
           {/* Р СћР ВµР С”РЎРѓРЎвЂљ: РЎвЂљР ВµР С—Р ВµРЎР‚РЎРЉ Р С•Р Р… "Р С–Р В»Р В°Р Р†Р Р…РЎвЂ№Р в„–" */}
           <div className="flex-1 space-y-10">

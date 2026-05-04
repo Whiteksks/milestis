@@ -1,6 +1,7 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,15 +11,13 @@ import { Animate } from '../../../primitives/animate'
 interface IntroLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
+export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumiereProps) {
   const { introduction } = sectionContent
-  const imageSettings = introduction.images?.imageSettings?.[0]
-  const imageUrl = introduction.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const introImage = imageContent?.introduction
+  const hasImage = Boolean(introImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -38,22 +37,19 @@ export function IntroLumiere({ sectionContent, theme }: IntroLumiereProps) {
         </Animate>
 
         {/* Photo — large, film-framed, centred hero */}
-        {hasImage && (
+        {hasImage && introImage && (
           <Animate trigger="mount" delay={0.1} distance={24} className="w-full max-w-sm @md:max-w-md @lg:max-w-lg mb-12 @md:mb-14">
             <div className="border border-current/10 p-[3px]">
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={introImage.slotId}
+                value={introImage.value}
                 alt={introduction.title ?? 'Introduction'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageSettings?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 85vw, 480px"
               />
             </div>
-            {introduction.images?.caption && (
+            {introImage.value.caption && (
               <p className={cn('mt-2.5 text-[9px] uppercase tracking-widest opacity-25 text-center', theme.fontBody)}>
-                {introduction.images.caption}
+                {introImage.value.caption}
               </p>
             )}
           </Animate>

@@ -1,6 +1,7 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,15 +11,13 @@ import { Animate } from '../../../primitives/animate'
 interface EndingLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
+export function EndingLumiere({ sectionContent, theme, imageContent }: EndingLumiereProps) {
   const { ending } = sectionContent
-  const imageSettings = ending.images?.imageSettings?.[0]
-  const imageUrl = ending.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'portrait'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const endingImage = imageContent?.ending
+  const hasImage = Boolean(endingImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -52,16 +51,13 @@ export function EndingLumiere({ sectionContent, theme }: EndingLumiereProps) {
         )}
 
         {/* Optional closing photo — large, film-framed */}
-        {hasImage && (
+        {hasImage && endingImage && (
           <Animate trigger="mount" delay={0.1} distance={24} className="w-full max-w-xs @md:max-w-sm mb-12 @md:mb-14">
             <div className="border border-current/10 p-[3px]">
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={endingImage.slotId}
+                value={endingImage.value}
                 alt={ending.signature ?? 'Closing'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageSettings?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 75vw, 380px"
               />
             </div>

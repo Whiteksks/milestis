@@ -63,7 +63,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
             {sectionContent.header.title}
           </motion.a>
 
-          {/* Nav РІР‚вЂќ desktop */}
+          {/* Nav   desktop */}
           <motion.nav
             initial={disabled ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,7 +99,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
         </div>
       </div>
 
-      {/* Mobile menu РІР‚вЂќ separate glass panel */}
+      {/* Mobile menu   separate glass panel */}
       <AnimatePresence>
         {isOpen && hasLinks && (
           <motion.div

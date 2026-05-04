@@ -1,14 +1,13 @@
 "use client"
 
 import { useId } from "react"
+import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
+import { ImagePicker, createPortfolioSectionImage, replacePortfolioManagedImageAsset, type ImageValue } from "@/editor/image"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Trash2, Plus, Trophy } from "lucide-react"
-import { PortfolioImagePicker } from "@/editor/components/editor/section-settings/ui/portfolio-image-picker"
-import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { cn } from "@/lib/utils"
 import { ps, LIMITS, editorialInput, editorialLabel, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
@@ -65,26 +64,44 @@ export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
 
 export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
-  const { bio, updateSectionContent } = useContentSelector((state) => ({
-    bio: state.sectionContent.bio,
-    updateSectionContent: state.updateSectionContent,
+  const { bioImage, setPortfolioSingleImage } = useContentSelector((state) => ({
+    bioImage: state.portfolioImageContent.bio,
+    setPortfolioSingleImage: state.setPortfolioSingleImage,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const bioRestrictions = useSectionRestrictions('bio')
-
-  const handleImageSelect = (url: string) => {
-    updateSectionContent("bio", { image: url })
+  const emptyValue: ImageValue = {
+    asset: { src: "", width: 0, height: 0 },
   }
+  const pickerValue = bioImage?.value ?? emptyValue
 
   if (dense) {
     return (
       <div className={ps.root(true)}>
-        <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
-        <PortfolioImagePicker
-          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData, aspectRatioBeforeLock: bio.aspectRatioBeforeLock }}
-          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData, aspectRatioBeforeLock: value.aspectRatioBeforeLock })}
+        <MediaPickerModal
+          ownerId={ownerId}
+          onSelectImage={(url, thumbUrl) => {
+            if (bioImage) {
+              setPortfolioSingleImage("bio", replacePortfolioManagedImageAsset(bioImage, { src: url, blurDataUrl: thumbUrl }))
+            } else {
+              setPortfolioSingleImage("bio", createPortfolioSectionImage({ id: "bio-primary", sectionId: "bio", src: url, blurDataUrl: thumbUrl }))
+            }
+          }}
+        />
+        <ImagePicker
+          slotId="portfolio.bio.primary"
+          value={pickerValue}
+          onChange={(next) => {
+            if (!next.asset.src) {
+              setPortfolioSingleImage("bio", undefined)
+              return
+            }
+            if (bioImage) {
+              setPortfolioSingleImage("bio", { ...bioImage, value: next })
+            }
+          }}
           onOpenMediaPicker={() => openMediaPicker(ownerId)}
-          restrictions={bioRestrictions}
+          dense
+          showCaption={false}
         />
       </div>
     )
@@ -92,7 +109,16 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
 
   return (
     <div className="py-6 border-b border-border/30 space-y-4">
-      <MediaPickerModal ownerId={ownerId} onSelectImage={handleImageSelect} />
+      <MediaPickerModal
+        ownerId={ownerId}
+        onSelectImage={(url, thumbUrl) => {
+          if (bioImage) {
+            setPortfolioSingleImage("bio", replacePortfolioManagedImageAsset(bioImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPortfolioSingleImage("bio", createPortfolioSectionImage({ id: "bio-primary", sectionId: "bio", src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
+      />
       <div className="flex items-baseline justify-between">
         <label className={editorialLabel}>Profile Photo</label>
         <button
@@ -104,12 +130,21 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
       </div>
       <div className="relative group transition-all duration-500">
         <div className="absolute -inset-2 rounded-[2rem] bg-muted/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity pointer-events-none" />
-        <PortfolioImagePicker
+        <ImagePicker
           label=""
-          value={{ image: bio.image || "", aspectRatio: bio.aspectRatio, frameStyle: bio.frameStyle, cropData: bio.cropData, aspectRatioBeforeLock: bio.aspectRatioBeforeLock }}
-          onChange={(value) => updateSectionContent("bio", { image: value.image, aspectRatio: value.aspectRatio, frameStyle: value.frameStyle, cropData: value.cropData, aspectRatioBeforeLock: value.aspectRatioBeforeLock })}
+          slotId="portfolio.bio.primary"
+          value={pickerValue}
+          onChange={(next) => {
+            if (!next.asset.src) {
+              setPortfolioSingleImage("bio", undefined)
+              return
+            }
+            if (bioImage) {
+              setPortfolioSingleImage("bio", { ...bioImage, value: next })
+            }
+          }}
           onOpenMediaPicker={() => openMediaPicker(ownerId)}
-          restrictions={bioRestrictions}
+          showCaption={false}
         />
       </div>
     </div>

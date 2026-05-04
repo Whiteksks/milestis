@@ -13,9 +13,10 @@ interface PortfolioTemplateShellProps {
 }
 
 export function PortfolioTemplateShell({ Design }: PortfolioTemplateShellProps) {
-  const { sectionVisibility, sectionContent } = useContentSelector(state => ({
+  const { sectionVisibility, sectionContent, portfolioImageContent } = useContentSelector(state => ({
     sectionVisibility: state.sectionVisibility,
     sectionContent: state.sectionContent,
+    portfolioImageContent: state.portfolioImageContent,
   }))
   const { currentTheme } = useThemeSelector(state => ({
     currentTheme: state.currentTheme,
@@ -38,6 +39,7 @@ export function PortfolioTemplateShell({ Design }: PortfolioTemplateShellProps) 
       theme={theme}
       sectionVisibility={sectionVisibility}
       sectionContent={sectionContent}
+      imageContent={portfolioImageContent}
       handleAnchorClick={handleAnchorClick}
     />
   )

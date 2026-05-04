@@ -2,14 +2,15 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
-type GridBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type GridBioProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function GridBio({ theme, sectionContent }: GridBioProps) {
+export function GridBio({ theme, sectionContent, imageContent }: GridBioProps) {
   const achievements = sectionContent.bio.achievements ?? []
+  const bioImage = imageContent?.bio
 
   return (
     <SectionWrapper
@@ -37,17 +38,17 @@ export function GridBio({ theme, sectionContent }: GridBioProps) {
               delay={0.2}
               className="@lg:col-span-4 flex justify-center @lg:justify-start"
             >
-              <SiteImage
-                unoptimized
-                src={sectionContent.bio.image}
-                alt={sectionContent.bio.title || 'Profile'}
-                aspectRatio={sectionContent.bio.aspectRatio || 'portrait'}
-                frameStyle={sectionContent.bio.frameStyle || 'none'}
-                cropData={sectionContent.bio.cropData}
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2 rounded-2xl"
-                imageClassName="object-cover"
-              />
+              {bioImage && (
+                <SlotImage
+                  slotId={bioImage.slotId}
+                  value={bioImage.value}
+                  templateId="grid"
+                  alt={sectionContent.bio.title || 'Profile'}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="w-full max-w-[280px] @lg:max-w-none transition-transform duration-500 hover:rotate-2 rounded-2xl"
+                  imageClassName="object-cover"
+                />
+              )}
             </Animate>
 
             {/* [B] Р СџРЎР‚Р В°Р Р†Р В°РЎРЏ Р С”Р С•Р В»Р С•Р Р…Р С”Р В°: Р ВР Р…РЎвЂћР С• */}

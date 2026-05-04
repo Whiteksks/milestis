@@ -22,6 +22,7 @@ interface PublishedViewProps {
   themeCustomizations: ThemeCustomizations
   customDecorations: ThemeCustomDecorations[]
   content: Record<string, unknown>
+  imageContent?: Record<string, unknown>
   visibility: Record<string, unknown>
 }
 
@@ -32,6 +33,7 @@ export function PublishedView({
   themeCustomizations,
   customDecorations,
   content,
+  imageContent,
   visibility,
 }: PublishedViewProps) {
   const theme = getTheme(themeId)
@@ -50,6 +52,7 @@ export function PublishedView({
     theme,
     themeCustomizations,
     content,
+    imageContent,
     visibility,
     handleAnchorClick,
   })

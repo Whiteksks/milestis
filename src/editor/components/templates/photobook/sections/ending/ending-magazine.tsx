@@ -1,7 +1,8 @@
 'use client'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { Animate } from '../../../primitives/animate'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
@@ -10,12 +11,13 @@ import type { PhotobookSectionContent } from '@/editor/lib/types'
 interface EndingMagazineProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
+export function EndingMagazine({ sectionContent, theme, imageContent }: EndingMagazineProps) {
   const { ending } = sectionContent
-  const imageUrl = ending.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const endingImage = imageContent?.ending
+  const hasImage = Boolean(endingImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -24,15 +26,14 @@ export function EndingMagazine({ sectionContent, theme }: EndingMagazineProps) {
       className={cn('@container relative min-h-screen flex flex-col overflow-hidden', theme.background)}
     >
       {/* Full-bleed background — mirrors the cover */}
-      {hasImage && (
+      {hasImage && endingImage && (
         <div className="absolute inset-0">
-          <SiteImage
+          <SlotImage
             fillParent
-            unoptimized
-            src={imageUrl}
+            slotId={endingImage.slotId}
+            value={endingImage.value}
             alt={ending.text ?? 'Closing'}
             sizes="100vw"
-            imageClassName="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/50" />
         </div>

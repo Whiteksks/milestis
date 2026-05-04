@@ -1,6 +1,7 @@
 'use client'
 
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
@@ -10,15 +11,13 @@ import { Animate } from '../../../primitives/animate'
 interface HighlightLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProps) {
+export function HighlightLumiere({ sectionContent, theme, imageContent }: HighlightLumiereProps) {
   const { highlight } = sectionContent
-  const imageSettings = highlight.images?.imageSettings?.[0]
-  const imageUrl = highlight.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
-  const aspectRatio = imageSettings?.aspectRatio ?? 'wide'
-  const frameStyle = imageSettings?.frameStyle ?? 'none'
+  const highlightImage = imageContent?.highlight
+  const hasImage = Boolean(highlightImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -41,16 +40,13 @@ export function HighlightLumiere({ sectionContent, theme }: HighlightLumiereProp
         </Animate>
 
         {/* Full-width film-framed statement photo */}
-        {hasImage && (
+        {hasImage && highlightImage && (
           <Animate trigger="mount" delay={0.1} distance={20} className="w-full mb-10 @md:mb-12">
             <div className="border border-current/10 p-[3px]">
-              <SiteImage
-                src={imageUrl}
+              <SlotImage
+                slotId={highlightImage.slotId}
+                value={highlightImage.value}
                 alt={highlight.title ?? 'Highlight'}
-                aspectRatio={aspectRatio}
-                frameStyle={frameStyle}
-                cropData={imageSettings?.cropData}
-                unoptimized
                 sizes="(max-width: 768px) 95vw, 70vw"
               />
             </div>

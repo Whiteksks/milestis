@@ -1,8 +1,7 @@
 "use client"
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
+import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { ps, editorialInput, editorialLabel, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -65,42 +64,45 @@ export function EndingSignaturePanel({ dense = false }: { dense?: boolean }) {
 
 export function EndingImagePanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
-  const { ending, updatePhotobookSection } = useContentSelector((state) => ({
-    ending: state.photobookSectionContent.ending,
-    updatePhotobookSection: state.updatePhotobookSection,
+  const { endingImage, setPhotobookSingleImage } = useContentSelector((state) => ({
+    endingImage: state.photobookImageContent.ending,
+    setPhotobookSingleImage: state.setPhotobookSingleImage,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const endingRestrictions = useSectionRestrictions('ending')
+
+  const emptyValue: ImageValue = { asset: { src: '', width: 0, height: 0 } }
+  const pickerValue = endingImage?.value ?? emptyValue
 
   return (
     <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url) =>
-          updatePhotobookSection("ending", {
-            images: {
-              id: ending.images?.id || "ending-detail",
-              image: url,
-              caption: ending.images?.caption || "",
-              imageSettings:
-                ending.images?.imageSettings?.length
-                  ? ending.images.imageSettings
-                  : [{ aspectRatio: "square", frameStyle: "soft" }],
-            },
-          })
-        }
+        onSelectImage={(url, thumbUrl) => {
+          if (endingImage) {
+            setPhotobookSingleImage('ending', replacePhotobookManagedImageAsset(endingImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPhotobookSingleImage('ending', createPhotobookSectionImage({ id: 'ending-main', sectionId: 'ending', src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
       />
 
       {!dense && <label className={editorialLabel}>Decorative Image</label>}
 
       <ImagePicker
-        label=""
-        value={ending.images}
-        dense={dense}
-        onChange={(next) => updatePhotobookSection("ending", { images: next })}
+        slotId="photobook.ending.primary"
+        value={pickerValue}
+        onChange={(next) => {
+          if (!next.asset.src) {
+            setPhotobookSingleImage('ending', undefined)
+            return
+          }
+          if (endingImage) {
+            setPhotobookSingleImage('ending', { ...endingImage, value: next })
+          }
+        }}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        dense={dense}
         showCaption={false}
-        restrictions={endingRestrictions}
       />
     </div>
   )

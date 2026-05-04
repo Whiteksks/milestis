@@ -25,6 +25,7 @@ export function BentoTemplateDesign({
   theme,
   sectionVisibility,
   sectionContent,
+  imageContent,
   handleAnchorClick,
   disableAnimations = false,
 }: PortfolioTemplateProps) {
@@ -39,13 +40,13 @@ export function BentoTemplateDesign({
         />
       )}
       {sectionVisibility.showHero && (
-        <BentoHero theme={theme} sectionContent={sectionContent} />
+        <BentoHero theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showBio && (
-        <BentoBio theme={theme} sectionContent={sectionContent} />
+        <BentoBio theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showFeaturedWork && (
-        <BentoFeaturedWork theme={theme} sectionContent={sectionContent} />
+        <BentoFeaturedWork theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
       )}
       {sectionVisibility.showVideo && (
         <BentoVideo theme={theme} sectionContent={sectionContent} />

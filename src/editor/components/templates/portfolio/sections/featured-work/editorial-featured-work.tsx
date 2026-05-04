@@ -4,17 +4,18 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 import { getAspectRatioClass } from '@/editor/lib/aspect-ratios'
 import { getFrameStyle } from '@/editor/lib/frame-styles'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 import { ProjectPlaceholder } from '../../../primitives/project-placeholder'
+import { getPortfolioFeaturedWorkImage, toCanonicalAspectRatio } from '../image-helpers'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { EditorialTitle, EditorialParagraph } from '../../../primitives/portfolio/typography'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-type EditorialFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type EditorialFeaturedWorkProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeaturedWorkProps) {
+export function EditorialFeaturedWork({ theme, sectionContent, imageContent }: EditorialFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
 
   return (
@@ -41,6 +42,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
         <div className="space-y-32 @md:space-y-40">
           {projects.map((project, i) => {
             const isEven = i % 2 === 0
+            const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
             return (
               <Animate
                 key={i}
@@ -52,7 +54,7 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
               >
                 <div className="grid grid-cols-1 @lg:grid-cols-12 gap-8 @lg:gap-16 items-center">
                   
-                  {/* Content (Text) РІР‚вЂќ Order changes via order-last/first */}
+                  {/* Content (Text)   Order changes via order-last/first */}
                   <div className={cn(
                     '@lg:col-span-5 space-y-6',
                     isEven ? '@lg:order-first' : '@lg:order-last'
@@ -84,25 +86,25 @@ export function EditorialFeaturedWork({ theme, sectionContent }: EditorialFeatur
                     <div
                       className={cn(
                         'relative overflow-hidden bg-neutral-100',
-                        getAspectRatioClass(project.aspectRatio || 'wide'),
+                        getAspectRatioClass(toCanonicalAspectRatio(projectImage?.value.presentation?.ratio, 'wide')),
                         theme.shadow,
-                        getFrameStyle(project.frameStyle || 'none'),
+                        getFrameStyle(projectImage?.value.presentation?.frameStyle || 'none'),
                       )}
                     >
-                      {!project.image ? (
+                      {!projectImage ? (
                         <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
                       ) : (
-                        <SiteImage
+                        <SlotImage
+                          slotId={projectImage.slotId}
+                          value={projectImage.value}
+                          templateId="editorial"
                           fillParent
-                          unoptimized
-                          src={project.image}
                           alt={project.title}
                           sizes="(max-width: 768px) 100vw, 58vw"
-                          cropData={project.cropData}
                           imageClassName="object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700 ease-out scale-[1.04] group-hover:scale-100"
                         />
                       )}
-                      {/* Hover overlay РІР‚вЂќ subtle darkening from bottom */}
+                      {/* Hover overlay   subtle darkening from bottom */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
                   </div>

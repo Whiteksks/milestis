@@ -13,8 +13,8 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // Fonts
   "font-src 'self' https://fonts.gstatic.com",
-  // Images: Firebase Storage + Google account avatars + next/image optimiser
-  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com",
+  // Images: Firebase Storage + Google account avatars + next/image optimiser + Unsplash (dev/test)
+  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com https://images.unsplash.com",
   // Fetch / XHR: Firebase services + Cloud Run functions
   "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app",
   // Frames: Firebase Auth popup + Google Sign-In + YouTube embeds
@@ -36,7 +36,7 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   reactCompiler: true,
   typescript: { ignoreBuildErrors: false },
   async headers() {

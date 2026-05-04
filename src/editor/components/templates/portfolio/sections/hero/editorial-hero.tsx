@@ -2,17 +2,16 @@
 
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import { SlotImage } from '@/editor/image'
 
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 import { EditorialDivider } from '../../../primitives/portfolio/divider'
 
-type EditorialHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent'> 
+type EditorialHeroProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'imageContent'> 
 
-export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
-  const heroImage = sectionContent.hero.image
-  const heroCropData = sectionContent.hero.cropData
+export function EditorialHero({ theme, sectionContent, imageContent }: EditorialHeroProps) {
+  const heroImage = imageContent?.hero
 
   const descriptionBlock = (
     <div className="space-y-5 max-w-sm">
@@ -52,7 +51,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
 
             </div>
 
-            {/* Title РІР‚вЂќ overflows onto photo on desktop */}
+            {/* Title   overflows onto photo on desktop */}
             <Animate
               direction="left"
               distance={-30}
@@ -70,13 +69,13 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
               </h1>
             </Animate>
 
-            {/* Description РІР‚вЂќ bottom of left col, desktop only */}
+            {/* Description   bottom of left col, desktop only */}
             <div className="mt-auto pt-14 hidden @md:block">
               {descriptionBlock}
             </div>
           </div>
 
-          {/* RIGHT: photo РІР‚вЂќ vertically centered, clears header with top padding */}
+          {/* RIGHT: photo   vertically centered, clears header with top padding */}
           {heroImage && (
             <Animate
               direction="right"
@@ -84,12 +83,11 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
               delay={0.15}
               className="flex items-center justify-center @md:pr-10 @lg:pr-20 px-6 @md:px-0 pt-8 @md:pt-28 @lg:pt-32 pb-8 @md:pb-14 w-full"
             >
-              <SiteImage
-                src={heroImage}
+              <SlotImage
+                slotId={heroImage.slotId}
+                value={heroImage.value}
+                templateId="editorial"
                 alt={sectionContent.hero.title}
-                aspectRatio={sectionContent.hero.aspectRatio || 'square'}
-                frameStyle={sectionContent.hero.frameStyle || 'none'}
-                cropData={heroCropData}
                 className="w-full"
                 priority
               />
@@ -97,7 +95,7 @@ export function EditorialHero({ theme, sectionContent }: EditorialHeroProps) {
           )}
         </div>
 
-        {/* Description РІР‚вЂќ mobile only, below photo */}
+        {/* Description   mobile only, below photo */}
         <div className="@md:hidden max-w-7xl mx-auto w-full @lg:px-20 @md:px-12 px-6 pb-10 pt-4">
           {descriptionBlock}
         </div>

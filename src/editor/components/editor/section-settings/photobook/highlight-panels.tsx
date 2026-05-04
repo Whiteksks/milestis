@@ -1,8 +1,7 @@
 "use client"
 
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
-import { ImagePicker } from "@/editor/components/editor/section-settings/ui/image-picker"
-import { useSectionRestrictions } from "@/editor/hooks/use-section-restrictions"
+import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { ps, editorialInput, editorialLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -58,42 +57,45 @@ export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
 
 export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
   const ownerId = useId()
-  const { highlight, updatePhotobookSection } = useContentSelector((state) => ({
-    highlight: state.photobookSectionContent.highlight,
-    updatePhotobookSection: state.updatePhotobookSection,
+  const { highlightImage, setPhotobookSingleImage } = useContentSelector((state) => ({
+    highlightImage: state.photobookImageContent.highlight,
+    setPhotobookSingleImage: state.setPhotobookSingleImage,
   }))
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
-  const highlightRestrictions = useSectionRestrictions('highlight')
+
+  const emptyValue: ImageValue = { asset: { src: '', width: 0, height: 0 } }
+  const pickerValue = highlightImage?.value ?? emptyValue
 
   return (
     <div className={ps.pbRoot}>
       <MediaPickerModal
         ownerId={ownerId}
-        onSelectImage={(url) =>
-          updatePhotobookSection("highlight", {
-            images: {
-              id: highlight.images?.id || "highlight-main",
-              image: url,
-              caption: highlight.images?.caption || "",
-              imageSettings:
-                highlight.images?.imageSettings?.length
-                  ? highlight.images.imageSettings
-                  : [{ aspectRatio: "wide" as const, frameStyle: "none" as const }],
-            },
-          })
-        }
+        onSelectImage={(url, thumbUrl) => {
+          if (highlightImage) {
+            setPhotobookSingleImage('highlight', replacePhotobookManagedImageAsset(highlightImage, { src: url, blurDataUrl: thumbUrl }))
+          } else {
+            setPhotobookSingleImage('highlight', createPhotobookSectionImage({ id: 'highlight-main', sectionId: 'highlight', src: url, blurDataUrl: thumbUrl }))
+          }
+        }}
       />
 
       {!dense && <label className={editorialLabel}>Image</label>}
 
       <ImagePicker
-        label=""
-        value={highlight.images}
-        dense={dense}
-        onChange={(next) => updatePhotobookSection("highlight", { images: next })}
+        slotId="photobook.highlight.primary"
+        value={pickerValue}
+        onChange={(next) => {
+          if (!next.asset.src) {
+            setPhotobookSingleImage('highlight', undefined)
+            return
+          }
+          if (highlightImage) {
+            setPhotobookSingleImage('highlight', { ...highlightImage, value: next })
+          }
+        }}
         onOpenMediaPicker={() => openMediaPicker(ownerId)}
+        dense={dense}
         showCaption={false}
-        restrictions={highlightRestrictions}
       />
     </div>
   )

@@ -86,22 +86,11 @@ export interface SectionContent {
     title: string
     subtitle: string
     description: string
-    image?: string
-    heroThumb?: string
-    aspectRatio?: AspectRatio
-    frameStyle?: FrameStyle
-    cropData?: import('./crop-data').ImageCropData
-    aspectRatioBeforeLock?: AspectRatio
   }
   bio: {
     title: string
     subtitle?: string
     description: string
-    image?: string
-    aspectRatio?: AspectRatio
-    frameStyle?: FrameStyle
-    cropData?: import('./crop-data').ImageCropData
-    aspectRatioBeforeLock?: AspectRatio
     achievements?: string[]
   }
   featuredWork: {
@@ -111,12 +100,7 @@ export interface SectionContent {
       id: string
       title: string
       description: string
-      image: string
       tags?: string[]
-      aspectRatio?: AspectRatio
-      frameStyle?: FrameStyle
-      cropData?: import('./crop-data').ImageCropData
-      aspectRatioBeforeLock?: AspectRatio
     }>
   }
   video: {
@@ -213,19 +197,16 @@ export type PhotobookSectionVisibility = {
   [K in keyof PhotobookSectionContent as `show${Capitalize<string & K>}`]: boolean
 }
 
-export interface PhotoBlock {
+export interface PhotobookStoryMoment {
   id: string
-  image: string
-  thumbUrl?: string
   label?: string
   caption?: string
   description?: string
-  imageSettings: Array<{
-    aspectRatio?: AspectRatio
-    frameStyle?: FrameStyle
-    cropData?: import('./crop-data').ImageCropData
-    aspectRatioBeforeLock?: AspectRatio
-  }>
+}
+
+export interface PhotobookGalleryPhoto {
+  id: string
+  caption?: string
 }
 
 
@@ -237,7 +218,6 @@ export interface PhotobookSectionContent {
     date?: string
     location?: string
     tagline?: string
-    images?: PhotoBlock
   }
 
   introduction: {
@@ -245,7 +225,6 @@ export interface PhotobookSectionContent {
     title?: string
     quote?: string
     dedication?: string
-    images?: PhotoBlock
   }
 
   story: {
@@ -253,14 +232,14 @@ export interface PhotobookSectionContent {
     title?: string
     date?: string
     location?: string
-    images?: PhotoBlock[]
+    moments?: PhotobookStoryMoment[]
   }
 
   gallery: {
     label?: string
     title?: string
     description?: string
-    images?: PhotoBlock[]
+    photos?: PhotobookGalleryPhoto[]
   }
 
   highlight: {
@@ -268,7 +247,6 @@ export interface PhotobookSectionContent {
     title?: string
     description?: string
     quote?: string
-    images?: PhotoBlock
     videoUrl?: string
   }
 
@@ -278,6 +256,5 @@ export interface PhotobookSectionContent {
     text?: string
     date?: string
     signature?: string
-    images?: PhotoBlock
   }
 }

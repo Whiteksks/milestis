@@ -3,19 +3,21 @@
 import { cn } from '@/lib/utils'
 import type { ThemeConfig } from '@/editor/lib/themes'
 import type { PhotobookSectionContent } from '@/editor/lib/types'
-import { SiteImage } from '@/editor/components/editor/section-settings/ui/site-image'
+import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import { SlotImage } from '@/editor/image'
 import { SectionWrapper } from '../../../primitives/section-wrapper'
 import { Animate } from '../../../primitives/animate'
 
 interface CoverLumiereProps {
   sectionContent: PhotobookSectionContent
   theme: ThemeConfig
+  imageContent?: PhotobookImageContent
 }
 
-export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
+export function CoverLumiere({ sectionContent, theme, imageContent }: CoverLumiereProps) {
   const { cover } = sectionContent
-  const imageUrl = cover.images?.image ?? ''
-  const hasImage = Boolean(imageUrl)
+  const coverImage = imageContent?.cover
+  const hasImage = Boolean(coverImage?.value.asset.src)
 
   return (
     <SectionWrapper
@@ -27,15 +29,14 @@ export function CoverLumiere({ sectionContent, theme }: CoverLumiereProps) {
       )}
     >
       {/* Full-bleed background — cinematic, like looking through a lens */}
-      {hasImage && (
+      {hasImage && coverImage && (
         <div className="absolute inset-0">
-          <SiteImage
+          <SlotImage
+            slotId={coverImage.slotId}
+            value={coverImage.value}
             fillParent
-            unoptimized
-            src={imageUrl}
             alt={cover.title ?? 'Cover'}
             sizes="100vw"
-            imageClassName="object-cover"
             priority
           />
           {/* Soft cinematic vignette — heavy bottom, gentle top bloom */}
