@@ -83,7 +83,9 @@ function validatePayload(body: unknown): AnalyzeInput {
 function countUniquePhotos(content: unknown): number {
 	const json = JSON.stringify(content);
 	const unique = new Set<string>();
-	const re = /"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+\/images%2F([^%"]+)%2F[^"]+"/g;
+	// Match both public paths (/o/images%2F{id}%2F) and
+	// private paths (/o/users%2F...%2Fimages%2F{id}%2F) by accepting %2F or / before "images".
+	const re = /"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+(?:\/|%2F)images%2F([^%"]+)%2F[^"]+"/g;
 	let m: RegExpExecArray | null;
 	while ((m = re.exec(json)) !== null) {
 		unique.add(m[1]);

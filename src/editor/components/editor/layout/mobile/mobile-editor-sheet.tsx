@@ -105,12 +105,12 @@ function useManagedInert(
 const MobileSheetNav = memo(function MobileSheetNav({
   activeTab,
   onTabPress,
-  dragHandleProps,
+  dragHandleRef,
   isExpanded,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
-  dragHandleProps: React.HTMLAttributes<HTMLDivElement>
+  dragHandleRef: React.RefObject<HTMLDivElement | null>
   isExpanded: boolean
 }) {
   return (
@@ -120,11 +120,8 @@ const MobileSheetNav = memo(function MobileSheetNav({
       transition={PANEL_TRANSITION}
     >
       <div
-        {...dragHandleProps}
-        className={cn(
-          dragHandleProps.className,
-          "absolute inset-x-0 top-0 z-10 h-8 -translate-y-2 cursor-grab active:cursor-grabbing",
-        )}
+        ref={dragHandleRef}
+        className="touch-none select-none absolute inset-x-0 top-0 z-10 h-8 -translate-y-2 cursor-grab active:cursor-grabbing"
         aria-label="Drag editor sheet"
       />
 
@@ -250,7 +247,7 @@ function MobileEditorSheetContent({
   onTabPress,
   scrollContainerRef,
 }: MobileEditorSheetContentProps) {
-  const { dragHandleProps, snapHeights } = useSnapBottomSheet()
+  const { dragHandleRef, snapHeights } = useSnapBottomSheet()
   const quickActionsRef = useRef<HTMLDivElement | null>(null)
   const fullContentRef = useRef<HTMLDivElement | null>(null)
   const actionsHeight = Math.max(0, (snapHeights[1] ?? 0) - (snapHeights[0] ?? 0))
@@ -267,7 +264,7 @@ function MobileEditorSheetContent({
         <MobileSheetNav
           activeTab={activeTab}
           onTabPress={onTabPress}
-          dragHandleProps={dragHandleProps}
+          dragHandleRef={dragHandleRef}
           isExpanded={isExpanded}
         />
 
@@ -351,7 +348,7 @@ export function MobileEditorSheet({
       setActiveSnapPoint={handleSnapChange}
       ariaLabel="Editor controls"
       className={cn(
-        "bg-card/90 backdrop-blur-sm",
+        "bg-card/90",
         "border border-foreground/15 border-b-0 rounded-t-2xl",
         "focus:outline-none",
       )}

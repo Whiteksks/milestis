@@ -3,6 +3,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
 import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject, publishProject, unpublishProject, republishProject } from '@/lib/projects'
 import { toastProject } from '@/lib/toast'
+import { useUiStore } from '@/editor/lib/store-ui'
 
 function useUid() {
   return useUserStore((s) => s.profile?.uid ?? null)
@@ -231,6 +232,12 @@ export function usePublishMutation() {
     },
     onSuccess: (result) => {
       if (updateBalance) updateBalance(result.balance)
+      // After publish the cloud function overwrites the content doc with public URLs
+      // and deletes the private originals. The Zustand store still holds stale private
+      // URLs, so any subsequent auto-save (e.g. on visibilitychange) would overwrite
+      // the content doc with dead private URLs. Marking clean prevents that save.
+      // The next editor open will reload the content doc which already has public URLs.
+      useUiStore.getState().markClean()
     },
     onError: (_err, _vars, context) => {
       if (!uid || !context) return

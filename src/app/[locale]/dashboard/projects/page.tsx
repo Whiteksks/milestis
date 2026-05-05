@@ -237,7 +237,6 @@ export default function ProjectsPage() {
                     icon={Archive}
                     currentView={view}
                     onToggle={() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }}
-                    badge={archivedProjects.length}
                   />
                   <ViewToggleButton
                     id="trash"

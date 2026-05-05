@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -38,6 +38,15 @@ export function PublishedView({
 }: PublishedViewProps) {
   const theme = getTheme(themeId)
   const isMobile = useIsMobile()
+
+  // Disable browser scroll restoration so the browser doesn't try to restore
+  // a saved scroll offset on reload, which conflicts with framer-motion's
+  // initial animation states and causes a visible scroll-then-snap-to-top jump.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+  }, [])
   const deviceView = isMobile === true ? 'mobile' : 'desktop'
 
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {

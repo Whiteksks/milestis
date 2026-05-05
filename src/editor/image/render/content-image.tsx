@@ -25,7 +25,7 @@ function BackgroundLayer({
   src,
   alt,
   backgroundSize = 'cover',
-  backgroundPosition,
+  backgroundPosition = 'center',
   className,
 }: {
   src: string

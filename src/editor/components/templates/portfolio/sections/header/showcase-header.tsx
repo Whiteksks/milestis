@@ -21,13 +21,22 @@ export function ShowcaseHeader({ theme, sectionContent, imageContent, handleAnch
   const isOverHero = hasHeroImage && heroVisible
 
   useEffect(() => {
-    const hero = document.getElementById('hero')
+    // In preview mode the overlay renders another copy of the template, so
+    // there are two #hero elements in the document simultaneously.
+    // getElementById returns the first one (editor canvas), which is wrong.
+    // Instead: locate the nearest [data-scroll-root] ancestor of THIS header
+    // (added by PreviewOverlay) and query #hero only within it.
+    // In published / canvas mode there is no [data-scroll-root], so we fall
+    // back to document-wide getElementById.
+    const scrollRoot = document.querySelector<HTMLElement>('[data-scroll-root]') ?? null
+    const hero: HTMLElement | null = scrollRoot
+      ? (scrollRoot.querySelector<HTMLElement>('#hero') ?? document.getElementById('hero'))
+      : document.getElementById('hero')
     if (!hero) return
 
     const observer = new IntersectionObserver(
       ([entry]) => setHeroVisible(entry.isIntersecting),
-      // Fire as soon as even 1px of hero leaves the top of the viewport
-      { threshold: 0, rootMargin: '-64px 0px 0px 0px' },
+      { threshold: 0, rootMargin: '-64px 0px 0px 0px', root: scrollRoot },
     )
     observer.observe(hero)
     return () => observer.disconnect()

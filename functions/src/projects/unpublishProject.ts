@@ -1,10 +1,8 @@
-import { createHash } from "crypto";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
-import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
 import { VALID_MODES, type ProjectMode } from "./projectInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 
@@ -97,26 +95,15 @@ export const unpublishProject = onRequest(
           throw new FlowError(409, ERROR.INVALID_PAYLOAD, "Project is not published.");
         }
 
-        // Release the slug reservation atomically.
+        // Validate mode (needed for slug reservation key calculation).
         const rawMode = projectData.mode;
         if (!VALID_MODES.includes(rawMode as ProjectMode)) {
           throw new FlowError(500, ERROR.INTERNAL_SERVER_ERROR);
         }
-        const mode = rawMode as ProjectMode;
-        const publishedSlug = projectData.publishedSlug;
-        if (typeof publishedSlug === "string" && publishedSlug) {
-          const publishedAccessToken =
-            typeof projectData.publishedAccessToken === "string" && projectData.publishedAccessToken
-              ? projectData.publishedAccessToken
-              : undefined;
-          const hashedToken = publishedAccessToken
-            ? createHash("sha256").update(publishedAccessToken).digest("hex")
-            : undefined;
-          const slugRef = db.collection(PUBLISHED_PROJECT_SLUGS_COLLECTION).doc(
-            getSlugReservationDocId(mode, publishedSlug, hashedToken),
-          );
-          tx.delete(slugRef);
-        }
+
+        // Intentionally NOT deleting the slug reservation so the user can
+        // re-publish with the same slug via republishProject.
+        // The slug remains reserved for this project while it is hidden.
 
         // Hide published_projects doc (keep content for re-publish).
         const publishedRef = db.collection("published_projects").doc(projectId.trim());

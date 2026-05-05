@@ -61,7 +61,7 @@ export function PreviewOverlay() {
   if (!isPreviewOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[200] overflow-y-auto bg-background">
+    <div className="fixed inset-0 z-[200] overflow-y-auto bg-background" data-scroll-root>
       <PublishedView
         mode={editorMode}
         templateId={currentTemplateId}
@@ -74,10 +74,11 @@ export function PreviewOverlay() {
       />
 
       {/* Close button — floats above everything */}
+      {/* On mobile: top-left so it doesn't overlap the burger menu in the template header */}
       <Button
         onClick={handleClose}
         size="icon"
-        className="fixed top-4 right-8 z-[201] size-9 rounded-full shadow-lg"
+        className="fixed top-4 left-4 sm:left-auto sm:right-8 z-[201] size-9 rounded-full shadow-lg"
         title="Close preview (Esc)"
       >
         <X className="size-4" />

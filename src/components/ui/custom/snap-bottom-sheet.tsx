@@ -2,15 +2,14 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type HTMLAttributes,
   type ReactNode,
 } from "react"
+import { useDrag } from "@use-gesture/react"
 import { animate, motion, useMotionValue, useTransform, type MotionValue } from "framer-motion"
 import { createPortal } from "react-dom"
 
@@ -23,8 +22,6 @@ const SHEET_SNAP_TRANSITION = {
   restDelta: 0.01,
 } as const
 
-const SNAP_VELOCITY_THRESHOLD = 720
-const SNAP_PROJECTION_FACTOR = 0.2
 
 type SnapPoint = string | number
 
@@ -33,8 +30,7 @@ function clamp01(value: number) {
 }
 
 export interface SnapBottomSheetRenderProps {
-  dragHandleProps: HTMLAttributes<HTMLDivElement>
-  isDragging: boolean
+  dragHandleRef: React.RefObject<HTMLDivElement | null>
   snapHeights: readonly number[]
   sheetHeight: MotionValue<number>
   sheetProgress: MotionValue<number>
@@ -48,7 +44,6 @@ interface SnapBottomSheetProps<T extends SnapPoint> {
   activeSnapPoint: T
   setActiveSnapPoint: (snapPoint: T) => void
   className?: string
-  overlayClassName?: string
   ariaLabel?: string
   children: ReactNode
 }
@@ -142,42 +137,16 @@ function applyResistance(value: number, min: number, max: number) {
   return value
 }
 
-function findSnapIndex(heights: readonly number[], currentHeight: number, velocity: number) {
-  const minHeight = heights[0] ?? 0
-  const maxHeight = heights[heights.length - 1] ?? 0
-  const clampedHeight = Math.min(Math.max(currentHeight, minHeight), maxHeight)
-  const projectedHeight = Math.min(
-    Math.max(clampedHeight + velocity * SNAP_PROJECTION_FACTOR, minHeight),
-    maxHeight,
-  )
-
-  if (Math.abs(velocity) >= SNAP_VELOCITY_THRESHOLD) {
-    if (velocity > 0) {
-      for (let index = 0; index < heights.length; index += 1) {
-        if (heights[index] >= projectedHeight - 8) return index
-      }
-      return heights.length - 1
-    }
-
-    for (let index = heights.length - 1; index >= 0; index -= 1) {
-      if (heights[index] <= projectedHeight + 8) return index
-    }
-    return 0
-  }
-
-  let closestIndex = 0
-  let closestDistance = Number.POSITIVE_INFINITY
-
-  for (let index = 0; index < heights.length; index += 1) {
-    const distance = Math.abs(heights[index] - projectedHeight)
-    if (distance < closestDistance) {
-      closestDistance = distance
-      closestIndex = index
-    }
-  }
-
-  return closestIndex
+function syncViewportHeight(
+  heightRef: React.MutableRefObject<number>,
+  setHeight: (h: number) => void,
+) {
+  const next = resolveViewportHeight()
+  if (next === heightRef.current) return
+  heightRef.current = next
+  setHeight(next)
 }
+
 
 export function SnapBottomSheet<T extends SnapPoint>({
   open = true,
@@ -185,49 +154,29 @@ export function SnapBottomSheet<T extends SnapPoint>({
   activeSnapPoint,
   setActiveSnapPoint,
   className,
-  overlayClassName,
   ariaLabel,
   children,
 }: SnapBottomSheetProps<T>) {
   const [isMounted, setIsMounted] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
 
   const sheetHeight = useMotionValue(0)
   const animationRef = useRef<ReturnType<typeof animate> | null>(null)
   const viewportHeightRef = useRef(0)
   const viewportFrameRef = useRef<number | null>(null)
-  const isDraggingRef = useRef(false)
-  const pointerIdRef = useRef<number | null>(null)
-  const startClientYRef = useRef(0)
   const startHeightRef = useRef(0)
-  const lastClientYRef = useRef(0)
-  const lastTimestampRef = useRef(0)
-  const velocityRef = useRef(0)
+  const hasDraggedRef = useRef(false)
+  const dragHandleRef = useRef<HTMLDivElement | null>(null)
 
-  const resolvedSnapPoints = useMemo(
-    () =>
-      snapPoints.map((point) => ({
-        point,
-        height: resolveSnapPoint(point, viewportHeight),
-      })),
-    [snapPoints, viewportHeight],
-  )
-
-  const resolvedSnapHeights = useMemo(
-    () => resolvedSnapPoints.map(({ height }) => height),
-    [resolvedSnapPoints],
-  )
-
-  const orderedSnapPoints = useMemo(
-    () => [...resolvedSnapPoints].sort((left, right) => left.height - right.height),
-    [resolvedSnapPoints],
-  )
-
-  const orderedSnapHeights = useMemo(
-    () => orderedSnapPoints.map(({ height }) => height),
-    [orderedSnapPoints],
-  )
+  const { resolvedSnapHeights, orderedSnapPoints, orderedSnapHeights } = useMemo(() => {
+    const resolved = snapPoints.map((point) => ({ point, height: resolveSnapPoint(point, viewportHeight) }))
+    const ordered = [...resolved].sort((a, b) => a.height - b.height)
+    return {
+      resolvedSnapHeights: resolved.map(({ height }) => height),
+      orderedSnapPoints: ordered,
+      orderedSnapHeights: ordered.map(({ height }) => height),
+    }
+  }, [snapPoints, viewportHeight])
 
   const maxSnapHeight = orderedSnapHeights[orderedSnapHeights.length - 1] ?? 0
   const minSnapHeight = orderedSnapHeights[0] ?? 0
@@ -242,54 +191,39 @@ export function SnapBottomSheet<T extends SnapPoint>({
   )
   const targetHeight = resolvedSnapHeights[activeSnapIndex] ?? minSnapHeight
 
-  const updateViewportHeight = useCallback(() => {
-    const nextHeight = resolveViewportHeight()
-
-    if (nextHeight === viewportHeightRef.current) return
-
-    viewportHeightRef.current = nextHeight
-    setViewportHeight(nextHeight)
-  }, [])
-
-  const scheduleViewportHeightUpdate = useCallback(() => {
-    if (viewportFrameRef.current !== null) return
-
-    viewportFrameRef.current = window.requestAnimationFrame(() => {
-      viewportFrameRef.current = null
-      updateViewportHeight()
-    })
-  }, [updateViewportHeight])
-
   useEffect(() => {
     setIsMounted(true)
-    updateViewportHeight()
-  }, [updateViewportHeight])
+    syncViewportHeight(viewportHeightRef, setViewportHeight)
+  }, [])
 
   useEffect(() => {
     if (!isMounted) return
 
-    const handleViewportChange = () => {
-      scheduleViewportHeightUpdate()
+    syncViewportHeight(viewportHeightRef, setViewportHeight)
+
+    const schedule = () => {
+      if (viewportFrameRef.current !== null) return
+      viewportFrameRef.current = window.requestAnimationFrame(() => {
+        viewportFrameRef.current = null
+        syncViewportHeight(viewportHeightRef, setViewportHeight)
+      })
     }
 
-    handleViewportChange()
-
     const visualViewport = window.visualViewport
-    window.addEventListener("resize", handleViewportChange)
-    window.addEventListener("orientationchange", handleViewportChange)
-    visualViewport?.addEventListener("resize", handleViewportChange)
+    window.addEventListener("resize", schedule)
+    window.addEventListener("orientationchange", schedule)
+    visualViewport?.addEventListener("resize", schedule)
 
     return () => {
-      window.removeEventListener("resize", handleViewportChange)
-      window.removeEventListener("orientationchange", handleViewportChange)
-      visualViewport?.removeEventListener("resize", handleViewportChange)
-
+      window.removeEventListener("resize", schedule)
+      window.removeEventListener("orientationchange", schedule)
+      visualViewport?.removeEventListener("resize", schedule)
       if (viewportFrameRef.current !== null) {
         window.cancelAnimationFrame(viewportFrameRef.current)
         viewportFrameRef.current = null
       }
     }
-  }, [isMounted, scheduleViewportHeightUpdate])
+  }, [isMounted])
 
   useEffect(() => {
     if (!isMounted || !open || targetHeight <= 0) return
@@ -298,8 +232,6 @@ export function SnapBottomSheet<T extends SnapPoint>({
       sheetHeight.set(targetHeight)
       return
     }
-
-    if (isDraggingRef.current) return
 
     animationRef.current?.stop()
     animationRef.current = animate(sheetHeight, targetHeight, SHEET_SNAP_TRANSITION)
@@ -311,124 +243,93 @@ export function SnapBottomSheet<T extends SnapPoint>({
     }
   }, [])
 
-  const finishDrag = useCallback(
-    (pointerId: number | null, releaseTarget?: HTMLDivElement | null) => {
-      if (pointerId !== null && releaseTarget?.hasPointerCapture(pointerId)) {
-        releaseTarget.releasePointerCapture(pointerId)
+  useDrag(
+    ({ first, last, movement: [, my], swipe: [, sy] }) => {
+      if (first) {
+        startHeightRef.current = sheetHeight.get() || targetHeight
+        hasDraggedRef.current = false
       }
 
-      const currentHeight = Math.min(Math.max(sheetHeight.get(), minSnapHeight), maxSnapHeight)
-      const nextIndex = findSnapIndex(orderedSnapHeights, currentHeight, velocityRef.current)
-      const nextSnap = orderedSnapPoints[nextIndex]
-      const nextPoint = nextSnap?.point ?? activeSnapPoint
-      const nextHeight = nextSnap?.height ?? currentHeight
+      // Only engage once there is real movement — prevents tap from
+      // interrupting an in-progress snap animation
+      if (Math.abs(my) > 3) {
+        if (!hasDraggedRef.current) {
+          hasDraggedRef.current = true
+          animationRef.current?.stop()
+        }
+        sheetHeight.set(applyResistance(startHeightRef.current - my, minSnapHeight, maxSnapHeight))
+      }
 
-      isDraggingRef.current = false
-      pointerIdRef.current = null
-      setIsDragging(false)
-      velocityRef.current = 0
+      if (!last) return
+
+      // Tap — no real drag happened, leave animation untouched
+      if (!hasDraggedRef.current) return
+
+      let snapIndex: number
+      if (sy !== 0) {
+        // flick: move ±1 snap from the active snap point
+        // sy=-1 → flick up → higher snap, sy=1 → flick down → lower snap
+        const activeOrderedIndex = orderedSnapPoints.findIndex((s) => Object.is(s.point, activeSnapPoint))
+        snapIndex = Math.min(Math.max(activeOrderedIndex - sy, 0), orderedSnapPoints.length - 1)
+      } else {
+        // slow drag: snap to nearest
+        const h = Math.min(Math.max(sheetHeight.get(), minSnapHeight), maxSnapHeight)
+        snapIndex = orderedSnapHeights.reduce(
+          (best, sh, i) =>
+            Math.abs(sh - h) < Math.abs(orderedSnapHeights[best] - h) ? i : best,
+          0,
+        )
+      }
+
+      const nextSnap = orderedSnapPoints[snapIndex]
+      const nextPoint = nextSnap?.point ?? activeSnapPoint
+      const snapHeight = nextSnap?.height ?? sheetHeight.get()
 
       animationRef.current?.stop()
-      animationRef.current = animate(sheetHeight, nextHeight, SHEET_SNAP_TRANSITION)
+      animationRef.current = animate(sheetHeight, snapHeight, SHEET_SNAP_TRANSITION)
 
       if (!Object.is(nextPoint, activeSnapPoint)) {
         setActiveSnapPoint(nextPoint)
       }
     },
-    [activeSnapPoint, maxSnapHeight, minSnapHeight, orderedSnapHeights, orderedSnapPoints, setActiveSnapPoint, sheetHeight],
-  )
-
-  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "mouse" && event.button !== 0) return
-
-    animationRef.current?.stop()
-    isDraggingRef.current = true
-    pointerIdRef.current = event.pointerId
-    startClientYRef.current = event.clientY
-    startHeightRef.current = sheetHeight.get() || targetHeight
-    lastClientYRef.current = event.clientY
-    lastTimestampRef.current = event.timeStamp
-    velocityRef.current = 0
-    setIsDragging(true)
-
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }, [sheetHeight, targetHeight])
-
-  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current || pointerIdRef.current !== event.pointerId) return
-
-    const deltaY = startClientYRef.current - event.clientY
-    const rawHeight = startHeightRef.current + deltaY
-    const nextHeight = applyResistance(rawHeight, minSnapHeight, maxSnapHeight)
-    const deltaTime = event.timeStamp - lastTimestampRef.current
-
-    if (deltaTime > 0) {
-      velocityRef.current = ((lastClientYRef.current - event.clientY) / deltaTime) * 1000
-    }
-
-    lastClientYRef.current = event.clientY
-    lastTimestampRef.current = event.timeStamp
-    sheetHeight.set(nextHeight)
-    event.preventDefault()
-  }, [maxSnapHeight, minSnapHeight, sheetHeight])
-
-  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current || pointerIdRef.current !== event.pointerId) return
-    finishDrag(event.pointerId, event.currentTarget)
-  }, [finishDrag])
-
-  const handlePointerCancel = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current || pointerIdRef.current !== event.pointerId) return
-    finishDrag(event.pointerId, event.currentTarget)
-  }, [finishDrag])
-
-  const dragHandleProps = useMemo<HTMLAttributes<HTMLDivElement>>(
-    () => ({
-      onPointerDown: handlePointerDown,
-      onPointerMove: handlePointerMove,
-      onPointerUp: handlePointerUp,
-      onPointerCancel: handlePointerCancel,
-      className: "touch-none select-none [touch-action:none]",
-    }),
-    [handlePointerCancel, handlePointerDown, handlePointerMove, handlePointerUp],
+    {
+      target: dragHandleRef,
+      axis: "y",
+      filterTaps: true,
+      swipe: { velocity: 0.3 },
+    },
   )
 
   const contextValue = useMemo<SnapBottomSheetRenderProps>(
     () => ({
-      dragHandleProps,
-      isDragging,
+      dragHandleRef,
       snapHeights: resolvedSnapHeights,
       sheetHeight,
       sheetProgress,
     }),
-    [dragHandleProps, isDragging, resolvedSnapHeights, sheetHeight, sheetProgress],
+    [resolvedSnapHeights, sheetHeight, sheetProgress],
   )
 
   if (!isMounted || !open) return null
 
-  const content = (
-    <>
-      <div className={cn("fixed inset-0 z-40 bg-transparent pointer-events-none md:hidden", overlayClassName)} />
-      <motion.div
-        aria-label={ariaLabel}
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 flex flex-col overflow-hidden pointer-events-auto md:hidden transform-gpu [will-change:transform]",
-          className,
-        )}
-        style={{
-          height: maxSnapHeight,
-          maxHeight: maxSnapHeight,
-          backdropFilter: isDragging ? "none" : undefined,
-          WebkitBackdropFilter: isDragging ? "none" : undefined,
-          y: sheetOffset,
-        }}
-      >
-        <SnapBottomSheetContext.Provider value={contextValue}>
-          {children}
-        </SnapBottomSheetContext.Provider>
-      </motion.div>
-    </>
+  return createPortal(
+    <motion.div
+      aria-label={ariaLabel}
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 flex flex-col overflow-hidden pointer-events-auto md:hidden",
+        className,
+      )}
+      style={{
+        height: maxSnapHeight,
+        maxHeight: maxSnapHeight,
+        willChange: "transform",
+        y: sheetOffset,
+      }}
+    >
+      <SnapBottomSheetContext.Provider value={contextValue}>
+        {children}
+      </SnapBottomSheetContext.Provider>
+    </motion.div>,
+    document.body,
   )
-
-  return createPortal(content, document.body)
 }
