@@ -25,14 +25,16 @@ import { DecorationsSettingsPanel } from "../sidebar/decorations-settings-panel"
  * Snap 2 — панель быстрых действий
  * Snap 3 — развернутая панель (92% высоты экрана)
  */
-const SNAP_NAV = "68px"
-const SNAP_ACTIONS = "132px"
-const SNAP_FULL = 0.9
-const SNAPS: (string | number)[] = [SNAP_NAV, SNAP_ACTIONS, SNAP_FULL]
+const SNAP_NAV_INDEX = 0
+const SNAP_ACTIONS_INDEX = 1
+const SNAP_FULL_INDEX = 2
+const SNAP_NAV_HEIGHT = 68
+const SNAP_ACTIONS_HEIGHT = 132
+const SNAP_FULL_HEIGHT_RATIO = 0.9
 
-const PANEL_TRANSITION = {
-  duration: 0.24,
-  ease: [0.32, 0.72, 0, 1] as const,
+const CONTENT_FADE_TRANSITION = {
+  duration: 0.16,
+  ease: "linear",
 } as const
 
 const TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
@@ -79,9 +81,52 @@ interface MobileEditorSheetProps {
 interface MobileEditorSheetContentProps {
   activeTab: MobileEditorTab
   isFullOpen: boolean
-  snap: string | number
+  activeSnapIndex: number
   onTabPress: (tab: MobileEditorTab) => void
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
+}
+
+function resolveViewportHeight() {
+  if (typeof window === "undefined") return 0
+  return window.visualViewport?.height ?? window.innerHeight
+}
+
+function useViewportHeight() {
+  const [viewportHeight, setViewportHeight] = useState(0)
+
+  useEffect(() => {
+    const syncViewportHeight = () => {
+      setViewportHeight(resolveViewportHeight())
+    }
+
+    let frameId: number | null = null
+    const scheduleViewportSync = () => {
+      if (frameId !== null) return
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null
+        syncViewportHeight()
+      })
+    }
+
+    syncViewportHeight()
+
+    const visualViewport = window.visualViewport
+    window.addEventListener("resize", scheduleViewportSync)
+    window.addEventListener("orientationchange", scheduleViewportSync)
+    visualViewport?.addEventListener("resize", scheduleViewportSync)
+
+    return () => {
+      window.removeEventListener("resize", scheduleViewportSync)
+      window.removeEventListener("orientationchange", scheduleViewportSync)
+      visualViewport?.removeEventListener("resize", scheduleViewportSync)
+
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId)
+      }
+    }
+  }, [])
+
+  return viewportHeight
 }
 
 function useManagedInert(
@@ -106,19 +151,13 @@ const MobileSheetNav = memo(function MobileSheetNav({
   activeTab,
   onTabPress,
   dragHandleRef,
-  isExpanded,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
   dragHandleRef: React.RefObject<HTMLDivElement | null>
-  isExpanded: boolean
 }) {
   return (
-    <motion.div
-      className="relative shrink-0"
-      animate={{ opacity: isExpanded ? 1 : 0.96 }}
-      transition={PANEL_TRANSITION}
-    >
+    <div className="relative shrink-0">
       <div
         ref={dragHandleRef}
         className="touch-none select-none absolute inset-x-0 top-0 z-10 h-8 -translate-y-2 cursor-grab active:cursor-grabbing"
@@ -126,11 +165,7 @@ const MobileSheetNav = memo(function MobileSheetNav({
       />
 
       <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
-        <motion.div
-          className="w-10 h-1 rounded-full bg-foreground/20"
-          animate={{ scaleX: isExpanded ? 1 : 0.94 }}
-          transition={PANEL_TRANSITION}
-        />
+        <div className="w-10 h-1 rounded-full bg-foreground/20" />
       </div>
 
       <div className="grid h-12 shrink-0 grid-cols-4 pb-2 mb-2">
@@ -153,7 +188,7 @@ const MobileSheetNav = memo(function MobileSheetNav({
           </button>
         ))}
       </div>
-    </motion.div>
+    </div>
   )
 })
 
@@ -161,14 +196,12 @@ const MobileSheetQuickActions = memo(function MobileSheetQuickActions({
   activeTab,
   scrollContainerRef,
   showQuickActions,
-  isFullOpen,
   quickActionsRef,
   actionsHeight,
 }: {
   activeTab: MobileEditorTab
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
   showQuickActions: boolean
-  isFullOpen: boolean
   quickActionsRef: React.RefObject<HTMLDivElement | null>
   actionsHeight: number
 }) {
@@ -185,15 +218,12 @@ const MobileSheetQuickActions = memo(function MobileSheetQuickActions({
     <motion.div
       ref={quickActionsRef}
       className={cn(
-        "shrink-0 overflow-hidden border-t border-border/30 transform-gpu [will-change:transform,opacity]",
+        "absolute inset-x-0 top-0 overflow-hidden [will-change:opacity]",
         !showQuickActions && "pointer-events-none",
       )}
-      animate={{
-        height: isFullOpen ? 0 : actionsHeight,
-        opacity: showQuickActions ? 1 : 0,
-        y: isFullOpen ? -8 : showQuickActions ? 0 : 10,
-      }}
-      transition={PANEL_TRANSITION}
+      style={{ height: actionsHeight }}
+      animate={{ opacity: showQuickActions ? 1 : 0 }}
+      transition={CONTENT_FADE_TRANSITION}
     >
       <div className="h-full overflow-x-auto overscroll-x-contain no-scrollbar">
         <div className="min-w-max">{activeTab !== "design" && quickActionPanels[activeTab]}</div>
@@ -224,14 +254,11 @@ const MobileSheetFullContent = memo(function MobileSheetFullContent({
     <motion.div
       ref={fullContentRef}
       className={cn(
-        "min-h-0 flex-1 overflow-hidden border-t border-border/30 transform-gpu [will-change:transform,opacity]",
+        "absolute inset-0 min-h-0 overflow-hidden [will-change:opacity]",
         !isFullOpen && "pointer-events-none",
       )}
-      animate={{
-        opacity: isFullOpen && activeTab !== "design" ? 1 : 0,
-        y: isFullOpen ? 0 : 18,
-      }}
-      transition={PANEL_TRANSITION}
+      animate={{ opacity: isFullOpen && activeTab !== "design" ? 1 : 0 }}
+      transition={CONTENT_FADE_TRANSITION}
     >
       <div className="h-full overflow-y-auto overscroll-contain">
         {activeTab !== "design" && fullSettingsPanels[activeTab]}
@@ -243,7 +270,7 @@ const MobileSheetFullContent = memo(function MobileSheetFullContent({
 function MobileEditorSheetContent({
   activeTab,
   isFullOpen,
-  snap,
+  activeSnapIndex,
   onTabPress,
   scrollContainerRef,
 }: MobileEditorSheetContentProps) {
@@ -251,8 +278,7 @@ function MobileEditorSheetContent({
   const quickActionsRef = useRef<HTMLDivElement | null>(null)
   const fullContentRef = useRef<HTMLDivElement | null>(null)
   const actionsHeight = Math.max(0, (snapHeights[1] ?? 0) - (snapHeights[0] ?? 0))
-  const showQuickActions = snap !== SNAP_NAV && !isFullOpen
-  const isExpanded = snap !== SNAP_NAV
+  const showQuickActions = activeSnapIndex !== SNAP_NAV_INDEX && !isFullOpen
   const isFullContentVisible = isFullOpen && activeTab !== "design"
 
   useManagedInert(quickActionsRef, showQuickActions)
@@ -265,23 +291,23 @@ function MobileEditorSheetContent({
           activeTab={activeTab}
           onTabPress={onTabPress}
           dragHandleRef={dragHandleRef}
-          isExpanded={isExpanded}
         />
 
-        <MobileSheetQuickActions
-          activeTab={activeTab}
-          scrollContainerRef={scrollContainerRef}
-          showQuickActions={showQuickActions}
-          isFullOpen={isFullOpen}
-          quickActionsRef={quickActionsRef}
-          actionsHeight={actionsHeight}
-        />
+        <div className="relative min-h-0 flex-1 overflow-hidden border-t border-border/30">
+          <MobileSheetQuickActions
+            activeTab={activeTab}
+            scrollContainerRef={scrollContainerRef}
+            showQuickActions={showQuickActions}
+            quickActionsRef={quickActionsRef}
+            actionsHeight={actionsHeight}
+          />
 
-        <MobileSheetFullContent
-          activeTab={activeTab}
-          isFullOpen={isFullOpen}
-          fullContentRef={fullContentRef}
-        />
+          <MobileSheetFullContent
+            activeTab={activeTab}
+            isFullOpen={isFullOpen}
+            fullContentRef={fullContentRef}
+          />
+        </div>
 
         <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />
       </div>
@@ -294,7 +320,16 @@ export function MobileEditorSheet({
   onTabChange,
   scrollContainerRef,
 }: MobileEditorSheetProps) {
-  const [snap, setSnap] = useState<string | number>(SNAP_NAV)
+  const [activeSnapIndex, setActiveSnapIndex] = useState(SNAP_NAV_INDEX)
+  const viewportHeight = useViewportHeight()
+  const snapHeights = useMemo(
+    () => [
+      SNAP_NAV_HEIGHT,
+      SNAP_ACTIONS_HEIGHT,
+      Math.max(SNAP_ACTIONS_HEIGHT, viewportHeight * SNAP_FULL_HEIGHT_RATIO),
+    ],
+    [viewportHeight],
+  )
 
   const { openDesignModal, designModalSection, setSelectedDecorationId } = useUiSelector(
     (s) => ({
@@ -304,8 +339,8 @@ export function MobileEditorSheet({
     }),
   )
 
-  const handleSnapChange = useCallback((nextSnap: string | number) => {
-    setSnap(nextSnap)
+  const handleSnapChange = useCallback((nextSnapIndex: number) => {
+    setActiveSnapIndex(nextSnapIndex)
   }, [])
 
   const handleTabPress = useCallback(
@@ -313,7 +348,7 @@ export function MobileEditorSheet({
       // Таб "Design": сворачиваем панель и открываем модалку каталога
       if (tab === "design") {
         onTabChange("design")
-        setSnap(SNAP_NAV)
+        setActiveSnapIndex(SNAP_NAV_INDEX)
         openDesignModal(designModalSection)
         return
       }
@@ -329,23 +364,23 @@ export function MobileEditorSheet({
       // 1. Из свернутого состояния -> открываем быстрые действия
       // 2. Если уже на быстрых действиях и нажат ТОТ ЖЕ таб -> открываем на весь экран
       // 3. Если на весь экран или меняем таб в процессе -> оставляем текущую высоту
-      if (snap === SNAP_NAV) {
-        setSnap(SNAP_ACTIONS)
-      } else if (snap === SNAP_ACTIONS && tab === activeTab) {
-        setSnap(SNAP_FULL)
+      if (activeSnapIndex === SNAP_NAV_INDEX) {
+        setActiveSnapIndex(SNAP_ACTIONS_INDEX)
+      } else if (activeSnapIndex === SNAP_ACTIONS_INDEX && tab === activeTab) {
+        setActiveSnapIndex(SNAP_FULL_INDEX)
       }
     },
-    [snap, activeTab, onTabChange, openDesignModal, designModalSection, setSelectedDecorationId],
+    [activeSnapIndex, activeTab, onTabChange, openDesignModal, designModalSection, setSelectedDecorationId],
   )
 
-  const isFullOpen = snap === SNAP_FULL
+  const isFullOpen = activeSnapIndex === SNAP_FULL_INDEX
 
   return (
     <SnapBottomSheet
       open
-      snapPoints={SNAPS}
-      activeSnapPoint={snap}
-      setActiveSnapPoint={handleSnapChange}
+      snapHeights={snapHeights}
+      activeSnapIndex={activeSnapIndex}
+      setActiveSnapIndex={handleSnapChange}
       ariaLabel="Editor controls"
       className={cn(
         "bg-card/90",
@@ -356,7 +391,7 @@ export function MobileEditorSheet({
       <MobileEditorSheetContent
         activeTab={activeTab}
         isFullOpen={isFullOpen}
-        snap={snap}
+        activeSnapIndex={activeSnapIndex}
         onTabPress={handleTabPress}
         scrollContainerRef={scrollContainerRef}
       />

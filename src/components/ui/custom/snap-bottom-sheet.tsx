@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  useCallback,
   createContext,
   useContext,
   useEffect,
@@ -15,18 +16,20 @@ import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
 
-const SHEET_SNAP_TRANSITION = {
-  type: "spring",
-  stiffness: 300,
-  damping: 30,
-  restDelta: 0.01,
-} as const
+const SNAP_SPRING = {
+  type: "spring" as const,
+  stiffness: 380,
+  damping: 32,
+  mass: 0.9,
+  restDelta: 0.5,
+  restSpeed: 2,
+}
 
+const DRAG_ACTIVATION_DISTANCE = 3
+const RESISTANCE_FACTOR = 0.14
 
-type SnapPoint = string | number
-
-function clamp01(value: number) {
-  return Math.min(Math.max(value, 0), 1)
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max)
 }
 
 export interface SnapBottomSheetRenderProps {
@@ -38,11 +41,11 @@ export interface SnapBottomSheetRenderProps {
 
 const SnapBottomSheetContext = createContext<SnapBottomSheetRenderProps | null>(null)
 
-interface SnapBottomSheetProps<T extends SnapPoint> {
+interface SnapBottomSheetProps {
   open?: boolean
-  snapPoints: readonly T[]
-  activeSnapPoint: T
-  setActiveSnapPoint: (snapPoint: T) => void
+  snapHeights: readonly number[]
+  activeSnapIndex: number
+  setActiveSnapIndex: (snapIndex: number) => void
   className?: string
   ariaLabel?: string
   children: ReactNode
@@ -69,7 +72,7 @@ function resolveSnapRangeProgress(
 
   if (endHeight <= startHeight) return 1
 
-  return clamp01((value - startHeight) / (endHeight - startHeight))
+  return clamp((value - startHeight) / (endHeight - startHeight), 0, 1)
 }
 
 interface SnapBottomSheetTransitionOptions {
@@ -116,126 +119,91 @@ export function useSnapBottomSheetTransition({
   }
 }
 
-function resolveViewportHeight() {
-  if (typeof window === "undefined") return 0
-  return window.visualViewport?.height ?? window.innerHeight
-}
-
-function resolveSnapPoint(point: SnapPoint, viewportHeight: number) {
-  if (typeof point === "number") {
-    if (point > 0 && point <= 1) return viewportHeight * point
-    return point
-  }
-
-  const parsed = Number.parseFloat(point)
-  return Number.isFinite(parsed) ? parsed : 0
-}
-
 function applyResistance(value: number, min: number, max: number) {
-  if (value < min) return min - (min - value) * 0.14
-  if (value > max) return max + (value - max) * 0.14
+  if (value < min) return min - (min - value) * RESISTANCE_FACTOR
+  if (value > max) return max + (value - max) * RESISTANCE_FACTOR
   return value
 }
 
-function syncViewportHeight(
-  heightRef: React.MutableRefObject<number>,
-  setHeight: (h: number) => void,
-) {
-  const next = resolveViewportHeight()
-  if (next === heightRef.current) return
-  heightRef.current = next
-  setHeight(next)
+function findNearestSnapIndex(value: number, snapHeights: readonly number[]) {
+  let bestIndex = 0
+  let bestDistance = Number.POSITIVE_INFINITY
+
+  for (let index = 0; index < snapHeights.length; index += 1) {
+    const distance = Math.abs(snapHeights[index] - value)
+    if (distance < bestDistance) {
+      bestDistance = distance
+      bestIndex = index
+    }
+  }
+
+  return bestIndex
 }
 
-
-export function SnapBottomSheet<T extends SnapPoint>({
+export function SnapBottomSheet({
   open = true,
-  snapPoints,
-  activeSnapPoint,
-  setActiveSnapPoint,
+  snapHeights,
+  activeSnapIndex,
+  setActiveSnapIndex,
   className,
   ariaLabel,
   children,
-}: SnapBottomSheetProps<T>) {
+}: SnapBottomSheetProps) {
   const [isMounted, setIsMounted] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(0)
 
   const sheetHeight = useMotionValue(0)
   const animationRef = useRef<ReturnType<typeof animate> | null>(null)
-  const viewportHeightRef = useRef(0)
-  const viewportFrameRef = useRef<number | null>(null)
   const startHeightRef = useRef(0)
-  const hasDraggedRef = useRef(false)
   const dragHandleRef = useRef<HTMLDivElement | null>(null)
 
-  const { resolvedSnapHeights, orderedSnapPoints, orderedSnapHeights } = useMemo(() => {
-    const resolved = snapPoints.map((point) => ({ point, height: resolveSnapPoint(point, viewportHeight) }))
-    const ordered = [...resolved].sort((a, b) => a.height - b.height)
-    return {
-      resolvedSnapHeights: resolved.map(({ height }) => height),
-      orderedSnapPoints: ordered,
-      orderedSnapHeights: ordered.map(({ height }) => height),
-    }
-  }, [snapPoints, viewportHeight])
-
-  const maxSnapHeight = orderedSnapHeights[orderedSnapHeights.length - 1] ?? 0
-  const minSnapHeight = orderedSnapHeights[0] ?? 0
-  const sheetOffset = useTransform(sheetHeight, (value) => Math.max(0, maxSnapHeight - value))
+  const maxSnapHeight = snapHeights[snapHeights.length - 1] ?? 0
+  const minSnapHeight = snapHeights[0] ?? 0
+  const lastSnapIndex = Math.max(0, snapHeights.length - 1)
+  const safeActiveSnapIndex = clamp(activeSnapIndex, 0, lastSnapIndex)
+  const targetHeight = snapHeights[safeActiveSnapIndex] ?? minSnapHeight
+  const sheetOffset = useTransform(sheetHeight, [minSnapHeight, maxSnapHeight], [maxSnapHeight - minSnapHeight, 0])
   const sheetProgress = useTransform(sheetHeight, (value) => {
     if (maxSnapHeight <= minSnapHeight) return 1
-    return Math.min(Math.max((value - minSnapHeight) / (maxSnapHeight - minSnapHeight), 0), 1)
+    return clamp((value - minSnapHeight) / (maxSnapHeight - minSnapHeight), 0, 1)
   })
-  const activeSnapIndex = Math.max(
-    0,
-    snapPoints.findIndex((point) => Object.is(point, activeSnapPoint)),
+
+  const animateToHeight = useCallback(
+    (nextHeight: number) => {
+      const currentHeight = sheetHeight.get()
+
+      if (Math.abs(currentHeight - nextHeight) < 0.5) {
+        animationRef.current?.stop()
+        sheetHeight.set(nextHeight)
+        return
+      }
+
+      animationRef.current?.stop()
+      animationRef.current = animate(sheetHeight, nextHeight, SNAP_SPRING)
+    },
+    [sheetHeight],
   )
-  const targetHeight = resolvedSnapHeights[activeSnapIndex] ?? minSnapHeight
 
   useEffect(() => {
     setIsMounted(true)
-    syncViewportHeight(viewportHeightRef, setViewportHeight)
   }, [])
 
   useEffect(() => {
     if (!isMounted) return
 
-    syncViewportHeight(viewportHeightRef, setViewportHeight)
-
-    const schedule = () => {
-      if (viewportFrameRef.current !== null) return
-      viewportFrameRef.current = window.requestAnimationFrame(() => {
-        viewportFrameRef.current = null
-        syncViewportHeight(viewportHeightRef, setViewportHeight)
-      })
+    if (!open) {
+      animationRef.current?.stop()
+      return
     }
 
-    const visualViewport = window.visualViewport
-    window.addEventListener("resize", schedule)
-    window.addEventListener("orientationchange", schedule)
-    visualViewport?.addEventListener("resize", schedule)
-
-    return () => {
-      window.removeEventListener("resize", schedule)
-      window.removeEventListener("orientationchange", schedule)
-      visualViewport?.removeEventListener("resize", schedule)
-      if (viewportFrameRef.current !== null) {
-        window.cancelAnimationFrame(viewportFrameRef.current)
-        viewportFrameRef.current = null
-      }
-    }
-  }, [isMounted])
-
-  useEffect(() => {
-    if (!isMounted || !open || targetHeight <= 0) return
+    if (targetHeight < 0) return
 
     if (!sheetHeight.get()) {
       sheetHeight.set(targetHeight)
       return
     }
 
-    animationRef.current?.stop()
-    animationRef.current = animate(sheetHeight, targetHeight, SHEET_SNAP_TRANSITION)
-  }, [isMounted, open, targetHeight, sheetHeight])
+    animateToHeight(targetHeight)
+  }, [animateToHeight, isMounted, open, targetHeight, sheetHeight])
 
   useEffect(() => {
     return () => {
@@ -246,56 +214,35 @@ export function SnapBottomSheet<T extends SnapPoint>({
   useDrag(
     ({ first, last, movement: [, my], swipe: [, sy] }) => {
       if (first) {
+        animationRef.current?.stop()
         startHeightRef.current = sheetHeight.get() || targetHeight
-        hasDraggedRef.current = false
       }
 
-      // Only engage once there is real movement — prevents tap from
-      // interrupting an in-progress snap animation
-      if (Math.abs(my) > 3) {
-        if (!hasDraggedRef.current) {
-          hasDraggedRef.current = true
-          animationRef.current?.stop()
-        }
-        sheetHeight.set(applyResistance(startHeightRef.current - my, minSnapHeight, maxSnapHeight))
-      }
+      sheetHeight.set(applyResistance(startHeightRef.current - my, minSnapHeight, maxSnapHeight))
 
       if (!last) return
 
-      // Tap — no real drag happened, leave animation untouched
-      if (!hasDraggedRef.current) return
-
       let snapIndex: number
       if (sy !== 0) {
-        // flick: move ±1 snap from the active snap point
-        // sy=-1 → flick up → higher snap, sy=1 → flick down → lower snap
-        const activeOrderedIndex = orderedSnapPoints.findIndex((s) => Object.is(s.point, activeSnapPoint))
-        snapIndex = Math.min(Math.max(activeOrderedIndex - sy, 0), orderedSnapPoints.length - 1)
+        snapIndex = clamp(safeActiveSnapIndex - sy, 0, lastSnapIndex)
       } else {
-        // slow drag: snap to nearest
-        const h = Math.min(Math.max(sheetHeight.get(), minSnapHeight), maxSnapHeight)
-        snapIndex = orderedSnapHeights.reduce(
-          (best, sh, i) =>
-            Math.abs(sh - h) < Math.abs(orderedSnapHeights[best] - h) ? i : best,
-          0,
-        )
+        const currentHeight = clamp(sheetHeight.get(), minSnapHeight, maxSnapHeight)
+        snapIndex = findNearestSnapIndex(currentHeight, snapHeights)
       }
 
-      const nextSnap = orderedSnapPoints[snapIndex]
-      const nextPoint = nextSnap?.point ?? activeSnapPoint
-      const snapHeight = nextSnap?.height ?? sheetHeight.get()
+      const nextSnapHeight = snapHeights[snapIndex] ?? sheetHeight.get()
 
-      animationRef.current?.stop()
-      animationRef.current = animate(sheetHeight, snapHeight, SHEET_SNAP_TRANSITION)
+      animateToHeight(nextSnapHeight)
 
-      if (!Object.is(nextPoint, activeSnapPoint)) {
-        setActiveSnapPoint(nextPoint)
+      if (snapIndex !== safeActiveSnapIndex) {
+        setActiveSnapIndex(snapIndex)
       }
     },
     {
       target: dragHandleRef,
       axis: "y",
       filterTaps: true,
+      threshold: DRAG_ACTIVATION_DISTANCE,
       swipe: { velocity: 0.3 },
     },
   )
@@ -303,11 +250,11 @@ export function SnapBottomSheet<T extends SnapPoint>({
   const contextValue = useMemo<SnapBottomSheetRenderProps>(
     () => ({
       dragHandleRef,
-      snapHeights: resolvedSnapHeights,
+      snapHeights,
       sheetHeight,
       sheetProgress,
     }),
-    [resolvedSnapHeights, sheetHeight, sheetProgress],
+    [snapHeights, sheetHeight, sheetProgress],
   )
 
   if (!isMounted || !open) return null
