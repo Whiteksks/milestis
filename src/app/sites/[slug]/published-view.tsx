@@ -12,6 +12,7 @@ import type { ThemeCustomDecorations } from '@/editor/lib/types'
 import type { DecorationAnimation } from '@/editor/lib/decoration-animations'
 import { PublishedBackgroundLayers } from '@/editor/components/editor/layout/background-layers/published-background-layers'
 import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-logic'
+import { MilestisWhiteLabel } from '@/app/sites/[slug]/milestis-white-label'
 
 // ─── Published view ───────────────────────────────────────────────────────────
 
@@ -100,6 +101,8 @@ export function PublishedView({
         <div className="relative z-10">
           {template}
         </div>
+
+        <MilestisWhiteLabel />
       </div>
     </div>
   )

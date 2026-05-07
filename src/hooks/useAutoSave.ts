@@ -71,5 +71,23 @@ export function useAutoSave(projectId: string) {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [])
 
+  // ── pagehide: iOS Safari fires this instead of beforeunload on Back ───
+  useEffect(() => {
+    function handlePageHide() {
+      if (useUiStore.getState().isDirty) save()
+    }
+    window.addEventListener('pagehide', handlePageHide)
+    return () => window.removeEventListener('pagehide', handlePageHide)
+  }, [save])
+
+  // ── popstate: SPA back-navigation (Android back button, swipe back) ───
+  useEffect(() => {
+    function handlePopState() {
+      if (useUiStore.getState().isDirty) save()
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [save])
+
   return { save, isDirty }
 }

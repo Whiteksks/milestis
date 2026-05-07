@@ -1,29 +1,29 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import {
+  HeaderContent,
+  HeaderMenuToggle,
+  HeaderMobileDrawer,
+  HeaderShell,
+} from '../../../primitives/header-primitives'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
 type BentoHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoHeaderProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const links = sectionContent.header.links ?? []
   const hasLinks = links.length > 0
 
   return (
-    <header
-      className={cn('fixed top-0 left-0 z-50', theme.glassPanel)}
-      style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
-    >
-      <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between gap-6">
+    <HeaderShell placement="fixed" className={theme.glassPanel}>
+      {({ menu, getLinkProps }) => (
+        <>
+          <HeaderContent width="compact" className="px-5 h-14 flex items-center justify-between gap-6">
 
         {/* Logo / name */}
         <a
-          href="#hero"
-          onClick={(e) => handleAnchorClick(e, '#hero')}
+          {...getLinkProps('#hero', handleAnchorClick)}
           className={cn('text-sm font-bold tracking-tight opacity-80 hover:opacity-100 transition-opacity', theme.foreground, theme.fontBody)}
         >
           {sectionContent.header.title}
@@ -38,8 +38,7 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
             {links.map((link, i) => (
               <a
                 key={i}
-                href={link.href}
-                onClick={(e) => handleAnchorClick(e, link.href)}
+                {...getLinkProps(link.href, handleAnchorClick)}
                 className={cn(
                   'px-3.5 py-1 text-[11px] font-medium rounded-full opacity-60 hover:opacity-100 hover:bg-current/8 transition-all duration-150',
                   theme.fontBody,
@@ -54,41 +53,32 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
 
         {/* Mobile toggle */}
         {hasLinks && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
+          <HeaderMenuToggle
+            menu={menu}
             className={cn('@md:hidden p-2 opacity-60 hover:opacity-100 transition-opacity', theme.foreground)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={16} /> : <Menu size={16} />}
-          </button>
+          />
         )}
-      </div>
+          </HeaderContent>
 
       {/* Mobile drawer */}
-      <AnimatePresence>
-        {isOpen && hasLinks && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className={cn('@md:hidden overflow-hidden border-t border-current/8', theme.glassPanel)}
-          >
+      {hasLinks && (
+        <HeaderMobileDrawer menu={menu} className={cn('@md:hidden border-t border-current/8', theme.glassPanel)}>
             <nav className="flex flex-col px-5 py-3 gap-0.5">
               {links.map((link, i) => (
                 <a
                   key={i}
-                  href={link.href}
-                  onClick={(e) => { handleAnchorClick(e, link.href); setIsOpen(false) }}
+                  {...getLinkProps(link.href, handleAnchorClick, { closeMenu: true })}
                   className={cn('py-2.5 px-2 text-sm font-medium opacity-60 hover:opacity-100 transition-opacity rounded-xl', theme.fontBody, theme.foreground)}
                 >
                   {link.label}
                 </a>
               ))}
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+        </HeaderMobileDrawer>
+      )}
+        </>
+      )}
+    </HeaderShell>
   )
 }
 

@@ -11,8 +11,8 @@ import {
   LogOutIcon,
 } from 'lucide-react'
 
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { UserAvatar } from '@/components/shared/user-avatar'
 
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
@@ -41,21 +41,18 @@ const MENU_GROUPS = [
 // 2. Универсальный рендер контента (вне компонента, чтобы React не пересоздавал его на каждый рендер)
 type MenuContentProps = {
   displayName: string
-  photoURL: string
-  initials: string
   onClose: () => void
   onLogout: () => void
 }
 
-function MenuContent({ displayName, photoURL, initials, onClose, onLogout }: MenuContentProps) {
+function MenuContent({ displayName, onClose, onLogout }: MenuContentProps) {
   return (
     <div className="flex flex-col w-full">
       {/* Header / Profile Info */}
       <div className="flex items-center gap-2 p-2">
-        <Avatar className="size-10 border ml-2 mt-2">
-          <AvatarImage src={photoURL} alt={displayName} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
+        <div className="ml-2 mt-2 shrink-0">
+          <UserAvatar size="md" shape="circle" />
+        </div>
         <div className="flex flex-col overflow-hidden">
           <span className="font-semibold truncate mt-2">{displayName}</span>
         </div>
@@ -109,8 +106,6 @@ const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
   const { profile } = useUserStore()
 
   const displayName = profile?.displayName || 'User'
-  const photoURL = profile?.photoURL || ''
-  const initials = displayName.slice(0, 2).toUpperCase()
 
   const handleLogout = async () => {
     setOpen(false)
@@ -124,8 +119,6 @@ const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
 
   const menuProps: MenuContentProps = {
     displayName,
-    photoURL,
-    initials,
     onClose: () => setOpen(false),
     onLogout: handleLogout,
   }

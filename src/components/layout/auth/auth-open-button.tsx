@@ -25,8 +25,8 @@ const HeaderAuthButton = () => {
       <div className="flex items-center gap-2">
         <ProfileDropdown
           trigger={
-            <Button variant='ghost' size='icon' className='size-9.5'>
-              <UserAvatar size="sm" shape="circle"/>
+            <Button variant='ghost' className='size-9.5 rounded-full p-0 overflow-hidden'>
+              <UserAvatar size="md" shape="circle" className="size-full"/>
             </Button>
           }
         />

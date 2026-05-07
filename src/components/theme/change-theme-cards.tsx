@@ -1,12 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { useTheme } from 'next-themes'
+import { useThemeTransition } from '@/hooks/useThemeTransition'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function ThemeCards() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme } = useThemeTransition()
 
   const themes = [
     { name: 'System', value: 'system' },

@@ -44,6 +44,32 @@
   display: none;
 }
 
+/* ─── View Transitions ─────────────────────────────────────── */
+
+/* Disable React ViewTransition page-switch animation on mobile */
+@media (max-width: 1023px) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0s;
+  }
+}
+
+/* Theme-switch transition — instant hide old, fade in new */
+html[data-theme-transition]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-theme-transition]::view-transition-new(root) {
+  animation: 0.35s ease-out forwards theme-fade-in;
+  z-index: 9999;
+}
+
+@keyframes theme-fade-in {
+  from { opacity: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────── */
+
 @media (max-width: 767px) {
   [class*="backdrop-blur"] {
     -webkit-backdrop-filter: none !important;

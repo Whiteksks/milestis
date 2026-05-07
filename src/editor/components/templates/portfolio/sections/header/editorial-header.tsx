@@ -1,23 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import {
+  HeaderContent,
+  HeaderMenuToggle,
+  HeaderMobileDrawer,
+  HeaderShell,
+} from '../../../primitives/header-primitives'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
 type EditorialHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionContent' | 'handleAnchorClick'> 
 
 export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: EditorialHeaderProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
   return (
-    <header
-      className={cn('fixed top-0 left-0 z-50 border-b border-current/10', theme.glassPanel)}
-      style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-8">
+    <HeaderShell placement="fixed" className={cn('border-b border-current/10', theme.glassPanel)}>
+      {({ menu, getLinkProps }) => (
+        <>
+          <HeaderContent width="compact" className="px-6 h-14 flex items-center justify-between gap-8">
         {/* Left: issue marker + brand */}
         <div className="flex items-center gap-4">
           <span
@@ -31,8 +32,7 @@ export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: Ed
           </span>
           <div className="w-px h-4 bg-current opacity-20" />
           <a
-            href="#hero"
-            onClick={(e) => handleAnchorClick(e, '#hero')}
+            {...getLinkProps('#hero', handleAnchorClick)}
             className={cn(
               'text-xs uppercase tracking-[0.25em] font-medium',
               theme.fontBody,
@@ -48,8 +48,7 @@ export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: Ed
           {(sectionContent.header.links ?? []).map((link, i) => (
             <a
               key={i}
-              href={link.href}
-              onClick={(e) => handleAnchorClick(e, link.href)}
+              {...getLinkProps(link.href, handleAnchorClick)}
               className={cn(
                 'text-[11px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100 transition-opacity',
                 theme.fontBody,
@@ -62,34 +61,21 @@ export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: Ed
 
         {/* Mobile toggle */}
         {hasLinks && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
+          <HeaderMenuToggle
+            menu={menu}
             className="@md:hidden p-2 opacity-60 hover:opacity-100 transition-opacity"
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={16} /> : <Menu size={16} />}
-          </button>
+          />
         )}
-      </div>
+          </HeaderContent>
 
       {/* Mobile menu */}
-      <AnimatePresence>
-        {isOpen && hasLinks && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className={cn('@md:hidden overflow-hidden border-t border-current/10', theme.glassPanel)}
-          >
+      {hasLinks && (
+        <HeaderMobileDrawer menu={menu} className={cn('@md:hidden border-t border-current/10', theme.glassPanel)}>
             <nav className="flex flex-col px-6 py-5 gap-5">
               {(sectionContent.header.links ?? []).map((link, i) => (
                 <a
                   key={i}
-                  href={link.href}
-                  onClick={(e) => {
-                    handleAnchorClick(e, link.href)
-                    setIsOpen(false)
-                  }}
+                  {...getLinkProps(link.href, handleAnchorClick, { closeMenu: true })}
                   className={cn(
                     'text-xs uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity',
                     theme.fontBody,
@@ -99,9 +85,10 @@ export function EditorialHeader({ theme, sectionContent, handleAnchorClick }: Ed
                 </a>
               ))}
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+        </HeaderMobileDrawer>
+      )}
+        </>
+      )}
+    </HeaderShell>
   )
 }

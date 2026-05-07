@@ -1,9 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useT, useDisabled } from '../../../primitives/animation-context'
-import { Menu, X } from 'lucide-react'
+import {
+  HeaderContent,
+  HeaderMenuToggle,
+  HeaderMobilePanel,
+  HeaderShell,
+} from '../../../primitives/header-primitives'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import { cn } from '@/lib/utils'
 
@@ -12,31 +16,17 @@ type LiquidGlassHeaderProps = Pick<PortfolioTemplateProps, 'theme' | 'sectionCon
 export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: LiquidGlassHeaderProps) {
   const t = useT()
   const disabled = useDisabled()
-  const [isOpen, setIsOpen] = useState(false)
-  const [heroVisible, setHeroVisible] = useState(true)
   const hasLinks = (sectionContent.header.links ?? []).length > 0
 
-  useEffect(() => {
-    const hero = document.getElementById('hero')
-    if (!hero) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroVisible(entry.isIntersecting),
-      { threshold: 0, rootMargin: '-64px 0px 0px 0px' },
-    )
-    observer.observe(hero)
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <header
-      className="fixed top-0 left-0 z-50 transition-all duration-500"
-      style={{ right: 'var(--canvas-scrollbar-width, 0px)' }}
-    >
+    <HeaderShell placement="fixed" watchHero className="transition-all duration-500">
+      {({ overHero, menu, getLinkProps }) => (
+        <>
       {/* Glass bar */}
       <div
         className="mx-3 mt-3 rounded-2xl border border-white/20 transition-all duration-500"
         style={{
-          background: heroVisible
+          background: overHero
             ? 'rgba(255,255,255,0.08)'
             : 'rgba(255,255,255,0.14)',
           backdropFilter: 'blur(24px) saturate(180%) brightness(1.05)',
@@ -50,11 +40,10 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
           style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%)' }}
         />
 
-        <div className="relative max-w-7xl mx-auto px-5 @md:px-10 @lg:px-16 h-14 flex items-center justify-between gap-8">
+        <HeaderContent width="compact" className="relative px-5 @md:px-10 @lg:px-16 h-14 flex items-center justify-between gap-8">
           {/* Brand */}
           <motion.a
-            href="#hero"
-            onClick={(e) => handleAnchorClick(e, '#hero')}
+            {...getLinkProps('#hero', handleAnchorClick)}
             initial={disabled ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={disabled ? undefined : t(0.6)}
@@ -73,8 +62,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
             {(sectionContent.header.links ?? []).map((link, i) => (
               <a
                 key={i}
-                href={link.href}
-                onClick={(e) => handleAnchorClick(e, link.href)}
+                {...getLinkProps(link.href, handleAnchorClick)}
                 className={cn(
                   'relative text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white transition-colors duration-200 group',
                   theme.fontBody,
@@ -88,24 +76,19 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
 
           {/* Mobile toggle */}
           {hasLinks && (
-            <button
-              onClick={() => setIsOpen(!isOpen)}
+            <HeaderMenuToggle
+              menu={menu}
               className="@md:hidden p-1.5 text-white/70 hover:text-white transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+              iconSize={18}
+            />
           )}
-        </div>
+        </HeaderContent>
       </div>
 
       {/* Mobile menu   separate glass panel */}
-      <AnimatePresence>
-        {isOpen && hasLinks && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+      {hasLinks && (
+        <HeaderMobilePanel
+            menu={menu}
             transition={t(0.2)}
             className="mx-3 mt-2 rounded-2xl overflow-hidden border border-white/15"
             style={{
@@ -119,11 +102,7 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
               {(sectionContent.header.links ?? []).map((link, i) => (
                 <a
                   key={i}
-                  href={link.href}
-                  onClick={(e) => {
-                    handleAnchorClick(e, link.href)
-                    setIsOpen(false)
-                  }}
+                  {...getLinkProps(link.href, handleAnchorClick, { closeMenu: true })}
                   className={cn(
                     'text-sm uppercase tracking-[0.18em] text-white/70 hover:text-white transition-colors',
                     theme.fontBody,
@@ -133,9 +112,10 @@ export function LiquidGlassHeader({ theme, sectionContent, handleAnchorClick }: 
                 </a>
               ))}
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+        </HeaderMobilePanel>
+      )}
+        </>
+      )}
+    </HeaderShell>
   )
 }

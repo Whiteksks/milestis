@@ -14,7 +14,7 @@ export function ElegantFeaturedWork({ theme, sectionContent, imageContent }: Ele
   const projects = sectionContent.featuredWork.projects ?? []
   return (
     <SectionWrapper
-      id="featured-work"
+      id="work"
       themeForeground={theme.foreground}
       className="@container"
     >

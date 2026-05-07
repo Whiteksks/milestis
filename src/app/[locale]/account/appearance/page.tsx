@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { Check, Sun, Moon, Laptop, Zap } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useTheme } from "next-themes"
+import { useThemeTransition } from "@/hooks/useThemeTransition"
 import AppearanceSettingsSkeleton from "./loading"
 import { useTranslations } from "next-intl"
+import { Switch } from "@/components/ui/switch"
 
 const themes = [
   {
@@ -14,28 +14,27 @@ const themes = [
     nameKey: "themes.light.name",
     descriptionKey: "themes.light.description",
     icon: Sun,
-    colors: { bg: "bg-amber-50", accent: "bg-rose-300", card: "bg-white", text: "bg-stone-400" },
+    colors: { bg: "bg-amber-50", sidebar: "bg-stone-50", card: "bg-white", accent: "bg-rose-400", text: "bg-stone-400" },
   },
   {
     id: "cozy",
     nameKey: "themes.cozy.name",
     descriptionKey: "themes.cozy.description",
     icon: Sun,
-    colors: { bg: "bg-orange-100", accent: "bg-amber-400", card: "bg-orange-50", text: "bg-amber-700" },
+    colors: { bg: "bg-amber-100", sidebar: "bg-amber-50", card: "bg-orange-50", accent: "bg-amber-500", text: "bg-amber-700" },
   },
   {
     id: "dark",
     nameKey: "themes.dark.name",
     descriptionKey: "themes.dark.description",
     icon: Moon,
-    colors: { bg: "bg-stone-900", accent: "bg-rose-400", card: "bg-stone-800", text: "bg-stone-500" },
+    colors: { bg: "bg-stone-950", sidebar: "bg-stone-900", card: "bg-stone-800", accent: "bg-rose-500", text: "bg-stone-600" },
   },
 ]
 
 export default function AppearanceSettings() {
   const t = useTranslations("account.appearance")
-  const { theme, setTheme } = useTheme()
-  const [highContrast, setHighContrast] = useState(false)
+  const { theme, setTheme, highContrast, setHighContrast } = useThemeTransition()
 
   const activeTheme = themes.find((th) => th.id === theme) || themes[0]
   const [mounted, setMounted] = useState(false)
@@ -70,11 +69,23 @@ export default function AppearanceSettings() {
 
         <div className="space-y-8">
           <div className="flex flex-col items-center gap-6 sm:hidden">
-            <div className={`${activeTheme.colors.bg} relative aspect-video w-full overflow-hidden rounded-2xl border p-4 transition-colors duration-500`}>
-              <div className={`absolute left-4 top-4 bottom-4 w-12 ${activeTheme.colors.card} rounded-xl opacity-90 shadow-sm`} />
-              <div className={`absolute left-20 right-4 top-4 h-6 ${activeTheme.colors.card} rounded-lg opacity-90`} />
-              <div className={`absolute left-20 right-4 top-14 h-16 ${activeTheme.colors.card} rounded-xl opacity-90`}>
-                <div className={`absolute right-3 top-3 h-5 w-12 ${activeTheme.colors.accent} rounded-full`} />
+            <div className={`${activeTheme.colors.bg} relative aspect-video w-full overflow-hidden rounded-2xl border transition-colors duration-500 flex`}>
+              {/* Sidebar strip */}
+              <div className={`w-14 shrink-0 h-full ${activeTheme.colors.sidebar} flex flex-col items-center pt-4 gap-3 transition-colors duration-500`}>
+                <div className={`size-6 rounded-xl ${activeTheme.colors.accent} opacity-90`} />
+                <div className={`size-6 rounded-lg ${activeTheme.colors.card} opacity-50`} />
+                <div className={`size-6 rounded-lg ${activeTheme.colors.card} opacity-50`} />
+              </div>
+              {/* Content area */}
+              <div className="flex-1 p-3 flex flex-col gap-2">
+                <div className={`h-6 w-full rounded-xl ${activeTheme.colors.card} opacity-80 transition-colors duration-500`} />
+                <div className="flex gap-2 flex-1">
+                  <div className={`flex-1 rounded-xl ${activeTheme.colors.card} opacity-90 transition-colors duration-500`} />
+                  <div className="flex flex-col gap-2 w-1/3">
+                    <div className={`flex-1 rounded-xl ${activeTheme.colors.card} opacity-60 transition-colors duration-500`} />
+                    <div className={`h-10 rounded-xl ${activeTheme.colors.accent} opacity-50 transition-colors duration-500`} />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -105,13 +116,23 @@ export default function AppearanceSettings() {
                   key={th.id}
                   onClick={() => setTheme(th.id)}
                   className={`group relative overflow-hidden rounded-2xl border-2 p-1 transition-all duration-300 hover:scale-[1.02] ${isActive ? "border-primary shadow-lg shadow-primary/20" : "border-border hover:border-primary/40"}`}>
-                  <div className={`${th.colors.bg} relative aspect-4/3 overflow-hidden rounded-xl p-3`}>
-                    <div className={`absolute left-2 top-2 bottom-2 w-8 ${th.colors.card} rounded-lg opacity-90`}>
-                      <div className={`mx-1.5 mt-2 h-1.5 w-5 ${th.colors.text} rounded-full opacity-60`} />
+                  <div className={`${th.colors.bg} relative aspect-4/3 overflow-hidden rounded-xl flex`}>
+                    {/* Sidebar strip */}
+                    <div className={`w-7 shrink-0 h-full ${th.colors.sidebar} flex flex-col items-center pt-2 gap-1.5`}>
+                      <div className={`size-3 rounded-md ${th.colors.accent} opacity-90`} />
+                      <div className={`size-3 rounded-md ${th.colors.card} opacity-50`} />
+                      <div className={`size-3 rounded-md ${th.colors.card} opacity-50`} />
                     </div>
-                    <div className={`absolute left-12 right-2 top-2 h-5 ${th.colors.card} rounded-lg opacity-90`} />
-                    <div className={`absolute left-12 right-2 top-9 h-8 ${th.colors.card} rounded-lg opacity-90`}>
-                      <div className={`absolute right-2 top-2 h-4 w-10 ${th.colors.accent} rounded-full`} />
+                    {/* Content area */}
+                    <div className="flex-1 p-1.5 flex flex-col gap-1.5">
+                      <div className={`h-3 w-full rounded-lg ${th.colors.card} opacity-80`} />
+                      <div className="flex gap-1.5 flex-1">
+                        <div className={`flex-1 rounded-lg ${th.colors.card} opacity-90`} />
+                        <div className="flex flex-col gap-1.5 w-1/3">
+                          <div className={`flex-1 rounded-lg ${th.colors.card} opacity-60`} />
+                          <div className={`h-4 rounded-lg ${th.colors.accent} opacity-50`} />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2.5 text-left">

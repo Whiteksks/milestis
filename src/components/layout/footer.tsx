@@ -3,6 +3,8 @@
 import Link from "next/link"
 import LogoSvg from "@/components/icons/logo"
 import { Separator } from "@/components/ui/separator"
+import { useThemeTransition } from "@/hooks/useThemeTransition"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import {
   Accordion,
@@ -42,6 +44,8 @@ const FOOTER_LINKS = [
 
 
 export function Footer() {
+  const { theme, setTheme } = useThemeTransition()
+
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24">
@@ -58,20 +62,16 @@ export function Footer() {
               Create beautiful memory books, photobooks, and portfolios — in minutes.
             </p>
 
-            <div className="flex items-center gap-4">
-              {/* {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
-                >
-                  {s.icon}
-                </a>
-              ))} */}
-            </div>
+            <Select value={theme ?? "light"} onValueChange={setTheme}>
+              <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="cozy">Cozy</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Desktop link columns */}
@@ -139,6 +139,8 @@ export function Footer() {
               Terms and Conditions
             </Link>
           </div>
+
+
         </div>
       </div>
     </footer>

@@ -13,7 +13,7 @@ export function GridFeaturedWork({ theme, sectionContent, imageContent }: Pick<P
 
   return (
     <SectionWrapper
-      id="featured-work"
+      id="work"
       themeForeground={theme.foreground}
       className="@container py-20"
     >
