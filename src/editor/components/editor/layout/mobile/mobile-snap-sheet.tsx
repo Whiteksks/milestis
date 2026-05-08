@@ -1,19 +1,19 @@
 "use client"
 
+import { useCallback, useEffect, useMemo, useRef, useState, type HTMLAttributes, type ReactNode } from "react"
 import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type HTMLAttributes,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-} from "react"
-import { animate, motion, useMotionValue, useTransform, type AnimationPlaybackControls } from "framer-motion"
+  animate,
+  motion,
+  useDragControls,
+  useMotionValue,
+  type AnimationPlaybackControls,
+  type PanInfo,
+} from "framer-motion"
 import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
+
+// ─── Spring config ────────────────────────────────────────────────────────────
 
 const SNAP_SPRING = {
   type: "spring" as const,
@@ -24,65 +24,58 @@ const SNAP_SPRING = {
   restSpeed: 2,
 }
 
-const RESISTANCE_FACTOR = 0.14
-const SWIPE_VELOCITY_THRESHOLD = 0.35
-const SWIPE_VELOCITY_PROJECTION = 180
+/** How far ahead (in seconds) to project velocity when choosing a snap point. */
+const VELOCITY_PROJECTION_S = 0.18
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max)
-}
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function applyResistance(value: number, min: number, max: number) {
-  if (value < min) return min - (min - value) * RESISTANCE_FACTOR
-  if (value > max) return max + (value - max) * RESISTANCE_FACTOR
-  return value
-}
-
-function findNearestSnapIndex(value: number, snapHeights: readonly number[]) {
-  let bestIndex = 0
-  let bestDistance = Number.POSITIVE_INFINITY
-
-  for (let index = 0; index < snapHeights.length; index += 1) {
-    const distance = Math.abs(snapHeights[index] - value)
-    if (distance < bestDistance) {
-      bestDistance = distance
-      bestIndex = index
-    }
-  }
-
-  return bestIndex
-}
-
-function normalizeSnapHeights(snapHeights: readonly number[]) {
-  return snapHeights.reduce<number[]>((accumulator, height, index) => {
-    const previousHeight = accumulator[index - 1] ?? 0
-    accumulator.push(Math.max(previousHeight, Math.max(0, height)))
-    return accumulator
+/**
+ * Normalises snap heights so they are ascending and non-negative.
+ * Each entry is clamped to be >= its predecessor and >= 0.
+ */
+function normaliseHeights(heights: readonly number[]): number[] {
+  return heights.reduce<number[]>((acc, h, i) => {
+    acc.push(Math.max(acc[i - 1] ?? 0, Math.max(0, h)))
+    return acc
   }, [])
 }
 
-interface DragSession {
-  pointerId: number
-  startY: number
-  lastY: number
-  lastTime: number
-  velocity: number
-  startHeight: number
+/**
+ * Returns the index in `values` whose entry is closest to `target`.
+ */
+function nearestIndex(target: number, values: readonly number[]): number {
+  let best = 0
+  let bestDist = Infinity
+  for (let i = 0; i < values.length; i++) {
+    const dist = Math.abs(values[i] - target)
+    if (dist < bestDist) {
+      bestDist = dist
+      best = i
+    }
+  }
+  return best
 }
 
+// ─── Public types ─────────────────────────────────────────────────────────────
+
 export interface MobileSnapSheetRenderProps {
-  dragHandleProps: HTMLAttributes<HTMLDivElement>
+  /** Spread onto the element that should initiate the drag gesture. */
+  dragHandleProps: Pick<HTMLAttributes<HTMLDivElement>, "onPointerDown">
 }
 
 interface MobileSnapSheetProps {
   open?: boolean
+  /** Heights (px) the sheet can snap to, in ascending order. */
   snapHeights: readonly number[]
+  /** Currently active snap index (controlled). */
   snapIndex: number
-  onSnapIndexChange: (snapIndex: number) => void
+  onSnapIndexChange: (index: number) => void
   className?: string
   ariaLabel?: string
   children: (props: MobileSnapSheetRenderProps) => ReactNode
 }
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function MobileSnapSheet({
   open = true,
@@ -94,188 +87,109 @@ export function MobileSnapSheet({
   children,
 }: MobileSnapSheetProps) {
   const [isMounted, setIsMounted] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
+  const dragControls = useDragControls()
+  const animRef = useRef<AnimationPlaybackControls | null>(null)
+  /**
+   * Guard that prevents the external-snapIndex effect from re-animating while
+   * a drag or its immediately-following onSnapIndexChange propagation is active.
+   */
+  const isDraggingRef = useRef(false)
 
-  const resolvedSnapHeights = useMemo(() => normalizeSnapHeights(snapHeights), [snapHeights])
-  const lastSnapIndex = Math.max(0, resolvedSnapHeights.length - 1)
-  const safeSnapIndex = clamp(snapIndex, 0, lastSnapIndex)
-  const minSnapHeight = resolvedSnapHeights[0] ?? 0
-  const maxSnapHeight = resolvedSnapHeights[lastSnapIndex] ?? minSnapHeight
-  const targetHeight = resolvedSnapHeights[safeSnapIndex] ?? minSnapHeight
+  // Derived snap geometry ──────────────────────────────────────────────────────
 
-  const sheetHeight = useMotionValue(targetHeight)
-  const animationRef = useRef<AnimationPlaybackControls | null>(null)
-  const dragSessionRef = useRef<DragSession | null>(null)
+  const normalised = useMemo(() => normaliseHeights(snapHeights), [snapHeights])
+  const lastIndex = Math.max(0, normalised.length - 1)
+  const maxHeight = normalised[lastIndex] ?? 0
+  const minHeight = normalised[0] ?? 0
+  const safeIndex = Math.min(Math.max(snapIndex, 0), lastIndex)
 
-  const stopAnimation = useCallback(() => {
-    animationRef.current?.stop()
-    animationRef.current = null
-  }, [])
+  /**
+   * Each snap height is expressed as a `y` offset from the top of the fixed
+   * container (which always has `height = maxHeight`):
+   *   y = 0                        → fully open  (sheet at maxHeight)
+   *   y = maxHeight − minHeight    → most collapsed (sheet at minHeight)
+   */
+  const snapY = useMemo(
+    () => normalised.map((h) => maxHeight - h),
+    [normalised, maxHeight],
+  )
 
-  const animateToHeight = useCallback(
-    (nextHeight: number) => {
-      const currentHeight = sheetHeight.get()
+  // Motion value ───────────────────────────────────────────────────────────────
 
-      if (Math.abs(currentHeight - nextHeight) < 0.5) {
-        stopAnimation()
-        sheetHeight.set(nextHeight)
+  const y = useMotionValue(snapY[safeIndex] ?? 0)
+
+  const animateTo = useCallback(
+    (targetY: number) => {
+      animRef.current?.stop()
+      if (Math.abs(y.get() - targetY) < 0.5) {
+        y.set(targetY)
+        animRef.current = null
         return
       }
-
-      stopAnimation()
-      animationRef.current = animate(sheetHeight, nextHeight, SNAP_SPRING)
+      animRef.current = animate(y, targetY, SNAP_SPRING)
     },
-    [sheetHeight, stopAnimation],
+    [y],
   )
+
+  // Mount / unmount ────────────────────────────────────────────────────────────
 
   useEffect(() => {
     setIsMounted(true)
+    return () => { animRef.current?.stop() }
   }, [])
 
-  useEffect(() => {
-    return () => {
-      stopAnimation()
-    }
-  }, [stopAnimation])
+  // Sync external snapIndex changes (e.g. parent resets to nav on tab switch) ──
 
   useEffect(() => {
-    if (!isMounted || !open || isDragging) return
-    animateToHeight(targetHeight)
-  }, [animateToHeight, isDragging, isMounted, open, targetHeight])
+    if (!isMounted || !open || isDraggingRef.current) return
+    animateTo(snapY[safeIndex] ?? 0)
+  }, [animateTo, isMounted, open, safeIndex, snapY])
 
-  const finalizeDrag = useCallback(
-    (pointerId: number) => {
-      const dragSession = dragSessionRef.current
-      if (!dragSession || dragSession.pointerId !== pointerId) return
+  // Drag handlers ──────────────────────────────────────────────────────────────
 
-      dragSessionRef.current = null
-      setIsDragging(false)
+  const handleDragStart = useCallback(() => {
+    isDraggingRef.current = true
+    animRef.current?.stop()
+  }, [])
 
-      const currentHeight = clamp(sheetHeight.get(), minSnapHeight, maxSnapHeight)
-      const nearestSnapIndex = findNearestSnapIndex(currentHeight, resolvedSnapHeights)
+  const handleDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      // Project the current position forward in time using velocity to pick
+      // which snap feels most natural for the gesture speed/direction.
+      const projected = y.get() + info.velocity.y * VELOCITY_PROJECTION_S
+      const nextIndex = nearestIndex(projected, snapY)
+      const nextY = snapY[nextIndex] ?? y.get()
 
-      const nextSnapIndex = Math.abs(dragSession.velocity) >= SWIPE_VELOCITY_THRESHOLD
-        ? clamp(
-          findNearestSnapIndex(
-            clamp(
-              currentHeight - dragSession.velocity * SWIPE_VELOCITY_PROJECTION,
-              minSnapHeight,
-              maxSnapHeight,
-            ),
-            resolvedSnapHeights,
-          ),
-          Math.max(0, nearestSnapIndex - 1),
-          Math.min(lastSnapIndex, nearestSnapIndex + 1),
-        )
-        : nearestSnapIndex
+      animateTo(nextY)
 
-      const nextHeight = resolvedSnapHeights[nextSnapIndex] ?? currentHeight
-      animateToHeight(nextHeight)
-
-      if (nextSnapIndex !== safeSnapIndex) {
-        onSnapIndexChange(nextSnapIndex)
+      if (nextIndex !== safeIndex) {
+        onSnapIndexChange(nextIndex)
       }
+
+      // Delay clearing so the effect triggered by onSnapIndexChange (re-render)
+      // still sees isDraggingRef as true and doesn't double-animate.
+      requestAnimationFrame(() => {
+        isDraggingRef.current = false
+      })
     },
-    [
-      animateToHeight,
-      lastSnapIndex,
-      maxSnapHeight,
-      minSnapHeight,
-      onSnapIndexChange,
-      resolvedSnapHeights,
-      safeSnapIndex,
-      sheetHeight,
-    ],
+    [animateTo, onSnapIndexChange, safeIndex, snapY, y],
   )
+
+  // Drag handle props (only onPointerDown needed with dragControls) ─────────────
 
   const handlePointerDown = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (event.pointerType === "mouse" && event.button !== 0) return
-
-      event.preventDefault()
-      event.stopPropagation()
-
-      stopAnimation()
-      setIsDragging(true)
-
-      dragSessionRef.current = {
-        pointerId: event.pointerId,
-        startY: event.clientY,
-        lastY: event.clientY,
-        lastTime: event.timeStamp,
-        velocity: 0,
-        startHeight: sheetHeight.get() || targetHeight,
-      }
-
-      event.currentTarget.setPointerCapture(event.pointerId)
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      dragControls.start(event)
     },
-    [sheetHeight, stopAnimation, targetHeight],
+    [dragControls],
   )
 
-  const handlePointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      const dragSession = dragSessionRef.current
-      if (!dragSession || dragSession.pointerId !== event.pointerId) return
-
-      const deltaY = event.clientY - dragSession.startY
-      const nextHeight = applyResistance(dragSession.startHeight - deltaY, minSnapHeight, maxSnapHeight)
-
-      sheetHeight.set(nextHeight)
-
-      const deltaTime = Math.max(event.timeStamp - dragSession.lastTime, 1)
-      dragSession.velocity = (event.clientY - dragSession.lastY) / deltaTime
-      dragSession.lastY = event.clientY
-      dragSession.lastTime = event.timeStamp
-    },
-    [maxSnapHeight, minSnapHeight, sheetHeight],
+  const dragHandleProps = useMemo<MobileSnapSheetRenderProps["dragHandleProps"]>(
+    () => ({ onPointerDown: handlePointerDown }),
+    [handlePointerDown],
   )
 
-  const handlePointerUp = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (dragSessionRef.current?.pointerId !== event.pointerId) return
-
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId)
-      }
-
-      finalizeDrag(event.pointerId)
-    },
-    [finalizeDrag],
-  )
-
-  const handlePointerCancel = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (dragSessionRef.current?.pointerId !== event.pointerId) return
-
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId)
-      }
-
-      finalizeDrag(event.pointerId)
-    },
-    [finalizeDrag],
-  )
-
-  const handleLostPointerCapture = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (dragSessionRef.current?.pointerId !== event.pointerId) return
-      finalizeDrag(event.pointerId)
-    },
-    [finalizeDrag],
-  )
-
-  const dragHandleProps = useMemo<HTMLAttributes<HTMLDivElement>>(
-    () => ({
-      onPointerDown: handlePointerDown,
-      onPointerMove: handlePointerMove,
-      onPointerUp: handlePointerUp,
-      onPointerCancel: handlePointerCancel,
-      onLostPointerCapture: handleLostPointerCapture,
-    }),
-    [handleLostPointerCapture, handlePointerCancel, handlePointerDown, handlePointerMove, handlePointerUp],
-  )
-
-  const sheetOffset = useTransform(sheetHeight, (value) => Math.max(0, maxSnapHeight - value))
+  // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (!isMounted || !open) return null
 
@@ -286,12 +200,15 @@ export function MobileSnapSheet({
         "fixed bottom-0 left-0 right-0 z-50 flex flex-col overflow-hidden pointer-events-auto md:hidden",
         className,
       )}
-      style={{
-        height: maxSnapHeight,
-        maxHeight: maxSnapHeight,
-        willChange: "transform",
-        y: sheetOffset,
-      }}
+      style={{ height: maxHeight, y, willChange: "transform" }}
+      drag="y"
+      dragControls={dragControls}
+      dragListener={false}
+      dragConstraints={{ top: 0, bottom: maxHeight - minHeight }}
+      dragElastic={{ top: 0.1, bottom: 0.1 }}
+      dragMomentum={false}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
     >
       {children({ dragHandleProps })}
     </motion.div>,

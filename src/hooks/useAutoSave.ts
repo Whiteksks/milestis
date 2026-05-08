@@ -52,14 +52,27 @@ export function useAutoSave(projectId: string) {
     }
   }, [projectId, markClean])
 
+  const saveImmediately = useCallback(async () => {
+    if (savingRef.current || !useUiStore.getState().isDirty) return
+    savingRef.current = true
+    try {
+      await saveProject(projectId, { bypassQueue: true })
+      markClean()
+    } catch {
+      // Silent — data stays in Zustand memory, user can retry via Save button
+    } finally {
+      savingRef.current = false
+    }
+  }, [projectId, markClean])
+
   // ── visibilitychange: save when tab loses focus ───────────────────────
   useEffect(() => {
     function handleVisibility() {
-      if (document.hidden) save()
+      if (document.hidden) void saveImmediately()
     }
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [save])
+  }, [saveImmediately])
 
   // ── beforeunload: show native browser "Leave site?" dialog ───────────
   useEffect(() => {
@@ -74,20 +87,20 @@ export function useAutoSave(projectId: string) {
   // ── pagehide: iOS Safari fires this instead of beforeunload on Back ───
   useEffect(() => {
     function handlePageHide() {
-      if (useUiStore.getState().isDirty) save()
+      if (useUiStore.getState().isDirty) void saveImmediately()
     }
     window.addEventListener('pagehide', handlePageHide)
     return () => window.removeEventListener('pagehide', handlePageHide)
-  }, [save])
+  }, [saveImmediately])
 
   // ── popstate: SPA back-navigation (Android back button, swipe back) ───
   useEffect(() => {
     function handlePopState() {
-      if (useUiStore.getState().isDirty) save()
+      if (useUiStore.getState().isDirty) void saveImmediately()
     }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [save])
+  }, [saveImmediately])
 
   return { save, isDirty }
 }

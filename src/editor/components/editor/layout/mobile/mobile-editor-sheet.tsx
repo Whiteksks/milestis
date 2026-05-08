@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useState, useCallback, useEffect, useMemo, type HTMLAttributes, type ReactNode } from "react"
+import { memo, useState, useCallback, useEffect, useMemo, type ReactNode } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
 import type { MobileEditorTab } from "@/editor/lib/editor-tabs"
 
-import { MobileSnapSheet } from "./mobile-snap-sheet"
+import { MobileSnapSheet, type MobileSnapSheetRenderProps } from "./mobile-snap-sheet"
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"
 import { ThemeSheetActions } from "./sheet-actions/theme-sheet-actions"
 import { DecorationsSheetActions } from "./sheet-actions/decorations-sheet-actions"
@@ -16,29 +16,26 @@ import { SettingsContent } from "./settings-content"
 import { ThemeSettingsPanel } from "../sidebar/theme-settings-panel"
 import { DecorationsSettingsPanel } from "../sidebar/decorations-settings-panel"
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 const SNAP_NAV_INDEX = 0
 const SNAP_NAV_HEIGHT = 68
 const SNAP_ACTIONS_HEIGHT = 132
 const SNAP_FULL_HEIGHT_RATIO = 0.9
 
-const CONTENT_FADE_TRANSITION = {
-  duration: 0.16,
-  ease: "linear",
-} as const
-
-const SETTINGS_SWITCH_FADE_TRANSITION = {
-  duration: 0.14,
-  ease: "easeOut",
-} as const
+const CONTENT_FADE = { duration: 0.16, ease: "linear" } as const
+const PANEL_SWITCH_FADE = { duration: 0.14, ease: "easeOut" } as const
 
 const TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
-  { id: "sections", icon: Layers, label: "Sections" },
-  { id: "background", icon: Paintbrush, label: "Background" },
-  { id: "decorations", icon: Sparkles, label: "Decor" },
-  { id: "design", icon: LayoutTemplate, label: "Design" },
+  { id: "sections",     icon: Layers,        label: "Sections"   },
+  { id: "background",   icon: Paintbrush,    label: "Background" },
+  { id: "decorations",  icon: Sparkles,      label: "Decor"      },
+  { id: "design",       icon: LayoutTemplate, label: "Design"    },
 ]
 
-type MobileSheetMode = "nav" | "actions" | "full"
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type SheetMode = "nav" | "actions" | "full"
 
 interface MobileEditorSheetProps {
   activeTab: MobileEditorTab
@@ -46,133 +43,123 @@ interface MobileEditorSheetProps {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
 function resolveViewportHeight() {
   if (typeof window === "undefined") return 0
   return window.visualViewport?.height ?? window.innerHeight
 }
 
 function useViewportHeight() {
-  const [viewportHeight, setViewportHeight] = useState(0)
+  const [height, setHeight] = useState(0)
 
   useEffect(() => {
-    const syncViewportHeight = () => {
-      setViewportHeight(resolveViewportHeight())
-    }
-
     let frameId: number | null = null
-    const scheduleViewportSync = () => {
+
+    const sync = () => setHeight(resolveViewportHeight())
+    const schedule = () => {
       if (frameId !== null) return
-      frameId = window.requestAnimationFrame(() => {
-        frameId = null
-        syncViewportHeight()
-      })
+      frameId = requestAnimationFrame(() => { frameId = null; sync() })
     }
 
-    syncViewportHeight()
+    sync()
 
-    const visualViewport = window.visualViewport
-    window.addEventListener("resize", scheduleViewportSync)
-    window.addEventListener("orientationchange", scheduleViewportSync)
-    visualViewport?.addEventListener("resize", scheduleViewportSync)
+    const vv = window.visualViewport
+    window.addEventListener("resize", schedule)
+    window.addEventListener("orientationchange", schedule)
+    vv?.addEventListener("resize", schedule)
 
     return () => {
-      window.removeEventListener("resize", scheduleViewportSync)
-      window.removeEventListener("orientationchange", scheduleViewportSync)
-      visualViewport?.removeEventListener("resize", scheduleViewportSync)
-
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId)
-      }
+      window.removeEventListener("resize", schedule)
+      window.removeEventListener("orientationchange", schedule)
+      vv?.removeEventListener("resize", schedule)
+      if (frameId !== null) cancelAnimationFrame(frameId)
     }
   }, [])
 
-  return viewportHeight
+  return height
 }
 
-function resolveSheetMode(snapIndex: number, fullSnapIndex: number): MobileSheetMode {
+function resolveSheetMode(snapIndex: number, fullSnapIndex: number): SheetMode {
   if (snapIndex <= SNAP_NAV_INDEX) return "nav"
   if (snapIndex >= fullSnapIndex) return "full"
   return "actions"
 }
 
+/**
+ * Resolves which snap to jump to when a tab is pressed:
+ * - At nav → always step up one level
+ * - At actions/full and pressing the same tab → step up one level
+ * - Switching to a different tab → stay at current snap
+ */
 function resolveNextSnapIndex(
-  currentSnapIndex: number,
+  currentIndex: number,
   currentTab: MobileEditorTab,
   nextTab: MobileEditorTab,
-  fullSnapIndex: number,
-) {
-  const nextExpandedSnapIndex = Math.min(currentSnapIndex + 1, fullSnapIndex)
-
-  if (currentSnapIndex === SNAP_NAV_INDEX) return nextExpandedSnapIndex
-  if (currentSnapIndex < fullSnapIndex && nextTab === currentTab) return nextExpandedSnapIndex
-  return currentSnapIndex
+  fullIndex: number,
+): number {
+  const stepped = Math.min(currentIndex + 1, fullIndex)
+  if (currentIndex === SNAP_NAV_INDEX) return stepped
+  if (currentIndex < fullIndex && nextTab === currentTab) return stepped
+  return currentIndex
 }
 
-function renderQuickActions(
-  activeTab: MobileEditorTab,
+function renderActions(
+  tab: MobileEditorTab,
   scrollContainerRef: React.RefObject<HTMLDivElement | null>,
-) {
-  switch (activeTab) {
-    case "sections":
-      return <SectionsSheetActions />
-    case "background":
-      return <ThemeSheetActions />
-    case "decorations":
-      return <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
-    default:
-      return null
+): ReactNode {
+  switch (tab) {
+    case "sections":    return <SectionsSheetActions />
+    case "background":  return <ThemeSheetActions />
+    case "decorations": return <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
+    default:            return null
   }
 }
 
-function renderSettingsPanel(activeTab: MobileEditorTab) {
-  switch (activeTab) {
-    case "sections":
-      return <SettingsContent />
-    case "background":
-      return <ThemeSettingsPanel />
-    case "decorations":
-      return <DecorationsSettingsPanel />
-    default:
-      return null
+function renderPanel(tab: MobileEditorTab): ReactNode {
+  switch (tab) {
+    case "sections":    return <SettingsContent />
+    case "background":  return <ThemeSettingsPanel />
+    case "decorations": return <DecorationsSettingsPanel />
+    default:            return null
   }
 }
 
-const MobileSheetNav = memo(function MobileSheetNav({
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+const SheetNav = memo(function SheetNav({
   activeTab,
   onTabPress,
   dragHandleProps,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
-  dragHandleProps: HTMLAttributes<HTMLDivElement>
+  dragHandleProps: MobileSnapSheetRenderProps["dragHandleProps"]
 }) {
   return (
+    // Entire nav area is the drag surface — tabs stop propagation individually
     <div
-      className="relative shrink-0 select-none"
+      {...dragHandleProps}
+      className="relative shrink-0 select-none touch-none cursor-grab active:cursor-grabbing"
       aria-label="Editor sheet navigation"
     >
-      <div
-        {...dragHandleProps}
-        aria-label="Drag editor sheet"
-        className="absolute inset-x-0 top-0 z-10 h-10 -translate-y-2 touch-none cursor-grab active:cursor-grabbing"
-      />
-
+      {/* Handle pill */}
       <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
         <div className="w-10 h-1 rounded-full bg-foreground/20" />
       </div>
 
-      <div className="mb-2 grid h-12 shrink-0 grid-cols-4 pb-2">
+      {/* Tab bar */}
+      <div className="mb-2 grid h-12 shrink-0 grid-cols-4 pb-2 items-center justify-items-center">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             aria-label={tab.label}
             aria-current={activeTab === tab.id ? "page" : undefined}
-            onClick={(event) => {
-              event.currentTarget.blur()
-              onTabPress(tab.id)
-            }}
+            // Block the drag from starting when the finger lands on a tab button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.currentTarget.blur(); onTabPress(tab.id) }}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 transition-colors",
+              "touch-auto cursor-pointer w-12 h-full flex flex-col items-center justify-center gap-1 transition-colors",
               activeTab === tab.id ? "text-foreground" : "text-muted-foreground",
             )}
           >
@@ -185,46 +172,43 @@ const MobileSheetNav = memo(function MobileSheetNav({
   )
 })
 
-const MobileSheetBody = memo(function MobileSheetBody({
+const SheetBody = memo(function SheetBody({
   mode,
   activeTab,
   scrollContainerRef,
 }: {
-  mode: MobileSheetMode
+  mode: SheetMode
   activeTab: MobileEditorTab
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }) {
-  let content: ReactNode = null
-  let contentClassName = ""
+  const content = mode === "actions"
+    ? renderActions(activeTab, scrollContainerRef)
+    : mode === "full"
+    ? renderPanel(activeTab)
+    : null
 
-  if (mode === "actions") {
-    content = renderQuickActions(activeTab, scrollContainerRef)
-    contentClassName = "overflow-x-auto overscroll-x-contain no-scrollbar"
-  }
+  const contentClass = mode === "actions"
+    ? "overflow-x-auto overscroll-x-contain no-scrollbar"
+    : "overflow-y-auto overscroll-contain"
 
-  if (mode === "full") {
-    content = renderSettingsPanel(activeTab)
-    contentClassName = "overflow-y-auto overscroll-contain"
-  }
-
-  const hasVisibleContent = mode !== "nav" && activeTab !== "design" && content !== null
+  const visible = mode !== "nav" && activeTab !== "design" && content !== null
 
   return (
     <motion.div
       className="min-h-0 flex-1 overflow-hidden border-t border-border/30"
       initial={false}
-      animate={{ opacity: hasVisibleContent ? 1 : 0 }}
-      transition={CONTENT_FADE_TRANSITION}
+      animate={{ opacity: visible ? 1 : 0 }}
+      transition={CONTENT_FADE}
     >
       <AnimatePresence initial={false} mode="wait">
-        {hasVisibleContent ? (
+        {visible ? (
           <motion.div
             key={`${mode}:${activeTab}`}
-            className={cn("h-full", contentClassName)}
+            className={cn("h-full", contentClass)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={SETTINGS_SWITCH_FADE_TRANSITION}
+            transition={PANEL_SWITCH_FADE}
           >
             {content}
           </motion.div>
@@ -234,37 +218,7 @@ const MobileSheetBody = memo(function MobileSheetBody({
   )
 })
 
-const MobileEditorSheetContent = memo(function MobileEditorSheetContent({
-  activeTab,
-  mode,
-  onTabPress,
-  dragHandleProps,
-  scrollContainerRef,
-}: {
-  activeTab: MobileEditorTab
-  mode: MobileSheetMode
-  onTabPress: (tab: MobileEditorTab) => void
-  dragHandleProps: HTMLAttributes<HTMLDivElement>
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>
-}) {
-  return (
-    <div onPointerDown={(event) => event.stopPropagation()} className="flex h-full flex-col overflow-hidden">
-      <MobileSheetNav
-        activeTab={activeTab}
-        onTabPress={onTabPress}
-        dragHandleProps={dragHandleProps}
-      />
-
-      <MobileSheetBody
-        mode={mode}
-        activeTab={activeTab}
-        scrollContainerRef={scrollContainerRef}
-      />
-
-      <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />
-    </div>
-  )
-})
+// ─── Main export ──────────────────────────────────────────────────────────────
 
 export function MobileEditorSheet({
   activeTab,
@@ -273,6 +227,7 @@ export function MobileEditorSheet({
 }: MobileEditorSheetProps) {
   const [snapIndex, setSnapIndex] = useState(SNAP_NAV_INDEX)
   const viewportHeight = useViewportHeight()
+
   const snapHeights = useMemo(
     () => [
       SNAP_NAV_HEIGHT,
@@ -281,7 +236,9 @@ export function MobileEditorSheet({
     ],
     [viewportHeight],
   )
+
   const fullSnapIndex = snapHeights.length - 1
+  const mode = resolveSheetMode(snapIndex, fullSnapIndex)
 
   const { openDesignModal, designModalSection, setSelectedDecorationId } = useUiSelector(
     (state) => ({
@@ -291,8 +248,7 @@ export function MobileEditorSheet({
     }),
   )
 
-  const mode = resolveSheetMode(snapIndex, fullSnapIndex)
-
+  // Collapse to nav when design tab is active (it opens a modal instead)
   useEffect(() => {
     if (activeTab !== "design") return
     setSnapIndex(SNAP_NAV_INDEX)
@@ -312,7 +268,7 @@ export function MobileEditorSheet({
       }
 
       onTabChange(tab)
-      setSnapIndex((currentSnapIndex) => resolveNextSnapIndex(currentSnapIndex, activeTab, tab, fullSnapIndex))
+      setSnapIndex((current) => resolveNextSnapIndex(current, activeTab, tab, fullSnapIndex))
     },
     [activeTab, designModalSection, fullSnapIndex, onTabChange, openDesignModal, setSelectedDecorationId],
   )
@@ -331,13 +287,22 @@ export function MobileEditorSheet({
       )}
     >
       {({ dragHandleProps }) => (
-        <MobileEditorSheetContent
-          activeTab={activeTab}
-          mode={mode}
-          onTabPress={handleTabPress}
-          dragHandleProps={dragHandleProps}
-          scrollContainerRef={scrollContainerRef}
-        />
+        <div
+          onPointerDown={(e) => e.stopPropagation()}
+          className="flex h-full flex-col overflow-hidden"
+        >
+          <SheetNav
+            activeTab={activeTab}
+            onTabPress={handleTabPress}
+            dragHandleProps={dragHandleProps}
+          />
+          <SheetBody
+            mode={mode}
+            activeTab={activeTab}
+            scrollContainerRef={scrollContainerRef}
+          />
+          <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />
+        </div>
       )}
     </MobileSnapSheet>
   )

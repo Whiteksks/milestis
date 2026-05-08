@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { SettingsMenu } from "@/components/layout/settings/settings-menu"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, ViewTransition } from "react"
 import { useTranslations } from "next-intl"
@@ -12,6 +13,8 @@ import { useTranslations } from "next-intl"
 const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const isMobile = useIsMobile()
+  const content = isMobile === false ? <ViewTransition>{children}</ViewTransition> : children
 
   useEffect(() => {
     if (window.innerWidth < 1024) {
@@ -44,9 +47,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Контент */}
               <div ref={contentRef} className="min-h-150 min-w-0 flex-1">
-                <ViewTransition>
-                  {children}
-                </ViewTransition>
+                {content}
               </div>
 
             </div>

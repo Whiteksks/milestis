@@ -56,7 +56,7 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
   return (
     <>
       {/* Bottom navigation bar */}
-      <nav className="fixed rounded-t-md bottom-0 left-0 right-0  z-40 flex h-16 items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden">
+      <nav className="fixed rounded-t-md bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden">
         {/* Left nav items */}
         {mainNavItems.slice(0, 2).map((item) => {
           const Icon = item.icon
