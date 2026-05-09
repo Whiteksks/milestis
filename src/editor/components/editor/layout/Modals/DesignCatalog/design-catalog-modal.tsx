@@ -372,7 +372,7 @@ export function DesignCatalogModal() {
 
     return (
       <Drawer
-        open={isDesignModalOpen}
+        open={isDesignModalOpen}  
         onOpenChange={(open) => {
           if (open) {
             ;(document.activeElement as HTMLElement | null)?.blur()
@@ -381,7 +381,10 @@ export function DesignCatalogModal() {
           }
         }}
       >
-        <DrawerContent className={cn("md:hidden flex flex-col bg-card border-border/60 focus:outline-none transition-opacity duration-200", isPreviewMode && "opacity-60")}>
+        <DrawerContent
+          hideOverlay
+          className={cn("md:hidden flex flex-col bg-card border-border/60 focus:outline-none transition-opacity duration-200", isPreviewMode && "opacity-60")}
+        >
           <DrawerHeader className="sr-only">
             <DrawerTitle>Design Catalog</DrawerTitle>
             <DrawerDescription>Choose a template, theme, and background effects.</DrawerDescription>

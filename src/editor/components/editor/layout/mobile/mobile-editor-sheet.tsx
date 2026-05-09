@@ -22,6 +22,7 @@ const SNAP_NAV_INDEX = 0
 const SNAP_NAV_HEIGHT = 68
 const SNAP_ACTIONS_HEIGHT = 132
 const SNAP_FULL_HEIGHT_RATIO = 0.9
+const FULL_SNAP_INDEX = 2
 
 const CONTENT_FADE = { duration: 0.16, ease: "linear" } as const
 const PANEL_SWITCH_FADE = { duration: 0.14, ease: "easeOut" } as const
@@ -47,7 +48,7 @@ interface MobileEditorSheetProps {
 
 function resolveViewportHeight() {
   if (typeof window === "undefined") return 0
-  return window.visualViewport?.height ?? window.innerHeight
+  return Math.round(window.visualViewport?.height ?? window.innerHeight)
 }
 
 function useViewportHeight() {
@@ -56,7 +57,10 @@ function useViewportHeight() {
   useEffect(() => {
     let frameId: number | null = null
 
-    const sync = () => setHeight(resolveViewportHeight())
+    const sync = () => {
+      const nextHeight = resolveViewportHeight()
+      setHeight((currentHeight) => (currentHeight === nextHeight ? currentHeight : nextHeight))
+    }
     const schedule = () => {
       if (frameId !== null) return
       frameId = requestAnimationFrame(() => { frameId = null; sync() })
@@ -232,21 +236,16 @@ export function MobileEditorSheet({
     () => [
       SNAP_NAV_HEIGHT,
       SNAP_ACTIONS_HEIGHT,
-      Math.max(SNAP_ACTIONS_HEIGHT, viewportHeight * SNAP_FULL_HEIGHT_RATIO),
+      Math.max(SNAP_ACTIONS_HEIGHT, Math.round(viewportHeight * SNAP_FULL_HEIGHT_RATIO)),
     ],
     [viewportHeight],
   )
 
-  const fullSnapIndex = snapHeights.length - 1
-  const mode = resolveSheetMode(snapIndex, fullSnapIndex)
+  const mode = resolveSheetMode(snapIndex, FULL_SNAP_INDEX)
 
-  const { openDesignModal, designModalSection, setSelectedDecorationId } = useUiSelector(
-    (state) => ({
-      openDesignModal: state.openDesignModal,
-      designModalSection: state.designModalSection,
-      setSelectedDecorationId: state.setSelectedDecorationId,
-    }),
-  )
+  const openDesignModal = useUiSelector((state) => state.openDesignModal)
+  const designModalSection = useUiSelector((state) => state.designModalSection)
+  const setSelectedDecorationId = useUiSelector((state) => state.setSelectedDecorationId)
 
   // Collapse to nav when design tab is active (it opens a modal instead)
   useEffect(() => {
@@ -268,11 +267,11 @@ export function MobileEditorSheet({
       }
 
       onTabChange(tab)
-      setSnapIndex((current) => resolveNextSnapIndex(current, activeTab, tab, fullSnapIndex))
+      setSnapIndex((current) => resolveNextSnapIndex(current, activeTab, tab, FULL_SNAP_INDEX))
     },
-    [activeTab, designModalSection, fullSnapIndex, onTabChange, openDesignModal, setSelectedDecorationId],
+    [activeTab, designModalSection, onTabChange, openDesignModal, setSelectedDecorationId],
   )
-
+  const handleStopPropagation = useCallback((e: React.PointerEvent) => e.stopPropagation(), [])
   return (
     <MobileSnapSheet
       open
@@ -288,7 +287,7 @@ export function MobileEditorSheet({
     >
       {({ dragHandleProps }) => (
         <div
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDown={handleStopPropagation}
           className="flex h-full flex-col overflow-hidden"
         >
           <SheetNav
