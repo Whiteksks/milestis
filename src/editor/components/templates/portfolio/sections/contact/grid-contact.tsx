@@ -20,7 +20,6 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
           
           <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6 items-stretch">
             
-            {/* Р вЂєР вЂўР вЂ™Р С’Р Р‡ Р РЋР СћР С›Р В Р С›Р СњР С’: Р ВР Р…РЎвЂћР С• Р С‘ Р С™Р С•Р Р…РЎвЂљР В°Р С”РЎвЂљРЎвЂ№ */}
             <div className="flex flex-col gap-6">
               <Animate
                 direction="up"
@@ -60,7 +59,6 @@ export function GridContact({ theme, sectionContent }: GridContactProps) {
               </Animate>
             </div>
 
-            {/* Р СџР В Р С’Р вЂ™Р С’Р Р‡ Р РЋР СћР С›Р В Р С›Р СњР С’: Р В¤Р С•РЎР‚Р СР В° */}
             <Animate
               direction="up"
               distance={20}

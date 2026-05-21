@@ -20,7 +20,7 @@ export type AnimateTrigger = 'scroll' | 'mount'
  *  - 'fade'   opacity + optional translate/scale. Current behaviour.
  *  - 'rise'   stronger translate-up, no opacity change (decorative text, big numbers).
  *  - 'scale'  scale from scaleOffset to 1 at origin-center, mild opacity.
- *  - 'blur'   opacity + blur(8pxРІвЂ вЂ™0). Soft, editorial.
+ *  - 'blur'   opacity + blur(8px ™0). Soft, editorial.
  *  - 'slide'  pure translate, no opacity. Bold, magazine-like.
  */
 export type AnimateType = 'fade' | 'rise' | 'scale' | 'blur' | 'slide'

@@ -55,7 +55,7 @@ export function GalleryMemoir({ sectionContent, theme, imageContent }: GalleryMe
           )}
         </Animate>
 
-        {/* Photo grid вЂ” 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
+        {/* Photo grid ” 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
         {photos.length > 0 && (
           <div className="space-y-4 @md:space-y-6">
 

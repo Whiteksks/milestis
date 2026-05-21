@@ -38,7 +38,7 @@ export function IntroMemoir({ sectionContent, theme, imageContent }: IntroMemoir
         )}
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 items-start">
 
-          {/* Left РІР‚вЂњ text */}
+          {/* Left Ђњ text */}
           <Animate direction="right" distance={30} delay={0.1} className="space-y-10">
             {introduction.title && (
               <h2

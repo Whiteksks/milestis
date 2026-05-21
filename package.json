@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "scan:template-mojibake": "node scripts/template-mojibake.mjs",
+    "fix:template-mojibake": "node scripts/template-mojibake.mjs --write"
   },
   "engines": {
     "node": "^24"

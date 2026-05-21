@@ -19,7 +19,7 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
   const coverImage = imageContent?.cover
   const hasImage = Boolean(coverImage?.value.asset.src)
 
-  // Split title into words вЂ” alternate solid / outline rendering
+  // Split title into words ” alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
   return (
     <SectionWrapper

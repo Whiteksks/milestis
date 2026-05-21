@@ -128,7 +128,7 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
                 name="message"
                 value={fields.message}
                 onChange={handleChange}
-                placeholder="Tell me about your projectРІР‚В¦"
+                placeholder="Tell me about your project¦"
                 rows={4}
                 className={cn('w-full bg-transparent outline-none text-sm font-light opacity-70 placeholder:opacity-20 resize-none', theme.fontBody)}
               />

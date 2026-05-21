@@ -171,7 +171,7 @@ export function LiquidGlassContact({ theme, sectionContent }: LiquidGlassContact
                   name="message"
                   value={fields.message}
                   onChange={handleChange}
-                  placeholder="Tell me about your projectРІР‚В¦"
+                  placeholder="Tell me about your project¦"
                   rows={4}
                   className={cn('w-full bg-transparent outline-none text-sm text-white resize-none placeholder:text-white/20', theme.fontBody)}
                 />

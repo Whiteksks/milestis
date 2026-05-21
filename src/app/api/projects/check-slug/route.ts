@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase/admin"
 import {
-  getSlugModePolicy,
-  getSlugReservationDocId,
-  getSlugValidationError,
-  isSlugBlocked,
-  isSlugMode,
-  normalizeSlug,
-  PUBLISHED_PROJECT_SLUGS_COLLECTION,
+  getSlugModePolicy, getSlugReservationDocId, getSlugValidationError, isSlugBlocked, isSlugMode, normalizeSlug, PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from "@/lib/slug"
 
 export async function GET(req: NextRequest) {

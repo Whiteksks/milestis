@@ -51,7 +51,6 @@ export function GridBio({ theme, sectionContent, imageContent }: GridBioProps) {
               )}
             </Animate>
 
-            {/* [B] Р СџРЎР‚Р В°Р Р†Р В°РЎРЏ Р С”Р С•Р В»Р С•Р Р…Р С”Р В°: Р ВР Р…РЎвЂћР С• */}
             <div className="@lg:col-span-8 flex flex-col">
               <div className="space-y-2 mb-6">
                 <Animate direction="up" delay={0.25} distance={10}>
@@ -78,7 +77,7 @@ export function GridBio({ theme, sectionContent, imageContent }: GridBioProps) {
                 </p>
               </Animate>
 
-              {/* Achievements Р С”Р В°Р С” Р С–Р С•РЎР‚Р С‘Р В·Р С•Р Р…РЎвЂљР В°Р В»РЎРЉР Р…РЎвЂ№Р в„– РЎРѓР С”РЎР‚Р С•Р В»Р В» Р С‘Р В»Р С‘ РЎРѓР ВµРЎвЂљР С”Р В° */}
+              {/* Achievements */}
               {achievements.length > 0 && (
                 <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 pt-8 border-t border-current/5">
                   {achievements.map((item, i) => (

@@ -6,8 +6,6 @@
  * are serialised into this structure when saving and rehydrated from it when
  * loading.
  *
- * Firestore path (planned):
- *   projects/{projectId}
  */
 
 import type {
@@ -24,22 +22,18 @@ import type { ThemeCustomizations } from './store-theme'
 import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
 import type { PhotobookImageContent } from '@/editor/image/photobook/content'
 
-// ─── Metadata ─────────────────────────────────────────────────────────────
+// ─── Metadata 
 
 export interface ProjectMeta {
-  /** Firestore document ID */
-  id: string
-  /** UID of the owning user (Firebase Auth) */
-  ownerId: string
-  /** Human-readable project name set by the user */
-  name: string
-  /** Determines which content/template set this project uses. Immutable after creation. */
-  mode: EditorMode
+  id: string   /** Firestore document ID */
+  ownerId: string   /** UID of the owning user (Firebase Auth) */
+  name: string  /** Human-readable project name set by the user */
+  mode: EditorMode   /** Determines which content/template set this project uses. Immutable after creation. */
   createdAt: number   // Unix ms — Firestore Timestamp converts to this on read
   updatedAt: number
 }
 
-// ─── Theme snapshot ─────────────────────────────────────────────────────────
+// ─── Theme snapshot 
 
 export interface ProjectThemeData {
   currentTemplateId: TemplateId
@@ -48,7 +42,7 @@ export interface ProjectThemeData {
   customDecorations: ThemeCustomDecorations[]
 }
 
-// ─── Mode-specific content ────────────────────────────────────────────────
+// ─── Mode-specific content 
 
 export interface PortfolioProjectContent {
   sectionVisibility: SectionVisibility
@@ -62,28 +56,24 @@ export interface PhotobookProjectContent {
   imageContent?: PhotobookImageContent
 }
 
-// ─── Full project document (discriminated union) ──────────────────────────
+// ─── Full project document (discriminated union) 
 
 export interface PortfolioProject extends ProjectMeta {
   mode: 'portfolio'
-  /** Absent on freshly-created projects — editor uses store defaults until first save. */
   theme?: ProjectThemeData
-  /** Absent on freshly-created projects — editor uses store defaults until first save. */
   content?: PortfolioProjectContent
 }
 
 export interface PhotobookProject extends ProjectMeta {
   mode: 'photobook'
-  /** Absent on freshly-created projects — editor uses store defaults until first save. */
   theme?: ProjectThemeData
-  /** Absent on freshly-created projects — editor uses store defaults until first save. */
   content?: PhotobookProjectContent
 }
 
 /** The union type used everywhere in the app when referring to a project. */
 export type EditorProject = PortfolioProject | PhotobookProject
 
-// ─── Type guards ─────────────────────────────────────────────────────────
+// ─── Type guards 
 
 export function isPortfolioProject(p: EditorProject): p is PortfolioProject {
   return p.mode === 'portfolio'
@@ -93,7 +83,7 @@ export function isPhotobookProject(p: EditorProject): p is PhotobookProject {
   return p.mode === 'photobook'
 }
 
-// ─── Minimal creation payload ─────────────────────────────────────────────
+// ─── Minimal creation payload
 
 /** Passed to the "create project" Firebase Function — server fills in id, userId, timestamps. */
 export type CreateProjectPayload =

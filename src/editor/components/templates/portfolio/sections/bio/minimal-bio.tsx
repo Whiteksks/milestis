@@ -29,7 +29,7 @@ export function MinimalBio({ theme, sectionContent, imageContent }: MinimalBioPr
           </Animate>
         </div>
 
-        {/* Identity block   centered, stacked: photo РІвЂ вЂ™ name РІвЂ вЂ™ subtitle */}
+        {/* Identity block   centered, stacked: photo  ™ name  ™ subtitle */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
           {bioImage && (
             <Animate direction="none" scaleOffset={0.96} delay={0.1}>

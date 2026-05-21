@@ -33,7 +33,7 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
             imageClassName="object-cover object-center"
             priority
           />
-          {/* Gradient: bottom-heavy on mobile, leftРІвЂ вЂ™right on desktop */}
+          {/* Gradient: bottom-heavy on mobile, left ™right on desktop */}
           <div
             className="absolute inset-0"
             style={{

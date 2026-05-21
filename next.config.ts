@@ -4,7 +4,6 @@ import createNextIntlPlugin from "next-intl/plugin"
 const withNextIntl = createNextIntlPlugin()
 
 // ── Content Security Policy ───────────────────────────────────────────────────
-// Adjust src lists as you add new third-party services.
 const CSP = [
   "default-src 'self'",
   // Scripts: Next.js chunks + Firebase + Google APIs (apis.google.com used by Firebase Auth)
@@ -13,8 +12,8 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // Fonts
   "font-src 'self' https://fonts.gstatic.com",
-  // Images: Firebase Storage + Google account avatars + next/image optimiser + Unsplash (dev/test)
-  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com https://images.unsplash.com",
+  // Images: Firebase Storage + Google account avatars + next/image optimiser
+  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com",
   // Fetch / XHR: Firebase services + Cloud Run functions
   "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app",
   // Frames: Firebase Auth popup + Google Sign-In + YouTube embeds
@@ -31,8 +30,8 @@ const securityHeaders = [
   { key: "X-Content-Type-Options",  value: "nosniff" },
   { key: "X-Frame-Options",         value: "SAMEORIGIN" },
   { key: "X-XSS-Protection",        value: "1; mode=block" },
-  { key: "Referrer-Policy",          value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy",        value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Referrer-Policy",         value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy",      value: "camera=(), microphone=(), geolocation=()" },
 ]
 
 const nextConfig: NextConfig = {
@@ -42,17 +41,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Apply security headers to all routes
         source: "/(.*)",
         headers: securityHeaders,
       },
-      // {
-      //   // Long-term cache for immutable Next.js assets
-      //   source: "/_next/static/(.*)",
-      //   headers: [
-      //     { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      //   ],
-      // },
     ]
   },
   images: {
@@ -63,7 +54,6 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack(config) {
-    // Ищем правило для изображений
     const imageRule = config.module.rules.find(
       (rule: { test?: RegExp }) =>
         typeof rule !== "string" &&
@@ -72,12 +62,10 @@ const nextConfig: NextConfig = {
     )
 
     if (imageRule && typeof imageRule !== "string") {
-      // исключаем .svg из стандартного image-loader
       if (!imageRule.exclude) imageRule.exclude = []
       ;(imageRule.exclude as RegExp[]).push(/\.svg$/i)
     }
 
-    // Добавляем обработку через SVGR
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,

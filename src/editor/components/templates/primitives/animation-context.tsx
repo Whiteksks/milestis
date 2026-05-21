@@ -35,10 +35,10 @@ export type TemplateId =
 /**
  * Two characteristic eases that define the feel split between templates.
  *
- * SPRING РІвЂ вЂ™ long, elegant tail. Feels weightless and refined.
+ * SPRING  ™ long, elegant tail. Feels weightless and refined.
  *          Used by: editorial, showcase, elegant, minimal, liquid-glass
  *
- * SNAPPY РІвЂ вЂ™ fast build, assertive punch. Feels decisive and structured.
+ * SNAPPY  ™ fast build, assertive punch. Feels decisive and structured.
  *          Used by: bento, grid
  */
 export const EASE: { spring: [number, number, number, number]; snappy: [number, number, number, number] } = {
@@ -53,13 +53,13 @@ export const EASE: { spring: [number, number, number, number]; snappy: [number, 
  * Internal card stagger delays should still be passed explicitly via t(duration, delay).
  *
  * These values are intentional:
- *   elegant  0.90s spring РІвЂ вЂ™ feels the slowest and most luxurious
- *   showcase 0.80s spring РІвЂ вЂ™ cinematic, deliberate
- *   liquid   0.85s spring РІвЂ вЂ™ fluid, slightly longer than showcase
- *   editorial 0.70s spring РІвЂ вЂ™ confident, editorial rhythm
- *   minimal  0.65s spring РІвЂ вЂ™ clean, no excess
- *   grid     0.60s snappy РІвЂ вЂ™ structured, fast
- *   bento    0.55s snappy РІвЂ вЂ™ the most energetic   cards pop
+ *   elegant  0.90s spring  ™ feels the slowest and most luxurious
+ *   showcase 0.80s spring  ™ cinematic, deliberate
+ *   liquid   0.85s spring  ™ fluid, slightly longer than showcase
+ *   editorial 0.70s spring  ™ confident, editorial rhythm
+ *   minimal  0.65s spring  ™ clean, no excess
+ *   grid     0.60s snappy  ™ structured, fast
+ *   bento    0.55s snappy  ™ the most energetic   cards pop
  */
 export const TEMPLATE_CONFIG: Record<
   TemplateId,
@@ -138,8 +138,8 @@ export function AnimationProvider({
     <AnimationContext.Provider value={value}>
       {/*
         MotionConfig at the provider level:
-        РІР‚Сћ reducedMotion="always" when disabled РІвЂ вЂ™ all framer-motion transitions are instant globally
-        РІР‚Сћ reducedMotion="user" when enabled РІвЂ вЂ™ respects OS accessibility preference
+         reducedMotion="always" when disabled  ™ all framer-motion transitions are instant globally
+         reducedMotion="user" when enabled  ™ respects OS accessibility preference
       */}
       <MotionConfig reducedMotion={disabled ? 'always' : 'user'}>
         {children}

@@ -40,7 +40,7 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
 
         <div className="flex-1 flex flex-col @md:flex-row gap-12 @md:gap-20 items-start @md:items-center">
 
-          {/* Left вЂ” typographic closing */}
+          {/* Left ” typographic closing */}
           <div className="flex-1 space-y-6 @md:space-y-8">
             {/* Title masthead */}
             {ending.title && (
@@ -81,7 +81,7 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
             </div>
           </div>
 
-          {/* Right вЂ” optional closing photo */}
+          {/* Right ” optional closing photo */}
           {hasImage && endingImage && (
             <div className="w-full @md:w-64 @lg:w-80 shrink-0">
               <SlotImage

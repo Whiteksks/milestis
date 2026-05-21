@@ -74,7 +74,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Write РІвЂ вЂ”
+                Write вЂ вЂ”
               </a>
             </div>
           </Animate>
@@ -147,7 +147,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               name="message"
               value={fields.message}
               onChange={handleChange}
-              placeholder="Tell me about your projectРІР‚В¦"
+              placeholder="Tell me about your project!"
               rows={4}
               className={cn(
                 'w-full px-4 py-3 text-sm bg-current/5 border border-current/10 rounded-2xl outline-none',
@@ -164,7 +164,7 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
                   theme.fontBody,
                 )}
               >
-                Send message РІвЂ вЂ™
+                Send message вЂ вЂ™
               </button>
             </div>
           </form>

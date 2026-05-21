@@ -63,7 +63,7 @@ export function GallerySoleil({ sectionContent, theme, imageContent }: GallerySo
         </p>
       )}
 
-      {/* Two-column photo grid вЂ” no borders, gentle hover */}
+      {/* Two-column photo grid ” no borders, gentle hover */}
       {images.length > 0 ? (
         <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
           {images.map((photo, index) => {

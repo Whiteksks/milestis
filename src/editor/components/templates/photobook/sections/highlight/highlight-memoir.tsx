@@ -28,7 +28,7 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
 
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
-          {/* Left вЂ“ Photo (order-2 on mobile в†’ shows below text) */}
+          {/* Left “ Photo (order-2 on mobile в†’ shows below text) */}
           <div className="order-2 @md:order-1">
             {hasImage && highlightImage ? (
               <div className={cn('overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none', theme.shadow, theme.elementGlow)}>
@@ -44,7 +44,7 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
             )}
           </div>
 
-          {/* Right вЂ“ Content (order-1 on mobile в†’ shows above photo) */}
+          {/* Right “ Content (order-1 on mobile в†’ shows above photo) */}
           <div className="order-1 @md:order-2 space-y-6 @md:space-y-8">
             {/* Label */}
             {highlight.label && (

@@ -16,8 +16,6 @@ import { ThemeFloatingToolbar } from '@/editor/components/editor/layout/Floating
 import { useIsMobile } from '@/hooks/use-mobile'
 import { SectionRegistryProvider } from '@/editor/lib/section-registry-context'
 
-// Stable panel components — defined outside Canvas so they are never recreated on re-render.
-// SectionsToolbarPanel and ThemeFloatingToolbar have no props that change per Canvas render.
 const StableSectionsPanel = memo(function StableSectionsPanel() {
   return <SectionsToolbarPanel />
 })
@@ -26,9 +24,6 @@ const StableThemePanel = memo(function StableThemePanel() {
 })
 
 const DEVICE_CLASSES: Record<DeviceView, string> = {
-  // 'mobile' preview on desktop: constrain to phone width for realistic preview.
-  // On a real mobile device (isMobile=true) the canvas uses w-full without a max-width
-  // cap so it fills the screen rather than being narrower than the actual device.
   mobile: 'max-w-sm w-full',
   tablet: 'w-full max-w-4xl',
   desktop: 'w-full max-w-7xl',
@@ -50,9 +45,7 @@ export function Canvas({
   const isMobile = useIsMobile()
   const setDeviceView = useUiStore((s) => s.setDeviceView)
 
-  // On a real mobile device, auto-switch deviceView to 'mobile' on first load.
-  // This ensures responsiveScale decorations apply the correct scale factor,
-  // and prevents the canvas from being narrower than the actual screen.
+
   useEffect(() => {
     if (isMobile === true) {
       setDeviceView('mobile')
@@ -129,14 +122,8 @@ export function Canvas({
       <div
         ref={viewportRef}
         className={cn(
-          // transition-all would animate every CSS property; restrict to max-width only.
-          // will-change-transform promotes to compositor layer for smooth device-view switching.
           '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
-          // On a real mobile device in 'mobile' view: fill the full screen width.
-          // On desktop in 'mobile' preview: use max-w-sm to simulate phone dimensions.
           deviceView === 'mobile' && isMobile === true ? 'w-full' : DEVICE_CLASSES[deviceView],
-          // Background always lives on the viewport div so decorative layers (z-0 absolute)
-          // remain BEHIND content in both fixed and scroll modes.
           theme.background,
         )}
         style={{ '--canvas-scrollbar-width': `${scrollbarWidth}px` } as CSSProperties}
@@ -174,8 +161,6 @@ export function Canvas({
 
               {/*
                 Bottom spacer — reserves space so floating bars never cover canvas content.
-                Height matches the bar height: ~64px on mobile (MobileBottomNav),
-                ~56px on desktop (FloatingToolbar). pointer-events-none so it's invisible.
               */}
               <div className="h-20 md:h-12 pointer-events-none select-none" aria-hidden="true" />
             </div>

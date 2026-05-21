@@ -19,7 +19,6 @@ export function ElegantBio({ theme, sectionContent, imageContent }: ElegantBioPr
       <div className="max-w-5xl mx-auto px-6 @md:px-10 py-20 @md:py-32">
         <div className="flex flex-col @lg:flex-row items-start gap-12 @lg:gap-20">
           
-          {/* Р В¤Р С•РЎвЂљР С•: Р С•РЎРѓРЎвЂљР В°Р ВµРЎвЂљРЎРѓРЎРЏ Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…РЎвЂ№Р С (240px), Р Р…Р С• Р С—Р В»Р С•РЎвЂљР Р…Р С• Р С—РЎР‚Р С‘Р В¶Р В°РЎвЂљР С• Р С” РЎРѓР ВµРЎвЂљР С”Р Вµ */}
           {bioImage && (
             <Animate
               delay={0.1}
@@ -39,7 +38,6 @@ export function ElegantBio({ theme, sectionContent, imageContent }: ElegantBioPr
             </Animate>
           )}
 
-          {/* Р СћР ВµР С”РЎРѓРЎвЂљ: РЎвЂљР ВµР С—Р ВµРЎР‚РЎРЉ Р С•Р Р… "Р С–Р В»Р В°Р Р†Р Р…РЎвЂ№Р в„–" */}
           <div className="flex-1 space-y-10">
             <div className="space-y-6">
               <Animate

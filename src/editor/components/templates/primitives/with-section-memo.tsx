@@ -34,6 +34,6 @@ export function withSectionMemo<P extends { sectionContent: object; theme: unkno
       if (!Object.is(prev[key], next[key])) return false
     }
 
-    return true // equal вЂ” skip re-render
+    return true // equal ” skip re-render
   })
 }

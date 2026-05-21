@@ -54,7 +54,7 @@ export function StorySoleil({ sectionContent, theme, imageContent }: StorySoleil
         </Animate>
       )}
 
-      {/* Moments вЂ” alternating photo / caption layout */}
+      {/* Moments ” alternating photo / caption layout */}
       {moments.length > 0 && (
         <div className="space-y-16 @md:space-y-24">
           {moments.map((block, index) => {
