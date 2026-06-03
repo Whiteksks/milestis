@@ -135,13 +135,16 @@ export function MobileSnapSheet({
   const targetY = snapY[safeIndex] ?? 0
 
   const safeIndexRef = useRef(safeIndex)
-  safeIndexRef.current = safeIndex
 
   const snapYRef = useRef(snapY)
-  snapYRef.current = snapY
 
   const previousSafeIndexRef = useRef(safeIndex)
   const previousTargetYRef = useRef(targetY)
+
+  useLayoutEffect(() => {
+    safeIndexRef.current = safeIndex
+    snapYRef.current = snapY
+  }, [safeIndex, snapY])
 
   // Motion value ───────────────────────────────────────────────────────────────
 

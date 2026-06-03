@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create, type StateCreator } from 'zustand'
 import { createPortfolioSlice, type PortfolioSlice } from '@/editor/modes/portfolio/store-slice'
 import { createPhotobookSlice, type PhotobookSlice } from '@/editor/modes/photobook/store-slice'
 
@@ -9,9 +9,10 @@ import { createPhotobookSlice, type PhotobookSlice } from '@/editor/modes/photob
  *  3. Add createXxxSlice to ALL_SLICE_CREATORS */
 export type ContentStore = PortfolioSlice & PhotobookSlice
 
-const ALL_SLICE_CREATORS = [createPortfolioSlice, createPhotobookSlice] as const
+type ContentStoreSliceCreator = StateCreator<ContentStore, [], [], Partial<ContentStore>>
+
+const ALL_SLICE_CREATORS: readonly ContentStoreSliceCreator[] = [createPortfolioSlice, createPhotobookSlice]
 
 export const useContentStore = create<ContentStore>()((...a) =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ALL_SLICE_CREATORS.reduce((acc, creator) => ({ ...acc, ...creator(...a) }), {} as ContentStore)
 )

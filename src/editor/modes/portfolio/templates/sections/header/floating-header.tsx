@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { useT } from '@/editor/components/templates/primitives/animation-context'
 import {
   HeaderContent,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type MouseEvent, type RefCallback } from 'react'
 
 export type HeaderBehavior = 'static' | 'sticky' | 'reveal'
 
@@ -37,7 +37,7 @@ export interface HeaderControllerState {
   visible: boolean
   overHero: boolean
   menu: HeaderMenuState
-  rootRef: React.RefObject<HTMLElement | null>
+  setRootElement: RefCallback<HTMLElement>
   getLinkProps: (
     href: string,
     onAnchorClick?: HeaderLinkClickHandler,
@@ -83,6 +83,9 @@ export function useHeaderController({
   const [visible, setVisible] = useState(true)
   const [overHero, setOverHero] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const setRootElement = useCallback<RefCallback<HTMLElement>>((node) => {
+    rootRef.current = node
+  }, [])
 
   useEffect(() => {
     if (behavior === 'static') {
@@ -198,7 +201,7 @@ export function useHeaderController({
     visible,
     overHero,
     menu,
-    rootRef,
+    setRootElement,
     getLinkProps: (href, onAnchorClick, options) => ({
       href,
       onClick: (event) => {

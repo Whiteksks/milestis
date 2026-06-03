@@ -96,6 +96,7 @@ export function HeaderShell({
     revealOffset,
     revealDelta,
   })
+  const { visible, setRootElement } = controller
   const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
   useEffect(() => {
@@ -142,7 +143,7 @@ export function HeaderShell({
   const revealStyle: CSSProperties =
     behavior === 'reveal'
       ? {
-          transform: controller.visible ? 'translateY(0)' : 'translateY(-100%)',
+          transform: visible ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
         }
       : {}
@@ -151,7 +152,7 @@ export function HeaderShell({
     <header
       id="header"
       data-section-id="header"
-      ref={controller.rootRef}
+      ref={setRootElement}
       {...rest}
       className={cn('@container', placementClass, className)}
       style={{ ...placementStyle, ...revealStyle, ...(rest.style ?? {}) }}

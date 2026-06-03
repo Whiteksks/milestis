@@ -15,7 +15,6 @@ import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/secti
 import { MobileEditorSheet } from '@/editor/components/editor/layout/mobile/mobile-editor-sheet'
 import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/config/editor-tabs'
 import { useUiSelector } from '@/editor/lib/store'
-import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
 import type { EditorMode } from '@/editor/lib/editor-mode'
