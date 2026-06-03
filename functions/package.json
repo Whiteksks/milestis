@@ -30,7 +30,10 @@
     "typescript-eslint": "^8.58.1"
   },
   "overrides": {
-    "@tootallnate/once": "^3.0.1"
+    "@tootallnate/once": "^3.0.1",
+    "inflight": "^1.0.6",
+    "glob": "^11.0.0",
+    "uuid": "^11.0.0"
   },
   "private": true
 }
