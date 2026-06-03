@@ -1,0 +1,190 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "templates": "Templates",
+    "analytics": "Analytics",
+    "domains": "Domains",
+    "profile": "Profile",
+    "billing": "Billing",
+    "settings": "Settings",
+    "helpSupport": "Help & Support",
+    "upgradePlan": "Upgrade Plan",
+    "logOut": "Log out",
+    "more": "More",
+    "upgrade": "Upgrade",
+    "management": "Management",
+    "account": "Account",
+    "support": "Support",
+    "publishedDomains": "Published Domains",
+    "security": "Security",
+    "helpCenter": "Help Center",
+    "contactSupport": "Contact Support",
+    "newProject": "New Project",
+    "new": "New",
+    "archive": "Archive"
+  },
+  "plans": {
+    "free": "Free",
+    "basic": "Basic",
+    "pro": "Pro",
+    "proPlus": "Pro+"
+  },
+  "promo": {
+    "proPlanTitle": "Pro Plan",
+    "proPlanDescription": "Unlock analytics, custom domains, and unlimited projects.",
+    "viewAllPlans": "View All Plans"
+  },
+  "createCards": {
+    "photobook": {
+      "title": "Memory Book",
+      "description": "Create an interactive photo book with ready-made presets. Perfect for preserving memories.",
+      "badge": "Uses credits",
+      "secondary": "Browse presets"
+    },
+    "portfolio": {
+      "title": "Portfolio Site",
+      "description": "Build a clean personal site without design skills. Showcase your work beautifully.",
+      "secondary": "View examples"
+    },
+    "creating": "Creating…",
+    "create": "Create"
+  },
+  "greetings": {
+    "midnight": "Burning the midnight oil?",
+    "earlyBird": "Early bird! Good morning",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "readyToBuild": "Ready to build something great?"
+  },
+  "emptyState": {
+    "noProjects": "No projects yet",
+    "description": "Create your first memory book to get started.",
+    "createMemoryBook": "Create Memory Book"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago",
+    "weeksAgo": "{n}w ago",
+    "monthsAgo": "{n}mo ago"
+  },
+  "project": {
+    "mode": {
+      "portfolio": "Portfolio",
+      "photobook": "Photobook"
+    },
+    "restore": "Restore",
+    "delete": "Delete",
+    "deletesOn": "Deletes permanently on {date}",
+    "pendingPurge": "Pending purge",
+    "confirmDeleteTitle": "Permanently delete project?",
+    "confirmDeleteDescription": "{name} and all its uploaded images will be deleted forever. This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting…",
+    "deleteForever": "Delete forever",
+    "edit": "Edit",
+    "view": "View",
+    "openMenu": "Open menu",
+    "moveToTrash": "Move to Trash",
+    "status": {
+      "draft": "Draft",
+      "published": "Published"
+    },
+    "edited": "Edited",
+    "publish": "Publish",
+    "unpublish": "Unpublish"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "All your photo books and portfolio sites in one place",
+    "createPortfolio": "Create Portfolio",
+    "createPhotobook": "Create Photobook",
+    "tabs": {
+      "active": "Active",
+      "trash": "Trash"
+    },
+    "filters": {
+      "all": "All",
+      "photobooks": "Photobooks",
+      "portfolios": "Portfolios"
+    },
+    "searchPlaceholder": "Search...",
+    "searchTrashPlaceholder": "Search trash...",
+    "statusPlaceholder": "Status",
+    "status": {
+      "all": "All Status",
+      "draft": "Draft",
+      "published": "Published"
+    },
+    "trashNotice": "Projects in trash are permanently deleted on the 1st of the scheduled month. You can restore them at any time before that."
+  },
+  "templates": {
+    "title": "Templates",
+    "description": "Choose a preset to start your photo book or portfolio",
+    "searchPlaceholder": "Search templates",
+    "preview": "Preview",
+    "use": "Use",
+    "type": {
+      "photobook": "Photobook",
+      "site": "Site",
+      "portfolioSite": "Portfolio Site"
+    },
+    "noTemplatesFound": "No templates found",
+    "tryAdjusting": "Try adjusting your search or filter",
+    "clearFilters": "Clear filters",
+    "close": "Close",
+    "useThis": "Use this template",
+    "categories": {
+      "all": "All",
+      "photobooks": "Photobooks",
+      "sites": "Portfolio Sites",
+      "weddings": "Weddings",
+      "birthdays": "Birthdays",
+      "minimal": "Minimal"
+    }
+  },
+  "domains": {
+    "title": "Domains",
+    "description": "Manage and share your published projects",
+    "notPublished": "Not published yet",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "openProject": "Open project",
+    "domainSettings": "Domain settings",
+    "publishProject": "Publish project",
+    "createPrompt": "Create a photobook or portfolio to get started",
+    "aboutTitle": "About Milestis domains",
+    "aboutDescription": "All published projects get a free milestis.site subdomain. Custom domains are coming soon."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "description": "Track views and engagement across your projects",
+    "comingSoon": "Coming Soon",
+    "comingTitle": "Analytics is on the way",
+    "comingDescription": "Soon you'll be able to see how your photobooks and portfolio sites are performing with detailed insights and engagement metrics.",
+    "stats": {
+      "totalViews": "Total Views",
+      "clicks": "Clicks",
+      "avgTime": "Avg. Time",
+      "growth": "Growth"
+    },
+    "whatToExpectTitle": "What to expect",
+    "features": {
+      "viewTracking": {
+        "title": "View Tracking",
+        "description": "See how many people visit your published projects"
+      },
+      "engagement": {
+        "title": "Engagement Metrics",
+        "description": "Understand how visitors interact with your content"
+      },
+      "time": {
+        "title": "Time Insights",
+        "description": "Learn when your audience is most active"
+      }
+    }
+  }
+}
