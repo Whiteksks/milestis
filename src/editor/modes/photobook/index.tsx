@@ -3,7 +3,14 @@ import type { PhotobookTemplateProps } from '@/editor/lib/template-types'
 import type { ModeRegistryEntry } from '@/editor/lib/modes/types'
 import { type PhotobookTemplateId } from './template-ids'
 import { Layers } from 'lucide-react'
-import { createPhotobookSlice } from '@/editor/modes/photobook/store-slice'
+import {
+  createPhotobookSlice,
+  defaultPhotobookContent,
+  defaultPhotobookImageContent,
+  defaultPhotobookVisibility,
+} from '@/editor/modes/photobook/store-slice'
+import type { PhotobookImageContent } from './image/content'
+import { useContentStore } from '@/editor/lib/store/content'
 
 import dynamic from 'next/dynamic'
 import { PhotobookTemplateShell } from '@/editor/components/editor/layout/photobook-template-shell'
@@ -78,6 +85,7 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
   },
   createSlice: createPhotobookSlice,
   label: 'Photobook',
+  defaultTemplateId: 'photobook-memoir',
   templates: [
     { id: 'photobook-memoir', name: 'Memoir', tags: ['editorial', 'minimal'], previewComponent: CoverMemoir },
     { id: 'photobook-chronicle', name: 'Chronicle', tags: ['editorial', 'documentary'], previewComponent: CoverChronicle },
@@ -116,6 +124,41 @@ export const photobookMode: ModeRegistryEntry<keyof PhotobookSectionVisibility> 
       TemplateMemoirDesign
 
     return <PhotobookTemplateShell Design={Design} />
+  },
+
+  extractContent: (store) => ({
+    sectionVisibility: store.photobookSectionVisibility,
+    sectionContent: store.photobookSectionContent,
+    imageContent: store.photobookImageContent,
+  }),
+
+  extractPreviewMeta: (store) => {
+    const img = store.photobookImageContent
+    const content = store.photobookSectionContent
+    return {
+      heroThumbUrl: img.cover?.value.asset.blurDataUrl ?? img.cover?.value.asset.src,
+      title: content.cover.title,
+      subtitle: content.cover.subtitle,
+      date: content.cover.date,
+      aspectRatio: img.cover?.value.presentation?.ratio,
+      frameStyle: img.cover?.value.presentation?.frameStyle,
+    }
+  },
+
+  hydrateStore: (savedContent) => {
+    if (savedContent) {
+      useContentStore.setState({
+        photobookSectionVisibility: savedContent.sectionVisibility as PhotobookSectionVisibility,
+        photobookSectionContent: savedContent.sectionContent as PhotobookSectionContent,
+        photobookImageContent: (savedContent.imageContent as PhotobookImageContent) ?? defaultPhotobookImageContent,
+      })
+    } else {
+      useContentStore.setState({
+        photobookSectionVisibility: defaultPhotobookVisibility,
+        photobookSectionContent: defaultPhotobookContent,
+        photobookImageContent: defaultPhotobookImageContent,
+      })
+    }
   },
 
   renderPublished: ({ templateId, theme, themeCustomizations, content, imageContent, visibility }) => {

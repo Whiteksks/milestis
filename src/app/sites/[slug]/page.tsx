@@ -12,6 +12,8 @@ import {
 import { PublishedView, TokenGateForm } from "./published-view"
 import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
+import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
+import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -123,8 +125,8 @@ export default async function SitePage({ params, searchParams }: Props) {
     const theme = project.theme ?? {}
     return (
       <PublishedView
-        mode="portfolio"
-        templateId={(theme.currentTemplateId as string | undefined) ?? "minimal"}
+        mode={mode}
+        templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[mode].defaultTemplateId}
         themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
         themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
         customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
@@ -150,21 +152,19 @@ export default async function SitePage({ params, searchParams }: Props) {
     return <TokenGateForm slug={slug} />
   }
 
-  // Token verified — render photobook
-  if (project.mode === "photobook") {
-    const content = project.content ?? {}
-    const theme = project.theme ?? {}
-    return (
-      <PublishedView
-        mode="photobook"
-        templateId={(theme.currentTemplateId as string | undefined) ?? "photobook-memoir"}
-        themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
-        themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
-        customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
-        content={(content.sectionContent ?? {}) as Record<string, unknown>}
-        imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
-        visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
-      />
-    )
-  }
+  // Token verified — render project
+  const content = project.content ?? {}
+  const theme = project.theme ?? {}
+  return (
+    <PublishedView
+      mode={mode}
+      templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[mode].defaultTemplateId}
+      themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
+      themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
+      customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
+      content={(content.sectionContent ?? {}) as Record<string, unknown>}
+      imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
+      visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
+    />
+  )
 }

@@ -7,8 +7,7 @@ import { createProject } from "@/lib/projects"
 import { toastProject } from "@/lib/toast"
 import { projectKeys } from "@/hooks/useProjectsQuery"
 import { useUserStore } from "@/hooks/useUserStore"
-
-type ProjectMode = "portfolio" | "photobook"
+import type { ProjectMode } from "@/lib/projects/project-type-config"
 
 const adjectives = [
   // Световые и цветовые

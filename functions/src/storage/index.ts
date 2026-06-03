@@ -39,6 +39,16 @@ export const resizeAvatar = makeResizeFunction({
 });
 
 /**
+ * Per-mode backend capabilities.
+ * Add an entry here when introducing a new project mode.
+ * generatePrintVariant: whether to produce a high-quality print.jpg alongside the webp variants.
+ */
+const BACKEND_MODE_CONFIG: Record<string, { generatePrintVariant: boolean }> = {
+  portfolio: { generatePrintVariant: false },
+  photobook: { generatePrintVariant: true },
+}
+
+/**
  * Triggered when a file is uploaded to: projects/{uid}/{projectId}/{imageId}/original.*
  *
  * Works for both photobooks and portfolio websites — project type is read from
@@ -71,9 +81,9 @@ export const resizeProjectImage = makeResizeFunction({
     }
 
     const projectSnap = await db.collection("projects").doc(projectId).get();
-    const isPhotobook = projectSnap.data()?.mode === "photobook";
+    const modeConfig = BACKEND_MODE_CONFIG[projectSnap.data()?.mode] ?? { generatePrintVariant: false }
 
-    if (isPhotobook) {
+    if (modeConfig.generatePrintVariant) {
       return [
         { name: "print.jpg", width: 2560, height: 2560, format: "jpeg", quality: 95, fit: "outside" },
         ...webpOutputs,

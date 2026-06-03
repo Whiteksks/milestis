@@ -1,4 +1,5 @@
 import { auth } from "../firebase/firebase"
+import type { ProjectMode } from "./project-type-config"
 
 export class CreateProjectError extends Error {
   constructor(public readonly code: string, message: string) {
@@ -8,7 +9,7 @@ export class CreateProjectError extends Error {
 
 export async function createProject(
   name: string,
-  mode: "portfolio" | "photobook"
+  mode: ProjectMode
 ): Promise<string> {
   const user = auth.currentUser
   if (!user) throw new CreateProjectError("UNAUTHORIZED", "Not authenticated")

@@ -16,6 +16,7 @@ import { usePublishedProjectsQuery, getProjectShareUrl } from "@/hooks/useProjec
 import { useTranslations } from "next-intl"
 import { useTranslations as useGlobalT } from "next-intl"
 import type { DashboardProject } from "@/hooks/useProjectsQuery"
+import { getProjectConfig } from "@/lib/projects/project-type-config"
 
 export default function DomainsSettingsPage() {
   const t = useTranslations("account.domains")
@@ -131,7 +132,7 @@ export default function DomainsSettingsPage() {
                 </div>
 
                 <div className="mt-2 flex min-w-0 items-center gap-2 text-sm">
-                  {project.mode === "photobook" && !project.publishedAccessToken ? (
+                  {getProjectConfig(project.mode).hasAccessToken && !project.publishedAccessToken ? (
                     <>
                       <Lock className="size-3.5 text-muted-foreground" />
                       <span className="truncate text-muted-foreground italic">{t("tokenUnavailable")}</span>

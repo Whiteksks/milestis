@@ -3,6 +3,7 @@ import { db } from '../firebase/firebase'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { useUiStore } from '@/editor/lib/store/ui'
+import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
 
 interface SaveProjectOptions {
   updateDashboardMeta?: boolean
@@ -24,14 +25,7 @@ async function performSaveProject(
   projectId: string,
   { updateDashboardMeta = true, updateTimestamp = true }: SaveProjectOptions = {},
 ): Promise<void> {
-  const {
-    sectionVisibility,
-    sectionContent,
-    portfolioImageContent,
-    photobookSectionVisibility,
-    photobookSectionContent,
-    photobookImageContent,
-  } = useContentStore.getState()
+  const contentStore = useContentStore.getState()
 
   const {
     currentTemplateId,
@@ -42,6 +36,8 @@ async function performSaveProject(
 
   const { editorMode } = useUiStore.getState()
 
+  const modeEntry = MODE_REGISTRY[editorMode]
+
   const theme = {
     currentTemplateId,
     currentTheme,
@@ -49,23 +45,7 @@ async function performSaveProject(
     customDecorations,
   }
 
-  const content =
-    editorMode === 'portfolio'
-      ? {
-          sectionVisibility,
-          sectionContent,
-          imageContent: portfolioImageContent,
-        }
-      : {
-          sectionVisibility: photobookSectionVisibility,
-          sectionContent: photobookSectionContent,
-          imageContent: photobookImageContent,
-        }
-
-  const rawHeroThumb =
-    editorMode === 'portfolio'
-      ? portfolioImageContent.hero?.value.asset.blurDataUrl ?? portfolioImageContent.hero?.value.asset.src
-      : photobookImageContent.cover?.value.asset.blurDataUrl ?? photobookImageContent.cover?.value.asset.src
+  const content = modeEntry.extractContent(contentStore)
 
   const payload: Record<string, unknown> = {}
 
@@ -74,27 +54,16 @@ async function performSaveProject(
       themeId: currentTheme,
       templateId: currentTemplateId,
     }
-    const previewImageUrl = rawHeroThumb
-    if (previewImageUrl && (previewImageUrl.startsWith('http://') || previewImageUrl.startsWith('https://'))) {
-      preview.heroImageUrl = previewImageUrl
-    }
 
-    if (editorMode === 'portfolio') {
-      if (sectionContent.hero.title) preview.title = sectionContent.hero.title
-      if (sectionContent.hero.subtitle) preview.subtitle = sectionContent.hero.subtitle
-      if (portfolioImageContent.hero?.value.presentation?.ratio) preview.aspectRatio = portfolioImageContent.hero.value.presentation.ratio
-      if (portfolioImageContent.hero?.value.presentation?.frameStyle) preview.frameStyle = portfolioImageContent.hero.value.presentation.frameStyle
-    } else {
-      if (photobookSectionContent.cover.title) preview.title = photobookSectionContent.cover.title
-      if (photobookSectionContent.cover.subtitle) preview.subtitle = photobookSectionContent.cover.subtitle
-      if (photobookSectionContent.cover.date) preview.date = photobookSectionContent.cover.date
-      if (photobookImageContent.cover?.value.presentation?.ratio) {
-        preview.aspectRatio = photobookImageContent.cover.value.presentation.ratio
-      }
-      if (photobookImageContent.cover?.value.presentation?.frameStyle) {
-        preview.frameStyle = photobookImageContent.cover.value.presentation.frameStyle
-      }
+    const meta = modeEntry.extractPreviewMeta(contentStore)
+    if (meta.heroThumbUrl && (meta.heroThumbUrl.startsWith('http://') || meta.heroThumbUrl.startsWith('https://'))) {
+      preview.heroImageUrl = meta.heroThumbUrl
     }
+    if (meta.title) preview.title = meta.title
+    if (meta.subtitle) preview.subtitle = meta.subtitle
+    if (meta.date) preview.date = meta.date
+    if (meta.aspectRatio) preview.aspectRatio = meta.aspectRatio
+    if (meta.frameStyle) preview.frameStyle = meta.frameStyle
 
     payload.preview = preview
   }

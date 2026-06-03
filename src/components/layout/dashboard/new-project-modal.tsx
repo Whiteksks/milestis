@@ -7,13 +7,12 @@ import { useCreateProject } from "@/hooks/useCreateProject"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { DialogTitle } from "@radix-ui/react-dialog"
+import type { ProjectMode } from "@/lib/projects/project-type-config"
 
 interface NewProjectModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-
-type ProjectMode = "portfolio" | "photobook"
 
 const options: {
   mode: ProjectMode

@@ -4,7 +4,14 @@ import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 import type { ModeRegistryEntry } from '@/editor/lib/modes/types'
 import { type PortfolioTemplateId } from './template-ids'
 import { WandSparkles } from 'lucide-react'
-import { createPortfolioSlice } from './store-slice'
+import {
+  createPortfolioSlice,
+  defaultPortfolioContent,
+  defaultPortfolioImageContent,
+  defaultPortfolioVisibility,
+} from './store-slice'
+import type { PortfolioImageContent } from './image/content'
+import { useContentStore } from '@/editor/lib/store/content'
 
 import dynamic from 'next/dynamic'
 import { PortfolioTemplateShell } from '@/editor/components/editor/layout/portfolio-template-shell'
@@ -109,6 +116,7 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
   },
   createSlice: createPortfolioSlice,
   label: 'Portfolio',
+  defaultTemplateId: 'editorial',
   templates: [
     { id: 'editorial', name: 'Editorial', tags: ['Classic', 'Modern'], previewComponent: EditorialHero },
     { id: 'minimal', name: 'Minimal', tags: ['Clean', 'Classic'], previewComponent: MinimalHero },
@@ -139,6 +147,40 @@ export const portfolioMode: ModeRegistryEntry<keyof SectionVisibility> = {
       EditorialTemplateDesign
 
     return <PortfolioTemplateShell Design={Design} />
+  },
+
+  extractContent: (store) => ({
+    sectionVisibility: store.sectionVisibility,
+    sectionContent: store.sectionContent,
+    imageContent: store.portfolioImageContent,
+  }),
+
+  extractPreviewMeta: (store) => {
+    const img = store.portfolioImageContent
+    const content = store.sectionContent
+    return {
+      heroThumbUrl: img.hero?.value.asset.blurDataUrl ?? img.hero?.value.asset.src,
+      title: content.hero.title,
+      subtitle: content.hero.subtitle,
+      aspectRatio: img.hero?.value.presentation?.ratio,
+      frameStyle: img.hero?.value.presentation?.frameStyle,
+    }
+  },
+
+  hydrateStore: (savedContent) => {
+    if (savedContent) {
+      useContentStore.setState({
+        sectionVisibility: savedContent.sectionVisibility as SectionVisibility,
+        sectionContent: savedContent.sectionContent as SectionContent,
+        portfolioImageContent: (savedContent.imageContent as PortfolioImageContent) ?? defaultPortfolioImageContent,
+      })
+    } else {
+      useContentStore.setState({
+        sectionVisibility: defaultPortfolioVisibility,
+        sectionContent: defaultPortfolioContent,
+        portfolioImageContent: defaultPortfolioImageContent,
+      })
+    }
   },
 
   renderPublished: ({ templateId, theme, content, imageContent, visibility, handleAnchorClick }) => {

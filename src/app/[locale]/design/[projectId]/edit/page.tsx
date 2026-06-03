@@ -17,16 +17,8 @@ import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/config/edit
 import { useUiSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
-import {
-  defaultPortfolioContent,
-  defaultPortfolioImageContent,
-  defaultPortfolioVisibility,
-} from '@/editor/modes/portfolio/store-slice'
-import {
-  defaultPhotobookContent,
-  defaultPhotobookImageContent,
-  defaultPhotobookVisibility,
-} from '@/editor/modes/photobook/store-slice'
+import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
+import type { EditorMode } from '@/editor/lib/editor-mode'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
 
@@ -108,36 +100,8 @@ export default function EditorPage() {
         }
 
         // Rehydrate content store
-        if (editorData?.content) {
-          if (project.mode === 'portfolio') {
-            useContentStore.setState({
-              sectionVisibility: editorData.content.sectionVisibility,
-              sectionContent: editorData.content.sectionContent,
-              portfolioImageContent: editorData.content.imageContent ?? defaultPortfolioImageContent,
-            })
-          } else {
-            useContentStore.setState({
-              photobookSectionVisibility: editorData.content.sectionVisibility,
-              photobookSectionContent: editorData.content.sectionContent,
-              photobookImageContent: editorData.content.imageContent ?? defaultPhotobookImageContent,
-            })
-          }
-        } else {
-          // New project — reset content to defaults
-          if (project.mode === 'portfolio') {
-            useContentStore.setState({
-              sectionVisibility: defaultPortfolioVisibility,
-              sectionContent: defaultPortfolioContent,
-              portfolioImageContent: defaultPortfolioImageContent,
-            })
-          } else {
-            useContentStore.setState({
-              photobookSectionVisibility: defaultPhotobookVisibility,
-              photobookSectionContent: defaultPhotobookContent,
-              photobookImageContent: defaultPhotobookImageContent,
-            })
-          }
-        }
+        const modeEntry = MODE_REGISTRY[project.mode as EditorMode]
+        modeEntry.hydrateStore(editorData?.content ?? null)
 
         setLoadState('ready')
       } catch {

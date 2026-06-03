@@ -8,6 +8,7 @@ import {
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
+import { getProjectConfig } from '@/lib/projects/project-type-config'
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
 export type PublishStep = 'slug' | 'review'
@@ -22,9 +23,9 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
   const [step, setStep] = useState<PublishStep>('slug')
   const [slug, setSlug] = useState('')
   const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
-  // Stable token per modal instance — generated once for photobooks
+  // Stable token per modal instance — generated once for modes that require access tokens
   const [accessToken] = useState<string>(() =>
-    mode === 'photobook' ? generateToken() : '',
+    getProjectConfig(mode).hasAccessToken ? generateToken() : '',
   )
 
   // Step 2 state
@@ -117,12 +118,12 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
   }
 
   const portfolioUrl =
-    mode === 'portfolio' && slug
+    !getProjectConfig(mode).hasAccessToken && slug
       ? buildPublishedProjectUrl(mode, slug)
       : null
 
   const photobookUrl =
-    mode === 'photobook' && slug
+    getProjectConfig(mode).hasAccessToken && slug
       ? buildPublishedProjectUrl(mode, slug, accessToken)
       : null
 

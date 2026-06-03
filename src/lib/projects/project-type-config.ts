@@ -13,6 +13,9 @@ export const PROJECT_TYPE_CONFIG = {
     /** Human-readable label */
     label: 'Portfolio',
 
+    /** Whether this mode uses a private access token for viewing. */
+    hasAccessToken: false,
+
     // ── Editor header ─────────────────────────────────────────────────────
     /** Primary action button label (unpublished state) */
     primaryActionLabel: 'Publish',
@@ -49,6 +52,9 @@ export const PROJECT_TYPE_CONFIG = {
 
   photobook: {
     label: 'Photobook',
+
+    /** Whether this mode uses a private access token for viewing. */
+    hasAccessToken: true,
 
     primaryActionLabel: 'Publish',
     republishLabel: 'Republish',

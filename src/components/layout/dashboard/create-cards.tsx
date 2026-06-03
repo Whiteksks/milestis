@@ -3,9 +3,8 @@
 import { ArrowRight, Loader2 } from "lucide-react"
 import { useCreateProject } from "@/hooks/useCreateProject"
 import { useTranslations } from "next-intl"
-import { cn } from "@/lib/utils" // Убедись, что путь до утилиты shadcn правильный
-
-type ProjectMode = "portfolio" | "photobook"
+import { cn } from "@/lib/utils"
+import type { ProjectMode } from "@/lib/projects/project-type-config"
 
 const cards: {
   mode: ProjectMode

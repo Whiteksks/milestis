@@ -8,6 +8,23 @@ import type { LucideIcon } from 'lucide-react'
 
 import type React from 'react'
 
+/** Serializable content snapshot saved to / loaded from Firestore. */
+export type ModeContent = {
+  sectionVisibility: unknown
+  sectionContent: unknown
+  imageContent: unknown
+}
+
+/** Metadata extracted for the dashboard project card. */
+export type ModePreviewMeta = {
+  heroThumbUrl?: string
+  title?: string
+  subtitle?: string
+  date?: string
+  aspectRatio?: string
+  frameStyle?: string
+}
+
 /** Args passed to each mode's `renderPublished` — no Zustand, data comes from props. */
 export type PublishedRenderArgs = {
   templateId: string
@@ -87,6 +104,8 @@ export type ModeRegistryEntry<TVisibilityKey extends string> = {
   createSlice: StateCreator<ContentStore, [], [], any>
 
   label: string
+  /** Fallback template id used when a project has no saved template yet. */
+  defaultTemplateId: string
   templates: TemplateDef[]
   sections: SectionDef<TVisibilityKey>[]
   defaultActiveSectionId: string
@@ -101,6 +120,13 @@ export type ModeRegistryEntry<TVisibilityKey extends string> = {
 
   /** Renders the template with explicit props (for the published site — no Zustand). */
   renderPublished: (args: PublishedRenderArgs) => React.ReactNode
+
+  /** Extracts this mode's content from the store for saving to Firestore. */
+  extractContent: (store: ContentStore) => ModeContent
+  /** Extracts preview card metadata (title, hero thumb, etc.) for the dashboard. */
+  extractPreviewMeta: (store: ContentStore) => ModePreviewMeta
+  /** Hydrates the content store. Pass null for a new project — defaults will be applied. */
+  hydrateStore: (savedContent: ModeContent | null) => void
 
   /** Extracts this mode's section visibility from ContentStore. */
   visibilitySelector: (s: ContentStore) => Record<TVisibilityKey, boolean>
