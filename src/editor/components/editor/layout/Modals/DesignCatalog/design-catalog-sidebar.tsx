@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import type { EditorMode } from '@/editor/lib/types'
-import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
+import { getModeUiConfig } from '@/editor/lib/modes'
 
 import type { DesignCatalogSection, TagMeta } from './types'
 

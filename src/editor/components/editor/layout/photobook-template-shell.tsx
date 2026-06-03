@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useContentSelector, useThemeSelector } from '@/editor/lib/store'
-import { getTheme } from '@/editor/lib/themes'
+import { getTheme } from '@/editor/lib/config/themes'
 import type { PhotobookTemplateProps } from '@/editor/lib/template-types'
 import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 

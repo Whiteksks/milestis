@@ -1,4 +1,4 @@
-import { useContentStore } from '@/editor/lib/store-content'
+import { useContentStore } from '@/editor/lib/store/content'
 import { useShallow } from 'zustand/react/shallow'
 
 /**

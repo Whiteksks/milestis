@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Area } from 'react-easy-crop'
-import { getImageNaturalSize } from '@/editor/lib/crop-data'
+import { getImageNaturalSize } from '@/editor/lib/config/crop-data'
 import { setUserCrop, clearImageCrop } from '../editor/update-image-value'
 import { parseImageRatio } from '../image-ratio'
 import type { ImageRatioValue, ImageValue } from '../data'

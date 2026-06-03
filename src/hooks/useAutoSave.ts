@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
-import { useUiStore } from '@/editor/lib/store-ui'
-import { useContentStore } from '@/editor/lib/store-content'
-import { useThemeStore } from '@/editor/lib/store-theme'
+import { useUiStore } from '@/editor/lib/store/ui'
+import { useContentStore } from '@/editor/lib/store/content'
+import { useThemeStore } from '@/editor/lib/store/theme'
 import { saveProject } from '@/lib/projects'
 
 /**

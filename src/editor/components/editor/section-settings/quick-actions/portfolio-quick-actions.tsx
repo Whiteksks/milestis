@@ -17,13 +17,13 @@ import {
   Image as ImageIcon,
 } from "lucide-react"
 
-import { BioAchievementsPanel, BioBiographyPanel, BioPhotoPanel, BioTitlePanel } from "@/editor/components/editor/section-settings/portfolio/bio-panels"
-import { ContactDetailsPanel, ContactHeadingPanel } from "@/editor/components/editor/section-settings/portfolio/contact-panels"
-import { FeaturedWorkHeaderPanel, FeaturedWorkProjectsPanel } from "@/editor/components/editor/section-settings/portfolio/featured-work-panels"
-import { FooterCopyrightPanel, FooterSocialLinksPanel } from "@/editor/components/editor/section-settings/portfolio/footer-panels"
-import { HeaderBrandPanel, HeaderLinksPanel } from "@/editor/components/editor/section-settings/portfolio/header-panels"
-import { HeroDescriptionPanel, HeroImagePanel, HeroTitlePanel } from "@/editor/components/editor/section-settings/portfolio/hero-panels"
-import { VideoHeaderPanel, VideoUrlPanel } from "@/editor/components/editor/section-settings/portfolio/video-panels"
+import { BioAchievementsPanel, BioBiographyPanel, BioPhotoPanel, BioTitlePanel } from "@/editor/modes/portfolio/section-settings/bio-panels"
+import { ContactDetailsPanel, ContactHeadingPanel } from "@/editor/modes/portfolio/section-settings/contact-panels"
+import { FeaturedWorkHeaderPanel, FeaturedWorkProjectsPanel } from "@/editor/modes/portfolio/section-settings/featured-work-panels"
+import { FooterCopyrightPanel, FooterSocialLinksPanel } from "@/editor/modes/portfolio/section-settings/footer-panels"
+import { HeaderBrandPanel, HeaderLinksPanel } from "@/editor/modes/portfolio/section-settings/header-panels"
+import { HeroDescriptionPanel, HeroImagePanel, HeroTitlePanel } from "@/editor/modes/portfolio/section-settings/hero-panels"
+import { VideoHeaderPanel, VideoUrlPanel } from "@/editor/modes/portfolio/section-settings/video-panels"
 
 export type PortfolioSectionQuickActionId =
   | "bio.title"

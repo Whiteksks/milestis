@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import type { DecorationElement } from '@/editor/lib/types'
-import { useUiStore } from '@/editor/lib/store-ui'
+import { useUiStore } from '@/editor/lib/store/ui'
 import { useEditorDecorations } from '@/editor/hooks/use-editor-decorations'
 import { DecorationsLayer as OptimizedDecorationsLayer } from '.'
-import { DECORATION_ANIMATIONS, type DecorationAnimation } from '@/editor/lib/decoration-animations'
+import { DECORATION_ANIMATIONS, type DecorationAnimation } from '@/editor/lib/config/decoration-animations'
 
 interface DecorationsLayerProps {
   decorations: DecorationElement[]

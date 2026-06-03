@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase'
 import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
 import { getPublishedProjectShareUrl } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
-import type { ImageCropData } from '@/editor/lib/crop-data'
+import type { ImageCropData } from '@/editor/lib/config/crop-data'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

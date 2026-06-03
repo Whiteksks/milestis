@@ -3,7 +3,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys, type DashboardProject } from '@/hooks/useProjectsQuery'
 import { softDeleteProject, computePurgeAt, restoreProject, forceDeleteProject, renameProject, publishProject, unpublishProject, republishProject } from '@/lib/projects'
 import { toastProject } from '@/lib/toast'
-import { useUiStore } from '@/editor/lib/store-ui'
+import { useUiStore } from '@/editor/lib/store/ui'
 
 function useUid() {
   return useUserStore((s) => s.profile?.uid ?? null)

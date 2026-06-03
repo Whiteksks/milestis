@@ -18,9 +18,9 @@ import type {
   PhotobookSectionVisibility,
   ThemeCustomDecorations,
 } from './types'
-import type { ThemeCustomizations } from './store-theme'
-import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
-import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import type { ThemeCustomizations } from './store/theme'
+import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
+import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 
 // ─── Metadata 
 

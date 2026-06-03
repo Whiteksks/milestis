@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
-import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
+import { getModeUiConfig } from '@/editor/lib/modes'
 import { RotateCcw, Sun, Sparkles, ChevronDown } from 'lucide-react'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
 import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '@/editor/lib/types'

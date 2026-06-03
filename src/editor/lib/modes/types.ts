@@ -1,11 +1,10 @@
-import type { ThemeConfig } from '@/editor/lib/themes'
-import type {
-  PhotobookSectionContent,
-  PhotobookSectionVisibility,
-  TemplateId,
-} from '@/editor/lib/types'
-import type { ContentStore } from '@/editor/lib/store-content'
-import type { ThemeCustomizations } from '@/editor/lib/store-theme'
+import type { ThemeConfig } from '@/editor/lib/config/themes'
+import type { TemplateId } from '@/editor/lib/types'
+import type { EditorMode } from '@/editor/lib/editor-mode'
+import type { ContentStore } from '@/editor/lib/store/content'
+import type { ThemeCustomizations } from '@/editor/lib/store/theme'
+import type { StateCreator } from 'zustand'
+import type { LucideIcon } from 'lucide-react'
 
 import type React from 'react'
 
@@ -41,17 +40,52 @@ export type SectionDef<K extends string = string> = {
   toggleKey: K
 }
 
-/** Base args always available for every mode.
- *  Mode-specific fields are optional here — each mode provides them via canvasDataSelector. */
+/** Args passed to renderCanvas — common fields for every mode.
+ *  Each mode's shell reads its own content directly from the store. */
 export type CanvasRenderArgs = {
   templateId: TemplateId
   theme: ThemeConfig
-  // Photobook-specific — always present when photobook mode is active
-  photobookSectionContent?: PhotobookSectionContent
-  photobookSectionVisibility?: PhotobookSectionVisibility
+}
+
+/** All UI-related configuration for a mode.
+ *  Lives inside the mode's registration object so adding a new mode
+ *  does not require touching any shared config file. */
+export interface ModeUiConfig {
+  /** Sidebar / panel header label for the backgrounds / effects section. */
+  backgroundLabel: string
+  /** Subtitle line shown when no effects are active. */
+  backgroundHint: string
+  /** Icon rendered next to the background label. */
+  backgroundIcon: LucideIcon
+
+  /** Tab label in the left sections sidebar. */
+  sectionsTabLabel: string
+
+  /** Section-title shown inside the design catalog modal. */
+  backgroundCatalogTitle: string
+  /** Icon for the backgrounds tab in the mobile design catalog drawer. */
+  backgroundCatalogMobileIcon: LucideIcon
+  /** Label for the backgrounds tab in the mobile design catalog drawer. */
+  backgroundCatalogMobileLabel: string
+
+  /** Returns the number of currently-active background effects for this mode. */
+  getActiveEffectsCount: (c: Partial<ThemeCustomizations>) => number
+  /** Resets all background effects for this mode.
+   *  @param update — the `updateThemeCustomization` action from the theme store. */
+  resetEffects: (update: (patch: Partial<ThemeCustomizations>) => void) => void
 }
 
 export type ModeRegistryEntry<TVisibilityKey extends string> = {
+  /** Must be a valid EditorMode — TypeScript will error here if you forget to add it to lib/editor-mode.ts. */
+  id: EditorMode
+
+  /** All UI configuration for this mode. No shared config file needed for new modes. */
+  uiConfig: ModeUiConfig
+
+  /** Zustand slice factory — ContentStore auto-composes from all registered modes. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSlice: StateCreator<ContentStore, [], [], any>
+
   label: string
   templates: TemplateDef[]
   sections: SectionDef<TVisibilityKey>[]

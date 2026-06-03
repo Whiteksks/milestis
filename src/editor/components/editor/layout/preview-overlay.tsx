@@ -4,9 +4,9 @@ import { useEffect, useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useUiStore } from '@/editor/lib/store-ui'
-import { useThemeStore } from '@/editor/lib/store-theme'
-import { useContentStore } from '@/editor/lib/store-content'
+import { useUiStore } from '@/editor/lib/store/ui'
+import { useThemeStore } from '@/editor/lib/store/theme'
+import { useContentStore } from '@/editor/lib/store/content'
 import { PublishedView } from '@/app/sites/[slug]/published-view'
 
 export function PreviewOverlay() {

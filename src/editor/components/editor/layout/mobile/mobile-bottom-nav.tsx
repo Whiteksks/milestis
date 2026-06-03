@@ -3,7 +3,7 @@
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import type { MobileEditorTab } from '@/editor/lib/editor-tabs'
+import type { MobileEditorTab } from '@/editor/lib/config/editor-tabs'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
 import { useScrollAtBottom } from '@/editor/hooks/use-scroll-at-bottom'
 

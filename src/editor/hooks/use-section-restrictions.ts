@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/editor/lib/store-theme'
+import { useThemeStore } from '@/editor/lib/store/theme'
 import {
   getTemplateImageRestrictions,
   type SectionImageRestrictions,

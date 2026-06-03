@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { Area } from "react-easy-crop"
-import type { ImageCropData } from "@/editor/lib/crop-data"
-import { getImageNaturalSize } from "@/editor/lib/crop-data"
+import type { ImageCropData } from "@/editor/lib/config/crop-data"
+import { getImageNaturalSize } from "@/editor/lib/config/crop-data"
 
 export interface UseCropOptions {
   /** Current source image URL. */

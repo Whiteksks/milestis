@@ -1,15 +1,3 @@
-/**
- * Deterministic mesh-gradient placeholder generator.
- *
- * Same seed (e.g. project id) → always same gradient. No randomness at
- * render time, so SSR and client produce identical output — zero hydration
- * mismatch. Pass 'abc123' or any fixed string as a fallback seed.
- *
- * Palette is tuned for a nostalgic / memory theme: warm blush, rose,
- * amber, soft lavender, sage, dusty teal.
- */
-
-// FNV-1a 32-bit hash — fast, deterministic, good distribution
 function hashStr(s: string): number {
   let h = 2166136261 >>> 0
   for (let i = 0; i < s.length; i++) {
@@ -19,14 +7,13 @@ function hashStr(s: string): number {
   return h
 }
 
-// Hue ranges that feel nostalgic / warm
 const HUE_RANGES: [number, number][] = [
-  [330, 355], // rose / blush
-  [20,  42],  // warm amber / peach
-  [270, 295], // soft lavender
-  [150, 170], // sage green
-  [185, 205], // dusty teal
-  [40,  60],  // warm gold / cream
+  [330, 355],
+  [20,  42],
+  [270, 295],
+  [150, 170], 
+  [185, 205], 
+  [40,  60],
 ]
 
 function lerp(t: number, min: number, max: number): number {
@@ -35,14 +22,10 @@ function lerp(t: number, min: number, max: number): number {
 
 export interface PlaceholderStyle {
   background: string
-  /** Subtle text colour for "add image" labels placed on top */
   labelColor: string
 }
 
-/**
- * Pure function — safe to call on the server and client with identical results.
- * @param seed  Any stable string — project id, block id, 'abc123', etc.
- */
+
 export function getPlaceholderGradient(seed: string): PlaceholderStyle {
   const h0 = hashStr(seed)
   const h1 = hashStr(seed + '\x01')
@@ -57,7 +40,6 @@ export function getPlaceholderGradient(seed: string): PlaceholderStyle {
   const hueB = lerp(h1, rangeB[0], rangeB[1])
   const hueC = lerp(h2, rangeC[0], rangeC[1])
 
-  // Radial gradient anchor positions (spread 20–80% range)
   const x1 = 15 + (h0 % 35)
   const y1 = 10 + (h1 % 35)
   const x2 = 50 + (h2 % 40)
@@ -75,15 +57,12 @@ export function getPlaceholderGradient(seed: string): PlaceholderStyle {
     base,
   ].join(', ')
 
-  // Use a slightly deeper tint of the primary hue as label colour
   const labelColor = `hsl(${hueA.toFixed(1)}, 30%, 55%)`
 
   return { background, labelColor }
 }
 
-/**
- * React hook wrapper — accepts an optional seed and falls back to 'abc123'.
- */
+
 export function usePlaceholderGradient(seed?: string): PlaceholderStyle {
   return getPlaceholderGradient(seed ?? 'abc123')
 }

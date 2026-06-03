@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { ThemeConfig } from '@/editor/lib/themes'
+import type { ThemeConfig } from '@/editor/lib/config/themes'
 
 interface SectionLabelProps {
   num?: number

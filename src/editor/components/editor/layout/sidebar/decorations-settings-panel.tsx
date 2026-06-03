@@ -15,7 +15,7 @@ import { Plus, Trash2, Sparkles, Shuffle, ChevronDown, Check } from 'lucide-reac
 import { useCallback, useId, MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { useCanvasScrollContainer } from '@/editor/components/editor/canvas-scroll-context'
-import { decorationAnimationOptions, type DecorationAnimation } from '@/editor/lib/decoration-animations'
+import { decorationAnimationOptions, type DecorationAnimation } from '@/editor/lib/config/decoration-animations'
 import { loadImageAspectRatio } from '@/editor/components/editor/layout/decorationEdit/utils'
 import { LIMITS } from '@/editor/components/editor/section-settings/ui/panel-ui'
 import { DecorationVisual } from '@/editor/components/editor/layout/decorationEdit/decoration-visual'

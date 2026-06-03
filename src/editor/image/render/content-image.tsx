@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { getFrameStyle } from '@/editor/lib/frame-styles'
+import { getFrameStyle } from '@/editor/lib/config/frame-styles'
 import { parseImageRatio } from '../image-ratio'
 import type { ResolvedImage } from '../render'
 

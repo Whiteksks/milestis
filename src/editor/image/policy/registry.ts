@@ -1,5 +1,5 @@
-import { aspectRatios } from '@/editor/lib/aspect-ratios'
-import { frameStyles } from '@/editor/lib/frame-styles'
+import { aspectRatios } from '@/editor/lib/config/aspect-ratios'
+import { frameStyles } from '@/editor/lib/config/frame-styles'
 import type { AspectRatio, FrameStyle, TemplateId } from '@/editor/lib/types'
 import type { ImageSlotId } from '../slots'
 import type { ImageOptionPolicy, ImagePolicy } from './types'

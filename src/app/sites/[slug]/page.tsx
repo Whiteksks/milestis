@@ -1,4 +1,4 @@
-﻿import { notFound } from "next/navigation"
+import { notFound } from "next/navigation"
 import { createHash } from "crypto"
 import { headers } from "next/headers"
 import type { Metadata } from "next"
@@ -10,7 +10,7 @@ import {
   PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from "@/lib/slug"
 import { PublishedView, TokenGateForm } from "./published-view"
-import type { ThemeCustomizations } from "@/editor/lib/store-theme"
+import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 
 interface Props {

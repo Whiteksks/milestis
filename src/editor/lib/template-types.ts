@@ -1,12 +1,12 @@
-import type { ThemeConfig } from '@/editor/lib/themes'
+import type { ThemeConfig } from '@/editor/lib/config/themes'
 import type {
   SectionContent,
   SectionVisibility,
   PhotobookSectionContent,
   PhotobookSectionVisibility,
 } from '@/editor/lib/types'
-import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
-import type { PhotobookImageContent } from '@/editor/image/photobook/content'
+import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
+import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 
 /** Shared base — fields present in every template regardless of mode. */
 export interface BaseTemplateProps {

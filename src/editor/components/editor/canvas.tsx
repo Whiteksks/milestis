@@ -2,9 +2,9 @@
 
 import { useRef, useLayoutEffect, useState, useEffect, memo, type CSSProperties } from 'react'
 import { useUiSelector, useThemeSelector, useContentSelector } from '@/editor/lib/store'
-import { useUiStore } from '@/editor/lib/store-ui'
-import { getTheme } from '@/editor/lib/themes'
-import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
+import { useUiStore } from '@/editor/lib/store/ui'
+import { getTheme } from '@/editor/lib/config/themes'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
 import { cn } from '@/lib/utils'
 import { DecorationsLayer } from '@/editor/components/editor/layout/decorationEdit/decorations-layer'
 import { BackgroundLayers } from './layout/background-layers'
@@ -35,7 +35,7 @@ export function Canvas({
   desktopActiveTab,
 }: {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>
-  desktopActiveTab?: import('@/editor/lib/editor-tabs').DesktopEditorTab
+  desktopActiveTab?: import('@/editor/lib/config/editor-tabs').DesktopEditorTab
 }) {
   const viewportRef = useRef<HTMLDivElement>(null)
   const internalScrollContainerRef = useRef<HTMLDivElement>(null)

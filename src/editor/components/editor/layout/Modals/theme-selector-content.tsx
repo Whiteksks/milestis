@@ -1,7 +1,7 @@
 'use client'
 
 import { useThemeSelector } from '@/editor/lib/store'
-import { themes } from '@/editor/lib/themes'
+import { themes } from '@/editor/lib/config/themes'
 import type { Theme } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

@@ -4,12 +4,12 @@ import type { ComponentType } from "react"
 import type { LucideIcon } from "lucide-react"
 import { AlignLeft, Calendar, Image as ImageIcon, MapPin, PenLine, Type } from "lucide-react"
 
-import { CoverImagePanel, CoverMetadataPanel, CoverTextPanel } from "@/editor/components/editor/section-settings/photobook/cover-panels"
-import { IntroductionImagePanel, IntroductionTextPanel } from "@/editor/components/editor/section-settings/photobook/introduction-panels"
-import { StoryHeaderPanel, StoryImagePanel } from "@/editor/components/editor/section-settings/photobook/story-panels"
-import { GalleryHeaderPanel, GalleryImagesPanel } from "@/editor/components/editor/section-settings/photobook/gallery-panels"
-import { HighlightImagePanel, HighlightTextPanel } from "@/editor/components/editor/section-settings/photobook/highlight-panels"
-import { EndingImagePanel, EndingMessagePanel, EndingSignaturePanel } from "@/editor/components/editor/section-settings/photobook/ending-panels"
+import { CoverImagePanel, CoverMetadataPanel, CoverTextPanel } from "@/editor/modes/photobook/section-settings/cover-panels"
+import { IntroductionImagePanel, IntroductionTextPanel } from "@/editor/modes/photobook/section-settings/introduction-panels"
+import { StoryHeaderPanel, StoryImagePanel } from "@/editor/modes/photobook/section-settings/story-panels"
+import { GalleryHeaderPanel, GalleryImagesPanel } from "@/editor/modes/photobook/section-settings/gallery-panels"
+import { HighlightImagePanel, HighlightTextPanel } from "@/editor/modes/photobook/section-settings/highlight-panels"
+import { EndingImagePanel, EndingMessagePanel, EndingSignaturePanel } from "@/editor/modes/photobook/section-settings/ending-panels"
 
 export interface PhotobookSectionQuickAction {
   id: string

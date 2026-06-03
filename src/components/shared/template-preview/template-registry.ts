@@ -1,9 +1,9 @@
 import type { ComponentType } from 'react'
-import type { ThemeConfig } from '@/editor/lib/themes'
+import type { ThemeConfig } from '@/editor/lib/config/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
-import type { PortfolioImageContent } from '@/editor/image/portfolio/content'
-import type { PhotobookImageContent } from '@/editor/image/photobook/content'
-import { getModeTemplates } from '@/editor/lib/mode-registry'
+import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
+import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
+import { getModeTemplates } from '@/editor/lib/modes'
 
 export type HeroPreviewComponent = ComponentType<{
   theme: ThemeConfig

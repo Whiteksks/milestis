@@ -7,7 +7,7 @@ import type { DeviceView } from "@/editor/lib/types"
 import { getResponsiveFactor } from "./utils"
 import { useDecorationDrag } from "../../../../hooks/use-decoration-drag"
 import { DraggableDecoration } from "./draggable-decoration"
-import { getDecorationAnimationVariants, type DecorationAnimation } from "@/editor/lib/decoration-animations"
+import { getDecorationAnimationVariants, type DecorationAnimation } from "@/editor/lib/config/decoration-animations"
 import { useSectionRegistry } from "@/editor/lib/section-registry-context"
 
 export interface DecorationsLayerProps {

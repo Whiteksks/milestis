@@ -2,18 +2,18 @@
 
 import { useMemo } from 'react'
 import { useUiSelector } from '@/editor/lib/store'
-import { getModeUiConfig } from '@/editor/lib/mode-ui-configs'
+import { getModeUiConfig } from '@/editor/lib/modes'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles } from 'lucide-react'
 
-import type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
+import type { DesktopEditorTab } from '@/editor/lib/config/editor-tabs'
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 import { PersistentDrawer } from '@/components/ui/custom/persistent-drawer'
 
-export type { DesktopEditorTab } from '@/editor/lib/editor-tabs'
+export type { DesktopEditorTab } from '@/editor/lib/config/editor-tabs'
 
 const SIDEBAR_WIDTH = 380
 

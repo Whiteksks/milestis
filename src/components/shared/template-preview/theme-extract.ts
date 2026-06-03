@@ -1,4 +1,4 @@
-import { getTheme } from '@/editor/lib/themes'
+import { getTheme } from '@/editor/lib/config/themes'
 
 export interface PreviewColors {
   bg: string

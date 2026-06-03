@@ -40,7 +40,7 @@ export type {
 export type { ImageSlotId, ImageSlotFamily } from './slots'
 
 // Photobook domain:
-export type { PhotobookImageContent } from './photobook/content'
+export type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 export {
   createEmptyPhotobookImageContent,
   setPhotobookSingleImage,
@@ -48,22 +48,22 @@ export {
   replacePhotobookRepeatingImage,
   removePhotobookRepeatingImage,
   findPhotobookRepeatingImage,
-} from './photobook/content'
-export type { PhotobookManagedImage } from './photobook/types'
+} from '@/editor/modes/photobook/image/content'
+export type { PhotobookManagedImage } from '@/editor/modes/photobook/image/types'
 export {
   createPhotobookSectionImage,
   createPhotobookRepeatingImage,
   replacePhotobookManagedImageAsset,
   resolvePhotobookManagedImage,
-} from './photobook/helpers'
+} from '@/editor/modes/photobook/image/helpers'
 export {
   selectPhotobookSingleResolvedImage,
   selectPhotobookRepeatingResolvedImage,
   selectPhotobookImageContent,
-} from './photobook/selectors'
+} from '@/editor/modes/photobook/image/selectors'
 
 // Portfolio domain:
-export type { PortfolioImageContent } from './portfolio/content'
+export type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
 export {
   createEmptyPortfolioImageContent,
   setPortfolioSingleImage,
@@ -71,15 +71,15 @@ export {
   replacePortfolioRepeatingImage,
   removePortfolioRepeatingImage,
   findPortfolioRepeatingImage,
-} from './portfolio/content'
-export type { PortfolioManagedImage } from './portfolio/types'
+} from '@/editor/modes/portfolio/image/content'
+export type { PortfolioManagedImage } from '@/editor/modes/portfolio/image/types'
 export {
   createPortfolioSectionImage,
   createPortfolioRepeatingImage,
   replacePortfolioManagedImageAsset,
   resolvePortfolioManagedImage,
-} from './portfolio/helpers'
+} from '@/editor/modes/portfolio/image/helpers'
 export {
   selectPortfolioSingleResolvedImage,
   selectPortfolioRepeatingResolvedImage,
-} from './portfolio/selectors'
+} from '@/editor/modes/portfolio/image/selectors'

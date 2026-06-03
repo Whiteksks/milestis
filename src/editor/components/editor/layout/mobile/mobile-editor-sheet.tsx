@@ -6,7 +6,7 @@ import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
-import type { MobileEditorTab } from "@/editor/lib/editor-tabs"
+import type { MobileEditorTab } from "@/editor/lib/config/editor-tabs"
 
 import { MobileSnapSheet, type MobileSnapSheetRenderProps } from "./mobile-snap-sheet"
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"

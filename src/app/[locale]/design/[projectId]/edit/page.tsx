@@ -13,20 +13,20 @@ import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/medi
 import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/design-catalog-modal'
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { MobileEditorSheet } from '@/editor/components/editor/layout/mobile/mobile-editor-sheet'
-import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/editor-tabs'
+import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/config/editor-tabs'
 import { useUiSelector } from '@/editor/lib/store'
-import { useContentStore } from '@/editor/lib/store-content'
-import { useThemeStore } from '@/editor/lib/store-theme'
+import { useContentStore } from '@/editor/lib/store/content'
+import { useThemeStore } from '@/editor/lib/store/theme'
 import {
   defaultPortfolioContent,
   defaultPortfolioImageContent,
   defaultPortfolioVisibility,
-} from '@/editor/lib/store-content-portfolio'
+} from '@/editor/modes/portfolio/store-slice'
 import {
   defaultPhotobookContent,
   defaultPhotobookImageContent,
   defaultPhotobookVisibility,
-} from '@/editor/lib/store-content-photobook'
+} from '@/editor/modes/photobook/store-slice'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
 

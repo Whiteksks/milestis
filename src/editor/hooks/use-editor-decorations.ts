@@ -1,7 +1,7 @@
 "use client"
 
-import { useUiStore } from "@/editor/lib/store-ui"
-import { useThemeStore } from "@/editor/lib/store-theme"
+import { useUiStore } from "@/editor/lib/store/ui"
+import { useThemeStore } from "@/editor/lib/store/theme"
 import type { DecorationElement, DecorationUpdatePayload } from "@/editor/lib/types"
 
 /**

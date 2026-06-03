@@ -1,8 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { ThemeConfig } from '@/editor/lib/themes'
-import type { ThemeCustomizations } from '@/editor/lib/store-theme'
+import type { ThemeConfig } from '@/editor/lib/config/themes'
+import type { ThemeCustomizations } from '@/editor/lib/store/theme'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from './registry'
 
 interface Props {

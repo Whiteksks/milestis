@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { frameStyles } from '@/editor/lib/frame-styles'
+import { frameStyles } from '@/editor/lib/config/frame-styles'
 import type { TemplateId } from '@/editor/lib/types'
 import { getEffectiveImagePolicy } from '../policy/registry'
 import type { ImageSlotId } from '../slots'

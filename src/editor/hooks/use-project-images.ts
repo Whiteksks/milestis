@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes } from 'firebase/storage'
 import { db } from '@/lib/firebase'
-import { useUiStore } from '@/editor/lib/store-ui'
+import { useUiStore } from '@/editor/lib/store/ui'
 import { useUserStore } from '@/hooks/useUserStore'
 import { storage } from '@/lib/firebase'
 

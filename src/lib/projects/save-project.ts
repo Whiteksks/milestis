@@ -1,8 +1,8 @@
 import { doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/firebase'
-import { useContentStore } from '@/editor/lib/store-content'
-import { useThemeStore } from '@/editor/lib/store-theme'
-import { useUiStore } from '@/editor/lib/store-ui'
+import { useContentStore } from '@/editor/lib/store/content'
+import { useThemeStore } from '@/editor/lib/store/theme'
+import { useUiStore } from '@/editor/lib/store/ui'
 
 interface SaveProjectOptions {
   updateDashboardMeta?: boolean

@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from 'react'
 import { useThemeSelector } from '@/editor/lib/store'
-import { getTheme } from '@/editor/lib/themes'
+import { getTheme } from '@/editor/lib/config/themes'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from './registry'
 import { useParallaxLayer } from '@/editor/hooks/use-parallax-layer'
 

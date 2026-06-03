@@ -1,8 +1,8 @@
 'use client'
 
 import { useContentSelector, useUiSelector, useUiStore, useContentStore } from '@/editor/lib/store'
-import { MODE_REGISTRY } from '@/editor/lib/mode-registry'
-import type { ContentStore } from '@/editor/lib/store-content'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
+import type { ContentStore } from '@/editor/lib/store/content'
 
 export function useModeSections() {
   const { editorMode, activeSectionId } = useUiSelector((state) => ({

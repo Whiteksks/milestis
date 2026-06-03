@@ -9,7 +9,7 @@ import { Check, X, ZoomIn, RotateCcw } from "lucide-react"
 import type { CSSProperties } from "react"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
 import { getEffectiveAspectRatio } from "@/editor/lib/restrictions/frame-style-restrictions"
-import { ASPECT_RATIO_NUM } from "@/editor/lib/aspect-ratios"
+import { ASPECT_RATIO_NUM } from "@/editor/lib/config/aspect-ratios"
 
 /** Maps each frame style to the visual CSS overlay used inside the Cropper. */
 function getCropAreaStyle(frameStyle: FrameStyle): CSSProperties {

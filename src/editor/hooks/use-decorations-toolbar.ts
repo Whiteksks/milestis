@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { DecorationElement } from "@/editor/lib/types"
-import { useUiStore } from "@/editor/lib/store-ui"
+import { useUiStore } from "@/editor/lib/store/ui"
 import { useThemeSelector, useUiSelector, type ThemeCustomDecorations } from "@/editor/lib/store"
 import { useEditorDecorations } from "@/editor/hooks/use-editor-decorations"
 import { loadImageAspectRatio } from "@/editor/components/editor/layout/decorationEdit/utils"

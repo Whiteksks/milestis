@@ -1,5 +1,9 @@
 export type DeviceView = 'desktop' | 'tablet' | 'mobile' | 'fullscreen'
 
+// EditorMode is defined in editor-mode.ts (zero-dep file) — re-exported here for convenience.
+export { EDITOR_MODES } from './editor-mode'
+export type { EditorMode } from './editor-mode'
+
 export const THEMES = {
   parchment: 'parchment',
   frost: 'frost',
@@ -14,13 +18,6 @@ export const THEMES = {
 } as const
 
 export type Theme = (typeof THEMES)[keyof typeof THEMES]
-
-export const EDITOR_MODES = {
-  portfolio: 'portfolio',
-  photobook: 'photobook',
-} as const
-
-export type EditorMode = (typeof EDITOR_MODES)[keyof typeof EDITOR_MODES]
 
 export const FRAME_STYLES = {
   none: 'none',
@@ -54,79 +51,24 @@ export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
 /** TemplateId is derived automatically from each mode's ID list.
  *  To add a new template — edit modes/portfolio-ids.ts or modes/photobook-ids.ts.
  *  Never edit this line directly. */
-import type { PortfolioTemplateId } from './modes/portfolio-ids'
-import type { PhotobookTemplateId } from './modes/photobook-ids'
-import type { DecorationAnimation } from './decoration-animations'
+import type { PortfolioTemplateId } from '@/editor/modes/portfolio/template-ids'
+import type { PhotobookTemplateId } from '@/editor/modes/photobook/template-ids'
+import type { DecorationAnimation } from './config/decoration-animations'
 export type { PortfolioTemplateId, PhotobookTemplateId, DecorationAnimation }
 
 // 3. Создаем составной тип
 export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
 
-export type DepthEffect = 'none' | 'radial-glow' | 'vignette' | 'ambient-blobs' | 'asymmetric-light' | 'aurora' | 'horizon'
-export type RayEffect = 'none' | 'diagonal-rays' | 'conic-rays' | 'soft-streaks' | 'lens-flare' | 'caustics' | 'god-rays' | 'prism'
-export type TextureEffect = 'none' | 'grain' | 'dots' | 'lines' | 'grid' | 'halftone' | 'scanlines' | 'diamond-grid' | 'woven'
-export type BackgroundLayersTheme = 'dark' | 'light'
-export type BackgroundScrollMode = 'fixed' | 'scroll'
+// Portfolio background effect types — defined in the portfolio mode, re-exported here for shared consumers.
+export type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/modes/portfolio/content-types'
 
-/** Photobook-specific decorative overlays */
-export type PhotobookTexture = 'none' | 'vignette' | 'matte' | 'warmth' | 'silver' | 'linen' | 'haze' | 'grain' | 'canvas' | 'velvet'| 'parchment' 
-export type PhotobookMood = 'none' | 'warm' | 'cool' | 'muted' | 'fade' | 'golden' | 'noir' | 'vibrant' | 'dreamy' | 'earthy'
+// Photobook background effect types — defined in the photobook mode, re-exported here for shared consumers.
+export type { PhotobookTexture, PhotobookMood } from '@/editor/modes/photobook/content-types'
 
-/** Derived automatically from SectionContent — adding a key there adds show<Key> here. */
-export type SectionVisibility = {
-  [K in keyof SectionContent as `show${Capitalize<string & K>}`]: boolean
-}
-
-export interface SectionContent {
-  header: {
-    title: string
-    links: Array<{ label: string; href: string }>
-  }
-  hero: {
-    title: string
-    subtitle: string
-    description: string
-  }
-  bio: {
-    title: string
-    subtitle?: string
-    description: string
-    achievements?: string[]
-  }
-  featuredWork: {
-    title: string
-    subtitle?: string
-    projects: Array<{
-      id: string
-      title: string
-      description: string
-      tags?: string[]
-    }>
-  }
-  video: {
-    title: string
-    subtitle?: string
-    description: string
-    videoUrl: string
-  }
-  contact: {
-    title: string
-    subtitle?: string
-    description: string
-    email: string
-  }
-  footer: {
-    copyright: string
-    socialLinks?: Array<{ icon: string; href: string }>
-  }
-}
-
-export interface MediaImage {
-  id: string
-  url: string
-  name: string
-  uploadedAt: Date
-}
+// Mode-specific content types — defined in their respective mode folders.
+// Re-exported here so existing imports from '@/editor/lib/types' keep working.
+export type { SectionContent, SectionVisibility, MediaImage } from '@/editor/modes/portfolio/content-types'
+export type { PhotobookSectionContent, PhotobookSectionVisibility, PhotobookStoryMoment, PhotobookGalleryPhoto } from '@/editor/modes/photobook/content-types'
 
 export interface DecorationPosition {
   top?: string
@@ -189,72 +131,4 @@ export interface DecorationsConfig {
   tags?: string[]
   animation?: DecorationAnimation
   elements?: DecorationElement[]
-}
-
-
-/** Derived automatically from PhotobookSectionContent — adding a key there adds show<Key> here. */
-export type PhotobookSectionVisibility = {
-  [K in keyof PhotobookSectionContent as `show${Capitalize<string & K>}`]: boolean
-}
-
-export interface PhotobookStoryMoment {
-  id: string
-  label?: string
-  caption?: string
-  description?: string
-}
-
-export interface PhotobookGalleryPhoto {
-  id: string
-  caption?: string
-}
-
-
-// Section content model for Photobook mode
-export interface PhotobookSectionContent {
-  cover: {
-    title: string
-    subtitle?: string
-    date?: string
-    location?: string
-    tagline?: string
-  }
-
-  introduction: {
-    label?: string
-    title?: string
-    quote?: string
-    dedication?: string
-  }
-
-  story: {
-    label?: string
-    title?: string
-    date?: string
-    location?: string
-    moments?: PhotobookStoryMoment[]
-  }
-
-  gallery: {
-    label?: string
-    title?: string
-    description?: string
-    photos?: PhotobookGalleryPhoto[]
-  }
-
-  highlight: {
-    label?: string
-    title?: string
-    description?: string
-    quote?: string
-    videoUrl?: string
-  }
-
-  ending: {
-    title?: string
-    label?: string
-    text?: string
-    date?: string
-    signature?: string
-  }
 }

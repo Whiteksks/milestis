@@ -16,7 +16,7 @@ import { useImageCrop } from '../crop/use-image-crop'
 import { ImageCropPanel } from '../crop/image-crop-panel'
 import type { FrameStyle, TemplateId } from '@/editor/lib/types'
 import type { ImageRatioValue } from '../data'
-import { useThemeStore } from '@/editor/lib/store-theme'
+import { useThemeStore } from '@/editor/lib/store/theme'
 
 type ActivePanel = 'default' | 'crop' | 'style'
 

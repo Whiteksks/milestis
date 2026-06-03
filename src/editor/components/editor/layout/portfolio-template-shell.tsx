@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { useContentSelector, useThemeSelector } from '@/editor/lib/store'
-import { getTheme } from '@/editor/lib/themes'
+import { getTheme } from '@/editor/lib/config/themes'
 import type { PortfolioTemplateProps } from '@/editor/lib/template-types'
 
 // PortfolioTemplateProps is defined in @/editor/lib/template-types — import from there directly.
