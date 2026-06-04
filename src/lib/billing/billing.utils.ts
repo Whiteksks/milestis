@@ -1,54 +1,35 @@
-import type { UserSubscription } from "@/lib/user/user-update.dto"
+import type { SubscriptionPlanTier } from "@/lib/user/user-update.dto"
 
-// ─── Plan display helpers ──────────────────────────────────────────────────
-
-const PLAN_NAMES: Record<string, string> = {
-  free: "Free Plan",
-  basic: "Basic Plan",
-  pro: "Pro Plan",
-  pro_plus: "Pro+ Plan",
+const LEGACY_PLAN_TIER_ALIASES: Record<string, SubscriptionPlanTier> = {
+  basic: "explorer",
+  pro: "creator",
+  pro_plus: "archive",
 }
 
-const PLAN_DESCRIPTIONS: Record<string, string> = {
-  free: "Perfect for trying out Milestis. Create beautiful memory books and share them with anyone.",
-  basic: "Great for personal use. More projects, more storage, and priority exports.",
-  pro: "For creators who need full control — custom branding, high-quality exports, and priority support.",
-  pro_plus: "The ultimate plan. Everything in Pro plus even more credits and storage.",
+export function normalizePlanTier(planTier?: string | null): SubscriptionPlanTier {
+  if (!planTier || planTier === "free") return "free"
+
+  switch (planTier) {
+    case "explorer":
+    case "creator":
+    case "archive":
+      return planTier
+    default:
+      return LEGACY_PLAN_TIER_ALIASES[planTier] ?? "free"
+  }
 }
 
-export function planDisplayName(planTier?: string): string {
-  return PLAN_NAMES[planTier ?? "free"] ?? "Free Plan"
+export function getPlanTranslationKey(planTier?: string | null): SubscriptionPlanTier {
+  return normalizePlanTier(planTier)
 }
 
-export function planDescription(planTier?: string): string {
-  return PLAN_DESCRIPTIONS[planTier ?? "free"] ?? PLAN_DESCRIPTIONS.free
-}
-
-export function isPaidPlan(planTier?: string): boolean {
-  return !!planTier && planTier !== "free"
+export function isPaidPlan(planTier?: string | null): boolean {
+  return normalizePlanTier(planTier) !== "free"
 }
 
 // ─── Date formatting ───────────────────────────────────────────────────────
 
-export function formatResetDate(date?: Date | null): string {
+export function formatResetDate(locale: string, date?: Date | null): string {
   if (!date) return "—"
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-}
-
-// ─── Subscription status label ────────────────────────────────────────────
-
-export function subscriptionStatusLabel(sub?: UserSubscription): string {
-  if (!sub) return "Free"
-  switch (sub.status) {
-    case "active":
-      return sub.cancelAtPeriodEnd ? "Cancels at period end" : "Active"
-    case "trialing":
-      return "Trial"
-    case "past_due":
-      return "Past due"
-    case "canceled":
-      return "Canceled"
-    default:
-      return sub.status
-  }
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(date)
 }

@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "projects": "Проекты",
+    "templates": "Шаблоны",
+    "analytics": "Аналитика",
+    "domains": "Домены",
+    "profile": "Профиль",
+    "billing": "Тарифы",
+    "settings": "Настройки",
+    "helpSupport": "Помощь и поддержка",
+    "upgradePlan": "Обновить тариф",
+    "logOut": "Выйти",
+    "more": "Ещё",
+    "upgrade": "Улучшить",
+    "management": "Управление",
+    "account": "Аккаунт",
+    "support": "Поддержка",
+    "publishedDomains": "Опубликованные домены",
+    "security": "Безопасность",
+    "helpCenter": "Центр помощи",
+    "contactSupport": "Связаться с поддержкой",
+    "newProject": "Новый проект",
+    "new": "Новое",
+    "archive": "Архив"
+  },
+  "plans": {
+    "free": "Бесплатный",
+    "explorer": "Explorer",
+    "creator": "Creator",
+    "archive": "Архив"
+  }
+}

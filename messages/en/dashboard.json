@@ -1,38 +1,7 @@
 {
-  "nav": {
-    "dashboard": "Dashboard",
-    "projects": "Projects",
-    "templates": "Templates",
-    "analytics": "Analytics",
-    "domains": "Domains",
-    "profile": "Profile",
-    "billing": "Billing",
-    "settings": "Settings",
-    "helpSupport": "Help & Support",
-    "upgradePlan": "Upgrade Plan",
-    "logOut": "Log out",
-    "more": "More",
-    "upgrade": "Upgrade",
-    "management": "Management",
-    "account": "Account",
-    "support": "Support",
-    "publishedDomains": "Published Domains",
-    "security": "Security",
-    "helpCenter": "Help Center",
-    "contactSupport": "Contact Support",
-    "newProject": "New Project",
-    "new": "New",
-    "archive": "Archive"
-  },
-  "plans": {
-    "free": "Free",
-    "basic": "Basic",
-    "pro": "Pro",
-    "proPlus": "Pro+"
-  },
   "promo": {
-    "proPlanTitle": "Pro Plan",
-    "proPlanDescription": "Unlock analytics, custom domains, and unlimited projects.",
+    "creatorPlanTitle": "Creator Plan",
+    "creatorPlanDescription": "Unlock analytics, custom domains, and unlimited projects.",
     "viewAllPlans": "View All Plans"
   },
   "createCards": {
@@ -49,6 +18,10 @@
     },
     "creating": "Creating…",
     "create": "Create"
+  },
+  "createModal": {
+    "title": "New Creation",
+    "description": "Choose your format"
   },
   "greetings": {
     "midnight": "Burning the midnight oil?",
@@ -95,10 +68,14 @@
     },
     "edited": "Edited",
     "publish": "Publish",
-    "unpublish": "Unpublish"
+    "unpublish": "Unpublish",
+    "manageInSettings": "Manage in Settings"
   },
   "projects": {
     "title": "Projects",
+    "recentTitle": "Recent projects",
+    "recentDescription": "Pick up where you left off",
+    "viewAll": "View all →",
     "description": "All your photo books and portfolio sites in one place",
     "createPortfolio": "Create Portfolio",
     "createPhotobook": "Create Photobook",
@@ -119,7 +96,15 @@
       "draft": "Draft",
       "published": "Published"
     },
-    "trashNotice": "Projects in trash are permanently deleted on the 1st of the scheduled month. You can restore them at any time before that."
+    "trashNotice": "Projects in trash are permanently deleted on the 1st of the scheduled month. You can restore them at any time before that.",
+    "typePlaceholder": "Type",
+    "totalCount": "{count} Total",
+    "noResultsTitle": "No projects match your filters",
+    "noResultsDescription": "Try adjusting your search or filter criteria.",
+    "trashEmptyTitle": "Trash is empty",
+    "trashEmptyDescription": "Deleted projects will appear here before being permanently removed.",
+    "archiveEmptyTitle": "Archive is empty",
+    "archiveEmptyDescription": "Exported projects will appear here."
   },
   "templates": {
     "title": "Templates",
@@ -145,6 +130,16 @@
       "birthdays": "Birthdays",
       "minimal": "Minimal"
     }
+  },
+  "archive": {
+    "title": "Archive",
+    "exportsSummary": "Exported projects · {count} Total",
+    "empty": "Your archive is empty",
+    "createdOn": "Created on {date}",
+    "download": "Download",
+    "viewSite": "View site",
+    "edit": "Edit",
+    "live": "Live"
   },
   "domains": {
     "title": "Domains",

@@ -77,7 +77,7 @@ const PricingPage = () => {
               "Priority Infrastructure Support",
               "Evergreen Web Updates"
             ]}
-            buttonText="Go Pro"
+            buttonText="Start Archive"
             variant="outline"
           />
         </div>

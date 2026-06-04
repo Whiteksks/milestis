@@ -173,7 +173,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                   className="cursor-pointer rounded-lg"
                   onClick={() => router.push(`/${locale}/account/archive`)}
                 >
-                  <Settings className="mr-2 size-4" /> Manage in Settings
+                  <Settings className="mr-2 size-4" /> {t('project.manageInSettings')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -215,7 +215,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 onClick={handleRestore}
               >
                 <RotateCcw className="mr-1.5 size-3.5" />
-                Restore
+                {t('project.restore')}
               </Button>
               <Button
                 size="sm"
@@ -225,7 +225,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 onClick={() => setConfirmOpen(true)}
               >
                 <Trash2 className="mr-1.5 size-3.5" />
-                Delete
+                {t('project.delete')}
               </Button>
             </div>
             {/* Mode badge */}
@@ -253,7 +253,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 onClick={handleRestore}
               >
                 <RotateCcw className="size-3" />
-                Restore
+                {t('project.restore')}
               </Button>
               <Button
                 size="sm"
@@ -263,7 +263,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 onClick={() => setConfirmOpen(true)}
               >
                 <Trash2 className="size-3" />
-                Delete
+                {t('project.delete')}
               </Button>
             </div>
           </CardContent>

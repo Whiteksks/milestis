@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
+import { useLocale } from 'next-intl'
 import { useShallow } from "zustand/react/shallow"
 import { auth, db } from '@/lib/firebase'
 import { selectCurrentUid, selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
 import {
-  planDisplayName,
-  planDescription,
+  getPlanTranslationKey,
   isPaidPlan,
   formatResetDate,
-  subscriptionStatusLabel,
 } from "@/lib/billing/billing.utils"
 
 export interface BillingCreditsData {
@@ -237,6 +236,7 @@ function extractPaymentMethod(invoices: BillingInvoiceItem[]): BillingPaymentMet
 }
 
 export function useBilling() {
+  const locale = useLocale()
   const { profile, loading, uid } = useUserStore(
     useShallow((s) => ({
       profile: s.profile,
@@ -263,7 +263,7 @@ export function useBilling() {
         monthly: {
           used: 0,
           total: balance.subscription,
-          resetDate: formatResetDate(subscription?.currentPeriodEnd),
+          resetDate: formatResetDate(locale, subscription?.currentPeriodEnd),
         },
         bonus: { amount: balance.bonus },
         purchased: { amount: balance.purchased },
@@ -272,10 +272,8 @@ export function useBilling() {
 
   // ─── Plan ─────────────────────────────────────────────────────────────────
   const planTier = subscription?.planTier
-  const planName = planDisplayName(planTier)
-  const planDesc = planDescription(planTier)
+  const planKey = getPlanTranslationKey(planTier)
   const isPro = isPaidPlan(planTier)
-  const statusLabel = subscriptionStatusLabel(subscription ?? undefined)
   const transactions = transactionsQuery.data ?? []
   const creditHistory = transactions.filter(
     (transaction): transaction is BillingCreditHistoryItem => transaction.category === 'credit'
@@ -292,10 +290,8 @@ export function useBilling() {
     subscription,
     balance,
     creditsData,
-    planName,
-    planDesc,
+    planKey,
     isPro,
-    statusLabel,
     creditHistory,
     invoiceHistory,
     paymentMethod,

@@ -1,0 +1,125 @@
+{
+  "account": {
+    "menu": {
+      "profile": "Profile",
+      "account": "Account",
+      "billing": "Billing & Credits",
+      "archive": "Archive",
+      "appearance": "Appearance",
+      "security": "Security"
+    },
+    "settings": {
+      "preferences": {
+        "title": "Preferences",
+        "description": "Manage your language and regional interface settings."
+      },
+      "interfaceLanguage": {
+        "label": "Interface Language",
+        "description": "Select the language used for menus and system notifications.",
+        "note": "Note: This won't translate your project data."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Emails you would like to receive",
+        "items": {
+          "project_updates": {
+            "label": "Project Updates",
+            "desc": "Get notified when your published project status changes"
+          },
+          "project_reminders": {
+            "label": "Project Reminders",
+            "desc": "Reminders to continue working on unfinished projects"
+          },
+          "project_milestones": {
+            "label": "Project Milestones",
+            "desc": "Celebrate when your projects reach new view or share counts"
+          },
+          "whats_new": {
+            "label": "What's New",
+            "desc": "Feature announcements and platform updates"
+          },
+          "personalized_recommendations": {
+            "label": "Personalized Recommendations",
+            "desc": "Tips and template suggestions tailored to your work"
+          },
+          "seasonal_specials": {
+            "label": "Seasonal Specials",
+            "desc": "Holiday themes, limited-time offers and special collections"
+          }
+        }
+      },
+      "save": {
+        "saving": "Saving…",
+        "saveSettings": "Save Settings"
+      },
+      "data": {
+        "title": "Data & Export",
+        "description": "Download your account information and project data",
+        "downloadAccountData": "Download Account Data",
+        "selectProject": "Select a project…",
+        "exportProjectContent": "Export Project",
+        "descriptionLong": "Account data includes your profile, preferences, and usage history. Project export includes design content and publish history."
+      },
+      "danger": {
+        "title": "Danger Zone",
+        "description": "Permanent actions that cannot be undone",
+        "deleteTitle": "Delete your account",
+        "deleteDescription": "This will permanently remove all your projects and data.",
+        "deleteButton": "Delete Account"
+      }
+    },
+    "security": {
+      "signIn": {
+        "title": "Sign-in Methods",
+        "description": "Manage how you access your Milestis account"
+      },
+      "email": {
+        "title": "Email (Magic Link)",
+        "description": "Sign in securely using a magic link sent to your email",
+        "placeholder": "your@email.com",
+        "sending": "Sending…",
+        "sendButton": "Send link",
+        "checkInbox": "Check your inbox — a magic link was sent.",
+        "primary": "Primary",
+        "alwaysEnabled": "Always enabled"
+      },
+      "google": {
+        "title": "Google",
+        "description": "Sign in with your Google account",
+        "cannotDisconnectNote": "Add email access first before disconnecting Google.",
+        "connect": "Connect Google",
+        "disconnect": "Disconnect"
+      },
+      "note": {
+        "recoveryPrimary": "Your Magic Link email will always remain the primary way to recover your account."
+      }
+    },
+    "appearance": {
+      "title": "Color Theme",
+      "description": "Choose how Milestis looks for you",
+      "select": {
+        "syncing": "Syncing",
+        "manual": "Manual Selection",
+        "system": "Sync with System"
+      },
+      "themes": {
+        "light": {
+          "name": "Light",
+          "description": "Warm and cozy"
+        },
+        "cozy": {
+          "name": "Cozy",
+          "description": "Soft and muted"
+        },
+        "dark": {
+          "name": "Dark",
+          "description": "Easy on the eyes"
+        }
+      },
+      "highContrast": {
+        "title": "High Contrast",
+        "description": "Make muted colors more vivid and borders sharper"
+      }
+    }
+  }
+}

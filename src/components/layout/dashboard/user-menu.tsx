@@ -15,18 +15,18 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
+import { normalizePlanTier } from "@/lib/billing/billing.utils"
 import { useUserStore } from "@/hooks/useUserStore"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { UserAvatar } from "@/components/shared/user-avatar"
 
-// Конфигурация тарифов
 const PLAN_CONFIG: Record<string, { labelKey: string; className: string }> = {
-  free:     { labelKey: "plans.free",  className: "bg-muted text-muted-foreground" },
-  basic:    { labelKey: "plans.basic", className: "bg-muted text-muted-foreground" },
-  pro:      { labelKey: "plans.pro",   className: "bg-primary/10 text-primary" },
-  pro_plus: { labelKey: "plans.proPlus",  className: "bg-primary/10 text-primary" },
+  free: { labelKey: "plans.free", className: "bg-muted text-muted-foreground" },
+  explorer: { labelKey: "plans.explorer", className: "bg-muted text-muted-foreground" },
+  creator: { labelKey: "plans.creator", className: "bg-primary/10 text-primary" },
+  archive: { labelKey: "plans.archive", className: "bg-primary/10 text-primary" },
 }
 
 // Конфигурация навигации
@@ -46,7 +46,7 @@ export function UserMenu() {
 
   // Данные пользователя
   const { displayName = " ", email = " " } = profile || {}
-  const planTier = profile?.subscription?.planTier
+  const planTier = normalizePlanTier(profile?.subscription?.planTier)
   const plan = planTier ? PLAN_CONFIG[planTier] : null
 
   const handleLogout = async () => {

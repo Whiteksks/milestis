@@ -20,6 +20,7 @@ import {
 } from "@/hooks/useProjectsQuery"
 import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
 import { QueryErrorBoundary } from "@/components/shared/query-error-boundary"
+import { useTranslations } from "next-intl"
 
 type View = "active" | "trash" | "archive"
 
@@ -70,37 +71,40 @@ function ViewToggleButton({
 }
 
 function NoResults() {
+  const t = useTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
         <Search className="size-6 text-muted-foreground" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">No projects match your filters</h3>
-      <p className="mt-2 text-sm text-muted-foreground">Try adjusting your search or filter criteria.</p>
+      <h3 className="mt-5 font-serif text-xl">{t('projects.noResultsTitle')}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{t('projects.noResultsDescription')}</p>
     </div>
   )
 }
 
 function TrashEmpty() {
+  const t = useTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
         <Trash2 className="size-6 text-muted-foreground" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">Trash is empty</h3>
-      <p className="mt-2 text-sm text-muted-foreground">Deleted projects will appear here before being permanently removed.</p>
+      <h3 className="mt-5 font-serif text-xl">{t('projects.trashEmptyTitle')}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{t('projects.trashEmptyDescription')}</p>
     </div>
   )
 }
 
 function ArchiveEmpty() {
+  const t = useTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
         <Archive className="size-6 text-muted-foreground" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">Archive is empty</h3>
-      <p className="mt-2 text-sm text-muted-foreground">Exported projects will appear here.</p>
+      <h3 className="mt-5 font-serif text-xl">{t('projects.archiveEmptyTitle')}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{t('projects.archiveEmptyDescription')}</p>
     </div>
   )
 }
@@ -157,6 +161,7 @@ function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string
 }
 
 export default function ProjectsPage() {
+  const t = useTranslations()
   const [view, setView] = useState<View>("active")
   // Used only for counts/badges — shares the same cache entries as Suspense inner components
   const { data: activeProjects = [] } = useActiveProjectsQuery()
@@ -179,10 +184,10 @@ export default function ProjectsPage() {
           {/* Row 1: Title and Count */}
           <div className="flex items-baseline gap-3">
             <h1 className="font-serif text-3xl md:text-5xl tracking-tight">
-              {view === "active" ? "Projects" : view === "archive" ? "Archive" : "Trash"}
+              {view === "active" ? t('projects.title') : view === "archive" ? t('archive.title') : t('projects.tabs.trash')}
             </h1>
             <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full">
-              {view === "active" ? activeProjects.length : view === "trash" ? trashedProjects.length : archivedProjects.length} Total
+              {t('projects.totalCount', { count: view === "active" ? activeProjects.length : view === "trash" ? trashedProjects.length : archivedProjects.length })}
             </span>
           </div>
 
@@ -193,7 +198,7 @@ export default function ProjectsPage() {
             <div className="relative w-full md:max-w-xs">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
               <Input
-                placeholder="Search projects..."
+                placeholder={t('projects.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-11 md:h-10 w-full rounded-full pl-9 bg-muted/50 border-none focus-visible:ring-1"
@@ -204,15 +209,15 @@ export default function ProjectsPage() {
             <div className={`flex items-center ${view === "active" ? "justify-between" : "justify-end"} md:justify-end gap-2 w-full md:w-auto`}>
               
               {/* Type Filter */}
-              {view === "active" ? (
+                {view === "active" ? (
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger className="h-10 w-[140px] rounded-full bg-muted/50 border-none">
-                    <SelectValue placeholder="Type" />
+                    <SelectValue placeholder={t('projects.typePlaceholder')} />
                   </SelectTrigger>
                   <SelectContent align="start" className="rounded-xl">
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="photobooks">Memory Books</SelectItem>
-                    <SelectItem value="portfolios">Portfolios</SelectItem>
+                    <SelectItem value="all">{t('projects.filters.all')}</SelectItem>
+                    <SelectItem value="photobooks">{t('projects.filters.photobooks')}</SelectItem>
+                    <SelectItem value="portfolios">{t('projects.filters.portfolios')}</SelectItem>
                   </SelectContent>
                 </Select>
               ) : null}
@@ -232,7 +237,7 @@ export default function ProjectsPage() {
                 <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-full ml-1">
                   <ViewToggleButton
                     id="archive"
-                    label="Archive"
+                    label={t('archive.title')}
                     activeWidth="w-[82px]"
                     icon={Archive}
                     currentView={view}
@@ -240,7 +245,7 @@ export default function ProjectsPage() {
                   />
                   <ViewToggleButton
                     id="trash"
-                    label="Trash"
+                    label={t('projects.tabs.trash')}
                     activeWidth="w-[68px]"
                     icon={Trash2}
                     currentView={view}

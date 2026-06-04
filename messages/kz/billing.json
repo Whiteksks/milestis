@@ -1,0 +1,109 @@
+{
+  "billing": {
+    "unavailable": "Биллинг тарихы уақытша қолжетімсіз.",
+    "noCredits": "Кредит операциялары әлі жоқ.",
+    "noInvoices": "Шоттар әлі жоқ.",
+    "project": "Жоба: {name}",
+    "reference": "ID {id}",
+    "creditsLabel": "кредит",
+    "totalAvailable": "Барлығы қолжетімді",
+    "usedOrder": "Соңғы операциялар ретімен пайдаланылады",
+    "balanceAfter": "Қалды: {total}",
+    "noDate": "—",
+    "types": {
+      "creditGrant": "Қосылды",
+      "creditSpend": "Кредит жұмсалды",
+      "creditExpire": "Кредит мерзімі аяқталды",
+      "creditAdjustmentIn": "Қолмен түзету (+)",
+      "creditAdjustmentOut": "Қолмен түзету (-)",
+      "credit": "Кредит операциясы",
+      "buyCredits": "Кредит сатып алу",
+      "subscriptionPayment": "Жазылымды жаңарту",
+      "refund": "Қайтарым",
+      "invoice": "Төлем"
+    },
+    "direction": {
+      "in": "Қосылды",
+      "out": "Жұмсалды",
+      "charge": "Шегеру",
+      "refund": "Қайтарым"
+    },
+    "pagination": {
+      "previous": "Артқа",
+      "next": "Келесі",
+      "page": "Бет {current} / {total}"
+    },
+    "tabs": {
+      "credits": "Кредит тарихы",
+      "invoices": "Шоттар және биллинг"
+    },
+    "history": {
+      "title": "Тарих",
+      "description": "Өткен кредит операциялары мен шоттар."
+    },
+    "plan": {
+      "title": "Жазылым",
+      "description": "Жоспарды, биллингті және төлем әдістерін басқарыңыз."
+    },
+    "planCard": {
+      "activeBadge": "Белсенді",
+      "upgrade": "Жаңарту",
+      "viewPlans": "Жоспарларды көру",
+      "manage": "Басқару"
+    },
+    "plans": {
+      "free": {
+        "name": "Тегін жоспар",
+        "desc": "Milestis-пен танысуға ыңғайлы. Әдемі фотоальбомдар жасап, естеліктеріңізбен бөлісіңіз."
+      },
+      "explorer": {
+        "name": "Explorer",
+        "desc": "Жеке қолдану мен шағын жобаларға арналған негізгі құралдар."
+      },
+      "creator": {
+        "name": "Creator",
+        "desc": "Кәсіби фотографтар мен визуалды әңгімелеушілерге арналған."
+      },
+      "archive": {
+        "name": "Archive",
+        "desc": "Ірі цифрлық архивтерді басқаратын студияларға арналған ең жоғары мүмкіндік."
+      }
+    },
+    "credits": {
+      "title": "Кредиттер",
+      "description": "Айлық, бонустық және сатып алынған кредиттерді қарап, басқарыңыз.",
+      "totalAvailable": "Барлығы қолжетімді",
+      "creditsLabel": "Кредиттер",
+      "balanceLabel": "Кредит балансы",
+      "expirationNotice": "Айлық кредиттер әр есептік кезең сайын жаңарып, келесі айға ауыспайды.",
+      "items": {
+        "monthly": {
+          "label": "Айлық",
+          "sub": "Барлығы {total} — жаңарады {resetDate}"
+        },
+        "bonus": {
+          "label": "Бонустық",
+          "sub": "Промо немесе сыйлық кредиттері"
+        },
+        "purchased": {
+          "label": "Сатып алынған",
+          "sub": "Бір реттік сатып алынған кредиттер"
+        }
+      }
+    },
+    "paymentMethodCard": {
+      "title": "Төлем әдісі",
+      "defaultBrand": "Карта",
+      "defaultType": "Банк картасы",
+      "expiry": "Мерзімі {date} дейін"
+    },
+    "statuses": {
+      "free": "Тегін",
+      "active": "Белсенді",
+      "cancelsAtPeriodEnd": "Кезең соңында тоқтайды",
+      "trialing": "Сынақ кезеңі",
+      "past_due": "Төлем мерзімі өткен",
+      "canceled": "Тоқтатылған"
+    }
+  }
+}

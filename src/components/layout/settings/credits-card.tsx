@@ -9,7 +9,7 @@ interface CreditsBreakdownProps {
 }
 
 export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps) {
-  const t = useTranslations("account.billing.credits")
+  const t = useTranslations("billing")
   const totalCredits = (monthly.total - monthly.used) + bonus.amount + purchased.amount
   const monthlyRemaining = monthly.total - monthly.used
   const monthlyPercentage = monthly.total > 0 ? (monthly.used / monthly.total) * 100 : 0
@@ -17,24 +17,24 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
   const types = [
     {
       icon: Sparkles,
-      labelKey: "items.monthly.label",
+      labelKey: "credits.items.monthly.label",
       value: monthlyRemaining,
-      subKey: "items.monthly.sub",
+      subKey: "credits.items.monthly.sub",
       subVars: { total: monthly.total, resetDate: monthly.resetDate },
       progress: monthlyPercentage,
     },
     {
       icon: Gift,
-      labelKey: "items.bonus.label",
+      labelKey: "credits.items.bonus.label",
       value: bonus.amount,
-      subKey: "items.bonus.sub",
+      subKey: "credits.items.bonus.sub",
       progress: null,
     },
     {
       icon: ShoppingBag,
-      labelKey: "items.purchased.label",
+      labelKey: "credits.items.purchased.label",
       value: purchased.amount,
-      subKey: "items.purchased.sub",
+      subKey: "credits.items.purchased.sub",
       progress: null,
     },
   ]
@@ -43,7 +43,7 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
     <div className="rounded-2xl bg-card p-6 shadow-sm">
       {/* Big total */}
       <div className="mb-8">
-        <p className="text-sm text-muted-foreground">{t("totalAvailable")}</p>
+        <p className="text-sm text-muted-foreground">{t("credits.totalAvailable")}</p>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="font-serif text-5xl font-bold leading-none">{totalCredits}</span>
           <span className="text-lg text-muted-foreground">{t("creditsLabel")}</span>

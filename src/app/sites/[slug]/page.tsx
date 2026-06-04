@@ -13,7 +13,6 @@ import { PublishedView, TokenGateForm } from "./published-view"
 import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
-import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
 
 interface Props {
   params: Promise<{ slug: string }>

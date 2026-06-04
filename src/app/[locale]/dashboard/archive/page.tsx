@@ -10,6 +10,7 @@ import { useProjectExportsQuery, useArchivedProjectsQuery, type DashboardProject
 import { cn } from "@/lib/utils"
 import { getProjectConfig } from "@/lib/projects/project-type-config"
 import { getPublishedProjectShareUrl } from "@/lib/slug"
+import { useTranslations } from "next-intl"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,7 @@ function ExportRow({
   record: ProjectExportRecord; 
   project?: DashboardProject 
 }) {
+  const t = useTranslations()
   const config = getProjectConfig(record.mode)
   
   // Единая логика формирования ссылки через live-функцию
@@ -52,13 +54,13 @@ function ExportRow({
             </Badge>
           </div>
           <p className="text-[11px] text-muted-foreground/60 font-light italic">
-            Created on {formatDate(record.createdAt)}
+            {t('archive.createdOn', { date: formatDate(record.createdAt) })}
           </p>
         </div>
       </div>
 
       <div className="flex items-center gap-1 sm:gap-4 shrink-0">
-        {config.canDownloadFile ? (
+            {config.canDownloadFile ? (
           <Button
             variant="ghost"
             size="sm"
@@ -67,7 +69,7 @@ function ExportRow({
           >
             <a href={record.fileDownloadUrl} target="_blank" rel="noopener noreferrer" download>
               <Download className="size-3.5 sm:mr-2" />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">Download</span>
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">{t('archive.download')}</span>
             </a>
           </Button>
         ) : shareUrl ? ( // Используем shareUrl вместо record.publishedSlug
@@ -79,7 +81,7 @@ function ExportRow({
           >
 			      <a href={shareUrl} target="_blank" rel="noopener noreferrer">
               <Globe className="size-3.5 sm:mr-2" />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">View site</span>
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">{t('archive.viewSite')}</span>
             </a>
           </Button>
         ) : null}
@@ -110,6 +112,7 @@ export default function ExportsPage() {
   const locale = params.locale as string
   const { data: exports = [], isLoading } = useProjectExportsQuery()
   const { data: archivedProjects = [] } = useArchivedProjectsQuery()
+  const t = useTranslations()
 
   const archivedMap = new Map<string, typeof archivedProjects[number]>()
   for (const p of archivedProjects) archivedMap.set(p.id, p)
@@ -127,12 +130,12 @@ export default function ExportsPage() {
       <header className="relative mb-6 border-b border-border/30 pb-6">
         <div className="flex flex-col gap-4">
           <h1 className="font-serif text-4xl md:text-5xl font-light tracking-tighter italic">
-            Archive
+            {t('archive.title')}
           </h1>
           <div className="flex items-center gap-3">
             <div className="h-px w-12 bg-primary/30" />
             <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-              Exported projects · {exports.length} Total
+              {t('archive.exportsSummary', { count: exports.length })}
             </p>
           </div>
         </div>
@@ -141,9 +144,9 @@ export default function ExportsPage() {
       {isLoading ? (
         <ExportsSkeleton />
       ) : exports.length === 0 ? (
-        <div className="py-40 text-center border-t border-dashed border-border/60">
-           <p className="font-serif text-2xl italic text-muted-foreground/50">Your archive is empty</p>
-        </div>
+          <div className="py-40 text-center border-t border-dashed border-border/60">
+            <p className="font-serif text-2xl italic text-muted-foreground/50">{t('archive.empty')}</p>
+          </div>
       ) : (
         <div className="space-y-2">
           {grouped.map(([projectId, group]) => {
@@ -163,7 +166,7 @@ export default function ExportsPage() {
                   <h2 className="font-serif text-lg md:text-xl italic tracking-tight leading-none">
                     {group.projectName}
                   </h2>
-                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                     {shareUrl && (
                       <a
                         href={shareUrl}
@@ -171,14 +174,14 @@ export default function ExportsPage() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.2em] text-primary/70 hover:text-primary transition-colors"
                       >
-                        <Globe className="size-2.5" /> Live
+                        <Globe className="size-2.5" /> {t('archive.live')}
                       </a>
                     )}
                     <Link
                       href={`/${locale}/design/${projectId}/edit`}
                       className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors"
                     >
-                      Edit <ArrowUpRight className="size-2.5" />
+                      {t('archive.edit')} <ArrowUpRight className="size-2.5" />
                     </Link>
                   </div>
                 </aside>

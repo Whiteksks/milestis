@@ -1,0 +1,109 @@
+{
+  "billing": {
+    "unavailable": "Billing history is temporarily unavailable.",
+    "noCredits": "No credit transactions found.",
+    "noInvoices": "No invoices found.",
+    "project": "Project: {name}",
+    "reference": "Ref {id}",
+    "creditsLabel": "credits",
+    "totalAvailable": "Total available",
+    "usedOrder": "Used for recent orders",
+    "balanceAfter": "{total} left",
+    "noDate": "—",
+    "types": {
+      "creditGrant": "Granted",
+      "creditSpend": "Credits spent",
+      "creditExpire": "Expired",
+      "creditAdjustmentIn": "Adjustment (In)",
+      "creditAdjustmentOut": "Adjustment (Out)",
+      "credit": "Credit Transaction",
+      "buyCredits": "Bought Credits",
+      "subscriptionPayment": "Subscription Renewal",
+      "refund": "Refund",
+      "invoice": "Invoice Payment"
+    },
+    "direction": {
+      "in": "Received",
+      "out": "Used",
+      "charge": "Charge",
+      "refund": "Refund"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}"
+    },
+    "tabs": {
+      "credits": "Credits History",
+      "invoices": "Invoices & Billing"
+    },
+    "history": {
+      "title": "History",
+      "description": "Past credit transactions and invoices."
+    },
+    "plan": {
+      "title": "Subscription",
+      "description": "Manage your plan, billing, and payment methods."
+    },
+    "planCard": {
+      "activeBadge": "Active",
+      "upgrade": "Upgrade",
+      "viewPlans": "View plans",
+      "manage": "Manage"
+    },
+    "plans": {
+      "free": {
+        "name": "Free Plan",
+        "desc": "Perfect for trying out Milestis. Create beautiful photo books and share your memories."
+      },
+      "explorer": {
+        "name": "Explorer",
+        "desc": "Essential tools for individuals and small personal projects."
+      },
+      "creator": {
+        "name": "Creator",
+        "desc": "Designed for professional photographers and visual storytellers."
+      },
+      "archive": {
+        "name": "Archive",
+        "desc": "Maximum capacity for studios managing large-scale digital legacies."
+      }
+    },
+    "credits": {
+      "title": "Credits",
+      "description": "View and manage your monthly, bonus, and purchased credits.",
+      "totalAvailable": "Total available",
+      "creditsLabel": "Credits",
+      "balanceLabel": "Credits balance",
+      "expirationNotice": "Monthly credits refresh each billing period and do not roll over to the next month.",
+      "items": {
+        "monthly": {
+          "label": "Monthly",
+          "sub": "{total} total — resets on {resetDate}"
+        },
+        "bonus": {
+          "label": "Bonus",
+          "sub": "Promotional or gifted credits"
+        },
+        "purchased": {
+          "label": "Purchased",
+          "sub": "One-time bought credits"
+        }
+      }
+    },
+    "paymentMethodCard": {
+      "title": "Payment Method",
+      "defaultBrand": "Card",
+      "defaultType": "Credit Card",
+      "expiry": "Exp: {date}"
+    },
+    "statuses": {
+      "free": "Free",
+      "active": "Active",
+      "cancelsAtPeriodEnd": "Cancels at period end",
+      "trialing": "Trial",
+      "past_due": "Past due",
+      "canceled": "Canceled"
+    }
+  }
+}

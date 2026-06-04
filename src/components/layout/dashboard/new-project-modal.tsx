@@ -8,6 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import type { ProjectMode } from "@/lib/projects/project-type-config"
+import { useTranslations } from "next-intl"
 
 interface NewProjectModalProps {
   open: boolean
@@ -16,18 +17,18 @@ interface NewProjectModalProps {
 
 const options: {
   mode: ProjectMode
-  title: string
-  description: string
+  titleKey: string
+  descriptionKey: string
 }[] = [
   {
     mode: "photobook",
-    title: "Memory Book",
-    description: "A timeless digital experience to preserve your most cherished stories.",
+    titleKey: "createCards.photobook.title",
+    descriptionKey: "createCards.photobook.description",
   },
   {
     mode: "portfolio",
-    title: "Portfolio site",
-    description: "A sleek, modern website to showcase your work and achievements.",
+    titleKey: "createCards.portfolio.title",
+    descriptionKey: "createCards.portfolio.description",
   },
 ]
 
@@ -36,6 +37,7 @@ function OptionCard({ opt, loadingMode, onCreate }: {
   loadingMode: ProjectMode | null
   onCreate: (mode: ProjectMode) => void
 }) {
+  const t = useTranslations()
   const isLoading = loadingMode === opt.mode
   const isDisabled = !!loadingMode
 
@@ -52,10 +54,10 @@ function OptionCard({ opt, loadingMode, onCreate }: {
       {/* Топ: Текст */}
       <div className="space-y-2">
         <p className="font-serif text-2xl font-medium tracking-tight italic">
-          {opt.title}
+          {t(opt.titleKey)}
         </p>
         <p className="text-base text-muted-foreground/90 leading-relaxed font-light max-w-[280px]">
-          {opt.description}
+          {t(opt.descriptionKey)}
         </p>
       </div>
 
@@ -65,7 +67,7 @@ function OptionCard({ opt, loadingMode, onCreate }: {
           <Loader2 className="size-4 animate-spin" />
         ) : (
           <>
-            <span>Create</span>
+            <span>{t('createCards.create')}</span>
             <ArrowRight className="size-4 opacity-70 transition-transform duration-300 group-hover:translate-x-1" />
           </>
         )}
@@ -76,14 +78,16 @@ function OptionCard({ opt, loadingMode, onCreate }: {
 
 function ModalBody({ onClose: _onClose }: { onClose?: () => void }) {
   const { handleCreate, loadingMode } = useCreateProject()
+  const t = useTranslations()
 
   return (
     <div className="flex flex-col p-4 md:p-8">
       <header className="mb-14 space-y-2.5 text-center sm:text-left">
         <h2 className="font-serif text-3xl font-light tracking-tight italic">
-          New Creation
+          {t('createModal.title')}
         </h2>
         <div className="h-px w-14 bg-primary/20 mx-auto sm:mx-0" />
+        <p className="text-sm text-muted-foreground mt-2">{t('createModal.description')}</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

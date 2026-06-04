@@ -170,36 +170,33 @@ export default function AccountSettings() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-16 max-w-5xl mx-auto pb-12">
 
-      {/* Language */}
-      <section className="max-w-4xl space-y-6">
+      {/* Language Preferences */}
+      <section className="space-y-6">
         <div className="space-y-1 px-1">
-          <h2 className="font-serif text-2xl tracking-tight text-foreground">{t("preferences.title")}</h2>
-          <p className="text-sm text-muted-foreground">{t("preferences.description")}</p>
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("preferences.title")}</h2>
+          <p className="text-sm text-muted-foreground/90">{t("preferences.description")}</p>
         </div>
 
-        {/* Карточка настройки */}
-        <div className="group rounded-xl border border-border/50 bg-card p-5 shadow-sm transition-all hover:border-border/80">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="group rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:border-border/100 hover:shadow-md">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             
-            {/* Левая часть: Иконка и Текст (занимает всё свободное место) */}
-            <div className="flex flex-1 items-start gap-4">
-              <div className="mt-1 hidden rounded-md border border-border/50 p-2 shadow-sm sm:block">
-                <Globe className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            <div className="flex flex-1 items-center gap-4">
+              <div className="hidden rounded-xl border border-border/60 bg-secondary/30 p-2.5 shadow-sm sm:block transition-colors group-hover:bg-secondary">
+                <Globe className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[15px] font-semibold tracking-tight">{t("interfaceLanguage.label")}</Label>
-                <p className="max-w-[440px] text-xs leading-relaxed text-muted-foreground">
+                <Label className="text-[16px] font-semibold tracking-tight">{t("interfaceLanguage.label")}</Label>
+                <p className="max-w-xl text-xs leading-relaxed text-muted-foreground/80">
                   {t("interfaceLanguage.description")} 
-                  <span className="ml-1 text-primary/70 font-medium italic">{t("interfaceLanguage.note")}</span>
+                  <span className="ml-1.5 text-primary/80 font-medium italic">{t("interfaceLanguage.note")}</span>
                 </p>
               </div>
             </div>
 
-            {/* Правая часть: Компактный Switcher */}
-            <div className="w-full sm:w-auto sm:min-w-[180px]">
-              <div className="[&_button]:h-9 [&_button]:w-full [&_button]:justify-between [&_button]:px-3 [&_button]:text-sm">
+            <div className="w-full sm:w-auto sm:min-w-[200px]">
+              <div className="[&_button]:h-10 [&_button]:w-full [&_button]:justify-between [&_button]:px-4 [&_button]:text-sm [&_button]:rounded-full">
                 <LanguageSwitcher />
               </div>
             </div>
@@ -207,31 +204,31 @@ export default function AccountSettings() {
           </div>
         </div>
       </section>
-      {/* Notifications - Обновленный блок (2 колонки) */}
+
+      {/* Notifications */}
       <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">{t("notifications.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("notifications.description")}</p>
+        <div className="px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("notifications.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground/90">{t("notifications.description")}</p>
         </div>
         
-        {/* Здесь мы используем grid для создания 2 колонок на экранах md и больше */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {notificationItems.map(({ key, icon: Icon, labelKey, descKey }) => (
             <div 
               key={key} 
-              className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-card shadow-sm border border-border/40 hover:border-border transition-colors"
+              className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-card shadow-sm border border-border/50 hover:border-border/90"
             >
-              <div className="flex items-start gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Icon className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-4">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary/50 group-hover:bg-primary/10 transition-colors duration-300">
+                  <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                 </div>
-                <div className="flex flex-col gap-1 mt-0.5">
-                  <p className="font-medium leading-none">{t(labelKey)}</p>
-                  <p className="text-sm text-muted-foreground leading-snug">{t(descKey)}</p>
+                <div className="flex flex-col gap-0.5">
+                  <p className="font-medium text-[15px] leading-tight text-foreground">{t(labelKey)}</p>
+                  <p className="text-xs text-muted-foreground/80 leading-normal max-w-[260px] sm:max-w-none">{t(descKey)}</p>
                 </div>
               </div>
               <Switch
-                className="mt-1 shrink-0"
+                className="shrink-0 data-[state=checked]:bg-primary"
                 checked={notifications[key]}
                 onCheckedChange={(v) => toggle(key, v)}
               />
@@ -239,80 +236,81 @@ export default function AccountSettings() {
           ))}
         </div>
         
-        <div className="flex justify-end">
-          <Button className="rounded-full px-8" onClick={handleSaveSettings} disabled={saving}>
+        <div className="flex justify-end pt-2">
+          <Button className="rounded-full px-8 h-10 shadow-sm font-medium hover:opacity-90 transition-opacity" onClick={handleSaveSettings} disabled={saving}>
             {saving ? t("save.saving") : t("save.saveSettings")}
           </Button>
         </div>
       </section>
 
-      {/* Data */}
+      {/* Data Management */}
       <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">{t("data.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("data.description")}</p>
+        <div className="px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("data.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground/90">{t("data.description")}</p>
         </div>
-        <div className="rounded-2xl bg-card p-6 shadow-sm space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 rounded-full bg-transparent sm:w-auto"
-            onClick={handleExportAccountData}
-            disabled={exportingAccountData || exportingProjectContent || deletingAccount}
-          >
-            <Download className="h-4 w-4" />
-            {t("data.downloadAccountData")}
-          </Button>
+        <div className="rounded-2xl bg-card border border-border/50 p-6 shadow-sm space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <Button
+              variant="outline"
+              className="w-full justify-center gap-2 rounded-full bg-transparent h-10 sm:w-auto px-5 border-border/80 hover:bg-secondary/50 transition-colors"
+              onClick={handleExportAccountData}
+              disabled={exportingAccountData || exportingProjectContent || deletingAccount}
+            >
+              <Download className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{t("data.downloadAccountData")}</span>
+            </Button>
 
-          {exportableProjects.length > 0 && (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Select
-                value={selectedProjectId}
-                onValueChange={setSelectedProjectId}
-                disabled={exportingProjectContent || deletingAccount}
-              >
-                <SelectTrigger className="h-9 flex-1 rounded-full text-sm">
-                  <SelectValue placeholder={t("data.selectProject")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {exportableProjects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                className="shrink-0 gap-2 rounded-full bg-transparent"
-                onClick={handleExportProjectContent}
-                disabled={!selectedProjectId || exportingProjectContent || deletingAccount}
-              >
-                <Package className="h-4 w-4" />
-                {t("data.exportProjectContent")}
-              </Button>
-            </div>
-          )}
+            {exportableProjects.length > 0 && (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center w-full lg:w-auto">
+                <Select
+                  value={selectedProjectId}
+                  onValueChange={setSelectedProjectId}
+                  disabled={exportingProjectContent || deletingAccount}
+                >
+                  <SelectTrigger className="h-10 w-full sm:w-[220px] rounded-full text-sm border-border/80 px-4">
+                    <SelectValue placeholder={t("data.selectProject")} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {exportableProjects.map((p) => (
+                      <SelectItem key={p.id} value={p.id} className="rounded-lg">
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto shrink-0 gap-2 rounded-full bg-transparent h-10 px-5 border-border/80 hover:bg-secondary/50 transition-colors"
+                  onClick={handleExportProjectContent}
+                  disabled={!selectedProjectId || exportingProjectContent || deletingAccount}
+                >
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{t("data.exportProjectContent")}</span>
+                </Button>
+              </div>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t("data.descriptionLong")}</p>
+          <div className="border-t border-border/40 pt-4">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed">{t("data.descriptionLong")}</p>
+          </div>
         </div>
       </section>
 
       {/* Danger Zone */}
       <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl text-muted-foreground">{t("danger.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("danger.description")}</p>
+        <div className="px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-destructive/90">{t("danger.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground/90">{t("danger.description")}</p>
         </div>
-        <div className="rounded-2xl bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/[0.01] p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-medium">{t("danger.deleteTitle")}</p>
-              <p className="text-sm text-muted-foreground">{t("danger.deleteDescription")}</p>
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground text-[15px]">{t("danger.deleteTitle")}</p>
+              <p className="text-xs text-muted-foreground/80 max-w-xl leading-normal">{t("danger.deleteDescription")}</p>
             </div>
             <Button
-              variant="outline"
-              className="shrink-0 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
+              className="shrink-0 rounded-full h-10 px-6 border-destructive/60 text-primary-foreground hover:bg-destructive hover:text-destructive-foreground font-medium transition-all duration-200"
               onClick={handleDeleteAccount}
               disabled={deletingAccount || exportingAccountData || exportingProjectContent}
             >

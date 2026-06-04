@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 import { findPhotobookRepeatingImage, SlotImage } from '@/editor/image'
 import { SectionWrapper } from '@/editor/components/templates/primitives/section-wrapper'
@@ -18,59 +17,66 @@ interface GalleryMagazineProps {
 export function GalleryMagazine({ sectionContent, theme, imageContent }: GalleryMagazineProps) {
   const { gallery } = sectionContent
   const photos = gallery.photos ?? []
-  const [selectedImage, setSelectedImage] = useState<number | null>(null)
-  const selectedPhoto = selectedImage !== null ? photos[selectedImage] : undefined
-  const selectedManagedImage = selectedPhoto && imageContent
-    ? findPhotobookRepeatingImage(imageContent, 'gallery', selectedPhoto.id)
-    : undefined
 
-  // Распределяем фото по редакционной сетке
+  // Распределяем фото по строгой, но динамичной журнальной сетке
   const [feature, second, third, ...rest] = photos
 
   return (
     <SectionWrapper
       id="gallery"
       themeForeground={theme.foreground}
-      className={cn(theme.background, "selection:bg-current selection:text-background")}
+      className={cn(theme.background, "selection:bg-current selection:text-background antialiased")}
     >
-      <div className="max-w-[1600px] mx-auto px-6 @md:px-12 py-20 @md:py-32">
+      <div className="max-w-[1600px] mx-auto px-6 @md:px-12 @lg:px-20 py-20 @md:py-36">
         
         {/* Editorial Header */}
         <header className="mb-20 @md:mb-32">
           <Animate trigger="mount" direction="none" className="space-y-12">
-            <div className="flex items-center gap-4">
+            
+            {/* Meta Line */}
+            <div className="flex items-center justify-between gap-6">
               {gallery.label && (
-                <span className={cn("text-[10px] uppercase tracking-[0.5em] opacity-40", theme.fontBody)}>
+                <span className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.6em] opacity-50 block font-medium", theme.fontBody)}>
                   {gallery.label}
                 </span>
               )}
-              <div className="h-px flex-1 bg-current opacity-10" />
+              <div className="h-[0.5px] flex-1 bg-current opacity-10" />
               {photos.length > 0 && (
-                <span className={cn("text-[10px] opacity-20 font-mono", theme.fontBody)}>
-                  {String(photos.length).padStart(2, '0')}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] opacity-20 uppercase tracking-widest font-mono">Index</span>
+                  <span className={cn("text-[10px] @md:text-xs opacity-40 font-mono font-light", theme.fontBody)}>
+                    ({String(photos.length).padStart(2, '0')})
+                  </span>
+                </div>
               )}
             </div>
 
-            <div className="grid grid-cols-1 @lg:grid-cols-12 gap-8 items-end">
-              <div className="@lg:col-span-8">
+            {/* Title & Description Grid */}
+            <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 @lg:gap-16 items-start">
+              <div className="@lg:col-span-8 space-y-4">
                 {gallery.title && (
                   <h2 className={cn(
-                    "text-5xl @md:text-8xl @lg:text-9xl tracking-tighter leading-[0.85] uppercase",
+                    "text-5xl @md:text-7xl @lg:text-[92px] tracking-tightest leading-[0.85] uppercase break-words font-normal",
                     theme.fontTitle
                   )}>
                     {gallery.title.split(' ').map((word, i) => (
-                      <span key={i} className={cn("block", i % 2 !== 0 && "italic font-light ml-4 @md:ml-12")}>
+                      <span 
+                        key={i} 
+                        className={cn(
+                          "block transition-transform duration-500 hover:translate-x-2", 
+                          i % 2 !== 0 && "italic font-light @md:pl-16 opacity-90 text-serif"
+                        )}
+                      >
                         {word}
                       </span>
                     ))}
                   </h2>
                 )}
               </div>
-              <div className="@lg:col-span-4">
+              <div className="@lg:col-span-4 @lg:mt-4">
                 {gallery.description && (
                   <p className={cn(
-                    "text-sm @md:text-base opacity-50 max-w-sm leading-relaxed border-l border-current pl-6 py-2",
+                    "text-xs @md:text-sm opacity-60 max-w-sm leading-relaxed border-l-2 border-current/20 pl-6 py-2 font-light",
                     theme.fontBody
                   )}>
                     {gallery.description}
@@ -81,116 +87,122 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
           </Animate>
         </header>
 
-        <div className="space-y-24 @md:space-y-40">
-          {/* 1. Hero Section - Cinematic 21:9 */}
+        {/* Сетка медиа-контента */}
+        <div className="space-y-20 @md:space-y-36">
+          
+          {/* 1. Главный панорамный кадр (Cinematic 21:9 / Роскошный оверсайз) */}
           {feature && (
             <Animate trigger="mount" direction="up" distance={40}>
               {(() => {
                 const featureImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', feature.id) : undefined
 
                 return (
-              <div 
-                className="group relative cursor-zoom-in"
-                onClick={() => setSelectedImage(0)}
-              >
-                <div className="relative aspect-[21/9] overflow-hidden bg-muted">
-                  {featureImage?.value.asset.src ? (
-                  <SlotImage
-                    slotId={featureImage.slotId}
-                    value={featureImage.value}
-                    fillParent
-                    alt={feature.caption ?? ''}
-                    imageClassName="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                  />
-                  ) : (
-                    <div className="absolute inset-0 bg-muted" />
-                  )}
-                </div>
-                <div className="mt-6 flex justify-between items-start">
-                  <div className="flex items-center gap-4">
-                    <span className="text-[10px] opacity-30 font-mono">01</span>
-                    <div className="h-px w-8 bg-current opacity-20" />
+                  <div className="group relative w-full">
+                    <div className="relative aspect-[21/9] @md:aspect-[16/9] overflow-hidden bg-current/[0.02] rounded-[2px] transition-all duration-700 ring-1 ring-current/5 group-hover:ring-current/10">
+                      {featureImage?.value.asset.src ? (
+                        <SlotImage
+                          slotId={featureImage.slotId}
+                          value={featureImage.value}
+                          fillParent
+                          alt={feature.caption ?? ''}
+                          imageClassName="object-cover transition-transform duration-[1200ms] ease-out scale-100 group-hover:scale-[1.015]"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-current/[0.03] animate-pulse" />
+                      )}
+                    </div>
+                    
+                    {/* Meta под главным кадром */}
+                    <div className="mt-5 flex justify-between items-baseline px-1">
+                      <div className="flex items-center gap-4">
+                        <span className="text-[10px] font-mono opacity-40 font-medium">01 // FEATURE</span>
+                      </div>
+                      {feature.caption && (
+                        <p className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.2em] opacity-40 text-right max-w-md truncate font-light", theme.fontBody)}>
+                          {feature.caption}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  {feature.caption && (
-                    <p className={cn("text-[11px] uppercase tracking-widest opacity-40 text-right max-w-xs", theme.fontBody)}>
-                      {feature.caption}
-                    </p>
-                  )}
-                </div>
-              </div>
                 )
               })()}
             </Animate>
           )}
 
-          {/* 2. Asymmetric Dual Row */}
+          {/* 2. Асимметричный парный блок (Журнальный ритм со смещением по вертикали) */}
           {(second || third) && (
-            <div className="grid grid-cols-1 @md:grid-cols-12 gap-6 @md:gap-12">
+            <div className="grid grid-cols-1 @md:grid-cols-12 gap-10 @md:gap-12 items-start">
+              
+              {/* Левое фото — шире и выше */}
               {second && (
-                <div className="@md:col-span-7">
-                  <Animate direction="up" delay={0.1}>
+                <div className="@md:col-span-7 w-full">
+                  <Animate direction="up" delay={0.05} distance={30}>
                     {(() => {
                       const secondImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', second.id) : undefined
 
                       return (
-                    <div className="group cursor-zoom-in" onClick={() => setSelectedImage(1)}>
-                      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                        {secondImage?.value.asset.src ? (
-                        <SlotImage
-                          slotId={secondImage.slotId}
-                          value={secondImage.value}
-                          fillParent
-                          alt={second.caption ?? ''}
-                          imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        ) : (
-                          <div className="absolute inset-0 bg-muted" />
-                        )}
-                      </div>
-                      <div className="mt-4 flex items-center gap-3">
-                        <span className="text-[9px] opacity-20 font-mono text-current">02</span>
-                        {second.caption && (
-                          <p className={cn("text-[9px] uppercase tracking-[0.3em] opacity-40", theme.fontBody)}>
-                            {second.caption}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                        <div className="group w-full">
+                          <div className="relative aspect-[4/5] overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5">
+                            {secondImage?.value.asset.src ? (
+                              <SlotImage
+                                slotId={secondImage.slotId}
+                                value={secondImage.value}
+                                fillParent
+                                alt={second.caption ?? ''}
+                                imageClassName="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.02]"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-current/[0.03]" />
+                            )}
+                          </div>
+                          <div className="mt-4 flex items-center gap-3 px-1">
+                            <span className="text-[10px] opacity-40 font-mono">02</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-current opacity-25" />
+                            {second.caption && (
+                              <p className={cn("text-[9px] uppercase tracking-[0.2em] opacity-50 truncate font-light", theme.fontBody)}>
+                                {second.caption}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       )
                     })()}
                   </Animate>
                 </div>
               )}
+              
+              {/* Правое фото — уже и изящно утоплено вниз на больших экранах */}
               {third && (
-                <div className="@md:col-span-5 @md:mt-32">
-                  <Animate direction="up" delay={0.2}>
+                <div className="@md:col-span-5 w-full @md:mt-24">
+                  <Animate direction="up" delay={0.15} distance={30}>
                     {(() => {
                       const thirdImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', third.id) : undefined
 
                       return (
-                    <div className="group cursor-zoom-in" onClick={() => setSelectedImage(2)}>
-                      <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                        {thirdImage?.value.asset.src ? (
-                        <SlotImage
-                          slotId={thirdImage.slotId}
-                          value={thirdImage.value}
-                          fillParent
-                          alt={third.caption ?? ''}
-                          imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        ) : (
-                          <div className="absolute inset-0 bg-muted" />
-                        )}
-                      </div>
-                      <div className="mt-4 flex items-center gap-3">
-                        <span className="text-[9px] opacity-20 font-mono text-current">03</span>
-                        {third.caption && (
-                          <p className={cn("text-[9px] uppercase tracking-[0.3em] opacity-40", theme.fontBody)}>
-                            {third.caption}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                        <div className="group w-full">
+                          <div className="relative aspect-[2/3] overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5">
+                            {thirdImage?.value.asset.src ? (
+                              <SlotImage
+                                slotId={thirdImage.slotId}
+                                value={thirdImage.value}
+                                fillParent
+                                alt={third.caption ?? ''}
+                                imageClassName="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.02]"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-current/[0.03]" />
+                            )}
+                          </div>
+                          <div className="mt-4 flex items-center gap-3 px-1">
+                            <span className="text-[10px] opacity-40 font-mono">03</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-current opacity-25" />
+                            {third.caption && (
+                              <p className={cn("text-[9px] uppercase tracking-[0.2em] opacity-50 truncate font-light", theme.fontBody)}>
+                                {third.caption}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       )
                     })()}
                   </Animate>
@@ -199,48 +211,58 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
             </div>
           )}
 
-          {/* 3. Masonry Grid for Rest */}
+          {/* 3. Равномерная бесконечная сетка (Динамический триптих) */}
           {rest.length > 0 && (
-            <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-x-8 gap-y-20 @md:gap-y-32">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-8 @md:gap-12 @lg:gap-16">
               {rest.map((block, index) => {
-                const isTall = index % 3 === 1;
                 const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', block.id) : undefined
+                const absoluteIndex = index + 3
+
+                // Чередуем пропорции кадров в рядах для ощущения живой верстки книги
+                const aspectClass = index % 3 === 1 ? "aspect-[3/4]" : "aspect-[4/5]"
+
                 return (
                   <Animate 
                     key={block.id} 
                     direction="up" 
-                    delay={index * 0.05}
-                    className={cn(isTall && "@lg:mt-24")}
+                    delay={(index % 3) * 0.08}
+                    distance={25}
                   >
-                    <div 
-                      className="group cursor-zoom-in"
-                      onClick={() => setSelectedImage(index + 3)}
-                    >
-                      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                    <div className="group relative w-full">
+                      <div className={cn("relative overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5 transition-all duration-500", aspectClass)}>
                         {galleryImage?.value.asset.src ? (
-                        <SlotImage
-                          slotId={galleryImage.slotId}
-                          value={galleryImage.value}
-                          fillParent
-                          alt={block.caption ?? ''}
-                          imageClassName="object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
+                          <SlotImage
+                            slotId={galleryImage.slotId}
+                            value={galleryImage.value}
+                            fillParent
+                            alt={block.caption ?? ''}
+                            imageClassName="object-cover transition-transform duration-[1000ms] group-hover:scale-[1.025]"
+                          />
                         ) : (
-                          <div className="absolute inset-0 bg-muted" />
+                          <div className="absolute inset-0 bg-current/[0.03]" />
                         )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                           {block.caption && (
-                             <p className="text-white text-[10px] uppercase tracking-widest leading-relaxed">
-                               {block.caption}
-                             </p>
-                           )}
+                        
+                        {/* Новое чистое наведение: вместо черного градиента — легкое элегантное тонирование */}
+                        <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-between p-6">
+                          <span className="text-[10px] font-mono text-current mix-blend-difference opacity-60">
+                            #{String(absoluteIndex + 1).padStart(2, '0')}
+                          </span>
+                          {block.caption && (
+                            <p className="text-current mix-blend-difference text-[9px] uppercase tracking-[0.2em] leading-relaxed font-medium max-w-[90%]">
+                              {block.caption}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <div className="mt-6 flex items-center gap-4">
-                        <span className="text-[10px] font-mono opacity-20">{String(index + 4).padStart(2, '0')}</span>
-                        <div className="h-px flex-1 bg-current opacity-10" />
+
+                      {/* Метаданные под карточкой в спокойном состоянии */}
+                      <div className="mt-4 flex items-center gap-3 px-1">
+                        <span className="text-[10px] font-mono opacity-40">{String(absoluteIndex + 1).padStart(2, '0')}</span>
+                        <div className="h-[0.5px] flex-1 bg-current opacity-10" />
                         {block.caption && (
-                          <span className={cn("text-[9px] uppercase tracking-[0.2em] opacity-40 truncate max-w-[16ch]", theme.fontBody)}>{block.caption}</span>
+                          <span className={cn("text-[9px] uppercase tracking-[0.15em] opacity-40 truncate max-w-[16ch] font-light", theme.fontBody)}>
+                            {block.caption}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -251,50 +273,24 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
           )}
         </div>
 
-        {/* Footer Navigation */}
-        <footer className="mt-40 pt-12 border-t border-current border-opacity-10 flex justify-between items-center">
-          <div className={cn("text-[10px] uppercase tracking-[0.5em] opacity-20", theme.fontBody)}>
-            {gallery.title}
+        {/* Editorial Footer */}
+        <footer className="mt-36 pt-12 border-t border-current/10 flex justify-between items-center px-1">
+          <div className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.5em] opacity-40 truncate max-w-[300px] font-medium", theme.fontBody)}>
+            {gallery.title || 'Editorial Archive'}
           </div>
+          
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="group w-8 h-8 rounded-full border border-current flex items-center justify-center opacity-40 hover:opacity-100 hover:-translate-y-1 transition-all"
+            className="group relative w-10 h-10 rounded-full border border-current/10 flex items-center justify-center opacity-50 hover:opacity-100 hover:border-current/40 transition-all duration-500"
             aria-label="Scroll to top"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            <span className="absolute inset-0 rounded-full bg-current/5 scale-0 group-hover:scale-100 transition-transform duration-500 ease-out" />
+            <svg className="w-3.5 h-3.5 text-current transition-transform duration-300 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
           </button>
         </footer>
       </div>
-
-      {/* Lightbox Modal */}
-      {selectedImage !== null && photos[selectedImage] && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative w-full h-full max-w-7xl max-h-[85vh]">
-            {selectedManagedImage?.value.asset.src && (
-              <SlotImage
-                fillParent
-                slotId={selectedManagedImage.slotId}
-                value={selectedManagedImage.value}
-                alt={selectedPhoto?.caption ?? ''}
-                imageClassName="object-contain"
-              />
-            )}
-          </div>
-          <div className="absolute bottom-10 left-10 right-10 flex justify-between items-center text-white/50">
-            <p className="text-[10px] uppercase tracking-widest">
-              {photos[selectedImage].caption}
-            </p>
-            <p className="font-mono text-[10px]">
-              {String(selectedImage + 1).padStart(2, '0')} / {String(photos.length).padStart(2, '0')}
-            </p>
-          </div>
-        </div>
-      )}
     </SectionWrapper>
   )
 }

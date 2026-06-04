@@ -94,54 +94,59 @@ export default function ProfileSettings() {
   }
 
   return (
-    <div className="space-y-12">
-      {/* Identity */}
+    <div className="space-y-16 max-w-5xl mx-auto pb-12">
+      
+      {/* Identity Section */}
       <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">{t('account.profile.title')}</h2>
-          <p className="mt-1 text-muted-foreground">{t('account.profile.subtitle')}</p>
+        <div className="space-y-1 px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t('account.profile.title')}</h2>
+          <p className="text-sm text-muted-foreground/90">{t('account.profile.subtitle')}</p>
         </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-colors duration-300 hover:border-border/100">
           {editing ? (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <UserAvatar shape="square" size="lg" />
+              <UserAvatar shape="square" size="lg" className="rounded-xl shadow-inner border border-border/40" />
 
-              <div className="flex-1 min-w-0 space-y-3">
-                <div className="space-y-1">
-                  <Label htmlFor="editName" className="text-xs text-muted-foreground">{t('account.profile.displayNameLabel')}</Label>
+              <div className="flex-1 min-w-0 space-y-3 w-full">
+                <div className="space-y-1.5">
+                  <Label htmlFor="editName" className="text-xs font-medium text-muted-foreground">{t('account.profile.displayNameLabel')}</Label>
                   <Input
                     id="editName"
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
-                    className="rounded-xl"
+                    className="rounded-xl h-10 transition-all border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary"
                   />
                 </div>
-                {editError && <p className="text-xs text-destructive">{editError}</p>}
+                {editError && <p className="text-xs font-medium text-destructive">{editError}</p>}
               </div>
 
-              <div className="flex gap-2 shrink-0">
-                <Button variant="outline" size="sm" className="rounded-full px-4" onClick={() => setEditing(false)} disabled={isSavingEdit}>
+              <div className="flex gap-2.5 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0">
+                <Button variant="outline" size="sm" className="rounded-full h-9 px-4 border-border/80 hover:bg-secondary/60 transition-colors" onClick={() => setEditing(false)} disabled={isSavingEdit}>
                   {t('account.profile.cancel')}
                 </Button>
-                <Button size="sm" className="rounded-full px-4" onClick={handleEditSave} disabled={isSavingEdit}>
+                <Button size="sm" className="rounded-full h-9 px-5 shadow-sm transition-opacity hover:opacity-90" onClick={handleEditSave} disabled={isSavingEdit}>
                   {isSavingEdit ? t('account.profile.saving') : t('account.profile.save')}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <UserAvatar shape="square" size="xl" uploadable />
+              <UserAvatar shape="square" size="xl" uploadable className="rounded-2xl shadow-sm border border-border/50" />
 
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-lg leading-tight truncate">{displayName || t('account.profile.yourName')}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{email}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{t('account.profile.loginEmail')}</span>
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="font-semibold text-xl tracking-tight leading-none text-foreground truncate">
+                  {displayName || t('account.profile.yourName')}
+                </p>
+                <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <span className="text-sm text-muted-foreground/90">{email}</span>
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary tracking-wide">
+                    {t('account.profile.loginEmail')}
+                  </span>
                 </div>
               </div>
 
-              <Button variant="outline" size="sm" className="rounded-full px-5 shrink-0" onClick={handleEditOpen}>
+              <Button variant="outline" size="sm" className="rounded-full h-9 px-5 shrink-0 border-border/80 hover:bg-secondary/60 transition-colors w-full sm:w-auto" onClick={handleEditOpen}>
                 {t('account.profile.editButton')}
               </Button>
             </div>
@@ -149,30 +154,30 @@ export default function ProfileSettings() {
         </div>
       </section>
 
-      {/* Public profile */}
+      {/* Public Profile Section */}
       <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">{t('account.publicProfile.title')}</h2>
-          <p className="mt-1 text-muted-foreground">{t('account.publicProfile.subtitle')}</p>
+        <div className="space-y-1 px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t('account.publicProfile.title')}</h2>
+          <p className="text-sm text-muted-foreground/90">{t('account.publicProfile.subtitle')}</p>
         </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-sm space-y-6">
+        <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm space-y-6 transition-colors duration-300 hover:border-border/100">
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="publicName" className="text-sm font-medium">{t('account.publicProfile.publicNameLabel')}</Label>
+              <Label htmlFor="publicName" className="text-sm font-medium text-foreground">{t('account.publicProfile.publicNameLabel')}</Label>
               <Input
                 id="publicName"
                 value={publicName}
                 onChange={e => setPublicName(e.target.value)}
                 placeholder={t('account.publicProfile.publicNamePlaceholder')}
-                className="rounded-xl"
+                className="rounded-xl h-10 border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary transition-all"
               />
-              <p className="text-xs text-muted-foreground">{t('account.publicProfile.canDiffer')}</p>
+              <p className="text-xs text-muted-foreground/70 pl-0.5">{t('account.publicProfile.canDiffer')}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
-                <MapPin className="size-4 text-muted-foreground" />
+              <Label htmlFor="location" className="text-sm font-medium text-foreground flex items-center gap-2">
+                <MapPin className="size-4 text-muted-foreground/80" />
                 {t('account.publicProfile.locationLabel')}
               </Label>
               <Input
@@ -180,31 +185,35 @@ export default function ProfileSettings() {
                 value={location}
                 onChange={e => setLocation(e.target.value)}
                 placeholder={t('account.publicProfile.locationPlaceholder')}
-                className="rounded-xl"
+                className="rounded-xl h-10 border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio" className="text-sm font-medium">{t('account.publicProfile.bioLabel')}</Label>
+            <Label htmlFor="bio" className="text-sm font-medium text-foreground">{t('account.publicProfile.bioLabel')}</Label>
             <Textarea
               id="bio"
               value={bio}
               onChange={e => setBio(e.target.value)}
               placeholder={t('account.publicProfile.bioPlaceholder')}
-              className="rounded-xl resize-none min-h-20"
+              className="rounded-xl resize-none min-h-[100px] p-3.5 border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary transition-all leading-relaxed"
               maxLength={160}
             />
-            <p className="text-xs text-muted-foreground text-right">{bio.length} / 160 {t('account.publicProfile.characters')}</p>
+            <p className="text-[11px] font-medium text-muted-foreground/60 text-right pr-1">
+              {bio.length} / 160 {t('account.publicProfile.characters')}
+            </p>
           </div>
 
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Social Links</Label>
-            <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
+          <div className="space-y-3 border-t border-border/40 pt-5">
+            <Label className="text-sm font-medium text-foreground pl-0.5">Social Links</Label>
+            <div className="rounded-xl bg-secondary/20 p-2 border border-border/30">
+              <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
+            </div>
           </div>
 
-          <div className="flex justify-end pt-2">
-            <Button className="rounded-full px-8" onClick={handleSave} disabled={isSavingProfile}>
+          <div className="flex justify-end pt-4 border-t border-border/40">
+            <Button className="rounded-full h-10 px-8 shadow-sm font-medium hover:opacity-90 transition-opacity" onClick={handleSave} disabled={isSavingProfile}>
               {isSavingProfile ? t('account.profile.saving') : t('account.profile.saveChanges')}
             </Button>
           </div>

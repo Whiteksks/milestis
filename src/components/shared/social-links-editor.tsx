@@ -137,18 +137,24 @@ export function SocialLinksEditor({
             )
           }
         return (
-          <div key={index} className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary transition-colors">
-              <Icon className="size-4 text-primary transition-all" />
-            </div>
-            <Input
-              value={link}
-              onChange={(e) => updateLink(index, e.target.value)}
-              onBlur={(e) => handleBlur(index, e.target.value)}
-              placeholder={placeholders?.[index] ?? `Social link ${index + 1}`}
-              className="rounded-xl flex-1"
-            />
+         <div 
+          key={index} 
+          className="flex items-center gap-3 group/link transition-colors p-1 rounded-2xl border border-transparent focus-within:bg-secondary/10"
+        >
+          {/* Контейнер иконки: плавно меняет фон при фокусе на инпут или ховере */}
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary/60 border border-border/40 transition-colors duration-300 group-focus-within/link:bg-primary/10 group-focus-within/link:border-primary/20 group-hover/link:bg-secondary">
+            <Icon className="size-4 text-muted-foreground/80 transition-colors duration-300 group-focus-within/link:text-primary group-hover/link:text-foreground" />
           </div>
+          
+          {/* Инпут: аккуратная граница и мягкое свечение при фокусе */}
+          <Input
+            value={link}
+            onChange={(e) => updateLink(index, e.target.value)}
+            onBlur={(e) => handleBlur(index, e.target.value)}
+            placeholder={placeholders?.[index] ?? `Social link ${index + 1}`}
+            className="rounded-xl h-10 flex-1 border-border/80 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary focus-visible:bg-background transition-all duration-200"
+          />
+        </div>
         )
       })}
     </div>

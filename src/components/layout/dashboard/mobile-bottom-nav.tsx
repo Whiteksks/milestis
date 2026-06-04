@@ -141,8 +141,8 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
         <div className="flex-1 overflow-y-auto p-4 mt-2">
             {/* Баннер апгрейда */}
             <PromoCard
-            title={t('promo.proPlanTitle')}
-            description={t('promo.proPlanDescription')}
+            title={t('promo.creatorPlanTitle')}
+            description={t('promo.creatorPlanDescription')}
             ctaText={t('promo.viewAllPlans')}
             href={withLocale(locale, "/pricing")}
             onClick={() => setOpen(false)}

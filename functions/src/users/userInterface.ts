@@ -1,12 +1,12 @@
 import { FieldValue } from "firebase-admin/firestore";
 
 // --- Вспомогательные типы ---
-export type SubscriptionTier = "free" | "basic" | "pro" | "pro_plus";
+export type SubscriptionTier = "free" | "explorer" | "creator" | "archive";
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "paused" | "canceled";
 
 export interface UserSubscription {
   priceId?: string; // paddle price id (absent for free tier)
-  planTier: SubscriptionTier; // free/basic/pro/pro_plus
+  planTier: SubscriptionTier; // free/explorer/creator/archive
   status: SubscriptionStatus;
   nextBillDate?: FieldValue;
   cancelAtPeriodEnd?: boolean;

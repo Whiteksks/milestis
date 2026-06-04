@@ -30,9 +30,11 @@ export interface UserSubscriptionFeatures {
   prioritySupport: boolean;
 }
 
+export type SubscriptionPlanTier = "free" | "explorer" | "creator" | "archive";
+
 export interface UserSubscription {
   planId: string;
-  planTier: "free" | "basic" | "pro" | "pro_plus";
+  planTier: SubscriptionPlanTier;
   status: "active" | "trialing" | "past_due" | "canceled";
   gracePeriodEnd?: Date | null;
   trialEnd?: Date | null;

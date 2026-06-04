@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "templates": "Templates",
+    "analytics": "Analytics",
+    "domains": "Domains",
+    "profile": "Profile",
+    "billing": "Billing",
+    "settings": "Settings",
+    "helpSupport": "Help & Support",
+    "upgradePlan": "Upgrade Plan",
+    "logOut": "Log out",
+    "more": "More",
+    "upgrade": "Upgrade",
+    "management": "Management",
+    "account": "Account",
+    "support": "Support",
+    "publishedDomains": "Published Domains",
+    "security": "Security",
+    "helpCenter": "Help Center",
+    "contactSupport": "Contact Support",
+    "newProject": "New Project",
+    "new": "New",
+    "archive": "Archive"
+  },
+  "plans": {
+    "free": "Free",
+    "explorer": "Explorer",
+    "creator": "Creator",
+    "archive": "Archive"
+  }
+}
