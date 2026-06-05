@@ -4,13 +4,15 @@ export interface BackgroundPreset {
   id: string
   name: string
   description: string
+  nameKey?: string
+  descriptionKey?: string
   tags: string[]
   depth: DepthEffect
   rays: RayEffect
   texture: TextureEffect
   theme: BackgroundLayersTheme
 }
-export const BACKGROUND_PRESETS: BackgroundPreset[] = [
+const rawBackgroundPresets: BackgroundPreset[] = [
   {
     id: 'clean',
     name: 'Clean',
@@ -96,3 +98,9 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
     depth: 'radial-glow', rays: 'caustics', texture: 'grain', theme: 'light',
   },
 ]
+
+export const BACKGROUND_PRESETS: BackgroundPreset[] = rawBackgroundPresets.map((preset) => ({
+  ...preset,
+  nameKey: preset.nameKey ?? `editor.paletteLabels.backgroundPresets.${preset.id}.name`,
+  descriptionKey: preset.descriptionKey ?? `editor.paletteLabels.backgroundPresets.${preset.id}.description`,
+}))

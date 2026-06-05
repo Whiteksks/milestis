@@ -23,9 +23,9 @@ const BUBBLE_SHAPES = [
 ] as const
 
 export const BUBBLE_STYLE_OPTIONS = [
-  { id: "soft", label: "Soft Orb" },
-  { id: "glass", label: "Glass Orb" },
-  { id: "memory", label: "Memory Orb" },
+  { id: "soft", label: "Soft Orb", labelKey: 'editor.controls.decorations.bubbleStyles.soft' },
+  { id: "glass", label: "Glass Orb", labelKey: 'editor.controls.decorations.bubbleStyles.glass' },
+  { id: "memory", label: "Memory Orb", labelKey: 'editor.controls.decorations.bubbleStyles.memory' },
 ] as const
 
 const BUBBLE_STYLE_CLASSES = {

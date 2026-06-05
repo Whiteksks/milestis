@@ -1,7 +1,7 @@
 'use client'
 
 import { useThemeSelector } from '@/editor/lib/store'
-import { themes } from '@/editor/lib/config/themes'
+import { useLocalizedThemes } from '@/editor/hooks/use-localized-editor-config'
 import type { Theme } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,7 @@ interface ThemeSelectorContentProps {
 }
 
 export function ThemeSelectorContent({ onClose }: ThemeSelectorContentProps) {
+  const localizedThemes = useLocalizedThemes()
   const { currentTheme, setTheme } = useThemeSelector((state) => ({
     currentTheme: state.currentTheme,
     setTheme: state.setTheme,
@@ -24,7 +25,7 @@ export function ThemeSelectorContent({ onClose }: ThemeSelectorContentProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-        {themes.map((theme) => {
+        {localizedThemes.map((theme) => {
           const isSelected = currentTheme === theme.id
 
           return (

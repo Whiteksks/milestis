@@ -2,6 +2,7 @@
 
 import { memo, useId } from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useTranslations } from 'next-intl'
 
 import { Button } from "@/components/ui/button"
 import { MediaPickerModal } from "../Modals/media-picker-modal"
@@ -42,6 +43,7 @@ import type { DecorationElement } from "../decorationEdit/decorationTypes"
 import { clamp } from "../decorationEdit/utils"
 import { useDecorationToolbar } from "../../../../hooks/use-decoration-toolbar"
 import { BUBBLE_STYLE_OPTIONS } from "../decorationEdit/decoration-visual"
+import { localizeOptions, useEditorTranslationResolver } from '@/editor/hooks/use-localized-editor-config'
 
 // Module-level constants — не пересоздаются при каждом рендере
 const ICON_BTN = "h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
@@ -81,24 +83,25 @@ function DecorationPicker({
   onPick,
   variant,
 }: DecorationPickerProps) {
+  const t = useTranslations('editor.controls.decorations')
   const trigger =
     variant === "compact" ? (
       <Button
         type="button"
         variant="ghost"
         className="h-8 px-2.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-        aria-label="Select decoration"
+        aria-label={t('selectDecoration')}
       >
-        <span className="text-xs font-medium">{activeName || "Select decoration"}</span>
+        <span className="text-xs font-medium">{activeName || t('selectDecoration')}</span>
         <ChevronDown className="ml-1 h-3.5 w-3.5" />
       </Button>
     ) : (
       <Button
         variant="outline"
         className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
-        aria-label="Select decoration"
+        aria-label={t('selectDecoration')}
       >
-        <span>{activeName || "Select"}</span>
+        <span>{activeName || t('select')}</span>
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
       </Button>
     )
@@ -112,7 +115,7 @@ function DecorationPicker({
         className={cn("rounded-xl", variant === "compact" ? "w-64" : "w-60")}
       >
         {variant === "compact" && (
-          <DropdownMenuLabel className="text-xs">Decorations</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-xs">{t('title')}</DropdownMenuLabel>
         )}
         <DropdownMenuRadioGroup
           value={activeDecorationId ?? ""}
@@ -120,7 +123,7 @@ function DecorationPicker({
         >
           {decorations.map((d, i) => (
             <DropdownMenuRadioItem key={d.id} value={d.id}>
-              {d.name || `Decoration ${i + 1}`}
+              {d.name || t('decorationName', { count: i + 1 })}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -162,13 +165,17 @@ export const DecorationToolbar = memo(function DecorationToolbar({
   onAddDecoration,
   className,
 }: DecorationToolbarProps) {
+  const t = useTranslations('editor.controls.decorations')
+  const tm = useTranslations('editor.controls.media')
+  const resolveLabel = useEditorTranslationResolver()
   const fallbackOwnerId = useId()
   const ownerId = decoration?.id ?? fallbackOwnerId
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   const editorMode = useUiStore((s) => s.editorMode)
   const isPhotobook = editorMode === 'photobook'
-  const imageButtonLabel = decoration?.kind === 'bubble' ? 'Add image' : 'Replace image'
+  const imageButtonLabel = decoration?.kind === 'bubble' ? tm('addImage') : tm('changeImage')
   const bubbleStyle = decoration?.bubbleStyle ?? 'soft'
+  const bubbleStyleOptions = localizeOptions(BUBBLE_STYLE_OPTIONS, resolveLabel)
 
   const {
     isExpanded,
@@ -207,8 +214,8 @@ export const DecorationToolbar = memo(function DecorationToolbar({
               type="button"
               variant="ghost"
               onClick={onAddDecoration}
-              aria-label="Add decoration"
-              title="Add decoration"
+              aria-label={t('addNew')}
+              title={t('addNew')}
               className={ICON_BTN}
             >
               <Plus className="h-4 w-4" />
@@ -232,7 +239,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
               variant="ghost"
               onClick={onOpenSettings}
               disabled={!activeDecorationId}
-              aria-label="Open decoration settings"
+              aria-label={t('openSettings')}
               className={ICON_BTN}
             >
               <ChevronRight className="h-4 w-4" />
@@ -276,7 +283,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
               </PopoverTrigger>
               <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 <div className="flex items-center justify-between mb-3">
-                  <Label className="text-xs text-muted-foreground">Scale</Label>
+                  <Label className="text-xs text-muted-foreground">{t('scale')}</Label>
                   <span className="text-xs tabular-nums text-muted-foreground">{scalePercent}%</span>
                 </div>
                 <Slider
@@ -298,7 +305,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
               </PopoverTrigger>
               <PopoverContent side="top" sideOffset={10} className="w-64 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 <div className="flex items-center justify-between mb-3">
-                  <Label className="text-xs text-muted-foreground">Opacity</Label>
+                  <Label className="text-xs text-muted-foreground">{t('opacity')}</Label>
                   <span className="text-xs tabular-nums text-muted-foreground">{opacityPercent}%</span>
                 </div>
                 <Slider
@@ -318,7 +325,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             <Button
               variant="ghost"
               onClick={toggleZIndex}
-              aria-label={isFront ? "Send to back" : "Bring to front"}
+              aria-label={isFront ? t('sendToBack') : t('bringToFront')}
               className={ICON_BTN}
             >
               {isFront ? <BringToFront className="h-4 w-4" /> : <SendToBack className="h-4 w-4" />}
@@ -347,7 +354,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
               <PopoverContent side="top" sideOffset={10} className="w-72 p-4 rounded-2xl border-border/60 shadow-lg m-1">
                 {/* Decoration Selector — единый источник, тот же DecorationPicker */}
                 <div className="mb-4">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Decoration</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">{t('title')}</Label>
                   <DecorationPicker
                     decorations={decorations}
                     activeDecorationId={activeDecorationId}
@@ -362,14 +369,14 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                 {decoration?.kind === 'bubble' && (
                   <>
                     <div className="mb-4">
-                      <Label className="text-xs text-muted-foreground mb-2 block">Bubble style</Label>
+                      <Label className="text-xs text-muted-foreground mb-2 block">{t('bubbleStyle')}</Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="outline"
                             className="w-full justify-between h-8 text-xs font-normal rounded-xl border-border/60"
                           >
-                            <span>{BUBBLE_STYLE_OPTIONS.find((option) => option.id === bubbleStyle)?.label ?? 'Soft Orb'}</span>
+                            <span>{bubbleStyleOptions.find((option) => option.id === bubbleStyle)?.label ?? t('bubbleStyles.soft')}</span>
                             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -378,7 +385,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                             value={bubbleStyle}
                             onValueChange={(value) => onUpdate?.({ bubbleStyle: value as DecorationElement['bubbleStyle'] })}
                           >
-                            {BUBBLE_STYLE_OPTIONS.map((option) => (
+                            {bubbleStyleOptions.map((option) => (
                               <DropdownMenuRadioItem key={option.id} value={option.id}>
                                 {option.label}
                               </DropdownMenuRadioItem>
@@ -395,9 +402,9 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                 {/* Mobile Adaptation */}
                 <label className="flex items-center justify-between gap-3 py-1 cursor-pointer">
                   <div>
-                    <div className="text-xs font-medium text-foreground">Mobile adaptation</div>
+                    <div className="text-xs font-medium text-foreground">{t('mobileAdaptation')}</div>
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Scale down on small screens
+                      {t('mobileAdaptationDescription')}
                     </div>
                   </div>
                   <Switch
@@ -418,7 +425,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     disabled={!onLocate}
                   >
                     <ScanSearch className="h-3.5 w-3.5 mr-2" />
-                    Locate on canvas
+                    {t('locateOnCanvas')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -427,7 +434,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
                     onClick={onDelete}
                   >
                     <Trash2 className="h-3.5 w-3.5 mr-2" />
-                    Delete
+                    {tm('deleteImage')}
                   </Button>
                 </div>
               </PopoverContent>
@@ -438,7 +445,7 @@ export const DecorationToolbar = memo(function DecorationToolbar({
             <Button
               variant="ghost"
               onClick={onCloseSettings}
-              aria-label="Close settings"
+              aria-label={tm('close')}
               className={ICON_BTN}
             >
               <ChevronLeft className="h-4 w-4" />

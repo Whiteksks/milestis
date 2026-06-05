@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useUiSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store/content'
 import { themes } from '@/editor/lib/config/themes'
+import { useLocalizedBackgroundPresets, useLocalizedPhotobookPresets, useLocalizedThemes } from '@/editor/hooks/use-localized-editor-config'
 import type { BackgroundPreset } from '@/editor/lib/config/background-presets'
 import type { DepthEffect, RayEffect, TextureEffect, PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '@/editor/components/editor/layout/background-layers/registry'
@@ -182,12 +183,14 @@ export function ThemesSection({
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
-  const t = useTranslations('editor.paletteLabels')
+  const localizedThemes = useLocalizedThemes()
+  const localizedThemeMap = new Map(localizedThemes.map((theme) => [theme.id, theme]))
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
       {items.map((theme) => {
         const isSelected = selectedId === theme.id
+        const localizedTheme = localizedThemeMap.get(theme.id) ?? theme
         return (
           <button
             key={theme.id}
@@ -202,7 +205,7 @@ export function ThemesSection({
           >
             <div className={cn('relative aspect-4/3 overflow-hidden flex items-center justify-center', theme.background)}>
               <div className={cn('text-xs font-semibold tracking-wide uppercase', theme.foreground, theme.fontTitle)}>
-                {theme.name}
+                {localizedTheme.name}
               </div>
 
               <div className={cn('absolute left-3 bottom-3 h-1.5 w-10 rounded-full opacity-80', theme.primary)} />
@@ -223,8 +226,8 @@ export function ThemesSection({
           </div>
 
             <div className="p-3">
-              <h3 className="text-sm font-medium text-card-foreground truncate">{theme.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1 truncate">{theme.description}</p>
+              <h3 className="text-sm font-medium text-card-foreground truncate">{localizedTheme.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1 truncate">{localizedTheme.description}</p>
             </div>
           </button>
         )
@@ -242,10 +245,14 @@ export function BackgroundsSection({
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
+  const localizedPresets = useLocalizedBackgroundPresets()
+  const localizedPresetMap = new Map(localizedPresets.map((preset) => [preset.id, preset]))
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
       {items.map((preset) => {
         const isSelected = selectedId === preset.id
+        const localizedPreset = localizedPresetMap.get(preset.id) ?? preset
 
         return (
           <button
@@ -272,8 +279,8 @@ export function BackgroundsSection({
             </div>
 
             <div className="p-3">
-              <h3 className="text-sm font-medium text-card-foreground truncate">{preset.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1 truncate">{preset.description}</p>
+              <h3 className="text-sm font-medium text-card-foreground truncate">{localizedPreset.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1 truncate">{localizedPreset.description}</p>
             </div>
           </button>
         )
@@ -304,6 +311,8 @@ function PhotobookPresetCardInner({
   onSelect: (id: string) => void
 }) {
   const t = useTranslations('editor.paletteLabels')
+  const localizedPresets = useLocalizedPhotobookPresets()
+  const localizedPreset = localizedPresets.find((item) => item.id === preset.id) ?? preset
 
   const filter =
     preset.mood !== 'none' ? getMoodFilter(preset.mood as PhotobookMood) : undefined
@@ -353,10 +362,10 @@ function PhotobookPresetCardInner({
       {/* Card body */}
       <div className="p-3 space-y-1.5">
         <h3 className="text-sm font-semibold text-card-foreground leading-tight">
-          {preset.name}
+          {localizedPreset.name}
         </h3>
         <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">
-          {preset.description}
+          {localizedPreset.description}
         </p>
         {(moodLabel || textureLabel) && (
           <div className="flex flex-wrap gap-1 pt-0.5">

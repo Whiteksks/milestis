@@ -13,6 +13,13 @@
 import type { LayerEffectDef } from './types'
 import type { DepthEffect, RayEffect, TextureEffect } from '@/editor/lib/types'
 
+function withLabelKeys<TId extends string>(baseKey: string, effects: LayerEffectDef<TId>[]): LayerEffectDef<TId>[] {
+  return effects.map((effect) => ({
+    ...effect,
+    labelKey: effect.labelKey ?? `${baseKey}.${effect.id}`,
+  }))
+}
+
 // ── Depth ─────────────────────────────────────────────────────────────────
 import { radialGlow }      from './effects/depth/radial-glow'
 import { vignette }        from './effects/depth/vignette'
@@ -42,16 +49,16 @@ import { woven }       from './effects/texture/woven'
 
 // ── Exports ───────────────────────────────────────────────────────────────
 
-export const DEPTH_EFFECTS: LayerEffectDef<DepthEffect>[] = [
+export const DEPTH_EFFECTS: LayerEffectDef<DepthEffect>[] = withLabelKeys('editor.controls.theme.portfolio.depthOptions', [
   radialGlow,
   vignette,
   ambientBlobs,
   asymmetricLight,
   aurora,
   horizon,
-]
+])
 
-export const RAYS_EFFECTS: LayerEffectDef<RayEffect>[] = [
+export const RAYS_EFFECTS: LayerEffectDef<RayEffect>[] = withLabelKeys('editor.controls.theme.portfolio.raysOptions', [
   diagonalRays,
   conicRays,
   softStreaks,
@@ -59,9 +66,9 @@ export const RAYS_EFFECTS: LayerEffectDef<RayEffect>[] = [
   caustics,
   godRays,
   prism,
-]
+])
 
-export const TEXTURE_EFFECTS: LayerEffectDef<TextureEffect>[] = [
+export const TEXTURE_EFFECTS: LayerEffectDef<TextureEffect>[] = withLabelKeys('editor.controls.theme.portfolio.textureOptions', [
   grain,
   dots,
   lines,
@@ -70,6 +77,6 @@ export const TEXTURE_EFFECTS: LayerEffectDef<TextureEffect>[] = [
   scanlines,
   diamondGrid,
   woven,
-]
+])
 
 

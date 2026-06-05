@@ -5,6 +5,8 @@ export interface PhotobookPreset {
   name: string
   /** One-line description shown below the card name in the design catalog. */
   description: string
+  nameKey?: string
+  descriptionKey?: string
   mood: PhotobookMood
   texture: PhotobookTexture
   tags?: string[]
@@ -16,7 +18,7 @@ export interface PhotobookPreset {
  * To add a new preset: append an entry here — it will appear in the
  * design catalog automatically.
  */
-export const PHOTOBOOK_PRESETS: PhotobookPreset[] = [
+const rawPhotobookPresets: PhotobookPreset[] = [
   {
     id: 'clean',
     name: 'Clean Slate',
@@ -114,6 +116,12 @@ export const PHOTOBOOK_PRESETS: PhotobookPreset[] = [
     tags: ['vibrant'],
   },
 ]
+
+export const PHOTOBOOK_PRESETS: PhotobookPreset[] = rawPhotobookPresets.map((preset) => ({
+  ...preset,
+  nameKey: preset.nameKey ?? `editor.paletteLabels.photobookPresets.${preset.id}.name`,
+  descriptionKey: preset.descriptionKey ?? `editor.paletteLabels.photobookPresets.${preset.id}.description`,
+}))
 
 /** Returns the preset whose mood + texture match the current theme settings, or null. */
 export function findMatchingPreset(

@@ -17,6 +17,7 @@ import {
 
 import { useThemeSelector, useUiSelector, type ThemeCustomizations } from '@/editor/lib/store'
 import { themes } from '@/editor/lib/config/themes'
+import { useLocalizedBackgroundPresets, useLocalizedPhotobookPresets, useLocalizedThemes } from '@/editor/hooks/use-localized-editor-config'
 import { BACKGROUND_PRESETS } from '@/editor/lib/config/background-presets'
 import type { BackgroundPreset } from '@/editor/lib/config/background-presets'
 import { getModeTemplates } from '@/editor/lib/modes'
@@ -35,6 +36,9 @@ import { BackgroundsSection, PhotobookPresetsSection, ThemesSection, TemplatesSe
 export function DesignCatalogModal() {
   const t = useTranslations('editor.modal.designCatalog')
   const translate = useTranslations()
+  const localizedThemes = useLocalizedThemes()
+  const localizedBackgroundPresets = useLocalizedBackgroundPresets()
+  const localizedPhotobookPresets = useLocalizedPhotobookPresets()
   const {
     isDesignModalOpen,
     designModalSection,
@@ -149,12 +153,12 @@ export function DesignCatalogModal() {
     [templates, currentTemplateId]
   )
   const currentThemeName = useMemo(
-    () => themes.find((t) => t.id === currentTheme)?.name ?? currentTheme ?? null,
-    [currentTheme]
+    () => localizedThemes.find((theme) => theme.id === currentTheme)?.name ?? currentTheme ?? null,
+    [currentTheme, localizedThemes]
   )
   const currentBackgroundName = useMemo(
-    () => BACKGROUND_PRESETS.find((p) => p.id === currentBackgroundPresetId)?.name ?? null,
-    [currentBackgroundPresetId],
+    () => localizedBackgroundPresets.find((p) => p.id === currentBackgroundPresetId)?.name ?? null,
+    [currentBackgroundPresetId, localizedBackgroundPresets],
   )
 
   const revertAll = () => {
@@ -260,15 +264,15 @@ export function DesignCatalogModal() {
     }
     if (designModalSection === 'themes') {
       if (!effectiveSelectedThemeId) return null
-      return themes.find((t) => t.id === effectiveSelectedThemeId)?.name ?? effectiveSelectedThemeId
+      return localizedThemes.find((theme) => theme.id === effectiveSelectedThemeId)?.name ?? effectiveSelectedThemeId
     }
     if (designModalSection === 'backgrounds') {
       if (isPhotobook) {
-        const preset = PHOTOBOOK_PRESETS.find((p) => p.id === effectivePhotobookPresetId)
+        const preset = localizedPhotobookPresets.find((p) => p.id === effectivePhotobookPresetId)
         return preset ? preset.name : null
       }
       if (!effectiveSelectedBackgroundId) return null
-      return BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)?.name ?? effectiveSelectedBackgroundId
+      return localizedBackgroundPresets.find((p) => p.id === effectiveSelectedBackgroundId)?.name ?? effectiveSelectedBackgroundId
     }
     return null
   }, [
@@ -278,6 +282,9 @@ export function DesignCatalogModal() {
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
     effectivePhotobookPresetId,
+    localizedBackgroundPresets,
+    localizedPhotobookPresets,
+    localizedThemes,
     templates,
   ])
 

@@ -62,7 +62,32 @@
           "moodDescription": "Жалпы түстік өңдеу.",
           "overlayTitle": "Фото қабаты",
           "overlayLabel": "Қабат",
-          "overlayDescription": "Фотографиялық текстура."
+          "overlayDescription": "Фотографиялық текстура.",
+          "moodOptions": {
+            "none": "Жоқ",
+            "warm": "Жылы",
+            "golden": "Алтын",
+            "cool": "Суық",
+            "muted": "Бәсең",
+            "fade": "Өңі кеткен",
+            "noir": "Нуар",
+            "vibrant": "Қанық",
+            "dreamy": "Арманшыл",
+            "earthy": "Табиғи"
+          },
+          "textureOptions": {
+            "none": "Жоқ",
+            "vignette": "Виньетка",
+            "matte": "Күңгірт",
+            "warmth": "Жылылық",
+            "silver": "Күміс",
+            "linen": "Зығыр",
+            "haze": "Тұман",
+            "grain": "Түйір",
+            "canvas": "Кенеп",
+            "velvet": "Барқыт",
+            "parchment": "Пергамент"
+          }
         },
         "portfolio": {
           "generalTitle": "Жалпы",
@@ -71,7 +96,68 @@
           "effectsTitle": "Әсерлер",
           "depthLabel": "Тереңдік",
           "raysLabel": "Сәулелер",
-          "textureLabel": "Текстура"
+          "textureLabel": "Текстура",
+          "depthOptions": {
+            "radial-glow": "Радиалды жарқыл",
+            "vignette": "Виньетка",
+            "ambient-blobs": "Жұмсақ пішіндер",
+            "asymmetric-light": "Асимметрия",
+            "aurora": "Аврора",
+            "horizon": "Көкжиек"
+          },
+          "raysOptions": {
+            "diagonal-rays": "Қиғаш сәулелер",
+            "conic-rays": "Конус сәулелер",
+            "soft-streaks": "Жұмсақ жолақтар",
+            "lens-flare": "Линза жарқылы",
+            "caustics": "Каустика",
+            "god-rays": "Құдай сәулелері",
+            "prism": "Призма"
+          },
+          "textureOptions": {
+            "grain": "Түйір",
+            "dots": "Нүктелер",
+            "lines": "Сызықтар",
+            "grid": "Тор",
+            "halftone": "Жарты тон",
+            "scanlines": "Скан жолақтары",
+            "diamond-grid": "Ромб",
+            "woven": "Тоқыма"
+          }
+        }
+      },
+      "decorations": {
+        "title": "Декорациялар",
+        "visualAccents": "Көрнекі акценттер",
+        "elementsCount": "{count} элемент",
+        "animation": "Анимация",
+        "scale": "Өлшем",
+        "opacity": "Мөлдірлік",
+        "addNew": "Қосу",
+        "select": "Таңдау",
+        "selectDecoration": "Декорацияны таңдау",
+        "openSettings": "Декорация баптауларын ашу",
+        "bringToFront": "Алдыңғы қабатқа шығару",
+        "sendToBack": "Артқы қабатқа жіберу",
+        "bubbleStyle": "Көпіршік стилі",
+        "mobileAdaptation": "Мобильге бейімдеу",
+        "mobileAdaptationDescription": "Кіші экрандарда кішірейту",
+        "locateOnCanvas": "Холсттан табу",
+        "quickPlacement": "Жылдам орналастыру",
+        "elementsLabel": "Элементтер ({count}/{limit})",
+        "clearAll": "Барлығын тазалау",
+        "unnamed": "Атаусыз",
+        "decorationName": "Декорация {count}",
+        "sizeShort": "Ө",
+        "opacityShort": "М",
+        "bubbleStyles": {
+          "soft": "Жұмсақ сфера",
+          "glass": "Шыны сфера",
+          "memory": "Естелік сферасы"
+        },
+        "animations": {
+          "none": "Жоқ",
+          "fade": "Пайда болу"
         }
       }
     }

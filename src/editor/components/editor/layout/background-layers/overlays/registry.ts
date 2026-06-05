@@ -10,11 +10,19 @@
 export interface PhotobookOption {
   id: string
   label: string
+  labelKey?: string
+}
+
+function withLabelKeys(baseKey: string, options: PhotobookOption[]): PhotobookOption[] {
+  return options.map((option) => ({
+    ...option,
+    labelKey: option.labelKey ?? `${baseKey}.${option.id}`,
+  }))
 }
 
 // ─── Colour Mood options ───────────────────────────────────────────────────
 
-export const MOOD_OPTIONS: PhotobookOption[] = [
+export const MOOD_OPTIONS: PhotobookOption[] = withLabelKeys('editor.controls.theme.photobook.moodOptions', [
   { id: 'none',    label: 'None' },
   { id: 'warm',    label: 'Warm' },
   { id: 'golden',  label: 'Golden' },
@@ -25,11 +33,11 @@ export const MOOD_OPTIONS: PhotobookOption[] = [
   { id: 'vibrant', label: 'Vibrant' },
   { id: 'dreamy',  label: 'Dreamy' },
   { id: 'earthy',  label: 'Earthy' },
-]
+])
 
 // ─── Photo Overlay options ─────────────────────────────────────────────────
 
-export const TEXTURE_OPTIONS: PhotobookOption[] = [
+export const TEXTURE_OPTIONS: PhotobookOption[] = withLabelKeys('editor.controls.theme.photobook.textureOptions', [
   { id: 'none',      label: 'None' },
   { id: 'vignette',  label: 'Vignette' },
   { id: 'matte',     label: 'Matte' },
@@ -41,4 +49,4 @@ export const TEXTURE_OPTIONS: PhotobookOption[] = [
   { id: 'canvas',    label: 'Canvas' },
   { id: 'velvet',    label: 'Velvet' },
   { id: 'parchment', label: 'Parchment' },
-]
+])

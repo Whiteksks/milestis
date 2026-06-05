@@ -1,5 +1,6 @@
 "use client"
 
+import { localizeOptions, useEditorTranslationResolver } from '@/editor/hooks/use-localized-editor-config'
 import { useThemeSelector } from "@/editor/lib/store"
 import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from "@/editor/components/editor/layout/background-layers/registry"
 import { MOOD_OPTIONS, TEXTURE_OPTIONS } from "@/editor/components/editor/layout/background-layers/overlays/registry"
@@ -18,6 +19,7 @@ import type {
  * Used by both the desktop pill and the mobile sheet.
  */
 export function usePortfolioThemeToolbar() {
+  const resolveLabel = useEditorTranslationResolver()
   const { themeCustomizations, updateThemeCustomization } = useThemeSelector((s) => ({
     themeCustomizations: s.themeCustomizations,
     updateThemeCustomization: s.updateThemeCustomization,
@@ -77,9 +79,9 @@ export function usePortfolioThemeToolbar() {
     setDepth,
     setRays,
     setTexture,
-    depthOptions: [{ id: "none", label: "None" }, ...DEPTH_EFFECTS],
-    raysOptions: [{ id: "none", label: "None" }, ...RAYS_EFFECTS],
-    textureOptions: [{ id: "none", label: "None" }, ...TEXTURE_EFFECTS],
+    depthOptions: [{ id: "none", label: resolveLabel('editor.controls.theme.none', 'None') }, ...localizeOptions(DEPTH_EFFECTS, resolveLabel)],
+    raysOptions: [{ id: "none", label: resolveLabel('editor.controls.theme.none', 'None') }, ...localizeOptions(RAYS_EFFECTS, resolveLabel)],
+    textureOptions: [{ id: "none", label: resolveLabel('editor.controls.theme.none', 'None') }, ...localizeOptions(TEXTURE_EFFECTS, resolveLabel)],
   }
 }
 
@@ -88,6 +90,7 @@ export function usePortfolioThemeToolbar() {
  * Used by both the desktop pill and the mobile sheet.
  */
 export function usePhotobookThemeToolbar() {
+  const resolveLabel = useEditorTranslationResolver()
   const { themeCustomizations, updateThemeCustomization } = useThemeSelector((s) => ({
     themeCustomizations: s.themeCustomizations,
     updateThemeCustomization: s.updateThemeCustomization,
@@ -114,7 +117,7 @@ export function usePhotobookThemeToolbar() {
     handleReset,
     setMood,
     setTexture,
-    moodOptions: MOOD_OPTIONS,
-    textureOptions: TEXTURE_OPTIONS,
+    moodOptions: localizeOptions(MOOD_OPTIONS, resolveLabel),
+    textureOptions: localizeOptions(TEXTURE_OPTIONS, resolveLabel),
   }
 }

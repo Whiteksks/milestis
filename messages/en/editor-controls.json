@@ -62,7 +62,32 @@
           "moodDescription": "Global colour grade.",
           "overlayTitle": "Photo Overlay",
           "overlayLabel": "Overlay",
-          "overlayDescription": "Photographic texture."
+          "overlayDescription": "Photographic texture.",
+          "moodOptions": {
+            "none": "None",
+            "warm": "Warm",
+            "golden": "Golden",
+            "cool": "Cool",
+            "muted": "Muted",
+            "fade": "Fade",
+            "noir": "Noir",
+            "vibrant": "Vibrant",
+            "dreamy": "Dreamy",
+            "earthy": "Earthy"
+          },
+          "textureOptions": {
+            "none": "None",
+            "vignette": "Vignette",
+            "matte": "Matte",
+            "warmth": "Warmth",
+            "silver": "Silver",
+            "linen": "Linen",
+            "haze": "Haze",
+            "grain": "Grain",
+            "canvas": "Canvas",
+            "velvet": "Velvet",
+            "parchment": "Parchment"
+          }
         },
         "portfolio": {
           "generalTitle": "General",
@@ -71,7 +96,68 @@
           "effectsTitle": "Effects",
           "depthLabel": "Depth",
           "raysLabel": "Rays",
-          "textureLabel": "Texture"
+          "textureLabel": "Texture",
+          "depthOptions": {
+            "radial-glow": "Radial Glow",
+            "vignette": "Vignette",
+            "ambient-blobs": "Ambient Blobs",
+            "asymmetric-light": "Asymmetric",
+            "aurora": "Aurora",
+            "horizon": "Horizon"
+          },
+          "raysOptions": {
+            "diagonal-rays": "Diagonal Rays",
+            "conic-rays": "Conic Rays",
+            "soft-streaks": "Streaks",
+            "lens-flare": "Lens Flare",
+            "caustics": "Caustics",
+            "god-rays": "God Rays",
+            "prism": "Prism"
+          },
+          "textureOptions": {
+            "grain": "Grain",
+            "dots": "Dots",
+            "lines": "Lines",
+            "grid": "Grid",
+            "halftone": "Halftone",
+            "scanlines": "Scanlines",
+            "diamond-grid": "Diamond",
+            "woven": "Woven"
+          }
+        }
+      },
+      "decorations": {
+        "title": "Decorations",
+        "visualAccents": "Visual accents",
+        "elementsCount": "{count, plural, one {# element} other {# elements}}",
+        "animation": "Animation",
+        "scale": "Scale",
+        "opacity": "Opacity",
+        "addNew": "Add New",
+        "select": "Select",
+        "selectDecoration": "Select decoration",
+        "openSettings": "Open decoration settings",
+        "bringToFront": "Bring to front",
+        "sendToBack": "Send to back",
+        "bubbleStyle": "Bubble style",
+        "mobileAdaptation": "Mobile adaptation",
+        "mobileAdaptationDescription": "Scale down on small screens",
+        "locateOnCanvas": "Locate on canvas",
+        "quickPlacement": "Quick Placement",
+        "elementsLabel": "Elements ({count}/{limit})",
+        "clearAll": "Clear All",
+        "unnamed": "Unnamed",
+        "decorationName": "Decoration {count}",
+        "sizeShort": "S",
+        "opacityShort": "O",
+        "bubbleStyles": {
+          "soft": "Soft Orb",
+          "glass": "Glass Orb",
+          "memory": "Memory Orb"
+        },
+        "animations": {
+          "none": "None",
+          "fade": "Fade In"
         }
       }
     }

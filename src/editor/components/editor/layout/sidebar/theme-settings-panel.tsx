@@ -5,13 +5,12 @@ import { useTranslations } from 'next-intl'
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
 import { RotateCcw, Sun, Sparkles, ChevronDown } from 'lucide-react'
-import { DEPTH_EFFECTS, RAYS_EFFECTS, TEXTURE_EFFECTS } from '../background-layers/registry'
 import type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '@/editor/lib/types'
-import { MOOD_OPTIONS, TEXTURE_OPTIONS } from '@/editor/components/editor/layout/background-layers/overlays/registry'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { EffectCard } from './effect-card'
 import { SegmentedControl } from './segmented-control'
+import { usePhotobookThemeToolbar, usePortfolioThemeToolbar } from '@/editor/hooks/use-theme-toolbar'
 
 interface CollapsibleSectionProps {
   title: string
@@ -60,6 +59,20 @@ function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }:
 export function ThemeSettingsPanel() {
   const t = useTranslations('editor.controls.theme')
   const translate = useTranslations()
+  const {
+    depthOptions,
+    raysOptions,
+    textureOptions,
+    setDepth,
+    setRays,
+    setTexture,
+  } = usePortfolioThemeToolbar()
+  const {
+    moodOptions: photobookMoodOptions,
+    textureOptions: photobookTextureOptions,
+    setMood,
+    setTexture: setPhotobookTexture,
+  } = usePhotobookThemeToolbar()
   const { themeCustomizations, updateThemeCustomization } = useThemeSelector((state) => ({
     themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
@@ -123,8 +136,8 @@ export function ThemeSettingsPanel() {
                 label={t('photobook.moodLabel')}
                 description={t('photobook.moodDescription')}
                 value={photobookMood}
-                options={MOOD_OPTIONS}
-                onChange={(v) => updateThemeCustomization({ photobookMood: v as PhotobookMood })}
+                options={photobookMoodOptions}
+                onChange={(v) => setMood(v as PhotobookMood)}
               />
             </CollapsibleSection>
 
@@ -133,8 +146,8 @@ export function ThemeSettingsPanel() {
                 label={t('photobook.overlayLabel')}
                 description={t('photobook.overlayDescription')}
                 value={photobookTexture}
-                options={TEXTURE_OPTIONS}
-                onChange={(v) => updateThemeCustomization({ photobookTexture: v as PhotobookTexture })}
+                options={photobookTextureOptions}
+                onChange={(v) => setPhotobookTexture(v as PhotobookTexture)}
               />
             </CollapsibleSection>
           </>
@@ -165,20 +178,20 @@ export function ThemeSettingsPanel() {
               <EffectCard
                 label={t('portfolio.depthLabel')}
                 value={depth}
-                options={[{ id: 'none', label: t('none') }, ...DEPTH_EFFECTS]}
-                onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
+                options={depthOptions}
+                onChange={(v) => setDepth(v as DepthEffect)}
               />
               <EffectCard
                 label={t('portfolio.raysLabel')}
                 value={rays}
-                options={[{ id: 'none', label: t('none') }, ...RAYS_EFFECTS]}
-                onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
+                options={raysOptions}
+                onChange={(v) => setRays(v as RayEffect)}
               />
               <EffectCard
                 label={t('portfolio.textureLabel')}
                 value={texture}
-                options={[{ id: 'none', label: t('none') }, ...TEXTURE_EFFECTS]}
-                onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
+                options={textureOptions}
+                onChange={(v) => setTexture(v as TextureEffect)}
               />
             </CollapsibleSection>
           </>

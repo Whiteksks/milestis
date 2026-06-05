@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { useDecorationsToolbar } from "@/editor/hooks/use-decorations-toolbar"
 import { DecorationToolbar } from "../../FloatingActions/decoration-toolbar"
 import { Button } from "@/components/ui/button"
@@ -15,6 +16,7 @@ export function DecorationsSheetActions({
 }: {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }) {
+  const t = useTranslations('editor.controls.decorations')
   const {
     normalizedDecorations,
     activeDecorationId,
@@ -38,7 +40,7 @@ export function DecorationsSheetActions({
           className="h-10 px-3.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors gap-2"
         >
           <Plus className="h-4 w-4" />
-          Add decoration
+          {t('addNew')}
         </Button>
       </div>
     )

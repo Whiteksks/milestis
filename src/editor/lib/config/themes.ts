@@ -2,6 +2,8 @@ export interface ThemeConfig {
   id: string
   name: string
   description: string
+  nameKey?: string
+  descriptionKey?: string
   tags?: string[]
 
   // --- CORE COLORS ---
@@ -61,7 +63,7 @@ export interface ThemeConfig {
   shadow: string
 }
 
-export const themes: ThemeConfig[] = [
+const rawThemes: ThemeConfig[] = [
 
   // =====================================================
   // 1. PARCHMENT  (Light + Warm + Neutral)
@@ -992,6 +994,12 @@ export const themes: ThemeConfig[] = [
     },
   },
 ]
+
+export const themes: ThemeConfig[] = rawThemes.map((theme) => ({
+  ...theme,
+  nameKey: theme.nameKey ?? `editor.paletteLabels.themes.${theme.id}`,
+  descriptionKey: theme.descriptionKey ?? `editor.paletteLabels.themeDescriptions.${theme.id}`,
+}))
 
 export const getTheme = (id: string): ThemeConfig => {
   return themes.find(t => t.id === id) || themes[0]

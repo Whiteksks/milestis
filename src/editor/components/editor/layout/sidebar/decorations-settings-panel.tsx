@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { useThemeSelector, useUiSelector, useUiStore, type ThemeCustomDecorations } from '@/editor/lib/store'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,7 @@ const createDecorationId = (prefix = 'decoration') => {
 }
 
 export function DecorationsSettingsPanel() {
+  const t = useTranslations('editor.controls.decorations')
   const canvasScrollRef = useCanvasScrollContainer()
   const quickPlacementOwnerId = useId()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
@@ -63,7 +65,11 @@ export function DecorationsSettingsPanel() {
 
   const decorations = customDecorations
   const currentAnimationId = themeCustomizations.decorationAnimation || 'fade'
-  const currentAnimationLabel = decorationAnimationOptions.find(opt => opt.id === currentAnimationId)?.label
+  const animationOptions = decorationAnimationOptions.map((option) => ({
+    ...option,
+    label: t(`animations.${option.id}`),
+  }))
+  const currentAnimationLabel = animationOptions.find((opt) => opt.id === currentAnimationId)?.label
 
   const handleQuickPlacement = useCallback(
     async (urls: string[]) => {
@@ -111,13 +117,13 @@ export function DecorationsSettingsPanel() {
       scale: 1,
       responsiveScale: true,
       zIndex: 20,
-      name: `Decoration ${decorations.length + 1}`,
+      name: t('decorationName', { count: decorations.length + 1 }),
       aspectRatio: 1,
     }
 
     addDecoration(newDecoration)
     setSelectedDecorationId(newDecoration.id)
-  }, [canvasScrollRef, decorations, addDecoration, setSelectedDecorationId])
+  }, [canvasScrollRef, decorations, addDecoration, setSelectedDecorationId, t])
 
   const handleRemoveDecoration = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     const id = event.currentTarget.dataset.decorationRemoveId
@@ -137,11 +143,11 @@ export function DecorationsSettingsPanel() {
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">Decorations</h3>
+            <h3 className="text-sm font-semibold text-foreground tracking-tight">{t('title')}</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {decorations.length > 0 ? (
-                <span className="text-primary">{decorations.length} element{decorations.length > 1 ? 's' : ''}</span>
-              ) : 'Visual accents'}
+                <span className="text-primary">{t('elementsCount', { count: decorations.length })}</span>
+              ) : t('visualAccents')}
             </p>
           </div>
         </div>
@@ -153,7 +159,7 @@ export function DecorationsSettingsPanel() {
         {/* Dropdown Animation & Add Button */}
         <div className="flex items-end gap-3 mt-4">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Animation</Label>
+            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{t('animation')}</Label>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -166,7 +172,7 @@ export function DecorationsSettingsPanel() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-[160px]">
-                {decorationAnimationOptions.map((opt) => (
+                {animationOptions.map((opt) => (
                   <DropdownMenuItem 
                     key={opt.id} 
                     onClick={() => updateThemeCustomization({ decorationAnimation: opt.id as DecorationAnimation })}
@@ -187,7 +193,7 @@ export function DecorationsSettingsPanel() {
             className="h-9 px-4 text-[12px] font-medium rounded-sm active:scale-[0.98] transition-transform"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Add New
+            {t('addNew')}
           </Button>
         </div>
 
@@ -199,21 +205,21 @@ export function DecorationsSettingsPanel() {
             className="w-full h-9 text-[12px] border-border/30 hover:bg-muted/40 transition-colors"
           >
             <Shuffle className="w-3.5 h-3.5 mr-1.5" />
-            Quick Placement
+            {t('quickPlacement')}
           </Button>
         )}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-              Elements ({decorations.length}/{LIMITS.decorations})
+              {t('elementsLabel', { count: decorations.length, limit: LIMITS.decorations })}
             </Label>
             {decorations.length > 0 && (
               <button
                 onClick={() => { resetDecorations(); setSelectedDecorationId(null); }}
                 className="text-[10px] text-muted-foreground/60 hover:text-destructive transition-colors"
               >
-                Clear All
+                {t('clearAll')}
               </button>
             )}
           </div>
@@ -240,13 +246,13 @@ export function DecorationsSettingsPanel() {
                         value={decoration.name || ''}
                         onChange={(e) => updateDecoration(decoration.id, { name: e.target.value })}
                         onClick={(e) => e.stopPropagation()}
-                        placeholder="Unnamed"
+                        placeholder={t('unnamed')}
                         className="h-6 px-1 -ml-1 text-[12px] font-medium bg-transparent border-transparent shadow-none hover:bg-muted/40 focus-visible:bg-background transition-colors"
                       />
                       <div className="flex items-center gap-2 mt-0.5 text-[9px] text-muted-foreground/60 font-medium uppercase tracking-tight">
-                        <span>S: {Math.round((decoration.scale ?? 1) * 100)}%</span>
+                        <span>{t('sizeShort')}: {Math.round((decoration.scale ?? 1) * 100)}%</span>
                         <span className="w-0.5 h-0.5 rounded-full bg-border" />
-                        <span>O: {Math.round(decoration.opacity * 100)}%</span>
+                        <span>{t('opacityShort')}: {Math.round(decoration.opacity * 100)}%</span>
                       </div>
                     </div>
 

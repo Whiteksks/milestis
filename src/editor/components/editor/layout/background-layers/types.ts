@@ -21,5 +21,6 @@ export function withAlpha(hex: string, opacity: number): string {
 export interface LayerEffectDef<TId extends string = string> {
   id: TId
   label: string
+  labelKey?: string
   Component: React.ComponentType<{ isDark: boolean } & EffectColors>
 }

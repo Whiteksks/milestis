@@ -62,7 +62,32 @@
           "moodDescription": "Глобальная цветокоррекция.",
           "overlayTitle": "Наложение фото",
           "overlayLabel": "Наложение",
-          "overlayDescription": "Фотографическая текстура."
+          "overlayDescription": "Фотографическая текстура.",
+          "moodOptions": {
+            "none": "Нет",
+            "warm": "Тёплый",
+            "golden": "Золотистый",
+            "cool": "Холодный",
+            "muted": "Приглушённый",
+            "fade": "Выцветший",
+            "noir": "Нуар",
+            "vibrant": "Яркий",
+            "dreamy": "Мечтательный",
+            "earthy": "Натуральный"
+          },
+          "textureOptions": {
+            "none": "Нет",
+            "vignette": "Виньетка",
+            "matte": "Матовый",
+            "warmth": "Теплота",
+            "silver": "Серебро",
+            "linen": "Лён",
+            "haze": "Дымка",
+            "grain": "Зерно",
+            "canvas": "Холст",
+            "velvet": "Бархат",
+            "parchment": "Пергамент"
+          }
         },
         "portfolio": {
           "generalTitle": "Общее",
@@ -71,7 +96,68 @@
           "effectsTitle": "Эффекты",
           "depthLabel": "Глубина",
           "raysLabel": "Лучи",
-          "textureLabel": "Текстура"
+          "textureLabel": "Текстура",
+          "depthOptions": {
+            "radial-glow": "Радиальное свечение",
+            "vignette": "Виньетка",
+            "ambient-blobs": "Мягкие формы",
+            "asymmetric-light": "Асимметрия",
+            "aurora": "Аврора",
+            "horizon": "Горизонт"
+          },
+          "raysOptions": {
+            "diagonal-rays": "Диагональные лучи",
+            "conic-rays": "Конические лучи",
+            "soft-streaks": "Полосы",
+            "lens-flare": "Блик линзы",
+            "caustics": "Каустика",
+            "god-rays": "Божественные лучи",
+            "prism": "Призма"
+          },
+          "textureOptions": {
+            "grain": "Зерно",
+            "dots": "Точки",
+            "lines": "Линии",
+            "grid": "Сетка",
+            "halftone": "Полутон",
+            "scanlines": "Сканлайны",
+            "diamond-grid": "Ромб",
+            "woven": "Плетение"
+          }
+        }
+      },
+      "decorations": {
+        "title": "Декорации",
+        "visualAccents": "Визуальные акценты",
+        "elementsCount": "{count, plural, one {# элемент} few {# элемента} many {# элементов} other {# элемента}}",
+        "animation": "Анимация",
+        "scale": "Размер",
+        "opacity": "Прозрачность",
+        "addNew": "Добавить",
+        "select": "Выбрать",
+        "selectDecoration": "Выбрать декорацию",
+        "openSettings": "Открыть настройки декорации",
+        "bringToFront": "На передний план",
+        "sendToBack": "На задний план",
+        "bubbleStyle": "Стиль пузыря",
+        "mobileAdaptation": "Адаптация для мобильных",
+        "mobileAdaptationDescription": "Уменьшать на маленьких экранах",
+        "locateOnCanvas": "Найти на холсте",
+        "quickPlacement": "Быстрое размещение",
+        "elementsLabel": "Элементы ({count}/{limit})",
+        "clearAll": "Очистить всё",
+        "unnamed": "Без названия",
+        "decorationName": "Декорация {count}",
+        "sizeShort": "Р",
+        "opacityShort": "Н",
+        "bubbleStyles": {
+          "soft": "Мягкая сфера",
+          "glass": "Стеклянная сфера",
+          "memory": "Сфера-воспоминание"
+        },
+        "animations": {
+          "none": "Нет",
+          "fade": "Появление"
         }
       }
     }
