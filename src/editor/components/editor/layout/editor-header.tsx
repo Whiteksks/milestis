@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
@@ -27,6 +28,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  const t = useTranslations('editor.layout')
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
@@ -167,7 +169,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             size="icon"
             onClick={handleHomeClick}
             className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0"
-            title="Back to Dashboard"
+            title={t('header.backToDashboard')}
           >
             <Home className="size-4" />
           </Button>
@@ -184,7 +186,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               if (e.key === 'Enter') e.currentTarget.blur()
               if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }
             }}
-            placeholder="Untitled"
+            placeholder={t('header.projectNamePlaceholder')}
             className="min-w-0 w-24 sm:w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border focus:outline-none transition-colors truncate"
           />
           {/* Inline save icon — always visible, color reflects save state */}
@@ -193,7 +195,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             size="lg"
             onClick={handleSave}
             disabled={saveState === 'saving'}
-            title="Save (Ctrl+S)"
+            title={t('header.saveShortcut')}
             className={[
               'h-8 w-6 rounded-full transition-colors shrink-0',
               saveState === 'saved' ? 'text-emerald-500 hover:text-emerald-500' :
@@ -221,10 +223,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               className="gap-2"
             >
               {[
-                { id: 'desktop', icon: Monitor, label: 'Desktop' },
-                { id: 'tablet', icon: Tablet, label: 'Tablet' },
-                { id: 'mobile', icon: Smartphone, label: 'Mobile' },
-                { id: 'fullscreen', icon: Monitor, label: 'Full Screen' }
+                { id: 'desktop', icon: Monitor, label: t('header.desktop') },
+                { id: 'tablet', icon: Tablet, label: t('header.tablet') },
+                { id: 'mobile', icon: Smartphone, label: t('header.mobile') },
+                { id: 'fullscreen', icon: Monitor, label: t('header.fullscreen') }
               ].map(({ id, icon: Icon, label }) => (
                 <ToggleGroupItem
                   key={id}
@@ -251,7 +253,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
           >
             <ImageIcon className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline font-medium">Media</span>
+            <span className="hidden sm:inline font-medium">{t('header.media')}</span>
           </Button>
 
           <Button
@@ -261,7 +263,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
           >
             <Eye className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Preview</span>
+            <span className="hidden sm:inline">{t('header.preview')}</span>
           </Button>
 
           <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
@@ -280,7 +282,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   ) : (
                     <Globe className="h-3 w-3" />
                   )}
-                  <span className="hidden sm:inline">Published</span>
+                  <span className="hidden sm:inline">{t('header.published')}</span>
                   <ChevronDown className="h-3 w-3 hidden sm:inline" />
                 </Button>
               </DropdownMenuTrigger>
@@ -297,12 +299,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                     }}
                   >
                     <Globe className="size-4" />
-                    View site
+                    {t('header.viewSite')}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
                   <EyeOff className="size-4" />
-                  Unpublish
+                  {t('header.unpublish')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -314,7 +316,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
             >
               <Globe className="h-3 w-3" />
-              <span className="hidden sm:inline">Publish</span>
+              <span className="hidden sm:inline">{t('header.publish')}</span>
             </Button>
           )}
         </div>

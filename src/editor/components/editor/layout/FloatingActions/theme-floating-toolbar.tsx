@@ -1,6 +1,7 @@
 "use client"
 
 import type { ComponentType } from 'react'
+import { useTranslations } from 'next-intl'
 import type { EditorMode } from '@/editor/lib/types'
 import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ export function ThemeFloatingToolbar() {
 // ─── Portfolio toolbar ────────────────────────────────────────────────────────
 
 function PortfolioFloatingToolbar() {
+  const t = useTranslations('editor.controls.theme')
   const {
     depth, rays, texture,
     isDark, isFixed, canReset,
@@ -50,7 +52,7 @@ function PortfolioFloatingToolbar() {
       <Button
         type="button"
         variant="ghost"
-        title={isDark ? 'Switch to light background' : 'Switch to dark background'}
+        title={isDark ? t('switchToLightBackground') : t('switchToDarkBackground')}
         className={cn(ICON_BTN)}
         onClick={toggleDarkLight}
       >
@@ -61,7 +63,7 @@ function PortfolioFloatingToolbar() {
       <Button
         type="button"
         variant="ghost"
-        title={isFixed ? 'Switch to parallax scroll' : 'Switch to fixed background'}
+        title={isFixed ? t('switchToParallaxScroll') : t('switchToFixedBackground')}
         className={cn(
           'h-7 px-2 rounded-full text-xs font-medium transition-colors shrink-0',
           !isFixed
@@ -70,14 +72,14 @@ function PortfolioFloatingToolbar() {
         )}
         onClick={toggleScrollMode}
       >
-        {isFixed ? 'Fixed' : 'Scroll'}
+        {isFixed ? t('fixed') : t('scroll')}
       </Button>
 
       <Separator orientation="vertical" className="mx-1 h-4 bg-border/60 shrink-0" />
 
       {/* Depth effect */}
       <EffectPopover
-        label="Depth"
+        label={t('portfolio.depthLabel')}
         value={depth}
         options={depthOptions}
         onChange={setDepth}
@@ -85,7 +87,7 @@ function PortfolioFloatingToolbar() {
 
       {/* Rays effect */}
       <EffectPopover
-        label="Rays"
+        label={t('portfolio.raysLabel')}
         value={rays}
         options={raysOptions}
         onChange={setRays}
@@ -93,7 +95,7 @@ function PortfolioFloatingToolbar() {
 
       {/* Texture effect */}
       <EffectPopover
-        label="Texture"
+        label={t('portfolio.textureLabel')}
         value={texture}
         options={textureOptions}
         onChange={setTexture}
@@ -104,7 +106,7 @@ function PortfolioFloatingToolbar() {
       <Button
         type="button"
         variant="ghost"
-        title="Reset all effects"
+        title={t('resetAllEffects')}
         disabled={!canReset}
         className={cn(ICON_BTN, 'disabled:opacity-30')}
         onClick={handleReset}
@@ -118,6 +120,7 @@ function PortfolioFloatingToolbar() {
 // ─── Photobook toolbar ────────────────────────────────────────────────────────
 
 function PhotobookFloatingToolbar() {
+  const t = useTranslations('editor.controls.theme')
   const {
     mood, texture, canReset,
     handleReset, setMood, setTexture,
@@ -129,7 +132,7 @@ function PhotobookFloatingToolbar() {
 
       {/* Colour mood — moodOptions already includes {id:'none'} as first item */}
       <EffectPopover
-        label="Mood"
+        label={t('photobook.moodTitle')}
         value={mood}
         options={moodOptions}
         onChange={setMood}
@@ -137,7 +140,7 @@ function PhotobookFloatingToolbar() {
 
       {/* Photo overlay — textureOptions already includes {id:'none'} as first item */}
       <EffectPopover
-        label="Overlay"
+        label={t('photobook.overlayLabel')}
         value={texture}
         options={textureOptions}
         onChange={setTexture}
@@ -148,7 +151,7 @@ function PhotobookFloatingToolbar() {
       <Button
         type="button"
         variant="ghost"
-        title="Reset all overlays"
+        title={t('resetAllOverlays')}
         disabled={!canReset}
         className={cn(ICON_BTN, 'disabled:opacity-30')}
         onClick={handleReset}

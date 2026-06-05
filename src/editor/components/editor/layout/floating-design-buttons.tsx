@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -7,6 +8,7 @@ import { Palette, WandSparkles, LayoutTemplate } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function FloatingActions() {
+  const t = useTranslations('editor.layout.floating')
   const { openDesignModal } = useUiSelector((state) => ({
     openDesignModal: state.openDesignModal,
   }))
@@ -25,7 +27,7 @@ export function FloatingActions() {
             </Button>
           </TooltipTrigger>
         </motion.div>
-        <TooltipContent side="right">Change Template</TooltipContent>
+        <TooltipContent side="right">{t('changeTemplate')}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -39,7 +41,7 @@ export function FloatingActions() {
             </Button>
           </TooltipTrigger>
         </motion.div>
-        <TooltipContent side="right">Change Theme</TooltipContent>
+        <TooltipContent side="right">{t('changeTheme')}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -53,7 +55,7 @@ export function FloatingActions() {
             </Button>
           </TooltipTrigger>
         </motion.div>
-        <TooltipContent side="right">Background</TooltipContent>
+        <TooltipContent side="right">{t('background')}</TooltipContent>
       </Tooltip>
     </div>
   )

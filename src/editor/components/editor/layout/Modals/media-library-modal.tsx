@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileDrawer } from '../mobile/mobile-drawer'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 interface MediaLibraryModalProps {
   mode?: 'select' | 'manage'
@@ -29,6 +30,7 @@ interface MediaLibraryModalProps {
 }
 
 export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibraryModalProps) {
+  const t = useTranslations('editor.controls.media')
   const { isMediaLibraryOpen, setMediaLibraryOpen } = useUiSelector((state) => ({
     isMediaLibraryOpen: state.isMediaLibraryOpen,
     setMediaLibraryOpen: state.setMediaLibraryOpen,
@@ -75,7 +77,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Images className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-foreground">Library</span>
+          <span className="text-sm font-medium text-foreground">{t('library')}</span>
           {totalCount > 0 && (
             <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full tabular-nums">
               {totalCount}
@@ -89,7 +91,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           onClick={() => fileInputRef.current?.click()}
         >
           <Upload className="h-3.5 w-3.5" />
-          Upload
+          {t('upload')}
         </Button>
         {uploadInput}
       </div>
@@ -106,8 +108,8 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
               <Upload className="h-5 w-5" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium">Upload your first image</p>
-              <p className="text-xs text-muted-foreground mt-0.5">PNG, JPG, SVG supported</p>
+              <p className="text-sm font-medium">{t('uploadFirstImage')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('supportedFormats')}</p>
             </div>
           </button>
         ) : (
@@ -119,7 +121,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
               className="aspect-square rounded-xl border-2 border-dashed border-border/50 bg-transparent flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/30 transition-all cursor-pointer"
             >
               <Upload className="h-5 w-5" />
-              <span className="text-[11px] font-medium">Upload</span>
+              <span className="text-[11px] font-medium">{t('upload')}</span>
             </button>
 
             {/* Uploading placeholders — hide any whose imageId is already in Firestore
@@ -184,7 +186,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                         handleDelete(image.id)
                       }}
                       className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/90 hover:bg-red-50 dark:hover:bg-red-950/20 text-muted-foreground hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100"
-                      aria-label="Delete image"
+                      aria-label={t('deleteImage')}
                     >
                       <X className="h-3.5 w-3.5" />
                     </Button>
@@ -205,7 +207,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
         onClick={closeMediaLibrary}
         className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
-        {mode === 'select' ? 'Cancel' : 'Close'}
+        {mode === 'select' ? t('cancel') : t('close')}
       </Button>
 
       {mode === 'select' && selectedImageUrl && (
@@ -213,7 +215,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
           onClick={handleConfirmSelection}
           className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all"
         >
-          Select Image
+          {t('selectImage')}
         </Button>
       )}
     </div>
@@ -221,7 +223,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
   if (isMobile) {
     return (
-      <MobileDrawer open={isMediaLibraryOpen} onOpenChange={(v) => { if (!v) closeMediaLibrary() }} title="Media Library" showHeader>
+      <MobileDrawer open={isMediaLibraryOpen} onOpenChange={(v) => { if (!v) closeMediaLibrary() }} title={t('mediaLibrary')} showHeader>
         <div className="flex flex-col gap-4 pb-6">
           {galleryContent}
           <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
@@ -231,7 +233,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
               onClick={closeMediaLibrary}
               className="rounded-xl text-muted-foreground hover:text-foreground"
             >
-              {mode === 'select' ? 'Cancel' : 'Close'}
+              {mode === 'select' ? t('cancel') : t('close')}
             </Button>
             {mode === 'select' && selectedImageUrl && (
               <Button
@@ -239,7 +241,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
                 onClick={handleConfirmSelection}
                 className="rounded-xl bg-foreground text-background"
               >
-                Select Image
+                {t('selectImage')}
               </Button>
             )}
           </div>
@@ -253,10 +255,10 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
       <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col min-h-0 bg-background/95 backdrop-blur-xl border-border shadow-xl p-8 gap-0">
         <DialogHeader className="pb-5">
           <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">
-            Media Library
+            {t('mediaLibrary')}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {mode === 'select' ? 'Select an image for your project' : 'Upload and manage your project images'}
+            {mode === 'select' ? t('selectProjectImage') : t('manageProjectImages')}
           </DialogDescription>
         </DialogHeader>
 

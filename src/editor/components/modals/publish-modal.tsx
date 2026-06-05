@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { useTranslations } from 'next-intl'
 import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -43,6 +44,7 @@ interface PublishModalProps {
 }
 
 export function PublishModal({ open, onOpenChange, projectId, mode }: PublishModalProps) {
+  const t = useTranslations('editor.modal.publish')
   const { setIsPublished, setPublishedInfo } = useUiSelector((s) => ({
     setIsPublished: s.setIsPublished,
     setPublishedInfo: s.setPublishedInfo,
@@ -80,10 +82,10 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
     ? <Globe className="size-4 text-primary" />
     : <Lock className="size-4 text-primary" />
 
-  const step1Title = mode === 'portfolio' ? 'Publish Portfolio' : 'Publish Photobook'
+  const step1Title = mode === 'portfolio' ? t('title.portfolio') : t('title.photobook')
   const step1Description = mode === 'portfolio'
-    ? 'Choose a custom subdomain for your site.'
-    : 'Choose a memorable link identifier for your photobook.'
+    ? t('description.portfolio')
+    : t('description.photobook')
 
   if (isMobile) {
     const mobileFooter = modalData.step === 'slug' ? (
@@ -94,12 +96,12 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           className="gap-2 w-full"
         >
           {modalData.isAnalyzing
-            ? <><Loader2 className="size-3 animate-spin" /> Checking…</>
-            : <>Continue <ArrowRight className="size-3" /></>
+            ? <><Loader2 className="size-3 animate-spin" /> {t('actions.checking')}</>
+            : <>{t('actions.continue')} <ArrowRight className="size-3" /></>
           }
         </Button>
         <Button variant="ghost" onClick={() => handleClose(false)} className="w-full">
-          Cancel
+          {t('actions.cancel')}
         </Button>
       </>
     ) : (
@@ -110,8 +112,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           className="gap-2 w-full"
         >
           {publishMutation.isPending
-            ? <><Loader2 className="size-3 animate-spin" /> Publishing…</>
-            : <><ExternalLink className="size-3" /> Publish</>
+            ? <><Loader2 className="size-3 animate-spin" /> {t('actions.publishing')}</>
+            : <><ExternalLink className="size-3" /> {t('actions.publish')}</>
           }
         </Button>
         <Button
@@ -121,8 +123,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           className="gap-1.5 w-full"
         >
           {modalData.analyzeError
-            ? <><RefreshCw className="size-3" /> Try again</>
-            : <><ArrowLeft className="size-3" /> Back</>
+            ? <><RefreshCw className="size-3" /> {t('actions.tryAgain')}</>
+            : <><ArrowLeft className="size-3" /> {t('actions.back')}</>
           }
         </Button>
       </>
@@ -132,8 +134,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
       <MobileDrawer
         open={open}
         onOpenChange={handleClose}
-        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : 'Review & Confirm'}</span>}
-        description={modalData.step === 'slug' ? step1Description : 'Review publication details before confirming.'}
+        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : t('title.review')}</span>}
+        description={modalData.step === 'slug' ? step1Description : t('description.review')}
         showHeader
         footer={mobileFooter}
         bodyClassName="px-2 min-h-64"
@@ -153,12 +155,12 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
         <DialogHeader className="gap-1">
           <DialogTitle className="flex items-center gap-2 text-base">
             {modeIcon}
-            {modalData.step === 'slug' ? step1Title : 'Review & Confirm'}
+            {modalData.step === 'slug' ? step1Title : t('title.review')}
           </DialogTitle>
           <DialogDescription className="text-xs">
             {modalData.step === 'slug'
               ? step1Description
-              : 'Review the details below before confirming publication.'}
+              : t('description.reviewDesktop')}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,7 +174,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
           {modalData.step === 'slug' ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => handleClose(false)}>
-                Cancel
+                {t('actions.cancel')}
               </Button>
               <Button
                 size="sm"
@@ -181,8 +183,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
                 className="gap-1.5"
               >
                 {modalData.isAnalyzing
-                  ? <><Loader2 className="size-3 animate-spin" /> Checking…</>
-                  : <>Continue <ArrowRight className="size-3" /></>
+                  ? <><Loader2 className="size-3 animate-spin" /> {t('actions.checking')}</>
+                  : <>{t('actions.continue')} <ArrowRight className="size-3" /></>
                 }
               </Button>
             </>
@@ -196,8 +198,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
                 className="gap-1.5"
               >
                 {modalData.analyzeError
-                  ? <><RefreshCw className="size-3" /> Try again</>
-                  : <><ArrowLeft className="size-3" /> Back</>
+                  ? <><RefreshCw className="size-3" /> {t('actions.tryAgain')}</>
+                  : <><ArrowLeft className="size-3" /> {t('actions.back')}</>
                 }
               </Button>
               <Button
@@ -207,8 +209,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
                 className="gap-2"
               >
                 {publishMutation.isPending
-                  ? <><Loader2 className="size-3 animate-spin" /> Publishing…</>
-                  : <><ExternalLink className="size-3" /> Publish</>
+                  ? <><Loader2 className="size-3 animate-spin" /> {t('actions.publishing')}</>
+                  : <><ExternalLink className="size-3" /> {t('actions.publish')}</>
                 }
               </Button>
             </>
@@ -226,13 +228,14 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
   const maxLength = 24
   const chrome = getSlugInputChrome(mode)
 
+  const t = useTranslations('editor.modal.publish')
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
           <Label htmlFor="slug" className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] flex items-center gap-2">
             {mode === 'portfolio' ? <Globe className="size-3.5 text-primary/60" /> : <Link2 className="size-3.5 text-primary/60" />}
-            {mode === 'portfolio' ? 'Subdomain Settings' : 'Link Identifier'}
+            {mode === 'portfolio' ? t('form.subdomainSettings') : t('form.linkIdentifier')}
           </Label>
           <span className={`text-[10px] font-mono font-medium ${slug.length >= maxLength ? 'text-destructive' : 'text-muted-foreground/40'}`}>
             {slug.length}<span className="opacity-50">/{maxLength}</span>
@@ -248,7 +251,7 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
               id="slug"
               value={slug}
               onChange={(e) => e.target.value.length <= maxLength && handleSlugChange(e.target.value)}
-              placeholder={mode === 'portfolio' ? 'unique-name' : 'moment-2026'}
+              placeholder={mode === 'portfolio' ? t('form.placeholderPortfolio') : t('form.placeholderPhotobook')}
               className="h-13 border-0 bg-transparent px-4 text-base font-medium placeholder:text-muted-foreground/20 focus-visible:ring-0 w-full truncate"
               autoComplete="off"
               spellCheck={false}
@@ -275,8 +278,8 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
         </div>
         <p className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
           {mode === 'photobook'
-            ? "Privacy First: This link is encrypted and hidden from search engines. Only people with the direct URL can see your photos."
-            : "Global Access: Your site will be optimized for fast loading worldwide. You can update your content or domain at any time."
+            ? t('form.privacyFirst')
+            : t('form.globalAccess')
           }
         </p>
       </div>
@@ -298,16 +301,17 @@ function ReviewPane({ data }: { data: ReturnType<typeof usePublishModal> }) {
 
 function ReviewContent({ quoteData }: { quoteData: AnalyzeProjectResult }) {
   const insufficient = quoteData.userBalance < quoteData.creditCost
+  const t = useTranslations('editor.modal.publish')
 
   return (
     <div className="space-y-3 py-2">
       {/* Summary rows */}
       <div className="rounded-2xl border border-border/50 overflow-hidden">
-        <ReviewRow label="Project" value={quoteData.projectName} />
-        <ReviewRow label="Address" value={quoteData.domain} mono />
+        <ReviewRow label={t('review.project')} value={quoteData.projectName} />
+        <ReviewRow label={t('review.address')} value={quoteData.domain} mono />
         <ReviewRow
-          label="Photos"
-          value={quoteData.photoCount === 0 ? 'No photos' : `${quoteData.photoCount} unique`}
+          label={t('review.photos')}
+          value={quoteData.photoCount === 0 ? t('review.noPhotos') : t('review.uniquePhotos', { count: quoteData.photoCount })}
           icon={<ImageIcon className="size-3 text-muted-foreground/60" />}
         />
       </div>
@@ -316,20 +320,20 @@ function ReviewContent({ quoteData }: { quoteData: AnalyzeProjectResult }) {
       <div className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 border text-xs font-medium ${insufficient ? 'border-destructive/30 bg-destructive/5' : 'border-border/50 bg-muted/30'}`}>
         <span className="flex items-center gap-1.5 text-muted-foreground">
           <Coins className="size-3.5" />
-          Cost
+          {t('review.cost')}
         </span>
         <div className="flex items-center gap-2">
           {insufficient && <AlertTriangle className="size-3 text-destructive" />}
           <span className={insufficient ? 'text-destructive' : 'text-foreground'}>
-            {quoteData.creditCost} credits
-            <span className="text-muted-foreground/60 ml-1.5 font-normal">(balance: {quoteData.userBalance})</span>
+            {quoteData.creditCost} {t('review.credits')}
+            <span className="text-muted-foreground/60 ml-1.5 font-normal">({t('review.balance', { balance: quoteData.userBalance })})</span>
           </span>
         </div>
       </div>
 
       {insufficient && (
         <p className="text-xs text-destructive px-1">
-          You don&apos;t have enough credits. Top up your balance to continue.
+          {t('review.insufficient')}
         </p>
       )}
 
@@ -339,8 +343,7 @@ function ReviewContent({ quoteData }: { quoteData: AnalyzeProjectResult }) {
           <ShieldCheck className="w-3.5 h-3.5 text-primary/70" />
         </div>
         <p className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
-          By publishing you accept our Terms of Service and Content Policy.
-          Credits are non-refundable once publication is confirmed.
+          {t('review.terms')}
         </p>
       </div>
     </div>
@@ -379,13 +382,14 @@ function ReviewSkeleton() {
 }
 
 function ReviewError({ message }: { message: string }) {
+  const t = useTranslations('editor.modal.publish')
   return (
     <div className="py-8 flex flex-col items-center gap-3 text-center">
       <div className="p-2.5 rounded-xl bg-destructive/10">
         <AlertTriangle className="size-5 text-destructive" />
       </div>
       <div>
-        <p className="text-sm font-medium text-foreground">Analysis failed</p>
+        <p className="text-sm font-medium text-foreground">{t('review.analysisFailed')}</p>
         <p className="text-xs text-muted-foreground mt-1 max-w-xs">{message}</p>
       </div>
     </div>
@@ -410,13 +414,14 @@ function SlugStatusMessage({
   status: ReturnType<typeof usePublishModal>['slugStatus']
   mode: 'portfolio' | 'photobook'
 }) {
+  const t = useTranslations('editor.modal.publish')
   if (status === 'taken')
-    return <p className="text-xs text-destructive">This subdomain is already taken.</p>
+    return <p className="text-xs text-destructive">{t('form.taken')}</p>
   if (status === 'invalid')
-    return <p className="text-xs text-destructive">Lowercase letters, numbers, hyphens (3–24 chars).</p>
+    return <p className="text-xs text-destructive">{t('form.invalid')}</p>
   if (status === 'reserved')
-    return <p className="text-xs text-amber-600 dark:text-amber-400">This name is reserved and cannot be used.</p>
+    return <p className="text-xs text-amber-600 dark:text-amber-400">{t('form.reserved')}</p>
   if (status === 'available' && mode === 'portfolio')
-    return <p className="text-xs text-emerald-600 dark:text-emerald-400">Subdomain is available!</p>
+    return <p className="text-xs text-emerald-600 dark:text-emerald-400">{t('form.available')}</p>
   return null
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
 import { cn } from '@/lib/utils'
@@ -24,6 +25,8 @@ export function SectionsSidebar({
   activeTab: DesktopEditorTab
   onTabChange: (tab: DesktopEditorTab) => void
 }) {
+  const t = useTranslations('editor.layout')
+  const translate = useTranslations()
   const { isSidebarCollapsed, toggleSidebar, editorMode, setSelectedDecorationId } = useUiSelector((state) => ({
     isSidebarCollapsed: state.isSidebarCollapsed,
     toggleSidebar: state.toggleSidebar,
@@ -33,11 +36,11 @@ export function SectionsSidebar({
 
   const tabs = useMemo(
     () => [
-      { id: 'sections' as const, icon: Layers, label: getModeUiConfig(editorMode).sectionsTabLabel },
-      { id: 'background' as const, icon: WandSparkles, label: 'Background' },
-      { id: 'decorations' as const, icon: Sparkles, label: 'Decorations' },
+      { id: 'sections' as const, icon: Layers, label: getModeUiConfig(editorMode, translate).sectionsTabLabel },
+      { id: 'background' as const, icon: WandSparkles, label: t('sidebar.background') },
+      { id: 'decorations' as const, icon: Sparkles, label: t('sidebar.decorations') },
     ],
-    [editorMode],
+    [editorMode, t, translate],
   )
 
   const handleTabChange = (tab: DesktopEditorTab) => {
@@ -55,7 +58,7 @@ export function SectionsSidebar({
         {/* Кнопка — вне inert-дива, едет вместе с панелью, всегда кликабельна */}
         <button
           onClick={toggleSidebar}
-          aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isSidebarCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
           className={cn(
             "group absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-10",
             "hidden md:flex items-center justify-center",

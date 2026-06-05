@@ -1,0 +1,52 @@
+{
+  "editor": {
+    "portfolio": {
+      "ui": {
+        "backgroundLabel": "Background",
+        "backgroundHint": "No effects applied",
+        "sectionsTabLabel": "Sections",
+        "backgroundCatalogTitle": "Background Effects",
+        "backgroundCatalogMobileLabel": "Background"
+      },
+      "tags": {
+        "classic": "Classic",
+        "modern": "Modern",
+        "clean": "Clean",
+        "structured": "Structured",
+        "visual": "Visual"
+      },
+      "templates": {
+        "editorial": {
+          "name": "Editorial"
+        },
+        "minimal": {
+          "name": "Minimal"
+        },
+        "elegant": {
+          "name": "Elegant"
+        },
+        "grid": {
+          "name": "Grid"
+        },
+        "bento": {
+          "name": "Bento"
+        },
+        "showcase": {
+          "name": "Showcase"
+        },
+        "liquidGlass": {
+          "name": "Liquid Glass"
+        }
+      },
+      "sections": {
+        "header": "Header",
+        "hero": "Hero Section",
+        "bio": "Bio / About",
+        "featuredWork": "Featured Work",
+        "video": "Video Section",
+        "contact": "Contact Form",
+        "footer": "Footer"
+      }
+    }
+  }
+}

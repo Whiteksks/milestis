@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -32,6 +33,7 @@ function useStoryData() {
 }
 
 export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.story")
   const { story, updatePhotobookSection } = useStoryData()
   const update = (fields: Partial<PhotobookSectionContent["story"]>) => updatePhotobookSection("story", fields)
 
@@ -39,11 +41,11 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
     <div className="py-2">
       {!dense && (
         <div className="space-y-1 pb-4 mb-4">
-          <label className={editorialLabel}>Section Label</label>
+          <label className={editorialLabel}>{t("sectionLabel")}</label>
           <Input
             value={story.label || ""}
             onChange={(e) => update({ label: e.target.value })}
-            placeholder="Section label (e.g. Story)"
+            placeholder={t("placeholder.sectionLabel")}
             className={cn(editorialInput, "text-sm text-muted-foreground")}
             maxLength={LIMITS.label}
           />
@@ -52,21 +54,21 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
       {!dense && (
         <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-4 mb-4">
           <div className="space-y-1 pr-2">
-            <label className={editorialLabel}>Title</label>
+            <label className={editorialLabel}>{t("title")}</label>
             <Input
               value={story.title || ""}
               onChange={(e) => update({ title: e.target.value })}
-              placeholder="Story title"
+              placeholder={t("placeholder.storyTitle")}
               className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
               maxLength={LIMITS.title}
             />
           </div>
           <div className="space-y-1 pl-2">
-            <label className={editorialLabel}>Date</label>
+            <label className={editorialLabel}>{t("date")}</label>
             <Input
               value={story.date || ""}
               onChange={(e) => update({ date: e.target.value })}
-              placeholder="e.g. June 2024"
+              placeholder={t("placeholder.date")}
               className={cn(editorialInput, "text-base text-muted-foreground")}
               maxLength={LIMITS.date}
             />
@@ -75,16 +77,16 @@ export function StoryHeaderPanel({ dense = false }: { dense?: boolean }) {
       )}
       {dense && (
         <div className={ps.pbGrid2}>
-          <Input value={story.title || ""} onChange={(e) => update({ title: e.target.value })} placeholder="Story title" className={ps.pbInput} maxLength={LIMITS.title} />
-          <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder="Date" className={ps.pbInput} maxLength={LIMITS.date} />
+          <Input value={story.title || ""} onChange={(e) => update({ title: e.target.value })} placeholder={t("placeholder.storyTitle")} className={ps.pbInput} maxLength={LIMITS.title} />
+          <Input value={story.date || ""} onChange={(e) => update({ date: e.target.value })} placeholder={t("placeholder.denseDate")} className={ps.pbInput} maxLength={LIMITS.date} />
         </div>
       )}
       <div className="space-y-1">
-        {!dense && <label className={editorialLabel}>Location</label>}
+        {!dense && <label className={editorialLabel}>{t("location")}</label>}
         <Input
           value={story.location || ""}
           onChange={(e) => update({ location: e.target.value })}
-          placeholder="Location"
+          placeholder={t("placeholder.location")}
           className={dense ? ps.pbInput : cn(editorialInput, "text-sm text-muted-foreground")}
           maxLength={LIMITS.location}
         />
@@ -110,6 +112,7 @@ function StoryMomentItem({
   onSelectImage: (url: string, thumbUrl?: string) => void
   onImageChange: (next: ImageValue) => void
 }) {
+  const t = useTranslations("editor.photobookSettings.story")
   const ownerId = useId()
   const openMediaPicker = useUiStore((s) => s.openMediaPicker)
   const pickerValue = managedImage?.value ?? EMPTY_IMAGE_VALUE
@@ -120,11 +123,11 @@ function StoryMomentItem({
 
       <div className="flex items-center gap-2">
         <div className="flex-1 space-y-1">
-          <label className={editorialLabel}>Label</label>
+          <label className={editorialLabel}>{t("label")}</label>
           <Input
             value={block.label || ""}
             onChange={(e) => onUpdate({ label: e.target.value })}
-            placeholder="e.g. Morning"
+            placeholder={t("placeholder.label")}
             className={cn(editorialInput, "text-sm")}
             maxLength={LIMITS.label}
           />
@@ -135,27 +138,27 @@ function StoryMomentItem({
           className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/30 hover:text-destructive/60 transition-colors mt-5 flex items-center gap-1 shrink-0"
         >
           <Trash2 className="w-3 h-3" />
-          Delete
+          {t("remove")}
         </button>
       </div>
 
       <div className="space-y-1">
-        <label className={editorialLabel}>Caption</label>
+        <label className={editorialLabel}>{t("caption")}</label>
         <Input
           value={block.caption || ""}
           onChange={(e) => onUpdate({ caption: e.target.value })}
-          placeholder="Optional caption"
+          placeholder={t("placeholder.caption")}
           className={cn(editorialInput, "text-sm")}
           maxLength={LIMITS.caption}
         />
       </div>
 
       <div className="space-y-1">
-        <label className={editorialLabel}>Description</label>
+        <label className={editorialLabel}>{t("description")}</label>
         <Textarea
           value={block.description || ""}
           onChange={(e) => onUpdate({ description: e.target.value })}
-          placeholder="Optional description"
+          placeholder={t("placeholder.description")}
           rows={4}
           className={ps.pbTextarea}
           maxLength={LIMITS.description}
@@ -176,6 +179,7 @@ function StoryMomentItem({
 }
 
 export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.story")
   const addOwnerId = useId()
   const {
     story,
@@ -319,23 +323,23 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
       <MediaPickerModal ownerId={addOwnerId} onSelectImages={handleMultiAdd} />
 
       <div className="flex items-center justify-between gap-3">
-        {!dense && <PanelLabel>Photos</PanelLabel>}
+        {!dense && <PanelLabel>{t("photos")}</PanelLabel>}
         <Button
           variant="ghost"
           size="sm"
           className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
           onClick={addEmpty}
           disabled={images.length >= LIMITS.storyImages}
-          title={images.length >= LIMITS.storyImages ? `Maximum ${LIMITS.storyImages} photos` : undefined}
+          title={images.length >= LIMITS.storyImages ? t("maximumPhotos", { count: LIMITS.storyImages }) : undefined}
         >
-          <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add photo" : "Add"}
+          <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? t("addPhoto") : t("add")}
         </Button>
       </div>
 
       {images.length === 0 ? (
         <button type="button" onClick={() => openMediaPicker(addOwnerId)} className={ps.emptyZone}>
           <Plus className={ps.emptyIcon} />
-          {!dense && <span className={ps.emptyText}>Click to add story photos</span>}
+          {!dense && <span className={ps.emptyText}>{t("clickToAddStoryPhotos")}</span>}
         </button>
       ) : (
         <div className="space-y-4">
@@ -365,7 +369,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
                 <SelectContent>
                   {images.map((image, index) => (
                     <SelectItem key={image.id} value={String(index)}>
-                      {image.label?.trim() ? image.label : `Photo ${index + 1}`}
+                      {image.label?.trim() ? image.label : t("photoOption", { index: index + 1 })}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -400,7 +404,7 @@ export function StoryImagePanel({ dense = false }: { dense?: boolean }) {
       )}
 
       <Button variant="outline" className="h-8 text-xs w-full" onClick={() => openMediaPicker(addOwnerId)} disabled={images.length >= LIMITS.storyImages}>
-        <Plus className="w-3.5 h-3.5 mr-2" /> Add photo
+        <Plus className="w-3.5 h-3.5 mr-2" /> {t("addPhoto")}
       </Button>
     </div>
   )

@@ -1,6 +1,7 @@
 "use client"
 
 import type { ComponentType } from "react"
+import { useTranslations } from 'next-intl'
 import type { EditorMode } from "@/editor/lib/types"
 import { useUiSelector } from "@/editor/lib/store"
 import { cn } from "@/lib/utils"
@@ -90,6 +91,7 @@ function EffectChip({
 // ─── Portfolio ────────────────────────────────────────────────────────────────
 
 function PortfolioThemeSheetActions() {
+  const t = useTranslations('editor.controls.theme')
   const {
     depth, rays, texture,
     isDark, isFixed, canReset,
@@ -106,7 +108,7 @@ function PortfolioThemeSheetActions() {
         type="button"
         variant="ghost"
         size="icon"
-        title={isDark ? "Switch to light background" : "Switch to dark background"}
+        title={isDark ? t('switchToLightBackground') : t('switchToDarkBackground')}
         className={ICON_CHIP}
         onClick={toggleDarkLight}
       >
@@ -125,14 +127,14 @@ function PortfolioThemeSheetActions() {
         )}
         onClick={toggleScrollMode}
       >
-        {isFixed ? "Fixed" : "Scroll"}
+        {isFixed ? t('fixed') : t('scroll')}
       </Button>
 
       <Separator orientation="vertical" className="mx-0.5 h-5 bg-border/60 shrink-0" />
 
-      <EffectChip label="Depth"   value={depth}   options={depthOptions}   onChange={setDepth} />
-      <EffectChip label="Rays"    value={rays}    options={raysOptions}    onChange={setRays} />
-      <EffectChip label="Texture" value={texture} options={textureOptions} onChange={setTexture} />
+      <EffectChip label={t('portfolio.depthLabel')} value={depth} options={depthOptions} onChange={setDepth} />
+      <EffectChip label={t('portfolio.raysLabel')} value={rays} options={raysOptions} onChange={setRays} />
+      <EffectChip label={t('portfolio.textureLabel')} value={texture} options={textureOptions} onChange={setTexture} />
 
       <Separator orientation="vertical" className="mx-0.5 h-5 bg-border/60 shrink-0" />
 
@@ -140,7 +142,7 @@ function PortfolioThemeSheetActions() {
         type="button"
         variant="ghost"
         size="icon"
-        title="Reset all effects"
+        title={t('resetAllEffects')}
         disabled={!canReset}
         className={cn(ICON_CHIP, "disabled:opacity-30")}
         onClick={handleReset}
@@ -154,6 +156,7 @@ function PortfolioThemeSheetActions() {
 // ─── Photobook ────────────────────────────────────────────────────────────────
 
 function PhotobookThemeSheetActions() {
+  const t = useTranslations('editor.controls.theme')
   const {
     mood, texture, canReset,
     handleReset, setMood, setTexture,
@@ -163,8 +166,8 @@ function PhotobookThemeSheetActions() {
   return (
     <div className="flex items-center gap-1 px-3 py-2 overflow-x-auto no-scrollbar">
 
-      <EffectChip label="Mood"    value={mood}    options={moodOptions}    onChange={setMood} />
-      <EffectChip label="Overlay" value={texture} options={textureOptions} onChange={setTexture} />
+      <EffectChip label={t('photobook.moodTitle')} value={mood} options={moodOptions} onChange={setMood} />
+      <EffectChip label={t('photobook.overlayLabel')} value={texture} options={textureOptions} onChange={setTexture} />
 
       <Separator orientation="vertical" className="mx-0.5 h-5 bg-border/60 shrink-0" />
 
@@ -172,7 +175,7 @@ function PhotobookThemeSheetActions() {
         type="button"
         variant="ghost"
         size="icon"
-        title="Reset all overlays"
+        title={t('resetAllOverlays')}
         disabled={!canReset}
         className={cn(ICON_CHIP, "disabled:opacity-30")}
         onClick={handleReset}

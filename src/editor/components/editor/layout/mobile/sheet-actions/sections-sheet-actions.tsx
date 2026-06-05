@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { Eye, EyeOff, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,7 @@ import { useSectionsToolbar } from "@/editor/hooks/use-sections-toolbar"
  * to be touch-friendly inside the bottom sheet.
  */
 export function SectionsSheetActions() {
+  const t = useTranslations('editor.controls.sections')
   const {
     sections,
     resolvedActiveSectionId,
@@ -35,7 +37,7 @@ export function SectionsSheetActions() {
         variant="ghost"
         size="icon"
         className="h-10 w-10 shrink-0 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-        title={currentSection?.visible ? "Hide section" : "Show section"}
+        title={currentSection?.visible ? t('hideSection') : t('showSection')}
         onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
       >
         {currentSection?.visible
@@ -51,7 +53,7 @@ export function SectionsSheetActions() {
             size="sm"
             className="h-10 px-3 rounded-xl text-sm font-medium gap-1.5 border-border/60 shrink-0 max-w-44"
           >
-            <span className="truncate">{currentSection?.name ?? "Sections"}</span>
+            <span className="truncate">{currentSection?.name ?? t('allSections')}</span>
             <ChevronDown className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
           </Button>
         </PopoverTrigger>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useTranslations } from "next-intl"
 import { aspectRatios, RATIO_LABELS } from "@/editor/lib/config/aspect-ratios"
 import { frameStyles } from "@/editor/lib/config/frame-styles"
 import type { AspectRatio, FrameStyle } from "@/editor/lib/types"
@@ -61,6 +62,7 @@ export function ImagePickerCore({
   restrictions = {},
 }: ImagePickerCoreProps) {
   const [showStylePicker, setShowStylePicker] = useState(false)
+  const t = useTranslations("editor.controls.media")
 
   const handleFrameStyleChange = (newStyle: FrameStyle) => {
     const currentlyLocked = !!getFrameStyleRestrictions(value.frameStyle).lockedAspectRatio
@@ -156,7 +158,7 @@ if (dense) {
               onClick={onOpenMediaPicker}
               className="rounded-lg border border-border shadow-sm bg-background hover:ring-2 ring-primary/20 transition-all"
               style={{ position: 'relative', flexShrink: 0, width: 56, height: 56, overflow: 'hidden' }}
-              aria-label="Pick image"
+              aria-label={t("pickImage")}
             >
               {value.image ? (
                 <>
@@ -169,7 +171,7 @@ if (dense) {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full gap-1">
                   <ImageIcon className="w-4 h-4 text-muted-foreground/40" />
-                  <span className="text-[8px] uppercase font-medium text-muted-foreground/60">Add</span>
+                  <span className="text-[8px] uppercase font-medium text-muted-foreground/60">{t("add")}</span>
                 </div>
               )}
             </button>
@@ -207,7 +209,7 @@ if (dense) {
                       disabled={!value.image}
                       onClick={() => setShowStylePicker(true)}
                       className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
-                      title={frameStyles[value.frameStyle]?.name ?? "Style"}
+                      title={frameStyles[value.frameStyle]?.name ?? t("style")}
                     >
                       <Palette className="w-3.5 h-3.5" />
                     </button>
@@ -219,7 +221,7 @@ if (dense) {
                       disabled={!value.image}
                       onClick={() => setShowCrop(true)}
                       className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
-                      title="Crop"
+                      title={t("crop")}
                     >
                       <Crop className="w-3.5 h-3.5" />
                     </button>
@@ -230,7 +232,7 @@ if (dense) {
                       type="button"
                       onClick={() => onChange({ image: "", cropData: undefined })}
                       className="p-1.5 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all"
-                      title="Remove"
+                      title={t("remove")}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -243,11 +245,11 @@ if (dense) {
 
         {showCaption && !showCrop && !showStylePicker && (
           <div className="pt-2">
-            <label className={editorialLabel}>Caption</label>
+            <label className={editorialLabel}>{t("caption")}</label>
             <Input
               value={value.caption || ""}
               onChange={(e) => onChange({ caption: e.target.value })}
-              placeholder="Add caption..."
+              placeholder={t("addCaption")}
               className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs italic text-muted-foreground focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
             />
           </div>
@@ -255,11 +257,11 @@ if (dense) {
 
         {showDescription && !showCrop && !showStylePicker && (
           <div className="pt-2">
-            <label className={editorialLabel}>Description</label>
+            <label className={editorialLabel}>{t("description")}</label>
             <Textarea
               value={value.description || ""}
               onChange={(e) => onChange({ description: e.target.value })}
-              placeholder="Add description..."
+              placeholder={t("addDescription")}
               rows={2}
               className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs resize-none overflow-x-hidden break-words w-full focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
             />
@@ -322,11 +324,11 @@ if (dense) {
                     variant="ghost"
                     onClick={onOpenMediaPicker}
                     className="absolute inset-0 h-auto w-auto flex items-center justify-center rounded-none cursor-pointer hover:bg-transparent"
-                    aria-label="Change image"
+                    aria-label={t("changeImage")}
                   >
                     <span className="flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-sm text-xs font-medium text-foreground/90 hover:bg-background/80 transition-colors">
                       <Plus className="w-3 h-3" />
-                      Change
+                      {t("change")}
                     </span>
                   </Button>
 
@@ -340,7 +342,7 @@ if (dense) {
                       onChange({ image: "", cropData: undefined })
                     }}
                     className="absolute right-2 top-2 z-10 h-7 w-7 rounded-full bg-background/60 backdrop-blur-md border border-white/20 shadow-sm text-foreground/70 hover:text-foreground hover:bg-background/80"
-                    aria-label="Remove image"
+                    aria-label={t("removeImage")}
                   >
                     <X className="w-3.5 h-3.5" />
                   </Button>
@@ -353,7 +355,7 @@ if (dense) {
                   className="flex flex-col items-center justify-center w-full h-full gap-2 rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/70"
                 >
                   <ImageIcon className="w-6 h-6 stroke-[1.5]" />
-                  <span className="text-xs font-medium">Select Media</span>
+                  <span className="text-xs font-medium">{t("selectMedia")}</span>
                 </Button>
               )}
             </div>
@@ -395,7 +397,7 @@ if (dense) {
                       onClick={() => setShowStylePicker(true)}
                       className="h-8 flex-1 min-w-0 px-2 text-xs text-left justify-start truncate rounded-md text-foreground/80 hover:text-foreground hover:bg-muted/50"
                     >
-                      {frameStyles[value.frameStyle]?.name ?? "Style"}
+                      {frameStyles[value.frameStyle]?.name ?? t("style")}
                     </Button>
                   )}
                 </div>
@@ -413,7 +415,7 @@ if (dense) {
                         <Settings2 className="w-4 h-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Crop Image</TooltipContent>
+                    <TooltipContent>{t("cropImage")}</TooltipContent>
                   </Tooltip>
                 )}
               </div>
@@ -427,7 +429,7 @@ if (dense) {
           <Input
             value={value.caption || ""}
             onChange={(e) => onChange({ caption: e.target.value })}
-            placeholder="Add caption..."
+            placeholder={t("addCaption")}
             className="h-7 border-b border-t-0 border-x-0 rounded-none bg-transparent text-xs italic text-muted-foreground focus-visible:ring-0 px-0 placeholder:text-muted-foreground/50 shadow-none"
           />
         </div>
@@ -437,7 +439,7 @@ if (dense) {
         <Textarea
           value={value.description || ""}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Add description..."
+          placeholder={t("addDescription")}
           rows={3}
           className="border-0 border-b border-border/40 bg-transparent rounded-none px-1 h-auto text-xs resize-none overflow-x-hidden break-words w-full focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
         />

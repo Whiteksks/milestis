@@ -3,7 +3,7 @@ import type { ThemeConfig } from '@/editor/lib/config/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
 import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
 import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
-import { getModeTemplates } from '@/editor/lib/modes'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
 
 export type HeroPreviewComponent = ComponentType<{
   theme: ThemeConfig
@@ -22,14 +22,14 @@ export type CoverPreviewComponent = ComponentType<{
 // Adding a new template only requires editing portfolio.tsx or photobook.tsx.
 export const PORTFOLIO_PREVIEW_REGISTRY: Record<string, HeroPreviewComponent> =
   Object.fromEntries(
-    getModeTemplates('portfolio')
+    MODE_REGISTRY.portfolio.templates
       .filter((t) => t.previewComponent != null)
       .map((t) => [t.id, t.previewComponent as HeroPreviewComponent])
   )
 
 export const PHOTOBOOK_PREVIEW_REGISTRY: Record<string, CoverPreviewComponent> =
   Object.fromEntries(
-    getModeTemplates('photobook')
+    MODE_REGISTRY.photobook.templates
       .filter((t) => t.previewComponent != null)
       .map((t) => [t.id, t.previewComponent as CoverPreviewComponent])
   )

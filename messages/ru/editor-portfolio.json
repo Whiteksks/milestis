@@ -1,0 +1,52 @@
+{
+  "editor": {
+    "portfolio": {
+      "ui": {
+        "backgroundLabel": "Фон",
+        "backgroundHint": "Эффекты не применены",
+        "sectionsTabLabel": "Разделы",
+        "backgroundCatalogTitle": "Фоновые эффекты",
+        "backgroundCatalogMobileLabel": "Фон"
+      },
+      "tags": {
+        "classic": "Классический",
+        "modern": "Современный",
+        "clean": "Чистый",
+        "structured": "Структурированный",
+        "visual": "Визуальный"
+      },
+      "templates": {
+        "editorial": {
+          "name": "Редакционный"
+        },
+        "minimal": {
+          "name": "Минимализм"
+        },
+        "elegant": {
+          "name": "Элегантный"
+        },
+        "grid": {
+          "name": "Сетка"
+        },
+        "bento": {
+          "name": "Бенто"
+        },
+        "showcase": {
+          "name": "Витрина"
+        },
+        "liquidGlass": {
+          "name": "Жидкое стекло"
+        }
+      },
+      "sections": {
+        "header": "Шапка",
+        "hero": "Главный экран",
+        "bio": "О себе",
+        "featuredWork": "Избранные работы",
+        "video": "Видеораздел",
+        "contact": "Контактная форма",
+        "footer": "Подвал"
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Eye, EyeOff, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
 export function SettingsContent() {
+  const t = useTranslations('editor.layout')
   const { 
     sections, 
     toggleVisibility, 
@@ -38,14 +40,14 @@ export function SettingsContent() {
               <PopoverTrigger asChild>
                 <button className="group flex flex-col items-start outline-none transition-all min-w-0">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1 font-medium">
-                    Active Layer
+                    {t('sections.activeLayer')}
                   </span>
                   <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-colors max-w-full min-w-40">
                     <span className={cn(
                       "text-base font-medium tracking-tight transition-opacity truncate",
                       !currentSection?.visible && "opacity-40"
                     )}>
-                      {currentSection?.name ?? 'Select...'}
+                      {currentSection?.name ?? t('sections.selectLayer')}
                     </span>
                     <ChevronDown className={cn(
                       "h-3.5 w-3.5 shrink-0 text-muted-foreground ml-auto transition-transform duration-200",
@@ -62,7 +64,7 @@ export function SettingsContent() {
               >
                 <div className="px-3 py-2 mb-1">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-semibold">
-                    Project Layers
+                    {t('sections.projectLayers')}
                   </span>
                 </div>
 

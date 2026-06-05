@@ -1,0 +1,52 @@
+{
+  "editor": {
+    "portfolio": {
+      "ui": {
+        "backgroundLabel": "Фон",
+        "backgroundHint": "Әсерлер қолданылмаған",
+        "sectionsTabLabel": "Бөлімдер",
+        "backgroundCatalogTitle": "Фон әсерлері",
+        "backgroundCatalogMobileLabel": "Фон"
+      },
+      "tags": {
+        "classic": "Классикалық",
+        "modern": "Заманауи",
+        "clean": "Таза",
+        "structured": "Құрылымды",
+        "visual": "Көрнекі"
+      },
+      "templates": {
+        "editorial": {
+          "name": "Редакциялық"
+        },
+        "minimal": {
+          "name": "Минимализм"
+        },
+        "elegant": {
+          "name": "Талғампаз"
+        },
+        "grid": {
+          "name": "Тор"
+        },
+        "bento": {
+          "name": "Бенто"
+        },
+        "showcase": {
+          "name": "Көрме"
+        },
+        "liquidGlass": {
+          "name": "Сұйық әйнек"
+        }
+      },
+      "sections": {
+        "header": "Тақырыпша",
+        "hero": "Басты бөлім",
+        "bio": "Өзі туралы",
+        "featuredWork": "Таңдаулы жұмыстар",
+        "video": "Бейне бөлімі",
+        "contact": "Байланыс формасы",
+        "footer": "Төменгі бөлік"
+      }
+    }
+  }
+}

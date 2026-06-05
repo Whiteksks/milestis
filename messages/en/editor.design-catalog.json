@@ -1,0 +1,27 @@
+{
+  "editor": {
+    "modal": {
+      "designCatalog": {
+        "title": "Design Catalog",
+        "description": "Choose a template, theme, and background effects.",
+        "descriptionAlternate": "Choose a template, theme, and decorations.",
+        "sidebarTitle": "Milestis Design",
+        "sidebarDescription": "Choose template, theme and background",
+        "templates": "Templates",
+        "themes": "Themes",
+        "background": "Background",
+        "filter": "Filter",
+        "all": "All",
+        "preview": "Preview",
+        "applied": "Applied:",
+        "none": "None",
+        "selectItem": "Select an item to continue",
+        "selected": "selected",
+        "cancel": "Cancel",
+        "apply": "Apply",
+        "clean": "Clean",
+        "items": "Items"
+      }
+    }
+  }
+}

@@ -8,6 +8,8 @@ import type { LucideIcon } from 'lucide-react'
 
 import type React from 'react'
 
+export type TranslationKey = string
+
 /** Serializable content snapshot saved to / loaded from Firestore. */
 export type ModeContent = {
   sectionVisibility: unknown
@@ -41,10 +43,10 @@ export type PublishedRenderArgs = {
 
 export type TemplateDef = {
   id: TemplateId
-  name: string
+  nameKey: TranslationKey
   description?: string
   thumbnail?: string
-  tags?: string[]
+  tagKeys?: TranslationKey[]
   /** Hero / Cover component used by TemplatePreview. Co-located here so adding
    *  a template only requires editing one file. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,8 +55,17 @@ export type TemplateDef = {
 
 export type SectionDef<K extends string = string> = {
   id: string
-  name: string
+  nameKey: TranslationKey
   toggleKey: K
+}
+
+export type ResolvedTemplateDef = Omit<TemplateDef, 'nameKey' | 'tagKeys'> & {
+  name: string
+  tags?: string[]
+}
+
+export type ResolvedSectionDef<K extends string = string> = Omit<SectionDef<K>, 'nameKey'> & {
+  name: string
 }
 
 /** Args passed to renderCanvas — common fields for every mode.
@@ -69,27 +80,42 @@ export type CanvasRenderArgs = {
  *  does not require touching any shared config file. */
 export interface ModeUiConfig {
   /** Sidebar / panel header label for the backgrounds / effects section. */
-  backgroundLabel: string
+  backgroundLabelKey: TranslationKey
   /** Subtitle line shown when no effects are active. */
-  backgroundHint: string
+  backgroundHintKey: TranslationKey
   /** Icon rendered next to the background label. */
   backgroundIcon: LucideIcon
 
   /** Tab label in the left sections sidebar. */
-  sectionsTabLabel: string
+  sectionsTabLabelKey: TranslationKey
 
   /** Section-title shown inside the design catalog modal. */
-  backgroundCatalogTitle: string
+  backgroundCatalogTitleKey: TranslationKey
   /** Icon for the backgrounds tab in the mobile design catalog drawer. */
   backgroundCatalogMobileIcon: LucideIcon
   /** Label for the backgrounds tab in the mobile design catalog drawer. */
-  backgroundCatalogMobileLabel: string
+  backgroundCatalogMobileLabelKey: TranslationKey
 
   /** Returns the number of currently-active background effects for this mode. */
   getActiveEffectsCount: (c: Partial<ThemeCustomizations>) => number
   /** Resets all background effects for this mode.
    *  @param update — the `updateThemeCustomization` action from the theme store. */
   resetEffects: (update: (patch: Partial<ThemeCustomizations>) => void) => void
+}
+
+export type ResolvedModeUiConfig = Omit<
+  ModeUiConfig,
+  | 'backgroundLabelKey'
+  | 'backgroundHintKey'
+  | 'sectionsTabLabelKey'
+  | 'backgroundCatalogTitleKey'
+  | 'backgroundCatalogMobileLabelKey'
+> & {
+  backgroundLabel: string
+  backgroundHint: string
+  sectionsTabLabel: string
+  backgroundCatalogTitle: string
+  backgroundCatalogMobileLabel: string
 }
 
 export type ModeRegistryEntry<TVisibilityKey extends string> = {

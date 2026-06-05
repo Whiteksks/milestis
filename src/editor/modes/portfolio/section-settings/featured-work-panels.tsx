@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Plus, Shuffle, Trash2, Wand2 } from "lucide-react"
 import type { AspectRatio } from "@/editor/lib/types"
+import { useTranslations } from "next-intl"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { useCallback, useId, useMemo, useState } from "react"
 import { ImagePicker, createPortfolioRepeatingImage, type ImageValue } from "@/editor/image"
@@ -25,6 +26,7 @@ import { aspectRatios, RATIO_LABELS } from "@/editor/lib/config/aspect-ratios"
 import { LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.featuredWork")
   const { featuredWork, updateSectionContent } = useContentSelector((state) => ({
     featuredWork: state.sectionContent.featuredWork,
     updateSectionContent: state.updateSectionContent,
@@ -34,8 +36,8 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
     return (
       <div className={ps.root(true)}>
         <div className={ps.grid2(true)}>
-          <Input className={ps.input} value={featuredWork.title} onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })} placeholder="My best work" maxLength={LIMITS.title} />
-          <Input className={ps.input} value={featuredWork.subtitle || ""} onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })} placeholder="Subtitle" maxLength={LIMITS.subtitle} />
+          <Input className={ps.input} value={featuredWork.title} onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })} placeholder={t("myBestWork")} maxLength={LIMITS.title} />
+          <Input className={ps.input} value={featuredWork.subtitle || ""} onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })} placeholder={t("subtitle")} maxLength={LIMITS.subtitle} />
         </div>
       </div>
     )
@@ -45,22 +47,22 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
     <div className="py-2">
       <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-6">
         <div className="space-y-1 pr-2">
-          <label className={editorialLabel}>Title</label>
+          <label className={editorialLabel}>{t("title")}</label>
           <Input
             className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
             value={featuredWork.title}
             onChange={(e) => updateSectionContent("featuredWork", { title: e.target.value })}
-            placeholder="My best work"
+            placeholder={t("myBestWork")}
             maxLength={LIMITS.title}
           />
         </div>
         <div className="space-y-1 pl-2">
-          <label className={editorialLabel}>Subtitle</label>
+          <label className={editorialLabel}>{t("subtitle")}</label>
           <Input
             className={cn(editorialInput, "text-base text-muted-foreground")}
             value={featuredWork.subtitle || ""}
             onChange={(e) => updateSectionContent("featuredWork", { subtitle: e.target.value })}
-            placeholder="A curated selection"
+            placeholder={t("curatedSelection")}
             maxLength={LIMITS.subtitle}
           />
         </div>
@@ -70,6 +72,8 @@ export function FeaturedWorkHeaderPanel({ dense = false }: { dense?: boolean }) 
 }
 
 export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
+  const t = useTranslations("editor.portfolioSettings.featuredWork")
+  const tCommon = useTranslations("editor.portfolioSettings.common")
   const ownerId = useId()
   const quickPlacementOwnerId = useId()
 
@@ -182,7 +186,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
       ...projects,
       {
         id: crypto.randomUUID(),
-        title: "New Project",
+        title: t("newProject"),
         description: "",
         tags: [],
       },
@@ -209,11 +213,11 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
       {/* Quick actions */}
       {!dense && (
         <div className="flex items-center gap-4 border-b border-border/30 pb-4">
-          <label className={editorialLabel}>Quick</label>
+          <label className={editorialLabel}>{t("quick")}</label>
           <div className="flex-1" />
           <Select onValueChange={applyAspectRatioToAll}>
             <SelectTrigger className="h-auto border-0 border-b border-border/40 rounded-none text-[10px] tracking-[0.1em] uppercase px-0 py-0.5 bg-transparent shadow-none focus:ring-0 gap-1.5 text-muted-foreground/50 w-auto min-w-[80px]">
-              <SelectValue placeholder="Ratio: all" />
+              <SelectValue placeholder={t("ratioAll")} />
             </SelectTrigger>
             <SelectContent>
               {Object.values(aspectRatios).map((ratio) => (
@@ -231,7 +235,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
             className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/50 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
           >
             <Shuffle className="w-3 h-3" />
-            Place All
+            {t("placeAll")}
           </button>
         </div>
       )}
@@ -239,16 +243,16 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
       {/* Projects */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          {!dense && <label className={editorialLabel}>Projects</label>}
+          {!dense && <label className={editorialLabel}>{t("projects")}</label>}
           <Button
             variant="ghost"
             size="sm"
             className={`${ps.addBtn} ${dense ? "ml-auto" : ""}`}
             onClick={addProject}
             disabled={projects.length >= LIMITS.featuredWorkProjects}
-            title={projects.length >= LIMITS.featuredWorkProjects ? `Maximum ${LIMITS.featuredWorkProjects} projects` : undefined}
+            title={projects.length >= LIMITS.featuredWorkProjects ? t("maxProjects", { count: LIMITS.featuredWorkProjects }) : undefined}
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? "Add project" : "Add"}
+            <Plus className="w-3.5 h-3.5 mr-1" /> {dense ? t("addProject") : tCommon("add")}
           </Button>
         </div>
 
@@ -261,7 +265,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
             <Wand2 className={ps.emptyIcon} />
             {!dense && (
               <span className={ps.emptyText}>
-                Add your first project
+                {t("addFirstProject")}
               </span>
             )}
           </button>
@@ -299,7 +303,7 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
                   <SelectContent>
                     {projects.map((p, idx) => (
                       <SelectItem key={p.id} value={String(idx)}>
-                        {p.title?.trim() ? p.title : `Project ${idx + 1}`}
+                        {p.title?.trim() ? p.title : t("projectFallback", { index: idx + 1 })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -323,38 +327,38 @@ export function FeaturedWorkProjectsPanel({dense = false}: {dense?: boolean}) {
               <div className="space-y-4">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className={editorialLabel}>Title</label>
+                    <label className={editorialLabel}>{t("title")}</label>
                     <button
                       type="button"
                       onClick={() => deleteProject(normalizedIndex)}
                       className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground/30 hover:text-destructive/60 transition-colors flex items-center gap-1"
                     >
                       <Trash2 className="w-3 h-3" />
-                      Delete
+                      {t("delete")}
                     </button>
                   </div>
                   <Input
                     className={cn(editorialInput, "text-sm font-medium text-foreground")}
                     value={activeProject.title}
-                    placeholder="Project title"
+                    placeholder={t("projectTitle")}
                     onChange={(e) => updateActiveProject({ title: e.target.value })}
                     maxLength={LIMITS.projectTitle}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className={editorialLabel}>Description</label>
+                  <label className={editorialLabel}>{t("description")}</label>
                   <Textarea
                     className={cn(editorialInput, "text-sm leading-relaxed min-h-[72px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
                     value={activeProject.description}
-                    placeholder="Short description..."
+                    placeholder={t("shortDescription")}
                     onChange={(e) => updateActiveProject({ description: e.target.value })}
                     maxLength={LIMITS.projectDesc}
                   />
                 </div>
 
                 <ImagePicker
-                  label="Cover Image"
+                  label={t("coverImage")}
                   dense={dense}
                   slotId="portfolio.featured-work.item"
                   value={pickerValue}

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { createPhotobookRepeatingImage } from "@/editor/image"
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
@@ -14,6 +15,7 @@ import { useId } from "react"
 const passthroughLoader: ImageLoader = ({ src }) => src
 
 export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.gallery")
   const { gallery, updatePhotobookSection } = useContentSelector((state) => ({
     gallery: state.photobookSectionContent.gallery,
     updatePhotobookSection: state.updatePhotobookSection,
@@ -21,11 +23,11 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
 
   return (
     <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Header</PanelLabel>}
+      {!dense && <PanelLabel>{t("header")}</PanelLabel>}
       <Input
         value={gallery.label || ""}
         onChange={(e) => updatePhotobookSection("gallery", { label: e.target.value })}
-        placeholder="Section label (e.g. Gallery)"
+        placeholder={t("placeholder.sectionLabel")}
         className={ps.pbInput}
         maxLength={LIMITS.label}
       />
@@ -33,14 +35,14 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
         <Input
           value={gallery.title || ""}
           onChange={(e) => updatePhotobookSection("gallery", { title: e.target.value })}
-          placeholder="Title"
+          placeholder={t("placeholder.title")}
           className={ps.pbInput}
           maxLength={LIMITS.title}
         />
         <Input
           value={gallery.description || ""}
           onChange={(e) => updatePhotobookSection("gallery", { description: e.target.value })}
-          placeholder="Description"
+          placeholder={t("placeholder.description")}
           className={ps.pbInput}
           maxLength={LIMITS.description}
         />
@@ -50,6 +52,7 @@ export function GalleryHeaderPanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.gallery")
   const ownerId = useId()
   const {
     gallery,
@@ -110,9 +113,9 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
         <>
           <Separator className="bg-border/40" />
           <div className="flex items-center justify-between gap-3">
-            <PanelLabel>Photos <span className="text-muted-foreground/40 font-normal">({(gallery.photos || []).length}/{LIMITS.galleryImages})</span></PanelLabel>
+            <PanelLabel>{t("photos")} <span className="text-muted-foreground/40 font-normal">({(gallery.photos || []).length}/{LIMITS.galleryImages})</span></PanelLabel>
             <Button variant="outline" onClick={() => openMediaPicker(ownerId)} className="h-8 text-xs" disabled={(gallery.photos || []).length >= LIMITS.galleryImages}>
-              <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add
+              <ImageIcon className="w-3.5 h-3.5 mr-2" /> {t("add")}
             </Button>
           </div>
         </>
@@ -120,7 +123,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
 
       {dense && (
         <Button variant="outline" onClick={() => openMediaPicker(ownerId)} className="h-8 text-xs">
-          <ImageIcon className="w-3.5 h-3.5 mr-2" /> Add photos
+          <ImageIcon className="w-3.5 h-3.5 mr-2" /> {t("addPhotos")}
         </Button>
       )}
 
@@ -139,7 +142,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
                     loader={passthroughLoader}
                     unoptimized
                     src={managedImage.value.asset.src}
-                    alt={`Gallery Image ${index + 1}`}
+                    alt={t("galleryImageAlt", { index: index + 1 })}
                     fill
                     sizes="(max-width: 768px) 33vw, 120px"
                     className="object-cover"
@@ -150,7 +153,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
                   size="icon"
                   className="absolute right-1.5 top-1.5 h-6 w-6 rounded-md bg-background/90 text-muted-foreground border border-border/60 hover:bg-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
                   onClick={() => removeImage(index)}
-                  aria-label="Remove image"
+                  aria-label={t("removeImage")}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -165,7 +168,7 @@ export function GalleryImagesPanel({ dense = false }: { dense?: boolean }) {
           onClick={() => openMediaPicker(ownerId)}
         >
           <ImageIcon className="w-5 h-5 mb-1 opacity-60" />
-          <span className="text-[10px] font-medium">Add</span>
+          <span className="text-[10px] font-medium">{t("add")}</span>
         </Button>
       </div>
     </div>

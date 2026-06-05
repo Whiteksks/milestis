@@ -1,0 +1,27 @@
+{
+  "editor": {
+    "modal": {
+      "designCatalog": {
+        "title": "Дизайн каталогы",
+        "description": "Үлгіні, тақырыпты және фон әсерлерін таңдаңыз.",
+        "descriptionAlternate": "Үлгіні, тақырыпты және безендірулерді таңдаңыз.",
+        "sidebarTitle": "Milestis дизайны",
+        "sidebarDescription": "Үлгіні, тақырыпты және фонды таңдаңыз",
+        "templates": "Үлгілер",
+        "themes": "Тақырыптар",
+        "background": "Фон",
+        "filter": "Сүзгі",
+        "all": "Барлығы",
+        "preview": "Алдын ала қарау",
+        "applied": "Қолданылған:",
+        "none": "Жоқ",
+        "selectItem": "Жалғастыру үшін элементті таңдаңыз",
+        "selected": "таңдалды",
+        "cancel": "Бас тарту",
+        "apply": "Қолдану",
+        "clean": "Таза",
+        "items": "Элементтер"
+      }
+    }
+  }
+}

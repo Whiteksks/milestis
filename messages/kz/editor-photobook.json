@@ -1,0 +1,48 @@
+{
+  "editor": {
+    "photobook": {
+      "ui": {
+        "backgroundLabel": "Көңіл күй мен текстура",
+        "backgroundHint": "Қабаттар қолданылмаған",
+        "sectionsTabLabel": "Мазмұны",
+        "backgroundCatalogTitle": "Көңіл күй мен текстура",
+        "backgroundCatalogMobileLabel": "Көңіл күй"
+      },
+      "tags": {
+        "editorial": "Редакциялық",
+        "minimal": "Минималистік",
+        "documentary": "Деректі",
+        "magazine": "Журналдық",
+        "film": "Плёнкалық",
+        "light": "Жарық",
+        "warm": "Жылы",
+        "spacious": "Кең"
+      },
+      "templates": {
+        "memoir": {
+          "name": "Естеліктер"
+        },
+        "chronicle": {
+          "name": "Шежіре"
+        },
+        "magazine": {
+          "name": "Журнал"
+        },
+        "lumiere": {
+          "name": "Люмьер"
+        },
+        "soleil": {
+          "name": "Солей"
+        }
+      },
+      "sections": {
+        "cover": "Мұқаба",
+        "introduction": "Кіріспе",
+        "story": "Оқиға",
+        "gallery": "Галерея",
+        "highlight": "Негізгі сәт",
+        "ending": "Қорытынды"
+      }
+    }
+  }
+}

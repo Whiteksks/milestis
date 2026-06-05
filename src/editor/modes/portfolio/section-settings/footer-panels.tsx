@@ -2,6 +2,7 @@
 
 import { useContentSelector } from "@/editor/lib/store"
 import { Input } from "@/components/ui/input"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ps, LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 import {
@@ -30,6 +31,7 @@ function fromTuple(urls: SocialLinksTuple): SocialEntry[] {
 // ─── Panels ──────────────────────────────────────────────────────────────────
 
 export function FooterCopyrightPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.footer")
   const { footer, updateSectionContent } = useContentSelector((state) => ({
     footer: state.sectionContent.footer,
     updateSectionContent: state.updateSectionContent,
@@ -38,19 +40,19 @@ export function FooterCopyrightPanel({ dense = false }: { dense?: boolean }) {
   if (dense) {
     return (
       <div className={ps.root(true)}>
-        <Input className={ps.input} value={footer.copyright} onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })} placeholder="© 2026. All rights reserved." maxLength={LIMITS.copyright} />
+        <Input className={ps.input} value={footer.copyright} onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })} placeholder={t("copyrightPlaceholder")} maxLength={LIMITS.copyright} />
       </div>
     )
   }
 
   return (
     <div className="py-6 border-b border-border/30 space-y-3">
-      <label className={editorialLabel}>Copyright</label>
+      <label className={editorialLabel}>{t("copyright")}</label>
       <Input
         className={cn(editorialInput, "text-base text-foreground")}
         value={footer.copyright}
         onChange={(e) => updateSectionContent("footer", { copyright: e.target.value })}
-        placeholder="© 2026. All rights reserved."
+        placeholder={t("copyrightPlaceholder")}
         maxLength={LIMITS.copyright}
       />
     </div>
@@ -58,6 +60,7 @@ export function FooterCopyrightPanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.footer")
   const { footer, updateSectionContent } = useContentSelector((state) => ({
     footer: state.sectionContent.footer,
     updateSectionContent: state.updateSectionContent,
@@ -71,7 +74,7 @@ export function FooterSocialLinksPanel({ dense = false }: { dense?: boolean }) {
 
   return (
     <div className={dense ? ps.root(true) : "py-6 space-y-3"}>
-      {!dense && <label className={editorialLabel}>Social Links</label>}
+      {!dense && <label className={editorialLabel}>{t("socialLinks")}</label>}
       <SocialLinksEditor value={value} onChange={handleChange} editorial />
     </div>
   )

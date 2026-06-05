@@ -6,10 +6,12 @@ import { ImagePicker, createPortfolioSectionImage, replacePortfolioManagedImageA
 import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { LIMITS, editorialInput, editorialLabel, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function HeroTitlePanel() {
+  const t = useTranslations("editor.portfolioSettings.hero")
   const { hero, updateSectionContent } = useContentSelector((state) => ({
     hero: state.sectionContent.hero,
     updateSectionContent: state.updateSectionContent,
@@ -26,14 +28,14 @@ export function HeroTitlePanel() {
         {/* Левая колонка */}
         <div className="space-y-1 pr-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Headline</label>
+            <label className={editorialLabel}>{t("headline")}</label>
             <CharCounter value={hero.title} limit={LIMITS.title} />
           </div>
           <Input
             className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
             value={hero.title}
             onChange={(e) => updateSectionContent("hero", { title: e.target.value })}
-            placeholder="Main title"
+            placeholder={t("mainTitle")}
             maxLength={LIMITS.title}
           />
         </div>
@@ -41,14 +43,14 @@ export function HeroTitlePanel() {
         {/* Правая колонка — теперь идентична левой */}
         <div className="space-y-1 pl-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Subheadline</label>
+            <label className={editorialLabel}>{t("subheadline")}</label>
             <CharCounter value={hero.subtitle} limit={LIMITS.subtitle} />
           </div>
           <Input
             className={cn(editorialInput, "text-base text-muted-foreground")}
             value={hero.subtitle}
             onChange={(e) => updateSectionContent("hero", { subtitle: e.target.value })}
-            placeholder="Subtitle text"
+            placeholder={t("subtitleText")}
             maxLength={LIMITS.subtitle}
           />
         </div>
@@ -59,6 +61,7 @@ export function HeroTitlePanel() {
 }
 
 export function HeroDescriptionPanel() {
+  const t = useTranslations("editor.portfolioSettings.hero")
   const { hero, updateSectionContent } = useContentSelector((state) => ({
     hero: state.sectionContent.hero,
     updateSectionContent: state.updateSectionContent,
@@ -67,7 +70,7 @@ export function HeroDescriptionPanel() {
   return (
     <div className="py-6 border-b border-border/30 overflow-hidden">
       <div className="flex items-center justify-between mb-2">
-        <label className={editorialLabel}>Narrative / Description</label>
+        <label className={editorialLabel}>{t("narrativeDescription")}</label>
         <CharCounter value={hero.description} limit={LIMITS.description} />
       </div>
       <Textarea
@@ -77,7 +80,7 @@ export function HeroDescriptionPanel() {
         )}
         value={hero.description}
         onChange={(e) => updateSectionContent("hero", { description: e.target.value })}
-        placeholder="Start writing the story..."
+        placeholder={t("storyPlaceholder")}
         maxLength={LIMITS.description}
       />
     </div>
@@ -85,6 +88,7 @@ export function HeroDescriptionPanel() {
 }
 
 export function HeroImagePanel() {
+  const t = useTranslations("editor.portfolioSettings.hero")
   const ownerId = useId()
   const { heroImage, setPortfolioSingleImage } = useContentSelector((state) => ({
     heroImage: state.portfolioImageContent.hero,
@@ -111,12 +115,12 @@ export function HeroImagePanel() {
       />
 
       <div className="flex items-baseline justify-between">
-        <label className={editorialLabel}>Visual Frame</label>
+        <label className={editorialLabel}>{t("visualFrame")}</label>
         <button
           onClick={() => openMediaPicker(ownerId)}
           className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors border-b border-muted-foreground/30 pb-0.5"
         >
-          Replace Media
+          {t("replaceMedia")}
         </button>
       </div>
 

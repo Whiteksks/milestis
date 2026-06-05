@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { ps, editorialInput, editorialLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
@@ -10,6 +11,7 @@ import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
 export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.highlight")
   const { highlight, updatePhotobookSection } = useContentSelector((state) => ({
     highlight: state.photobookSectionContent.highlight,
     updatePhotobookSection: state.updatePhotobookSection,
@@ -18,8 +20,8 @@ export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
   if (dense) {
     return (
       <div className={ps.pbRoot}>
-        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder="Title" className={ps.pbInput} maxLength={LIMITS.title} />
-        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder="Description..." rows={3} className={ps.pbTextarea} maxLength={LIMITS.description} />
+        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder={t("placeholder.title")} className={ps.pbInput} maxLength={LIMITS.title} />
+        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder={t("placeholder.story")} rows={3} className={ps.pbTextarea} maxLength={LIMITS.description} />
       </div>
     )
   }
@@ -27,35 +29,36 @@ export function HighlightTextPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-1">
-        <label className={editorialLabel}>Section Label</label>
-        <Input value={highlight.label || ""} onChange={(e) => updatePhotobookSection("highlight", { label: e.target.value })} placeholder="Section label (e.g. Highlight)" className={cn(editorialInput, "text-sm text-muted-foreground")} maxLength={LIMITS.label} />
+        <label className={editorialLabel}>{t("sectionLabel")}</label>
+        <Input value={highlight.label || ""} onChange={(e) => updatePhotobookSection("highlight", { label: e.target.value })} placeholder={t("placeholder.sectionLabel")} className={cn(editorialInput, "text-sm text-muted-foreground")} maxLength={LIMITS.label} />
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <label className={editorialLabel}>Title</label>
+          <label className={editorialLabel}>{t("title")}</label>
           <CharCounter value={highlight.title || ""} limit={LIMITS.title} />
         </div>
-        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder="Title" className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")} maxLength={LIMITS.title} />
+        <Input value={highlight.title || ""} onChange={(e) => updatePhotobookSection("highlight", { title: e.target.value })} placeholder={t("placeholder.title")} className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")} maxLength={LIMITS.title} />
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <label className={editorialLabel}>Story</label>
+          <label className={editorialLabel}>{t("story")}</label>
           <CharCounter value={highlight.description || ""} limit={LIMITS.description} />
         </div>
-        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder="Tell the story of this moment..." rows={4} className={cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")} maxLength={LIMITS.description} />
+        <Textarea value={highlight.description || ""} onChange={(e) => updatePhotobookSection("highlight", { description: e.target.value })} placeholder={t("placeholder.story")} rows={4} className={cn(editorialInput, "text-sm leading-relaxed min-h-[100px] w-full max-w-full resize-none block overflow-x-hidden break-words")} maxLength={LIMITS.description} />
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <label className={editorialLabel}>Quote</label>
+          <label className={editorialLabel}>{t("quote")}</label>
           <CharCounter value={highlight.quote || ""} limit={LIMITS.quote} />
         </div>
-        <Input value={highlight.quote || ""} onChange={(e) => updatePhotobookSection("highlight", { quote: e.target.value })} placeholder="Optional quote" className={cn(editorialInput, "text-sm italic text-muted-foreground")} maxLength={LIMITS.quote} />
+        <Input value={highlight.quote || ""} onChange={(e) => updatePhotobookSection("highlight", { quote: e.target.value })} placeholder={t("placeholder.quote")} className={cn(editorialInput, "text-sm italic text-muted-foreground")} maxLength={LIMITS.quote} />
       </div>
     </div>
   )
 }
 
 export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.highlight")
   const ownerId = useId()
   const { highlightImage, setPhotobookSingleImage } = useContentSelector((state) => ({
     highlightImage: state.photobookImageContent.highlight,
@@ -79,7 +82,7 @@ export function HighlightImagePanel({ dense = false }: { dense?: boolean }) {
         }}
       />
 
-      {!dense && <label className={editorialLabel}>Image</label>}
+      {!dense && <label className={editorialLabel}>{t("image")}</label>}
 
       <ImagePicker
         slotId="photobook.highlight.primary"

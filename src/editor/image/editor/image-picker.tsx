@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { resolveImage } from '../resolve'
 import type { ImageValue } from '../data'
 import type { ImageSlotId } from '../slots'
@@ -49,6 +50,7 @@ export function ImagePicker({
   templateId: templateIdProp,
 }: ImagePickerProps) {
   const [activePanel, setActivePanel] = useState<ActivePanel>('default')
+  const t = useTranslations('editor.controls.media')
   const currentTemplateId = useThemeStore((state) => state.currentTemplateId)
   const templateId = templateIdProp ?? currentTemplateId
 
@@ -110,7 +112,7 @@ export function ImagePicker({
             <RatioPicker slotId={slotId} templateId={templateId} value={resolved.ratio} onChange={handleRatioChange} />
             <FramePicker slotId={slotId} templateId={templateId} value={resolved.frameStyle} onChange={handleFrameChange} />
             <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground px-0" onClick={() => setActivePanel('default')}>
-              ← Back
+              {`← ${t('back')}`}
             </Button>
           </div>
         ) : (
@@ -120,7 +122,7 @@ export function ImagePicker({
               onClick={onOpenMediaPicker}
               className="relative rounded-lg overflow-hidden border border-border shadow-sm bg-background hover:ring-2 ring-primary/20 transition-all"
               style={{ width: 56, height: 56, flexShrink: 0 }}
-              aria-label="Pick image"
+              aria-label={t('pickImage')}
             >
               {value.asset.src ? (
                 <>
@@ -132,7 +134,7 @@ export function ImagePicker({
               ) : (
                 <div className="flex flex-col items-center justify-center h-full gap-1">
                   <ImageIcon className="w-4 h-4 text-muted-foreground/40" />
-                  <span className="text-[8px] uppercase font-medium text-muted-foreground/60">Add</span>
+                  <span className="text-[8px] uppercase font-medium text-muted-foreground/60">{t('add')}</span>
                 </div>
               )}
             </button>
@@ -144,7 +146,7 @@ export function ImagePicker({
                   disabled={!value.asset.src}
                   onClick={() => setActivePanel('style')}
                   className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
-                  title="Style"
+                  title={t('style')}
                 >
                   <Palette className="w-3.5 h-3.5" />
                 </button>
@@ -153,7 +155,7 @@ export function ImagePicker({
                   disabled={!value.asset.src}
                   onClick={() => { crop.open(); setActivePanel('crop') }}
                   className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-background disabled:opacity-20 transition-all"
-                  title="Crop"
+                  title={t('crop')}
                 >
                   <Crop className="w-3.5 h-3.5" />
                 </button>
@@ -162,7 +164,7 @@ export function ImagePicker({
                     type="button"
                     onClick={handleRemove}
                     className="p-1.5 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all"
-                    title="Remove"
+                    title={t('remove')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -200,10 +202,10 @@ export function ImagePicker({
           <div className="p-4 space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setActivePanel('default')}>
-                ← Back
+                {`← ${t('back')}`}
               </Button>
               <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
-                Style
+                {t('style')}
               </span>
             </div>
             <RatioPicker slotId={slotId} templateId={templateId} value={resolved.ratio} onChange={handleRatioChange} />
@@ -229,11 +231,11 @@ export function ImagePicker({
                     variant="ghost"
                     onClick={onOpenMediaPicker}
                     className="absolute inset-0 h-auto w-auto flex items-center justify-center rounded-none cursor-pointer hover:bg-transparent"
-                    aria-label="Change image"
+                    aria-label={t('changeImage')}
                   >
                     <span className="flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-sm text-xs font-medium text-foreground/90 hover:bg-background/80 transition-colors">
                       <Plus className="w-3 h-3" />
-                      Change
+                      {t('change')}
                     </span>
                   </Button>
                   <Button
@@ -242,7 +244,7 @@ export function ImagePicker({
                     size="icon"
                     onClick={handleRemove}
                     className="absolute right-2 top-2 z-10 h-7 w-7 rounded-full bg-background/60 backdrop-blur-md border border-white/20 shadow-sm text-foreground/70 hover:text-foreground hover:bg-background/80"
-                    aria-label="Remove image"
+                    aria-label={t('removeImage')}
                   >
                     <X className="w-3.5 h-3.5" />
                   </Button>
@@ -254,7 +256,7 @@ export function ImagePicker({
                   className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
                 >
                   <ImageIcon className="w-8 h-8" />
-                  <span className="text-xs font-medium">Add image</span>
+                  <span className="text-xs font-medium">{t('addImage')}</span>
                 </button>
               )}
             </div>
@@ -268,7 +270,7 @@ export function ImagePicker({
                   className="flex items-center gap-1.5 px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   <Palette className="w-3 h-3" />
-                  Style
+                  {t('style')}
                 </button>
                 <button
                   type="button"
@@ -276,7 +278,7 @@ export function ImagePicker({
                   className="flex items-center gap-1.5 px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   <Crop className="w-3 h-3" />
-                  Crop
+                  {t('crop')}
                 </button>
               </div>
             )}
@@ -288,12 +290,12 @@ export function ImagePicker({
       {activePanel === 'default' && showCaption && (
         <div>
           <label className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/50 mb-1 block font-medium">
-            Caption
+            {t('caption')}
           </label>
           <Input
             value={value.caption ?? ''}
             onChange={(e) => onChange({ ...value, caption: e.target.value })}
-            placeholder="Add caption..."
+            placeholder={t('addCaption')}
             className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs italic text-muted-foreground focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
           />
         </div>
@@ -302,12 +304,12 @@ export function ImagePicker({
       {activePanel === 'default' && showDescription && (
         <div>
           <label className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/50 mb-1 block font-medium">
-            Description
+            {t('description')}
           </label>
           <Textarea
             value={value.description ?? ''}
             onChange={(e) => onChange({ ...value, description: e.target.value })}
-            placeholder="Add description..."
+            placeholder={t('addDescription')}
             rows={2}
             className="border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1 h-auto text-xs resize-none focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
           />

@@ -1,0 +1,96 @@
+{
+  "editor": {
+    "photobookSettings": {
+      "cover": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "taglineQuote": "Tagline / Quote",
+        "date": "Date",
+        "location": "Location",
+        "coverImage": "Cover Image",
+        "placeholder": {
+          "photobookTitle": "Photobook title",
+          "subtitle": "Subtitle",
+          "tagline": "A quote or tagline",
+          "date": "Date",
+          "location": "Location"
+        }
+      },
+      "introduction": {
+        "text": "Text",
+        "mainImage": "Main Image",
+        "placeholder": {
+          "sectionLabel": "Section label (e.g. Introduction)",
+          "pageTitle": "Page title",
+          "quote": "Quote",
+          "dedication": "Dedication..."
+        }
+      },
+      "highlight": {
+        "sectionLabel": "Section Label",
+        "title": "Title",
+        "story": "Story",
+        "quote": "Quote",
+        "image": "Image",
+        "placeholder": {
+          "sectionLabel": "Section label (e.g. Highlight)",
+          "title": "Title",
+          "story": "Tell the story of this moment...",
+          "quote": "Optional quote"
+        }
+      },
+      "gallery": {
+        "header": "Header",
+        "photos": "Photos",
+        "add": "Add",
+        "addPhotos": "Add photos",
+        "removeImage": "Remove image",
+        "galleryImageAlt": "Gallery Image {index}",
+        "placeholder": {
+          "sectionLabel": "Section label (e.g. Gallery)",
+          "title": "Title",
+          "description": "Description"
+        }
+      },
+      "story": {
+        "sectionLabel": "Section Label",
+        "title": "Title",
+        "date": "Date",
+        "location": "Location",
+        "label": "Label",
+        "caption": "Caption",
+        "description": "Description",
+        "photos": "Photos",
+        "add": "Add",
+        "addPhoto": "Add photo",
+        "remove": "Delete",
+        "photoOption": "Photo {index}",
+        "maximumPhotos": "Maximum {count} photos",
+        "clickToAddStoryPhotos": "Click to add story photos",
+        "placeholder": {
+          "sectionLabel": "Section label (e.g. Story)",
+          "storyTitle": "Story title",
+          "date": "e.g. June 2024",
+          "denseDate": "Date",
+          "location": "Location",
+          "label": "e.g. Morning",
+          "caption": "Optional caption",
+          "description": "Optional description"
+        }
+      },
+      "ending": {
+        "title": "Title",
+        "message": "Message",
+        "signature": "Signature",
+        "date": "Date",
+        "decorativeImage": "Decorative Image",
+        "placeholder": {
+          "title": "The End",
+          "message": "Thank you for watching...",
+          "signature": "Signature",
+          "date": "Date"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "editor": {
+    "controls": {
+      "sections": {
+        "showSection": "Show section",
+        "hideSection": "Hide section",
+        "allSections": "Sections"
+      },
+      "media": {
+        "pickImage": "Pick image",
+        "changeImage": "Change image",
+        "removeImage": "Remove image",
+        "deleteImage": "Delete image",
+        "add": "Add",
+        "addImage": "Add image",
+        "selectMedia": "Select media",
+        "style": "Style",
+        "crop": "Crop",
+        "cropImage": "Crop image",
+        "remove": "Remove",
+        "change": "Change",
+        "caption": "Caption",
+        "description": "Description",
+        "addCaption": "Add caption...",
+        "addDescription": "Add description...",
+        "back": "Back",
+        "ratio": "Ratio",
+        "frame": "Frame",
+        "fixed": "Fixed",
+        "library": "Library",
+        "upload": "Upload",
+        "uploadFirstImage": "Upload your first image",
+        "supportedFormats": "PNG, JPG, SVG supported",
+        "selectImage": "Select Image",
+        "selectImageDescription": "Choose from your uploaded images or upload a new one.",
+        "selectImagesDescription": "Choose from uploaded images or upload new ones.",
+        "mediaLibrary": "Media Library",
+        "selectProjectImage": "Select an image for your project",
+        "manageProjectImages": "Upload and manage your project images",
+        "noImagesYet": "No images yet. Upload images first.",
+        "useSelected": "Use Selected",
+        "useSelectedImages": "Use Selected Images",
+        "cancel": "Cancel",
+        "close": "Close"
+      },
+      "theme": {
+        "activeCount": "{count} active",
+        "none": "None",
+        "dark": "Dark",
+        "light": "Light",
+        "fixed": "Fixed",
+        "scroll": "Scroll",
+        "switchToLightBackground": "Switch to light background",
+        "switchToDarkBackground": "Switch to dark background",
+        "switchToParallaxScroll": "Switch to parallax scroll",
+        "switchToFixedBackground": "Switch to fixed background",
+        "resetAllEffects": "Reset all effects",
+        "resetAllOverlays": "Reset all overlays",
+        "photobook": {
+          "moodTitle": "Mood",
+          "moodLabel": "Colour Mood",
+          "moodDescription": "Global colour grade.",
+          "overlayTitle": "Photo Overlay",
+          "overlayLabel": "Overlay",
+          "overlayDescription": "Photographic texture."
+        },
+        "portfolio": {
+          "generalTitle": "General",
+          "themeLabel": "Theme",
+          "scrollLabel": "Scroll",
+          "effectsTitle": "Effects",
+          "depthLabel": "Depth",
+          "raysLabel": "Rays",
+          "textureLabel": "Texture"
+        }
+      }
+    }
+  }
+}

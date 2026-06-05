@@ -1,0 +1,96 @@
+{
+  "editor": {
+    "photobookSettings": {
+      "cover": {
+        "title": "Заголовок",
+        "subtitle": "Подзаголовок",
+        "taglineQuote": "Слоган / Цитата",
+        "date": "Дата",
+        "location": "Местоположение",
+        "coverImage": "Обложка",
+        "placeholder": {
+          "photobookTitle": "Название фотокниги",
+          "subtitle": "Подзаголовок",
+          "tagline": "Слоган или цитата",
+          "date": "Дата",
+          "location": "Местоположение"
+        }
+      },
+      "introduction": {
+        "text": "Текст",
+        "mainImage": "Основное изображение",
+        "placeholder": {
+          "sectionLabel": "Метка секции (например, Введение)",
+          "pageTitle": "Название страницы",
+          "quote": "Цитата",
+          "dedication": "Посвящение..."
+        }
+      },
+      "highlight": {
+        "sectionLabel": "Метка секции",
+        "title": "Заголовок",
+        "story": "История",
+        "quote": "Цитата",
+        "image": "Изображение",
+        "placeholder": {
+          "sectionLabel": "Метка секции (например, Выделенное)",
+          "title": "Заголовок",
+          "story": "Расскажите историю этого момента...",
+          "quote": "Необязательная цитата"
+        }
+      },
+      "gallery": {
+        "header": "Заголовок",
+        "photos": "Фотографии",
+        "add": "Добавить",
+        "addPhotos": "Добавить фотографии",
+        "removeImage": "Удалить изображение",
+        "galleryImageAlt": "Изображение галереи {index}",
+        "placeholder": {
+          "sectionLabel": "Метка секции (например, Галерея)",
+          "title": "Заголовок",
+          "description": "Описание"
+        }
+      },
+      "story": {
+        "sectionLabel": "Метка секции",
+        "title": "Заголовок",
+        "date": "Дата",
+        "location": "Местоположение",
+        "label": "Метка",
+        "caption": "Подпись",
+        "description": "Описание",
+        "photos": "Фотографии",
+        "add": "Добавить",
+        "addPhoto": "Добавить фотографию",
+        "remove": "Удалить",
+        "photoOption": "Фотография {index}",
+        "maximumPhotos": "Максимум {count} фотографий",
+        "clickToAddStoryPhotos": "Нажмите, чтобы добавить фотографии истории",
+        "placeholder": {
+          "sectionLabel": "Метка секции (например, История)",
+          "storyTitle": "Название истории",
+          "date": "например, Июнь 2024",
+          "denseDate": "Дата",
+          "location": "Местоположение",
+          "label": "например, Утро",
+          "caption": "Необязательная подпись",
+          "description": "Необязательное описание"
+        }
+      },
+      "ending": {
+        "title": "Заголовок",
+        "message": "Сообщение",
+        "signature": "Подпись",
+        "date": "Дата",
+        "decorativeImage": "Декоративное изображение",
+        "placeholder": {
+          "title": "Конец",
+          "message": "Спасибо за просмотр...",
+          "signature": "Подпись",
+          "date": "Дата"
+        }
+      }
+    }
+  }
+}

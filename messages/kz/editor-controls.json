@@ -1,0 +1,79 @@
+{
+  "editor": {
+    "controls": {
+      "sections": {
+        "showSection": "Бөлімді көрсету",
+        "hideSection": "Бөлімді жасыру",
+        "allSections": "Бөлімдер"
+      },
+      "media": {
+        "pickImage": "Суретті таңдау",
+        "changeImage": "Суретті өзгерту",
+        "removeImage": "Суретті өшіру",
+        "deleteImage": "Суретті өшіру",
+        "add": "Қосу",
+        "addImage": "Сурет қосу",
+        "selectMedia": "Медианы таңдау",
+        "style": "Стиль",
+        "crop": "Қию",
+        "cropImage": "Суретті қию",
+        "remove": "Өшіру",
+        "change": "Өзгерту",
+        "caption": "Тақырыпша",
+        "description": "Сипаттама",
+        "addCaption": "Тақырыпша қосу...",
+        "addDescription": "Сипаттама қосу...",
+        "back": "Артқа",
+        "ratio": "Қатынас",
+        "frame": "Жиек",
+        "fixed": "Бекітілген",
+        "library": "Кітапхана",
+        "upload": "Жүктеу",
+        "uploadFirstImage": "Алғашқы суретті жүктеңіз",
+        "supportedFormats": "PNG, JPG, SVG қолдайды",
+        "selectImage": "Суретті таңдау",
+        "selectImageDescription": "Жүктелген суреттерден таңдаңыз немесе жаңасын жүктеңіз.",
+        "selectImagesDescription": "Жүктелген суреттерден таңдаңыз немесе жаңаларын жүктеңіз.",
+        "mediaLibrary": "Медиа кітапхана",
+        "selectProjectImage": "Жобаңыз үшін сурет таңдаңыз",
+        "manageProjectImages": "Жоба суреттерін жүктеп, басқарыңыз",
+        "noImagesYet": "Әзірге суреттер жоқ. Алдымен оларды жүктеңіз.",
+        "useSelected": "Таңдалғанды қолдану",
+        "useSelectedImages": "Таңдалған суреттерді қолдану",
+        "cancel": "Бас тарту",
+        "close": "Жабу"
+      },
+      "theme": {
+        "activeCount": "{count} белсенді",
+        "none": "Жоқ",
+        "dark": "Қараңғы",
+        "light": "Жарық",
+        "fixed": "Бекітілген",
+        "scroll": "Айналдыру",
+        "switchToLightBackground": "Жарық фонға ауыстыру",
+        "switchToDarkBackground": "Қараңғы фонға ауыстыру",
+        "switchToParallaxScroll": "Параллакс айналдыруын қосу",
+        "switchToFixedBackground": "Бекітілген фонды қосу",
+        "resetAllEffects": "Барлық әсерлерді қалпына келтіру",
+        "resetAllOverlays": "Барлық қабаттарды қалпына келтіру",
+        "photobook": {
+          "moodTitle": "Көңіл күй",
+          "moodLabel": "Түс реңкі",
+          "moodDescription": "Жалпы түстік өңдеу.",
+          "overlayTitle": "Фото қабаты",
+          "overlayLabel": "Қабат",
+          "overlayDescription": "Фотографиялық текстура."
+        },
+        "portfolio": {
+          "generalTitle": "Жалпы",
+          "themeLabel": "Тақырып",
+          "scrollLabel": "Айналдыру",
+          "effectsTitle": "Әсерлер",
+          "depthLabel": "Тереңдік",
+          "raysLabel": "Сәулелер",
+          "textureLabel": "Текстура"
+        }
+      }
+    }
+  }
+}

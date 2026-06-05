@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -10,6 +11,7 @@ import { Eye, EyeOff, ChevronDown } from "lucide-react"
 import { useSectionsToolbar } from "@/editor/hooks/use-sections-toolbar"
 
 export function SectionsToolbarPanel() {
+  const t = useTranslations('editor.controls.sections')
   const {
     sections,
     resolvedActiveSectionId,
@@ -33,7 +35,7 @@ export function SectionsToolbarPanel() {
         variant="ghost"
         size="icon"
         className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-        title={currentSection?.visible ? "Hide section" : "Show section"}
+        title={currentSection?.visible ? t('hideSection') : t('showSection')}
         onClick={() => currentSection && toggleVisibility(currentSection.toggleKey)}
       >
         {currentSection?.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -47,7 +49,7 @@ export function SectionsToolbarPanel() {
             size="sm"
             className="h-8 px-2.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors gap-1"
           >
-            <span className="max-w-28 truncate">{currentSection?.name ?? "Sections"}</span>
+            <span className="max-w-28 truncate">{currentSection?.name ?? t('allSections')}</span>
             <ChevronDown className="w-3 h-3 shrink-0" />
           </Button>
         </PopoverTrigger>

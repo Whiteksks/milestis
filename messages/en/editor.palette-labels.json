@@ -1,0 +1,40 @@
+{
+  "editor": {
+    "paletteLabels": {
+      "themeTags": {
+        "light": "Light",
+        "dark": "Dark",
+        "warm": "Warm",
+        "cool": "Cool",
+        "minimal": "Minimal",
+        "vibrant": "Vibrant"
+      },
+      "mood": {
+        "none": "None",
+        "golden": "Golden",
+        "dreamy": "Dreamy",
+        "noir": "Noir",
+        "muted": "Muted",
+        "warm": "Warm",
+        "cool": "Cool",
+        "fade": "Fade",
+        "earthy": "Earthy",
+        "vibrant": "Vibrant"
+      },
+      "texture": {
+        "none": "None",
+        "warmth": "Warmth",
+        "haze": "Haze",
+        "grain": "Grain",
+        "vignette": "Vignette",
+        "parchment": "Parchment",
+        "silver": "Silver",
+        "matte": "Matte",
+        "canvas": "Canvas",
+        "velvet": "Velvet",
+        "linen": "Linen"
+      },
+      "clean": "Clean"
+    }
+  }
+}

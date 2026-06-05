@@ -1,0 +1,79 @@
+{
+  "editor": {
+    "controls": {
+      "sections": {
+        "showSection": "Показать раздел",
+        "hideSection": "Скрыть раздел",
+        "allSections": "Разделы"
+      },
+      "media": {
+        "pickImage": "Выбрать изображение",
+        "changeImage": "Изменить изображение",
+        "removeImage": "Удалить изображение",
+        "deleteImage": "Удалить изображение",
+        "add": "Добавить",
+        "addImage": "Добавить изображение",
+        "selectMedia": "Выбрать медиа",
+        "style": "Стиль",
+        "crop": "Обрезка",
+        "cropImage": "Обрезать изображение",
+        "remove": "Удалить",
+        "change": "Изменить",
+        "caption": "Подпись",
+        "description": "Описание",
+        "addCaption": "Добавить подпись...",
+        "addDescription": "Добавить описание...",
+        "back": "Назад",
+        "ratio": "Соотношение",
+        "frame": "Рамка",
+        "fixed": "Фиксировано",
+        "library": "Библиотека",
+        "upload": "Загрузить",
+        "uploadFirstImage": "Загрузите первое изображение",
+        "supportedFormats": "Поддерживаются PNG, JPG, SVG",
+        "selectImage": "Выбрать изображение",
+        "selectImageDescription": "Выберите из загруженных изображений или загрузите новое.",
+        "selectImagesDescription": "Выберите из загруженных изображений или загрузите новые.",
+        "mediaLibrary": "Медиабиблиотека",
+        "selectProjectImage": "Выберите изображение для проекта",
+        "manageProjectImages": "Загружайте изображения проекта и управляйте ими",
+        "noImagesYet": "Изображений пока нет. Сначала загрузите их.",
+        "useSelected": "Использовать выбранное",
+        "useSelectedImages": "Использовать выбранные изображения",
+        "cancel": "Отмена",
+        "close": "Закрыть"
+      },
+      "theme": {
+        "activeCount": "{count} активно",
+        "none": "Нет",
+        "dark": "Тёмная",
+        "light": "Светлая",
+        "fixed": "Статичный",
+        "scroll": "Прокрутка",
+        "switchToLightBackground": "Переключить на светлый фон",
+        "switchToDarkBackground": "Переключить на тёмный фон",
+        "switchToParallaxScroll": "Включить параллакс-прокрутку",
+        "switchToFixedBackground": "Включить фиксированный фон",
+        "resetAllEffects": "Сбросить все эффекты",
+        "resetAllOverlays": "Сбросить все наложения",
+        "photobook": {
+          "moodTitle": "Настроение",
+          "moodLabel": "Цветовое настроение",
+          "moodDescription": "Глобальная цветокоррекция.",
+          "overlayTitle": "Наложение фото",
+          "overlayLabel": "Наложение",
+          "overlayDescription": "Фотографическая текстура."
+        },
+        "portfolio": {
+          "generalTitle": "Общее",
+          "themeLabel": "Тема",
+          "scrollLabel": "Прокрутка",
+          "effectsTitle": "Эффекты",
+          "depthLabel": "Глубина",
+          "raysLabel": "Лучи",
+          "textureLabel": "Текстура"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { Filter, LayoutTemplate, Palette } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -36,14 +37,16 @@ export function DesignCatalogSidebar({
   visibleCount,
   editorMode,
 }: Props) {
-  const modeConfig = editorMode ? getModeUiConfig(editorMode) : null
+  const t = useTranslations('editor.modal.designCatalog')
+  const translate = useTranslations()
+  const modeConfig = editorMode ? getModeUiConfig(editorMode, translate) : null
   return (
     <aside className="w-full md:w-60  md:border-r border-border bg-sidebar p-4">
       <div className="flex items-center gap-2">
-        <h2 className="text-xl font-bold text-foreground tracking-tight">Milestis Design</h2>
+        <h2 className="text-xl font-bold text-foreground tracking-tight">{t('sidebarTitle')}</h2>
       </div>
       <p className="hidden md:block text-sm text-muted-foreground mt-1 leading-relaxed">
-        Choose template, theme and background
+        {t('sidebarDescription')}
       </p>
 
       <div className="flex md:flex-col gap-1 mt-4">
@@ -57,7 +60,7 @@ export function DesignCatalogSidebar({
           )}
         >
           <LayoutTemplate className="h-4 w-4" />
-          Templates
+          {t('templates')}
         </Button>
 
         <Button
@@ -70,7 +73,7 @@ export function DesignCatalogSidebar({
           )}
         >
           <Palette className="h-4 w-4" />
-          Themes
+          {t('themes')}
         </Button>
 
         <Button
@@ -85,7 +88,7 @@ export function DesignCatalogSidebar({
           {modeConfig
             ? <modeConfig.backgroundIcon className="h-4 w-4" />
             : null}
-          {modeConfig?.backgroundLabel ?? 'Background'}
+          {modeConfig?.backgroundLabel ?? t('background')}
         </Button>
       </div>
 
@@ -113,7 +116,7 @@ export function DesignCatalogSidebar({
                       activeTag === 'all' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                     )}
                   >
-                    All
+                    {t('all')}
                     <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{totalCount}</span>
                   </Button>
 
@@ -143,7 +146,7 @@ export function DesignCatalogSidebar({
 
           <div className="hidden md:block mt-4">
             <Separator className="mb-3" />
-            <p className="text-xs font-medium text-muted-foreground/70 mb-1 px-1">Filter</p>
+            <p className="text-xs font-medium text-muted-foreground/70 mb-1 px-1">{t('filter')}</p>
             <nav className="flex flex-col gap-0.5">
               <Button
                 type="button"
@@ -154,7 +157,7 @@ export function DesignCatalogSidebar({
                   activeTag === 'all' && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
                 )}
               >
-                All
+                {t('all')}
                 <span className="ml-auto text-xs tabular-nums text-muted-foreground/70">{totalCount}</span>
               </Button>
                 

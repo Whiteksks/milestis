@@ -26,6 +26,7 @@ import { Check, Upload, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 interface MediaPickerModalProps {
   ownerId: string
@@ -34,6 +35,7 @@ interface MediaPickerModalProps {
 }
 
 export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: MediaPickerModalProps) {
+  const t = useTranslations('editor.controls.media')
   const { isMediaPickerOpen, mediaPickerOwnerId, closeMediaPicker } = useUiSelector((state) => ({
     isMediaPickerOpen: state.isMediaPickerOpen,
     mediaPickerOwnerId: state.mediaPickerOwnerId,
@@ -93,7 +95,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
     <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain rounded-2xl border border-border p-4 bg-muted/30">
       {isEmpty ? (
         <div className="flex items-center justify-center h-40 text-muted-foreground text-sm font-medium">
-          No images yet. Upload images first.
+          {t('noImagesYet')}
         </div>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -170,14 +172,14 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         onClick={closePicker}
         className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50"
       >
-        Cancel
+        {t('cancel')}
       </Button>
       <Button
         onClick={handleConfirm}
         disabled={selectedUrls.length === 0}
         className="rounded-xl bg-foreground text-background hover:bg-foreground/90 shadow-md px-6 transition-all disabled:opacity-50"
       >
-        {isMultiSelect ? 'Use Selected Images' : 'Use Selected'}
+        {isMultiSelect ? t('useSelectedImages') : t('useSelected')}
       </Button>
     </div>
   )
@@ -200,10 +202,10 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
           <DrawerHeader className="px-5 py-4 flex flex-row items-center justify-between">
             <div>
               <DrawerTitle className="text-base font-semibold tracking-tight">
-                Select Image
+                {t('selectImage')}
               </DrawerTitle>
               <DrawerDescription className="text-xs text-muted-foreground mt-0.5">
-                Choose from uploaded images or upload a new one.
+                {isMultiSelect ? t('selectImagesDescription') : t('selectImageDescription')}
               </DrawerDescription>
             </div>
             <Button
@@ -213,7 +215,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-3.5 w-3.5" />
-              Upload
+              {t('upload')}
             </Button>
             {uploadInput}
           </DrawerHeader>
@@ -232,10 +234,10 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
         <DialogHeader className="pb-6 flex flex-row items-center justify-between">
           <div>
             <DialogTitle className="text-xl font-semibold text-foreground tracking-tight">
-              Select Image
+              {t('selectImage')}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Choose from your uploaded images or upload a new one.
+              {isMultiSelect ? t('selectImagesDescription') : t('selectImageDescription')}
             </DialogDescription>
           </div>
           <Button
@@ -245,7 +247,7 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload className="h-4 w-4" />
-            Upload
+            {t('upload')}
           </Button>
           {uploadInput}
         </DialogHeader>

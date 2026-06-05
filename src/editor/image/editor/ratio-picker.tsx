@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import type { TemplateId } from '@/editor/lib/types'
 import { getEffectiveImagePolicy } from '../policy/registry'
 import type { ImageSlotId } from '../slots'
@@ -28,18 +29,19 @@ interface RatioPickerProps {
 
 export function RatioPicker({ slotId, value, onChange, templateId, className }: RatioPickerProps) {
   const policy = getEffectiveImagePolicy(slotId, templateId)
+  const t = useTranslations('editor.controls.media')
 
   // Forced ratio — display only, no interaction
   if (policy.ratio.forced) {
     return (
       <div className={cn('flex items-center gap-1.5', className)}>
         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">
-          Ratio
+          {t('ratio')}
         </span>
         <span className="text-[11px] font-medium text-muted-foreground px-2 py-0.5 rounded bg-muted">
           {ratioLabel(policy.ratio.forced)}
         </span>
-        <span className="text-[10px] text-muted-foreground/40">fixed</span>
+        <span className="text-[10px] text-muted-foreground/40">{t('fixed')}</span>
       </div>
     )
   }
@@ -49,7 +51,7 @@ export function RatioPicker({ slotId, value, onChange, templateId, className }: 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">
-        Ratio
+        {t('ratio')}
       </span>
       <div className="flex gap-1 flex-wrap">
         {options.map((ratio) => (

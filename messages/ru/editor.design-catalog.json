@@ -1,0 +1,27 @@
+{
+  "editor": {
+    "modal": {
+      "designCatalog": {
+        "title": "Каталог дизайнов",
+        "description": "Выберите шаблон, тему и фоновые эффекты.",
+        "descriptionAlternate": "Выберите шаблон, тему и декорации.",
+        "sidebarTitle": "Дизайн Milestis",
+        "sidebarDescription": "Выберите шаблон, тему и фон",
+        "templates": "Шаблоны",
+        "themes": "Темы",
+        "background": "Фон",
+        "filter": "Фильтр",
+        "all": "Все",
+        "preview": "Предпросмотр",
+        "applied": "Применено:",
+        "none": "Нет",
+        "selectItem": "Выберите элемент для продолжения",
+        "selected": "выбрано",
+        "cancel": "Отмена",
+        "apply": "Применить",
+        "clean": "Чистый",
+        "items": "Элементов"
+      }
+    }
+  }
+}

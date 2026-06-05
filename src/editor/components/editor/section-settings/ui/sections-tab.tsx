@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -8,6 +9,7 @@ import { Eye, EyeOff, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function SectionsTab() {
+  const t = useTranslations('editor.layout')
   const { 
     sections, 
     toggleVisibility, 
@@ -41,14 +43,14 @@ export function SectionsTab() {
               <PopoverTrigger asChild>
                 <button className="group flex flex-col items-start outline-none transition-all min-w-0">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1 font-medium">
-                    Active Layer
+                    {t('sections.activeLayer')}
                   </span>
                   <div className="flex items-center gap-2 border-b border-foreground/10 group-hover:border-foreground/40 pb-1 transition-all max-w-full min-w-48">
                     <span className={cn(
                       "text-md font-medium tracking-tight transition-opacity truncate",
                       !currentSection?.visible && "opacity-40"
                     )}>
-                      {currentSection?.name ?? 'Select...'}
+                      {currentSection?.name ?? t('sections.selectLayer')}
                     </span>
                     <ChevronDown className={cn(
                       "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-300 ml-auto",
@@ -66,7 +68,7 @@ export function SectionsTab() {
                 {/* Заголовок внутри списка для контекста */}
                 <div className="px-3 py-2 mb-1">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-semibold">
-                    Project Layers
+                    {t('sections.projectLayers')}
                   </span>
                 </div>
 

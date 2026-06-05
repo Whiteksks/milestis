@@ -2,6 +2,7 @@
 
 import { memo, createElement } from 'react'
 import type { CSSProperties } from 'react'
+import { useTranslations } from 'next-intl'
 import { Check, Layers } from 'lucide-react'
 import { TemplatePreview } from '@/components/shared/template-preview'
 
@@ -181,6 +182,8 @@ export function ThemesSection({
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
+  const t = useTranslations('editor.paletteLabels')
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
       {items.map((theme) => {
@@ -300,6 +303,8 @@ function PhotobookPresetCardInner({
   isSelected: boolean
   onSelect: (id: string) => void
 }) {
+  const t = useTranslations('editor.paletteLabels')
+
   const filter =
     preset.mood !== 'none' ? getMoodFilter(preset.mood as PhotobookMood) : undefined
   const raw =
@@ -308,8 +313,8 @@ function PhotobookPresetCardInner({
     ? { ...raw, backgroundAttachment: 'scroll' }
     : undefined
 
-  const moodLabel = preset.mood !== 'none' ? preset.mood : null
-  const textureLabel = preset.texture !== 'none' ? preset.texture : null
+  const moodLabel = preset.mood !== 'none' ? t(`mood.${preset.mood}`) : null
+  const textureLabel = preset.texture !== 'none' ? t(`texture.${preset.texture}`) : null
 
   return (
     <button
@@ -327,7 +332,7 @@ function PhotobookPresetCardInner({
         {preset.mood === 'none' && preset.texture === 'none' ? (
           <div className="absolute inset-0 bg-muted/60 flex items-center justify-center">
             <span className="text-xs text-muted-foreground/50 font-medium tracking-widest uppercase">
-              Clean
+              {t('clean')}
             </span>
           </div>
         ) : (

@@ -1,0 +1,48 @@
+{
+  "editor": {
+    "photobook": {
+      "ui": {
+        "backgroundLabel": "Настроение и текстура",
+        "backgroundHint": "Наложения не применены",
+        "sectionsTabLabel": "Содержание",
+        "backgroundCatalogTitle": "Настроение и текстура",
+        "backgroundCatalogMobileLabel": "Настроение"
+      },
+      "tags": {
+        "editorial": "Редакционный",
+        "minimal": "Минимализм",
+        "documentary": "Документальный",
+        "magazine": "Журнальный",
+        "film": "Плёночный",
+        "light": "Светлый",
+        "warm": "Тёплый",
+        "spacious": "Просторный"
+      },
+      "templates": {
+        "memoir": {
+          "name": "Мемуары"
+        },
+        "chronicle": {
+          "name": "Хроника"
+        },
+        "magazine": {
+          "name": "Журнал"
+        },
+        "lumiere": {
+          "name": "Люмьер"
+        },
+        "soleil": {
+          "name": "Солей"
+        }
+      },
+      "sections": {
+        "cover": "Обложка",
+        "introduction": "Введение",
+        "story": "История",
+        "gallery": "Галерея",
+        "highlight": "Главный момент",
+        "ending": "Завершение"
+      }
+    }
+  }
+}

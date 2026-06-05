@@ -1,0 +1,46 @@
+{
+  "editor": {
+    "layout": {
+      "header": {
+        "brand": "Milestis",
+        "backToDashboard": "Back to Dashboard",
+        "projectNamePlaceholder": "Untitled",
+        "saveShortcut": "Save (Ctrl+S)",
+        "media": "Media",
+        "preview": "Preview",
+        "publish": "Publish",
+        "published": "Published",
+        "viewSite": "View site",
+        "unpublish": "Unpublish",
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile",
+        "fullscreen": "Full Screen"
+      },
+      "sidebar": {
+        "background": "Background",
+        "decorations": "Decorations",
+        "expand": "Expand sidebar",
+        "collapse": "Collapse sidebar",
+        "filter": "Filter",
+        "all": "All"
+      },
+      "sections": {
+        "activeLayer": "Active Layer",
+        "selectLayer": "Select...",
+        "projectLayers": "Project Layers"
+      },
+      "mobile": {
+        "sections": "Sections",
+        "background": "Background",
+        "decorations": "Decor",
+        "design": "Design"
+      },
+      "floating": {
+        "changeTemplate": "Change Template",
+        "changeTheme": "Change Theme",
+        "background": "Background"
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "editor": {
+    "modal": {
+      "publish": {
+        "title": {
+          "portfolio": "Publish Portfolio",
+          "photobook": "Publish Photobook",
+          "review": "Review & Confirm"
+        },
+        "description": {
+          "portfolio": "Choose a custom subdomain for your site.",
+          "photobook": "Choose a memorable link identifier for your photobook.",
+          "review": "Review publication details before confirming.",
+          "reviewDesktop": "Review the details below before confirming publication."
+        },
+        "actions": {
+          "cancel": "Cancel",
+          "continue": "Continue",
+          "back": "Back",
+          "tryAgain": "Try again",
+          "publish": "Publish",
+          "checking": "Checking…",
+          "publishing": "Publishing…"
+        },
+        "form": {
+          "subdomainSettings": "Subdomain Settings",
+          "linkIdentifier": "Link Identifier",
+          "placeholderPortfolio": "unique-name",
+          "placeholderPhotobook": "moment-2026",
+          "privacyFirst": "Privacy First: This link is encrypted and hidden from search engines. Only people with the direct URL can see your photos.",
+          "globalAccess": "Global Access: Your site will be optimized for fast loading worldwide. You can update your content or domain at any time.",
+          "available": "Subdomain is available!",
+          "taken": "This subdomain is already taken.",
+          "invalid": "Lowercase letters, numbers, hyphens (3–24 chars).",
+          "reserved": "This name is reserved and cannot be used."
+        },
+        "review": {
+          "project": "Project",
+          "address": "Address",
+          "photos": "Photos",
+          "noPhotos": "No photos",
+          "uniquePhotos": "{count} unique",
+          "cost": "Cost",
+          "credits": "credits",
+          "balance": "balance: {balance}",
+          "insufficient": "You don't have enough credits. Top up your balance to continue.",
+          "terms": "By publishing you accept our Terms of Service and Content Policy. Credits are non-refundable once publication is confirmed.",
+          "analysisFailed": "Analysis failed"
+        }
+      }
+    }
+  }
+}

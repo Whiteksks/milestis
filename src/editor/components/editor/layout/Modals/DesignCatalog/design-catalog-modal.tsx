@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -32,6 +33,8 @@ import { DesignCatalogFooter } from './design-catalog-footer'
 import { BackgroundsSection, PhotobookPresetsSection, ThemesSection, TemplatesSection } from './sections'
 
 export function DesignCatalogModal() {
+  const t = useTranslations('editor.modal.designCatalog')
+  const translate = useTranslations()
   const {
     isDesignModalOpen,
     designModalSection,
@@ -76,9 +79,9 @@ export function DesignCatalogModal() {
     customizations: ThemeCustomizations
   } | null>(null)
 
-  const templates = useMemo(() => getModeTemplates(editorMode), [editorMode])
+  const templates = useMemo(() => getModeTemplates(editorMode, translate), [editorMode, translate])
   const isPhotobook = editorMode === 'photobook'
-  const modeConfig = getModeUiConfig(editorMode)
+  const modeConfig = getModeUiConfig(editorMode, translate)
 
   useEffect(() => {
     if (isDesignModalOpen) {
@@ -139,7 +142,7 @@ export function DesignCatalogModal() {
     return (itemsForSection as Array<{ tags?: string[] }>).filter((item) => (item.tags ?? []).includes(activeTag))
   }, [activeTag, itemsForSection])
 
-  const activeTagLabel = activeTag === 'all' ? 'All' : activeTag
+  const activeTagLabel = activeTag === 'all' ? t('all') : activeTag
 
   const currentTemplateName = useMemo(
     () => templates.find((t) => t.id === currentTemplateId)?.name ?? currentTemplateId ?? null,
@@ -365,8 +368,8 @@ export function DesignCatalogModal() {
   // ── MOBILE: Drawer ──────────────────────────────────────────────
   if (isMobile) {
     const mobileSections = [
-      { id: 'templates' as const, icon: LayoutTemplate, label: 'Templates' },
-      { id: 'themes' as const, icon: Palette, label: 'Themes' },
+      { id: 'templates' as const, icon: LayoutTemplate, label: t('templates') },
+      { id: 'themes' as const, icon: Palette, label: t('themes') },
       { id: 'backgrounds' as const, icon: modeConfig.backgroundCatalogMobileIcon, label: modeConfig.backgroundCatalogMobileLabel },
     ]
 
@@ -386,8 +389,8 @@ export function DesignCatalogModal() {
           className={cn("md:hidden flex flex-col bg-card border-border/60 focus:outline-none transition-opacity duration-200", isPreviewMode && "opacity-60")}
         >
           <DrawerHeader className="sr-only">
-            <DrawerTitle>Design Catalog</DrawerTitle>
-            <DrawerDescription>Choose a template, theme, and background effects.</DrawerDescription>
+            <DrawerTitle>{t('title')}</DrawerTitle>
+            <DrawerDescription>{t('description')}</DrawerDescription>
           </DrawerHeader>
 
           {/* Section switcher — horizontal tabs */}
@@ -415,7 +418,7 @@ export function DesignCatalogModal() {
                 className={cn('shrink-0', isPreviewMode && 'border-primary/40 text-primary hover:text-primary')}
               >
                 {isPreviewMode ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                <span className="hidden sm:inline">Preview</span>
+                <span className="hidden sm:inline">{t('preview')}</span>
               </Button>
             </div>
           </div>
@@ -424,7 +427,7 @@ export function DesignCatalogModal() {
           {tagMeta.availableTags.length > 0 && (
             <div className="shrink-0 px-4 pt-2 pb-0 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
-                {visibleItems.length} item{visibleItems.length !== 1 ? 's' : ''}
+                {visibleItems.length} {visibleItems.length === 1 ? t('item') : t('items')}
                 {activeTag !== 'all' && (
                   <> · <span className="font-medium text-foreground">{activeTag}</span></>
                 )}
@@ -437,7 +440,7 @@ export function DesignCatalogModal() {
                     className={cn('h-7 gap-1.5 text-xs', activeTag !== 'all' && 'border-primary/40 text-primary hover:text-primary')}
                   >
                     <Filter className="h-3.5 w-3.5" />
-                    Filter
+                    {t('filter')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" side="bottom" className="w-44 p-1.5">
@@ -447,7 +450,7 @@ export function DesignCatalogModal() {
                     className="w-full justify-between"
                     onClick={() => setActiveTag('all')}
                   >
-                    All
+                    {t('all')}
                     <span className="text-xs text-muted-foreground">{itemsForSection.length}</span>
                   </Button>
                   {tagMeta.availableTags.map((tag) => (
@@ -494,8 +497,8 @@ export function DesignCatalogModal() {
         if (!open) handleClose()
       }}
     >
-      <DialogTitle className="sr-only">Design Catalog</DialogTitle>
-      <DialogDescription className="sr-only">Choose a template, theme, and decorations.</DialogDescription>
+      <DialogTitle className="sr-only">{t('title')}</DialogTitle>
+      <DialogDescription className="sr-only">{t('description')}</DialogDescription>
 
       <DialogContent
         className={cn(
@@ -525,12 +528,12 @@ export function DesignCatalogModal() {
           <main className="flex-1 flex flex-col min-h-0 min-w-0">
             <DialogHeader className="shrink-0 px-4 md:px-6 py-4 border-b border-border flex-row items-center justify-between gap-4">
               <div className="hidden md:flex items-center gap-1.5 text-xs min-w-0 flex-1 overflow-hidden">
-                <span className="text-muted-foreground shrink-0">Applied:</span>
+                <span className="text-muted-foreground shrink-0">{t('applied')}</span>
                 <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentTemplateName ?? '—'}</span>
                 <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
                 <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentThemeName ?? '—'}</span>
                 <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
-                <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentBackgroundName ?? 'None'}</span>
+                <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentBackgroundName ?? t('none')}</span>
               </div>
               <Button
                 variant={isPreviewMode ? 'outline' : 'ghost'}
@@ -539,7 +542,7 @@ export function DesignCatalogModal() {
                 className={cn('shrink-0 mr-6', isPreviewMode && 'border-primary/40 text-primary hover:text-primary')}
               >
                 {isPreviewMode ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                <span>Preview</span>
+                <span>{t('preview')}</span>
               </Button>
             </DialogHeader>
 

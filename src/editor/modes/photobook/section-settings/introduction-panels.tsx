@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { PanelLabel, ps, LIMITS } from "@/editor/components/editor/section-settings/ui/panel-ui"
@@ -10,6 +11,7 @@ import { useContentSelector, useUiStore } from "@/editor/lib/store"
 import { useId } from "react"
 
 export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.introduction")
   const { introduction, updatePhotobookSection } = useContentSelector((state) => ({
     introduction: state.photobookSectionContent.introduction,
     updatePhotobookSection: state.updatePhotobookSection,
@@ -17,12 +19,12 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
 
   return (
     <div className={ps.pbRoot}>
-      {!dense && <PanelLabel>Text</PanelLabel>}
+      {!dense && <PanelLabel>{t("text")}</PanelLabel>}
 
       <Input
         value={introduction.label || ""}
         onChange={(e) => updatePhotobookSection("introduction", { label: e.target.value })}
-        placeholder="Section label (e.g. Introduction)"
+        placeholder={t("placeholder.sectionLabel")}
         className={ps.pbInput}
         maxLength={LIMITS.label}
       />
@@ -31,14 +33,14 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
         <Input
           value={introduction.title}
           onChange={(e) => updatePhotobookSection("introduction", { title: e.target.value })}
-          placeholder="Page title"
+          placeholder={t("placeholder.pageTitle")}
           className={ps.pbInput}
           maxLength={LIMITS.title}
         />
         <Input
           value={introduction.quote || ""}
           onChange={(e) => updatePhotobookSection("introduction", { quote: e.target.value })}
-          placeholder="Quote"
+          placeholder={t("placeholder.quote")}
           className={ps.pbInput}
           maxLength={LIMITS.quote}
         />
@@ -47,7 +49,7 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
       <Textarea
         value={introduction.dedication || ""}
         onChange={(e) => updatePhotobookSection("introduction", { dedication: e.target.value })}
-        placeholder="Dedication..."
+        placeholder={t("placeholder.dedication")}
         rows={4}
         className={ps.pbTextarea}
         maxLength={LIMITS.dedication}
@@ -57,6 +59,7 @@ export function IntroductionTextPanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.introduction")
   const ownerId = useId()
   const { introImage, setPhotobookSingleImage } = useContentSelector((state) => ({
     introImage: state.photobookImageContent.introduction,
@@ -83,7 +86,7 @@ export function IntroductionImagePanel({ dense = false }: { dense?: boolean }) {
       {!dense && (
         <>
           <Separator className="bg-border/40" />
-          <PanelLabel>Main Image</PanelLabel>
+          <PanelLabel>{t("mainImage")}</PanelLabel>
         </>
       )}
 

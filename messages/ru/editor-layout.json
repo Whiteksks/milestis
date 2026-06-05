@@ -1,0 +1,46 @@
+{
+  "editor": {
+    "layout": {
+      "header": {
+        "brand": "Milestis",
+        "backToDashboard": "Вернуться в панель управления",
+        "projectNamePlaceholder": "Без названия",
+        "saveShortcut": "Сохранить (Ctrl+S)",
+        "media": "Медиа",
+        "preview": "Предпросмотр",
+        "publish": "Опубликовать",
+        "published": "Опубликовано",
+        "viewSite": "Открыть сайт",
+        "unpublish": "Снять с публикации",
+        "desktop": "Компьютер",
+        "tablet": "Планшет",
+        "mobile": "Телефон",
+        "fullscreen": "Полный экран"
+      },
+      "sidebar": {
+        "background": "Фон",
+        "decorations": "Декорации",
+        "expand": "Развернуть боковую панель",
+        "collapse": "Свернуть боковую панель",
+        "filter": "Фильтр",
+        "all": "Все"
+      },
+      "sections": {
+        "activeLayer": "Активный слой",
+        "selectLayer": "Выбрать...",
+        "projectLayers": "Слои проекта"
+      },
+      "mobile": {
+        "sections": "Разделы",
+        "background": "Фон",
+        "decorations": "Декор",
+        "design": "Дизайн"
+      },
+      "floating": {
+        "changeTemplate": "Изменить шаблон",
+        "changeTheme": "Изменить тему",
+        "background": "Фон"
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { useThemeSelector, useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
 import { RotateCcw, Sun, Sparkles, ChevronDown } from 'lucide-react'
@@ -57,6 +58,8 @@ function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }:
 }
 
 export function ThemeSettingsPanel() {
+  const t = useTranslations('editor.controls.theme')
+  const translate = useTranslations()
   const { themeCustomizations, updateThemeCustomization } = useThemeSelector((state) => ({
     themeCustomizations: state.themeCustomizations,
     updateThemeCustomization: state.updateThemeCustomization,
@@ -64,7 +67,7 @@ export function ThemeSettingsPanel() {
 
   const editorMode = useUiSelector((state) => state.editorMode)
   const isPhotobook = editorMode === 'photobook'
-  const modeConfig = getModeUiConfig(editorMode)
+  const modeConfig = getModeUiConfig(editorMode, translate)
 
   const {
     depthEffect: depth = 'none',
@@ -93,7 +96,7 @@ export function ThemeSettingsPanel() {
               </h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {activeCount > 0 ? (
-                  <span className="text-primary font-medium">{activeCount} active</span>
+                  <span className="text-primary font-medium">{t('activeCount', { count: activeCount })}</span>
                 ) : modeConfig.backgroundHint}
               </p>
             </div>
@@ -115,20 +118,20 @@ export function ThemeSettingsPanel() {
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {isPhotobook ? (
           <>
-            <CollapsibleSection title="Mood" icon={Sun}>
+            <CollapsibleSection title={t('photobook.moodTitle')} icon={Sun}>
               <EffectCard
-                label="Colour Mood"
-                description="Global colour grade."
+                label={t('photobook.moodLabel')}
+                description={t('photobook.moodDescription')}
                 value={photobookMood}
                 options={MOOD_OPTIONS}
                 onChange={(v) => updateThemeCustomization({ photobookMood: v as PhotobookMood })}
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Photo Overlay" icon={Sparkles}>
+            <CollapsibleSection title={t('photobook.overlayTitle')} icon={Sparkles}>
               <EffectCard
-                label="Overlay"
-                description="Photographic texture."
+                label={t('photobook.overlayLabel')}
+                description={t('photobook.overlayDescription')}
                 value={photobookTexture}
                 options={TEXTURE_OPTIONS}
                 onChange={(v) => updateThemeCustomization({ photobookTexture: v as PhotobookTexture })}
@@ -137,44 +140,44 @@ export function ThemeSettingsPanel() {
           </>
         ) : (
           <>
-            <CollapsibleSection title="General" icon={Sun}>
+            <CollapsibleSection title={t('portfolio.generalTitle')} icon={Sun}>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/60 uppercase px-1">Theme</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/60 uppercase px-1">{t('portfolio.themeLabel')}</label>
                   <SegmentedControl
                     value={layersTheme}
-                    options={[{ id: 'dark', label: 'Dark' }, { id: 'light', label: 'Light' }]}
+                    options={[{ id: 'dark', label: t('dark') }, { id: 'light', label: t('light') }]}
                     onChange={(v) => updateThemeCustomization({ backgroundLayersTheme: v as BackgroundLayersTheme })}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/60 uppercase px-1">Scroll</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/60 uppercase px-1">{t('portfolio.scrollLabel')}</label>
                   <SegmentedControl
                     value={scrollMode}
-                    options={[{ id: 'fixed', label: 'Fixed' }, { id: 'scroll', label: 'Scroll' }]}
+                    options={[{ id: 'fixed', label: t('fixed') }, { id: 'scroll', label: t('scroll') }]}
                     onChange={(v) => updateThemeCustomization({ backgroundScrollMode: v as BackgroundScrollMode })}
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            <CollapsibleSection title="Effects" icon={Sparkles}>
+            <CollapsibleSection title={t('portfolio.effectsTitle')} icon={Sparkles}>
               <EffectCard
-                label="Depth"
+                label={t('portfolio.depthLabel')}
                 value={depth}
-                options={[{ id: 'none', label: 'None' }, ...DEPTH_EFFECTS]}
+                options={[{ id: 'none', label: t('none') }, ...DEPTH_EFFECTS]}
                 onChange={(v) => updateThemeCustomization({ depthEffect: v as DepthEffect })}
               />
               <EffectCard
-                label="Rays"
+                label={t('portfolio.raysLabel')}
                 value={rays}
-                options={[{ id: 'none', label: 'None' }, ...RAYS_EFFECTS]}
+                options={[{ id: 'none', label: t('none') }, ...RAYS_EFFECTS]}
                 onChange={(v) => updateThemeCustomization({ raysEffect: v as RayEffect })}
               />
               <EffectCard
-                label="Texture"
+                label={t('portfolio.textureLabel')}
                 value={texture}
-                options={[{ id: 'none', label: 'None' }, ...TEXTURE_EFFECTS]}
+                options={[{ id: 'none', label: t('none') }, ...TEXTURE_EFFECTS]}
                 onChange={(v) => updateThemeCustomization({ textureEffect: v as TextureEffect })}
               />
             </CollapsibleSection>

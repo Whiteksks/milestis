@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { frameStyles } from '@/editor/lib/config/frame-styles'
 import type { TemplateId } from '@/editor/lib/types'
 import { getEffectiveImagePolicy } from '../policy/registry'
@@ -17,18 +18,19 @@ interface FramePickerProps {
 
 export function FramePicker({ slotId, value, onChange, templateId, className }: FramePickerProps) {
   const policy = getEffectiveImagePolicy(slotId, templateId)
+  const t = useTranslations('editor.controls.media')
 
   // Forced frame — display only, no interaction
   if (policy.frame.forced) {
     return (
       <div className={cn('flex items-center gap-1.5', className)}>
         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">
-          Frame
+          {t('frame')}
         </span>
         <span className="text-[11px] font-medium text-muted-foreground px-2 py-0.5 rounded bg-muted">
           {frameStyles[policy.frame.forced]?.name ?? policy.frame.forced}
         </span>
-        <span className="text-[10px] text-muted-foreground/40">fixed</span>
+        <span className="text-[10px] text-muted-foreground/40">{t('fixed')}</span>
       </div>
     )
   }
@@ -38,7 +40,7 @@ export function FramePicker({ slotId, value, onChange, templateId, className }: 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">
-        Frame
+        {t('frame')}
       </span>
       <div className="flex gap-1 flex-wrap">
         {options.map((frame) => {

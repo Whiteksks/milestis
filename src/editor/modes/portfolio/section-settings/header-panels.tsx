@@ -5,18 +5,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trash2, Plus } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ps, LIMITS, editorialInput, editorialLabel } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
-const anchorSections = [
-  { id: "hero", label: "Hero Section" },
-  { id: "bio", label: "Bio / About" },
-  { id: "work", label: "Featured Work" },
-  { id: "video", label: "Video" },
-  { id: "contact", label: "Contact" },
-]
-
 export function HeaderBrandPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.header")
   const { header, updateSectionContent } = useContentSelector((state) => ({
     header: state.sectionContent.header,
     updateSectionContent: state.updateSectionContent,
@@ -25,47 +19,57 @@ export function HeaderBrandPanel({ dense = false }: { dense?: boolean }) {
   if (dense) {
     return (
       <div className={ps.root(true)}>
-        <Input className={ps.input} value={header.title} onChange={(e) => updateSectionContent("header", { title: e.target.value })} placeholder="Your brand or name" maxLength={LIMITS.title} />
+        <Input className={ps.input} value={header.title} onChange={(e) => updateSectionContent("header", { title: e.target.value })} placeholder={t("brandPlaceholder")} maxLength={LIMITS.title} />
       </div>
     )
   }
 
   return (
     <div className="py-4 border-b border-border/30 space-y-3">
-      <label className={editorialLabel}>Brand Title</label>
+      <label className={editorialLabel}>{t("brandTitle")}</label>
       <Input
         className={cn(editorialInput, "text-base font-medium text-foreground")}
         value={header.title}
         onChange={(e) => updateSectionContent("header", { title: e.target.value })}
-        placeholder="Your brand or name"
+        placeholder={t("brandPlaceholder")}
         maxLength={LIMITS.title}
       />
     </div>
   )
 }
 export function HeaderLinksPanel() {
+  const t = useTranslations("editor.portfolioSettings.header")
+  const tCommon = useTranslations("editor.portfolioSettings.common")
   const { header, updateSectionContent } = useContentSelector((state) => ({
     header: state.sectionContent.header,
     updateSectionContent: state.updateSectionContent,
   }))
 
+  const anchorSections = [
+    { id: "hero", label: t("sections.hero") },
+    { id: "bio", label: t("sections.bio") },
+    { id: "work", label: t("sections.work") },
+    { id: "video", label: t("sections.video") },
+    { id: "contact", label: t("sections.contact") },
+  ]
+
   const addLink = () => {
     if (header.links.length >= LIMITS.links) return
     updateSectionContent("header", {
-      links: [...header.links, { label: "New Link", href: "#hero" }],
+      links: [...header.links, { label: t("newLink"), href: "#hero" }],
     })
   }
 
   return (
     <div className="py-4 space-y-0">
       <div className="flex items-center justify-between border-b border-border/30 pb-2">
-        <label className={editorialLabel}>Navigation Links</label>
+        <label className={editorialLabel}>{t("navigationLinks")}</label>
         {header.links.length < LIMITS.links && (
           <button 
             onClick={addLink}
             className="text-[10px] uppercase tracking-widest text-foreground hover:opacity-60 transition-opacity flex items-center gap-1"
           >
-            <Plus className="w-3 h-3" /> Add Item
+            <Plus className="w-3 h-3" /> {tCommon("addItem")}
           </button>
         )}
       </div>
@@ -82,7 +86,7 @@ export function HeaderLinksPanel() {
             <div className="flex-1">
               <Input
                 className={cn(editorialInput, "text-sm font-medium")}
-                placeholder="Link Label"
+                placeholder={t("linkLabel")}
                 value={link.label}
                 onChange={(e) => {
                   const newLinks = [...header.links]
@@ -136,14 +140,14 @@ export function HeaderLinksPanel() {
             <div className="p-3 bg-muted/50 rounded-full group-hover:scale-110 transition-transform">
               <Plus className="w-5 h-5" />
             </div>
-            <span className="text-[10px] uppercase tracking-[0.2em]">Add first link</span>
+            <span className="text-[10px] uppercase tracking-[0.2em]">{t("addFirstLink")}</span>
           </button>
         )}
       </div>
 
       {header.links.length >= LIMITS.links && (
         <p className="text-[9px] text-muted-foreground/40 text-center italic">
-          Navigation limit reached for optimal design balance.
+          {t("navigationLimitReached")}
         </p>
       )}
     </div>

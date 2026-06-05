@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { MediaPickerModal } from "@/editor/components/editor/layout/Modals/media-picker-modal"
 import { ImagePicker, createPhotobookSectionImage, replacePhotobookManagedImageAsset, type ImageValue } from "@/editor/image"
 import { ps, editorialInput, editorialLabel, PanelLabel, LIMITS, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
@@ -11,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 
 
 export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.cover")
   const { cover, updatePhotobookSection } = useContentSelector((state) => ({
     cover: state.photobookSectionContent.cover,
     updatePhotobookSection: state.updatePhotobookSection,
@@ -20,8 +22,8 @@ export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
     return (
       <div className={ps.pbRoot}>
         <div className={ps.pbGrid2}>
-          <Input value={cover.title} onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })} placeholder="Photobook title" className={ps.pbInput} maxLength={LIMITS.title} />
-          <Input value={cover.subtitle || ""} onChange={(e) => updatePhotobookSection("cover", { subtitle: e.target.value })} placeholder="Subtitle" className={ps.pbInput} maxLength={LIMITS.subtitle} />
+          <Input value={cover.title} onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })} placeholder={t("placeholder.photobookTitle")} className={ps.pbInput} maxLength={LIMITS.title} />
+          <Input value={cover.subtitle || ""} onChange={(e) => updatePhotobookSection("cover", { subtitle: e.target.value })} placeholder={t("placeholder.subtitle")} className={ps.pbInput} maxLength={LIMITS.subtitle} />
         </div>
       </div>
     )
@@ -32,26 +34,26 @@ export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
       <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-4 mb-4">
         <div className="space-y-1 pr-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Title</label>
+            <label className={editorialLabel}>{t("title")}</label>
             <CharCounter value={cover.title} limit={LIMITS.title} />
           </div>
           <Input
             value={cover.title}
             onChange={(e) => updatePhotobookSection("cover", { title: e.target.value })}
-            placeholder="Photobook title"
+            placeholder={t("placeholder.photobookTitle")}
             className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
             maxLength={LIMITS.title}
           />
         </div>
         <div className="space-y-1 pl-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Subtitle</label>
+            <label className={editorialLabel}>{t("subtitle")}</label>
             <CharCounter value={cover.subtitle || ""} limit={LIMITS.subtitle} />
           </div>
           <Input
             value={cover.subtitle || ""}
             onChange={(e) => updatePhotobookSection("cover", { subtitle: e.target.value })}
-            placeholder="Subtitle"
+            placeholder={t("placeholder.subtitle")}
             className={cn(editorialInput, "text-base text-muted-foreground")}
             maxLength={LIMITS.subtitle}
           />
@@ -59,13 +61,13 @@ export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <label className={editorialLabel}>Tagline / Quote</label>
+          <label className={editorialLabel}>{t("taglineQuote")}</label>
           <CharCounter value={cover.tagline || ""} limit={LIMITS.tagline} />
         </div>
         <Input
           value={cover.tagline || ""}
           onChange={(e) => updatePhotobookSection("cover", { tagline: e.target.value })}
-          placeholder="A quote or tagline"
+          placeholder={t("placeholder.tagline")}
           className={cn(editorialInput, "text-sm italic text-muted-foreground")}
           maxLength={LIMITS.tagline}
         />
@@ -75,6 +77,7 @@ export function CoverTextPanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function CoverMetadataPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.cover")
   const { cover, updatePhotobookSection } = useContentSelector((state) => ({
     cover: state.photobookSectionContent.cover,
     updatePhotobookSection: state.updatePhotobookSection,
@@ -83,18 +86,19 @@ export function CoverMetadataPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-1">
-        {!dense && <label className={editorialLabel}>Date</label>}
-        <Input value={cover.date || ""} onChange={(e) => updatePhotobookSection("cover", { date: e.target.value })} placeholder="Date" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} maxLength={LIMITS.date} />
+        {!dense && <label className={editorialLabel}>{t("date")}</label>}
+        <Input value={cover.date || ""} onChange={(e) => updatePhotobookSection("cover", { date: e.target.value })} placeholder={t("placeholder.date")} className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} maxLength={LIMITS.date} />
       </div>
       <div className="space-y-1">
-        {!dense && <label className={editorialLabel}>Location</label>}
-        <Input value={cover.location || ""} onChange={(e) => updatePhotobookSection("cover", { location: e.target.value })} placeholder="Location" className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} maxLength={LIMITS.location} />
+        {!dense && <label className={editorialLabel}>{t("location")}</label>}
+        <Input value={cover.location || ""} onChange={(e) => updatePhotobookSection("cover", { location: e.target.value })} placeholder={t("placeholder.location")} className={dense ? ps.pbInput : cn(editorialInput, "text-sm")} maxLength={LIMITS.location} />
       </div>
     </div>
   )
 }
 
 export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.photobookSettings.cover")
   const ownerId = useId()
   const { coverImage, setPhotobookSingleImage } = useContentSelector((state) => ({
     coverImage: state.photobookImageContent.cover,
@@ -125,7 +129,7 @@ export function CoverImagePanel({ dense = false }: { dense?: boolean }) {
       {!dense && (
         <>
           <Separator className="bg-border/40" />
-          <PanelLabel>Cover Image</PanelLabel>
+          <PanelLabel>{t("coverImage")}</PanelLabel>
         </>
       )}
 

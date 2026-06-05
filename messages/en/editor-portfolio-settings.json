@@ -1,0 +1,104 @@
+{
+  "editor": {
+    "portfolioSettings": {
+      "common": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "description": "Description",
+        "add": "Add",
+        "addItem": "Add Item",
+        "replaceMedia": "Replace Media"
+      },
+      "header": {
+        "brandTitle": "Brand Title",
+        "brandPlaceholder": "Your brand or name",
+        "navigationLinks": "Navigation Links",
+        "linkLabel": "Link Label",
+        "addFirstLink": "Add first link",
+        "navigationLimitReached": "Navigation limit reached for optimal design balance.",
+        "newLink": "New Link",
+        "sections": {
+          "hero": "Hero Section",
+          "bio": "Bio / About",
+          "work": "Featured Work",
+          "video": "Video",
+          "contact": "Contact"
+        }
+      },
+      "hero": {
+        "headline": "Headline",
+        "subheadline": "Subheadline",
+        "mainTitle": "Main title",
+        "subtitleText": "Subtitle text",
+        "narrativeDescription": "Narrative / Description",
+        "storyPlaceholder": "Start writing the story...",
+        "visualFrame": "Visual Frame",
+        "replaceMedia": "Replace Media"
+      },
+      "bio": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "sectionTitle": "Section title",
+        "about": "About",
+        "whoYouAre": "Who you are",
+        "profilePhoto": "Profile Photo",
+        "replaceMedia": "Replace Media",
+        "biography": "Biography",
+        "tellStory": "Tell your story",
+        "tellStoryEllipsis": "Tell your story...",
+        "achievementsRecognition": "Achievements & Recognition",
+        "achievementPlaceholder": "Grant, Award or Key Milestone...",
+        "recordAchievement": "Record an achievement",
+        "maxDisplayCapacity": "Maximum display capacity reached."
+      },
+      "featuredWork": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "description": "Description",
+        "myBestWork": "My best work",
+        "curatedSelection": "A curated selection",
+        "quick": "Quick",
+        "ratioAll": "Ratio: all",
+        "placeAll": "Place All",
+        "projects": "Projects",
+        "addProject": "Add project",
+        "addFirstProject": "Add your first project",
+        "maxProjects": "Maximum {count} projects",
+        "projectFallback": "Project {index}",
+        "delete": "Delete",
+        "projectTitle": "Project title",
+        "shortDescription": "Short description...",
+        "coverImage": "Cover Image",
+        "newProject": "New Project"
+      },
+      "contact": {
+        "subtitle": "Subtitle",
+        "description": "Description",
+        "heading": "Heading",
+        "getInTouch": "Get in touch",
+        "letsTalk": "Let's talk",
+        "descriptionPlaceholder": "How can I help you?",
+        "descriptionText": "Description text...",
+        "email": "Email",
+        "emailAddress": "Email Address",
+        "emailPlaceholder": "hello@example.com"
+      },
+      "footer": {
+        "copyright": "Copyright",
+        "copyrightPlaceholder": "© 2026. All rights reserved.",
+        "socialLinks": "Social Links"
+      },
+      "video": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "description": "Description",
+        "videoTitle": "Video title",
+        "subtitleText": "Subtitle text",
+        "describeVideo": "Describe the video...",
+        "youtubeUrl": "YouTube URL",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "youtubeHelp": "Supports standard YouTube links and youtu.be"
+      }
+    }
+  }
+}

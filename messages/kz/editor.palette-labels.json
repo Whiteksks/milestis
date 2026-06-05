@@ -1,0 +1,40 @@
+{
+  "editor": {
+    "paletteLabels": {
+      "themeTags": {
+        "light": "Жарық",
+        "dark": "Қараңғы",
+        "warm": "Жылы",
+        "cool": "Суық",
+        "minimal": "Минималистік",
+        "vibrant": "Қанық"
+      },
+      "mood": {
+        "none": "Жоқ",
+        "golden": "Алтын реңкті",
+        "dreamy": "Арманшыл",
+        "noir": "Нуар",
+        "muted": "Бәсең",
+        "warm": "Жылы",
+        "cool": "Суық",
+        "fade": "Өңі кеткен",
+        "earthy": "Табиғи",
+        "vibrant": "Қанық"
+      },
+      "texture": {
+        "none": "Жоқ",
+        "warmth": "Жылылық",
+        "haze": "Тұман",
+        "grain": "Түйіршіктілік",
+        "vignette": "Виньетка",
+        "parchment": "Пергамент",
+        "silver": "Күміс",
+        "matte": "Күңгірт",
+        "canvas": "Кенеп",
+        "velvet": "Барқыт",
+        "linen": "Зығыр"
+      },
+      "clean": "Таза"
+    }
+  }
+}

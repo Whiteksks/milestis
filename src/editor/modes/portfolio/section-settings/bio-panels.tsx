@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Trash2, Plus, Trophy } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ps, LIMITS, editorialInput, editorialLabel, CharCounter } from "@/editor/components/editor/section-settings/ui/panel-ui"
 
 export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.bio")
   const { bio, updateSectionContent } = useContentSelector((state) => ({
     bio: state.sectionContent.bio,
     updateSectionContent: state.updateSectionContent,
@@ -21,8 +23,8 @@ export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
     return (
       <div className={ps.root(true)}>
         <div className={ps.grid2(true)}>
-          <Input className={ps.input} value={bio.title} onChange={(e) => updateSectionContent("bio", { title: e.target.value })} placeholder="Section title" maxLength={LIMITS.title} />
-          <Input className={ps.input} value={bio.subtitle || ""} onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })} placeholder="Subtitle" maxLength={LIMITS.subtitle} />
+          <Input className={ps.input} value={bio.title} onChange={(e) => updateSectionContent("bio", { title: e.target.value })} placeholder={t("sectionTitle")} maxLength={LIMITS.title} />
+          <Input className={ps.input} value={bio.subtitle || ""} onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })} placeholder={t("subtitle")} maxLength={LIMITS.subtitle} />
         </div>
       </div>
     )
@@ -33,27 +35,27 @@ export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
       <div className="grid grid-cols-2 divide-x divide-border/30 border-b border-border/30 pb-6">
         <div className="space-y-1 pr-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Title</label>
+            <label className={editorialLabel}>{t("title")}</label>
             <CharCounter value={bio.title} limit={LIMITS.title} />
           </div>
           <Input
             className={cn(editorialInput, "text-base font-medium tracking-tight text-foreground")}
             value={bio.title}
             onChange={(e) => updateSectionContent("bio", { title: e.target.value })}
-            placeholder="About"
+            placeholder={t("about")}
             maxLength={LIMITS.title}
           />
         </div>
         <div className="space-y-1 pl-2">
           <div className="flex items-center justify-between">
-            <label className={editorialLabel}>Subtitle</label>
+            <label className={editorialLabel}>{t("subtitle")}</label>
             <CharCounter value={bio.subtitle || ""} limit={LIMITS.subtitle} />
           </div>
           <Input
             className={cn(editorialInput, "text-base text-muted-foreground")}
             value={bio.subtitle || ""}
             onChange={(e) => updateSectionContent("bio", { subtitle: e.target.value })}
-            placeholder="Who you are"
+            placeholder={t("whoYouAre")}
             maxLength={LIMITS.subtitle}
           />
         </div>
@@ -63,6 +65,7 @@ export function BioTitlePanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.bio")
   const ownerId = useId()
   const { bioImage, setPortfolioSingleImage } = useContentSelector((state) => ({
     bioImage: state.portfolioImageContent.bio,
@@ -120,12 +123,12 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
         }}
       />
       <div className="flex items-baseline justify-between">
-        <label className={editorialLabel}>Profile Photo</label>
+        <label className={editorialLabel}>{t("profilePhoto")}</label>
         <button
           onClick={() => openMediaPicker(ownerId)}
           className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors border-b border-muted-foreground/30 pb-0.5"
         >
-          Replace Media
+          {t("replaceMedia")}
         </button>
       </div>
       <div className="relative group transition-all duration-500">
@@ -152,6 +155,7 @@ export function BioPhotoPanel({ dense = false }: { dense?: boolean }) {
 }
 
 export function BioBiographyPanel({ dense = false }: { dense?: boolean }) {
+  const t = useTranslations("editor.portfolioSettings.bio")
   const { bio, updateSectionContent } = useContentSelector((state) => ({
     bio: state.sectionContent.bio,
     updateSectionContent: state.updateSectionContent,
@@ -164,7 +168,7 @@ export function BioBiographyPanel({ dense = false }: { dense?: boolean }) {
           className={ps.textarea(true, "min-h-24", "min-h-32")}
           value={bio.description}
           onChange={(e) => updateSectionContent("bio", { description: e.target.value })}
-          placeholder="Tell your story"
+          placeholder={t("tellStory")}
           maxLength={LIMITS.bio}
         />
       </div>
@@ -174,20 +178,22 @@ export function BioBiographyPanel({ dense = false }: { dense?: boolean }) {
   return (
     <div className="py-6 border-b border-border/30 overflow-hidden">
       <div className="flex items-center justify-between mb-2">
-        <label className={editorialLabel}>Biography</label>
+        <label className={editorialLabel}>{t("biography")}</label>
         <CharCounter value={bio.description} limit={LIMITS.bio} />
       </div>
       <Textarea
         className={cn(editorialInput, "text-base leading-relaxed min-h-[120px] w-full max-w-full resize-none block overflow-x-hidden break-words")}
         value={bio.description}
         onChange={(e) => updateSectionContent("bio", { description: e.target.value })}
-        placeholder="Tell your story..."
+        placeholder={t("tellStoryEllipsis")}
         maxLength={LIMITS.bio}
       />
     </div>
   )
 }
 export function BioAchievementsPanel() {
+  const t = useTranslations("editor.portfolioSettings.bio")
+  const tCommon = useTranslations("editor.portfolioSettings.common")
   const { bio, updateSectionContent } = useContentSelector((state) => ({
     bio: state.sectionContent.bio,
     updateSectionContent: state.updateSectionContent,
@@ -215,13 +221,13 @@ export function BioAchievementsPanel() {
     <div className="py-8 space-y-6">
       {/* Шапка секции */}
       <div className="flex items-center justify-between border-b border-border/30 pb-2">
-        <label className={editorialLabel}>Achievements & Recognition</label>
+        <label className={editorialLabel}>{t("achievementsRecognition")}</label>
         {achievements.length < LIMITS.count && (
           <button 
             onClick={addAchievement}
             className="text-[10px] uppercase tracking-widest text-foreground hover:opacity-60 transition-opacity flex items-center gap-1"
           >
-            <Plus className="w-3 h-3" /> Add Item
+            <Plus className="w-3 h-3" /> {tCommon("addItem")}
           </button>
         )}
       </div>
@@ -242,7 +248,7 @@ export function BioAchievementsPanel() {
             <div className="flex-1">
               <Input
                 className={cn(editorialInput, "text-sm leading-snug")}
-                placeholder="Grant, Award or Key Milestone..."
+                placeholder={t("achievementPlaceholder")}
                 value={achievement}
                 onChange={(e) => updateAchievement(index, e.target.value)}
                 maxLength={LIMITS.achievement}
@@ -268,7 +274,7 @@ export function BioAchievementsPanel() {
             className="w-full py-10 border border-dashed border-border/30 rounded-2xl flex flex-col items-center justify-center gap-2 text-muted-foreground/60 hover:text-foreground hover:border-border/60 transition-all group"
           >
             <Trophy className="w-5 h-5 mb-1 opacity-20 group-hover:opacity-100 transition-opacity" />
-            <span className="text-[10px] uppercase tracking-[0.2em]">Record an achievement</span>
+            <span className="text-[10px] uppercase tracking-[0.2em]">{t("recordAchievement")}</span>
           </button>
         )}
       </div>
@@ -276,7 +282,7 @@ export function BioAchievementsPanel() {
       {/* Лимиты */}
       {achievements.length >= LIMITS.count && (
         <p className="text-[9px] text-muted-foreground/30 text-center italic pt-2">
-          Maximum display capacity reached.
+          {t("maxDisplayCapacity")}
         </p>
       )}
     </div>

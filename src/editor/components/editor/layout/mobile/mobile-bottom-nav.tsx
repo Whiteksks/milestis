@@ -1,6 +1,7 @@
 'use client'
 
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import type { MobileEditorTab } from '@/editor/lib/config/editor-tabs'
@@ -14,17 +15,17 @@ interface MobileBottomNavProps {
   onTabChange: (tab: NavTab) => void
 }
 
-// Модульная константа — не пересоздаётся при каждом рендере
-const TABS: { id: NavTab; icon: React.ElementType; label: string }[] = [
-  { id: 'sections', icon: Layers, label: 'Sections' },
-  { id: 'background', icon: Paintbrush, label: 'Background' },
-  { id: 'decorations', icon: Sparkles, label: 'Decor' },
-  { id: 'design', icon: LayoutTemplate, label: 'Design' },
-]
-
 export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps) {
+  const t = useTranslations('editor.layout.mobile')
   const scrollRef = useCanvasScrollContainer()
   const atBottom = useScrollAtBottom(scrollRef ?? { current: null }, 8)
+
+  const tabs: { id: NavTab; icon: React.ElementType; label: string }[] = [
+    { id: 'sections', icon: Layers, label: t('sections') },
+    { id: 'background', icon: Paintbrush, label: t('background') },
+    { id: 'decorations', icon: Sparkles, label: t('decorations') },
+    { id: 'design', icon: LayoutTemplate, label: t('design') },
+  ]
 
   return (
     // Static container — no layout properties animated
@@ -50,7 +51,7 @@ export function MobileBottomNav({ activeTab, onTabChange }: MobileBottomNavProps
         }}
       >
         <div className="grid grid-cols-4 h-12">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               aria-label={tab.label}

@@ -1,0 +1,96 @@
+{
+  "editor": {
+    "photobookSettings": {
+      "cover": {
+        "title": "Тақырып",
+        "subtitle": "Қосымша тақырып",
+        "taglineQuote": "Ұран / Дәйексөз",
+        "date": "Күні",
+        "location": "Орналасқан жері",
+        "coverImage": "Мұқаба суреті",
+        "placeholder": {
+          "photobookTitle": "Фотокітап атауы",
+          "subtitle": "Қосымша тақырып",
+          "tagline": "Дәйексөз немесе ұран",
+          "date": "Күні",
+          "location": "Орналасқан жері"
+        }
+      },
+      "introduction": {
+        "text": "Мәтін",
+        "mainImage": "Негізгі сурет",
+        "placeholder": {
+          "sectionLabel": "Бөлім атауы (мысалы, Кіріспе)",
+          "pageTitle": "Бет тақырыбы",
+          "quote": "Дәйексөз",
+          "dedication": "Арнау..."
+        }
+      },
+      "highlight": {
+        "sectionLabel": "Бөлім атауы",
+        "title": "Тақырып",
+        "story": "Оқиға",
+        "quote": "Дәйексөз",
+        "image": "Сурет",
+        "placeholder": {
+          "sectionLabel": "Бөлім атауы (мысалы, Ерекше сәт)",
+          "title": "Тақырып",
+          "story": "Осы сәттің тарихын айтып беріңіз...",
+          "quote": "Қосымша дәйексөз"
+        }
+      },
+      "gallery": {
+        "header": "Тақырып",
+        "photos": "Фотосуреттер",
+        "add": "Қосу",
+        "addPhotos": "Фотосуреттер қосу",
+        "removeImage": "Суретті жою",
+        "galleryImageAlt": "Галерея суреті {index}",
+        "placeholder": {
+          "sectionLabel": "Бөлім атауы (мысалы, Галерея)",
+          "title": "Тақырып",
+          "description": "Сипаттама"
+        }
+      },
+      "story": {
+        "sectionLabel": "Бөлім атауы",
+        "title": "Тақырып",
+        "date": "Күні",
+        "location": "Орналасқан жері",
+        "label": "Белгі",
+        "caption": "Түсіндірме",
+        "description": "Сипаттама",
+        "photos": "Фотосуреттер",
+        "add": "Қосу",
+        "addPhoto": "Фотосурет қосу",
+        "remove": "Жою",
+        "photoOption": "Фотосурет {index}",
+        "maximumPhotos": "Ең көбі {count} фотосурет",
+        "clickToAddStoryPhotos": "Оқиға фотосуреттерін қосу үшін басыңыз",
+        "placeholder": {
+          "sectionLabel": "Бөлім атауы (мысалы, Оқиға)",
+          "storyTitle": "Оқиға тақырыбы",
+          "date": "мысалы, Маусым 2024",
+          "denseDate": "Күні",
+          "location": "Орналасқан жері",
+          "label": "мысалы, Таңертең",
+          "caption": "Қосымша түсіндірме",
+          "description": "Қосымша сипаттама"
+        }
+      },
+      "ending": {
+        "title": "Тақырып",
+        "message": "Хабарлама",
+        "signature": "Қолтаңба",
+        "date": "Күні",
+        "decorativeImage": "Сәндік сурет",
+        "placeholder": {
+          "title": "Соңы",
+          "message": "Көргеніңізге рахмет...",
+          "signature": "Қолтаңба",
+          "date": "Күні"
+        }
+      }
+    }
+  }
+}

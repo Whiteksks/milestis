@@ -1,0 +1,104 @@
+{
+  "editor": {
+    "portfolioSettings": {
+      "common": {
+        "title": "Заголовок",
+        "subtitle": "Подзаголовок",
+        "description": "Описание",
+        "add": "Добавить",
+        "addItem": "Добавить",
+        "replaceMedia": "Заменить медиа"
+      },
+      "header": {
+        "brandTitle": "Название бренда",
+        "brandPlaceholder": "Ваш бренд или имя",
+        "navigationLinks": "Навигационные ссылки",
+        "linkLabel": "Метка ссылки",
+        "addFirstLink": "Добавить первую ссылку",
+        "navigationLimitReached": "Достигнут лимит навигации для оптимального баланса дизайна.",
+        "newLink": "Новая ссылка",
+        "sections": {
+          "hero": "Главная секция",
+          "bio": "О себе",
+          "work": "Избранные работы",
+          "video": "Видео",
+          "contact": "Контакты"
+        }
+      },
+      "hero": {
+        "headline": "Заголовок",
+        "subheadline": "Подзаголовок",
+        "mainTitle": "Основной заголовок",
+        "subtitleText": "Текст подзаголовка",
+        "narrativeDescription": "Описание / Рассказ",
+        "storyPlaceholder": "Начните писать историю...",
+        "visualFrame": "Визуальная рамка",
+        "replaceMedia": "Заменить медиа"
+      },
+      "bio": {
+        "title": "Заголовок",
+        "subtitle": "Подзаголовок",
+        "sectionTitle": "Название секции",
+        "about": "О себе",
+        "whoYouAre": "Кто вы",
+        "profilePhoto": "Фотография профиля",
+        "replaceMedia": "Заменить медиа",
+        "biography": "Биография",
+        "tellStory": "Расскажите свою историю",
+        "tellStoryEllipsis": "Расскажите свою историю...",
+        "achievementsRecognition": "Достижения",
+        "achievementPlaceholder": "Грант, награда или ключевой этап...",
+        "recordAchievement": "Записать достижение",
+        "maxDisplayCapacity": "Достигнута максимальная вместимость отображения."
+      },
+      "featuredWork": {
+        "title": "Заголовок",
+        "subtitle": "Подзаголовок",
+        "description": "Описание",
+        "myBestWork": "Мои лучшие работы",
+        "curatedSelection": "Кураторский выбор",
+        "quick": "Быстро",
+        "ratioAll": "Соотношение: все",
+        "placeAll": "Разместить все",
+        "projects": "Проекты",
+        "addProject": "Добавить проект",
+        "addFirstProject": "Добавить первый проект",
+        "maxProjects": "Максимум {count} проектов",
+        "projectFallback": "Проект {index}",
+        "delete": "Удалить",
+        "projectTitle": "Название проекта",
+        "shortDescription": "Краткое описание...",
+        "coverImage": "Обложка",
+        "newProject": "Новый проект"
+      },
+      "contact": {
+        "subtitle": "Подзаголовок",
+        "description": "Описание",
+        "heading": "Заголовок",
+        "getInTouch": "Связаться",
+        "letsTalk": "Давайте поговорим",
+        "descriptionPlaceholder": "Как я могу вам помочь?",
+        "descriptionText": "Текст описания...",
+        "email": "Электронная почта",
+        "emailAddress": "Адрес электронной почты",
+        "emailPlaceholder": "hello@example.com"
+      },
+      "footer": {
+        "copyright": "Авторские права",
+        "copyrightPlaceholder": "© 2026. Все права защищены.",
+        "socialLinks": "Социальные ссылки"
+      },
+      "video": {
+        "title": "Заголовок",
+        "subtitle": "Подзаголовок",
+        "description": "Описание",
+        "videoTitle": "Название видео",
+        "subtitleText": "Текст подзаголовка",
+        "describeVideo": "Опишите видео...",
+        "youtubeUrl": "URL YouTube",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "youtubeHelp": "Поддерживаются стандартные ссылки YouTube и youtu.be"
+      }
+    }
+  }
+}

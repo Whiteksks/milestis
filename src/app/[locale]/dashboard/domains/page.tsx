@@ -174,23 +174,6 @@ export default function DomainsPage() {
           </div>
         )}
       </div>
-
-      <footer className="grid gap-6 border-t border-border/40 pt-10 md:grid-cols-2">
-        <div className="space-y-2">
-          <p className="text-[13px] font-medium text-foreground">
-            Global Infrastructure
-          </p>
-          <p className="text-[12px] leading-relaxed text-muted-foreground/70">
-            Every project on <strong>milestis.site</strong> is deployed to a global edge network, ensuring lightning-fast load times and bank-grade SSL security for your audience.
-          </p>
-        </div>
-        <div className="flex flex-col items-start gap-2 md:items-end">
-          <span className="text-[11px] font-mono uppercase tracking-widest text-primary/60">Status: Active</span>
-          <p className="text-[12px] text-muted-foreground/70 md:text-right">
-            Your sites are optimized and ready for high-traffic distribution.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

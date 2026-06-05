@@ -1,0 +1,48 @@
+{
+  "editor": {
+    "photobook": {
+      "ui": {
+        "backgroundLabel": "Mood & Texture",
+        "backgroundHint": "No overlays applied",
+        "sectionsTabLabel": "Content",
+        "backgroundCatalogTitle": "Mood & Texture",
+        "backgroundCatalogMobileLabel": "Mood"
+      },
+      "tags": {
+        "editorial": "Editorial",
+        "minimal": "Minimal",
+        "documentary": "Documentary",
+        "magazine": "Magazine",
+        "film": "Film",
+        "light": "Light",
+        "warm": "Warm",
+        "spacious": "Spacious"
+      },
+      "templates": {
+        "memoir": {
+          "name": "Memoir"
+        },
+        "chronicle": {
+          "name": "Chronicle"
+        },
+        "magazine": {
+          "name": "Magazine"
+        },
+        "lumiere": {
+          "name": "Lumiere"
+        },
+        "soleil": {
+          "name": "Soleil"
+        }
+      },
+      "sections": {
+        "cover": "Cover",
+        "introduction": "Introduction",
+        "story": "Story",
+        "gallery": "Gallery",
+        "highlight": "Highlight",
+        "ending": "Ending"
+      }
+    }
+  }
+}

@@ -1,10 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useContentSelector, useUiSelector, useUiStore, useContentStore } from '@/editor/lib/store'
-import { MODE_REGISTRY } from '@/editor/lib/modes'
+import { getModeSections, MODE_REGISTRY } from '@/editor/lib/modes'
 import type { ContentStore } from '@/editor/lib/store/content'
 
 export function useModeSections() {
+  const t = useTranslations()
   const { editorMode, activeSectionId } = useUiSelector((state) => ({
     editorMode: state.editorMode,
     activeSectionId: state.activeSectionId,
@@ -23,7 +25,7 @@ export function useModeSections() {
   )
 
   // Map sections with their visibility state
-  const sections = modeEntry.sections.map((section) => ({
+  const sections = getModeSections(editorMode, t).map((section) => ({
     ...section,
     visible: Boolean(visibility[section.toggleKey]),
   }))

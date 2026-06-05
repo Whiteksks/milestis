@@ -1,0 +1,104 @@
+{
+  "editor": {
+    "portfolioSettings": {
+      "common": {
+        "title": "Тақырып",
+        "subtitle": "Қосымша тақырып",
+        "description": "Сипаттама",
+        "add": "Қосу",
+        "addItem": "Элемент қосу",
+        "replaceMedia": "Медианы ауыстыру"
+      },
+      "header": {
+        "brandTitle": "Бренд атауы",
+        "brandPlaceholder": "Сіздің брендіңіз немесе атыңыз",
+        "navigationLinks": "Навигация сілтемелері",
+        "linkLabel": "Сілтеме атауы",
+        "addFirstLink": "Бірінші сілтемені қосу",
+        "navigationLimitReached": "Дизайн тепе-теңдігін сақтау үшін навигация шегі жетті.",
+        "newLink": "Жаңа сілтеме",
+        "sections": {
+          "hero": "Басты бөлім",
+          "bio": "Өмірбаян / Мен туралы",
+          "work": "Таңдаулы жұмыстар",
+          "video": "Видео",
+          "contact": "Байланыс"
+        }
+      },
+      "hero": {
+        "headline": "Негізгі тақырып",
+        "subheadline": "Қосымша тақырып",
+        "mainTitle": "Негізгі атау",
+        "subtitleText": "Қосымша мәтін",
+        "narrativeDescription": "Сипаттама / әңгіме",
+        "storyPlaceholder": "Әңгімені жазыңыз...",
+        "visualFrame": "Визуалды кадр",
+        "replaceMedia": "Медианы ауыстыру"
+      },
+      "bio": {
+        "title": "Тақырып",
+        "subtitle": "Қосымша тақырып",
+        "sectionTitle": "Бөлім атауы",
+        "about": "Туралы",
+        "whoYouAre": "Сіз кімсіз",
+        "profilePhoto": "Профиль суреті",
+        "replaceMedia": "Медианы ауыстыру",
+        "biography": "Өмірбаян",
+        "tellStory": "Өз тарихыңызды айтыңыз",
+        "tellStoryEllipsis": "Өз тарихыңызды айтыңыз...",
+        "achievementsRecognition": "Жетістіктер мен марапаттар",
+        "achievementPlaceholder": "Грант, марапат немесе маңызды жетістік...",
+        "recordAchievement": "Жетістікті қосу",
+        "maxDisplayCapacity": "Көрсету шегі толды."
+      },
+      "featuredWork": {
+        "title": "Тақырып",
+        "subtitle": "Қосымша тақырып",
+        "description": "Сипаттама",
+        "myBestWork": "Менің үздік жұмыстарым",
+        "curatedSelection": "Таңдалған жинақ",
+        "quick": "Жылдам",
+        "ratioAll": "Пропорция: барлығы",
+        "placeAll": "Барлығын орналастыру",
+        "projects": "Жобалар",
+        "addProject": "Жобаны қосу",
+        "addFirstProject": "Алғашқы жобаны қосыңыз",
+        "maxProjects": "Ең көбі {count} жоба",
+        "projectFallback": "Жоба {index}",
+        "delete": "Жою",
+        "projectTitle": "Жоба атауы",
+        "shortDescription": "Қысқаша сипаттама...",
+        "coverImage": "Мұқаба суреті",
+        "newProject": "Жаңа жоба"
+      },
+      "contact": {
+        "subtitle": "Қосымша тақырып",
+        "description": "Сипаттама",
+        "heading": "Тақырып",
+        "getInTouch": "Байланысу",
+        "letsTalk": "Сөйлесейік",
+        "descriptionPlaceholder": "Қалай көмектесе аламын?",
+        "descriptionText": "Сипаттама мәтіні...",
+        "email": "Электрондық пошта",
+        "emailAddress": "Электрондық пошта мекенжайы",
+        "emailPlaceholder": "hello@example.com"
+      },
+      "footer": {
+        "copyright": "Авторлық құқық",
+        "copyrightPlaceholder": "© 2026. Барлық құқықтар қорғалған.",
+        "socialLinks": "Әлеуметтік сілтемелер"
+      },
+      "video": {
+        "title": "Тақырып",
+        "subtitle": "Қосымша тақырып",
+        "description": "Сипаттама",
+        "videoTitle": "Видео атауы",
+        "subtitleText": "Қосымша мәтін",
+        "describeVideo": "Видеоны сипаттаңыз...",
+        "youtubeUrl": "YouTube сілтемесі",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "youtubeHelp": "Стандартты YouTube және youtu.be сілтемелеріне қолдау бар"
+      }
+    }
+  }
+}
