@@ -1,0 +1,48 @@
+{
+  "MissionPage": {
+    "hero": {
+      "badge": "Every milestone deserves to be remembered",
+      "titleMain": "Your life has milestones.",
+      "titleSub": "They deserve more than a folder.",
+      "description": "Milestis turns your most meaningful moments into living digital experiences — beautiful, permanent, and ready to share in minutes."
+    },
+    "soul": {
+      "title": "Why we built Milestis",
+      "description": "The people we love grow up, move away, get married. Life moves fast — and the moments that define us keep slipping into unorganized photo libraries, never to be properly honored.",
+      "quote": "Some moments are too good to live only in your camera roll.",
+      "features": {
+        "stunning": {
+          "title": "Always looks stunning",
+          "description": "You pick the photos. We handle the rest. Layouts, typography, light — everything is crafted so the result is always beautiful, whoever made it."
+        },
+        "gift": {
+          "title": "A gift worth sending",
+          "description": "Share a link — and they open an interactive photobook with depth effects, animations and your personal story. On any phone, instantly."
+        }
+      }
+    },
+    "simplicity": {
+      "title": "Made for real life",
+      "subtitle": "You shouldn't need a designer to honor a memory.",
+      "features": {
+        "speed": {
+          "title": "5 minutes, start to finish",
+          "description": "Upload your photos, pick a palette, hit publish. That's it. No tutorials, no learning curve — just your milestone, ready to share."
+        },
+        "unbreakable": {
+          "title": "Design you can't break",
+          "description": "Rigid layouts, curated palettes, professional depth effects. You customize the content — the quality is already guaranteed."
+        },
+        "mobile": {
+          "title": "From your phone",
+          "description": "Build and publish entirely from your smartphone. At the venue, on the way home, wherever the moment finds you."
+        }
+      }
+    },
+    "cta": {
+      "title": "Some moments only happen once.",
+      "description": "Make them permanent. Make them beautiful. Start your first milestone today.",
+      "button": "Begin Your Story"
+    }
+  }
+}

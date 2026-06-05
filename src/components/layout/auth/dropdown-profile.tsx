@@ -1,8 +1,9 @@
 'use client'
 
 import { type ReactNode, useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+// Импортируем умные навигационные элементы из нашей конфигурации
+import { Link, useRouter } from '@/i18n/routing'
 import {
   UserIcon,
   HomeIcon,
@@ -20,32 +21,34 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileDrawer } from '../../ui/custom/mobile-drawer'
 
-// 1. Структура данных меню
+// 1. Структура данных меню (оставляем только ключи локализации)
 const MENU_GROUPS = [
   {
     id: 'main',
     items: [
-      { label: 'Home', href: '/dashboard', icon: HomeIcon },
-      { label: 'Account', href: '/account/profile', icon: UserIcon },
+      { key: 'home', href: '/dashboard', icon: HomeIcon },
+      { key: 'account', href: '/account/profile', icon: UserIcon },
     ]
   },
   {
     id: 'support',
     items: [
-      { label: 'Help Center', href: '/help', icon: HelpCircleIcon },
-      { label: 'Privacy Policy', href: '/policies/legal', icon: ShieldCheckIcon },
+      { key: 'helpCenter', href: '/help', icon: HelpCircleIcon },
+      { key: 'privacyPolicy', href: '/policies/legal', icon: ShieldCheckIcon },
     ]
   }
 ]
 
-// 2. Универсальный рендер контента (вне компонента, чтобы React не пересоздавал его на каждый рендер)
 type MenuContentProps = {
   displayName: string
   onClose: () => void
   onLogout: () => void
 }
 
+// 2. Универсальный рендер контента
 function MenuContent({ displayName, onClose, onLogout }: MenuContentProps) {
+  const t = useTranslations('ProfileDropdown')
+
   return (
     <div className="flex flex-col w-full">
       {/* Header / Profile Info */}
@@ -71,7 +74,7 @@ function MenuContent({ displayName, onClose, onLogout }: MenuContentProps) {
                 className="flex items-center gap-3 p-2 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
               >
                 <item.icon className="size-4 text-muted-foreground" />
-                {item.label}
+                {t(`links.${item.key}`)}
               </Link>
             ))}
           </div>
@@ -87,7 +90,7 @@ function MenuContent({ displayName, onClose, onLogout }: MenuContentProps) {
           className="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
         >
           <LogOutIcon className="size-4" />
-          Logout
+          {t('logout')}
         </button>
       </div>
     </div>
@@ -100,12 +103,14 @@ type Props = {
 }
 
 const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
+  const t = useTranslations('ProfileDropdown')
   const isMobile = useIsMobile()
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const { profile } = useUserStore()
 
-  const displayName = profile?.displayName || 'User'
+  // Если имя пользователя отсутствует, берем дефолтное значение из переводов
+  const displayName = profile?.displayName || t('defaultUser')
 
   const handleLogout = async () => {
     setOpen(false)
@@ -123,7 +128,6 @@ const ProfileDropdown = ({ trigger, align = 'end' }: Props) => {
     onLogout: handleLogout,
   }
 
-  // 3. Условный рендеринг обертки
   if (isMobile) {
     return (
       <MobileDrawer

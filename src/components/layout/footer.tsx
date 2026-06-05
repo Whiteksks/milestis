@@ -1,10 +1,12 @@
 "use client"
 
-import Link from "next/link"
 import LogoSvg from "@/components/icons/logo"
 import { Separator } from "@/components/ui/separator"
 import { useThemeTransition } from "@/hooks/useThemeTransition"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useTranslations } from "next-intl"
+// Импортируем твой "умный" линк, который знает про локали
+import { Link } from "@/i18n/routing"
 
 import {
   Accordion,
@@ -13,37 +15,36 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
+// Вместо сырых строк храним только системные ключи
 const FOOTER_LINKS = [
   {
-    heading: "Product",
+    id: "product",
     links: [
-      { label: "Features", href: "/features" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Examples", href: "/examples" },
-      { label: "Milestis Releases", href: "/releases" },
+      { key: "features", href: "/features" },
+      { key: "pricing", href: "/pricing" },
+      { key: "releases", href: "/releases" },
     ],
   },
   {
-    heading: "Help & Support",
+    id: "support",
     links: [
-      { label: "Help Center", href: "/help" },
-      { label: "Getting Started", href: "/help/articles/getting-started" },
-      { label: "FAQ", href: "/help/faq" },
-      { label: "Contact Support", href: "/help#contact" },
+      { key: "helpCenter", href: "/help" },
+      { key: "gettingStarted", href: "/help/articles/getting-started" },
+      { key: "faq", href: "/help/faq" },
     ],
   },
   {
-    heading: "About",
+    id: "about",
     links: [
-      { label: "About Milestis", href: "/about" },
-      { label: "Our story", href: "/story" },
-      { label: "Legal", href: "/policies/legal" },
+      { key: "aboutUs", href: "/about" },
+      { key: "story", href: "/story" },
+      { key: "legal", href: "/policies/legal" },
     ],
   },
 ]
 
-
 export function Footer() {
+  const t = useTranslations("Footer")
   const { theme, setTheme } = useThemeTransition()
 
   return (
@@ -59,7 +60,7 @@ export function Footer() {
             </Link>
             
             <p className="max-w-xs text-base md:text-lg leading-relaxed text-muted-foreground">
-              Create beautiful memory books, photobooks, and portfolios — in minutes.
+              {t("description")}
             </p>
 
             <Select value={theme ?? "light"} onValueChange={setTheme}>
@@ -67,27 +68,27 @@ export function Footer() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="cozy">Cozy</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="light">{t("themes.light")}</SelectItem>
+                <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
+                <SelectItem value="dark">{t("themes.dark")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Desktop link columns */}
           {FOOTER_LINKS.map((col) => (
-            <div key={col.heading} className="hidden sm:block">
+            <div key={col.id} className="hidden sm:block">
               <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-foreground">
-                {col.heading}
+                {t(`headings.${col.id}`)}
               </h3>
               <ul className="space-y-4">
                 {col.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.key}>
                     <Link
                       href={link.href}
                       className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {link.label}
+                      {t(`links.${link.key}`)}
                     </Link>
                   </li>
                 ))}
@@ -99,19 +100,19 @@ export function Footer() {
         {/* Mobile accordion */}
         <Accordion type="multiple" className="mt-12 sm:hidden border-t border-border/40">
           {FOOTER_LINKS.map((col) => (
-            <AccordionItem key={col.heading} value={col.heading} className="border-border/40">
+            <AccordionItem key={col.id} value={col.id} className="border-border/40">
               <AccordionTrigger className="py-4 text-sm font-bold uppercase tracking-widest text-foreground hover:no-underline">
-                {col.heading}
+                {t(`headings.${col.id}`)}
               </AccordionTrigger>
               <AccordionContent>
                 <ul className="space-y-4 pb-4">
                   {col.links.map((link) => (
-                    <li key={link.label}>
+                    <li key={link.key}>
                       <Link
                         href={link.href}
                         className="inline-flex items-center gap-2 text-base text-muted-foreground"
                       >
-                        {link.label}
+                        {t(`links.${link.key}`)}
                       </Link>
                     </li>
                   ))}
@@ -125,22 +126,20 @@ export function Footer() {
         {/* Bottom row */}
         <div className="flex flex-col items-center justify-between gap-6 text-sm md:text-base text-muted-foreground sm:flex-row">
           <p className="order-2 sm:order-1 text-center sm:text-left">
-            © {new Date().getFullYear()} Milestis. All rights reserved.
+            © {new Date().getFullYear()} Milestis. {t("rightsReserved")}
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 order-1 sm:order-2 font-medium">
             <Link href="/policies/privacy-policy" className="transition-colors hover:text-foreground">
-              Privacy Policy
+              {t("policies.privacy")}
             </Link>
             <Link href="/policies/cookie-policy" className="transition-colors hover:text-foreground">
-              Cookie Policy
+              {t("policies.cookie")}
             </Link>
             <Link href="/policies/terms" className="transition-colors hover:text-foreground">
-              Terms and Conditions
+              {t("policies.terms")}
             </Link>
           </div>
-
-
         </div>
       </div>
     </footer>

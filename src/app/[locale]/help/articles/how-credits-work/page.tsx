@@ -1,141 +1,109 @@
 import type { Metadata } from "next"
+import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, Lightbulb } from "lucide-react"
 
-export const metadata: Metadata = {
-  title: "How credits work — Milestis Help",
-  description: "Learn what credits are in Milestis, where you can see your balance, and how publish cost is calculated.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("help_how_credits_work.metadata")
+  return {
+    title: t("title"),
+    description: t("description"),
+  }
 }
-
-const toc = [
-  { id: "what-are-credits", label: "What are credits?" },
-  { id: "where-to-see-balance", label: "Where to see your balance" },
-  { id: "publish-cost", label: "Publish cost" },
-  { id: "credit-types", label: "Credit types" },
-  { id: "running-low", label: "When credits run low" },
-  { id: "faq", label: "Frequently asked questions" },
-]
-
-const meta = {
-  title: "How credits work",
-  description:
-    "A practical guide to the Milestis credit system, including publish cost, remaining balance, and credit categories.",
-  category: "Billing",
-  readTime: "4 min read",
-  updatedAt: "April 2026",
-}
-
-const related = [
-  { title: "Account and security", href: "/help/articles/account-security" },
-  { title: "Publish and share your project", href: "/help/articles/publish-share" },
-]
 
 export default function HowCreditsWorkPage() {
+  const t = useTranslations("help_how_credits_work")
+
+  const richTextOption = {
+    strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+  }
+
+  const toc = [
+    { id: "what-are-credits", label: t("toc.what-are-credits") },
+    { id: "where-to-see-balance", label: t("toc.where-to-see-balance") },
+    { id: "publish-cost", label: t("toc.publish-cost") },
+    { id: "credit-types", label: t("toc.credit-types") },
+    { id: "running-low", label: t("toc.running-low") },
+    { id: "faq", label: t("toc.faq") },
+  ]
+
+  const meta = {
+    title: t("meta.title"),
+    description: t("meta.description"),
+    category: t("meta.category"),
+    readTime: t("meta.readTime"),
+    updatedAt: t("meta.updatedAt"),
+  }
+
+  const related = [
+    { title: t("related.account_security"), href: "/help/articles/account-security" },
+    { title: t("related.publish_share"), href: "/help/articles/publish-share" },
+  ]
+
   return (
     <ArticleLayout meta={meta} toc={toc} related={related}>
-      <h2 id="what-are-credits">What are credits?</h2>
-      <p>
-        Credits are the internal balance Milestis uses for publish-related actions and plan-based
-        usage. Instead of charging every step separately in the interface, Milestis keeps that value
-        in a credit system connected to your account.
-      </p>
-      <p>
-        In practical terms, credits matter most when you are getting a project ready to go live.
-        Before publishing, Milestis analyzes the project and shows how many credits the action will
-        use.
-      </p>
+      {/* What are credits? */}
+      <h2 id="what-are-credits">{t("toc.what-are-credits")}</h2>
+      <p>{t("content.credits_p1")}</p>
+      <p>{t("content.credits_p2")}</p>
 
       <div className="kb-callout">
         <Info className="kb-callout-icon text-primary" />
-        <span>
-          Your account balance can include <strong>subscription credits</strong>, <strong>bonus
-          credits</strong>, and <strong>purchased credits</strong>. Milestis keeps these categories
-          visible in Billing so you can understand what balance you still have available.
-        </span>
+        <span>{t.rich("content.callout_balance", richTextOption)}</span>
       </div>
 
-      <h2 id="where-to-see-balance">Where to see your balance</h2>
-      <p>
-        Open the <strong>Billing</strong> section of your account to see your current credit state.
-        Milestis shows the remaining subscription balance, bonus credits, purchased credits, and the
-        next reset date for the subscription part of your balance.
-      </p>
-      <p>
-        This makes Billing the main place to check whether you are ready to publish now or whether
-        you should wait for the next cycle.
-      </p>
+      {/* Where to see your balance */}
+      <h2 id="where-to-see-balance">{t("toc.where-to-see-balance")}</h2>
+      <p>{t.rich("content.balance_p1", richTextOption)}</p>
+      <p>{t("content.balance_p2")}</p>
 
-      <h2 id="publish-cost">Publish cost</h2>
-      <p>Milestis currently calculates publish cost by project type:</p>
+      {/* Publish cost */}
+      <h2 id="publish-cost">{t("toc.publish-cost")}</h2>
+      <p>{t("content.cost_intro")}</p>
       <ul>
+        <li>{t.rich("content.cost_portfolio", richTextOption)}</li>
         <li>
-          <strong>Portfolio Site</strong> — fixed publish cost of <strong>10 credits</strong>.
-        </li>
-        <li>
-          <strong>Memory Book</strong> — tiered publish cost based on photo count:
+          {t.rich("content.cost_memory", richTextOption)}
           <ul>
-            <li>up to 20 photos: 20 credits</li>
-            <li>up to 30 photos: 25 credits</li>
-            <li>up to 50 photos: 35 credits</li>
+            <li>{t("content.cost_memory_tier1")}</li>
+            <li>{t("content.cost_memory_tier2")}</li>
+            <li>{t("content.cost_memory_tier3")}</li>
           </ul>
         </li>
       </ul>
-      <p>
-        Before the final publish action, Milestis shows the quote so you can review the project link,
-        photo count, and required credits before confirming.
-      </p>
+      <p>{t("content.cost_outro")}</p>
 
-      <h2 id="credit-types">Credit types</h2>
-      <p>Milestis can hold more than one type of balance on the same account:</p>
+      {/* Credit types */}
+      <h2 id="credit-types">{t("toc.credit-types")}</h2>
+      <p>{t("content.types_intro")}</p>
       <ul>
-        <li>
-          <strong>Subscription credits</strong> — the recurring balance connected to your plan.
-        </li>
-        <li>
-          <strong>Bonus credits</strong> — extra credits added outside the normal recurring cycle.
-        </li>
-        <li>
-          <strong>Purchased credits</strong> — extra credits available on top of the plan allocation.
-        </li>
+        <li>{t.rich("content.types_subscription", richTextOption)}</li>
+        <li>{t.rich("content.types_bonus", richTextOption)}</li>
+        <li>{t.rich("content.types_purchased", richTextOption)}</li>
       </ul>
-      <p>
-        You do not need to manage these manually inside projects. Milestis shows them in Billing and
-        uses your account balance when publish actions are confirmed.
-      </p>
+      <p>{t("content.types_outro")}</p>
 
       <div className="kb-callout">
         <Lightbulb className="kb-callout-icon text-amber-500" />
-        <span>
-          Think of credits as your <strong>publishing capacity</strong>. The cleanest workflow is to
-          build first, review the quote second, and only then decide whether to publish immediately.
-        </span>
+        <span>{t.rich("content.callout_capacity", richTextOption)}</span>
       </div>
 
-      <h2 id="running-low">When credits run low</h2>
-      <p>
-        If your available balance is lower than the required publish cost, Milestis will stop the
-        final publish action before the project goes live. Your work is still safe, and you can keep
-        editing until you are ready.
-      </p>
-      <p>
-        The right next step depends on your account setup: wait for the next cycle, use existing
-        purchased credits, or move to a plan that better matches how often you publish.
-      </p>
+      {/* When credits run low */}
+      <h2 id="running-low">{t("toc.running-low")}</h2>
+      <p>{t("content.low_p1")}</p>
+      <p>{t("content.low_p2")}</p>
 
-      <h2 id="faq">Frequently asked questions</h2>
-      <h3>Do all projects cost the same to publish?</h3>
-      <p>
-        No. Portfolio Sites use a fixed cost, while Memory Books use tiered pricing based on how many
-        photos the project includes.
-      </p>
-      <h3>Can I see the cost before I publish?</h3>
-      <p>
-        Yes. Milestis analyzes the project first and shows the quote before the final publish step.
-      </p>
-      <h3>Does republish use more credits?</h3>
-      <p>
-        Not in the current product flow. Republish is currently supported without extra credit cost.
-      </p>
+      {/* Frequently asked questions */}
+      <h2 id="faq">{t("toc.faq")}</h2>
+      <h3>{t("content.faq_q1")}</h3>
+      <p>{t("content.faq_a1")}</p>
+      
+      <h3>{t("content.faq_q2")}</h3>
+      <p>{t("content.faq_a2")}</p>
+      
+      <h3>{t("content.faq_q3")}</h3>
+      <p>{t("content.faq_a3")}</p>
     </ArticleLayout>
   )
 }

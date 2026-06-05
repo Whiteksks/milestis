@@ -1,0 +1,52 @@
+{
+  "Header": {
+    "navigation": {
+      "features": "Features",
+      "story": "Our Story",
+      "pricing": "Pricing",
+      "help": "Help Center"
+    }
+  },
+  "Footer": {
+    "description": "Create beautiful memory books, photobooks, and portfolios — in minutes.",
+    "rightsReserved": "All rights reserved.",
+    "themes": {
+      "light": "Light",
+      "cozy": "Cozy",
+      "dark": "Dark"
+    },
+    "headings": {
+      "product": "Product",
+      "support": "Help & Support",
+      "about": "About"
+    },
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "examples": "Examples",
+      "releases": "Milestis Releases",
+      "helpCenter": "Help Center",
+      "gettingStarted": "Getting Started",
+      "faq": "FAQ",
+      "contact": "Contact Support",
+      "aboutUs": "About Milestis",
+      "story": "Our story",
+      "legal": "Legal"
+    },
+    "policies": {
+      "privacy": "Privacy Policy",
+      "cookie": "Cookie Policy",
+      "terms": "Terms and Conditions"
+    }
+  },
+  "ProfileDropdown": {
+    "defaultUser": "User",
+    "logout": "Logout",
+    "links": {
+      "home": "Home",
+      "account": "Account",
+      "helpCenter": "Help Center",
+      "privacyPolicy": "Privacy Policy"
+    }
+  }
+}

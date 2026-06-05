@@ -1,0 +1,73 @@
+{
+  "HelpPage": {
+    "header": {
+      "title": "Help & Support",
+      "description": "Find answers, learn how to use Milestis, or contact support",
+      "searchPlaceholder": "What do you need help with?"
+    },
+    "quickHelp": {
+      "title": "Quick help",
+      "learnMore": "Learn more",
+      "cards": {
+        "what-is-milestis": {
+          "title": "What is Milestis",
+          "description": "Understand the product, the project types, and why Milestis works differently from traditional editors."
+        },
+        "first-photobook": {
+          "title": "Create and edit your first project",
+          "description": "Learn how to start a project, shape the content, refine the design, and preview the result."
+        },
+        "publish": {
+          "title": "Publish and share your project",
+          "description": "Understand publishing, private and public links, credits, and how to share the final result."
+        },
+        "credits": {
+          "title": "How credits work",
+          "description": "See how publish cost is calculated, where your balance appears, and what happens when credits run low."
+        }
+      }
+    },
+    "guides": {
+      "title": "Guides & Tutorials",
+      "readTime": "{count} min read",
+      "categories": {
+        "Basics": "Basics",
+        "Sharing": "Sharing",
+        "Billing": "Billing",
+        "Account": "Account",
+        "Projects": "Projects"
+      },
+      "items": {
+        "what-is-milestis": {
+          "title": "What is Milestis",
+          "description": "A clear introduction to the product, who it is for, and how the Milestis workflow works."
+        },
+        "getting-started": {
+          "title": "Create and edit your first project",
+          "description": "A practical guide to starting a project, building it inside the editor, and refining the final look."
+        },
+        "sharing-options": {
+          "title": "Publish and share your project",
+          "description": "Learn how publishing works for Memory Books and Portfolio Sites, and how to share them the right way."
+        },
+        "how-credits-work": {
+          "title": "How credits work",
+          "description": "A practical guide to publish cost, balance categories, and how credits support your workflow."
+        },
+        "account-security": {
+          "title": "Account and security",
+          "description": "Understand sign-in methods, linked access, and the difference between private account identity and public profile."
+        },
+        "archive-republish": {
+          "title": "Archive, deletion, and republishing",
+          "description": "Learn what happens after publish and how to manage archived, offline, and permanently deleted projects."
+        }
+      }
+    },
+    "contact": {
+      "title": "Need more help?",
+      "description": "Our support team is here for you. We usually respond within 24 hours.",
+      "button": "Contact support"
+    }
+  }
+}

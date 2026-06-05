@@ -1,30 +1,28 @@
 import React from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 
+// Описываем интерфейс для текстовых данных из JSON
+interface ChangelogTextEntry {
+  date: string;
+  title: string;
+  description: string;
+  longDescription: string;
+  highlights: string[];
+}
+
+// Статичный путь к фотографии, который не зависит от языка
+const CHANGELOG_IMAGE_SRC = "/images/changelog/v1.png"; // Укажи здесь реальный путь к файлу
+
 const ChangelogPage = () => {
-  const entries = [
-    {
-      date: "March 12, 2026",
-      title: "Goodbye Complex Editors. Hello, Milestis!",
-      image: "/api/placeholder/800/450", // Замени на реальный путь к скриншоту
-      description: "We are officially live. Milestis is here to prove that professional design doesn't have to be difficult. From now on, your focus stays on the story, while we handle the aesthetic.",
-      longDescription: `
-        Creating a digital legacy shouldn't feel like a chore. Our initial launch introduces a 
-        universal editor with strict, high-performance templates for photobooks and portfolios. 
-        Whether you're at an event or on the move, you can now build a complete project in under 
-        5 minutes using just your smartphone. 
-      `,
-      highlights: [
-        "Select a professional layout and see your project come to life instantly.",
-        "Add atmospheric depth with light rays and textures using drag-and-drop.",
-        "Your memories are preserved forever with a unique permanent link."
-      ]
-    }
-  ];
+  const t = useTranslations('ChangelogPage');
+  
+  // Получаем массив текстовых переводов из JSON
+  const stringEntries = t.raw('entries') as ChangelogTextEntry[];
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
@@ -37,20 +35,20 @@ const ChangelogPage = () => {
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-medium mb-6 animate-in fade-in slide-in-from-bottom-2">
             <Sparkles className="w-3 h-3" />
-            <span>Latest Update: March 2026</span>
+            <span>{t('meta.latestUpdate')}</span>
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-            Milestis Releases
+            {t('meta.title')}
           </h1>
           
           <p className="text-muted-foreground text-xl font-light max-w-2xl leading-relaxed">
-            We’re constantly refining the Milestis experience. 
-            Follow our progress as we craft the ultimate tool for your digital legacy.
+            {t('meta.description')}
           </p>
         </header>
+
         <div className="space-y-32">
-          {entries.map((entry, index) => (
+          {stringEntries.map((entry, index) => (
             <section key={index} className="flex flex-col md:flex-row gap-8 md:gap-16">
               
               {/* Left: Date */}
@@ -66,12 +64,13 @@ const ChangelogPage = () => {
                   {entry.title}
                 </h2>
 
-                {/* Image Placeholder */}
-                <div className="mb-8 rounded-2xl overflow-hidden border border-border/40 bg-muted/30 aspect-video flex items-center justify-center">
+                {/* Image Container с единой статичной фотографией */}
+                <div className="mb-8 rounded-2xl overflow-hidden border border-border/40 bg-muted/30 aspect-video flex items-center justify-center relative">
                   <Image 
-                    src={entry.image} 
+                    src={CHANGELOG_IMAGE_SRC} 
                     alt={entry.title} 
                     fill
+                    priority={index === 0} // Первая картинка загружается быстрее
                     className="w-full h-full object-cover opacity-90"
                   />
                 </div>
@@ -95,7 +94,7 @@ const ChangelogPage = () => {
 
                   <div className="pt-8">
                     <Button variant="link" className="p-0 h-auto text-primary gap-2 group">
-                      Learn more in Help Center 
+                      {t('meta.helpCenterLink')}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>

@@ -1,0 +1,52 @@
+{
+  "Header": {
+    "navigation": {
+      "features": "Функции",
+      "story": "Наша история",
+      "pricing": "Цены",
+      "help": "Центр помощи"
+    }
+  },
+  "Footer": {
+    "description": "Создавайте красивые книги воспоминаний, фотокниги и портфолио — за считанные минуты.",
+    "rightsReserved": "Все права защищены.",
+    "themes": {
+      "light": "Светлая",
+      "cozy": "Уютная",
+      "dark": "Темная"
+    },
+    "headings": {
+      "product": "Продукт",
+      "support": "Помощь и поддержка",
+      "about": "О нас"
+    },
+    "links": {
+      "features": "Функции",
+      "pricing": "Цены",
+      "examples": "Примеры",
+      "releases": "Выпуски Milestis",
+      "helpCenter": "Центр помощи",
+      "gettingStarted": "Начало работы",
+      "faq": "Часто задаваемые вопросы",
+      "contact": "Связаться с поддержкой",
+      "aboutUs": "О Milestis",
+      "story": "Наша история",
+      "legal": "Юридическая информация"
+    },
+  "policies": {
+      "privacy": "Политика конфиденциальности",
+      "cookie": "Политика использования файлов cookie",
+      "terms": "Условия и положения"
+    }
+  },
+  "ProfileDropdown": {
+    "defaultUser": "Пользователь",
+    "logout": "Выйти",
+    "links": {
+      "home": "Главная",
+      "account": "Аккаунт",
+      "helpCenter": "Центр помощи",
+      "privacyPolicy": "Политика конфиденциальности"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "help_create_edit": {
+    "metadata": {
+      "title": "Create and edit your first project — Milestis Help",
+      "description": "Learn how to create a project, add content, refine the design, and preview the result."
+    },
+    "meta": {
+      "title": "Create and edit your first project",
+      "description": "A practical guide to creating your first Milestis project and shaping it into a finished result.",
+      "category": "Basics",
+      "readTime": "5 min read",
+      "updatedAt": "April 2026"
+    },
+    "toc": {
+      "start-from-dashboard": "Start from the dashboard",
+      "choose-format": "Choose a format",
+      "edit-content": "Edit your content",
+      "refine-design": "Refine the design",
+      "save-preview": "Save and preview",
+      "before-publishing": "Before publishing"
+    },
+    "related": {
+      "what_is_milestis": "What is Milestis",
+      "publish_share": "Publish & share projects"
+    },
+    "content": {
+      "dashboard_p1": "Once you sign in to <link_dashboard>Milestis</link_dashboard>, your dashboard becomes the starting point for every project. This is where you create new work, return to drafts, and manage published or archived results.",
+      "dashboard_p2": "Click <strong_tag>New Project</strong_tag> to begin. Milestis opens a small project picker instead of a complicated setup flow, so you can get into the editor quickly.",
+      "format_intro": "You will choose between two formats:",
+      "format_memory": "<strong_tag>Memory Book</strong_tag> — best for milestones, gifts, family stories, and emotional photo collections.",
+      "format_portfolio": "<strong_tag>Portfolio Site</strong_tag> — best for creators who want to present their work as a polished website.",
+      "format_outro": "After you choose a format, Milestis creates the project and opens the editor automatically. You can rename the project later, so there is no need to overthink the starting point.",
+      "edit_intro": "Inside the editor, the main task is simple: replace placeholders with real content and shape the story or presentation you want to publish.",
+      "edit_li1": "Add your photos and choose the images that matter most.",
+      "edit_li2": "Edit titles, subtitles, captions, and other text blocks so the project feels personal and complete.",
+      "edit_li3": "Reorder sections or pages until the flow feels right for the final viewer.",
+      "edit_outro": "The most important mindset is not to fill every space. Milestis works best when you choose strong content intentionally and let the structure do the visual work.",
+      "callout_lightbulb": "Start with fewer, stronger photos first. It is usually faster to build a clean first version and refine it than to overload the project on the first pass.",
+      "design_p1": "Milestis is built on rigid design principles, so refining the look is about choosing the right atmosphere, not rebuilding the layout from scratch.",
+      "design_p2": "As you edit, focus on the elements Milestis is designed to make easy:",
+      "design_li1": "<strong_tag>Template choice</strong_tag> — select the structure that best fits the content.",
+      "design_li2": "<strong_tag>Palette and mood</strong_tag> — choose the visual direction that matches the story.",
+      "design_li3": "<strong_tag>Depth and decoration</strong_tag> — use textures, light, and decorative details to add identity without making the composition messy.",
+      "save_p1": "Milestis keeps your editor state safe while you work and provides a real preview so you can see the result the way a viewer will see it after publishing.",
+      "save_p2": "Use <strong_tag>Preview</strong_tag> before publishing to check pacing, readability, and overall atmosphere. This is the best moment to make small adjustments to titles, image choices, and visual balance.",
+      "before_intro": "Before you make the project live, quickly check the essentials:",
+      "before_li1": "The project name reflects what you want to share.",
+      "before_li2": "The first screen or cover makes a strong impression.",
+      "before_li3": "Text is concise and free of placeholder copy.",
+      "before_li4": "The final rhythm feels intentional from start to finish.",
+      "before_outro": "When the project feels ready, continue with <link_publish>publishing and sharing</link_publish>."
+    }
+  }
+}

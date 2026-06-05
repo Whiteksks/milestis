@@ -1,0 +1,55 @@
+{
+  "help_how_credits_work": {
+    "metadata": {
+      "title": "How credits work — Milestis Help",
+      "description": "Learn what credits are in Milestis, where you can see your balance, and how publish cost is calculated."
+    },
+    "meta": {
+      "title": "How credits work",
+      "description": "A practical guide to the Milestis credit system, including publish cost, remaining balance, and credit categories.",
+      "category": "Billing",
+      "readTime": "4 min read",
+      "updatedAt": "April 2026"
+    },
+    "toc": {
+      "what-are-credits": "What are credits?",
+      "where-to-see-balance": "Where to see your balance",
+      "publish-cost": "Publish cost",
+      "credit-types": "Credit types",
+      "running-low": "When credits run low",
+      "faq": "Frequently asked questions"
+    },
+    "related": {
+      "account_security": "Account and security",
+      "publish_share": "Publish and share your project"
+    },
+    "content": {
+      "credits_p1": "Credits are the internal balance Milestis uses for publish-related actions and plan-based usage. Instead of charging every step separately in the interface, Milestis keeps that value in a credit system connected to your account.",
+      "credits_p2": "In practical terms, credits matter most when you are getting a project ready to go live. Before publishing, Milestis analyzes the project and shows how many credits the action will use.",
+      "callout_balance": "Your account balance can include <strong_tag>subscription credits</strong_tag>, <strong_tag>bonus credits</strong_tag>, and <strong_tag>purchased credits</strong_tag>. Milestis keeps these categories visible in Billing so you can understand what balance you still have available.",
+      "balance_p1": "Open the <strong_tag>Billing</strong_tag> section of your account to see your current credit state. Milestis shows the remaining subscription balance, bonus credits, purchased credits, and the next reset date for the subscription part of your balance.",
+      "balance_p2": "This makes Billing the main place to check whether you are ready to publish now or whether you should wait for the next cycle.",
+      "cost_intro": "Milestis currently calculates publish cost by project type:",
+      "cost_portfolio": "<strong_tag>Portfolio Site</strong_tag> — fixed publish cost of <strong_tag>10 credits</strong_tag>.",
+      "cost_memory": "<strong_tag>Memory Book</strong_tag> — tiered publish cost based on photo count:",
+      "cost_memory_tier1": "up to 20 photos: 20 credits",
+      "cost_memory_tier2": "up to 30 photos: 25 credits",
+      "cost_memory_tier3": "up to 50 photos: 35 credits",
+      "cost_outro": "Before the final publish action, Milestis shows the quote so you can review the project link, photo count, and required credits before confirming.",
+      "types_intro": "Milestis can hold more than one type of balance on the same account:",
+      "types_subscription": "<strong_tag>Subscription credits</strong_tag> — the recurring balance connected to your plan.",
+      "types_bonus": "<strong_tag>Bonus credits</strong_tag> — extra credits added outside the normal recurring cycle.",
+      "types_purchased": "<strong_tag>Purchased credits</strong_tag> — extra credits available on top of the plan allocation.",
+      "types_outro": "You do not need to manage these manually inside projects. Milestis shows them in Billing and uses your account balance when publish actions are confirmed.",
+      "callout_capacity": "Think of credits as your <strong_tag>publishing capacity</strong_tag>. The cleanest workflow is to build first, review the quote second, and only then decide whether to publish immediately.",
+      "low_p1": "If your available balance is lower than the required publish cost, Milestis will stop the final publish action before the project goes live. Your work is still safe, and you can keep editing until you are ready.",
+      "low_p2": "The right next step depends on your account setup: wait for the next cycle, use existing purchased credits, or move to a plan that better matches how often you publish.",
+      "faq_q1": "Do all projects cost the same to publish?",
+      "faq_a1": "No. Portfolio Sites use a fixed cost, while Memory Books use tiered pricing based on how many photos the project includes.",
+      "faq_q2": "Can I see the cost before I publish?",
+      "faq_a2": "Yes. Milestis analyzes the project first and shows the quote before the final publish step.",
+      "faq_q3": "Does republish use more credits?",
+      "faq_a3": "Not in the current product flow. Republish is currently supported without extra credit cost."
+    }
+  }
+}

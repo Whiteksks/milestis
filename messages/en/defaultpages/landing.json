@@ -1,0 +1,100 @@
+{
+  "Hero": {
+    "titlePrefix": "Milestis is",
+    "description": "Milestis transforms your life’s turning points into premium interactive experiences. Keep the depth of your memories without the complexity of design.",
+    "ctaPrimary": "Capture a milestone",
+    "ctaSecondary": "See the experience",
+    "imageAlt": "A significant life milestone captured beautifully",
+    "rotatingWords": {
+      "legacy": "legacy",
+      "freedom": "freedom",
+      "emotions": "emotions",
+      "moment": "the moment",
+      "story": "your story",
+      "stillness": "stillness"
+    }
+  },
+  "EmotionalContext": {
+    "subtitle": "One platform. Every format. Always premium.",
+    "labels": {
+      "eventStories": "Event stories",
+      "clientGifts": "Client gifts",
+      "shareableLinks": "Shareable links"
+    }
+  },
+  "HowItWorks": {
+    "title": "From content to finished project in 4 steps",
+    "subtitle": "No design skills. No guesswork. Quality is guaranteed by the platform.",
+    "steps": {
+      "pickTemplate": {
+        "title": "Pick a template",
+        "description": "Choose from premium rigid layouts — professionally designed so the result always looks stunning, no matter the content."
+      },
+      "addContent": {
+        "title": "Add your content",
+        "description": "Upload visuals, write your copy, select a curated color palette. The structure handles itself."
+      },
+      "personalTouch": {
+        "title": "Add your personal touch",
+        "description": "Place decorative elements freely, add depth effects and light layers — make the project unmistakably yours."
+      },
+      "publishShare": {
+        "title": "Publish and share",
+        "description": "One link. Anyone you send it to opens a fully interactive digital experience — no app, no download, any device."
+      }
+    }
+  },
+  "Features": {
+    "title": "Everything your project deserves",
+    "subtitle": "Built around one principle: the result should always look premium — regardless of who made it",
+    "items": {
+      "unbreakableDesign": {
+        "title": "Design you can't break",
+        "description": "Rigid layouts lock in professional structure. You only change the content — premium quality is baked into every template."
+      },
+      "depthAtmosphere": {
+        "title": "Depth & atmosphere",
+        "description": "Light rays, cinematic textures and layered shadows make every visual look like it belongs in a high-end production."
+      },
+      "freeformDecorations": {
+        "title": "Freeform decorations",
+        "description": "Drag and place decorative elements anywhere on the page. Add personality without disrupting the underlying layout."
+      },
+      "colorPalettes": {
+        "title": "Curated color palettes",
+        "description": "Handcrafted palettes engineered for aesthetic harmony. Pick one — the entire project falls into place automatically."
+      },
+      "interactiveAnimations": {
+        "title": "Interactive animations",
+        "description": "Every project comes alive with smooth motion powered by Framer Motion — the kind of feel that rivals native apps."
+      },
+      "shareableLink": {
+        "title": "Share with one link",
+        "description": "Publish and send. The recipient opens a live interactive experience on any device — no app, no download."
+      }
+    }
+  },
+  "UseCases": {
+    "title": "One platform, multiple ways to wow",
+    "subtitle": "From instant wedding gifts to professional photography deliverables — quality is built-in by design.",
+    "cases": {
+      "eventStories": {
+        "title": "Event Stories",
+        "description": "Turn any wedding or party into a living digital story. Created in 5 minutes from a phone, delivered as a premium gift link instantly."
+      },
+      "instantPortfolios": {
+        "title": "Instant Portfolios",
+        "description": "Showcase your vision without touching a design tool. A high-end digital space for artists and creators to express themselves beautifully."
+      },
+      "photographerUpsell": {
+        "title": "Photographer Upsell",
+        "description": "Don't just send a cloud folder. Deliver a branded digital product. Increase your average check by offering a premium experience."
+      }
+    }
+  },
+  "FinalCTA": {
+    "title": "Ready to create something premium?",
+    "subtitle": "Build your first project in 5 minutes — from any device, no design skills required. Quality guaranteed.",
+    "cta": "Start for free"
+  }
+}

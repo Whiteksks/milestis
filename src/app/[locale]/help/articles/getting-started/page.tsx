@@ -1,148 +1,108 @@
 import type { Metadata } from "next"
+import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Lightbulb } from "lucide-react"
-import Link from "next/link" // Добавили импорт
+import Link from "next/link"
 
-export const metadata: Metadata = {
-  title: "Create and edit your first project — Milestis Help",
-  description: "Learn how to create a project, add content, refine the design, and preview the result.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("help_create_edit.metadata")
+  return {
+    title: t("title"),
+    description: t("description"),
+  }
 }
-
-const toc = [
-  { id: "start-from-dashboard", label: "Start from the dashboard" },
-  { id: "choose-format", label: "Choose a format" },
-  { id: "edit-content", label: "Edit your content" },
-  { id: "refine-design", label: "Refine the design" },
-  { id: "save-preview", label: "Save and preview" },
-  { id: "before-publishing", label: "Before publishing" },
-]
-
-const meta = {
-  title: "Create and edit your first project",
-  description:
-    "A practical guide to creating your first Milestis project and shaping it into a finished result.",
-  category: "Basics",
-  readTime: "5 min read",
-  updatedAt: "April 2026",
-}
-
-const related = [
-  { title: "What is Milestis", href: "/help/articles/what-is-milestis" },
-  { title: "Publish & share projects", href: "/help/articles/publish-share" },
-]
 
 export default function GettingStartedPage() {
+  const t = useTranslations("help_create_edit")
+
+  // Конфигурация для Rich Text: маппинг тегов из JSON на React-компоненты
+  const richTextComponents = {
+    strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+    link_dashboard: (chunks: React.ReactNode) => <Link href="/">{chunks}</Link>,
+    link_publish: (chunks: React.ReactNode) => (
+      <Link href="/help/articles/publish-share">{chunks}</Link>
+    ),
+  }
+
+  const toc = [
+    { id: "start-from-dashboard", label: t("toc.start-from-dashboard") },
+    { id: "choose-format", label: t("toc.choose-format") },
+    { id: "edit-content", label: t("toc.edit-content") },
+    { id: "refine-design", label: t("toc.refine-design") },
+    { id: "save-preview", label: t("toc.save-preview") },
+    { id: "before-publishing", label: t("toc.before-publishing") },
+  ]
+
+  const meta = {
+    title: t("meta.title"),
+    description: t("meta.description"),
+    category: t("meta.category"),
+    readTime: t("meta.readTime"),
+    updatedAt: t("meta.updatedAt"),
+  }
+
+  const related = [
+    { title: t("related.what_is_milestis"), href: "/help/articles/what-is-milestis" },
+    { title: t("related.publish_share"), href: "/help/articles/publish-share" },
+  ]
+
   return (
     <ArticleLayout meta={meta} toc={toc} related={related}>
-      <h2 id="start-from-dashboard">Start from the dashboard</h2>
-      <p>
-        Once you sign in to <Link href="/">Milestis</Link>, your dashboard becomes the starting
-        point for every project. This is where you create new work, return to drafts, and manage
-        published or archived results.
-      </p>
-      <p>
-        Click <strong>New Project</strong> to begin. Milestis opens a small project picker instead
-        of a complicated setup flow, so you can get into the editor quickly.
-      </p>
+      {/* Start from the dashboard */}
+      <h2 id="start-from-dashboard">{t("toc.start-from-dashboard")}</h2>
+      <p>{t.rich("content.dashboard_p1", richTextComponents)}</p>
+      <p>{t.rich("content.dashboard_p2", richTextComponents)}</p>
 
-      <h2 id="choose-format">Choose a format</h2>
-      <p>
-        You will choose between two formats:
-      </p>
+      {/* Choose a format */}
+      <h2 id="choose-format">{t("toc.choose-format")}</h2>
+      <p>{t("content.format_intro")}</p>
       <ul>
-        <li>
-          <strong>Memory Book</strong> — best for milestones, gifts, family stories, and emotional
-          photo collections.
-        </li>
-        <li>
-          <strong>Portfolio Site</strong> — best for creators who want to present their work as a
-          polished website.
-        </li>
+        <li>{t.rich("content.format_memory", richTextComponents)}</li>
+        <li>{t.rich("content.format_portfolio", richTextComponents)}</li>
       </ul>
-      <p>
-        After you choose a format, Milestis creates the project and opens the editor automatically.
-        You can rename the project later, so there is no need to overthink the starting point.
-      </p>
+      <p>{t("content.format_outro")}</p>
 
-      <h2 id="edit-content">Edit your content</h2>
-      <p>
-        Inside the editor, the main task is simple: replace placeholders with real content and shape
-        the story or presentation you want to publish.
-      </p>
+      {/* Edit your content */}
+      <h2 id="edit-content">{t("toc.edit-content")}</h2>
+      <p>{t("content.edit_intro")}</p>
       <ul>
-        <li>
-          Add your photos and choose the images that matter most.
-        </li>
-        <li>
-          Edit titles, subtitles, captions, and other text blocks so the project feels personal and
-          complete.
-        </li>
-        <li>
-          Reorder sections or pages until the flow feels right for the final viewer.
-        </li>
+        <li>{t("content.edit_li1")}</li>
+        <li>{t("content.edit_li2")}</li>
+        <li>{t("content.edit_li3")}</li>
       </ul>
-      <p>
-        The most important mindset is not to fill every space. Milestis works best when you choose
-        strong content intentionally and let the structure do the visual work.
-      </p>
+      <p>{t("content.edit_outro")}</p>
 
       <div className="kb-callout">
         <Lightbulb className="kb-callout-icon text-amber-500" />
-        <span>
-          Start with fewer, stronger photos first. It is usually faster to build a clean first
-          version and refine it than to overload the project on the first pass.
-        </span>
+        <span>{t("content.callout_lightbulb")}</span>
       </div>
 
-      <h2 id="refine-design">Refine the design</h2>
-      <p>
-        Milestis is built on rigid design principles, so refining the look is about choosing the
-        right atmosphere, not rebuilding the layout from scratch.
-      </p>
-      <p>
-        As you edit, focus on the elements Milestis is designed to make easy:
-      </p>
+      {/* Refine the design */}
+      <h2 id="refine-design">{t("toc.refine-design")}</h2>
+      <p>{t("content.design_p1")}</p>
+      <p>{t("content.design_p2")}</p>
       <ul>
-        <li>
-          <strong>Template choice</strong> — select the structure that best fits the content.
-        </li>
-        <li>
-          <strong>Palette and mood</strong> — choose the visual direction that matches the story.
-        </li>
-        <li>
-          <strong>Depth and decoration</strong> — use textures, light, and decorative details to add
-          identity without making the composition messy.
-        </li>
+        <li>{t.rich("content.design_li1", richTextComponents)}</li>
+        <li>{t.rich("content.design_li2", richTextComponents)}</li>
+        <li>{t.rich("content.design_li3", richTextComponents)}</li>
       </ul>
 
-      <h2 id="save-preview">Save and preview</h2>
-      <p>
-        Milestis keeps your editor state safe while you work and provides a real preview so you can
-        see the result the way a viewer will see it after publishing.
-      </p>
-      <p>
-        Use <strong>Preview</strong> before publishing to check pacing, readability, and overall
-        atmosphere. This is the best moment to make small adjustments to titles, image choices, and
-        visual balance.
-      </p>
+      {/* Save and preview */}
+      <h2 id="save-preview">{t("toc.save-preview")}</h2>
+      <p>{t("content.save_p1")}</p>
+      <p>{t.rich("content.save_p2", richTextComponents)}</p>
 
-      <h2 id="before-publishing">Before publishing</h2>
-      <p>Before you make the project live, quickly check the essentials:</p>
+      {/* Before publishing */}
+      <h2 id="before-publishing">{t("toc.before-publishing")}</h2>
+      <p>{t("content.before_intro")}</p>
       <ul>
-        <li>
-          The project name reflects what you want to share.
-        </li>
-        <li>
-          The first screen or cover makes a strong impression.
-        </li>
-        <li>
-          Text is concise and free of placeholder copy.
-        </li>
-        <li>The final rhythm feels intentional from start to finish.</li>
+        <li>{t("content.before_li1")}</li>
+        <li>{t("content.before_li2")}</li>
+        <li>{t("content.before_li3")}</li>
+        <li>{t("content.before_li4")}</li>
       </ul>
-      <p>
-        When the project feels ready, continue with <Link href="/help/articles/publish-share">publishing and sharing</Link>.
-      </p>
+      <p>{t.rich("content.before_outro", richTextComponents)}</p>
     </ArticleLayout>
   )
 }

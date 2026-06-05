@@ -1,0 +1,71 @@
+{
+  "pricing": {
+  "header": {
+    "titleStart": "Simple, ",
+    "titleItalic": "honest",
+    "titleEnd": " pricing.",
+    "description": "Choose a plan that scales with your creative business. From single memories to professional digital archives."
+  },
+    "tiers": {
+      "explorer": {
+        "title": "Explorer",
+        "description": "Essential tools for individuals and small personal projects.",
+        "buttonText": "Get Started",
+        "features": [
+          "5 Active Projects",
+          "1GB Cloud Storage",
+          "Unlimited Archive Storage",
+          "Standard Project Support",
+          "Evergreen Web Updates",
+          "One-time purchase available"
+        ]
+      },
+      "creator": {
+        "title": "Creator",
+        "badge": "Professional Choice",
+        "description": "Designed for professional photographers and visual storytellers.",
+        "buttonText": "Start Creator",
+        "features": [
+          "25 Active Projects",
+          "10GB Cloud Storage",
+          "Professional Workspace",
+          "White-label Branding",
+          "200 Monthly Credits",
+          "Discounted Credit Top-ups",
+          "Extended Infrastructure Support",
+          "Evergreen Web Updates"
+        ]
+      },
+      "archive": {
+        "title": "Archive",
+        "description": "Maximum capacity for studios managing large-scale digital legacies.",
+        "buttonText": "Start Archive",
+        "features": [
+          "100 Active Projects",
+          "50GB Cloud Storage",
+          "Advanced Workspace",
+          "Full White-label Suite",
+          "750 Monthly Credits",
+          "Lowest Credit Rates",
+          "Priority Infrastructure Support",
+          "Evergreen Web Updates"
+        ]
+      }
+    },
+    "labels": {
+      "perMonth": "/month"
+    },
+    "evergreenSection": {
+      "badge": "Evergreen Infrastructure",
+      "title": "Future-Proof Memories",
+      "description": "The web is constantly evolving, and so are we. Every project hosted on our platform receives automatic updates to match modern browser standards and performance optimizations. Your digital sites stay fast, secure, and accessible, no matter how much time has passed.",
+      "supportCard": {
+        "title": "Guaranteed Support",
+        "subtitle": "Maintenance & Compatibility"
+      }
+    },
+    "footer": {
+      "text": "Powered by a sustainable SaaS model. Secure hosting and long-term digital preservation."
+    }
+  }
+}

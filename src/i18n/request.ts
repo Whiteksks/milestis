@@ -25,13 +25,36 @@ function deepMergeMessages(target: MessageRecord, source: MessageRecord): Messag
   return merged;
 }
 
+async function collectJsonFiles(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true });
+
+  const nestedFiles = await Promise.all(
+    entries
+      .sort((left, right) => left.name.localeCompare(right.name))
+      .map(async (entry) => {
+        const entryPath = path.join(directory, entry.name);
+
+        if (entry.isDirectory()) {
+          return collectJsonFiles(entryPath);
+        }
+
+        if (entry.isFile() && entry.name.endsWith('.json')) {
+          return [entryPath];
+        }
+
+        return [];
+      })
+  );
+
+  return nestedFiles.flat();
+}
+
 async function loadSplitMessages(locale: string) {
   const localeDir = path.join(process.cwd(), 'messages', locale);
-  const fileNames = (await readdir(localeDir)).filter((fileName) => fileName.endsWith('.json')).sort();
+  const filePaths = await collectJsonFiles(localeDir);
 
   const messages = await Promise.all(
-    fileNames.map(async (fileName) => {
-      const filePath = path.join(localeDir, fileName);
+    filePaths.map(async (filePath) => {
       const contents = await readFile(filePath, 'utf8');
       return JSON.parse(contents) as MessageRecord;
     })

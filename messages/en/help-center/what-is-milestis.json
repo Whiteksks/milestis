@@ -1,0 +1,53 @@
+{
+  "help_what_is_milestis": {
+    "metadata": {
+      "title": "What is Milestis — Milestis Help",
+      "description": "Learn what Milestis is, who it is for, and how the product works."
+    },
+    "meta": {
+      "title": "What is Milestis",
+      "description": "Milestis is a platform for creating premium digital photobooks and portfolio sites in minutes, without traditional design complexity.",
+      "category": "Basics",
+      "readTime": "4 min read",
+      "updatedAt": "April 2026"
+    },
+    "toc": {
+      "what-is-milestis": "What is Milestis?",
+      "who-it-is-for": "Who it is for",
+      "how-it-works": "How it works",
+      "project-types": "Project types",
+      "why-it-feels-different": "Why it feels different"
+    },
+    "related": {
+      "getting_started": "Create and edit your first project",
+      "publish_share": "Publish and share your project"
+    },
+    "content": {
+      "what_is_p1": "<strong_tag>Milestis</strong_tag> is a platform for turning photos and stories into polished digital experiences you can publish and share as a link. Instead of giving users a complex design tool, Milestis gives them a structured system where the quality is already built into the layout.",
+      "what_is_p2": "The goal is simple: help someone create something that looks premium in a few minutes, even from a phone, without learning design software first.",
+      "callout_result": "Milestis is built around the idea of <strong_tag>result over editing</strong_tag>. You are not expected to design from scratch. You select a format, add content, refine the mood, and publish.",
+      "who_p1": "Milestis is designed for two main kinds of users:",
+      "who_li1": "<strong_tag>Individuals and families</strong_tag> who want to create a beautiful digital gift, keepsake, or memory book for a wedding, birthday, trip, or milestone.",
+      "who_li2": "<strong_tag>Photographers and creators</strong_tag> who want to deliver a finished digital product instead of just a folder of files.",
+      "who_p2": "In both cases, the value is the same: a fast path from raw photos to something meaningful, presentable, and ready to share.",
+      "how_p1": "Milestis uses a <strong_tag>rigid design system</strong_tag>. That means the structure is already solved for you. You do not move everything freely on an empty canvas or build layouts from zero.",
+      "how_p2": "Instead, you work inside a guided workflow:",
+      "how_li1": "Create a new project from your dashboard.",
+      "how_li2": "Choose the format that fits your goal.",
+      "how_li3": "Add photos, text, and visual details.",
+      "how_li4": "Preview the final result.",
+      "how_li5": "Publish and share it with a link.",
+      "how_p3": "This makes the product faster, easier to use on mobile, and much harder to break visually.",
+      "types_p1": "Milestis currently supports two project formats:",
+      "types_li1": "<strong_tag>Memory Book</strong_tag> — a digital photobook for personal stories, milestones, and emotional moments.",
+      "types_li2": "<strong_tag>Portfolio Site</strong_tag> — a published website for presenting work, style, and visual identity.",
+      "types_p2": "Memory Books are suited to intimate sharing and gifting. Portfolio Sites are suited to public presentation and professional use.",
+      "different_p1": "Milestis is not trying to be a universal editor. It is designed to make one category of task feel dramatically easier: taking meaningful content and turning it into a finished digital product with confidence.",
+      "different_li1": "<strong_tag>Speed</strong_tag> — you can go from blank project to published result in minutes.",
+      "different_li2": "<strong_tag>Design safety</strong_tag> — layouts are structured so the result stays clean and premium.",
+      "different_li3": "<strong_tag>Atmosphere</strong_tag> — palettes, textures, depth, and decorations help the project feel personal without making the workflow heavy.",
+      "different_li4": "<strong_tag>Web-native delivery</strong_tag> — the result is already ready to open on any screen, without an app download.",
+      "callout_sparkles": "If you are new to the platform, the best next step is to create one small project first. Once you publish one Memory Book or Portfolio Site, the whole product model becomes clear."
+    }
+  }
+}

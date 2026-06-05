@@ -1,121 +1,96 @@
 import type { Metadata } from "next"
+import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, ShieldCheck } from "lucide-react"
 
-export const metadata: Metadata = {
-  title: "Account and security — Milestis Help",
-  description: "Learn how sign-in methods, login email, and public profile settings work in Milestis.",
+// Генерируем динамические метаданные через next-intl
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("help_account_security.metadata")
+  return {
+    title: t("title"),
+    description: t("description"),
+  }
 }
-
-const toc = [
-  { id: "your-account", label: "Your account" },
-  { id: "sign-in-methods", label: "Sign-in methods" },
-  { id: "email-access", label: "Email access" },
-  { id: "google-access", label: "Google access" },
-  { id: "public-profile", label: "Public profile" },
-  { id: "security-tips", label: "Security tips" },
-]
-
-const meta = {
-  title: "Account and security",
-  description:
-    "A practical guide to sign-in, linked login methods, and the difference between your account identity and your public profile.",
-  category: "Account",
-  readTime: "4 min read",
-  updatedAt: "April 2026",
-}
-
-const related = [
-  { title: "How credits work", href: "/help/articles/how-credits-work" },
-  { title: "Archive, deletion, and republishing", href: "/help/articles/archive-republish" },
-]
 
 export default function AccountSecurityPage() {
+  const t = useTranslations("help_account_security")
+
+  // Отрендерим стронг-теги одной функцией, чтобы не дублировать код
+  const richTextOption = {
+    strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+  }
+
+  const toc = [
+    { id: "your-account", label: t("toc.your-account") },
+    { id: "sign-in-methods", label: t("toc.sign-in-methods") },
+    { id: "email-access", label: t("toc.email-access") },
+    { id: "google-access", label: t("toc.google-access") },
+    { id: "public-profile", label: t("toc.public-profile") },
+    { id: "security-tips", label: t("toc.security-tips") },
+  ]
+
+  const meta = {
+    title: t("meta.title"),
+    description: t("meta.description"),
+    category: t("meta.category"),
+    readTime: t("meta.readTime"),
+    updatedAt: t("meta.updatedAt"),
+  }
+
+  const related = [
+    { title: t("related.credits"), href: "/help/articles/how-credits-work" },
+    { title: t("related.archive"), href: "/help/articles/archive-republish" },
+  ]
+
   return (
     <ArticleLayout meta={meta} toc={toc} related={related}>
-      <h2 id="your-account">Your account</h2>
-      <p>
-        Your Milestis account is the private identity behind your projects, credits, subscriptions,
-        and settings. It controls how you sign in and how your work is managed, but it is not the
-        same thing as your public creator profile.
-      </p>
-      <p>
-        In the account area you can manage your profile details, notification preferences, billing,
-        security, domains, and archive.
-      </p>
+      {/* Your account */}
+      <h2 id="your-account">{t("toc.your-account")}</h2>
+      <p>{t("content.p1")}</p>
+      <p>{t("content.p2")}</p>
 
-      <h2 id="sign-in-methods">Sign-in methods</h2>
-      <p>Milestis currently supports two account access methods:</p>
+      {/* Sign-in methods */}
+      <h2 id="sign-in-methods">{t("toc.sign-in-methods")}</h2>
+      <p>{t("content.methods_intro")}</p>
       <ul>
-        <li>
-          <strong>Email sign-in</strong> — your email becomes a stable login method for account
-          access and recovery.
-        </li>
-        <li>
-          <strong>Google sign-in</strong> — useful for quick access and convenient day-to-day login.
-        </li>
+        <li>{t.rich("content.method_email", richTextOption)}</li>
+        <li>{t.rich("content.method_google", richTextOption)}</li>
       </ul>
-      <p>
-        You can use one method or link both to the same account so you always have a backup way to
-        get in.
-      </p>
+      <p>{t("content.methods_outro")}</p>
 
       <div className="kb-callout">
         <Info className="kb-callout-icon text-primary" />
-        <span>
-          The safest setup is to have <strong>both email and Google linked</strong>. That gives you
-          a second path back into the account if one method becomes unavailable.
-        </span>
+        <span>{t.rich("content.callout_safe", richTextOption)}</span>
       </div>
 
-      <h2 id="email-access">Email access</h2>
-      <p>
-        If your account already has email linked, that email acts as your main recovery-friendly
-        login method. If your account was created with Google first, you can still add email access
-        later from the <strong>Security</strong> section.
-      </p>
-      <p>
-        When email is not yet linked, Milestis can send you a linking email so that the same account
-        can also be accessed through an email-based flow.
-      </p>
+      {/* Email access */}
+      <h2 id="email-access">{t("toc.email-access")}</h2>
+      <p>{t.rich("content.email_p1", richTextOption)}</p>
+      <p>{t("content.email_p2")}</p>
 
-      <h2 id="google-access">Google access</h2>
-      <p>
-        Google access can be connected or disconnected from the same security area. This is helpful
-        if you want faster login but still want your account anchored to an email-based method.
-      </p>
-      <p>
-        Milestis prevents unsafe account states. For example, disconnecting Google is only allowed
-        when email access is already linked, so you do not accidentally lock yourself out.
-      </p>
+      {/* Google access */}
+      <h2 id="google-access">{t("toc.google-access")}</h2>
+      <p>{t.rich("content.google_p1", richTextOption)}</p>
+      <p>{t("content.google_p2")}</p>
 
-      <h2 id="public-profile">Public profile</h2>
-      <p>
-        Your <strong>public profile</strong> is separate from your private login identity. Public name,
-        location, bio, and social links can be edited without changing how you access the account.
-      </p>
-      <p>
-        This distinction matters for creators: you may want one login identity for account security,
-        but a different public-facing name for published work and portfolio presentation.
-      </p>
+      {/* Public profile */}
+      <h2 id="public-profile">{t("toc.public-profile")}</h2>
+      <p>{t.rich("content.profile_p1", richTextOption)}</p>
+      <p>{t("content.profile_p2")}</p>
 
-      <h2 id="security-tips">Security tips</h2>
+      {/* Security tips */}
+      <h2 id="security-tips">{t("toc.security-tips")}</h2>
       <ul>
-        <li>Keep at least two sign-in options linked when possible.</li>
-        <li>Double-check your login email if you rely on it for account recovery.</li>
-        <li>Use your public profile for presentation, not as a substitute for account security.</li>
-        <li>
-          If you are working on client or family projects, avoid sharing your account itself. Share
-          published links instead.
-        </li>
+        <li>{t("content.tip1")}</li>
+        <li>{t("content.tip2")}</li>
+        <li>{t("content.tip3")}</li>
+        <li>{t("content.tip4")}</li>
       </ul>
 
       <div className="kb-callout">
         <ShieldCheck className="kb-callout-icon text-amber-500" />
-        <span>
-          If account access is the issue, solve it in <strong>Security</strong>. If the goal is to
-          change how your work appears publicly, solve it in <strong>Profile</strong> instead.
-        </span>
+        <span>{t.rich("content.callout_security", richTextOption)}</span>
       </div>
     </ArticleLayout>
   )

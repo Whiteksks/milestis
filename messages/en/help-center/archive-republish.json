@@ -1,0 +1,49 @@
+{
+  "help_archive_republish": {
+    "metadata": {
+      "title": "Archive, deletion, and republishing — Milestis Help",
+      "description": "Understand what happens after publish, what lives in the archive, and how unpublish, republish, and permanent deletion work."
+    },
+    "meta": {
+      "title": "Archive, deletion, and republishing",
+      "description": "A clear guide to what happens to projects after publish and how to manage them safely afterward.",
+      "category": "Projects",
+      "readTime": "4 min read",
+      "updatedAt": "April 2026"
+    },
+    "toc": {
+      "what-is-archive": "What is the archive?",
+      "after-publish": "What happens after publish",
+      "unpublish": "Unpublish a project",
+      "republish": "Republish a project",
+      "delete-forever": "Delete permanently",
+      "best-practices": "Best practices"
+    },
+    "related": {
+      "publish_share": "Publish and share your project",
+      "credits": "How credits work"
+    },
+    "content": {
+      "archive_p1": "The archive is where published projects live after they leave the active workspace. It acts like a management layer for finished results: you can review them, open the live link, return to editing, take them offline, or remove them permanently.",
+      "archive_p2": "This keeps your main creation area focused on current work while still preserving access to projects that are already part of your published history.",
+      "after_publish_p1": "When you publish a project, Milestis creates a live web version and moves that project into the archived side of your workflow. Published projects can still be managed later, but they are treated as finished outputs rather than fresh drafts.",
+      "after_publish_p2": "In the archive you may see a project as <strong_tag>Published</strong_tag> or <strong_tag>Offline</strong_tag>, depending on whether the live link is still active.",
+      "callout_archive": "Archived does not mean lost. It means the project has already gone through publishing and is now being managed as a finished result.",
+      "unpublish_p1": "Unpublishing takes the live version offline without deleting the project data itself. This is useful when you want to hide a project temporarily, revise it, or stop sharing it.",
+      "unpublish_p2": "After unpublishing, the archive will still keep the project, but its live state changes from published to offline.",
+      "republish_p1": "Republish brings an archived offline project back online. It is the right choice when the project already existed as a published result and you want to make it live again.",
+      "republish_p2": "In the current product flow, republishing is supported as a lightweight return-to-live action and does not currently consume extra credits.",
+      "delete_p1": "Permanent deletion is the destructive action. It removes the archived project, clears exported files and storage data, and immediately takes any live site offline.",
+      "delete_p2": "This is different from unpublish. Unpublish hides the project. Permanent deletion removes it.",
+      "delete_li1": "The live site goes offline immediately.",
+      "delete_li2": "Stored exported files are removed.",
+      "delete_li3": "Project data is no longer kept in the archive.",
+      "delete_li4": "Credits spent on the original publish are not refunded.",
+      "callout_delete": "Use permanent deletion only when you are sure the project is no longer needed. If you only want to hide it for a while, unpublish is the safer choice.",
+      "tips_li1": "Keep active work in the editor, and treat the archive as the home for already-published results.",
+      "tips_li2": "Unpublish when you need a pause. Delete only when you want the project gone for good.",
+      "tips_li3": "Before deleting, make sure you no longer need the live link or associated files.",
+      "tips_li4": "Use republish when the project already belongs to your published history and simply needs to go live again."
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "FaqPage": {
+    "hero": {
+      "title": "Questions & Answers",
+      "description": "Everything you need to know about creating and publishing memories with Milestis."
+    },
+    "sections": {
+      "general": {
+        "title": "General Questions",
+        "items": [
+          {
+            "question": "What is Milestis?",
+            "answer": "Milestis is a platform for creating digital photo books and interactive portfolios. With ready-made templates and decorative elements, you can build and publish your project in just a few minutes from your phone or computer."
+          },
+          {
+            "question": "Who is this service for?",
+            "answer": "The platform is suitable for anyone who wants to beautifully preserve memories or create a digital gift, as well as for photographers and designers who need to quickly build a portfolio."
+          }
+        ]
+      },
+      "privacySharing": {
+        "title": "Privacy & Publishing",
+        "items": [
+          {
+            "question": "How does project publishing work?",
+            "answer": "After publishing, the project receives a unique link on the milestis.site domain that can be shared with others. Project management and creation take place in the main platform interface."
+          },
+          {
+            "question": "Do I need an account to view my project?",
+            "answer": "No. Anyone with the link can open and view the project without registration."
+          }
+        ]
+      },
+      "editingContent": {
+        "title": "Content Editing",
+        "items": [
+          {
+            "question": "Can I edit my project after publishing?",
+            "answer": "Yes. You can edit your project at any time, and all changes will be automatically updated via the link."
+          },
+          {
+            "question": "Can I delete my project?",
+            "answer": "Yes, you can fully delete any project from your account. When a project is deleted, any spent funds and credits are not refunded."
+          }
+        ]
+      },
+      "pricingAccess": {
+        "title": "Payments & Access",
+        "items": [
+          {
+            "question": "How does payment work on the platform?",
+            "answer": "We offer a credit system for one-time payments, as well as a subscription that unlocks additional features and reduces usage costs."
+          },
+          {
+            "question": "What happens to my projects if my subscription ends?",
+            "answer": "All published projects will remain accessible via their links. Restrictions will only apply to creating new projects and using paid features until the subscription is renewed."
+          }
+        ]
+      }
+    },
+    "reassurance": {
+      "cards": {
+        "memories": {
+          "title": "Your memories belong to you",
+          "description": "Everything you create remains yours"
+        },
+        "noPressure": {
+          "title": "No pressure to upgrade",
+          "description": "Start for free and grow at your own pace"
+        },
+        "control": {
+          "title": "You stay in control",
+          "description": "Privacy settings are always in your hands"
+        }
+      }
+    }
+  }
+}

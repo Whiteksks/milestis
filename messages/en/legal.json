@@ -1,0 +1,27 @@
+{
+  "Legal": {
+    "badge": "Privacy & Rules",
+    "title": "Legal & Privacy",
+    "description": "We value transparency and keep things straightforward. Below you'll find the official rules for using Milestis, along with details on how we protect and handle your data.",
+    "effectiveDate": "Last updated: June 2026 • Milestis",
+    "policies": {
+      "terms": {
+        "title": "Terms of Service",
+        "description": "The rules and guidelines you agree to when using our platform and services."
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "description": "A clear breakdown of what data we collect, why we need it, and how we protect it."
+      },
+      "cookies": {
+        "title": "Cookie Policy",
+        "description": "How we use cookies to keep you logged in and improve your experience."
+      }
+    },
+    "support": {
+      "title": "Have questions?",
+      "description": "If you have any questions about your personal data or our policies, just let us know.",
+      "cta": "Contact Support"
+    }
+  }
+}

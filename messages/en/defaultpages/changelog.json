@@ -1,0 +1,23 @@
+{
+  "ChangelogPage": {
+    "meta": {
+      "latestUpdate": "Latest Update: June 2026",
+      "title": "Milestis Releases",
+      "description": "We’re constantly refining the Milestis experience. Follow our progress as we craft the ultimate tool for your digital legacy.",
+      "helpCenterLink": "Learn more in Help Center"
+    },
+    "entries": [
+      {
+        "date": "June 1, 2026",
+        "title": "Goodbye Complex Editors. Hello, Milestis!",
+        "description": "We are officially live. Milestis is here to prove that professional design doesn't have to be difficult. From now on, your focus stays on the story, while we handle the aesthetic.",
+        "longDescription": "Creating a digital legacy shouldn't feel like a chore. Our initial launch introduces a universal editor with strict, high-performance templates for photobooks and portfolios. Whether you're at an event or on the move, you can now build a complete project in under 5 minutes using just your smartphone.",
+        "highlights": [
+          "Select a professional layout and see your project come to life instantly.",
+          "Add atmospheric depth with light rays and textures using drag-and-drop.",
+          "Your memories are preserved forever with a unique permanent link."
+        ]
+      }
+    ]
+  }
+}

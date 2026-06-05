@@ -1,7 +1,14 @@
-import {defineRouting} from 'next-intl/routing';
+import { createNavigation } from 'next-intl/navigation';
+import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
-  // поддерживаемые локали
   locales: ['en', 'ru', 'kz'],
   defaultLocale: 'en'
 });
+
+export const { 
+  Link, 
+  redirect, 
+  usePathname, 
+  useRouter 
+} = createNavigation(routing);

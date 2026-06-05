@@ -1,0 +1,47 @@
+{
+  "help_account_security": {
+    "metadata": {
+      "title": "Account and security — Milestis Help",
+      "description": "Learn how sign-in methods, login email, and public profile settings work in Milestis."
+    },
+    "meta": {
+      "title": "Account and security",
+      "description": "A practical guide to sign-in, linked login methods, and the difference between your account identity and your public profile.",
+      "category": "Account",
+      "readTime": "4 min read",
+      "updatedAt": "April 2026"
+    },
+    "toc": {
+      "your-account": "Your account",
+      "sign-in-methods": "Sign-in methods",
+      "email-access": "Email access",
+      "google-access": "Google access",
+      "public-profile": "Public profile",
+      "security-tips": "Security tips"
+    },
+    "related": {
+      "credits": "How credits work",
+      "archive": "Archive, deletion, and republishing"
+    },
+    "content": {
+      "p1": "Your Milestis account is the private identity behind your projects, credits, subscriptions, and settings. It controls how you sign in and how your work is managed, but it is not the same thing as your public creator profile.",
+      "p2": "In the account area you can manage your profile details, notification preferences, billing, security, domains, and archive.",
+      "methods_intro": "Milestis currently supports two account access methods:",
+      "method_email": "<strong_tag>Email sign-in</strong_tag> — your email becomes a stable login method for account access and recovery.",
+      "method_google": "<strong_tag>Google sign-in</strong_tag> — useful for quick access and convenient day-to-day login.",
+      "methods_outro": "You can use one method or link both to the same account so you always have a backup way to get in.",
+      "callout_safe": "The safest setup is to have <strong_tag>both email and Google linked</strong_tag>. That gives you a second path back into the account if one method becomes unavailable.",
+      "email_p1": "If your account already has email linked, that email acts as your main recovery-friendly login method. If your account was created with Google first, you can still add email access later from the <strong_tag>Security</strong_tag> section.",
+      "email_p2": "When email is not yet linked, Milestis can send you a linking email so that the same account can also be accessed through an email-based flow.",
+      "google_p1": "Google access can be connected or disconnected from the same security area. This is helpful if you want faster login but still want your account anchored to an email-based method.",
+      "google_p2": "Milestis prevents unsafe account states. For example, disconnecting Google is only allowed when email access is already linked, so you do not accidentally lock yourself out.",
+      "profile_p1": "Your <strong_tag>public profile</strong_tag> is separate from your private login identity. Public name, location, bio, and social links can be edited without changing how you access the account.",
+      "profile_p2": "This distinction matters for creators: you may want one login identity for account security, but a different public-facing name for published work and portfolio presentation.",
+      "tip1": "Keep at least two sign-in options linked when possible.",
+      "tip2": "Double-check your login email if you rely on it for account recovery.",
+      "tip3": "Use your public profile for presentation, not as a substitute for account security.",
+      "tip4": "If you are working on client or family projects, avoid sharing your account itself. Share published links instead.",
+      "callout_security": "If account access is the issue, solve it in <strong_tag>Security</strong_tag>. If the goal is to change how your work appears publicly, solve it in <strong_tag>Profile</strong_tag> instead."
+    }
+  }
+}
