@@ -50,12 +50,35 @@ function clampPage(page: number, totalItems: number) {
   return Math.min(page, totalPages)
 }
 
+// Новые интерфейсы для типизации элементов истории
+interface CreditHistoryItem {
+  id: string
+  type: string
+  direction: "in" | "out"
+  createdAt: Date | number
+  amount: number
+  balanceSnapshot: {
+    total: number
+  }
+  meta?: Record<string, unknown>
+}
+
+interface InvoiceHistoryItem {
+  id: string
+  type: string
+  direction: "in" | "out"
+  createdAt: Date | number
+  amountMinor: number
+  currency: string
+  meta?: Record<string, unknown>
+}
+
 interface BillingHistoryProps {
   view?: "all" | "credits" | "invoices"
   historyLoading: boolean
-  historyError: any
-  creditHistory: any[]
-  invoiceHistory: any[]
+  historyError: Error | unknown // Заменили any на unknown (безопасный тип для ошибок)
+  creditHistory: CreditHistoryItem[]
+  invoiceHistory: InvoiceHistoryItem[]
 }
 
 export function BillingHistory({
@@ -65,9 +88,10 @@ export function BillingHistory({
   creditHistory = [],
   invoiceHistory = [],
 }: BillingHistoryProps) {
-  // Упрощено с "account.billing" до "billing"
   const t = useTranslations("billing")
   const locale = useLocale()
+  
+  // Явная типизация стейта табов, убрали as any в onValueChange
   const [activeTab, setActiveTab] = useState<"credits" | "billing">(
     view === "invoices" ? "billing" : "credits"
   )
@@ -188,7 +212,7 @@ export function BillingHistory({
   if (view === "invoices") return renderInvoices()
 
   return (
-    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "credits" | "billing")} className="w-full">
       <TabsList className="inline-flex h-10 items-center justify-center rounded-full bg-muted/60 p-1 text-muted-foreground backdrop-blur-sm">
         <TabsTrigger value="credits" className="rounded-full px-6 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
           {t("tabs.credits")}
@@ -234,12 +258,20 @@ function EmptyHistoryState({ message }: { message: string }) {
   )
 }
 
-function Pagination({ currentPage, totalPages, onPageChange, t }: any) {
+interface PaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: React.Dispatch<React.SetStateAction<number>>
+  t: ReturnType<typeof useTranslations>
+}
+
+// Заменили аny на структурированный интерфейс PaginationProps
+function Pagination({ currentPage, totalPages, onPageChange, t }: PaginationProps) {
   return (
     <div className="flex items-center justify-between gap-3 pt-2">
       <Button
         variant="ghost" size="sm" className="rounded-full text-xs text-muted-foreground hover:text-foreground"
-        onClick={() => onPageChange((p: number) => Math.max(1, p - 1))} disabled={currentPage === 1}
+        onClick={() => onPageChange((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
       >
         <ChevronLeft className="size-3.5 mr-1" />
         {t("pagination.previous")}
@@ -249,7 +281,7 @@ function Pagination({ currentPage, totalPages, onPageChange, t }: any) {
       </p>
       <Button
         variant="ghost" size="sm" className="rounded-full text-xs text-muted-foreground hover:text-foreground"
-        onClick={() => onPageChange((p: number) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+        onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
       >
         {t("pagination.next")}
         <ChevronRight className="size-3.5 ml-1" />

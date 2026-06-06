@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import {
-  Search,
   BookOpen,
   Share2,
   Coins,
@@ -87,7 +85,6 @@ const guides = [
 
 export function HelpPage() {
   const t = useTranslations("HelpPage")
-  const [searchQuery, setSearchQuery] = useState("")
 
   return (
     <div className="mx-auto max-w-5xl space-y-10">

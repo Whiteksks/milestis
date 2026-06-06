@@ -55,31 +55,31 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           
           {/* Brand column */}
-<div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-6">
-  <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
-    <LogoSvg className="h-9 w-auto" />
-  </Link>
-  
-  <p className="max-w-xs text-base md:text-lg leading-relaxed text-muted-foreground">
-    {t("description")}
-  </p>
+          <div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-6">
+            <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
+              <LogoSvg className="h-9 w-auto" />
+            </Link>
+            
+            <p className="max-w-xs text-base md:text-lg leading-relaxed text-muted-foreground">
+              {t("description")}
+            </p>
 
-  {/* Группа контролов: тема и язык */}
-  <div className="flex flex-row items-center gap-4">
-    <Select value={theme ?? "light"} onValueChange={setTheme}>
-      <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="light">{t("themes.light")}</SelectItem>
-        <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
-        <SelectItem value="dark">{t("themes.dark")}</SelectItem>
-      </SelectContent>
-    </Select>
+            {/* Группа контролов: тема и язык */}
+            <div className="flex flex-row items-center gap-4">
+              <Select value={theme ?? "light"} onValueChange={setTheme}>
+                <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">{t("themes.light")}</SelectItem>
+                  <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
+                  <SelectItem value="dark">{t("themes.dark")}</SelectItem>
+                </SelectContent>
+              </Select>
 
-    <LanguageSwitcher />
-  </div>
-</div>
+              <LanguageSwitcher />
+            </div>
+          </div>
 
           {/* Desktop link columns */}
           {FOOTER_LINKS.map((col) => (

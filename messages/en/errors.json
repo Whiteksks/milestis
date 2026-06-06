@@ -15,5 +15,15 @@
     "popupClosedByUser": "The sign-in popup was closed before completing.",
     "popupBlocked": "Sign-in popup was blocked by your browser. Please allow popups and try again.",
     "unknownError": "An unknown error occurred. Please try again."
+  },
+  "error": {
+    "404": {
+      "title": "Page not found",
+      "description": "Unfortunately, the requested page does not exist or has been moved. Please check the URL or use the links below.",
+      "goHome": "Go to homepage",
+      "getHelp": "Get help",
+      "supportText": "If you believe this is an error, please contact ",
+      "supportLink": "support service"
+    }
   }
 }
