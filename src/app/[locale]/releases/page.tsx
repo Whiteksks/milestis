@@ -1,4 +1,3 @@
-import React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 
-// Описываем интерфейс для текстовых данных из JSON
+
 interface ChangelogTextEntry {
   date: string;
   title: string;
@@ -16,7 +15,8 @@ interface ChangelogTextEntry {
 }
 
 // Статичный путь к фотографии, который не зависит от языка
-const CHANGELOG_IMAGE_SRC = "/images/changelog/v1.png"; // Укажи здесь реальный путь к файлу
+import CHANGELOG_IMAGE_SRC from "@/components/assets/milestis-release.webp"; // Укажи здесь реальный путь к файлу
+import Link from 'next/link';
 
 const ChangelogPage = () => {
   const t = useTranslations('ChangelogPage');
@@ -65,7 +65,7 @@ const ChangelogPage = () => {
                 </h2>
 
                 {/* Image Container с единой статичной фотографией */}
-                <div className="mb-8 rounded-2xl overflow-hidden border border-border/40 bg-muted/30 aspect-video flex items-center justify-center relative">
+                <div className="mb-8 rounded-2xl overflow-hidden border border-border/40 bg-muted/30 aspect-[16/11] flex items-center justify-center relative">
                   <Image 
                     src={CHANGELOG_IMAGE_SRC} 
                     alt={entry.title} 
@@ -92,12 +92,14 @@ const ChangelogPage = () => {
                     ))}
                   </ul>
 
-                  <div className="pt-8">
-                    <Button variant="link" className="p-0 h-auto text-primary gap-2 group">
+                <div className="pt-8">
+                  <Button variant="link" className="p-0 h-auto text-primary gap-2 group" asChild>
+                    <Link href="/help">
                       {t('meta.helpCenterLink')}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
+                    </Link>
+                  </Button>
+                </div>
                 </div>
               </div>
 

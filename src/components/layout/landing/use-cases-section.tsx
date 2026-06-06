@@ -1,20 +1,27 @@
 "use client"
 
-import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { EventStoriesIcon } from "@/components/assets/use-case1"
+import { InstantPortfoliosIcon } from "@/components/assets/use-case2"
+import { PhotographerUpsellIcon } from "@/components/assets/use-case3"
 
-const USE_CASES = [
+interface UseCase {
+  id: string
+  Icon: React.ComponentType<{ className?: string }>
+}
+
+const USE_CASES: UseCase[] = [
   {
     id: "eventStories",
-    image: "/images/event-story.jpg",
+    Icon: EventStoriesIcon,
   },
   {
     id: "instantPortfolios",
-    image: "/images/portfolio.jpg",
+    Icon: InstantPortfoliosIcon,
   },
   {
     id: "photographerUpsell",
-    image: "/images/upsell.jpg",
+    Icon: PhotographerUpsellIcon,
   },
 ]
 
@@ -34,30 +41,32 @@ export function UseCasesSection() {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {USE_CASES.map((useCase) => (
-            <div
-              key={useCase.id}
-              className="group overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-lg flex flex-col"
-            >
-              <div className="aspect-4/3 overflow-hidden relative">
-                <Image
-                  src={useCase.image || "/placeholder.svg"}
-                  alt={t(`cases.${useCase.id}.title`)}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+          {USE_CASES.map((useCase) => {
+            // Деструктурируем иконку с большой буквы, чтобы валидно использовать её как тег
+            const { Icon, id } = useCase
+
+            return (
+              <div
+                key={id}
+                className="group overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-lg flex flex-col"
+              >
+                <div className="aspect-4/3 flex items-center justify-center bg-muted/30 p-8 relative overflow-hidden">
+                  <Icon 
+                    className="h-auto scale-170 w-full max-w-[340px] text-black dark:text-white" 
+                  />
+                </div>
+
+                <div className="p-8 flex-grow">
+                  <h3 className="mb-3 text-xl font-semibold">
+                    {t(`cases.${id}.title`)}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {t(`cases.${id}.description`)}
+                  </p>
+                </div>
               </div>
-              <div className="p-8 flex-grow">
-                <h3 className="mb-3 text-xl font-semibold">
-                  {t(`cases.${useCase.id}.title`)}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t(`cases.${useCase.id}.description`)}
-                </p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 "use client"
 
-import LogoSvg from "@/components/icons/logo"
+import LogoSvg from "@/components/assets/logo"
 import { Separator } from "@/components/ui/separator"
 import { useThemeTransition } from "@/hooks/useThemeTransition"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { LanguageSwitcher } from "../ui/custom/LangSwitch"
 
 // Вместо сырых строк храним только системные ключи
 const FOOTER_LINKS = [
@@ -54,26 +55,31 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           
           {/* Brand column */}
-          <div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-6">
-            <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
-              <LogoSvg className="h-9 w-auto" />
-            </Link>
-            
-            <p className="max-w-xs text-base md:text-lg leading-relaxed text-muted-foreground">
-              {t("description")}
-            </p>
+<div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-6">
+  <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
+    <LogoSvg className="h-9 w-auto" />
+  </Link>
+  
+  <p className="max-w-xs text-base md:text-lg leading-relaxed text-muted-foreground">
+    {t("description")}
+  </p>
 
-            <Select value={theme ?? "light"} onValueChange={setTheme}>
-              <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">{t("themes.light")}</SelectItem>
-                <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
-                <SelectItem value="dark">{t("themes.dark")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+  {/* Группа контролов: тема и язык */}
+  <div className="flex flex-row items-center gap-4">
+    <Select value={theme ?? "light"} onValueChange={setTheme}>
+      <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="light">{t("themes.light")}</SelectItem>
+        <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
+        <SelectItem value="dark">{t("themes.dark")}</SelectItem>
+      </SelectContent>
+    </Select>
+
+    <LanguageSwitcher />
+  </div>
+</div>
 
           {/* Desktop link columns */}
           {FOOTER_LINKS.map((col) => (

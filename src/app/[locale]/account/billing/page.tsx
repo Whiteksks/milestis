@@ -84,7 +84,7 @@ export default function BillingSettings() {
   ] : []
 
   return (
-    <div className="space-y-12 max-w-5xl mx-auto py-6 px-4 sm:px-6 antialiased">
+    <div className="space-y-12 max-w-5xl mx-auto md:py-6 md:px-4 p-0 antialiased">
       
       {/* СЕКЦИЯ 1: Тариф и Оплата */}
       <section className="space-y-6">
@@ -200,7 +200,7 @@ export default function BillingSettings() {
           <p className="mt-1 text-muted-foreground">{t("history.description")}</p>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card/40 p-6 shadow-sm">
+        <div className="rounded-3xl border border-border bg-card/40 p-4 shadow-sm">
           <BillingHistory 
             view="all"
             historyLoading={historyLoading}

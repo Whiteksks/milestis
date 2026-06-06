@@ -1,5 +1,5 @@
 // SVG Imports
-import LogoSvg from '@/components/icons/logo'
+import LogoSvg from '@/components/assets/logo'
 
 // Util Imports
 import { cn } from '@/lib/utils'
