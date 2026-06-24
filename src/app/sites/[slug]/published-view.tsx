@@ -102,7 +102,7 @@ export function PublishedView({
           {template}
         </div>
 
-        <MilestisWhiteLabel />
+        <MilestisWhiteLabel clickable={false} />
       </div>
     </div>
   )

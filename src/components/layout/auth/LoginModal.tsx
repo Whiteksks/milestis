@@ -10,6 +10,7 @@ import { CheckCircle2, ArrowLeft, ArrowRight, FlaskConical } from "lucide-react"
 import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface LoginModalProps {
   open: boolean
@@ -31,15 +32,27 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [error, setError] = useState<string | null>(null)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [password, setPassword] = useState("")
+  const [consentChecked, setConsentChecked] = useState(false)
+
+  const recordIubendaConsent = (email: string) => {
+    ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
+      "submit",
+      {
+        subject: { email },
+        preferences: { terms: true, privacy_policy: true },
+      },
+    ])
+  }
 
   const handleSendMagicLink = async () => {
-    if (!email) return
+    if (!email || !consentChecked) return
     setLoading(true)
     setError(null)
 
     const { success, error } = await sendSignInLinkToEmail(email)
 
     if (success) {
+      recordIubendaConsent(email)
       setSent(true)
     } else if (error) {
       setError(error)
@@ -54,11 +67,13 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   }
 
   const handleSignInWithPassword = async () => {
-    if (!email || !password) return
+    if (!email || !password || !consentChecked) return
     setLoading(true)
     setError(null)
     const { success, error } = await signInWithPassword(email, password)
-    if (!success && error) {
+    if (success) {
+      recordIubendaConsent(email)
+    } else if (error) {
       setError(error)
     }
     setLoading(false)
@@ -72,6 +87,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       setLoading(false)
       setShowPasswordForm(false)
       setPassword("")
+      setConsentChecked(false)
     }
     onOpenChange(open)
   }
@@ -128,7 +144,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             {!showPasswordForm && (
             <Button
               onClick={handleSendMagicLink}
-              disabled={loading || !email}
+              disabled={loading || !email || !consentChecked}
               className="w-full h-12 text-base font-semibold rounded-xl shadow-lg shadow-primary/5 hover:scale-[1.01] transition-all active:scale-95 group"
             >
               {loading ? "Sending..." : "Send Magic Link"}
@@ -157,7 +173,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 </div>
                 <Button
                   onClick={handleSignInWithPassword}
-                  disabled={loading || !email || !password}
+                  disabled={loading || !email || !password || !consentChecked}
                   className="w-full h-12 text-base font-semibold rounded-xl bg-amber-500 hover:bg-amber-500/90 text-white shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-all active:scale-95 group"
                 >
                   {loading ? "Signing in..." : "Sign In with Password"}
@@ -167,15 +183,27 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             )}
           </div>
 
-          <p className="text-center text-xs text-muted-foreground font-light leading-relaxed">
-            By signing in, you agree to our{" "}
-            <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-              Terms
-            </Link>{" "}and{" "}
-            <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>.
-          </p>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="auth-consent"
+              checked={consentChecked}
+              onCheckedChange={(v) => setConsentChecked(v === true)}
+              className="mt-0.5 shrink-0"
+            />
+            <label
+              htmlFor="auth-consent"
+              className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+            >
+              I agree to the{" "}
+              <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                Terms of Service
+              </Link>
+              {" "}and{" "}
+              <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+            </label>
+          </div>
         </div>
       ) : (
         <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">

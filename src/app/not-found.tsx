@@ -1,10 +1,8 @@
-import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Home, HelpCircle } from "lucide-react"
 
 export default function NotFound() {
-  // Инициализируем пространство имен "error.404"
   const t = useTranslations("error.404")
 
   return (
@@ -22,32 +20,19 @@ export default function NotFound() {
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href="/">
+            <a href="https://milestis.com">
               <Home className="mr-2 h-4 w-4" />
               {t("goHome")}
-            </Link>
+            </a>
           </Button>
           
           <Button variant="outline" asChild className="bg-transparent">
-            <Link href="/help">
+            <a href="https://milestis.com/help">
               <HelpCircle className="mr-2 h-4 w-4" />
               {t("getHelp")}
-            </Link>
+            </a>
           </Button>
         </div>
-
-        {/* Используем встроенную в next-intl работу с тегами, 
-          чтобы ссылка корректно встраивалась в текст для любого языка
-        */}
-        <p className="mt-8 text-sm text-muted-foreground">
-          {t.rich("supportText", {
-              link: (chunks) => (
-                <Link href="/help" className="text-foreground underline underline-offset-4 hover:text-primary">
-                  {chunks}
-                </Link>
-              )
-          })}
-        </p>
       </div>
     </div>
   )

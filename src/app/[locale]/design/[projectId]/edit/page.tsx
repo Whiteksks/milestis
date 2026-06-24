@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDocFromServer } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
 import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
@@ -51,7 +51,7 @@ export default function EditorPage() {
 
     async function loadProject() {
       try {
-        const snap = await getDoc(doc(db, 'projects', projectId))
+        const snap = await getDocFromServer(doc(db, 'projects', projectId))
         if (cancelled) return
 
         if (!snap.exists()) {
@@ -66,7 +66,7 @@ export default function EditorPage() {
         }
 
         // Load heavy editor data (theme + content) from the subcollection
-        const contentSnap = await getDoc(doc(db, 'projects', projectId, 'data', 'content'))
+        const contentSnap = await getDocFromServer(doc(db, 'projects', projectId, 'data', 'content'))
         if (cancelled) return
         const editorData = contentSnap.exists() ? contentSnap.data() : null
 

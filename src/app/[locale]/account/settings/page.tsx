@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Globe, Download, Package, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
-import { LanguageSwitcher } from "@/components/ui/custom/LangSwitch"
+import { setLocaleCookie } from "@/components/ui/custom/LangSwitch"
 import { useUserStore } from "@/hooks/useUserStore"
 import { auth } from "@/lib/firebase/firebase"
 import { deleteAccount, downloadAccountData, downloadProjectContent, saveUserProfile } from "@/lib/user"
@@ -81,6 +81,9 @@ export default function AccountSettings() {
     seasonal_specials: false,
   })
   const [saving, setSaving] = useState(false)
+  const [selectedLang, setSelectedLang] = useState<'en' | 'ru' | 'kz'>(
+    (profile?.settings?.language) ?? (locale as 'en' | 'ru' | 'kz') ?? 'en'
+  )
   const [exportingAccountData, setExportingAccountData] = useState(false)
   const [exportingProjectContent, setExportingProjectContent] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState<string>("")
@@ -116,6 +119,12 @@ export default function AccountSettings() {
     })
   }, [profile?.settings?.notifications])
 
+  useEffect(() => {
+    if (profile?.settings?.language) {
+      setSelectedLang(profile.settings.language)
+    }
+  }, [profile?.settings?.language])
+
   const toggle = (key: NotificationKey, value: boolean) =>
     setNotifications((prev) => ({ ...prev, [key]: value }))
 
@@ -123,8 +132,12 @@ export default function AccountSettings() {
     setSaving(true)
     try {
       toastUser.saveSettings(
-        saveUserProfile({ settings: { notifications } })
+        saveUserProfile({ settings: { notifications, language: selectedLang } })
       )
+      setLocaleCookie(selectedLang)
+      if (selectedLang !== locale) {
+        router.push(`/${selectedLang}/account/settings`)
+      }
     } finally {
       setSaving(false)
     }
@@ -196,9 +209,16 @@ export default function AccountSettings() {
             </div>
 
             <div className="w-full sm:w-auto sm:min-w-[200px]">
-              <div className="[&_button]:h-10 [&_button]:w-full [&_button]:justify-between [&_button]:px-4 [&_button]:text-sm [&_button]:rounded-full">
-                <LanguageSwitcher />
-              </div>
+              <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as 'en' | 'ru' | 'kz')}>
+                <SelectTrigger className="h-10 w-full rounded-full px-4 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="ru">Русский</SelectItem>
+                  <SelectItem value="kz">Қазақша</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
           </div>

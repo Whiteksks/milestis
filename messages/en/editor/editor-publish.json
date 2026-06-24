@@ -44,7 +44,7 @@
           "credits": "credits",
           "balance": "balance: {balance}",
           "insufficient": "You don't have enough credits. Top up your balance to continue.",
-          "terms": "By publishing you accept our Terms of Service and Content Policy. Credits are non-refundable once publication is confirmed.",
+          "terms": "I accept the Terms of Service and Content Policy. Credits are non-refundable once publication is confirmed.",
           "analysisFailed": "Analysis failed"
         }
       }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { getSlugInputChrome } from '@/lib/slug'
 import type { AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface PublishModalProps {
   open: boolean
@@ -53,9 +55,10 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
   const publishMutation = usePublishMutation()
   const modalData = usePublishModal(projectId, mode)
   const isMobile = useIsMobile()
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   function handleClose(nextOpen: boolean) {
-    if (!nextOpen) modalData.reset()
+    if (!nextOpen) { modalData.reset(); setTermsAccepted(false) }
     onOpenChange(nextOpen)
   }
 
@@ -108,7 +111,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
       <>
         <Button
           onClick={handlePublish}
-          disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing}
+          disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing || !termsAccepted}
           className="gap-2 w-full"
         >
           {publishMutation.isPending
@@ -143,7 +146,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
         {modalData.step === 'slug' ? (
           <PublishForm mode={mode} data={modalData} />
         ) : (
-          <ReviewPane data={modalData} />
+          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} />
         )}
       </MobileDrawer>
     )
@@ -167,7 +170,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
         {modalData.step === 'slug' ? (
           <PublishForm mode={mode} data={modalData} />
         ) : (
-          <ReviewPane data={modalData} />
+          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} />
         )}
 
         <DialogFooter className="gap-2">
@@ -205,7 +208,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode }: PublishMod
               <Button
                 size="sm"
                 onClick={handlePublish}
-                disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing}
+                disabled={!modalData.canPublish || publishMutation.isPending || modalData.isAnalyzing || !termsAccepted}
                 className="gap-2"
               >
                 {publishMutation.isPending
@@ -289,17 +292,29 @@ export function PublishForm({ mode, data }: { mode: 'portfolio' | 'photobook'; d
 
 // ─── Step 2: Review pane ──────────────────────────────────────────────────────
 
-function ReviewPane({ data }: { data: ReturnType<typeof usePublishModal> }) {
+function ReviewPane({ data, termsAccepted, onTermsChange }: {
+  data: ReturnType<typeof usePublishModal>
+  termsAccepted: boolean
+  onTermsChange: (v: boolean) => void
+}) {
   const { isAnalyzing, analyzeError, quoteData } = data
 
   if (isAnalyzing) return <ReviewSkeleton />
   if (analyzeError) return <ReviewError message={analyzeError} />
   if (!quoteData) return null
 
-  return <ReviewContent quoteData={quoteData} />
+  return <ReviewContent quoteData={quoteData} termsAccepted={termsAccepted} onTermsChange={onTermsChange} />
 }
 
-function ReviewContent({ quoteData }: { quoteData: AnalyzeProjectResult }) {
+function ReviewContent({
+  quoteData,
+  termsAccepted,
+  onTermsChange,
+}: {
+  quoteData: AnalyzeProjectResult
+  termsAccepted: boolean
+  onTermsChange: (v: boolean) => void
+}) {
   const insufficient = quoteData.userBalance < quoteData.creditCost
   const t = useTranslations('editor.modal.publish')
 
@@ -337,15 +352,21 @@ function ReviewContent({ quoteData }: { quoteData: AnalyzeProjectResult }) {
         </p>
       )}
 
-      {/* Terms */}
-      <div className="flex items-start gap-3 p-4 rounded-2xl bg-primary/[0.02] border border-primary/5 shadow-inner">
-        <div className="p-1.5 rounded-lg bg-background border border-border/40 shrink-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-primary/70" />
-        </div>
-        <p className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
+      {/* Terms consent checkbox */}
+      <label
+        htmlFor="publish-consent"
+        className="flex items-start gap-3 p-4 rounded-2xl bg-primary/[0.02] border border-primary/5 shadow-inner cursor-pointer hover:bg-primary/[0.04] transition-colors"
+      >
+        <Checkbox
+          id="publish-consent"
+          checked={termsAccepted}
+          onCheckedChange={(v) => onTermsChange(v === true)}
+          className="mt-0.5 shrink-0"
+        />
+        <span className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
           {t('review.terms')}
-        </p>
-      </div>
+        </span>
+      </label>
     </div>
   )
 }

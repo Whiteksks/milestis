@@ -26,7 +26,7 @@ const LegalPage = () => {
   const t = useTranslations('Legal')
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/10">
+    <div className="min-h-screen text-foreground antialiased selection:bg-primary/10">
       <main className="max-w-3xl mx-auto px-6 py-24">
         
         {/* Header Section */}

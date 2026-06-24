@@ -244,28 +244,31 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 : t('project.pendingPurge')}
             </p>
             {/* Mobile action row — desktop uses hover overlay */}
-            <div className="mt-2 flex gap-1.5 md:hidden">
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex-1 h-8 rounded-full text-xs gap-1"
-                disabled={busy}
-                onClick={handleRestore}
-              >
-                <RotateCcw className="size-3" />
-                {t('project.restore')}
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                className="flex-1 h-8 rounded-full text-xs gap-1"
-                disabled={busy}
-                onClick={() => setConfirmOpen(true)}
-              >
-                <Trash2 className="size-3" />
-                {t('project.delete')}
-              </Button>
-            </div>
+           {/* Mobile action row — desktop uses hover overlay */}
+<div className="mt-2 flex gap-1.5 md:hidden">
+  <Button
+    size="sm"
+    variant="outline"
+    className="flex-1 h-8 rounded-full text-xs gap-1"
+    disabled={busy}
+    onClick={handleRestore}
+  >
+    <RotateCcw className="size-3" />
+    {/* Скрываем текст на мобилке, показываем на md+ */}
+    <span className="hidden md:inline">{t('project.restore')}</span>
+  </Button>
+  <Button
+    size="sm"
+    variant="destructive"
+    className="flex-1 h-8 rounded-full text-xs gap-1"
+    disabled={busy}
+    onClick={() => setConfirmOpen(true)}
+  >
+    <Trash2 className="size-3" />
+    {/* Скрываем текст на мобилке, показываем на md+ */}
+    <span className="hidden md:inline">{t('project.delete')}</span>
+  </Button>
+</div>
           </CardContent>
         </div>
 

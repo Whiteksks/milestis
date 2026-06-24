@@ -1,22 +1,28 @@
 "use client"
 
+import React from "react"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/routing"
+import { cn } from "@/lib/utils" 
+
 import LogoSvg from "@/components/assets/logo"
 import { Separator } from "@/components/ui/separator"
 import { useThemeTransition } from "@/hooks/useThemeTransition"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useTranslations } from "next-intl"
-// Импортируем твой "умный" линк, который знает про локали
-import { Link } from "@/i18n/routing"
-
+import { LanguageSwitcher } from "../ui/custom/LangSwitch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { LanguageSwitcher } from "../ui/custom/LangSwitch"
 
-// Вместо сырых строк храним только системные ключи
 const FOOTER_LINKS = [
   {
     id: "product",
@@ -44,12 +50,23 @@ const FOOTER_LINKS = [
   },
 ]
 
-export function Footer() {
+interface FooterProps extends React.ComponentProps<"footer"> {
+  showThemeSwitcher?: boolean
+}
+
+export function Footer({
+  className,
+  showThemeSwitcher = true,
+  ...props
+}: FooterProps) {
   const t = useTranslations("Footer")
   const { theme, setTheme } = useThemeTransition()
 
   return (
-    <footer className="border-t border-border bg-background">
+    <footer 
+      className={cn("border-t border-border bg-background transition-colors duration-300", className)} 
+      {...props}
+    >
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24">
         {/* Main Grid */}
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
@@ -66,16 +83,18 @@ export function Footer() {
 
             {/* Группа контролов: тема и язык */}
             <div className="flex flex-row items-center gap-4">
-              <Select value={theme ?? "light"} onValueChange={setTheme}>
-                <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">{t("themes.light")}</SelectItem>
-                  <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
-                  <SelectItem value="dark">{t("themes.dark")}</SelectItem>
-                </SelectContent>
-              </Select>
+              {showThemeSwitcher && (
+                <Select value={theme ?? "light"} onValueChange={setTheme}>
+                  <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">{t("themes.light")}</SelectItem>
+                    <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
+                    <SelectItem value="dark">{t("themes.dark")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
 
               <LanguageSwitcher />
             </div>
@@ -84,7 +103,7 @@ export function Footer() {
           {/* Desktop link columns */}
           {FOOTER_LINKS.map((col) => (
             <div key={col.id} className="hidden sm:block">
-              <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-foreground">
+              <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-current">
                 {t(`headings.${col.id}`)}
               </h3>
               <ul className="space-y-4">
@@ -92,7 +111,7 @@ export function Footer() {
                   <li key={link.key}>
                     <Link
                       href={link.href}
-                      className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-foreground"
+                      className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current"
                     >
                       {t(`links.${link.key}`)}
                     </Link>
@@ -107,7 +126,7 @@ export function Footer() {
         <Accordion type="multiple" className="mt-12 sm:hidden border-t border-border/40">
           {FOOTER_LINKS.map((col) => (
             <AccordionItem key={col.id} value={col.id} className="border-border/40">
-              <AccordionTrigger className="py-4 text-sm font-bold uppercase tracking-widest text-foreground hover:no-underline">
+              <AccordionTrigger className="py-4 text-sm font-bold uppercase tracking-widest text-current hover:no-underline">
                 {t(`headings.${col.id}`)}
               </AccordionTrigger>
               <AccordionContent>
@@ -127,6 +146,7 @@ export function Footer() {
             </AccordionItem>
           ))}
         </Accordion>  
+        
         <Separator className="my-12 opacity-50" />
 
         {/* Bottom row */}
@@ -136,13 +156,13 @@ export function Footer() {
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 order-1 sm:order-2 font-medium">
-            <Link href="/policies/privacy-policy" className="transition-colors hover:text-foreground">
+            <Link href="/policies/privacy-policy" className="transition-colors hover:text-current">
               {t("policies.privacy")}
             </Link>
-            <Link href="/policies/cookie-policy" className="transition-colors hover:text-foreground">
+            <Link href="/policies/cookie-policy" className="transition-colors hover:text-current">
               {t("policies.cookie")}
             </Link>
-            <Link href="/policies/terms" className="transition-colors hover:text-foreground">
+            <Link href="/policies/terms" className="transition-colors hover:text-current">
               {t("policies.terms")}
             </Link>
           </div>

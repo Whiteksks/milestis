@@ -147,6 +147,20 @@ export function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
+  // ── Preferred locale redirect ──────────────────────────────────────────────
+  // If the user has a saved language preference (NEXT_LOCALE cookie) and the
+  // URL locale doesn't match, redirect them to their preferred locale.
+  const urlLocaleMatch = pathname.match(/^\/([a-z]{2})(\/|$)/);
+  if (urlLocaleMatch) {
+    const urlLocale = urlLocaleMatch[1];
+    const preferredLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+    if (preferredLocale && LOCALES.includes(preferredLocale) && urlLocale !== preferredLocale) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/' + preferredLocale + (bare0 === '/' ? '' : bare0);
+      return NextResponse.redirect(url);
+    }
+  }
+
   // ── Auth-based redirects (main domain only) ───────────────────────────────
   const isAuthenticated = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
   const bare = stripLocale(pathname); // path without locale prefix
