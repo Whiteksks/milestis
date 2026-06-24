@@ -10,6 +10,7 @@ import { TransactionEngineError } from "../../transactions/engine";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import type { PublishInput, PublishOutput } from "./types";
 import { ALLOWED_ORIGINS } from "../../lib/cors";
+import { recordIubendaConsent } from "../../lib/iubendaConsent";
 
 // ─── Error codes ──────────────────────────────────────────────────────────────
 
@@ -251,9 +252,11 @@ export const publishProject = onRequest(
 		}
 
 		let uid: string;
+		let userEmail: string | null;
 		try {
 			const decoded = await getAuth().verifyIdToken(authHeader.split("Bearer ")[1]);
 			uid = decoded.uid;
+			userEmail = decoded.email ?? null;
 		} catch {
 			res.status(401).json({ error: ERROR.INVALID_OR_EXPIRED_TOKEN });
 			return;
@@ -466,6 +469,13 @@ export const publishProject = onRequest(
 				freedBytes,
 				transactionId: result.transactionId,
 			});
+
+			// Record publish consent in iubenda — fire-and-forget, must not block the response
+			recordIubendaConsent(
+				{ id: uid, email: userEmail },
+				["terms_and_conditions", "privacy_policy"],
+				`User accepted Terms and Privacy Policy when publishing project "${projectData.name}" on milestis.com`,
+			).catch(() => {});
 
 			res.status(200).json({
 				ok: true,

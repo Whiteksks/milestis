@@ -5,6 +5,7 @@ import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
 import { UserDocument } from "./userInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
+import { recordIubendaConsent } from "../lib/iubendaConsent";
 
 export const createUser = onRequest(
   {
@@ -88,6 +89,14 @@ export const createUser = onRequest(
       await docRef.create(newUser);
 
       logger.info("User document created", { uid });
+
+      // Record consent in iubenda — fire-and-forget, must not block the response
+      recordIubendaConsent(
+        { id: uid, email },
+        ["terms_and_conditions", "privacy_policy"],
+        "User accepted Terms and Privacy Policy during account registration on milestis.com",
+      ).catch(() => {});
+
       res.status(201).json({ ok: true, uid });
 
     } catch (error: unknown) {
