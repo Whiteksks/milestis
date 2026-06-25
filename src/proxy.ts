@@ -99,6 +99,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Next.js special file-based routes — must never receive a locale prefix.
+  if (
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/manifest.json' ||
+    pathname === '/manifest.webmanifest'
+  ) {
+    return NextResponse.next();
+  }
+
   // Firebase App Hosting may rewrite the Host header — check x-forwarded-host first
   const host =
     request.headers.get('x-forwarded-host') ??
