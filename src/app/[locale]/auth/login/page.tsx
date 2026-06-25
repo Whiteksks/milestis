@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox" // Импортировано из UI
 import { CheckCircle2, ArrowLeft, Zap, ArrowRight, Share, Palette, FlaskConical } from "lucide-react"
 import Header from "@/components/layout/header"
 import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect"
@@ -18,15 +19,28 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [password, setPassword] = useState("")
+  const [consentChecked, setConsentChecked] = useState(false) // Стейт чекбокса
+
+  // Логика интеграции с Iubenda
+  const recordIubendaConsent = (email: string) => {
+    ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
+      "submit",
+      {
+        subject: { email },
+        preferences: { terms: true, privacy_policy: true },
+      },
+    ])
+  }
 
   const handleSendMagicLink = async () => {
-    if (!email) return
+    if (!email || !consentChecked) return
     setLoading(true)
     setError(null)
 
     const { success, error } = await sendSignInLinkToEmail(email)
 
     if (success) {
+      recordIubendaConsent(email) // Вызов согласия
       setSent(true)
     } else if (error) {
       setError(error)
@@ -36,11 +50,13 @@ export default function LoginPage() {
   }
 
   const handleSignInWithPassword = async () => {
-    if (!email || !password) return
+    if (!email || !password || !consentChecked) return
     setLoading(true)
     setError(null)
     const { success, error } = await signInWithPassword(email, password)
-    if (!success && error) {
+    if (success) {
+      recordIubendaConsent(email) // Вызов согласия
+    } else if (error) {
       setError(error)
     }
     setLoading(false)
@@ -151,6 +167,7 @@ export default function LoginPage() {
                         placeholder="name@example.com" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSendMagicLink()}
                         className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
                       />
                       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
@@ -159,7 +176,7 @@ export default function LoginPage() {
                     {!showPasswordForm && (
                     <Button 
                       onClick={handleSendMagicLink}
-                      disabled={loading || !email}
+                      disabled={loading || !email || !consentChecked} // Добавлено согласие
                       className="w-full h-12 text-base font-semibold rounded-xl shadow-lg shadow-primary/5 hover:scale-[1.01] transition-all active:scale-95 group"
                     >
                       {loading ? "Sending..." : "Send Magic Link"}
@@ -185,7 +202,7 @@ export default function LoginPage() {
                         </div>
                         <Button
                           onClick={handleSignInWithPassword}
-                          disabled={loading || !email || !password}
+                          disabled={loading || !email || !password || !consentChecked} // Добавлено согласие
                           className="w-full h-12 text-base font-semibold rounded-xl bg-amber-500 hover:bg-amber-500/90 text-white shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-all active:scale-95 group"
                         >
                           {loading ? "Signing in..." : "Sign In with Password"}
@@ -193,14 +210,30 @@ export default function LoginPage() {
                         </Button>
                       </div>
                     )}
-
-
                   </div>
 
-                  <p className="text-center text-xs text-muted-foreground font-light leading-relaxed pt-6">
-                    By signing in, you agree to our <br />
-                    <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground">Terms</Link> and <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground">Privacy Policy</Link>.
-                  </p>
+                  {/* Блок согласия с чекбоксом */}
+                  <div className="flex items-start gap-3 pt-2">
+                    <Checkbox
+                      id="auth-consent"
+                      checked={consentChecked}
+                      onCheckedChange={(v) => setConsentChecked(v === true)}
+                      className="mt-0.5 shrink-0"
+                    />
+                    <label
+                      htmlFor="auth-consent"
+                      className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+                    >
+                      I agree to the{" "}
+                      <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                        Terms of Service
+                      </Link>
+                      {" "}and{" "}
+                      <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
                 </div>
               ) : (
                 /* Success State: Airy & Focused */
@@ -238,7 +271,7 @@ export default function LoginPage() {
         </Card>
       </main>
 
-      {/* Footer (outside card for more air) */}
+      {/* Footer */}
       <footer className="text-center py-6 px-6 relative z-10">
         <p className="text-xs text-muted-foreground/60 font-light">
           © 2026 Milestis. Professional storytelling tools. All rights reserved.

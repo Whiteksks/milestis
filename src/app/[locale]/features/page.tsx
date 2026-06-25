@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next'
 import { useTranslations } from 'next-intl';
 import { CTAButton } from '@/components/shared/cta-button';
 import {
@@ -15,6 +16,55 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+
+  const titles: Record<string, string> = {
+    en: 'Features',
+    ru: 'Возможности',
+    kz: 'Мүмкіндіктер',
+  }
+  const descriptions: Record<string, string> = {
+    en: 'Discover all Milestis features — interactive layouts, stunning templates, drag-and-drop media uploads, and more.',
+    ru: 'Откройте все возможности Milestis — интерактивные макеты, красивые шаблоны, загрузка медиа и многое другое.',
+    kz: 'Milestis мүмкіндіктерін ашыңыз — интерактивті макеттер, үлгілер, медиа жүктеу және тағы басқа.',
+  }
+
+  const title = titles[locale] ?? titles.en
+  const description = descriptions[locale] ?? descriptions.en
+  const url = `https://milestis.com/${locale}/features`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        'en': 'https://milestis.com/en/features',
+        'ru': 'https://milestis.com/ru/features',
+        'kk': 'https://milestis.com/kz/features',
+        'x-default': 'https://milestis.com/en/features',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      siteName: 'Milestis',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}
 
 export default function FeaturesPage() {
   const t = useTranslations('features');

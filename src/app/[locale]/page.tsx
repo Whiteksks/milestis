@@ -22,20 +22,43 @@ export async function generateMetadata({
     kz: 'Milestis — Интерактивті фотокітапты жасаңыз',
   }
   const descriptions: Record<string, string> = {
-    en: 'Create beautiful interactive photo books and share your story with the world.',
-    ru: 'Создавайте красивые интерактивные фотокниги и делитесь своей историей.',
-    kz: 'Әдемі интерактивті фотокітаптар жасаңыз және тарихыңызбен бөлісіңіз.',
+    en: 'Create beautiful interactive photo books and share your story with the world. Start for free — no design skills needed.',
+    ru: 'Создавайте красивые интерактивные фотокниги и делитесь своей историей. Начните бесплатно.',
+    kz: 'Әдемі интерактивті фотокітаптар жасаңыз және тарихыңызбен бөлісіңіз. Тегін бастаңыз.',
   }
 
+  const title = titles[locale] ?? titles.en
+  const description = descriptions[locale] ?? descriptions.en
+  const url = `https://milestis.com/${locale}`
+
   return {
-    title: titles[locale] ?? titles.en,
-    description: descriptions[locale] ?? descriptions.en,
+    title,
+    description,
+    keywords: locale === 'ru'
+      ? ['фотокнига', 'интерактивная фотокнига', 'создать фотокнигу', 'онлайн фотокнига', 'milestis']
+      : locale === 'kz'
+      ? ['фотокітап', 'интерактивті фотокітап', 'milestis']
+      : ['photo book', 'interactive photo book', 'create photo book', 'online photo book', 'milestis'],
     alternates: {
-      canonical: `/${locale}`,
+      canonical: url,
       languages: {
-        'en': '/en',
-        'ru': '/ru',
+        'en': 'https://milestis.com/en',
+        'ru': 'https://milestis.com/ru',
+        'kk': 'https://milestis.com/kz',
+        'x-default': 'https://milestis.com/en',
       },
+    },
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      siteName: 'Milestis',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   }
 }

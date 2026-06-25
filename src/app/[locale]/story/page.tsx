@@ -1,10 +1,60 @@
 import React from 'react';
+import type { Metadata } from 'next'
 import { useTranslations } from 'next-intl';
 import { CTAButton } from '@/components/shared/cta-button';
 import { Heart, Sparkles, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+
+  const titles: Record<string, string> = {
+    en: 'Our Story',
+    ru: 'Наша история',
+    kz: 'Біздің тарих',
+  }
+  const descriptions: Record<string, string> = {
+    en: 'Learn about the mission behind Milestis — building a platform to preserve and share life\'s most precious memories.',
+    ru: 'Узнайте о миссии Milestis — платформе для сохранения и передачи самых ценных воспоминаний.',
+    kz: 'Milestis миссиясы туралы біліңіз — қымбат естеліктерді сақтауға арналған платформа.',
+  }
+
+  const title = titles[locale] ?? titles.en
+  const description = descriptions[locale] ?? descriptions.en
+  const url = `https://milestis.com/${locale}/story`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        'en': 'https://milestis.com/en/story',
+        'ru': 'https://milestis.com/ru/story',
+        'kk': 'https://milestis.com/kz/story',
+        'x-default': 'https://milestis.com/en/story',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      siteName: 'Milestis',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}
 
 const MissionPage = () => {
   const t = useTranslations('MissionPage');

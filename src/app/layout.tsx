@@ -13,7 +13,19 @@ export const metadata: Metadata = {
     template: '%s | Milestis',
   },
   description: 'Create your interactive photo book and share your story with the world.',
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: 'website',
+    siteName: 'Milestis',
+    title: 'Milestis',
+    description: 'Create your interactive photo book and share your story with the world.',
+    url: process.env.NEXT_APP_URL ?? 'https://milestis.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Milestis',
+    description: 'Create your interactive photo book and share your story with the world.',
+  },
 };
 
 const alice = Alice({
@@ -68,20 +80,6 @@ export default async function RootLayout({
         >
           {children}
         </ThemeProvider>
-        <Script
-          id="iubenda-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              var _iub = _iub || {};
-              _iub.cons_instructions = _iub.cons_instructions || [];
-              _iub.cons_instructions.push([
-                "init",
-                { api_key: "pvTSqMmlQs4Gnv7pVZu77irTq4IMsjD1" }
-              ]);
-            `,
-          }}
-        />
       </body>
     </html>
   );

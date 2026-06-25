@@ -5,7 +5,7 @@ import type { MetadataRoute } from 'next'
  * false → block all crawlers (test / staging)
  * true  → allow crawlers on public pages
  */
-const INDEXING_ENABLED = false
+const INDEXING_ENABLED = true
 
 const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com'
 
@@ -23,12 +23,10 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [
           '/account/',
-          '/auth/',
           '/dashboard/',
           '/design/',
           '/api/',
           '/*/account/',
-          '/*/auth/',
           '/*/dashboard/',
           '/*/design/',
           '/*/api/',

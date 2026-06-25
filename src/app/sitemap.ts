@@ -4,7 +4,7 @@ import type { MetadataRoute } from 'next'
  * Set to true when ready to go public.
  * While false – returns an empty sitemap so search engines index nothing.
  */
-const SITEMAP_ENABLED = false
+const SITEMAP_ENABLED = true
 
 const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com'
 const LOCALES = ['en', 'ru', 'kz'] as const
