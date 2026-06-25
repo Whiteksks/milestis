@@ -89,7 +89,7 @@ const PricingPage = () => {
           {/* Explorer Tier */}
           <PricingCard 
             title={t('tiers.explorer.title')}
-            price="--" 
+            price="0" 
             perMonthLabel={t('labels.perMonth')}
             description={t('tiers.explorer.description')}
             features={explorerFeatures}
@@ -100,7 +100,7 @@ const PricingPage = () => {
           {/* Creator Tier */}
           <PricingCard 
             title={t('tiers.creator.title')}
-            price="--" 
+            price="59" 
             perMonthLabel={t('labels.perMonth')}
             description={t('tiers.creator.description')}
             features={creatorFeatures}
@@ -113,7 +113,7 @@ const PricingPage = () => {
           {/* Archive Tier */}
           <PricingCard 
             title={t('tiers.archive.title')}
-            price="--" 
+            price="149" 
             perMonthLabel={t('labels.perMonth')}
             description={t('tiers.archive.description')}
             features={archiveFeatures}

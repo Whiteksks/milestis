@@ -114,6 +114,7 @@ env:
   - variable: NEXT_APP_URL
     value: https://milestis.com
     availability:
+      - BUILD
       - RUNTIME
 
   # ── Server-side secrets (хранятся в Firebase Secret Manager) ─────────────
