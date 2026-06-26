@@ -53,7 +53,11 @@
       }
     },
     "labels": {
-      "perMonth": "/месяц"
+      "perMonth": "/месяц",
+      "monthly": "Помесячно",
+      "yearly": "Годовой",
+      "saveTwoMonths": "Экономия 2 месяца",
+      "billedYearly": "оплата раз в год"
     },
     "evergreenSection": {
       "badge": "Стабильная инфраструктура",

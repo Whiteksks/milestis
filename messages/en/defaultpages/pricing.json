@@ -53,7 +53,11 @@
       }
     },
     "labels": {
-      "perMonth": "/month"
+      "perMonth": "/month",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "saveTwoMonths": "Save 2 months",
+      "billedYearly": "billed yearly"
     },
     "evergreenSection": {
       "badge": "Evergreen Infrastructure",

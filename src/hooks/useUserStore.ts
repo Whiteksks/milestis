@@ -27,9 +27,12 @@ export interface UserState {
   profile: UserProfile | null;
   authStatus: AuthStatus;
   profileStatus: ProfileStatus;
+  /** true after syncServerSession resolves — cookie is guaranteed to exist */
+  sessionSynced: boolean;
   setAuthLoading: () => void;
   setAuthenticatedProfile: (data: UserProfile, profileStatus?: Exclude<ProfileStatus, 'idle'>) => void;
   clearProfile: () => void;
+  setSessionSynced: () => void;
   updateBalance: (balance: UserBalance) => void;
 }
 
@@ -43,7 +46,8 @@ export const useUserStore = create<UserState>((set) => ({
   profile: null,
   authStatus: 'loading',
   profileStatus: 'idle',
-  setAuthLoading: () => set({ profile: null, authStatus: 'loading', profileStatus: 'idle' }),
+  sessionSynced: false,
+  setAuthLoading: () => set({ profile: null, authStatus: 'loading', profileStatus: 'idle', sessionSynced: false }),
   setAuthenticatedProfile: (data, profileStatus = 'ready') => set({
     profile: data,
     authStatus: 'authenticated',
@@ -53,7 +57,9 @@ export const useUserStore = create<UserState>((set) => ({
     profile: null,
     authStatus: 'unauthenticated',
     profileStatus: 'idle',
+    sessionSynced: false,
   }),
+  setSessionSynced: () => set({ sessionSynced: true }),
   updateBalance: (balance) =>
     set((state) =>
       state.profile ? { profile: { ...state.profile, balance } } : {},

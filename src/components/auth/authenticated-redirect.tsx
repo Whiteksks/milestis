@@ -10,13 +10,13 @@ export function AuthenticatedRedirect() {
   const router = useRouter()
   const locale = useLocale()
   const authStatus = useUserStore((state) => state.authStatus)
-  const profileStatus = useUserStore((state) => state.profileStatus)
+  const sessionSynced = useUserStore((state) => state.sessionSynced)
 
   useEffect(() => {
-    if (authStatus === "authenticated" && profileStatus === "ready") {
+    if (authStatus === "authenticated" && sessionSynced) {
       router.replace(`/${locale}/dashboard`)
     }
-  }, [authStatus, profileStatus, locale, router])
+  }, [authStatus, sessionSynced, locale, router])
 
   return null
 }

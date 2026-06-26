@@ -15,8 +15,8 @@ export function useIubenda() {
     }
 
     // Уничтожаем глобальный объект iubenda, если он остался от прошлых страниц
-    if (typeof window !== 'undefined' && (window as any).Iubenda) {
-      delete (window as any).Iubenda;
+    if (typeof window !== 'undefined' && (window as Window & { Iubenda?: unknown }).Iubenda) {
+      delete (window as Window & { Iubenda?: unknown }).Iubenda;
     }
 
     // 2. Создаем и вставляем скрипт заново для новой страницы

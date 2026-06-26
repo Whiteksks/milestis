@@ -20,6 +20,7 @@ export default function FirebaseInitializer() {
   const setAuthLoading = useUserStore((state) => state.setAuthLoading)
   const setAuthenticatedProfile = useUserStore((state) => state.setAuthenticatedProfile)
   const clearProfile = useUserStore((state) => state.clearProfile)
+  const setSessionSynced = useUserStore((state) => state.setSessionSynced)
 
   useEffect(() => {
     setAuthLoading()
@@ -46,7 +47,7 @@ export default function FirebaseInitializer() {
 
       // On token rotation — only refresh the server session cookie, keep UI state intact.
       void user.getIdToken().then(
-        (idToken) => syncServerSession(idToken),
+        (idToken) => syncServerSession(idToken).then(setSessionSynced),
         (err) => {
           console.error('Ошибка при синхронизации серверной сессии:', err)
         },

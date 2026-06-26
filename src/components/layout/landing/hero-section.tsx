@@ -72,10 +72,10 @@ export function HeroSection() {
                 <Sparkles className="h-5 w-5" />
                 {t("ctaPrimary")}
               </CTAButton>
-              <Button variant="ghost" size="lg" className="gap-2 rounded-full px-8 border border-input">
+              {/* <Button variant="ghost" size="lg" className="gap-2 rounded-full px-8 border border-input">
                 <Play className="h-5 w-5" />
                 {t("ctaSecondary")}
-              </Button>
+              </Button> */}
             </div>
           </div>
 

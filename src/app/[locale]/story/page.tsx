@@ -185,16 +185,21 @@ const MissionPage = () => {
 
       {/* CTA Section */}
       <footer className="py-24 px-6">
-        <Card className="max-w-4xl mx-auto bg-primary text-primary-foreground overflow-hidden border-none relative shadow-xl rounded-3xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+        <Card className="max-w-4xl mx-auto bg-gradient-to-br from-primary to-primary/90 text-primary-foreground overflow-hidden border-none relative shadow-xl hover:shadow-2xl rounded-3xl transition-all duration-500 ease-out hover:-translate-y-1 group">
+          {/* Декоративные светящиеся сферы (Blur эффекты) */}
+          <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl transition-transform duration-700 group-hover:scale-110" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl transition-transform duration-700 group-hover:scale-110" />
+          
           <CardContent className="p-12 md:p-16 text-center relative z-10">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 italic font-serif leading-tight">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 italic font-serif leading-tight tracking-tight">
               {t('cta.title')}
             </h2>
             <p className="text-primary-foreground/80 mb-10 max-w-lg mx-auto text-base md:text-lg leading-relaxed">
               {t('cta.description')}
             </p>
-            <CTAButton className="bg-background text-foreground px-12 py-4 rounded-full font-bold hover:opacity-90 transition-opacity shadow-lg active:scale-95">
+            
+            {/* Кнопка с продвинутым hover-эффектом */}
+            <CTAButton className="bg-background text-foreground px-12 py-4 rounded-full font-semibold transition-all duration-300 ease-in-out shadow-md hover:shadow-xl hover:bg-background/95 hover:-translate-y-0.5 active:scale-98 transform-gpu">
               {t('cta.button')}
             </CTAButton>
           </CardContent>

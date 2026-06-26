@@ -53,7 +53,11 @@
       }
     },
     "labels": {
-      "perMonth": "/ай"
+      "perMonth": "/ай",
+      "monthly": "Ай сайын",
+      "yearly": "Жылдық",
+      "saveTwoMonths": "2 ай үнемдеу",
+      "billedYearly": "жылына бір рет"
     },
     "evergreenSection": {
       "badge": "Тұрақты инфрақұрылым",

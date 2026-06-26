@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { useThemeTransition } from '@/hooks/useThemeTransition'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'

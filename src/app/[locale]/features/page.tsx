@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Briefcase,
   GripHorizontal,
+  Check,
 } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import Header from '@/components/layout/header';
@@ -213,33 +214,56 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Section 3: For Professionals */}
-      <section className="py-24 px-6 bg-muted/20 border-b border-border/40">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary text-center">
-            {t('sections.professionals.badge')}
-          </p>
+{/* Section 3: For Professionals (ОБНОВЛЕННАЯ СЕКЦИЯ) */}
+      <section className="py-24 px-6 bg-gradient-to-b from-muted/10 to-muted/30 border-b border-border/40 overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Левая колонка — Заголовки */}
+            <div className="lg:col-span-5 space-y-5 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/15 backdrop-blur-sm">
+                <Briefcase className="w-3.5 h-3.5" />
+                <span className="text-xs font-semibold uppercase tracking-widest">
+                  {t('sections.professionals.badge')}
+                </span>
+              </div>
+              
+              <div className="space-y-4">
+                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+                  {t('sections.professionals.title')}
+                </h2>
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                  {t('sections.professionals.description')}
+                </p>
+              </div>
+            </div>
 
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mx-auto">
-            <Briefcase className="w-6 h-6" />
-          </div>
-          
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold tracking-tight">{t('sections.professionals.title')}</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              {t('sections.professionals.description')}
-            </p>
-          </div>
+            {/* Правая колонка — Карточки для двух пунктов */}
+            <div className="lg:col-span-7 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {proList
+                  ?.filter((item: string) => !item.toLowerCase().includes('white label')) // Надежная фильтрация от white label
+                  ?.map((item: string, index: number) => (
+                    <div 
+                      key={index} 
+                      className="group relative flex flex-col justify-between p-6 bg-background border border-border/60 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/20 hover:bg-background/80 transition-all duration-300"
+                    >
+                      {/* Декоративный легкий светящийся элемент при ховере */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                      
+                      <div className="space-y-4 relative z-10">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                          <Check className="h-4 w-4 stroke-[3]" />
+                        </div>
+                        <p className="text-sm sm:text-base font-medium text-foreground/90 leading-relaxed">
+                          {item}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
 
-          <div className="max-w-md mx-auto text-left bg-background border border-border p-6 rounded-2xl shadow-sm">
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {proList?.map((item: string) => (
-                <li key={item} className="flex items-center gap-3 text-sm font-medium text-foreground/80">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                  <span className="line-clamp-2">{item}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
