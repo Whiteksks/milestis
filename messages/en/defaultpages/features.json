@@ -29,8 +29,8 @@
       },
       "platform": {
         "badge": "02 — Platform",
-        "title": "Infrastructure That Lasts",
-        "subtitle": "Every project hosted on Milestis is a live web product — not a static file.",
+        "title": "Built for Real-World Sharing",
+        "subtitle": "Every project published through Milestis is a fully interactive digital presentation — accessible from any link.",
         "cards": {
           "instant": {
             "title": "Opens in an Instant",
@@ -42,7 +42,7 @@
           },
           "upToDate": {
             "title": "Always Up to Date",
-            "description": "We maintain every hosted project automatically. Fast, secure, and accessible — years from now."
+            "description": "Milestis automatically handles browser compatibility so your projects open correctly on any device, always."
           }
         }
       },

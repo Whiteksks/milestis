@@ -1,7 +1,7 @@
 {
   "promo": {
     "creatorPlanTitle": "Creator Plan",
-    "creatorPlanDescription": "Unlock analytics, custom domains, and unlimited projects.",
+    "creatorPlanDescription": "Unlock analytics and unlimited projects.",
     "viewAllPlans": "View All Plans"
   },
   "createCards": {
@@ -12,8 +12,8 @@
       "secondary": "Browse presets"
     },
     "portfolio": {
-      "title": "Portfolio Site",
-      "description": "Build a clean personal site without design skills. Showcase your work beautifully.",
+      "title": "Portfolio",
+      "description": "Build a clean personal portfolio without design skills. Showcase your work beautifully.",
       "secondary": "View examples"
     },
     "creating": "Creating…",
@@ -76,7 +76,7 @@
     "recentTitle": "Recent projects",
     "recentDescription": "Pick up where you left off",
     "viewAll": "View all →",
-    "description": "All your photo books and portfolio sites in one place",
+    "description": "All your photo books and portfolios in one place",
     "createPortfolio": "Create Portfolio",
     "createPhotobook": "Create Photobook",
     "tabs": {
@@ -115,7 +115,7 @@
     "type": {
       "photobook": "Photobook",
       "site": "Site",
-      "portfolioSite": "Portfolio Site"
+      "portfolioSite": "Portfolio"
     },
     "noTemplatesFound": "No templates found",
     "tryAdjusting": "Try adjusting your search or filter",
@@ -125,7 +125,7 @@
     "categories": {
       "all": "All",
       "photobooks": "Photobooks",
-      "sites": "Portfolio Sites",
+      "sites": "Portfolios",
       "weddings": "Weddings",
       "birthdays": "Birthdays",
       "minimal": "Minimal"
@@ -137,29 +137,20 @@
     "empty": "Your archive is empty",
     "createdOn": "Created on {date}",
     "download": "Download",
-    "viewSite": "View site",
+    "viewSite": "View project",
     "edit": "Edit",
-    "live": "Live"
-  },
-  "domains": {
-    "title": "Domains",
-    "description": "Manage and share your published projects",
-    "notPublished": "Not published yet",
+    "live": "Published",
+    "backToList": "All projects",
     "copyLink": "Copy link",
-    "copied": "Copied",
-    "openProject": "Open project",
-    "domainSettings": "Domain settings",
-    "publishProject": "Publish project",
-    "createPrompt": "Create a photobook or portfolio to get started",
-    "aboutTitle": "About Milestis domains",
-    "aboutDescription": "All published projects get a free milestis.site subdomain. Custom domains are coming soon."
+    "linkCopied": "Copied!",
+    "shareUrl": "Share URL"
   },
   "analytics": {
     "title": "Analytics",
     "description": "Track views and engagement across your projects",
     "comingSoon": "Coming Soon",
     "comingTitle": "Analytics is on the way",
-    "comingDescription": "Soon you'll be able to see how your photobooks and portfolio sites are performing with detailed insights and engagement metrics.",
+    "comingDescription": "Soon you'll be able to see how your photobooks and portfolios are performing with detailed insights and engagement metrics.",
     "stats": {
       "totalViews": "Total Views",
       "clicks": "Clicks",

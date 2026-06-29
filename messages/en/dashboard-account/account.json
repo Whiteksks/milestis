@@ -23,17 +23,6 @@
       "bioLabel": "Short Bio",
       "bioPlaceholder": "A few words about yourself or your work...",
       "characters": "characters"
-    },
-    "domains": {
-      "title": "Domains",
-      "description": "Share links for your published projects",
-      "noPublished": "No published projects yet.",
-      "publishPrompt": "Publish a project to see its link here.",
-      "copyLink": "Copy link",
-      "copied": "Copied",
-      "openProject": "Open project",
-      "shareVia": "Share via link",
-      "tokenUnavailable": "Republish to get share link"
     }
   }
 }

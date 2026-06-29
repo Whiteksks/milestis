@@ -25,7 +25,7 @@
     },
     "content": {
       "p1": "Your Milestis account is the private identity behind your projects, credits, subscriptions, and settings. It controls how you sign in and how your work is managed, but it is not the same thing as your public creator profile.",
-      "p2": "In the account area you can manage your profile details, notification preferences, billing, security, domains, and archive.",
+      "p2": "In the account area you can manage your profile details, notification preferences, billing, security, and archive.",
       "methods_intro": "Milestis currently supports two account access methods:",
       "method_email": "<strong_tag>Email sign-in</strong_tag> — your email becomes a stable login method for account access and recovery.",
       "method_google": "<strong_tag>Google sign-in</strong_tag> — useful for quick access and convenient day-to-day login.",

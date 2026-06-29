@@ -6,7 +6,7 @@
     },
     "meta": {
       "title": "Publish and share your project",
-      "description": "A clear guide to making your project live and understanding how access works for Memory Books and Portfolio Sites.",
+      "description": "A clear guide to making your project available for sharing and understanding how access works for Memory Books and Portfolios.",
       "category": "Sharing",
       "readTime": "4 min read",
       "updatedAt": "April 2026"
@@ -24,16 +24,16 @@
       "getting_started": "Create and edit your first project"
     },
     "content": {
-      "publish_p1": "In Milestis, publishing means turning your in-editor project into a live web experience that can be opened outside the editor. Once published, your project gets a real shareable address and can be viewed on any device.",
+      "publish_p1": "In Milestis, publishing means turning your in-editor project into a shareable interactive presentation that can be opened outside the editor. Once published, your project gets a real shareable address and can be viewed on any device.",
       "publish_p2": "The exact link and access model depend on the format you chose when the project was created.",
       "callout_control": "Publishing does not mean losing control. You can still take a project offline later and bring it back again when needed.",
       "memory_p1": "A <strong_tag>Memory Book</strong_tag> is published as a private share link. The published URL includes a viewing token, so the link itself becomes the key to access.",
       "memory_p2": "This makes Memory Books feel appropriate for personal stories, gifts, family moments, and emotionally sensitive content. Anyone who receives the full link can open the project, but it is not meant to behave like a public showcase page.",
-      "portfolio_p1": "A <strong_tag>Portfolio Site</strong_tag> is published as a public web address. This is the right format when you want people to visit your work, evaluate your style, and share the site more openly.",
+      "portfolio_p1": "A <strong_tag>Portfolio</strong_tag> is published as a public address. This is the right format when you want people to view your work, evaluate your style, and share it more openly.",
       "portfolio_p2": "Before publishing, Milestis asks you to choose a slug. That slug becomes part of the live address people will use to open your site, so it is worth choosing something clean, readable, and close to your name or brand.",
       "callout_slug": "Slugs are part of the public address. Keep them short, clear, and easy to type or share.",
       "cost_intro": "Publishing uses credits, and the cost depends on the type of project:",
-      "cost_portfolio": "<strong_tag>Portfolio Site</strong_tag> uses a fixed publish cost.",
+      "cost_portfolio": "<strong_tag>Portfolio</strong_tag> uses a fixed publish cost.",
       "cost_memory": "<strong_tag>Memory Book</strong_tag> uses a tiered cost based on how many photos are included.",
       "cost_outro": "Before the final publish step, Milestis analyzes the project and shows the expected cost. This gives you a chance to confirm the result, the final link, and the credit usage before making the project live.",
       "unpublish_p1": "If you need to take a project offline, you can <strong_tag>unpublish</strong_tag> it. This removes public access while keeping the project data intact.",
@@ -42,7 +42,7 @@
       "sharing_li1": "Open the live preview and make sure the first screen or cover feels finished.",
       "sharing_li2": "Double-check project titles, dates, and visible text for small mistakes.",
       "sharing_li3": "For Memory Books, copy the full link so the recipient gets the access token as part of the URL.",
-      "sharing_li4": "For Portfolio Sites, choose a slug you will still be comfortable sharing later in your bio, messages, or client communication.",
+      "sharing_li4": "For Portfolio projects, choose a slug you will still be comfortable sharing later in your bio, messages, or client communication.",
       "sharing_outro": "Good publishing in Milestis is not only about making the project live. It is about making sure the first viewer experiences it exactly the way you intended."
     }
   }

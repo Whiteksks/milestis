@@ -1,203 +1,300 @@
 "use client"
 
+import { memo, useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { Download, ArrowUpRight, Globe } from "lucide-react"
+import { ArrowLeft, BookOpen, Check, Copy, Edit, Globe, Layout } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
-import { useProjectExportsQuery, useArchivedProjectsQuery, type DashboardProject, type ProjectExportRecord } from "@/hooks/useProjectsQuery"
-import { cn } from "@/lib/utils"
-import { getProjectConfig } from "@/lib/projects/project-type-config"
+import { TemplatePreview } from "@/components/shared/template-preview"
+import { useArchivedProjectsQuery, type DashboardProject } from "@/hooks/useProjectsQuery"
 import { getPublishedProjectShareUrl } from "@/lib/slug"
+import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Config ───────────────────────────────────────────────────────────────────
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  })
+const modeConfig = {
+  portfolio: { icon: Layout, labelKey: "project.mode.portfolio" as const },
+  photobook: { icon: BookOpen, labelKey: "project.mode.photobook" as const },
 }
 
-// ─── Row ──────────────────────────────────────────────────────────────────────
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
-function ExportRow({ 
-  record, 
-  project 
-}: { 
-  record: ProjectExportRecord; 
-  project?: DashboardProject 
-}) {
-  const t = useTranslations()
-  const config = getProjectConfig(record.mode)
-  
-  // Единая логика формирования ссылки через live-функцию
-  const shareUrl = project ? getPublishedProjectShareUrl(project) : null
-
+function GridSkeleton() {
   return (
-    <div className="group flex items-center gap-6 border-b border-border/40 py-5 transition-colors hover:bg-accent/20 px-2 -mx-2 rounded-lg">
-      <div className="flex-1 min-w-0 flex items-baseline gap-4">
-        <span className="text-xs font-medium tabular-nums text-muted-foreground/60 uppercase tracking-widest">
-          v{record.versionNumber}
-        </span>
-        
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium tracking-tight truncate">
-              {config.archiveRecordTitle}
-            </span>
-            <Badge variant="outline" className="text-[9px] font-normal tracking-wider uppercase px-1.5 h-4 border-muted-foreground/20">
-              {config.archiveBadge}
-            </Badge>
-          </div>
-          <p className="text-[11px] text-muted-foreground/60 font-light italic">
-            {t('archive.createdOn', { date: formatDate(record.createdAt) })}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-1 sm:gap-4 shrink-0">
-            {config.canDownloadFile ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
-            asChild
-          >
-            <a href={record.fileDownloadUrl} target="_blank" rel="noopener noreferrer" download>
-              <Download className="size-3.5 sm:mr-2" />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">{t('archive.download')}</span>
-            </a>
-          </Button>
-        ) : shareUrl ? ( // Используем shareUrl вместо record.publishedSlug
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 w-9 sm:w-auto sm:px-4 rounded-full border border-transparent hover:border-border/60 hover:bg-background"
-            asChild
-          >
-			      <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-              <Globe className="size-3.5 sm:mr-2" />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider">{t('archive.viewSite')}</span>
-            </a>
-          </Button>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-
-// ─── Sections ─────────────────────────────────────────────────────────────────
-
-function ExportsSkeleton() {
-  return (
-    <div className="space-y-8 mt-12">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="space-y-4">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-[200px] w-full rounded-2xl" />
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
       ))}
     </div>
   )
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ─── Card ─────────────────────────────────────────────────────────────────────
 
-export default function ExportsPage() {
-  const params = useParams()
-  const locale = params.locale as string
-  const { data: exports = [], isLoading } = useProjectExportsQuery()
-  const { data: archivedProjects = [] } = useArchivedProjectsQuery()
+const PublishedProjectCard = memo(function PublishedProjectCard({
+  project,
+  isSelected,
+  onSelect,
+}: {
+  project: DashboardProject
+  isSelected: boolean
+  onSelect: (id: string) => void
+}) {
   const t = useTranslations()
+  const modeInfo = modeConfig[project.mode]
 
-  const archivedMap = new Map<string, typeof archivedProjects[number]>()
-  for (const p of archivedProjects) archivedMap.set(p.id, p)
-
-  const groupedMap = new Map<string, { projectName: string; records: ProjectExportRecord[] }>()
-  for (const record of exports) {
-    const existing = groupedMap.get(record.projectId)
-    if (existing) existing.records.push(record)
-    else groupedMap.set(record.projectId, { projectName: record.projectName, records: [record] })
-  }
-  const grouped = Array.from(groupedMap.entries())
+  const thumbnail = useMemo(
+    () => (
+      <TemplatePreview
+        themeId={project.preview?.themeId}
+        templateId={project.preview?.templateId}
+        heroImageUrl={project.preview?.heroImageUrl}
+        title={project.preview?.title}
+        subtitle={project.preview?.subtitle}
+        date={project.preview?.date}
+        aspectRatio={project.preview?.aspectRatio}
+        frameStyle={project.preview?.frameStyle}
+        cropData={project.preview?.cropData}
+        zoom={3.55}
+      />
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      project.preview?.themeId,
+      project.preview?.templateId,
+      project.preview?.heroImageUrl,
+      project.preview?.title,
+      project.preview?.subtitle,
+      project.preview?.date,
+      project.preview?.aspectRatio,
+      project.preview?.frameStyle,
+      project.preview?.cropData,
+    ]
+  )
 
   return (
-    <div className="mx-auto max-w-5xl md:px-4 md:py-8">
-      <header className="relative mb-6 border-b border-border/30 pb-6">
-        <div className="flex flex-col gap-4">
-          <h1 className="font-serif text-4xl md:text-5xl font-light tracking-tighter italic">
-            {t('archive.title')}
-          </h1>
-          <div className="flex items-center gap-3">
-            <div className="h-px w-12 bg-primary/30" />
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-              {t('archive.exportsSummary', { count: exports.length })}
-            </p>
+    <button
+      type="button"
+      onClick={() => onSelect(project.id)}
+      className={cn(
+        "group w-full overflow-hidden rounded-2xl text-left shadow-sm transition-all duration-200",
+        isSelected
+          ? "ring-2 ring-primary shadow-md"
+          : "hover:shadow-md hover:ring-1 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+      )}
+    >
+      <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
+        <div className="absolute inset-0">{thumbnail}</div>
+        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+          <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
+            <modeInfo.icon className="size-3" />
+            {t(modeInfo.labelKey)}
+          </span>
+        </div>
+      </div>
+      <div className="p-3">
+        <p className="truncate text-sm font-medium">{project.name}</p>
+      </div>
+    </button>
+  )
+})
+
+// ─── Detail Panel ─────────────────────────────────────────────────────────────
+
+function ProjectDetailPanel({
+  project,
+  onBack,
+}: {
+  project: DashboardProject
+  onBack: () => void
+}) {
+  const params = useParams()
+  const locale = params.locale as string
+  const t = useTranslations()
+  const [copied, setCopied] = useState(false)
+
+  const modeInfo = modeConfig[project.mode]
+  const editUrl = `/${locale}/design/${project.id}/edit`
+  const shareUrl = getPublishedProjectShareUrl(project)
+
+  async function copyLink() {
+    if (!shareUrl) return
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard API not available
+    }
+  }
+
+  const thumbnail = useMemo(
+    () => (
+      <TemplatePreview
+        themeId={project.preview?.themeId}
+        templateId={project.preview?.templateId}
+        heroImageUrl={project.preview?.heroImageUrl}
+        title={project.preview?.title}
+        subtitle={project.preview?.subtitle}
+        date={project.preview?.date}
+        aspectRatio={project.preview?.aspectRatio}
+        frameStyle={project.preview?.frameStyle}
+        cropData={project.preview?.cropData}
+        zoom={1.9}
+      />
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      project.preview?.themeId,
+      project.preview?.templateId,
+      project.preview?.heroImageUrl,
+      project.preview?.title,
+      project.preview?.subtitle,
+      project.preview?.date,
+      project.preview?.aspectRatio,
+      project.preview?.frameStyle,
+      project.preview?.cropData,
+    ]
+  )
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_340px] gap-6 md:gap-10">
+      {/* Left: Preview */}
+      <div>
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" />
+          {t("archive.backToList")}
+        </button>
+
+        <div className="overflow-hidden rounded-2xl bg-muted shadow-md">
+          <div className="relative aspect-[16/10]">
+            <div className="absolute inset-0">{thumbnail}</div>
           </div>
         </div>
-      </header>
 
-      {isLoading ? (
-        <ExportsSkeleton />
-      ) : exports.length === 0 ? (
-          <div className="py-40 text-center border-t border-dashed border-border/60">
-            <p className="font-serif text-2xl italic text-muted-foreground/50">{t('archive.empty')}</p>
+        <div className="mt-4">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight">{project.name}</h2>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="gap-1.5 rounded-full font-normal">
+              <modeInfo.icon className="size-3" />
+              {t(modeInfo.labelKey)}
+            </Badge>
+            {project.isPublished && (
+              <Badge className="rounded-full border-0 bg-primary/10 text-primary hover:bg-primary/20">
+                {t("project.status.published")}
+              </Badge>
+            )}
           </div>
-      ) : (
-        <div className="space-y-2">
-          {grouped.map(([projectId, group]) => {
-            const project = archivedMap.get(projectId)
-            const shareUrl = project ? getPublishedProjectShareUrl(project) : null
+        </div>
+      </div>
 
-            return (
-              <section 
-                key={projectId} 
-                className="grid grid-cols-1 md:grid-cols-[200px_1fr] md:gap-12"
+      {/* Right: Actions */}
+      <div className="flex flex-col gap-4 md:pt-[52px]">
+        {shareUrl && (
+          <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
+            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              {t("archive.shareUrl")}
+            </p>
+            <p className="break-all font-mono text-xs leading-relaxed text-foreground/70">
+              {shareUrl}
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <Button asChild className="h-10 rounded-xl">
+            <Link href={editUrl}>
+              <Edit className="mr-2 size-4" />
+              {t("archive.edit")}
+            </Link>
+          </Button>
+
+          {shareUrl && (
+            <>
+              <Button variant="outline" className="h-10 rounded-xl" asChild>
+                <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                  <Globe className="mr-2 size-4" />
+                  {t("archive.viewSite")}
+                </a>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-10 rounded-xl"
+                onClick={copyLink}
               >
-                <aside className={cn(
-                  "flex items-center justify-between border-b border-border/10",
-                  "md:flex-col md:items-start md:justify-start md:gap-4 md:border-none md:pb-0",
-                  "md:pt-5"
-                )}>
-                  <h2 className="font-serif text-lg md:text-xl italic tracking-tight leading-none">
-                    {group.projectName}
-                  </h2>
-                    <div className="flex items-center gap-2">
-                    {shareUrl && (
-                      <a
-                        href={shareUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.2em] text-primary/70 hover:text-primary transition-colors"
-                      >
-                        <Globe className="size-2.5" /> {t('archive.live')}
-                      </a>
-                    )}
-                    <Link
-                      href={`/${locale}/design/${projectId}/edit`}
-                      className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors"
-                    >
-                      {t('archive.edit')} <ArrowUpRight className="size-2.5" />
-                    </Link>
-                  </div>
-                </aside>
+                {copied ? (
+                  <Check className="mr-2 size-4 text-green-500" />
+                ) : (
+                  <Copy className="mr-2 size-4" />
+                )}
+                {copied ? t("archive.linkCopied") : t("archive.copyLink")}
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
-                <div className="flex flex-col md:mt-0">
-                  {group.records.map((record) => (
-                    <ExportRow 
-                      key={record.exportId} 
-                      record={record} 
-                      project={project} // Передаем объект проекта в строку
-                    />
-                  ))}
-                </div>
-              </section>
-            )
-          })}
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
+export default function ArchivePage() {
+  const t = useTranslations()
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { data: projects = [], isLoading } = useArchivedProjectsQuery()
+  const selectedProject = projects.find((p) => p.id === selectedId) ?? null
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-6 md:px-4 md:py-8">
+      {/* Header — hidden when detail panel is open */}
+      {!selectedProject && (
+        <header className="flex flex-col gap-4 border-b pb-6">
+          <div className="flex items-baseline gap-3">
+            <h1 className="font-serif text-3xl md:text-5xl tracking-tight">
+              {t("archive.title")}
+            </h1>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              {t("projects.totalCount", { count: projects.length })}
+            </span>
+          </div>
+        </header>
+      )}
+
+      {selectedProject ? (
+        <ProjectDetailPanel
+          project={selectedProject}
+          onBack={() => setSelectedId(null)}
+        />
+      ) : isLoading ? (
+        <GridSkeleton />
+      ) : projects.length === 0 ? (
+        <div className="border-t border-dashed border-border/60 py-40 text-center">
+          <p className="font-serif text-2xl italic text-muted-foreground/50">
+            {t("archive.empty")}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          {projects.map((project) => (
+            <PublishedProjectCard
+              key={project.id}
+              project={project}
+              isSelected={selectedId === project.id}
+              onSelect={setSelectedId}
+            />
+          ))}
         </div>
       )}
     </div>

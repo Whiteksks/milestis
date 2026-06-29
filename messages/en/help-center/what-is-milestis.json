@@ -6,7 +6,7 @@
     },
     "meta": {
       "title": "What is Milestis",
-      "description": "Milestis is a platform for creating premium digital photobooks and portfolio sites in minutes, without traditional design complexity.",
+      "description": "Milestis is a platform for creating premium digital photobooks and portfolio presentations in minutes, without traditional design complexity.",
       "category": "Basics",
       "readTime": "4 min read",
       "updatedAt": "April 2026"
@@ -40,14 +40,14 @@
       "how_p3": "This makes the product faster, easier to use on mobile, and much harder to break visually.",
       "types_p1": "Milestis currently supports two project formats:",
       "types_li1": "<strong_tag>Memory Book</strong_tag> — a digital photobook for personal stories, milestones, and emotional moments.",
-      "types_li2": "<strong_tag>Portfolio Site</strong_tag> — a published website for presenting work, style, and visual identity.",
-      "types_p2": "Memory Books are suited to intimate sharing and gifting. Portfolio Sites are suited to public presentation and professional use.",
+      "types_li2": "<strong_tag>Portfolio</strong_tag> — an interactive digital presentation for showcasing work, style, and visual identity.",
+      "types_p2": "Memory Books are suited to intimate sharing and gifting. Portfolio projects are suited to public presentation and professional use.",
       "different_p1": "Milestis is not trying to be a universal editor. It is designed to make one category of task feel dramatically easier: taking meaningful content and turning it into a finished digital product with confidence.",
       "different_li1": "<strong_tag>Speed</strong_tag> — you can go from blank project to published result in minutes.",
       "different_li2": "<strong_tag>Design safety</strong_tag> — layouts are structured so the result stays clean and premium.",
       "different_li3": "<strong_tag>Atmosphere</strong_tag> — palettes, textures, depth, and decorations help the project feel personal without making the workflow heavy.",
       "different_li4": "<strong_tag>Web-native delivery</strong_tag> — the result is already ready to open on any screen, without an app download.",
-      "callout_sparkles": "If you are new to the platform, the best next step is to create one small project first. Once you publish one Memory Book or Portfolio Site, the whole product model becomes clear."
+      "callout_sparkles": "If you are new to the platform, the best next step is to create one small project first. Once you publish one Memory Book or Portfolio, the whole product model becomes clear."
     }
   }
 }

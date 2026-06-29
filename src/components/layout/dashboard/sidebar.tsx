@@ -9,7 +9,6 @@ import {
   Home, 
   Settings, 
   HelpCircle, 
-  Globe, 
   Plus,
   Archive,
 } from "lucide-react"
@@ -36,7 +35,6 @@ const navItems = [
   { id: "dashboard", labelKey: "nav.dashboard", icon: Home, href: "/dashboard" },
   { id: "projects", labelKey: "nav.projects", icon: FolderOpen, href: "/dashboard/projects" },
   { id: "archive", labelKey: "nav.archive", icon: Archive, href: "/dashboard/archive" },
-  { id: "domains", labelKey: "nav.domains", icon: Globe, href: "/dashboard/domains" },
 ]
 
 const bottomItems = [

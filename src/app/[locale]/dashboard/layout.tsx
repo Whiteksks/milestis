@@ -18,7 +18,6 @@ const headerTitles: Record<string, string> = {
   archive: "Archive",
   templates: "Templates",
   analytics: "Analytics",
-  domains: "Domains",
   help: "Help & Support",
 }
 

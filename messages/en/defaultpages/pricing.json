@@ -13,10 +13,9 @@
         "buttonText": "Get Started",
         "features": [
           "5 Active Projects",
-          "1GB Cloud Storage",
-          "Unlimited Archive Storage",
+          "Unlimited Archived Projects",
           "Standard Project Support",
-          "Evergreen Web Updates",
+          "Continuous Platform Updates",
           "One-time purchase available"
         ]
       },
@@ -27,13 +26,12 @@
         "buttonText": "Start Creator",
         "features": [
           "25 Active Projects",
-          "10GB Cloud Storage",
           "Professional Workspace",
-          "White-label Branding",
+          "Custom Branding",
           "250 Monthly Credits",
           "Discounted Credit Top-ups",
-          "Extended Infrastructure Support",
-          "Evergreen Web Updates"
+          "Extended Platform Support",
+          "Continuous Platform Updates"
         ]
       },
       "archive": {
@@ -42,13 +40,12 @@
         "buttonText": "Start Archive",
         "features": [
           "100 Active Projects",
-          "50GB Cloud Storage",
           "Advanced Workspace",
-          "Full White-label Suite",
+          "Full Custom Branding",
           "750 Monthly Credits",
           "Lowest Credit Rates",
-          "Priority Infrastructure Support",
-          "Evergreen Web Updates"
+          "Priority Platform Support",
+          "Continuous Platform Updates"
         ]
       }
     },
@@ -60,12 +57,12 @@
       "billedYearly": "billed yearly"
     },
     "evergreenSection": {
-      "badge": "Evergreen Infrastructure",
-      "title": "Future-Proof Memories",
-      "description": "The web is constantly evolving, and so are we. Every project hosted on our platform receives automatic updates to match modern browser standards and performance optimizations. Your digital sites stay fast, secure, and accessible, no matter how much time has passed.",
+      "badge": "Always Compatible",
+      "title": "Projects That Always Work",
+      "description": "Milestis takes care of all the technical details so your published projects display correctly across every device and browser. No outdated links, no broken layouts — just your work, working.",
       "supportCard": {
-        "title": "Guaranteed Support",
-        "subtitle": "Maintenance & Compatibility"
+        "title": "Platform Support",
+        "subtitle": "Device & Browser Compatibility"
       }
     },
     "footer": {

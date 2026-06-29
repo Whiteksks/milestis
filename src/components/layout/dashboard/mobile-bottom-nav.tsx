@@ -7,7 +7,6 @@ import {
   Home,
   FolderOpen,
   MoreHorizontal,
-  Globe,
   FileText,
   CreditCard,
   Shield,
@@ -147,16 +146,6 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
             href={withLocale(locale, "/pricing")}
             onClick={() => setOpen(false)}
             />
-
-            {/* Управление */}
-            <MenuSection title={t('nav.management')}>
-            <MenuItem
-              label={t('nav.publishedDomains')}
-              icon={Globe}
-              href={withLocale(locale, "/dashboard/domains")}
-              onClick={() => setOpen(false)}
-            />
-            </MenuSection>
 
             {/* Настройки */}
             <MenuSection title={t('nav.account')}>
