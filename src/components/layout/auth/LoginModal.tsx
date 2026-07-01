@@ -33,13 +33,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [password, setPassword] = useState("")
   const [consentChecked, setConsentChecked] = useState(false)
+  const [newsletterChecked, setNewsletterChecked] = useState(false)
 
   const recordIubendaConsent = (email: string) => {
     ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
       "submit",
       {
         subject: { email },
-        preferences: { terms: true, privacy_policy: true },
+        preferences: {
+          terms: true,
+          privacy_policy: true,
+          ...(newsletterChecked ? { newsletter: true } : {}),
+        },
       },
     ])
   }
@@ -88,6 +93,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       setShowPasswordForm(false)
       setPassword("")
       setConsentChecked(false)
+      setNewsletterChecked(false)
     }
     onOpenChange(open)
   }
@@ -183,26 +189,42 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             )}
           </div>
 
-          <div className="flex items-start gap-3">
-            <Checkbox
-              id="auth-consent"
-              checked={consentChecked}
-              onCheckedChange={(v) => setConsentChecked(v === true)}
-              className="mt-0.5 shrink-0"
-            />
-            <label
-              htmlFor="auth-consent"
-              className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-            >
-              I agree to the{" "}
-              <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                Terms of Service
-              </Link>
-              {" "}and{" "}
-              <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                Privacy Policy
-              </Link>
-            </label>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="auth-consent"
+                checked={consentChecked}
+                onCheckedChange={(v) => setConsentChecked(v === true)}
+                className="mt-0.5 shrink-0"
+              />
+              <label
+                htmlFor="auth-consent"
+                className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+              >
+                I agree to the{" "}
+                <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+                {" "}and{" "}
+                <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="newsletter-consent"
+                checked={newsletterChecked}
+                onCheckedChange={(v) => setNewsletterChecked(v === true)}
+                className="mt-0.5 shrink-0"
+              />
+              <label
+                htmlFor="newsletter-consent"
+                className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+              >
+                I&apos;d like to receive product news and updates from Milestis (optional)
+              </label>
+            </div>
           </div>
         </div>
       ) : (

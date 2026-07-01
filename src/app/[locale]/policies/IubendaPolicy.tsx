@@ -32,13 +32,15 @@ export function IubendaTerms() {
   const { terms } = useIubendaConfig();
   useIubenda();
   return (
-    <a
-      href={terms}
-      className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
-      title="Terms and Conditions"
-    >
-      Terms and Conditions
-    </a>
+    <div className="w-full overflow-x-hidden">
+      <a
+        href={terms}
+        className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
+        title="Terms and Conditions"
+      >
+        Terms and Conditions
+      </a>
+    </div>
   );
 }
 
@@ -47,13 +49,15 @@ export function IubendaCookie() {
   const { cookie } = useIubendaConfig();
   useIubenda();
   return (
-    <a
-      href={cookie}
-      className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
-      title="Cookie Policy"
-    >
-      Cookie Policy
-    </a>
+    <div className="w-full overflow-x-hidden">
+      <a
+        href={cookie}
+        className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
+        title="Cookie Policy"
+      >
+        Cookie Policy
+      </a>
+    </div>
   );
 }
 
@@ -62,12 +66,14 @@ export function IubendaPrivacy() {
   const { privacy } = useIubendaConfig();
   useIubenda();
   return (
-    <a
-      href={privacy}
-      className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
-      title="Privacy Policy"
-    >
-      Privacy Policy
-    </a>
+    <div className="w-full overflow-x-hidden">
+      <a
+        href={privacy}
+        className="iubenda-nostyle iubenda-noiframe iubenda-embed iub-body-embed"
+        title="Privacy Policy"
+      >
+        Privacy Policy
+      </a>
+    </div>
   );
 }

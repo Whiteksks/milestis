@@ -60,6 +60,12 @@
         "exportProjectContent": "Export Project",
         "descriptionLong": "Account data includes your profile, preferences, and usage history. Project export includes design content and publish history."
       },
+      "privacy": {
+        "title": "Privacy & Cookies",
+        "description": "Manage your cookie preferences and data consent settings.",
+        "preferencesButton": "Manage Cookie Preferences",
+        "preferencesDescription": "Update which cookies and tracking technologies are active on your device."
+      },
       "danger": {
         "title": "Danger Zone",
         "description": "Permanent actions that cannot be undone",

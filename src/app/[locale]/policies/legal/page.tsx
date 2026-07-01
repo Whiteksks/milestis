@@ -1,6 +1,6 @@
 'use client'
 
-import { ShieldCheck, Scale, FileText, ArrowRight, Lock, Mail } from 'lucide-react'
+import { ShieldCheck, Scale, FileText, ArrowRight, Lock, Mail, CreditCard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 
@@ -8,17 +8,22 @@ const POLICIES = [
   {
     id: "terms",
     icon: <Scale className="w-5 h-5" />,
-    link: "/policies/terms" // Сюда поставишь ссылку на условия от Iubenda
+    link: "/policies/terms"
   },
   {
     id: "privacy",
     icon: <ShieldCheck className="w-5 h-5" />,
-    link: "/policies/privacy-policy" // Сюда ссылку на приватность от Iubenda
+    link: "/policies/privacy-policy"
+  },
+  {
+    id: "refund",
+    icon: <CreditCard className="w-5 h-5" />,
+    link: "/policies/refund-policy"
   },
   {
     id: "cookies",
     icon: <FileText className="w-5 h-5" />,
-    link: "/policies/cookie-policy" // Сюда ссылку на куки от Iubenda
+    link: "/policies/cookie-policy"
   }
 ]
 

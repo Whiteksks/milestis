@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [password, setPassword] = useState("")
   const [consentChecked, setConsentChecked] = useState(false) // Стейт чекбокса
+  const [newsletterChecked, setNewsletterChecked] = useState(false) // Согласие на рассылку
 
   // Логика интеграции с Iubenda
   const recordIubendaConsent = (email: string) => {
@@ -27,7 +28,11 @@ export default function LoginPage() {
       "submit",
       {
         subject: { email },
-        preferences: { terms: true, privacy_policy: true },
+        preferences: {
+          terms: true,
+          privacy_policy: true,
+          ...(newsletterChecked ? { newsletter: true } : {}),
+        },
       },
     ])
   }
@@ -213,26 +218,42 @@ export default function LoginPage() {
                   </div>
 
                   {/* Блок согласия с чекбоксом */}
-                  <div className="flex items-start gap-3 pt-2">
-                    <Checkbox
-                      id="auth-consent"
-                      checked={consentChecked}
-                      onCheckedChange={(v) => setConsentChecked(v === true)}
-                      className="mt-0.5 shrink-0"
-                    />
-                    <label
-                      htmlFor="auth-consent"
-                      className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-                    >
-                      I agree to the{" "}
-                      <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                        Terms of Service
-                      </Link>
-                      {" "}and{" "}
-                      <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                        Privacy Policy
-                      </Link>
-                    </label>
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="auth-consent"
+                        checked={consentChecked}
+                        onCheckedChange={(v) => setConsentChecked(v === true)}
+                        className="mt-0.5 shrink-0"
+                      />
+                      <label
+                        htmlFor="auth-consent"
+                        className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+                      >
+                        I agree to the{" "}
+                        <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                          Terms of Service
+                        </Link>
+                        {" "}and{" "}
+                        <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                          Privacy Policy
+                        </Link>
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="newsletter-consent"
+                        checked={newsletterChecked}
+                        onCheckedChange={(v) => setNewsletterChecked(v === true)}
+                        className="mt-0.5 shrink-0"
+                      />
+                      <label
+                        htmlFor="newsletter-consent"
+                        className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
+                      >
+                        I&apos;d like to receive product news and updates from Milestis (optional)
+                      </label>
+                    </div>
                   </div>
                 </div>
               ) : (

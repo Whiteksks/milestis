@@ -1,0 +1,32 @@
+{
+  "account": {
+    "archive": {
+      "title": "Archive",
+      "subtitle": "Archived projects and their data. Expand a project to manage its settings.",
+      "warning": "Deleting permanently removes all files and unpublishes the site.",
+      "warningCredits": "Credits spent on export are not refunded.",
+      "emptyState": "No archived projects yet.",
+      "statusPublished": "Published",
+      "statusOffline": "Offline",
+      "modePortfolio": "Portfolio",
+      "modePhotobook": "Memory Book",
+      "dataPrivacyLabel": "Data & Privacy",
+      "deleteDescription": "Permanently removes all exported files and storage data",
+      "deleteDescriptionSuffix": ", and takes the published site offline",
+      "deleteUndone": "This action cannot be undone.",
+      "deleteButton": "Delete permanently",
+      "dialog": {
+        "title": "Delete permanently?",
+        "bodyPre": "All files and data for",
+        "bodyPost": "will be removed. This cannot be undone.",
+        "publishedWarning": "The live site will go offline immediately.",
+        "creditsNote": "Credits spent on this export will not be refunded.",
+        "typeToConfirmPre": "Type",
+        "typeToConfirmPost": "to confirm:",
+        "cancel": "Cancel",
+        "deleteButton": "Delete permanently",
+        "deleting": "Deleting…"
+      }
+    }
+  }
+}

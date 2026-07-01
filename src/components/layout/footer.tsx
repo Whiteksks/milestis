@@ -69,7 +69,7 @@ export function Footer({
     >
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
           
           {/* Brand column */}
           <div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-6">
@@ -120,6 +120,34 @@ export function Footer({
               </ul>
             </div>
           ))}
+
+          {/* Legal column */}
+          <div className="hidden sm:block">
+            <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-current">
+              {t("headings.legal")}
+            </h3>
+            <ul className="space-y-4">
+              <li>
+                <Link href="/policies/refund-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current">
+                  {t("policies.refund")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/policies/cookie-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current">
+                  {t("policies.cookie")}
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
+                  className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current"
+                >
+                  {t("policies.privacyChoices")}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Mobile accordion */}
@@ -145,23 +173,52 @@ export function Footer({
               </AccordionContent>
             </AccordionItem>
           ))}
+
+          {/* Legal accordion item */}
+          <AccordionItem value="legal" className="border-border/40">
+            <AccordionTrigger className="py-4 text-sm font-bold uppercase tracking-widest text-current hover:no-underline">
+              {t("headings.legal")}
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-4 pb-4">
+                <li>
+                  <Link href="/policies/refund-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground">
+                    {t("policies.refund")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/policies/cookie-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground">
+                    {t("policies.cookie")}
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
+                    className="inline-flex items-center gap-2 text-base text-muted-foreground"
+                  >
+                    {t("policies.privacyChoices")}
+                  </button>
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
         </Accordion>  
         
         <Separator className="my-12 opacity-50" />
 
         {/* Bottom row */}
-        <div className="flex flex-col items-center justify-between gap-6 text-sm md:text-base text-muted-foreground sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-2 text-sm md:text-base text-muted-foreground sm:flex-row">
           <p className="order-2 sm:order-1 text-center sm:text-left">
             © {new Date().getFullYear()} Milestis. {t("rightsReserved")}
           </p>
           
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 order-1 sm:order-2 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 order-1 sm:order-2 text-sm text-muted-foreground/80 font-normal">
             <Link href="/policies/privacy-policy" className="transition-colors hover:text-current">
               {t("policies.privacy")}
             </Link>
-            <Link href="/policies/cookie-policy" className="transition-colors hover:text-current">
-              {t("policies.cookie")}
-            </Link>
+            <span className="text-muted-foreground/30 select-none hidden sm:inline">|</span>
+
             <Link href="/policies/terms" className="transition-colors hover:text-current">
               {t("policies.terms")}
             </Link>

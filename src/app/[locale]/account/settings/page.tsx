@@ -317,6 +317,29 @@ export default function AccountSettings() {
         </div>
       </section>
 
+      {/* Privacy & Cookies */}
+      <section className="space-y-6">
+        <div className="px-1">
+          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("privacy.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground/90">{t("privacy.description")}</p>
+        </div>
+        <div className="rounded-2xl bg-card border border-border/50 p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground text-[15px]">{t("privacy.preferencesButton")}</p>
+              <p className="text-xs text-muted-foreground/80 max-w-xl leading-normal">{t("privacy.preferencesDescription")}</p>
+            </div>
+            <Button
+              variant="outline"
+              className="shrink-0 rounded-full h-10 px-6 border-border/80 hover:bg-secondary/50 font-medium transition-colors"
+              onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
+            >
+              {t("privacy.preferencesButton")}
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Danger Zone */}
       <section className="space-y-6">
         <div className="px-1">

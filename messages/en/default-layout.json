@@ -18,7 +18,8 @@
     "headings": {
       "product": "Product",
       "support": "Help & Support",
-      "about": "About"
+      "about": "About",
+      "legal": "Legal"
     },
     "links": {
       "features": "Features",
@@ -36,7 +37,9 @@
     "policies": {
       "privacy": "Privacy Policy",
       "cookie": "Cookie Policy",
-      "terms": "Terms and Conditions"
+      "terms": "Terms and Conditions",
+      "refund": "Refund Policy",
+      "privacyChoices": "Your Privacy Choices"
     }
   },
   "ProfileDropdown": {

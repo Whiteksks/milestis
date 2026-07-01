@@ -150,19 +150,6 @@ export function PricingContent() {
           </div>
         </div>
       </section>
-
-      <footer className="py-20 px-6 text-center border-t border-border/40">
-        <div className="max-w-2xl mx-auto flex flex-col items-center gap-6">
-          <div className="flex gap-8 text-muted-foreground/60 grayscale">
-            <ShieldCheck className="w-8 h-8" />
-            <Zap className="w-8 h-8" />
-            <Star className="w-8 h-8" />
-          </div>
-          <p className="text-sm text-muted-foreground max-w-sm">
-            {t('footer.text')}
-          </p>
-        </div>
-      </footer>
       <Footer />
     </div>
   );

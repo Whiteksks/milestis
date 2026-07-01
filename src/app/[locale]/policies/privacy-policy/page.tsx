@@ -41,7 +41,7 @@ export async function generateMetadata({
 
 export default function PrivacyPage() {
   return (
-    <main className="px-4 py-16 sm:py-24">
+    <main className="px-0 py-16 md:px-4 md:py-24">
       <IubendaPrivacy />
     </main>
   )

@@ -16,6 +16,10 @@
       "cookies": {
         "title": "Cookie Policy",
         "description": "How we use cookies to keep you logged in and improve your experience."
+      },
+      "refund": {
+        "title": "Pricing & Refund Policy",
+        "description": "Information about digital credits, subscription terms, payments, and refund conditions."
       }
     },
     "support": {

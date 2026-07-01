@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Archive, AlertTriangle, BookOpen, ChevronDown, Layout, Loader2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,9 +20,9 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useUserStore } from "@/hooks/useUserStore"
 import { cn } from "@/lib/utils"
 
-const modeConfig = {
-  portfolio: { icon: Layout, label: "Portfolio" },
-  photobook: { icon: BookOpen, label: "Memory Book" },
+const modeIcons = {
+  portfolio: Layout,
+  photobook: BookOpen,
 }
 
 // ─── Accordion Item ───────────────────────────────────────────────────────────
@@ -37,7 +38,11 @@ function ArchiveItem({
   onToggle: () => void
   onDelete: (project: DashboardProject) => void
 }) {
-  const ModeIcon = modeConfig[project.mode].icon
+  const t = useTranslations()
+  const ModeIcon = modeIcons[project.mode]
+  const modeLabel = project.mode === "portfolio"
+    ? t("account.archive.modePortfolio")
+    : t("account.archive.modePhotobook")
 
   return (
     <div
@@ -59,17 +64,17 @@ function ArchiveItem({
           <div className="min-w-0">
             <p className="truncate text-sm font-medium tracking-tight">{project.name}</p>
             <div className="mt-0.5 flex items-center gap-2">
-              <span className="text-[11px] text-muted-foreground">{modeConfig[project.mode].label}</span>
+              <span className="text-[11px] text-muted-foreground">{modeLabel}</span>
               <span className="text-[10px] text-border/80">•</span>
               {project.isPublished ? (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-500">
                   <span className="size-1.5 rounded-full bg-emerald-500" />
-                  Published
+                  {t("account.archive.statusPublished")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50">
                   <span className="size-1.5 rounded-full bg-muted-foreground/30" />
-                  Offline
+                  {t("account.archive.statusOffline")}
                 </span>
               )}
             </div>
@@ -87,13 +92,13 @@ function ArchiveItem({
       {isOpen && (
         <div className="border-t border-border/40 bg-muted/10 px-4 py-4">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Data &amp; Privacy
+            {t("account.archive.dataPrivacyLabel")}
           </p>
           <div className="rounded-xl border border-destructive/20 bg-destructive/[0.03] p-4 space-y-3">
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Permanently removes all exported files and storage data
-              {project.isPublished && ", and takes the published site offline"}.
-              This action cannot be undone.
+              {t("account.archive.deleteDescription")}
+              {project.isPublished && t("account.archive.deleteDescriptionSuffix")}.
+              {" "}{t("account.archive.deleteUndone")}
             </p>
             <Button
               variant="outline"
@@ -102,7 +107,7 @@ function ArchiveItem({
               onClick={() => onDelete(project)}
             >
               <Trash2 className="mr-1.5 size-3.5" />
-              Delete permanently
+              {t("account.archive.deleteButton")}
             </Button>
           </div>
         </div>
@@ -114,6 +119,7 @@ function ArchiveItem({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ArchiveSettingsPage() {
+  const t = useTranslations()
   const { data: projects = [], isLoading } = useArchivedProjectsQuery()
   const forceDelete = useForceDeleteMutation()
   const queryClient = useQueryClient()
@@ -160,9 +166,9 @@ export default function ArchiveSettingsPage() {
     <div className="max-w-2xl space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <h2 className="font-serif text-2xl md:text-3xl tracking-tight">Archive</h2>
+        <h2 className="font-serif text-2xl md:text-3xl tracking-tight">{t("account.archive.title")}</h2>
         <p className="max-w-prose text-sm text-muted-foreground">
-          Archived projects and their data. Expand a project to manage its settings.
+          {t("account.archive.subtitle")}
         </p>
       </div>
 
@@ -170,8 +176,8 @@ export default function ArchiveSettingsPage() {
       <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-50/90 p-3.5 dark:bg-amber-950/10">
         <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-500" />
         <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-300/90">
-          Deleting permanently removes all files and unpublishes the site.{" "}
-          <strong>Credits spent on export are not refunded.</strong>
+          {t("account.archive.warning")}{" "}
+          <strong>{t("account.archive.warningCredits")}</strong>
         </p>
       </div>
 
@@ -195,7 +201,7 @@ export default function ArchiveSettingsPage() {
           <div className="flex size-12 items-center justify-center rounded-full bg-muted/40 text-muted-foreground/40">
             <Archive className="size-5" />
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">No archived projects yet.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("account.archive.emptyState")}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -219,22 +225,22 @@ export default function ArchiveSettingsPage() {
               <Trash2 className="size-4 text-destructive" />
             </div>
             <DialogTitle className="font-serif text-xl tracking-tight">
-              Delete permanently?
+              {t("account.archive.dialog.title")}
             </DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
                 <p>
-                  All files and data for{" "}
+                  {t("account.archive.dialog.bodyPre")}{" "}
                   <strong className="font-semibold text-foreground">&ldquo;{target?.name}&rdquo;</strong>{" "}
-                  will be removed. This cannot be undone.
+                  {t("account.archive.dialog.bodyPost")}
                 </p>
                 {target?.isPublished && (
                   <div className="border-l-2 border-destructive/50 py-0.5 pl-3 text-xs font-medium text-destructive/80">
-                    The live site will go offline immediately.
+                    {t("account.archive.dialog.publishedWarning")}
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground/60">
-                  Credits spent on this export will not be refunded.
+                  {t("account.archive.dialog.creditsNote")}
                 </p>
               </div>
             </DialogDescription>
@@ -243,9 +249,9 @@ export default function ArchiveSettingsPage() {
           {/* Text confirmation input */}
           <div className="mt-4 space-y-2">
             <p className="text-xs text-muted-foreground">
-              Type{" "}
+              {t("account.archive.dialog.typeToConfirmPre")}{" "}
               <strong className="font-mono text-foreground">{target?.name}</strong>{" "}
-              to confirm:
+              {t("account.archive.dialog.typeToConfirmPost")}
             </p>
             <Input
               value={confirmText}
@@ -264,7 +270,7 @@ export default function ArchiveSettingsPage() {
               onClick={handleDialogClose}
               disabled={forceDelete.isPending}
             >
-              Cancel
+              {t("account.archive.dialog.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -275,10 +281,10 @@ export default function ArchiveSettingsPage() {
               {forceDelete.isPending ? (
                 <>
                   <Loader2 className="mr-2 size-3.5 animate-spin" />
-                  Deleting…
+                  {t("account.archive.dialog.deleting")}
                 </>
               ) : (
-                "Delete permanently"
+                t("account.archive.dialog.deleteButton")
               )}
             </Button>
           </DialogFooter>
