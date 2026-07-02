@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme/theme-provider';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 import Script from 'next/script';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_APP_URL ?? 'https://milestis.com'),
@@ -54,15 +55,20 @@ export default async function RootLayout({
   params: Promise<{ locale?: string }>;
 }) {
   const { locale } = await params;
+  const headersList = await headers();
+  const host = headersList.get('host') ?? '';
+  const isPublishedSite = host.endsWith('.site');
 
   return (
     <html lang={locale ?? 'en'} suppressHydrationWarning>
       <head>
-        <Script
-          id="iubenda-cookie-solution"
-          strategy="afterInteractive"
-          src="https://embeds.iubenda.com/widgets/f6bff847-fa8b-4753-8ce9-3dc2137f21d0.js"
-        />
+        {!isPublishedSite && (
+          <Script
+            id="iubenda-cookie-solution"
+            strategy="afterInteractive"
+            src="https://embeds.iubenda.com/widgets/f6bff847-fa8b-4753-8ce9-3dc2137f21d0.js"
+          />
+        )}
       </head>
 
       <body

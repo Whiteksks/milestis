@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox" // Импортировано из UI
-import { CheckCircle2, ArrowLeft, Zap, ArrowRight, Share, Palette, FlaskConical } from "lucide-react"
+import { CheckCircle2, ArrowLeft, Zap, ArrowRight, Share, Palette } from "lucide-react"
 import Header from "@/components/layout/header"
 import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect"
 import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [password, setPassword] = useState("")
   const [consentChecked, setConsentChecked] = useState(false) // Стейт чекбокса
   const [newsletterChecked, setNewsletterChecked] = useState(false) // Согласие на рассылку
@@ -147,20 +146,6 @@ export default function LoginPage() {
                     </p>
                   </div>
 
-                  {/* Toggle: Test Account */}
-                  <button
-                    type="button"
-                    onClick={() => { setShowPasswordForm(!showPasswordForm); setPassword(""); setError(null); }}
-                    className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-sm font-medium transition-all ${
-                      showPasswordForm
-                        ? "bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400"
-                        : "bg-muted/30 border-border/40 text-muted-foreground hover:text-foreground hover:border-border/70"
-                    }`}
-                  >
-                    <FlaskConical className="w-4 h-4" />
-                    {showPasswordForm ? "Back to Magic Link" : "Test Account"}
-                  </button>
-
                   <div className="space-y-5">
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
@@ -178,43 +163,46 @@ export default function LoginPage() {
                       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
                     </div>
 
-                    {!showPasswordForm && (
                     <Button 
                       onClick={handleSendMagicLink}
-                      disabled={loading || !email || !consentChecked} // Добавлено согласие
+                      disabled={loading || !email || !consentChecked}
                       className="w-full h-12 text-base font-semibold rounded-xl shadow-lg shadow-primary/5 hover:scale-[1.01] transition-all active:scale-95 group"
                     >
                       {loading ? "Sending..." : "Send Magic Link"}
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    )}
 
-                    {showPasswordForm && (
-                      <div className="space-y-3 animate-in fade-in duration-200">
-                        <div className="space-y-2">
-                          <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-                            Password
-                          </Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
-                            className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
-                          />
-                        </div>
-                        <Button
-                          onClick={handleSignInWithPassword}
-                          disabled={loading || !email || !password || !consentChecked} // Добавлено согласие
-                          className="w-full h-12 text-base font-semibold rounded-xl bg-amber-500 hover:bg-amber-500/90 text-white shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-all active:scale-95 group"
-                        >
-                          {loading ? "Signing in..." : "Sign In with Password"}
-                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Button>
+                    <div className="relative flex items-center gap-3">
+                      <div className="h-px flex-1 bg-border/40" />
+                      <span className="text-xs text-muted-foreground/50 font-light">or</span>
+                      <div className="h-px flex-1 bg-border/40" />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
+                          Password
+                        </Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
+                          className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
+                        />
                       </div>
-                    )}
+                      <Button
+                        variant="outline"
+                        onClick={handleSignInWithPassword}
+                        disabled={loading || !email || !password || !consentChecked}
+                        className="w-full h-10 text-sm font-medium rounded-xl border-border/60 hover:border-border hover:bg-muted/30 transition-all group"
+                      >
+                        {loading ? "Signing in..." : "Sign in with Password"}
+                        <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Блок согласия с чекбоксом */}
