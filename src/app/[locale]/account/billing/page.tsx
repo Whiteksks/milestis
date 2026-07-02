@@ -7,27 +7,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { useBilling } from "@/hooks/useBilling"
 import { Sparkles, Gift, ShoppingBag, CreditCard } from "lucide-react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 
 export default function BillingSettings() {
   const t = useTranslations("billing")
-  const locale = useLocale()
   
   const {
     loading,
     historyLoading,
     historyError,
     creditsData,
-    planKey,
     isPro,
     creditHistory,
     invoiceHistory,
-    paymentMethod,
   } = useBilling()
-
-  const pricingHref = `/${locale}/pricing`
-  const planName = t(`plans.${planKey}.name`)
-  const planDesc = t(`plans.${planKey}.desc`)
 
   if (loading) {
     return (
@@ -94,20 +87,12 @@ export default function BillingSettings() {
         </div>
         <div className="space-y-6">
           <div className="rounded-3xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-            <BillingPlanCard
-              planName={planName}
-              planDescription={planDesc}
-              isPro={isPro}
-              upgradeHref={pricingHref}
-              manageHref={pricingHref}
-              compareHref={`${pricingHref}#plans`}
-            />
+            <BillingPlanCard />
           </div>
 
-          {/* Способ оплаты — Рендерится внутри секции тарифов, если привязан */}
-          {paymentMethod && (
+          {isPro && (
             <div className="rounded-3xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-              <PaymentMethodCard paymentMethod={paymentMethod} />
+              <PaymentMethodCard paymentMethod={{}} />
             </div>
           )}
         </div>

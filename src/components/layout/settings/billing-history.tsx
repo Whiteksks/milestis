@@ -176,25 +176,25 @@ export function BillingHistory({
       <div className="space-y-6">
         <div className="divide-y divide-border/40 border-b border-border/40 px-1">
           {visibleInvoiceHistory.map((item) => {
-            const reference = typeof item.meta?.paddleTransactionId === "string" ? item.meta.paddleTransactionId : null
-            const isIn = item.direction === "in"
+            // direction: "in"  = money received by service = user was charged
+            // direction: "out" = money returned to user    = refund
+            const isCharge = item.direction === "in"
             return (
               <div key={item.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between hover:bg-muted/20 transition-colors rounded-xl px-3 -mx-3">
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-sm text-foreground/90">{getInvoiceLabel(t, item.type)}</span>
                     <Badge variant="outline" className="rounded-full text-[11px] font-normal px-2 py-0">
-                      {isIn ? t("direction.refund") : t("direction.charge")}
+                      {isCharge ? t("direction.charge") : t("direction.refund")}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {dateFormatter.format(item.createdAt)}
-                    {reference && ` · ${t("reference", { id: reference })}`}
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <p className={cn("font-semibold text-sm tabular-nums tracking-tight", isIn ? "text-emerald-600 dark:text-emerald-400" : "text-foreground")}>
-                    {isIn ? "+" : "-"}{formatCurrency(locale, item.amountMinor, item.currency)}
+                  <p className={cn("font-semibold text-sm tabular-nums tracking-tight", !isCharge ? "text-emerald-600 dark:text-emerald-400" : "text-foreground")}>
+                    {isCharge ? "-" : "+"}{formatCurrency(locale, item.amountMinor, item.currency)}
                   </p>
                 </div>
               </div>

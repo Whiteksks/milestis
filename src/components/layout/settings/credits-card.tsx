@@ -12,7 +12,7 @@ export function CreditsCard({ monthly, bonus, purchased }: CreditsBreakdownProps
   const t = useTranslations("billing")
   const totalCredits = (monthly.total - monthly.used) + bonus.amount + purchased.amount
   const monthlyRemaining = monthly.total - monthly.used
-  const monthlyPercentage = monthly.total > 0 ? (monthly.used / monthly.total) * 100 : 0
+  const monthlyPercentage = monthly.total > 0 ? (monthlyRemaining / monthly.total) * 100 : 0
 
   const types = [
     {

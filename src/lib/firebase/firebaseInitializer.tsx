@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { type User, onIdTokenChanged } from 'firebase/auth'
-import { doc, onSnapshot } from 'firebase/firestore'
+import { Timestamp, doc, onSnapshot } from 'firebase/firestore'
 import { clearServerSession, syncServerSession } from '@/lib/auth/session-client'
 import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
@@ -13,6 +13,22 @@ function buildFallbackProfile(user: User) {
     displayName: user.displayName ?? 'Без имени',
     email: user.email ?? null,
     photoURL: user.photoURL ?? null,
+  }
+}
+
+function tsToDate(v: unknown): Date | null | undefined {
+  if (v instanceof Timestamp) return v.toDate()
+  if (v instanceof Date) return v
+  return v == null ? (v as null | undefined) : undefined
+}
+
+function normalizeSubscriptionDates(sub: Record<string, unknown>) {
+  return {
+    ...sub,
+    currentPeriodStart: tsToDate(sub.currentPeriodStart) ?? undefined,
+    currentPeriodEnd: tsToDate(sub.currentPeriodEnd) ?? undefined,
+    gracePeriodEnd: tsToDate(sub.gracePeriodEnd) ?? null,
+    trialEnd: tsToDate(sub.trialEnd) ?? null,
   }
 }
 
@@ -94,7 +110,7 @@ export default function FirebaseInitializer() {
             photoURL: data.photoURL ?? fallbackProfile.photoURL,
             profileTemplate: data.profileTemplate,
             settings: data.settings,
-            subscription: data.subscription,
+            subscription: data.subscription ? normalizeSubscriptionDates(data.subscription as Record<string, unknown>) as never : undefined,
             balance: data.balance,
             stats: data.stats,
           }, 'ready')

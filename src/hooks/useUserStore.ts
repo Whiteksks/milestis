@@ -34,6 +34,7 @@ export interface UserState {
   clearProfile: () => void;
   setSessionSynced: () => void;
   updateBalance: (balance: UserBalance) => void;
+  updateSubscription: (subscription: UserSubscription) => void;
 }
 
 export const selectCurrentUid = (state: UserState) => state.profile?.uid ?? null;
@@ -41,6 +42,8 @@ export const selectAuthLoading = (state: UserState) => state.authStatus === 'loa
 export const selectProfileHydrating = (state: UserState) =>
   state.authStatus === 'loading' ||
   (state.authStatus === 'authenticated' && state.profileStatus === 'loading');
+export const selectSubscription = (state: UserState) => state.profile?.subscription ?? null;
+export const selectBalance = (state: UserState) => state.profile?.balance ?? null;
 
 export const useUserStore = create<UserState>((set) => ({
   profile: null,
@@ -63,5 +66,9 @@ export const useUserStore = create<UserState>((set) => ({
   updateBalance: (balance) =>
     set((state) =>
       state.profile ? { profile: { ...state.profile, balance } } : {},
+    ),
+  updateSubscription: (subscription) =>
+    set((state) =>
+      state.profile ? { profile: { ...state.profile, subscription } } : {},
     ),
 }));

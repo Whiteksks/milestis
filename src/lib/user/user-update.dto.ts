@@ -26,7 +26,9 @@ export interface UserSubscriptionFeatures {
   maxProjects: number;
   maxStorageBytes: number;
   canRemoveBranding: boolean;
-  highQualityExport: boolean;
+  photographerWorkspace: boolean;
+  monthlyCredits: number;
+  creditTopupRatePerDollar: number;
   prioritySupport: boolean;
 }
 
@@ -35,12 +37,16 @@ export type SubscriptionPlanTier = "free" | "explorer" | "creator" | "archive";
 export interface UserSubscription {
   planId: string;
   planTier: SubscriptionPlanTier;
-  status: "active" | "trialing" | "past_due" | "canceled";
+  planInterval?: "month" | "year";
+  status: "active" | "trialing" | "past_due" | "paused" | "canceled";
   gracePeriodEnd?: Date | null;
   trialEnd?: Date | null;
   currentPeriodStart?: Date;
   currentPeriodEnd?: Date;
   cancelAtPeriodEnd?: boolean;
+  polarSubscriptionId?: string;
+  polarCustomerId?: string;
+  polarProductId?: string;
   features: UserSubscriptionFeatures;
 }
 

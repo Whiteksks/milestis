@@ -27,14 +27,14 @@ interface TransactionBase {
 	balanceSnapshot: BalanceSnapshot; // balance AFTER this transaction
 }
 
-/** Real-money record (Paddle charge, refund, subscription renewal, etc.) */
+/** Real-money record (Polar order, refund, subscription renewal, etc.) */
 export interface BillingTransaction extends TransactionBase {
 	category: "billing";
 	type: BillingType;
 	currency: Currency;
 	amountMinor: number;      // integer cents — avoids float precision issues
 	refundedTxId?: string;    // for type="refund": internal billing tid being refunded
-	meta?: Record<string, unknown>; // paddleEventId, paddleTxId, packId, promoCode, …
+	meta?: Record<string, unknown>; // packId, promoCode, …
 }
 
 /** Virtual-credit record (grant, spend, expire, admin adjustment) */

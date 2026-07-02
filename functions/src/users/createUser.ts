@@ -60,7 +60,9 @@ export const createUser = onRequest(
             maxProjects: 5,
             maxStorageBytes: 1 * 1024 * 1024 * 1024, // 1 GB
             canRemoveBranding: false,
-            highQualityExport: false,
+            photographerWorkspace: false,
+            monthlyCredits: 0,
+            creditTopupRatePerDollar: 1,
             prioritySupport: false,
           },
         },

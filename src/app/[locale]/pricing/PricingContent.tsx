@@ -2,15 +2,91 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useShallow } from 'zustand/react/shallow';
 import { CTAButton } from '@/components/shared/cta-button';
-import { Check, Zap, Star, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Check, Zap, Star, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { useUserStore } from '@/hooks/useUserStore';
+import { isPaidPlan, normalizePlanTier } from '@/lib/billing/billing.utils';
+
+// ── Polar product IDs — set these in .env.local (sandbox) or production env vars.
+// NEXT_PUBLIC_ prefix is intentional: product IDs are not secret.
+const PRODUCT_IDS = {
+  creator: {
+    monthly: process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY ?? "",
+    yearly:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_YEARLY  ?? "",
+  },
+  archive: {
+    monthly: process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_MONTHLY ?? "",
+    yearly:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_YEARLY  ?? "",
+  },
+} as const;
+
+// ── Checkout button: calls /api/billing/checkout and redirects ───────────────
+function CheckoutButton({
+  productId,
+  children,
+  className,
+}: {
+  productId: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const locale = useLocale();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    if (!productId) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ productId }),
+      });
+
+      if (res.status === 401) {
+        // Not authenticated → send to login
+        router.push(`/${locale}/auth/login`);
+        return;
+      }
+
+      const data = await res.json() as { checkoutUrl?: string };
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch {
+      // Network error — silent fail, button re-enables
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button onClick={handleClick} disabled={loading} className={className}>
+      {loading
+        ? <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+        : children}
+    </button>
+  );
+}
 
 export function PricingContent() {
   const t = useTranslations('pricing');
+  const locale = useLocale();
   const [isYearly, setIsYearly] = useState(false);
+
+  const { profile } = useUserStore(useShallow((s) => ({ profile: s.profile })))
+  const activeTier = normalizePlanTier(profile?.subscription?.planTier)
+  const isPaidActive = isPaidPlan(activeTier) && profile?.subscription?.status === 'active'
+  const billingHref = `/${locale}/account/billing`
 
   const explorerFeatures = t.raw('tiers.explorer.features') as string[];
   const creatorFeatures = t.raw('tiers.creator.features') as string[];
@@ -90,6 +166,7 @@ export function PricingContent() {
             features={explorerFeatures}
             buttonText={t('tiers.explorer.buttonText')}
             variant="outline"
+            isFree
           />
 
           {/* Creator Tier */}
@@ -104,6 +181,10 @@ export function PricingContent() {
             variant="default"
             isPopular={true}
             badgeText={t('tiers.creator.badge')}
+            productId={isYearly ? PRODUCT_IDS.creator.yearly : PRODUCT_IDS.creator.monthly}
+            planTier="creator"
+            activeTier={isPaidActive ? activeTier : undefined}
+            billingHref={billingHref}
           />
 
           {/* Archive Tier */}
@@ -116,6 +197,10 @@ export function PricingContent() {
             features={archiveFeatures}
             buttonText={t('tiers.archive.buttonText')}
             variant="outline"
+            productId={isYearly ? PRODUCT_IDS.archive.yearly : PRODUCT_IDS.archive.monthly}
+            planTier="archive"
+            activeTier={isPaidActive ? activeTier : undefined}
+            billingHref={billingHref}
           />
         </div>
       </section>
@@ -166,6 +251,11 @@ interface PricingCardProps {
   variant?: string
   isPopular?: boolean
   badgeText?: string
+  productId?: string
+  isFree?: boolean
+  planTier?: string
+  activeTier?: string
+  billingHref?: string
 }
 
 const PricingCard = ({
@@ -178,8 +268,20 @@ const PricingCard = ({
   buttonText,
   variant,
   isPopular = false,
-  badgeText
-}: PricingCardProps) => (
+  badgeText,
+  productId,
+  isFree = false,
+  planTier,
+  activeTier,
+  billingHref = '/account/billing',
+}: PricingCardProps) => {
+  const buttonClass = `w-full py-3 rounded-full font-bold transition-all active:scale-95 ${
+    variant === 'default'
+      ? 'bg-primary text-primary-foreground hover:opacity-90'
+      : 'bg-background border border-border hover:bg-muted text-foreground'
+  }`
+
+  return (
   <Card className={`relative flex flex-col h-full bg-card border-border transition-all duration-300 hover:shadow-xl ${isPopular ? 'ring-2 ring-primary scale-105 z-10' : ''}`}>
     {isPopular && badgeText && (
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center justify-center text-center max-w-[85%] leading-tight">
@@ -219,13 +321,26 @@ const PricingCard = ({
       </ul>
     </CardContent>
     <CardFooter className="p-8 pt-0">
-      <CTAButton className={`w-full py-3 rounded-full font-bold transition-all active:scale-95 ${
-        variant === 'default'
-          ? 'bg-primary text-primary-foreground hover:opacity-90'
-          : 'bg-background border border-border hover:bg-muted text-foreground'
-      }`}>
-        {buttonText}
-      </CTAButton>
+      {isFree || !productId ? (
+        <CTAButton className={buttonClass}>
+          {buttonText}
+        </CTAButton>
+      ) : activeTier && planTier ? (
+        activeTier === planTier ? (
+          <button className={`${buttonClass} opacity-60 cursor-default`} disabled>
+            Current plan
+          </button>
+        ) : (
+          <Link href={billingHref} className={`${buttonClass} text-center inline-flex items-center justify-center`}>
+            Change plan
+          </Link>
+        )
+      ) : (
+        <CheckoutButton productId={productId} className={buttonClass}>
+          {buttonText}
+        </CheckoutButton>
+      )}
     </CardFooter>
   </Card>
-);
+  )
+};

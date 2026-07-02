@@ -1,9 +1,15 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { useLocale } from 'next-intl'
-import { useShallow } from "zustand/react/shallow"
 import { auth, db } from '@/lib/firebase'
-import { selectCurrentUid, selectProfileHydrating, useUserStore } from "@/hooks/useUserStore"
+import {
+  selectCurrentUid,
+  selectProfileHydrating,
+  selectSubscription,
+  selectBalance,
+  useUserStore,
+} from "@/hooks/useUserStore"
 import {
   getPlanTranslationKey,
   isPaidPlan,
@@ -47,12 +53,6 @@ export interface BillingCreditHistoryItem extends BillingTransactionBase {
   amount: number
 }
 
-export interface BillingPaymentMethod {
-  type: string
-  last4: string
-  expiry: string
-  brand: 'visa' | 'mastercard' | 'amex' | 'default'
-}
 
 interface FirestoreTransactionData {
   category?: 'billing' | 'credit'
@@ -106,21 +106,6 @@ function getNumberMeta(meta: Record<string, unknown> | undefined, keys: string[]
     if (typeof value === 'number' && Number.isFinite(value)) return value
   }
   return null
-}
-
-function normalizeBrand(value: string | null): BillingPaymentMethod['brand'] {
-  switch (value?.toLowerCase()) {
-    case 'visa':
-      return 'visa'
-    case 'mastercard':
-    case 'master_card':
-      return 'mastercard'
-    case 'amex':
-    case 'american_express':
-      return 'amex'
-    default:
-      return 'default'
-  }
 }
 
 async function fetchTransactions(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
@@ -211,42 +196,12 @@ function mapTransactionRecord(
   return []
 }
 
-function extractPaymentMethod(invoices: BillingInvoiceItem[]): BillingPaymentMethod | null {
-  for (const invoice of invoices) {
-    const last4 = getStringMeta(invoice.meta, ['last4', 'cardLast4', 'paymentLast4'])
-    if (!last4) continue
-
-    const expiryString = getStringMeta(invoice.meta, ['expiry', 'cardExpiry'])
-    const expiryMonth = getNumberMeta(invoice.meta, ['expiryMonth', 'cardExpiryMonth'])
-    const expiryYear = getNumberMeta(invoice.meta, ['expiryYear', 'cardExpiryYear'])
-    const expiry = expiryString
-      ?? (expiryMonth && expiryYear
-        ? `${String(expiryMonth).padStart(2, '0')}/${String(expiryYear).slice(-2)}`
-        : '—')
-
-    return {
-      type: getStringMeta(invoice.meta, ['paymentMethodType', 'cardType']) ?? 'Card',
-      last4,
-      expiry,
-      brand: normalizeBrand(getStringMeta(invoice.meta, ['brand', 'cardBrand', 'paymentBrand'])),
-    }
-  }
-
-  return null
-}
-
 export function useBilling() {
   const locale = useLocale()
-  const { profile, loading, uid } = useUserStore(
-    useShallow((s) => ({
-      profile: s.profile,
-      loading: selectProfileHydrating(s),
-      uid: selectCurrentUid(s),
-    }))
-  )
-
-  const subscription = profile?.subscription ?? null
-  const balance = profile?.balance ?? null
+  const loading = useUserStore(selectProfileHydrating)
+  const uid = useUserStore(selectCurrentUid)
+  const subscription = useUserStore(selectSubscription)
+  const balance = useUserStore(selectBalance)
   const transactionsQuery = useQuery({
     queryKey: ['billing', uid, 'transactions'],
     queryFn: () => fetchTransactions(uid ?? ''),
@@ -255,20 +210,23 @@ export function useBilling() {
   })
 
   // ─── Credits ──────────────────────────────────────────────────────────────
-  // balance.subscription = remaining subscription/monthly credits
-  // We show it as the "total" with 0 used since the separate "used" count
-  // is not stored client-side (it lives in Firestore statsfor totalCreditsSpent).
-  const creditsData: BillingCreditsData | null = balance
-    ? {
-        monthly: {
-          used: 0,
-          total: balance.subscription,
-          resetDate: formatResetDate(locale, subscription?.currentPeriodEnd),
-        },
-        bonus: { amount: balance.bonus },
-        purchased: { amount: balance.purchased },
-      }
-    : null
+  // monthly.total  = tier's full grant (from features.monthlyCredits)
+  // monthly.used   = total - remaining balance (real consumption this period)
+  // monthly.value shown in UI = total - used = balance.subscription
+  const creditsData: BillingCreditsData | null = useMemo(() => {
+    if (!balance) return null
+    const monthlyTotal = subscription?.features?.monthlyCredits ?? 0
+    const monthlyUsed  = Math.max(0, monthlyTotal - balance.subscription)
+    return {
+      monthly: {
+        used: monthlyUsed,
+        total: monthlyTotal,
+        resetDate: formatResetDate(locale, subscription?.currentPeriodEnd),
+      },
+      bonus:     { amount: balance.bonus },
+      purchased: { amount: balance.purchased },
+    }
+  }, [balance, subscription, locale])
 
   // ─── Plan ─────────────────────────────────────────────────────────────────
   const planTier = subscription?.planTier
@@ -281,19 +239,14 @@ export function useBilling() {
   const invoiceHistory = transactions.filter(
     (transaction): transaction is BillingInvoiceItem => transaction.category === 'billing'
   )
-  const paymentMethod = extractPaymentMethod(invoiceHistory)
 
   return {
     loading,
     historyLoading: transactionsQuery.isLoading,
     historyError: transactionsQuery.error,
-    subscription,
-    balance,
     creditsData,
-    planKey,
     isPro,
     creditHistory,
     invoiceHistory,
-    paymentMethod,
   }
 }

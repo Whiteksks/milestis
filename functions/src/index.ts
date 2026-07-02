@@ -14,6 +14,7 @@ import {unpublishProject} from "./projects/unpublishProject";
 import {republishProject} from "./projects/republishProject";
 import {publishProject} from "./projects/publish";
 import {analyzeProject} from "./projects/publish/analyzeProject";
+import {webhookPolar} from "./transactions/triggers/polar";
 
 export {
 	createUser,
@@ -29,4 +30,5 @@ export {
 	republishProject,
 	publishProject,
 	analyzeProject,
+	webhookPolar,
 };

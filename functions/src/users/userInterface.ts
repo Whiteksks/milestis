@@ -5,8 +5,9 @@ export type SubscriptionTier = "free" | "explorer" | "creator" | "archive";
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "paused" | "canceled";
 
 export interface UserSubscription {
-  priceId?: string; // paddle price id (absent for free tier)
+  priceId?: string; // polar product price id (absent for free tier)
   planTier: SubscriptionTier; // free/explorer/creator/archive
+  planInterval?: "month" | "year"; // billing interval (absent for free tier)
   status: SubscriptionStatus;
   nextBillDate?: FieldValue;
   cancelAtPeriodEnd?: boolean;
@@ -20,7 +21,12 @@ export interface SubscriptionFeatures {
   maxProjects: number;
   maxStorageBytes: number;
   canRemoveBranding: boolean;
-  highQualityExport: boolean;
+  /** Enables Professional/Advanced Workspace UI (photographer portfolio tools). */
+  photographerWorkspace: boolean;
+  /** Credits granted automatically each billing period. */
+  monthlyCredits: number;
+  /** Credits the user receives per $1 spent on credit top-up packs (subscriber rate vs free rate of 1). */
+  creditTopupRatePerDollar: number;
   prioritySupport: boolean;
 }
 

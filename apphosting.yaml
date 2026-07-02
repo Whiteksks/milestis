@@ -117,6 +117,43 @@ env:
       - BUILD
       - RUNTIME
 
+  # ── Polar Billing ─────────────────────────────────────────────────────────
+  # POLAR_ACCESS_TOKEN must be created in Firebase Secret Manager first:
+  #   firebase apphosting:secrets:set polar-access-token
+  - variable: POLAR_ACCESS_TOKEN
+    secret: polar-access-token
+    availability:
+      - RUNTIME
+
+  - variable: POLAR_SERVER
+    value: production
+    availability:
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY
+    value: 5174a41d-b7a6-4732-b60d-93fc7b923995
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_YEARLY
+    value: 257c0482-e452-4308-9611-c084977b4cc1
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_MONTHLY
+    value: 11e48c15-2345-49a3-a276-b2ec225d2c40
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_YEARLY
+    value: 888e08e7-bc88-49c1-a076-dff500a59fee
+    availability:
+      - BUILD
+      - RUNTIME
+
   # ── Server-side secrets (хранятся в Firebase Secret Manager) ─────────────
   # На App Hosting firebase-admin использует ADC автоматически,
   # поэтому FIREBASE_ADMIN_* переменные нужны ТОЛЬКО для локального режима.
