@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPolarClient } from "@/lib/billing/polar"
 import { requireAuth } from "@/lib/api/require-auth"
+import { adminAuth } from "@/lib/firebase/admin"
 
 export const runtime = "nodejs"
 
@@ -33,12 +34,24 @@ export async function POST(request: NextRequest) {
   // ── 3. Create Polar Checkout Session ────────────────────────────────────
   const successUrl = new URL("/account/billing?checkout=success", request.nextUrl.origin).toString()
 
+  // Fetch user's email to pre-fill the checkout form.
+  // This prevents the user from entering a different email and creating
+  // a mismatched Polar customer record.
+  let customerEmail: string | undefined
+  try {
+    const userRecord = await adminAuth.getUser(uid)
+    customerEmail = userRecord.email ?? undefined
+  } catch {
+    // Non-fatal — checkout proceeds without pre-filled email.
+  }
+
   try {
     const polar = getPolarClient()
 
     const checkout = await polar.checkouts.create({
       products: [productId],
       successUrl,
+      ...(customerEmail ? { customerEmail } : {}),
       // uid is injected server-side so the webhook can identify the user.
       // Credits and packId are resolved from the product's own metadata by the webhook.
       metadata: {

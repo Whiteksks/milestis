@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
 import { CTAButton } from '@/components/shared/cta-button';
-import { Check, Zap, Star, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
+import { Check, Zap, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';

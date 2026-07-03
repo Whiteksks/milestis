@@ -3,6 +3,7 @@
 import { BillingPlanCard } from "@/components/layout/settings/billing-plan-card"
 import { PaymentMethodCard } from "@/components/layout/settings/payment-method-card"
 import { BillingHistory } from "@/components/layout/settings/billing-history"
+import { BuyCreditsDialog } from "@/components/layout/settings/buy-credits-dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { useBilling } from "@/hooks/useBilling"
@@ -118,9 +119,12 @@ export default function BillingSettings() {
                 <div className="flex size-10 items-center justify-center rounded-xl bg-muted border border-border/80 shadow-sm">
                   <CreditCard className="size-4 text-primary" />
                 </div>
-                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase bg-muted/80 px-2.5 py-1 rounded-full border border-border/60 backdrop-blur-sm">
-                  {t("credits.balanceLabel")}
-                </span>
+                <div className="flex items-center gap-2">
+                  <BuyCreditsDialog />
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase bg-muted/80 px-2.5 py-1 rounded-full border border-border/60 backdrop-blur-sm">
+                    {t("credits.balanceLabel")}
+                  </span>
+                </div>
               </div>
 
               <div className="my-auto pt-6 relative z-10">

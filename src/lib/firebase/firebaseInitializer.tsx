@@ -126,7 +126,7 @@ export default function FirebaseInitializer() {
       if (unsubscribeUserDoc) unsubscribeUserDoc()
       unsubscribeAuth()
     }
-  }, [setAuthLoading, setAuthenticatedProfile, clearProfile])
+  }, [setAuthLoading, setAuthenticatedProfile, clearProfile, setSessionSynced])
 
   return null
 }

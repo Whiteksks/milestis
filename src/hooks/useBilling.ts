@@ -11,7 +11,6 @@ import {
   useUserStore,
 } from "@/hooks/useUserStore"
 import {
-  getPlanTranslationKey,
   isPaidPlan,
   formatResetDate,
 } from "@/lib/billing/billing.utils"
@@ -90,22 +89,6 @@ function normalizeBalanceSnapshot(snapshot: FirestoreTransactionData['balanceSna
     subscription: typeof snapshot?.subscription === 'number' ? snapshot.subscription : 0,
     bonus: typeof snapshot?.bonus === 'number' ? snapshot.bonus : 0,
   }
-}
-
-function getStringMeta(meta: Record<string, unknown> | undefined, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = meta?.[key]
-    if (typeof value === 'string' && value.trim()) return value.trim()
-  }
-  return null
-}
-
-function getNumberMeta(meta: Record<string, unknown> | undefined, keys: string[]): number | null {
-  for (const key of keys) {
-    const value = meta?.[key]
-    if (typeof value === 'number' && Number.isFinite(value)) return value
-  }
-  return null
 }
 
 async function fetchTransactions(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
@@ -230,7 +213,6 @@ export function useBilling() {
 
   // ─── Plan ─────────────────────────────────────────────────────────────────
   const planTier = subscription?.planTier
-  const planKey = getPlanTranslationKey(planTier)
   const isPro = isPaidPlan(planTier)
   const transactions = transactionsQuery.data ?? []
   const creditHistory = transactions.filter(

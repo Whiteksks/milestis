@@ -130,6 +130,13 @@ env:
     availability:
       - RUNTIME
 
+  # Product ID for one-time credit purchases (must be "Custom amount" type in Polar).
+  # Create the product in Polar → Products → New → set pricing to "Custom amount".
+  - variable: POLAR_CREDITS_PRODUCT_ID
+    value: d94483ee-0cc8-4ce2-92a8-872b4aee4434
+    availability:
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY
     value: 5174a41d-b7a6-4732-b60d-93fc7b923995
     availability:

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { CTAButton } from "@/components/shared/cta-button"
-import { Button } from "@/components/ui/button"
-import { Sparkles, Play } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"

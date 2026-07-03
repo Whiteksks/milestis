@@ -64,7 +64,6 @@ const PublishedProjectCard = memo(function PublishedProjectCard({
         zoom={3.55}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       project.preview?.themeId,
       project.preview?.templateId,
@@ -149,7 +148,6 @@ function ProjectDetailPanel({
         zoom={1.9}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       project.preview?.themeId,
       project.preview?.templateId,

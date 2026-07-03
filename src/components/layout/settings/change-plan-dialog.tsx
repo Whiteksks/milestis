@@ -12,7 +12,7 @@ import {
 import { Check, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useTranslations, useFormatter } from "next-intl"
+import { useTranslations } from "next-intl"
 import type { UserSubscription } from "@/lib/user"
 import { useUserStore } from "@/hooks/useUserStore"
 

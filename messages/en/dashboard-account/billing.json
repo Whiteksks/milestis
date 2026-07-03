@@ -129,6 +129,19 @@
       "manage": "Manage payment method",
       "manageDesc": "Update or change your payment card in the billing portal."
     },
+    "topup": {
+      "button": "Top up",
+      "dialogTitle": "Buy Credits",
+      "dialogDesc": "Choose how many credits to purchase. Your rate is determined by your current plan.",
+      "creditLabel": "credits",
+      "priceTitle": "Total",
+      "rateNote": "{rate} credit per $1",
+      "rateNotePremium": "{rate} credits per $1 — subscriber rate",
+      "buyButton": "Buy {credits} credits for ${price}",
+      "buyingButton": "Redirecting to checkout…",
+      "error": "Failed to start purchase. Please try again."
+    },
+    
     "statuses": {
       "free": "Free",
       "active": "Active",

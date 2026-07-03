@@ -6,6 +6,7 @@ import type { Request, Response } from "express";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../projects/publish/slug";
+import { Polar } from "@polar-sh/sdk";
 import {
   mapAuthPayload,
   mapUserDocument,
@@ -209,6 +210,40 @@ export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, re
 
   try {
     const userRef = db.collection("users").doc(uid);
+
+    // ── Cancel active Polar subscription before wiping data ───────────────
+    // Must happen first, while the user document still exists.
+    const userSnap = await userRef.get();
+    const subData = userSnap.data()?.subscription as Record<string, unknown> | undefined;
+    const polarSubscriptionId = typeof subData?.polarSubscriptionId === "string"
+      ? subData.polarSubscriptionId
+      : null;
+
+    if (polarSubscriptionId) {
+      try {
+        const polar = new Polar({
+          accessToken: process.env.POLAR_ACCESS_TOKEN ?? "",
+          server: (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production",
+        });
+        await polar.subscriptions.update({
+          id: polarSubscriptionId,
+          subscriptionUpdate: { cancelAtPeriodEnd: true },
+        });
+        logger.info(`[deleteUserAccount] Polar subscription cancelled`, {
+          uid,
+          polarSubscriptionId,
+        });
+      } catch (err) {
+        // Log but do not abort — proceed with account deletion regardless.
+        // The subscription may already be cancelled or the Polar API may be unreachable.
+        logger.warn(`[deleteUserAccount] Failed to cancel Polar subscription`, {
+          uid,
+          polarSubscriptionId,
+          err: String(err),
+        });
+      }
+    }
+
     const projectsSnap = await db.collection("projects").where("ownerId", "==", uid).get();
 
     let imagesDeleted = 0;
@@ -248,8 +283,8 @@ export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, re
       deleteStoragePrefix(`avatars/${uid}/`, `[deleteUserAccount:${uid}]`),
     ]);
 
-    const userSnap = await userRef.get();
-    if (userSnap.exists) {
+    const userSnap2 = await userRef.get();
+    if (userSnap2.exists) {
       await userRef.delete();
     }
 
