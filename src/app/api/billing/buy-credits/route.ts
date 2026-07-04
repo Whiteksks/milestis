@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { getPolarClient } from "@/lib/billing/polar"
 import { requireAuth } from "@/lib/api/require-auth"
 import { adminDb } from "@/lib/firebase/admin"
+import { getEffectiveSubscriptionFeatures } from "@/lib/billing/billing.utils"
 
 export const runtime = "nodejs"
 
-const MIN_CREDITS = 50
+const MIN_CREDITS = 1
 const MAX_CREDITS = 1000
 
 export async function POST(request: NextRequest) {
@@ -40,6 +41,16 @@ export async function POST(request: NextRequest) {
   }
   const credits = rawCredits
 
+  // Optional: custom return URL after payment (must be relative path to prevent open redirect)
+  const rawReturnTo =
+    body !== null && typeof body === "object" && "returnTo" in body
+      ? (body as Record<string, unknown>).returnTo
+      : null
+  const returnTo =
+    typeof rawReturnTo === "string" && rawReturnTo.startsWith("/")
+      ? rawReturnTo
+      : null
+
   // ── 3. Read user's credit rate from Firestore (never trust client) ───────
   // Rate is determined by subscription tier:
   //   free / explorer → 1 credit / $1
@@ -49,8 +60,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 })
   }
   const userData = userSnap.data()!
-  const ratePerDollar: number =
-    userData.subscription?.features?.creditTopupRatePerDollar ?? 1
+  // Guard against 0/undefined from old Firestore records — same defense as client side.
+  const ratePerDollar = getEffectiveSubscriptionFeatures(userData.subscription).creditTopupRatePerDollar || 1
   const userEmail: string | undefined = userData.email ?? undefined
   const polarCustomerId: string | undefined = userData.subscription?.polarCustomerId ?? undefined
 
@@ -68,7 +79,7 @@ export async function POST(request: NextRequest) {
   }
 
   const successUrl = new URL(
-    "/account/billing?checkout=success&type=credits",
+    returnTo ?? "/account/billing?checkout=success&type=credits",
     request.nextUrl.origin,
   ).toString()
 

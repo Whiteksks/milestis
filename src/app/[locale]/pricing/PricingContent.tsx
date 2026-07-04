@@ -16,24 +16,15 @@ import { isPaidPlan, normalizePlanTier } from '@/lib/billing/billing.utils';
 
 // ── Polar product IDs — set these in .env.local (sandbox) or production env vars.
 // NEXT_PUBLIC_ prefix is intentional: product IDs are not secret.
-const PRODUCT_IDS = {
-  creator: {
-    monthly: process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY ?? "",
-    yearly:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_YEARLY  ?? "",
-  },
-  archive: {
-    monthly: process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_MONTHLY ?? "",
-    yearly:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_YEARLY  ?? "",
-  },
-} as const;
-
 // ── Checkout button: calls /api/billing/checkout and redirects ───────────────
 function CheckoutButton({
-  productId,
+  plan,
+  interval,
   children,
   className,
 }: {
-  productId: string;
+  plan: 'creator' | 'archive';
+  interval: 'month' | 'year';
   children: React.ReactNode;
   className?: string;
 }) {
@@ -42,14 +33,13 @@ function CheckoutButton({
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
-    if (!productId) return;
     setLoading(true);
     try {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ productId }),
+        body: JSON.stringify({ plan, interval }),
       });
 
       if (res.status === 401) {
@@ -181,7 +171,7 @@ export function PricingContent() {
             variant="default"
             isPopular={true}
             badgeText={t('tiers.creator.badge')}
-            productId={isYearly ? PRODUCT_IDS.creator.yearly : PRODUCT_IDS.creator.monthly}
+            interval={isYearly ? 'year' : 'month'}
             planTier="creator"
             activeTier={isPaidActive ? activeTier : undefined}
             billingHref={billingHref}
@@ -197,7 +187,7 @@ export function PricingContent() {
             features={archiveFeatures}
             buttonText={t('tiers.archive.buttonText')}
             variant="outline"
-            productId={isYearly ? PRODUCT_IDS.archive.yearly : PRODUCT_IDS.archive.monthly}
+            interval={isYearly ? 'year' : 'month'}
             planTier="archive"
             activeTier={isPaidActive ? activeTier : undefined}
             billingHref={billingHref}
@@ -251,9 +241,9 @@ interface PricingCardProps {
   variant?: string
   isPopular?: boolean
   badgeText?: string
-  productId?: string
+  interval?: 'month' | 'year'
   isFree?: boolean
-  planTier?: string
+  planTier?: 'creator' | 'archive'
   activeTier?: string
   billingHref?: string
 }
@@ -269,7 +259,7 @@ const PricingCard = ({
   variant,
   isPopular = false,
   badgeText,
-  productId,
+  interval = 'month',
   isFree = false,
   planTier,
   activeTier,
@@ -321,7 +311,7 @@ const PricingCard = ({
       </ul>
     </CardContent>
     <CardFooter className="p-8 pt-0">
-      {isFree || !productId ? (
+      {isFree || !planTier ? (
         <CTAButton className={buttonClass}>
           {buttonText}
         </CTAButton>
@@ -336,7 +326,7 @@ const PricingCard = ({
           </Link>
         )
       ) : (
-        <CheckoutButton productId={productId} className={buttonClass}>
+        <CheckoutButton plan={planTier} interval={interval} className={buttonClass}>
           {buttonText}
         </CheckoutButton>
       )}

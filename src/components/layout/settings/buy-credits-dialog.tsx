@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { selectSubscription, useUserStore } from "@/hooks/useUserStore"
+import { getEffectiveSubscriptionFeatures } from "@/lib/billing/billing.utils"
 
 const MIN_CREDITS = 50
 const MAX_CREDITS = 1000
@@ -27,7 +28,7 @@ export function BuyCreditsDialog() {
   const [error, setError] = useState<string | null>(null)
 
   const subscription = useUserStore(selectSubscription)
-  const ratePerDollar: number = subscription?.features?.creditTopupRatePerDollar ?? 1
+  const ratePerDollar = getEffectiveSubscriptionFeatures(subscription).creditTopupRatePerDollar || 1
   const isPremiumRate = ratePerDollar > 1
 
   // Price in dollars, rounded to 2 decimal places

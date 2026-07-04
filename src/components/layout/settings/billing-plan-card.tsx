@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useLocale, useTranslations, useFormatter } from "next-intl"
 import { useUserStore, selectSubscription } from "@/hooks/useUserStore"
-import { getPlanTranslationKey, isPaidPlan } from "@/lib/billing/billing.utils"
+import { getPlanTranslationKey, isEffectivePaidSubscription } from "@/lib/billing/billing.utils"
 import { ChangePlanDialog } from "./change-plan-dialog"
 
 export function BillingPlanCard() {
@@ -36,7 +36,7 @@ export function BillingPlanCard() {
 
   const planTier = subscription?.planTier
   const planKey = getPlanTranslationKey(planTier)
-  const isPro = isPaidPlan(planTier)
+  const isPro = isEffectivePaidSubscription(subscription)
   const displayPlanName = t(`plans.${planKey}.name`)
   const displayPlanDescription = t(`plans.${planKey}.desc`)
 
@@ -222,7 +222,6 @@ export function BillingPlanCard() {
         </div>
       </div>
 
-      {/* Change plan dialog � extracted to its own component */}
       <ChangePlanDialog
         open={changePlanOpen}
         onOpenChange={setChangePlanOpen}

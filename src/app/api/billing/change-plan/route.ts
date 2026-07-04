@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase/admin"
 import { getPolarClient } from "@/lib/billing/polar"
+import { resolveBillingProductId } from "@/lib/billing/plans"
 import { requireAuth } from "@/lib/api/require-auth"
 
 export const runtime = "nodejs"
@@ -14,17 +15,6 @@ const TIER_RANK: Record<string, number> = {
   explorer: 0,
   creator: 1,
   archive: 2,
-}
-
-const PRODUCT_IDS: Record<string, Record<string, string | undefined>> = {
-  creator: {
-    month: process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY,
-    year:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_YEARLY,
-  },
-  archive: {
-    month: process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_MONTHLY,
-    year:  process.env.NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_YEARLY,
-  },
 }
 
 export async function POST(request: NextRequest) {
@@ -58,7 +48,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "NO_ACTIVE_SUBSCRIPTION" }, { status: 400 })
   }
 
-  const productId = PRODUCT_IDS[targetPlan]?.[interval]
+  const productId = resolveBillingProductId(targetPlan, interval)
   if (!productId) {
     return NextResponse.json({ error: "PRODUCT_NOT_CONFIGURED" }, { status: 500 })
   }

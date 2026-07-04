@@ -111,6 +111,10 @@
           "label": "Monthly",
           "sub": "{total} total — resets on {resetDate}"
         },
+        "yearly": {
+          "label": "Yearly",
+          "sub": "{total} total — resets on {resetDate}"
+        },
         "bonus": {
           "label": "Bonus",
           "sub": "Promotional or gifted credits"

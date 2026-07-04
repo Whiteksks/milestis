@@ -28,6 +28,9 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  // Slug pre-filled after returning from a credit topup checkout
+  const [afterTopupSlug, setAfterTopupSlug] = useState<string | null>(null)
+  const [afterTopupAccessToken, setAfterTopupAccessToken] = useState<string | null>(null)
   const t = useTranslations('editor.layout')
   const params = useParams()
   const router = useRouter()
@@ -68,6 +71,21 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   useEffect(() => {
     if (isDirty && saveState === 'saved') setSaveState('idle')
   }, [isDirty, saveState])
+
+  // Detect return from Polar credit topup checkout and auto-open publish modal
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('afterTopup') !== '1') return
+    const slug = params.get('slug') ?? ''
+    if (!slug) return
+    const accessToken = params.get('accessToken')
+    // Clean up URL so refreshing doesn't re-trigger
+    window.history.replaceState({}, '', window.location.pathname)
+    setAfterTopupSlug(slug)
+    setAfterTopupAccessToken(accessToken)
+    setIsPublishModalOpen(true)
+  }, []) // mount only
 
   async function handleRename() {
     const trimmed = localName.trim()
@@ -325,9 +343,18 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       {/* Publish modal (both modes, costs credits) */}
       <PublishModal
         open={isPublishModalOpen}
-        onOpenChange={setIsPublishModalOpen}
+        onOpenChange={(o) => {
+          setIsPublishModalOpen(o)
+          if (!o) {
+            setAfterTopupSlug(null)
+            setAfterTopupAccessToken(null)
+          }
+        }}
         projectId={projectId}
         mode={editorMode as 'portfolio' | 'photobook'}
+        initialSlug={afterTopupSlug ?? undefined}
+        initialAccessToken={afterTopupAccessToken ?? undefined}
+        autoAdvance={afterTopupSlug !== null}
       />
     </header>
   )

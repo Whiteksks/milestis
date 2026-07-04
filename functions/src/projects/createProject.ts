@@ -4,6 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
+import { getEffectiveSubscriptionFeatures } from "../users/subscriptionFeatures";
 import {
   CreateProjectPayload,
   ProjectMetadata,
@@ -164,7 +165,7 @@ export const createProject = onRequest(
         }
 
         const userData = userSnap.data()!;
-        const maxProjects: number = userData.subscription?.features?.maxProjects ?? 5;
+        const maxProjects = getEffectiveSubscriptionFeatures(userData.subscription).maxProjects;
         const projectsSnap = await tx.get(
           db.collection("projects")
             .where("ownerId", "==", uid)

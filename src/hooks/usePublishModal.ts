@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   buildPublishedProjectUrl,
   getSlugValidationError,
@@ -19,13 +19,16 @@ function generateToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export function usePublishModal(projectId: string, mode: SlugMode) {
+export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string }) {
+  const initialSlug = options?.initialSlug ?? ''
   const [step, setStep] = useState<PublishStep>('slug')
-  const [slug, setSlug] = useState('')
-  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
+  const [slug, setSlug] = useState(initialSlug)
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>(() =>
+    initialSlug.length >= 3 ? 'available' : 'idle',
+  )
   // Stable token per modal instance — generated once for modes that require access tokens
-  const [accessToken] = useState<string>(() =>
-    getProjectConfig(mode).hasAccessToken ? generateToken() : '',
+  const [accessToken, setAccessToken] = useState<string>(() =>
+    getProjectConfig(mode).hasAccessToken ? options?.initialAccessToken ?? generateToken() : '',
   )
 
   // Step 2 state
@@ -34,6 +37,17 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!options?.initialSlug) return
+    setSlug(options.initialSlug)
+    setSlugStatus(options.initialSlug.length >= 3 ? 'available' : 'idle')
+  }, [options?.initialSlug])
+
+  useEffect(() => {
+    if (!options?.initialAccessToken || !getProjectConfig(mode).hasAccessToken) return
+    setAccessToken(options.initialAccessToken)
+  }, [mode, options?.initialAccessToken])
 
   const checkAvailability = async (value: string) => {
     if (!value || value.length < 3) {
@@ -83,7 +97,8 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
 
   // Transition to step 2: immediately show review pane with loading state,
   // then populate with server response. Also used for retry on error.
-  const advanceToReview = async () => {
+  // Wrapped in useCallback so publish-modal can safely include it in effect deps.
+  const advanceToReview = useCallback(async () => {
     if (!canProceedToReview) return
     setStep('review')
     setIsAnalyzing(true)
@@ -98,7 +113,7 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     } finally {
       setIsAnalyzing(false)
     }
-  }
+  }, [canProceedToReview, projectId, slug])
 
   const goBack = () => {
     setStep('slug')
@@ -114,8 +129,51 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     setQuoteData(null)
     setIsAnalyzing(false)
     setAnalyzeError(null)
+    setAccessToken(getProjectConfig(mode).hasAccessToken ? generateToken() : '')
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }
+
+  // ── Pay & Publish flow ────────────────────────────────────────────────────
+  const [isBuyingCredits, setIsBuyingCredits] = useState(false)
+  const [buyCreditsError, setBuyCreditsError] = useState<string | null>(null)
+
+  const initiateBuyAndPublish = useCallback(async () => {
+    if (!quoteData) return
+    const deficit = quoteData.creditCost - quoteData.userBalance
+    if (deficit <= 0) return
+
+    // Buy exactly the deficit — no rounding up so the user pays only what's needed.
+    const toTopup = deficit
+
+    const returnParams = new URLSearchParams({ afterTopup: '1', slug })
+    if (accessToken) returnParams.set('accessToken', accessToken)
+    const returnTo = `/design/${projectId}/edit?${returnParams.toString()}`
+
+    setIsBuyingCredits(true)
+    setBuyCreditsError(null)
+    try {
+      const res = await fetch('/api/billing/buy-credits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ credits: toTopup, returnTo }),
+      })
+      if (!res.ok) {
+        setBuyCreditsError('topupFailed')
+        return
+      }
+      const data = await res.json() as { checkoutUrl?: string }
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+      } else {
+        setBuyCreditsError('topupFailed')
+      }
+    } catch {
+      setBuyCreditsError('topupFailed')
+    } finally {
+      setIsBuyingCredits(false)
+    }
+  }, [quoteData, projectId, slug, accessToken])
 
   const portfolioUrl =
     !getProjectConfig(mode).hasAccessToken && slug
@@ -150,5 +208,8 @@ export function usePublishModal(projectId: string, mode: SlugMode) {
     goBack,
     reset,
     canPublish,
+    isBuyingCredits,
+    buyCreditsError,
+    initiateBuyAndPublish,
   }
 }

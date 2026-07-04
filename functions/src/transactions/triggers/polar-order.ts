@@ -11,6 +11,7 @@
 
 import { logger } from "firebase-functions/v2";
 import type { Response } from "express";
+import { FieldValue } from "firebase-admin/firestore";
 import { processTransaction } from "../engine";
 import { db } from "../../lib/firebaseAdmin";
 
@@ -34,6 +35,67 @@ interface PolarRefundOrder {
 	customerId: string;
 }
 
+function encodeDocId(raw: string): string {
+	return Buffer.from(raw, "utf8").toString("base64url");
+}
+
+async function recordPolarAuditEvent(
+	webhookId: string,
+	eventType: string,
+	payload: Record<string, unknown>,
+): Promise<void> {
+	const auditRef = db.collection("polarWebhookAudit").doc(encodeDocId(`${eventType}:${webhookId}`));
+	await auditRef.set({
+		webhookId,
+		eventType,
+		provider: "polar",
+		createdAt: FieldValue.serverTimestamp(),
+		...payload,
+	}, { merge: false });
+}
+
+async function findUserByPolarIdentifiers(params: {
+	uid?: string;
+	subscriptionId?: string | null;
+	customerId?: string | null;
+}): Promise<string | null> {
+	if (params.uid) return params.uid;
+
+	if (params.subscriptionId) {
+		const usersSnap = await db
+			.collection("users")
+			.where("subscription.polarSubscriptionId", "==", params.subscriptionId)
+			.limit(1)
+			.get();
+		const uid = usersSnap.docs[0]?.id;
+		if (uid) return uid;
+	}
+
+	if (params.customerId) {
+		const usersSnap = await db
+			.collection("users")
+			.where("subscription.polarCustomerId", "==", params.customerId)
+			.limit(1)
+			.get();
+		return usersSnap.docs[0]?.id ?? null;
+	}
+
+	return null;
+}
+
+async function findOriginalBillingTransaction(orderId: string): Promise<string | undefined> {
+	const txSnap = await db
+		.collection("transactions")
+		.where("meta.polarOrderId", "==", orderId)
+		.limit(10)
+		.get();
+
+	return txSnap.docs.find((doc) => {
+		const data = doc.data();
+		return data.category === "billing" && data.direction === "in";
+	})?.id;
+}
+
 // ─── order.created ────────────────────────────────────────────────────────────
 
 export async function handleOrderCreated(
@@ -43,15 +105,12 @@ export async function handleOrderCreated(
 ): Promise<void> {
 	const order = rawData as PolarOrder;
 
-	// Debug log — visible in Firebase Functions console.
-	// Helps diagnose metadata propagation issues between checkout and order.
 	logger.info("Polar: order.created received", {
 		orderId: order.id,
 		subscriptionId: order.subscriptionId ?? null,
 		totalAmount: order.totalAmount,
 		currency: order.currency,
 		metadataKeys: Object.keys(order.metadata ?? {}),
-		metadata: order.metadata ?? {},
 	});
 
 	if (order.subscriptionId) {
@@ -95,20 +154,31 @@ async function recordSubscriptionOrder(
 		return;
 	}
 
-	// Renewal orders don't carry checkout metadata — look up uid via subscriptionId.
-	const usersSnap = await db
+	// Renewal orders don't carry checkout metadata — look up uid via subscriptionId,
+	// then by customerId as a fallback for out-of-order webhook delivery.
+	let usersSnap = await db
 		.collection("users")
 		.where("subscription.polarSubscriptionId", "==", order.subscriptionId)
 		.limit(1)
 		.get();
+
+	if (usersSnap.empty) {
+		usersSnap = await db
+			.collection("users")
+			.where("subscription.polarCustomerId", "==", order.customerId)
+			.limit(1)
+			.get();
+	}
+
 	const renewalUid = usersSnap.docs[0]?.id;
 
 	if (!renewalUid) {
-		logger.warn("Polar: renewal order — could not find user for subscription, skipping", {
+		logger.error("Polar: renewal order — could not find user for subscription", {
 			polarOrderId: order.id,
 			subscriptionId: order.subscriptionId,
+			customerId: order.customerId,
 		});
-		return;
+		throw new Error(`Polar renewal user not found for subscription ${order.subscriptionId}`);
 	}
 
 	await processTransaction({
@@ -255,23 +325,29 @@ export async function handleOrderRefunded(
 ): Promise<void> {
 	const order = rawData as PolarRefundOrder;
 	const metadata = (order.metadata ?? {}) as Record<string, unknown>;
-	let refundUid = typeof metadata.uid === "string" ? metadata.uid : undefined;
-
-	if (!refundUid && order.subscriptionId) {
-		const usersSnap = await db
-			.collection("users")
-			.where("subscription.polarSubscriptionId", "==", order.subscriptionId)
-			.limit(1)
-			.get();
-		refundUid = usersSnap.docs[0]?.id;
-	}
+	const refundUid = await findUserByPolarIdentifiers({
+		uid: typeof metadata.uid === "string" ? metadata.uid : undefined,
+		subscriptionId: order.subscriptionId,
+		customerId: order.customerId,
+	});
+	const refundedTxId = await findOriginalBillingTransaction(order.id);
 
 	if (!refundUid) {
-		logger.warn("Polar: refund — could not resolve uid, acknowledging without record", {
+		await recordPolarAuditEvent(webhookId, "order.refunded", {
+			status: "unresolved_user",
+			polarOrderId: order.id,
+			polarCustomerId: order.customerId,
+			polarSubscriptionId: order.subscriptionId ?? null,
+			currency: order.currency ?? "USD",
+			refundedAmount: order.refundedAmount ?? 0,
+			metadataKeys: Object.keys(metadata),
+		});
+
+		logger.warn("Polar: refund — could not resolve uid, audit event recorded", {
 			polarOrderId: order.id,
 			webhookId,
 		});
-		res.status(200).json({ ok: true });
+		res.status(200).json({ ok: true, audited: true });
 		return;
 	}
 
@@ -285,6 +361,7 @@ export async function handleOrderRefunded(
 				type: "refund",
 				currency: order.currency ?? "USD",
 				amountMinor: order.refundedAmount ?? 0,
+				...(refundedTxId ? { refundedTxId } : {}),
 				meta: {
 					polarEventId: webhookId,
 					polarOrderId: order.id,

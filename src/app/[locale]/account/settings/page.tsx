@@ -16,6 +16,7 @@ import { deleteAccount, downloadAccountData, downloadProjectContent, saveUserPro
 import { toastUser } from "@/lib/toast"
 import { useTranslations } from "next-intl"
 import { useQuery } from "@tanstack/react-query"
+import { DeleteAccountModal } from "@/components/layout/settings/delete-account-modal"
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { projectKeys, mapProjectDoc } from "@/hooks/useProjectsQuery"
@@ -88,6 +89,7 @@ export default function AccountSettings() {
   const [exportingProjectContent, setExportingProjectContent] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState<string>("")
   const [deletingAccount, setDeletingAccount] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   const { data: exportableProjects = [] } = useQuery({
     queryKey: profile?.uid ? [...projectKeys.all(profile.uid), "export-list"] : ["no-user"],
@@ -163,12 +165,10 @@ export default function AccountSettings() {
   }
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(`${t("danger.deleteTitle")}\n\n${t("danger.deleteDescription")}`)
-    if (!confirmed) return
-
     setDeletingAccount(true)
     try {
-      toastUser.deleteAccount(deleteAccount())
+      await toastUser.deleteAccount(deleteAccount())
+      setDeleteModalOpen(false)
       clearProfile()
       try {
         await signOut(auth)
@@ -183,9 +183,8 @@ export default function AccountSettings() {
   }
 
   return (
+    <>
     <div className="space-y-16 max-w-5xl mx-auto pb-12">
-
-      {/* Language Preferences */}
       <section className="space-y-6">
         <div className="space-y-1 px-1">
           <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("preferences.title")}</h2>
@@ -354,7 +353,7 @@ export default function AccountSettings() {
             </div>
             <Button
               className="shrink-0 rounded-full h-10 px-6 border-destructive/60 text-primary-foreground hover:bg-destructive hover:text-destructive-foreground font-medium transition-all duration-200"
-              onClick={handleDeleteAccount}
+              onClick={() => setDeleteModalOpen(true)}
               disabled={deletingAccount || exportingAccountData || exportingProjectContent}
             >
               {t("danger.deleteButton")}
@@ -364,5 +363,14 @@ export default function AccountSettings() {
       </section>
 
     </div>
+
+      <DeleteAccountModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        onConfirm={handleDeleteAccount}
+        loading={deletingAccount}
+        userEmail={profile?.email ?? ""}
+      />
+      </>
   )
 }

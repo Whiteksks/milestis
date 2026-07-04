@@ -75,6 +75,16 @@ export interface UpsertSubscriptionResult {
 	prevPeriodEndMillis: number | null;
 }
 
+function readIdempotentResult(data: FirebaseFirestore.DocumentData | undefined): UpsertSubscriptionResult {
+	const prevTier = typeof data?.prevTier === "string" && VALID_TIERS.has(data.prevTier)
+		? data.prevTier as SubscriptionTier
+		: "free";
+	const prevPeriodEndMillis = typeof data?.prevPeriodEndMillis === "number"
+		? data.prevPeriodEndMillis
+		: null;
+	return { prevTier, prevPeriodEndMillis };
+}
+
 /**
  * Resolve the subscription tier from Polar product.metadata.tier.
  * You set this field in the Polar dashboard per-product (e.g. "creator", "archive").
@@ -112,6 +122,9 @@ export async function upsertSubscription(input: UpsertSubscriptionInput): Promis
 		]);
 
 		if (idemSnap.exists) {
+			const idemResult = readIdempotentResult(idemSnap.data());
+			result.prevTier = idemResult.prevTier;
+			result.prevPeriodEndMillis = idemResult.prevPeriodEndMillis;
 			logger.info("upsertSubscription: idempotent — already processed", {
 				webhookId: input.webhookId,
 				uid: input.uid,
@@ -135,26 +148,25 @@ export async function upsertSubscription(input: UpsertSubscriptionInput): Promis
 
 		const userUpdates: Record<string, unknown> = {
 			"subscription.planTier": input.tier,
-			...(input.interval ? { "subscription.planInterval": input.interval } : {}),
+			"subscription.planInterval": input.interval ?? FieldValue.delete(),
 			"subscription.status": input.status,
 			"subscription.features": features,
 			"subscription.cancelAtPeriodEnd": input.cancelAtPeriodEnd,
 			"subscription.currency": input.currency,
 			"subscription.amount": input.amountMinor,
+			"subscription.currentPeriodEnd": input.currentPeriodEnd ?? FieldValue.delete(),
 			"subscription.polarSubscriptionId": input.polarSubscriptionId,
 			"subscription.polarCustomerId": input.polarCustomerId,
-			...(input.polarProductId ? { "subscription.polarProductId": input.polarProductId } : {}),
+			"subscription.polarProductId": input.polarProductId ?? FieldValue.delete(),
 		};
-
-		if (input.currentPeriodEnd) {
-			userUpdates["subscription.currentPeriodEnd"] = input.currentPeriodEnd;
-		}
 
 		tx.set(idemRef, {
 			uid: input.uid,
 			webhookId: input.webhookId,
 			tier: input.tier,
 			status: input.status,
+			prevTier: result.prevTier,
+			prevPeriodEndMillis: result.prevPeriodEndMillis,
 			processedAt: FieldValue.serverTimestamp(),
 		});
 

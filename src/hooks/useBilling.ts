@@ -11,12 +11,20 @@ import {
   useUserStore,
 } from "@/hooks/useUserStore"
 import {
-  isPaidPlan,
   formatResetDate,
+  getEffectiveSubscriptionFeatures,
+  isEffectivePaidSubscription,
 } from "@/lib/billing/billing.utils"
 
 export interface BillingCreditsData {
-  monthly: { used: number; total: number; resetDate: string }
+  monthly: {
+    used: number
+    total: number
+    /** Actual subscription bucket balance from Firestore (may exceed total during plan transitions). */
+    balance: number
+    resetDate: string
+    interval: 'month' | 'year'
+  }
   bonus: { amount: number }
   purchased: { amount: number }
 }
@@ -89,6 +97,10 @@ function normalizeBalanceSnapshot(snapshot: FirestoreTransactionData['balanceSna
     subscription: typeof snapshot?.subscription === 'number' ? snapshot.subscription : 0,
     bonus: typeof snapshot?.bonus === 'number' ? snapshot.bonus : 0,
   }
+}
+
+function safeNumber(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
 }
 
 async function fetchTransactions(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
@@ -193,27 +205,35 @@ export function useBilling() {
   })
 
   // ─── Credits ──────────────────────────────────────────────────────────────
-  // monthly.total  = tier's full grant (from features.monthlyCredits)
-  // monthly.used   = total - remaining balance (real consumption this period)
-  // monthly.value shown in UI = total - used = balance.subscription
+  // For monthly plans: periodTotal = monthlyCredits (e.g. 750 for archive).
+  // For yearly plans:  periodTotal = monthlyCredits × 12 (e.g. 9000 for archive yearly).
+  // Polar fires one webhook per period and grants the full periodTotal at once.
   const creditsData: BillingCreditsData | null = useMemo(() => {
     if (!balance) return null
-    const monthlyTotal = subscription?.features?.monthlyCredits ?? 0
-    const monthlyUsed  = Math.max(0, monthlyTotal - balance.subscription)
+    const monthlyCredits = getEffectiveSubscriptionFeatures(subscription).monthlyCredits
+    const interval: 'month' | 'year' = subscription?.planInterval === 'year' ? 'year' : 'month'
+    const periodMultiplier = interval === 'year' ? 12 : 1
+    const periodTotal = monthlyCredits * periodMultiplier
+    const subscriptionBalance = safeNumber(balance.subscription)
+    const bonusBalance = safeNumber(balance.bonus)
+    const purchasedBalance = safeNumber(balance.purchased)
+    // Remaining = min(subscriptionBalance, periodTotal); used = periodTotal - remaining
+    const periodUsed = Math.max(0, periodTotal - subscriptionBalance)
     return {
       monthly: {
-        used: monthlyUsed,
-        total: monthlyTotal,
+        used: periodUsed,
+        total: periodTotal,
+        balance: subscriptionBalance,
         resetDate: formatResetDate(locale, subscription?.currentPeriodEnd),
+        interval,
       },
-      bonus:     { amount: balance.bonus },
-      purchased: { amount: balance.purchased },
+      bonus:     { amount: bonusBalance },
+      purchased: { amount: purchasedBalance },
     }
   }, [balance, subscription, locale])
 
   // ─── Plan ─────────────────────────────────────────────────────────────────
-  const planTier = subscription?.planTier
-  const isPro = isPaidPlan(planTier)
+  const isPro = isEffectivePaidSubscription(subscription)
   const transactions = transactionsQuery.data ?? []
   const creditHistory = transactions.filter(
     (transaction): transaction is BillingCreditHistoryItem => transaction.category === 'credit'

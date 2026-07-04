@@ -313,7 +313,9 @@ export async function processTransactionInFirestoreTransaction(
 				);
 			}
 
-			const bucketOrder: BalanceBucket[] = ["purchased", "subscription", "bonus"];
+			// Spend subscription first (expires at period end), then bonus, then purchased
+			// (purchased credits are permanent — always spend expiring credits first).
+			const bucketOrder: BalanceBucket[] = ["subscription", "bonus", "purchased"];
 
 			if (input.direction === "in") {
 				const bucket = credit.creditBucket;

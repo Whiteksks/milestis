@@ -3,6 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { logger } from "firebase-functions/v2";
 import { db } from "../lib/firebaseAdmin";
+import { getEffectiveSubscriptionFeatures } from "../users/subscriptionFeatures";
 import { makeResizeFunction, OutputFile } from "./resizeImage";
 
 /**
@@ -106,7 +107,7 @@ export const resizeProjectImage = makeResizeFunction({
     // ── Storage limit check ───────────────────────────────────────────────
     const userSnap = await db.collection("users").doc(uid).get();
     const userData = userSnap.data();
-    const maxStorageBytes: number = userData?.subscription?.features?.maxStorageBytes ?? 0;
+    const maxStorageBytes = getEffectiveSubscriptionFeatures(userData?.subscription).maxStorageBytes;
     const usedStorageBytes: number = userData?.stats?.storageUsedBytes ?? 0;
 
     if (maxStorageBytes > 0 && usedStorageBytes + meta.generatedSizeBytes > maxStorageBytes) {

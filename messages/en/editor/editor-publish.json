@@ -43,7 +43,9 @@
           "cost": "Cost",
           "credits": "credits",
           "balance": "balance: {balance}",
-          "insufficient": "You don't have enough credits. Top up your balance to continue.",
+          "insufficient": "You don't have enough credits to publish.",
+          "topupFailed": "Could not start checkout. Please try again.",
+          "payAndPublish": "Pay ${price} & Publish",
           "terms": "I accept the Terms of Service and Content Policy. Credits are non-refundable once publication is confirmed.",
           "analysisFailed": "Analysis failed"
         }

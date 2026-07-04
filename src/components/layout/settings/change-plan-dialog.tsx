@@ -47,14 +47,11 @@ export function ChangePlanDialog({ open, onOpenChange, subscription }: ChangePla
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>(() => resolveInitialPlan(subscription?.planTier))
   const [loading, setLoading] = useState(false)
 
-  // Reset selection when dialog opens so it always reflects current state
   function handleOpenChange(next: boolean) {
     if (next) setSelectedPlan(resolveInitialPlan(subscription?.planTier))
     onOpenChange(next)
   }
 
-  // isCurrent: compare tier + interval saved directly in Firestore.
-  // planInterval is written by the webhook; fall back to tier-only match if missing.
   function isCurrentOption(plan: PlanKey, iv: Interval): boolean {
     if (!currentPlanTier) return false
     if (currentPlanInterval) return currentPlanTier === plan && currentPlanInterval === iv
@@ -85,153 +82,173 @@ export function ChangePlanDialog({ open, onOpenChange, subscription }: ChangePla
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden gap-0">
-        <div className="grid md:grid-cols-[2fr_3fr]">
+      <DialogContent className="max-w-3xl p-0 overflow-hidden border-none bg-background shadow-2xl rounded-3xl">
+        <div className="grid md:grid-cols-[1.1fr_1fr] min-h-[520px]">
 
-          {/* ── LEFT: selector ──────────────────────────────── */}
-          <div className="flex flex-col gap-5 p-6 border-b md:border-b-0 md:border-r border-border">
-            <div>
-              <DialogTitle className="font-semibold text-base">{t("planCard.changePlanTitle")}</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("planCard.changePlanSubtitle")}</p>
-            </div>
+          {/* ── LEFT: Selector Panel ──────────────────────────── */}
+          <div className="flex flex-col gap-6 p-8 justify-between">
+            <div className="space-y-5">
+              <div>
+                <DialogTitle className="font-semibold text-lg tracking-tight text-foreground">
+                  {t("planCard.changePlanTitle")}
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1 font-light leading-relaxed">
+                  {t("planCard.changePlanSubtitle")}
+                </p>
+              </div>
 
-            {/* Interval toggle */}
-            <div className="flex gap-1 p-1 bg-muted rounded-full border border-border/40">
-              {(["month", "year"] as Interval[]).map((iv) => (
-                <button
-                  key={iv}
-                  onClick={() => setInterval(iv)}
-                  className={cn(
-                    "flex-1 rounded-full text-xs py-1.5 font-medium transition-all",
-                    interval === iv
-                      ? "bg-background shadow-sm text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {iv === "month" ? t("planCard.monthly") : `${t("planCard.yearly")} · −20%`}
-                </button>
-              ))}
-            </div>
-
-            {/* Plan cards */}
-            <div className="flex flex-col gap-2">
-              {(["creator", "archive"] as PlanKey[]).map((plan) => {
-                const currentOption = isCurrentOption(plan, interval)
-                const isSelected = selectedPlan === plan && !currentOption
-                const price = PLAN_PRICES[plan][interval === "year" ? "year" : "month"]
-
-                return (
+              {/* Interval Toggle */}
+              <div className="inline-flex w-full p-1 bg-muted/60 rounded-xl border border-border/40 backdrop-blur-sm">
+                {(["month", "year"] as Interval[]).map((iv) => (
                   <button
-                    key={plan}
-                    disabled={currentOption}
-                    onClick={() => setSelectedPlan(plan)}
+                    key={iv}
+                    onClick={() => setInterval(iv)}
                     className={cn(
-                      "w-full text-left p-3.5 rounded-2xl border transition-all",
-                      currentOption
-                        ? "border-primary/40 bg-primary/5 opacity-70 cursor-not-allowed"
-                        : isSelected
-                        ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                        : "border-border hover:border-primary/40 hover:bg-muted/30 cursor-pointer"
+                      "flex-1 rounded-lg text-xs py-2 font-medium transition-all duration-200",
+                      interval === iv
+                        ? "bg-background shadow-sm text-foreground font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className={cn(
-                          "size-3.5 rounded-full border-2 transition-all shrink-0",
-                          currentOption
-                            ? "border-muted-foreground/30"
-                            : isSelected
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/40"
-                        )} />
-                        <span className="text-sm font-semibold">{t(`plans.${plan}.name`)}</span>
-                        {currentOption && (
-                          <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded-full">
-                            {t("planCard.currentPlanBadge")}
-                          </span>
-                        )}
-                        {plan === "creator" && !currentOption && (
-                          <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded-full">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-sm font-bold tabular-nums">
-                        ${price}<span className="text-xs font-normal text-muted-foreground">/mo</span>
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground mt-1 ml-5 line-clamp-1">{t(`plans.${plan}.desc`)}</p>
+                    {iv === "month" ? t("planCard.monthly") : `${t("planCard.yearly")} · −20%`}
                   </button>
-                )
-              })}
+                ))}
+              </div>
+
+              {/* Plan Cards */}
+              <div className="flex flex-col gap-3">
+                {(["creator", "archive"] as PlanKey[]).map((plan) => {
+                  const currentOption = isCurrentOption(plan, interval)
+                  const isSelected = selectedPlan === plan && !currentOption
+                  const price = PLAN_PRICES[plan][interval === "year" ? "year" : "month"]
+
+                  return (
+                    <button
+                      key={plan}
+                      disabled={currentOption}
+                      onClick={() => setSelectedPlan(plan)}
+                      className={cn(
+                        "w-full text-left p-4 rounded-xl border transition-all duration-200 relative overflow-hidden",
+                        currentOption
+                          ? "border-muted/60 bg-muted/20 opacity-60 cursor-not-allowed"
+                          : isSelected
+                          ? "border-primary bg-primary/[0.02] ring-2 ring-primary/10 shadow-sm"
+                          : "border-border/80 hover:border-border-hover hover:bg-muted/30 cursor-pointer"
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className={cn(
+                            "size-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center shrink-0",
+                            currentOption
+                              ? "border-muted-foreground/20"
+                              : isSelected
+                              ? "border-primary"
+                              : "border-muted-foreground/30"
+                          )}>
+                            {isSelected && <div className="size-2 rounded-full bg-primary animate-in fade-in zoom-in-75 duration-150" />}
+                          </div>
+                          
+                          <span className="text-sm font-medium tracking-tight">{t(`plans.${plan}.name`)}</span>
+                          
+                          {currentOption && (
+                            <span className="text-[10px] font-medium text-muted-foreground bg-muted border border-border/60 px-2 py-0.5 rounded-md">
+                              {t("planCard.currentPlanBadge")}
+                            </span>
+                          )}
+                          {plan === "creator" && !currentOption && (
+                            <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                              Popular
+                            </span>
+                          )}
+                        </div>
+                        
+                        <span className="text-sm font-semibold tabular-nums text-foreground">
+                          ${price}<span className="text-xs font-normal text-muted-foreground/80">/mo</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1.5 ml-6 line-clamp-1 font-light">{t(`plans.${plan}.desc`)}</p>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
-            {/* Policy note */}
-            <div className="mt-auto rounded-xl border border-border/50 bg-muted/30 p-3 space-y-1.5">
-              <p className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                <span className="text-primary font-bold leading-none mt-px">↑</span>
+            {/* Policy Notes */}
+            <div className="rounded-xl bg-muted/40 p-3.5 space-y-2 border border-border/20 text-[11px] text-muted-foreground/90 font-light">
+              <p className="flex items-center gap-2">
+                <span className="text-primary text-xs font-semibold">↑</span>
                 {t("planCard.upgradePolicy")}
               </p>
-              <p className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                <span className="font-bold leading-none mt-px">↓</span>
+              <p className="flex items-center gap-2">
+                <span className="text-muted-foreground text-xs font-semibold">↓</span>
                 {t("planCard.downgradePolicy")}
               </p>
             </div>
           </div>
 
-          {/* ── RIGHT: features preview ──────────────────────── */}
-          <div className="flex flex-col p-6">
-            <div className="mb-5">
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="text-xl font-bold">{t(`plans.${selectedPlan}.name`)}</h4>
-                {selectedPlan === "creator" && (
-                  <span className="text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
-                    Popular
+          {/* ── RIGHT: Features & CTA Panel ───────────────────── */}
+          <div className="flex flex-col p-8 bg-muted/30 border-t md:border-t-0 md:border-l border-border/40 justify-between">
+            <div className="animate-in fade-in-50 duration-200">
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h4 className="text-2xl font-bold tracking-tight text-foreground transition-all">{t(`plans.${selectedPlan}.name`)}</h4>
+                  {selectedPlan === "creator" && (
+                    <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                      Popular
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold tracking-tight tabular-nums transition-all">
+                    ${PLAN_PRICES[selectedPlan][interval === "year" ? "year" : "month"]}
                   </span>
+                  <span className="text-sm text-muted-foreground/80 font-light">/month</span>
+                </div>
+                {interval === "year" && (
+                  <p className="text-xs font-medium text-primary mt-1.5 animate-in slide-in-from-top-1 duration-200">
+                    ${PLAN_PRICES[selectedPlan].yearlyTotal} {t("planCard.billedYearly")}
+                  </p>
                 )}
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold tabular-nums">
-                  ${PLAN_PRICES[selectedPlan][interval === "year" ? "year" : "month"]}
-                </span>
-                <span className="text-sm text-muted-foreground">/month</span>
-              </div>
-              {interval === "year" && (
-                <p className="text-xs text-primary mt-0.5">
-                  ${PLAN_PRICES[selectedPlan].yearlyTotal} {t("planCard.billedYearly")}
-                </p>
-              )}
+
+              {/* Dynamic Feature List */}
+              <ul className="space-y-3.5">
+                {(pt.raw(`tiers.${selectedPlan}.features`) as string[]).map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-sm animate-in fade-in duration-300">
+                    <div className="size-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="size-2.5 text-primary stroke-[3]" />
+                    </div>
+                    <span className="text-muted-foreground font-light leading-snug">{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <ul className="flex-1 space-y-2.5">
-              {(pt.raw(`tiers.${selectedPlan}.features`) as string[]).map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm">
-                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">{f}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-6 pt-4 border-t border-border flex items-center justify-end gap-2">
+            {/* Actions Footer */}
+            <div className="mt-8 pt-4 flex items-center justify-end gap-3">
               <DialogClose asChild>
-                <Button variant="ghost" size="sm" className="rounded-full">
+                <Button variant="ghost" size="sm" className="rounded-xl text-muted-foreground hover:text-foreground px-4 py-2 text-xs">
                   {t("planCard.cancel")}
                 </Button>
               </DialogClose>
               <Button
                 size="sm"
-                className="rounded-full px-6"
+                className="rounded-xl px-6 py-2 text-xs font-medium shadow-sm transition-all duration-200"
                 disabled={loading || isCurrent}
                 onClick={handleConfirm}
               >
-                {loading
-                  ? <Loader2 className="size-3.5 animate-spin" />
-                  : isCurrent
-                  ? t("planCard.currentPlanBadge")
-                  : t("planCard.changePlanBtn")}
+                {loading ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : isCurrent ? (
+                  t("planCard.currentPlanBadge")
+                ) : (
+                  t("planCard.changePlanBtn")
+                )}
               </Button>
             </div>
           </div>
+          
         </div>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPolarClient } from "@/lib/billing/polar"
+import { resolveBillingProductId } from "@/lib/billing/plans"
 import { requireAuth } from "@/lib/api/require-auth"
 import { adminAuth } from "@/lib/firebase/admin"
 
@@ -19,16 +20,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "INVALID_JSON" }, { status: 400 })
   }
 
-  const productId =
-    body !== null &&
-    typeof body === "object" &&
-    "productId" in body &&
-    typeof (body as Record<string, unknown>).productId === "string"
-      ? (body as Record<string, unknown>).productId as string
-      : null
+  const bodyRecord = body !== null && typeof body === "object" ? body as Record<string, unknown> : {}
+  const plan = typeof bodyRecord.plan === "string" ? bodyRecord.plan : ""
+  const interval = typeof bodyRecord.interval === "string" ? bodyRecord.interval : ""
+  const productId = resolveBillingProductId(plan, interval)
 
   if (!productId) {
-    return NextResponse.json({ error: "PRODUCT_ID_REQUIRED" }, { status: 400 })
+    return NextResponse.json({ error: "INVALID_PLAN" }, { status: 400 })
   }
 
   // ── 3. Create Polar Checkout Session ────────────────────────────────────

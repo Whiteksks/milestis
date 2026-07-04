@@ -41,10 +41,10 @@ export default function BillingSettings() {
   }
 
   // Вычисления для кредитного дашборда
+  // totalCredits uses actual balance values (not capped periodTotal) so it matches Firestore.
   const totalCredits = creditsData 
-    ? (creditsData.monthly.total - creditsData.monthly.used) + creditsData.bonus.amount + creditsData.purchased.amount
+    ? creditsData.monthly.balance + creditsData.bonus.amount + creditsData.purchased.amount
     : 0
-  const monthlyRemaining = creditsData ? creditsData.monthly.total - creditsData.monthly.used : 0
   const monthlyPercentage = creditsData && creditsData.monthly.total > 0 
     ? (creditsData.monthly.used / creditsData.monthly.total) * 100 
     : 0
@@ -52,9 +52,13 @@ export default function BillingSettings() {
   const creditTypes = creditsData ? [
     {
       icon: Sparkles,
-      labelKey: "credits.items.monthly.label",
-      value: monthlyRemaining,
-      subKey: "credits.items.monthly.sub",
+      labelKey: creditsData.monthly.interval === 'year'
+        ? "credits.items.yearly.label"
+        : "credits.items.monthly.label",
+      value: creditsData.monthly.balance,
+      subKey: creditsData.monthly.interval === 'year'
+        ? "credits.items.yearly.sub"
+        : "credits.items.monthly.sub",
       subVars: { total: creditsData.monthly.total, resetDate: creditsData.monthly.resetDate },
       progress: monthlyPercentage,
       iconClass: "text-primary bg-primary/10 border-primary/20",

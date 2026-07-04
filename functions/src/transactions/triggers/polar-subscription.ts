@@ -18,6 +18,7 @@
 import { logger } from "firebase-functions/v2";
 import type { Response } from "express";
 import { processTransaction } from "../engine";
+import { db } from "../../lib/firebaseAdmin";
 import {
 	upsertSubscription,
 	resolveSubscriptionTier,
@@ -49,6 +50,28 @@ const POLAR_STATUS_MAP: Record<string, SubscriptionStatus> = {
 	canceled: "canceled",
 };
 
+async function resolveSubscriptionUid(sub: PolarSubscriptionEvent): Promise<string | null> {
+	const metadata = (sub.metadata ?? {}) as Record<string, unknown>;
+	const metadataUid = typeof metadata.uid === "string" ? metadata.uid : null;
+	if (metadataUid) return metadataUid;
+
+	let usersSnap = await db
+		.collection("users")
+		.where("subscription.polarSubscriptionId", "==", sub.id)
+		.limit(1)
+		.get();
+
+	if (usersSnap.empty) {
+		usersSnap = await db
+			.collection("users")
+			.where("subscription.polarCustomerId", "==", sub.customerId)
+			.limit(1)
+			.get();
+	}
+
+	return usersSnap.docs[0]?.id ?? null;
+}
+
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
 export async function handleSubscription(
@@ -58,16 +81,19 @@ export async function handleSubscription(
 	res: Response,
 ): Promise<void> {
 	const sub = rawData as PolarSubscriptionEvent;
-	const metadata = (sub.metadata ?? {}) as Record<string, unknown>;
-	const uid = typeof metadata.uid === "string" ? metadata.uid : undefined;
+	const uid = await resolveSubscriptionUid(sub);
 
 	if (!uid) {
-		logger.error("Polar: missing uid in subscription metadata", {
+		// User not found — likely the account was deleted before this webhook arrived
+		// (e.g. the final subscription.canceled that fires when cancelAtPeriodEnd expires).
+		// Acknowledge with 200 so Polar stops retrying; there is nothing to update.
+		logger.info("Polar: subscription event for unknown/deleted user — acknowledging gracefully", {
 			eventType,
 			webhookId,
-			metadata,
+			polarSubscriptionId: sub.id,
+			polarCustomerId: sub.customerId,
 		});
-		res.status(400).json({ error: "MISSING_UID" });
+		res.status(200).json({ ok: true, skipped: "user_not_found" });
 		return;
 	}
 
@@ -125,7 +151,8 @@ export async function handleSubscription(
 		cancelAtPeriodEnd: sub.cancelAtPeriodEnd ?? false,
 	});
 
-	// Grant monthly credits for the new billing period (non-fatal if it fails).
+	// Grant subscription credits before acknowledging the webhook. If this fails,
+	// the top-level handler returns 500 and Polar retries the same event.
 	await grantSubscriptionCredits({
 		uid,
 		sub,
@@ -179,40 +206,32 @@ async function grantSubscriptionCredits(params: GrantParams): Promise<void> {
 		return;
 	}
 
-	try {
-		await processTransaction({
-			uid,
-			idempotencyKey: `polar:sub:${sub.id}:credits:${tier}:${periodEndIso}`,
-			category: "credit",
-			direction: "in",
-			credit: {
-				type: "grant",
-				amount: creditsToGrant,
-				creditBucket: "subscription",
-				lot: {
-					// Subscription credits expire at period end and do not roll over.
-					expiresAtMillis: incomingPeriodEndMillis,
-				},
-				meta: {
-					reason: "subscription_monthly_grant",
-					polarSubscriptionId: sub.id,
-					tier,
-					periodEnd: periodEndIso,
-					prevTier: upsertResult.prevTier,
-					creditsToGrant,
-				},
+	await processTransaction({
+		uid,
+		idempotencyKey: `polar:sub:${sub.id}:credits:${tier}:${periodEndIso}`,
+		category: "credit",
+		direction: "in",
+		credit: {
+			type: "grant",
+			amount: creditsToGrant,
+			creditBucket: "subscription",
+			lot: {
+				// Subscription credits expire at period end and do not roll over.
+				expiresAtMillis: incomingPeriodEndMillis,
 			},
-		});
+			meta: {
+				reason: "subscription_monthly_grant",
+				polarSubscriptionId: sub.id,
+				tier,
+				periodEnd: periodEndIso,
+				prevTier: upsertResult.prevTier,
+				creditsToGrant,
+			},
+		},
+	});
 
-		logger.info("Polar: monthly credits granted", {
-			uid, tier, creditsToGrant, prevTier: upsertResult.prevTier,
-			isSamePeriod, periodEnd: periodEndIso,
-		});
-	} catch (err) {
-		// Non-fatal: subscription was already upserted. Log and move on.
-		// Polar will NOT retry because the outer handler already sent 200.
-		logger.error("Polar: monthly credit grant failed — subscription still updated", {
-			uid, tier, creditsToGrant, err: String(err),
-		});
-	}
+	logger.info("Polar: monthly credits granted", {
+		uid, tier, creditsToGrant, prevTier: upsertResult.prevTier,
+		isSamePeriod, periodEnd: periodEndIso,
+	});
 }

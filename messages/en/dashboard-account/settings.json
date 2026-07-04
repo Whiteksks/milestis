@@ -71,7 +71,20 @@
         "description": "Permanent actions that cannot be undone",
         "deleteTitle": "Delete your account",
         "deleteDescription": "This will permanently remove all your projects and data.",
-        "deleteButton": "Delete Account"
+        "deleteButton": "Delete Account",
+        "modal": {
+          "title": "Delete your account?",
+          "warning": "This action is permanent and cannot be undone.",
+          "warnProjects": "All projects, images, and published sites will be permanently deleted.",
+          "warnBilling": "Any active subscription will be cancelled at the end of the billing period.",
+          "inputLabel": "Type your email address to confirm:",
+          "confirmButton": "Permanently Delete Account",
+          "deleting": "Deleting\u2026",
+          "cancelButton": "Cancel",
+          "activeSubTitle": "Active subscription detected",
+          "activeSubDescription": "You have an active paid plan. Please cancel your subscription before deleting your account to avoid unexpected charges.",
+          "activeSubButton": "Manage Subscription"
+        }
       }
     },
     "security": {

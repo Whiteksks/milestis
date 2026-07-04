@@ -2,6 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { defineSecret } from "firebase-functions/params";
 import type { Request, Response } from "express";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
@@ -26,12 +27,19 @@ const ERROR = {
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
 } as const;
 
+const polarAccessToken = defineSecret("POLAR_ACCESS_TOKEN");
+
 const USER_FUNCTION_OPTIONS = {
   concurrency: 10,
   timeoutSeconds: 540,
   memory: "512MiB" as const,
   maxInstances: 10,
   cors: ALLOWED_ORIGINS,
+};
+
+const DELETE_USER_FUNCTION_OPTIONS = {
+  ...USER_FUNCTION_OPTIONS,
+  secrets: [polarAccessToken],
 };
 
 const DELETE_BATCH_SIZE = 400;
@@ -70,6 +78,10 @@ async function deleteStoragePrefix(prefix: string, logPrefix: string): Promise<v
   } catch (err) {
     logger.warn(`${logPrefix} Failed to delete Storage prefix ${prefix}.`, err);
   }
+}
+
+function getPolarServer(): "sandbox" | "production" {
+  return process.env.POLAR_SERVER === "sandbox" ? "sandbox" : "production";
 }
 
 async function deleteSnapshotsInBatches(
@@ -202,7 +214,7 @@ export const exportUserData = onRequest(USER_FUNCTION_OPTIONS, async (req, res) 
   }
 });
 
-export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, res) => {
+export const deleteUserAccount = onRequest(DELETE_USER_FUNCTION_OPTIONS, async (req, res) => {
   if (rejectNonPost(req, res)) return;
 
   const uid = await authenticateRequest(req, res);
@@ -222,8 +234,8 @@ export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, re
     if (polarSubscriptionId) {
       try {
         const polar = new Polar({
-          accessToken: process.env.POLAR_ACCESS_TOKEN ?? "",
-          server: (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production",
+          accessToken: polarAccessToken.value(),
+          server: getPolarServer(),
         });
         await polar.subscriptions.update({
           id: polarSubscriptionId,

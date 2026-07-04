@@ -5,16 +5,14 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { SettingsMenu } from "@/components/layout/settings/settings-menu"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { usePathname } from "next/navigation"
-import { useEffect, useRef, ViewTransition } from "react"
+import { useEffect, useRef } from "react"
 import { useTranslations } from "next-intl"
 
 const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
-  const isMobile = useIsMobile()
-  const content = isMobile === false ? <ViewTransition>{children}</ViewTransition> : children
+  const t = useTranslations()
 
   useEffect(() => {
     if (window.innerWidth < 1024) {
@@ -36,7 +34,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
           <div className="md:sticky top-0 z-50 pt-4">
             {/** localized header title */}
-            <DashboardHeader title={useTranslations()('nav.settings')} />
+            <DashboardHeader title={t('nav.settings')} />
           </div>
 
           <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">
@@ -47,7 +45,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Контент */}
               <div ref={contentRef} className="min-h-150 min-w-0 flex-1">
-                {content}
+                {children}
               </div>
 
             </div>

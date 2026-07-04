@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, ViewTransition } from "react"
+import { useEffect } from "react"
 import { usePathname, useSelectedLayoutSegments } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { useShallow } from "zustand/react/shallow"
@@ -8,7 +8,6 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/dashboard/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
 import { prefetchActiveProjects } from "@/hooks/useProjectsQuery"
 
@@ -31,7 +30,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const segments = useSelectedLayoutSegments()
   const queryClient = useQueryClient()
-  const isMobile = useIsMobile()
   const { uid, authLoading } = useUserStore(
     useShallow((state) => ({ uid: selectCurrentUid(state), authLoading: selectAuthLoading(state) }))
   )
@@ -45,7 +43,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const firstSegment = segments[0] ?? ""
   const activeItem = firstSegment === "" ? "dashboard" : firstSegment
-  const content = isMobile === false ? <ViewTransition>{children}</ViewTransition> : children
 
   const headerTitle = headerTitles[activeItem] ?? "Dashboard"
   const locale = getLocaleFromPathname(pathname)
@@ -62,7 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <main className="relative flex-1 p-4 pb-20 md:pb-6 md:p-6 lg:p-8">
-            {content}
+            {children}
           </main>
         </div>
       </SidebarInset>
