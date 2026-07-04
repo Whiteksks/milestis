@@ -49,12 +49,14 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
     setPublishedInfo: s.setPublishedInfo,
   }))
 
-  const publishMutation = usePublishMutation()
-  const modalData = usePublishModal(projectId, mode, { initialSlug, initialAccessToken })
-  const isMobile = useIsMobile()
-  const [termsAccepted, setTermsAccepted] = useState(false)
+  // Rate must be read before usePublishModal so it can be forwarded for min-purchase logic.
   const subscription = useUserStore(selectSubscription)
   const ratePerDollar = getEffectiveSubscriptionFeatures(subscription).creditTopupRatePerDollar || 1
+
+  const publishMutation = usePublishMutation()
+  const modalData = usePublishModal(projectId, mode, { initialSlug, initialAccessToken, ratePerDollar })
+  const isMobile = useIsMobile()
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   // Derived: is the user short on credits in the review step?
   const insufficient =
@@ -63,9 +65,13 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
     !modalData.isAnalyzing &&
     modalData.quoteData.userBalance < modalData.quoteData.creditCost
 
-  // Price for Pay & Publish button — exact deficit, not rounded up
+  // Price for Pay & Publish button — minimum $10 purchase enforced.
+  // Matches the minimum enforced in usePublishModal.initiateBuyAndPublish and buy-credits route.
   const deficit = Math.max(0, (modalData.quoteData?.creditCost ?? 0) - (modalData.quoteData?.userBalance ?? 0))
-  const priceDollars = (deficit / ratePerDollar).toFixed(2)
+  const MIN_TOPUP_DOLLARS = 10
+  const minTopupCredits = Math.ceil(MIN_TOPUP_DOLLARS * ratePerDollar)
+  const topupCredits = Math.max(deficit, minTopupCredits)
+  const priceDollars = (topupCredits / ratePerDollar).toFixed(2)
 
   // Auto-advance to review when returning from payment (afterTopup flow)
   const { step: modalStep, canProceedToReview, advanceToReview } = modalData

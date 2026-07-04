@@ -76,13 +76,13 @@
           "title": "Delete your account?",
           "warning": "This action is permanent and cannot be undone.",
           "warnProjects": "All projects, images, and published sites will be permanently deleted.",
-          "warnBilling": "Any active subscription will be cancelled at the end of the billing period.",
+          "warnBilling": "If you have an active subscription, cancel it before deleting the account.",
           "inputLabel": "Type your email address to confirm:",
           "confirmButton": "Permanently Delete Account",
           "deleting": "Deleting\u2026",
           "cancelButton": "Cancel",
           "activeSubTitle": "Active subscription detected",
-          "activeSubDescription": "You have an active paid plan. Please cancel your subscription before deleting your account to avoid unexpected charges.",
+          "activeSubDescription": "Account deletion is locked while your paid plan is active. Cancel the subscription first, then return here.",
           "activeSubButton": "Manage Subscription"
         }
       }

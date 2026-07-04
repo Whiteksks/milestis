@@ -72,6 +72,21 @@ async function resolveSubscriptionUid(sub: PolarSubscriptionEvent): Promise<stri
 	return usersSnap.docs[0]?.id ?? null;
 }
 
+function acknowledgeMissingUser(
+	eventType: string,
+	webhookId: string,
+	sub: PolarSubscriptionEvent,
+	res: Response,
+): void {
+	logger.info("Polar: subscription event for unknown/deleted user — acknowledging gracefully", {
+		eventType,
+		webhookId,
+		polarSubscriptionId: sub.id,
+		polarCustomerId: sub.customerId,
+	});
+	res.status(200).json({ ok: true, skipped: "user_not_found" });
+}
+
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
 export async function handleSubscription(
@@ -84,16 +99,13 @@ export async function handleSubscription(
 	const uid = await resolveSubscriptionUid(sub);
 
 	if (!uid) {
-		// User not found — likely the account was deleted before this webhook arrived
-		// (e.g. the final subscription.canceled that fires when cancelAtPeriodEnd expires).
-		// Acknowledge with 200 so Polar stops retrying; there is nothing to update.
-		logger.info("Polar: subscription event for unknown/deleted user — acknowledging gracefully", {
-			eventType,
-			webhookId,
-			polarSubscriptionId: sub.id,
-			polarCustomerId: sub.customerId,
-		});
-		res.status(200).json({ ok: true, skipped: "user_not_found" });
+		acknowledgeMissingUser(eventType, webhookId, sub, res);
+		return;
+	}
+
+	const userSnap = await db.collection("users").doc(uid).get();
+	if (!userSnap.exists) {
+		acknowledgeMissingUser(eventType, webhookId, sub, res);
 		return;
 	}
 

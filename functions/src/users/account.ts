@@ -2,12 +2,10 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
-import { defineSecret } from "firebase-functions/params";
 import type { Request, Response } from "express";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../projects/publish/slug";
-import { Polar } from "@polar-sh/sdk";
 import {
   mapAuthPayload,
   mapUserDocument,
@@ -24,10 +22,9 @@ const ERROR = {
   UNAUTHORIZED: "UNAUTHORIZED",
   INVALID_OR_EXPIRED_TOKEN: "INVALID_OR_EXPIRED_TOKEN",
   NOT_FOUND: "NOT_FOUND",
+  ACTIVE_SUBSCRIPTION: "ACTIVE_SUBSCRIPTION",
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
 } as const;
-
-const polarAccessToken = defineSecret("POLAR_ACCESS_TOKEN");
 
 const USER_FUNCTION_OPTIONS = {
   concurrency: 10,
@@ -35,11 +32,6 @@ const USER_FUNCTION_OPTIONS = {
   memory: "512MiB" as const,
   maxInstances: 10,
   cors: ALLOWED_ORIGINS,
-};
-
-const DELETE_USER_FUNCTION_OPTIONS = {
-  ...USER_FUNCTION_OPTIONS,
-  secrets: [polarAccessToken],
 };
 
 const DELETE_BATCH_SIZE = 400;
@@ -78,10 +70,6 @@ async function deleteStoragePrefix(prefix: string, logPrefix: string): Promise<v
   } catch (err) {
     logger.warn(`${logPrefix} Failed to delete Storage prefix ${prefix}.`, err);
   }
-}
-
-function getPolarServer(): "sandbox" | "production" {
-  return process.env.POLAR_SERVER === "sandbox" ? "sandbox" : "production";
 }
 
 async function deleteSnapshotsInBatches(
@@ -173,6 +161,18 @@ async function deleteProjectArtifacts(
   };
 }
 
+function hasBlockingSubscription(subData: Record<string, unknown> | undefined): boolean {
+  const status = typeof subData?.status === "string" ? subData.status : null;
+  const planTier = typeof subData?.planTier === "string" ? subData.planTier : null;
+  const cancelAtPeriodEnd = subData?.cancelAtPeriodEnd === true;
+  return Boolean(
+    subData?.polarSubscriptionId &&
+    !cancelAtPeriodEnd &&
+    (planTier === "creator" || planTier === "archive") &&
+    (status === "active" || status === "trialing" || status === "past_due" || status === "paused"),
+  );
+}
+
 export const exportUserData = onRequest(USER_FUNCTION_OPTIONS, async (req, res) => {
   if (rejectNonPost(req, res)) return;
 
@@ -214,7 +214,7 @@ export const exportUserData = onRequest(USER_FUNCTION_OPTIONS, async (req, res) 
   }
 });
 
-export const deleteUserAccount = onRequest(DELETE_USER_FUNCTION_OPTIONS, async (req, res) => {
+export const deleteUserAccount = onRequest(USER_FUNCTION_OPTIONS, async (req, res) => {
   if (rejectNonPost(req, res)) return;
 
   const uid = await authenticateRequest(req, res);
@@ -223,37 +223,14 @@ export const deleteUserAccount = onRequest(DELETE_USER_FUNCTION_OPTIONS, async (
   try {
     const userRef = db.collection("users").doc(uid);
 
-    // ── Cancel active Polar subscription before wiping data ───────────────
-    // Must happen first, while the user document still exists.
     const userSnap = await userRef.get();
     const subData = userSnap.data()?.subscription as Record<string, unknown> | undefined;
-    const polarSubscriptionId = typeof subData?.polarSubscriptionId === "string"
-      ? subData.polarSubscriptionId
-      : null;
-
-    if (polarSubscriptionId) {
-      try {
-        const polar = new Polar({
-          accessToken: polarAccessToken.value(),
-          server: getPolarServer(),
-        });
-        await polar.subscriptions.update({
-          id: polarSubscriptionId,
-          subscriptionUpdate: { cancelAtPeriodEnd: true },
-        });
-        logger.info(`[deleteUserAccount] Polar subscription cancelled`, {
-          uid,
-          polarSubscriptionId,
-        });
-      } catch (err) {
-        // Log but do not abort — proceed with account deletion regardless.
-        // The subscription may already be cancelled or the Polar API may be unreachable.
-        logger.warn(`[deleteUserAccount] Failed to cancel Polar subscription`, {
-          uid,
-          polarSubscriptionId,
-          err: String(err),
-        });
-      }
+    if (hasBlockingSubscription(subData)) {
+      res.status(409).json({
+        error: ERROR.ACTIVE_SUBSCRIPTION,
+        message: "Cancel your active subscription before deleting the account.",
+      });
+      return;
     }
 
     const projectsSnap = await db.collection("projects").where("ownerId", "==", uid).get();

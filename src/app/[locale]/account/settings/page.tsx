@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Globe, Download, Package, Lightbulb, Trophy, Clock, RefreshCw, Sparkles, Newspaper } from "lucide-react"
 import { setLocaleCookie } from "@/components/ui/custom/LangSwitch"
-import { useUserStore } from "@/hooks/useUserStore"
+import { useUserStore, selectSubscription } from "@/hooks/useUserStore"
+import { isEffectivePaidSubscription } from "@/lib/billing/billing.utils"
 import { auth } from "@/lib/firebase/firebase"
 import { deleteAccount, downloadAccountData, downloadProjectContent, saveUserProfile } from "@/lib/user"
 import { toastUser } from "@/lib/toast"
@@ -73,6 +74,7 @@ export default function AccountSettings() {
       clearProfile: state.clearProfile,
     }))
   )
+  const subscription = useUserStore(selectSubscription)
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     project_updates: true,
     project_reminders: false,
@@ -90,6 +92,7 @@ export default function AccountSettings() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("")
   const [deletingAccount, setDeletingAccount] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const hasBlockingSubscription = isEffectivePaidSubscription(subscription) && subscription?.cancelAtPeriodEnd !== true
 
   const { data: exportableProjects = [] } = useQuery({
     queryKey: profile?.uid ? [...projectKeys.all(profile.uid), "export-list"] : ["no-user"],
@@ -370,6 +373,8 @@ export default function AccountSettings() {
         onConfirm={handleDeleteAccount}
         loading={deletingAccount}
         userEmail={profile?.email ?? ""}
+        hasActiveSub={hasBlockingSubscription}
+        billingHref={`/${locale}/account/billing`}
       />
       </>
   )

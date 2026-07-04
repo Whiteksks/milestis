@@ -19,8 +19,9 @@ function generateToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string }) {
+export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string; ratePerDollar?: number }) {
   const initialSlug = options?.initialSlug ?? ''
+  const ratePerDollar = options?.ratePerDollar ?? 1
   const [step, setStep] = useState<PublishStep>('slug')
   const [slug, setSlug] = useState(initialSlug)
   const [slugStatus, setSlugStatus] = useState<SlugStatus>(() =>
@@ -142,8 +143,11 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     const deficit = quoteData.creditCost - quoteData.userBalance
     if (deficit <= 0) return
 
-    // Buy exactly the deficit — no rounding up so the user pays only what's needed.
-    const toTopup = deficit
+    // Enforce minimum $10 purchase so amounts are always above Polar/Stripe floor.
+    // ratePerDollar comes from the user's subscription tier (passed in from publish-modal).
+    const MIN_TOPUP_DOLLARS = 10
+    const minCredits = Math.ceil(MIN_TOPUP_DOLLARS * ratePerDollar)
+    const toTopup = Math.max(deficit, minCredits)
 
     const returnParams = new URLSearchParams({ afterTopup: '1', slug })
     if (accessToken) returnParams.set('accessToken', accessToken)
@@ -173,7 +177,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     } finally {
       setIsBuyingCredits(false)
     }
-  }, [quoteData, projectId, slug, accessToken])
+  }, [quoteData, projectId, slug, accessToken, ratePerDollar])
 
   const portfolioUrl =
     !getProjectConfig(mode).hasAccessToken && slug

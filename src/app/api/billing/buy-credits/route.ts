@@ -69,6 +69,16 @@ export async function POST(request: NextRequest) {
   // amountCents = credits / ratePerDollar * 100  (in US cents)
   const amountCents = Math.round((credits / ratePerDollar) * 100)
 
+  // Polar / Stripe enforce a $0.50 floor; we enforce $10.00 so the
+  // smallest checkout is always meaningful regardless of subscription tier.
+  const MIN_AMOUNT_CENTS = 1000 // $10.00
+  if (amountCents < MIN_AMOUNT_CENTS) {
+    return NextResponse.json(
+      { error: "AMOUNT_TOO_SMALL", minDollars: "10.00" },
+      { status: 400 },
+    )
+  }
+
   // ── 5. Create Polar ad-hoc checkout ─────────────────────────────────────
   // The product must be configured as "Custom amount" in the Polar dashboard.
   // Set POLAR_CREDITS_PRODUCT_ID in apphosting.yaml / .env.local.
