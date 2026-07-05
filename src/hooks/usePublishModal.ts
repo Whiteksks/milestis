@@ -38,6 +38,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   const [quoteData, setQuoteData] = useState<AnalyzeProjectResult | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
+  const [analyzeErrorCode, setAnalyzeErrorCode] = useState<string | null>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -111,6 +112,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     setStep('review')
     setIsAnalyzing(true)
     setAnalyzeError(null)
+    setAnalyzeErrorCode(null)
     setQuoteData(null)
     try {
       const result = republishMode
@@ -119,7 +121,9 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
       setQuoteData(result)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to analyze project. Please try again.'
+      const code = (err as { code?: string }).code ?? null
       setAnalyzeError(message)
+      setAnalyzeErrorCode(code)
     } finally {
       setIsAnalyzing(false)
     }
@@ -129,16 +133,18 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     setStep('slug')
     setQuoteData(null)
     setAnalyzeError(null)
+    setAnalyzeErrorCode(null)
   }
 
   // Reset all state — called when the modal closes
   const reset = () => {
     setStep('slug')
-    setSlug('')
-    setSlugStatus('idle')
+    setSlug(initialSlug)
+    setSlugStatus(initialSlug.length >= 3 ? 'available' : 'idle')
     setQuoteData(null)
     setIsAnalyzing(false)
     setAnalyzeError(null)
+    setAnalyzeErrorCode(null)
     setAccessToken(getProjectConfig(mode).hasAccessToken ? generateToken() : '')
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }
@@ -217,6 +223,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     advanceToReview,
     isAnalyzing,
     analyzeError,
+    analyzeErrorCode,
     quoteData,
     goBack,
     reset,

@@ -14,6 +14,7 @@ import {
 	PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from "./slug/index";
 import { getSlugModePolicy } from "./slug/policy";
+import { runSafeSearchCheck } from "../../lib/safeSearchCheck";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -32,8 +33,9 @@ const ERROR = {
 	FORBIDDEN:                "FORBIDDEN",
 	NOT_PUBLISHABLE:          "NOT_PUBLISHABLE",
 	INVALID_SLUG:             "INVALID_SLUG",
-	SLUG_TAKEN:               "SLUG_TAKEN",
-	INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
+	SLUG_TAKEN:                   "SLUG_TAKEN",
+	CONTENT_POLICY_VIOLATION:     "CONTENT_POLICY_VIOLATION",
+	INTERNAL_SERVER_ERROR:        "INTERNAL_SERVER_ERROR",
 } as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -122,7 +124,7 @@ function buildDomain(mode: ProjectMode, slug: string): string {
 export const analyzeProject = onRequest(
 	{
 		concurrency: 50,
-		timeoutSeconds: 30,
+		timeoutSeconds: 60,
 		memory: "256MiB",
 		maxInstances: 20,
 		cors: ALLOWED_ORIGINS,
@@ -236,6 +238,17 @@ export const analyzeProject = onRequest(
 				.get();
 			const editorData = contentSnap.exists ? contentSnap.data()! : {};
 			const photoCount = countUniquePhotos(editorData.content ?? null);
+
+			// ── SafeSearch content moderation ──────────────────────────────
+			const safeSearch = await runSafeSearchCheck(editorData.content ?? null);
+			if (!safeSearch.safe) {
+				logger.warn(`[analyzeProject] SafeSearch blocked project ${projectId}`, { violations: safeSearch.violations });
+				res.status(400).json({
+					error: ERROR.CONTENT_POLICY_VIOLATION,
+					message: "Project contains content that violates our content policy and cannot be published.",
+				});
+				return;
+			}
 
 			const userData = userSnap.data() ?? {};
 			const userBalance: number = typeof userData.balance?.total === "number"

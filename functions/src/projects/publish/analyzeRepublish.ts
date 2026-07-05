@@ -9,6 +9,7 @@ import { calculateCreditCost } from "./config";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./slug/index";
 import { getSlugModePolicy } from "./slug/policy";
+import { runSafeSearchCheck, extractImageIds } from "../../lib/safeSearchCheck";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -26,8 +27,9 @@ const ERROR = {
 	NOT_FOUND:                "NOT_FOUND",
 	FORBIDDEN:                "FORBIDDEN",
 	NOT_REPUBLISHABLE:        "NOT_REPUBLISHABLE",
-	SLUG_TAKEN:               "SLUG_TAKEN",
-	INTERNAL_SERVER_ERROR:    "INTERNAL_SERVER_ERROR",
+	SLUG_TAKEN:                   "SLUG_TAKEN",
+	CONTENT_POLICY_VIOLATION:     "CONTENT_POLICY_VIOLATION",
+	INTERNAL_SERVER_ERROR:        "INTERNAL_SERVER_ERROR",
 } as const;
 
 class ValidationError extends Error {}
@@ -108,7 +110,7 @@ function buildDomain(mode: ProjectMode, slug: string): string {
 export const analyzeRepublish = onRequest(
 	{
 		concurrency: 50,
-		timeoutSeconds: 30,
+		timeoutSeconds: 60,
 		memory: "256MiB",
 		maxInstances: 20,
 		cors: ALLOWED_ORIGINS,
@@ -220,14 +222,31 @@ export const analyzeRepublish = onRequest(
 			}
 
 			// ── Count photos in current content ───────────────────────────
-			const contentSnap = await db
-				.collection("projects")
-				.doc(projectId)
-				.collection("data")
-				.doc("content")
-				.get();
+			// Load current content + previously published content in parallel (for diff)
+			const [contentSnap, publishedSnap] = await Promise.all([
+				db.collection("projects").doc(projectId).collection("data").doc("content").get(),
+				db.collection("published_projects").doc(projectId).get(),
+			]);
 			const editorData = contentSnap.exists ? contentSnap.data()! : {};
 			const photoCount = countUniquePhotos(editorData.content ?? null);
+
+			// ── SafeSearch content moderation (with republish diff) ────────
+			// previousImageIds = images that were already in the last published version.
+			// These are skipped entirely — cache or not — because they haven't changed.
+			const publishedContent = publishedSnap.exists ? publishedSnap.data()?.content : null;
+			const previousImageIds = extractImageIds(publishedContent ?? null);
+			const safeSearch = await runSafeSearchCheck(
+				editorData.content ?? null,
+				{ previousImageIds },
+			);
+			if (!safeSearch.safe) {
+				logger.warn(`[analyzeRepublish] SafeSearch blocked project ${projectId}`, { violations: safeSearch.violations });
+				res.status(400).json({
+					error: ERROR.CONTENT_POLICY_VIOLATION,
+					message: "Project contains content that violates our content policy and cannot be published.",
+				});
+				return;
+			}
 
 			const userData = userSnap.data() ?? {};
 			const userBalance: number =

@@ -109,7 +109,6 @@ env:
       - BUILD
       - RUNTIME
 
-
   - variable: NEXT_PUBLIC_DELETE_USER_ACCOUNT_URL
     value: https://deleteuseraccount-5h4wes5waq-ez.a.run.app
     availability:
@@ -121,10 +120,6 @@ env:
     availability:
       - BUILD
       - RUNTIME
-
-  # ── Polar Billing ─────────────────────────────────────────────────────────
-  # POLAR_ACCESS_TOKEN must be created in Firebase Secret Manager first:
-  #   firebase apphosting:secrets:set polar-access-token
   - variable: POLAR_ACCESS_TOKEN
     secret: polar-access-token
     availability:
@@ -138,34 +133,33 @@ env:
   # Product ID for one-time credit purchases (must be "Custom amount" type in Polar).
   # Create the product in Polar → Products → New → set pricing to "Custom amount".
   - variable: POLAR_CREDITS_PRODUCT_ID
-    value: d94483ee-0cc8-4ce2-92a8-872b4aee4434
+    value: 682ee7fe-f569-430f-b048-5697e51a73ee
     availability:
       - RUNTIME
 
   - variable: NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_MONTHLY
-    value: 5174a41d-b7a6-4732-b60d-93fc7b923995
+    value: c4af34bf-753e-4da1-9ded-a5936801da15
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_POLAR_PRODUCT_CREATOR_YEARLY
-    value: 257c0482-e452-4308-9611-c084977b4cc1
+    value: adfa5df7-cf88-460f-bcad-72c34eb4026d
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_MONTHLY
-    value: 11e48c15-2345-49a3-a276-b2ec225d2c40
+    value: de74c4d1-ce0d-41ab-bf8f-a9f7f5b34450
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_POLAR_PRODUCT_ARCHIVE_YEARLY
-    value: 888e08e7-bc88-49c1-a076-dff500a59fee
+    value: 3f30890f-deb2-4e66-bfdf-fe40a34a4812
     availability:
       - BUILD
       - RUNTIME
-
   # ── Server-side secrets (хранятся в Firebase Secret Manager) ─────────────
   # На App Hosting firebase-admin использует ADC автоматически,
   # поэтому FIREBASE_ADMIN_* переменные нужны ТОЛЬКО для локального режима.

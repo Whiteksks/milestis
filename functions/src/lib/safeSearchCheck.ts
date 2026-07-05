@@ -1,224 +1,324 @@
-/**
+﻿/**
  * safeSearchCheck.ts
  *
- * Standalone module for Google Vision SafeSearch content moderation.
- * Extracts image URLs from project content and checks them against
- * Google Vision API SafeSearch Detection before publication.
+ * Google Vision SafeSearch content moderation with three optimizations:
  *
- * Usage:
- *   import { runSafeSearchCheck } from "../lib/safeSearchCheck";
- *   const result = await runSafeSearchCheck(projectContent);
- *   if (!result.safe) { ... reject ... }
+ *  1. Firestore cache — each imageId is checked once and the result is stored
+ *     permanently (imageIds are unique per upload so no TTL is needed).
+ *     Subsequent publish/republish calls skip already-checked images.
  *
- * Required:
- *   npm install @google-cloud/vision --save  (inside /functions)
- *   Google Cloud Vision API must be enabled in Firebase project console.
- *   The Cloud Functions service account automatically has credentials.
+ *  2. Batch Vision API requests — up to VISION_BATCH_SIZE images are sent in a
+ *     single batchAnnotateImages call, reducing HTTP round-trips dramatically.
+ *
+ *  3. Republish diff — callers can pass a Set of imageIds from the previously
+ *     published version. Images that have not changed are excluded before cache
+ *     lookup and API calls, making republish of unchanged projects near-instant.
+ *
+ * Usage (first publish):
+ *   const result = await runSafeSearchCheck(content);
+ *
+ * Usage (republish - pass previous imageIds to skip unchanged photos):
+ *   const previousIds = extractImageIds(publishedProjectContent);
+ *   const result = await runSafeSearchCheck(content, { previousImageIds: previousIds });
  */
 
 import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { FieldValue } from "firebase-admin/firestore";
+import { db } from "./firebaseAdmin";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types -------------------------------------------------------------------
 
-/** The 5 SafeSearch categories returned by Google Vision. */
 export type SafeSearchCategory = "adult" | "violence" | "racy" | "spoof" | "medical";
 
-/**
- * Likelihood levels as returned by the Vision API, ordered from least to most
- * likely (matches the numeric enum in the protobuf spec).
- */
 export type Likelihood =
-	| "UNKNOWN"
-	| "VERY_UNLIKELY"
-	| "UNLIKELY"
-	| "POSSIBLE"
-	| "LIKELY"
-	| "VERY_LIKELY";
+| "UNKNOWN"
+| "VERY_UNLIKELY"
+| "UNLIKELY"
+| "POSSIBLE"
+| "LIKELY"
+| "VERY_LIKELY";
 
 export interface ImageViolation {
-	/** The image URL that triggered the violation. */
-	imageUrl: string;
-	/** Which category triggered it (e.g. "adult", "violence"). */
-	category: SafeSearchCategory;
-	/** Likelihood string returned by Vision API. */
-	likelihood: Likelihood;
+imageId:    string;
+category:   SafeSearchCategory;
+likelihood: Likelihood;
 }
 
 export interface SafeSearchResult {
-	/** True when all images pass the safety threshold. */
-	safe: boolean;
-	/** Number of images that were analyzed. */
-	checkedCount: number;
-	/** Non-empty only when safe === false. */
-	violations: ImageViolation[];
+/** True when all images pass the safety threshold. */
+safe:         boolean;
+/** How many images were actually sent to Vision API this run (cache hits excluded). */
+checkedCount: number;
+/** How many images were served from the Firestore cache. */
+cachedCount:  number;
+/** How many images were skipped because they existed in the previous content (diff). */
+skippedCount: number;
+violations:   ImageViolation[];
 }
 
-// ─── Configuration ────────────────────────────────────────────────────────────
-
+export interface SafeSearchCheckOptions {
 /**
- * Categories that are considered policy violations.
- * "racy" is intentionally excluded because stock photos of swimwear etc.
- * would be flagged. Add it here if you want stricter moderation.
+ * imageIds from the previously published project content.
+ * Images whose IDs are in this set are assumed unchanged and skipped entirely.
+ * Obtain via extractImageIds(publishedProjectContent).
  */
+previousImageIds?: Set<string>;
+}
+
+// --- Configuration -----------------------------------------------------------
+
+/** Categories that trigger a block. "racy" excluded to avoid false positives on swimwear etc. */
 const BLOCKED_CATEGORIES: SafeSearchCategory[] = ["adult", "violence"];
 
-/**
- * Minimum likelihood level that triggers a block.
- * LIKELY and VERY_LIKELY are blocked; POSSIBLE and below are allowed.
- */
+/** Minimum likelihood to trigger a block. POSSIBLE and below are allowed. */
 const BLOCK_THRESHOLD: Likelihood = "LIKELY";
 
-/** Maximum number of images to check per project (cost + latency guard). */
-const MAX_IMAGES_TO_CHECK = 60;
+/** Hard cap on images checked per project (cost + latency guard). */
+const MAX_IMAGES_TO_CHECK = 50;
 
-// Numeric rank used for threshold comparison.
+/** Vision API batch size limit. */
+const VISION_BATCH_SIZE = 16;
+
+/** Firestore collection where per-image SafeSearch results are cached. */
+const CACHE_COLLECTION = "safesearch_cache";
+
 const LIKELIHOOD_RANK: Record<Likelihood, number> = {
-	UNKNOWN:       0,
-	VERY_UNLIKELY: 1,
-	UNLIKELY:      2,
-	POSSIBLE:      3,
-	LIKELY:        4,
-	VERY_LIKELY:   5,
+UNKNOWN:       0,
+VERY_UNLIKELY: 1,
+UNLIKELY:      2,
+POSSIBLE:      3,
+LIKELY:        4,
+VERY_LIKELY:   5,
 };
 
-// ─── Image URL extraction ─────────────────────────────────────────────────────
+const NUMERIC_TO_LIKELIHOOD: Record<number, Likelihood> = {
+0: "UNKNOWN",
+1: "VERY_UNLIKELY",
+2: "UNLIKELY",
+3: "POSSIBLE",
+4: "LIKELY",
+5: "VERY_LIKELY",
+};
 
-/**
- * Extracts unique Firebase Storage image URLs from project content JSON.
- *
- * Matches both:
- *  - Public paths:  /o/images%2F{imageId}%2F...
- *  - Private paths: /o/users%2F...%2Fimages%2F{imageId}%2F...
- *
- * Prefers the "middle" variant for checking (lower bandwidth, sufficient
- * resolution for SafeSearch). Falls back to any available URL.
- */
-function extractImageUrls(content: unknown): string[] {
-	const json = JSON.stringify(content);
+// --- Image extraction --------------------------------------------------------
 
-	// Collect all Firebase Storage image URLs
-	const urlPattern =
-		/"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+(?:\/|%2F)images%2F[^"]+)"/g;
-
-	const byImageId = new Map<string, { middle?: string; fallback: string }>();
-
-	let m: RegExpExecArray | null;
-	while ((m = urlPattern.exec(json)) !== null) {
-		const url = m[1];
-
-		// Extract imageId from path — works for both public and private paths.
-		const idMatch = url.match(/(?:\/|%2F)images%2F([^%"\/]+)%2F/);
-		if (!idMatch) continue;
-
-		const imageId = idMatch[1];
-		const existing = byImageId.get(imageId);
-
-		// Prefer "middle" variant as a balance of quality vs bandwidth.
-		if (url.includes("middle")) {
-			byImageId.set(imageId, { middle: url, fallback: existing?.fallback ?? url });
-		} else if (!existing) {
-			byImageId.set(imageId, { fallback: url });
-		}
-	}
-
-	const urls: string[] = [];
-	for (const entry of byImageId.values()) {
-		urls.push(entry.middle ?? entry.fallback);
-	}
-
-	return urls.slice(0, MAX_IMAGES_TO_CHECK);
-}
-
-// ─── SafeSearch logic ─────────────────────────────────────────────────────────
-
-/**
- * Checks a single image URL against Vision SafeSearch.
- * Returns an array of ImageViolation (empty when the image is clean).
- */
-async function checkImageUrl(
-	client: ImageAnnotatorClient,
-	imageUrl: string,
-): Promise<ImageViolation[]> {
-	const [result] = await client.safeSearchDetection(imageUrl);
-	const safe = result.safeSearchAnnotation;
-
-	if (!safe) return [];
-
-	const violations: ImageViolation[] = [];
-
-	for (const category of BLOCKED_CATEGORIES) {
-		// The Vision API returns likelihood as a string or number depending on
-		// the client version. Normalise to string.
-		const rawLikelihood = safe[category];
-		const likelihood = normaliseLikelihood(rawLikelihood);
-
-		if (LIKELIHOOD_RANK[likelihood] >= LIKELIHOOD_RANK[BLOCK_THRESHOLD]) {
-			violations.push({ imageUrl, category, likelihood });
-		}
-	}
-
-	return violations;
+interface ImageEntry {
+imageId: string;
+/** Best URL to use for Vision API (prefer "middle" variant). */
+url:     string;
 }
 
 /**
- * Normalises the raw Vision API likelihood value to our Likelihood type.
- * The Node.js client may return a string like "LIKELY" or a numeric enum value.
+ * Extracts unique image entries (imageId + best URL) from project content.
+ * Matches both public (/o/images%2F) and private (/o/users%2F.../images%2F) paths.
  */
+function extractEntries(content: unknown): ImageEntry[] {
+const json = JSON.stringify(content);
+const urlPattern =
+/"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+(?:\/|%2F)images%2F[^"]+)"/g;
+
+const byId = new Map<string, { middle?: string; fallback: string }>();
+
+let m: RegExpExecArray | null;
+while ((m = urlPattern.exec(json)) !== null) {
+const url = m[1];
+const idMatch = url.match(/(?:\/|%2F)images%2F([^%"/]+)%2F/);
+if (!idMatch) continue;
+
+const imageId = idMatch[1];
+const existing = byId.get(imageId);
+
+if (url.includes("middle")) {
+byId.set(imageId, { middle: url, fallback: existing?.fallback ?? url });
+} else if (!existing) {
+byId.set(imageId, { fallback: url });
+}
+}
+
+const entries: ImageEntry[] = [];
+for (const [imageId, { middle, fallback }] of byId) {
+entries.push({ imageId, url: middle ?? fallback });
+}
+return entries;
+}
+
+/**
+ * Extracts just the set of imageIds from content.
+ * Use this in the republish flow to get previousImageIds from the published project.
+ */
+export function extractImageIds(content: unknown): Set<string> {
+return new Set(extractEntries(content).map((e) => e.imageId));
+}
+
+// --- Likelihood helpers -------------------------------------------------------
+
 function normaliseLikelihood(raw: unknown): Likelihood {
-	if (typeof raw === "string" && raw in LIKELIHOOD_RANK) {
-		return raw as Likelihood;
-	}
-	// Numeric enum mapping (matches google.cloud.vision.v1.Likelihood protobuf)
-	const numericMap: Record<number, Likelihood> = {
-		0: "UNKNOWN",
-		1: "VERY_UNLIKELY",
-		2: "UNLIKELY",
-		3: "POSSIBLE",
-		4: "LIKELY",
-		5: "VERY_LIKELY",
-	};
-	if (typeof raw === "number" && raw in numericMap) {
-		return numericMap[raw];
-	}
-	return "UNKNOWN";
+if (typeof raw === "string" && raw in LIKELIHOOD_RANK) return raw as Likelihood;
+if (typeof raw === "number" && raw in NUMERIC_TO_LIKELIHOOD) return NUMERIC_TO_LIKELIHOOD[raw];
+return "UNKNOWN";
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+function isBlocked(likelihood: Likelihood): boolean {
+return LIKELIHOOD_RANK[likelihood] >= LIKELIHOOD_RANK[BLOCK_THRESHOLD];
+}
+
+// --- Firestore cache ----------------------------------------------------------
+
+interface CacheEntry {
+safe:           boolean;
+categoryScores: Partial<Record<SafeSearchCategory, Likelihood>>;
+}
+
+/** Reads cache entries for multiple imageIds in one getAll call. */
+async function readCache(imageIds: string[]): Promise<Map<string, CacheEntry>> {
+if (imageIds.length === 0) return new Map();
+
+const refs = imageIds.map((id) => db.collection(CACHE_COLLECTION).doc(id));
+const snaps = await db.getAll(...refs);
+
+const result = new Map<string, CacheEntry>();
+for (const snap of snaps) {
+if (snap.exists) {
+result.set(snap.id, snap.data() as CacheEntry);
+}
+}
+return result;
+}
+
+/** Writes a batch of cache entries atomically. */
+async function writeCache(entries: Array<{ imageId: string; entry: CacheEntry }>): Promise<void> {
+if (entries.length === 0) return;
+const batch = db.batch();
+for (const { imageId, entry } of entries) {
+batch.set(db.collection(CACHE_COLLECTION).doc(imageId), {
+...entry,
+checkedAt: FieldValue.serverTimestamp(),
+});
+}
+await batch.commit();
+}
+
+// --- Vision API ---------------------------------------------------------------
 
 /**
- * Runs Google Vision SafeSearch on all images found in project content.
- *
- * @param content - The raw project `content` field from Firestore.
- * @returns SafeSearchResult — safe flag, checked count, and any violations.
- *
- * @example
- * const result = await runSafeSearchCheck(projectData.content);
- * if (!result.safe) {
- *   logger.warn("SafeSearch blocked project", { violations: result.violations });
- *   res.status(400).json({ error: "CONTENT_POLICY_VIOLATION", violations: result.violations });
- *   return;
- * }
+ * Sends one batch (up to VISION_BATCH_SIZE images) to batchAnnotateImages.
+ * Returns a map of imageId -> CacheEntry.
  */
-export async function runSafeSearchCheck(content: unknown): Promise<SafeSearchResult> {
-	const imageUrls = extractImageUrls(content);
+async function checkBatch(
+client:  ImageAnnotatorClient,
+entries: ImageEntry[],
+): Promise<Map<string, CacheEntry>> {
+const [response] = await client.batchAnnotateImages({
+requests: entries.map((e) => ({
+image:    { source: { imageUri: e.url } },
+features: [{ type: "SAFE_SEARCH_DETECTION" as const }],
+})),
+});
 
-	if (imageUrls.length === 0) {
-		return { safe: true, checkedCount: 0, violations: [] };
-	}
+const results = new Map<string, CacheEntry>();
 
-	const client = new ImageAnnotatorClient();
+for (let i = 0; i < entries.length; i++) {
+const { imageId } = entries[i];
+const annotation = response.responses?.[i]?.safeSearchAnnotation;
 
-	// Check all images concurrently, but collect all violations (don't short-circuit)
-	// so that the full picture can be logged / shown to the moderator.
-	const violationArrays = await Promise.all(
-		imageUrls.map((url) => checkImageUrl(client, url)),
-	);
+if (!annotation) {
+// No annotation returned - treat as safe to avoid false blocks.
+results.set(imageId, { safe: true, categoryScores: {} });
+continue;
+}
 
-	const violations = violationArrays.flat();
+const categoryScores: Partial<Record<SafeSearchCategory, Likelihood>> = {};
+let safe = true;
 
-	return {
-		safe: violations.length === 0,
-		checkedCount: imageUrls.length,
-		violations,
-	};
+for (const category of BLOCKED_CATEGORIES) {
+const likelihood = normaliseLikelihood(annotation[category]);
+categoryScores[category] = likelihood;
+if (isBlocked(likelihood)) safe = false;
+}
+
+results.set(imageId, { safe, categoryScores });
+}
+
+return results;
+}
+
+// --- Public API ---------------------------------------------------------------
+
+/**
+ * Runs SafeSearch on all images in project content with caching and batching.
+ *
+ * @param content                  - Raw project `content` field from Firestore.
+ * @param options.previousImageIds - imageIds from the previously published version.
+ *                                   Images whose IDs appear here are skipped (republish diff).
+ */
+export async function runSafeSearchCheck(
+content: unknown,
+options?: SafeSearchCheckOptions,
+): Promise<SafeSearchResult> {
+const allEntries = extractEntries(content).slice(0, MAX_IMAGES_TO_CHECK);
+
+if (allEntries.length === 0) {
+return { safe: true, checkedCount: 0, cachedCount: 0, skippedCount: 0, violations: [] };
+}
+
+// 1. Diff: exclude images that have not changed since last publish
+const previousImageIds = options?.previousImageIds ?? new Set<string>();
+const toCheck      = allEntries.filter((e) => !previousImageIds.has(e.imageId));
+const skippedCount = allEntries.length - toCheck.length;
+
+if (toCheck.length === 0) {
+return { safe: true, checkedCount: 0, cachedCount: 0, skippedCount, violations: [] };
+}
+
+// 2. Cache: split into hits and misses
+const cached      = await readCache(toCheck.map((e) => e.imageId));
+const cacheHits   = toCheck.filter((e) =>  cached.has(e.imageId));
+const cacheMisses = toCheck.filter((e) => !cached.has(e.imageId));
+const cachedCount = cacheHits.length;
+
+// 3. Vision API: check uncached images in batches
+const freshResults = new Map<string, CacheEntry>();
+
+if (cacheMisses.length > 0) {
+		const client  = new ImageAnnotatorClient();
+const batches: ImageEntry[][] = [];
+
+for (let i = 0; i < cacheMisses.length; i += VISION_BATCH_SIZE) {
+batches.push(cacheMisses.slice(i, i + VISION_BATCH_SIZE));
+}
+
+// Run all batches in parallel.
+const batchMaps = await Promise.all(batches.map((b) => checkBatch(client, b)));
+for (const batchMap of batchMaps) {
+for (const [id, entry] of batchMap) freshResults.set(id, entry);
+}
+
+// Persist to cache - fire-and-forget, non-fatal.
+writeCache(
+[...freshResults.entries()].map(([imageId, entry]) => ({ imageId, entry })),
+).catch(() => { /* intentionally ignored */ });
+}
+
+// 4. Collect violations from all checked images
+const violations: ImageViolation[] = [];
+
+for (const { imageId } of toCheck) {
+const entry = freshResults.get(imageId) ?? cached.get(imageId);
+if (!entry || entry.safe) continue;
+
+for (const category of BLOCKED_CATEGORIES) {
+const likelihood = entry.categoryScores[category] ?? "UNKNOWN";
+if (isBlocked(likelihood)) {
+violations.push({ imageId, category, likelihood });
+}
+}
+}
+
+return {
+safe:         violations.length === 0,
+checkedCount: cacheMisses.length,
+cachedCount,
+skippedCount,
+violations,
+};
 }

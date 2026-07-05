@@ -420,6 +420,8 @@ export const publishProject = onRequest(
 			// ── Fix #2: rewrite images/{imageId}.urls with public URLs ──────────
 			// The images/ collection is the editor's media library source of truth.
 			// Without this, reopening the editor after unpublish shows broken images.
+			// Also deletes docs for images that were NOT placed in the content
+			// (unused uploads) — their private Storage files are about to be deleted.
 			if (urlMapping.size > 0) {
 				try {
 					const imagesSnap = await db
@@ -429,9 +431,15 @@ export const publishProject = onRequest(
 					if (!imagesSnap.empty) {
 						const imagesBatch = db.batch();
 						let patchCount = 0;
+						let deleteCount = 0;
 						for (const imageDoc of imagesSnap.docs) {
 							const data = imageDoc.data() as { urls?: Record<string, string> };
-							if (!data.urls) continue;
+							if (!data.urls) {
+								// No URLs — image was never processed; remove orphan doc.
+								imagesBatch.delete(imageDoc.ref);
+								deleteCount++;
+								continue;
+							}
 							const newUrls: Record<string, string> = {};
 							let changed = false;
 							for (const [variant, url] of Object.entries(data.urls)) {
@@ -446,11 +454,16 @@ export const publishProject = onRequest(
 							if (changed) {
 								imagesBatch.update(imageDoc.ref, { urls: newUrls });
 								patchCount++;
+							} else {
+								// None of this image's URLs were migrated — it was not placed
+								// in the content. Delete the doc; its Storage files are gone.
+								imagesBatch.delete(imageDoc.ref);
+								deleteCount++;
 							}
 						}
-						if (patchCount > 0) {
+						if (patchCount > 0 || deleteCount > 0) {
 							await imagesBatch.commit();
-							logger.info(`[publishProject] Rewrote public URLs in ${patchCount} image doc(s) for ${projectId}.`);
+							logger.info(`[publishProject] Rewrote ${patchCount} and removed ${deleteCount} image doc(s) for ${projectId}.`);
 						}
 					}
 				} catch (err) {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Coins, AlertTriangle, ImageIcon } from 'lucide-react'
+import { Coins, AlertTriangle, ImageIcon, ShieldAlert } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
 import type { usePublishModal } from '@/hooks/usePublishModal'
@@ -20,9 +20,10 @@ export function ReviewPane({
   onTermsChange: (v: boolean) => void
   republishMode?: boolean
 }) {
-  const { isAnalyzing, analyzeError, quoteData } = data
+  const { isAnalyzing, analyzeError, analyzeErrorCode, quoteData } = data
 
   if (isAnalyzing) return <ReviewSkeleton />
+  if (analyzeErrorCode === 'CONTENT_POLICY_VIOLATION') return <ContentPolicyError />
   if (analyzeError) return <ReviewError message={analyzeError} />
   if (!quoteData) return null
 
@@ -214,6 +215,31 @@ function ReviewSkeleton() {
       </div>
       <div className="h-10 rounded-xl bg-muted/40" />
       <div className="h-16 rounded-2xl bg-muted/20" />
+    </div>
+  )
+}
+
+// ─── Content policy error ─────────────────────────────────────────────────────────
+
+function ContentPolicyError() {
+  const t = useTranslations('editor.modal.publish')
+  return (
+    <div className="py-6 flex flex-col items-center gap-4 text-center">
+      <div className="p-3 rounded-2xl bg-amber-500/10">
+        <ShieldAlert className="size-6 text-amber-500" />
+      </div>
+      <div className="space-y-1.5 max-w-xs">
+        <p className="text-sm font-semibold text-foreground">{t('review.contentPolicyError.title')}</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">{t('review.contentPolicyError.description')}</p>
+      </div>
+      <Link
+        href="/policies/acceptable-use-policy"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-amber-600 dark:text-amber-400 underline underline-offset-2 hover:opacity-80 transition-opacity"
+      >
+        {t('review.contentPolicyError.aupLink')}
+      </Link>
     </div>
   )
 }

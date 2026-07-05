@@ -367,7 +367,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         }}
         projectId={projectId}
         mode={editorMode as 'portfolio' | 'photobook'}
-        initialSlug={afterTopupSlug ?? (normalizeSlug(projectName ?? '') || undefined)}
+        initialSlug={afterTopupSlug ?? (editorMode === 'photobook' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
         initialAccessToken={afterTopupAccessToken ?? undefined}
         autoAdvance={afterTopupSlug !== null}
         republishMode={projectStatus === 'archived' && !isPublished}

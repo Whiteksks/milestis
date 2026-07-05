@@ -76,7 +76,7 @@ async function performSaveProject(
   await setDoc(contentDocRef, {
     theme: stripUndefined(theme),
     content: stripUndefined(content),
-  }, { merge: true })
+  })
 
   if (Object.keys(payload).length > 0) {
     await updateDoc(doc(db, 'projects', projectId), payload)
