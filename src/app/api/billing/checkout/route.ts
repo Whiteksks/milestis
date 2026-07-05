@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 3. Create Polar Checkout Session ────────────────────────────────────
-  const successUrl = new URL("/account/billing?checkout=success", request.nextUrl.origin).toString()
+  const appUrl = process.env.NEXT_APP_URL ?? request.nextUrl.origin
+  const successUrl = new URL("/account/billing?checkout=success", appUrl).toString()
 
   // Fetch user's email to pre-fill the checkout form.
   // This prevents the user from entering a different email and creating

@@ -9,7 +9,13 @@ export type AuthResult = AuthSuccess | AuthFailure
 
 function isSameOriginRequest(request: NextRequest): boolean {
   const origin = request.headers.get("origin")
-  if (origin) return origin === request.nextUrl.origin
+  if (origin) {
+    const trustedOrigins = new Set([
+      request.nextUrl.origin,
+      process.env.NEXT_APP_URL,
+    ].filter(Boolean))
+    return trustedOrigins.has(origin)
+  }
 
   const fetchSite = request.headers.get("sec-fetch-site")
   if (fetchSite === "cross-site") return false

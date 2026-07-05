@@ -88,9 +88,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "CREDITS_PRODUCT_NOT_CONFIGURED" }, { status: 500 })
   }
 
+  const appUrl = process.env.NEXT_APP_URL ?? request.nextUrl.origin
   const successUrl = new URL(
     returnTo ?? "/account/billing?checkout=success&type=credits",
-    request.nextUrl.origin,
+    appUrl,
   ).toString()
 
   try {
