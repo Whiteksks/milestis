@@ -80,7 +80,7 @@ export async function commitPublish(
 	db: Firestore,
 	input: CommitPublishInput,
 ): Promise<{ balanceSnapshot: BalanceSnapshot; publishedSlug: string; transactionId: string }> {
-	const { projectId, uid, mode, projectName, prepared, contentSnapshot, creditCost, freedBytes, previewHeroUrl } = input;
+	const { projectId, uid, mode, projectName, prepared, contentSnapshot, creditCost, photoCount, freedBytes, previewHeroUrl } = input;
 
 	return await db.runTransaction(async (tx) => {
 		const projectRef = db.collection("projects").doc(projectId);
@@ -144,6 +144,8 @@ export async function commitPublish(
 			publishedSlug: prepared.slug,
 			...(prepared.accessToken ? { publishedAccessToken: prepared.accessToken } : {}),
 			status: "archived",
+			publishedCreditCost: creditCost,
+			publishedPhotoCount: photoCount,
 			publishedAt: FieldValue.serverTimestamp(),
 			publishLockId: FieldValue.delete(),
 			publishLockExpiresAtMillis: FieldValue.delete(),

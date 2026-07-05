@@ -8,6 +8,7 @@ import {
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
+import { analyzeRepublish } from '@/lib/projects/analyze-republish-api'
 import { getProjectConfig } from '@/lib/projects/project-type-config'
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
@@ -19,9 +20,10 @@ function generateToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string; ratePerDollar?: number }) {
+export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string; ratePerDollar?: number; republishMode?: boolean }) {
   const initialSlug = options?.initialSlug ?? ''
   const ratePerDollar = options?.ratePerDollar ?? 1
+  const republishMode = options?.republishMode ?? false
   const [step, setStep] = useState<PublishStep>('slug')
   const [slug, setSlug] = useState(initialSlug)
   const [slugStatus, setSlugStatus] = useState<SlugStatus>(() =>
@@ -88,13 +90,18 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   }
 
   // Step 1: ready to proceed to review
+  // In republishMode the slug is fixed — skip all slug validation
   const canProceedToReview =
-    slug.length >= 3 &&
-    slugStatus !== 'taken' &&
-    slugStatus !== 'invalid' &&
-    slugStatus !== 'reserved' &&
-    slugStatus !== 'checking' &&
-    !isAnalyzing
+    republishMode
+      ? !isAnalyzing
+      : (
+          slug.length >= 3 &&
+          slugStatus !== 'taken' &&
+          slugStatus !== 'invalid' &&
+          slugStatus !== 'reserved' &&
+          slugStatus !== 'checking' &&
+          !isAnalyzing
+        )
 
   // Transition to step 2: immediately show review pane with loading state,
   // then populate with server response. Also used for retry on error.
@@ -106,7 +113,9 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     setAnalyzeError(null)
     setQuoteData(null)
     try {
-      const result = await analyzeProject(projectId, slug)
+      const result = republishMode
+        ? await analyzeRepublish(projectId)
+        : await analyzeProject(projectId, slug)
       setQuoteData(result)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to analyze project. Please try again.'
@@ -114,7 +123,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     } finally {
       setIsAnalyzing(false)
     }
-  }, [canProceedToReview, projectId, slug])
+  }, [canProceedToReview, projectId, slug, republishMode])
 
   const goBack = () => {
     setStep('slug')

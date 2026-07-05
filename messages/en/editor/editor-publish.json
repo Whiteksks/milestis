@@ -5,13 +5,15 @@
         "title": {
           "portfolio": "Publish Portfolio",
           "photobook": "Publish Photobook",
-          "review": "Review & Confirm"
+          "review": "Review & Confirm",
+          "republish": "Republish"
         },
         "description": {
           "portfolio": "Choose a custom subdomain for your site.",
           "photobook": "Choose a memorable link identifier for your photobook.",
           "review": "Review publication details before confirming.",
-          "reviewDesktop": "Review the details below before confirming publication."
+          "reviewDesktop": "Review the details below before confirming publication.",
+          "republish": "Update your published site with the latest changes."
         },
         "actions": {
           "cancel": "Cancel",
@@ -19,6 +21,8 @@
           "back": "Back",
           "tryAgain": "Try again",
           "publish": "Publish",
+          "republish": "Republish",
+          "republishing": "Republishing\u2026",
           "checking": "Checking…",
           "publishing": "Publishing…"
         },
@@ -46,8 +50,14 @@
           "insufficient": "You don't have enough credits to publish.",
           "topupFailed": "Could not start checkout. Please try again.",
           "payAndPublish": "Pay ${price} & Publish",
+          "oneTimeNote": "Credits are charged based on photo count — you only pay the difference when adding more photos.",
           "terms": "I accept the Terms of Service and Content Policy. Credits are non-refundable once publication is confirmed.",
-          "analysisFailed": "Analysis failed"
+          "termsLink": "Pricing & Refund Policy",
+          "termsAnd": "and",
+          "aupLink": "Acceptable Use Policy",
+          "analysisFailed": "Analysis failed",
+          "freeRepublish": "No additional cost — same or fewer photos than before.",
+          "deltaNote": "You are charged only the difference: {delta} new credits ({prev}\u2192{new} cr)."
         }
       }
     }

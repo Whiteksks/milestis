@@ -8,7 +8,7 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
@@ -17,7 +17,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
-import { buildPublishedProjectUrl } from '@/lib/slug'
+import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
 
 interface EditorHeaderProps {
   projectId: string
@@ -43,7 +43,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
   const {
     deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean,
-    isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode,
+    isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode, projectStatus,
     setIsPreviewOpen,
   } = useUiSelector((state) => ({
     deviceView: state.deviceView,
@@ -58,6 +58,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     publishedSlug: state.publishedSlug,
     publishedAccessToken: state.publishedAccessToken,
     editorMode: state.editorMode,
+    projectStatus: state.projectStatus,
     setIsPreviewOpen: state.setIsPreviewOpen,
   }))
 
@@ -147,6 +148,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         clearPublishedInfo()
       },
     })
+  }
+
+  function handleRepublish() {
+    void handleOpenPublishModal()
   }
 
   async function handleHomeClick() {
@@ -326,6 +331,16 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : projectStatus === 'archived' ? (
+            <Button
+              size="sm"
+              onClick={handleRepublish}
+              disabled={saveState === 'saving'}
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
+            >
+              <RefreshCw className="h-3 w-3" />
+              <span className="hidden sm:inline">{t('header.republish')}</span>
+            </Button>
           ) : (
             <Button
               size="sm"
@@ -352,9 +367,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         }}
         projectId={projectId}
         mode={editorMode as 'portfolio' | 'photobook'}
-        initialSlug={afterTopupSlug ?? undefined}
+        initialSlug={afterTopupSlug ?? (normalizeSlug(projectName ?? '') || undefined)}
         initialAccessToken={afterTopupAccessToken ?? undefined}
         autoAdvance={afterTopupSlug !== null}
+        republishMode={projectStatus === 'archived' && !isPublished}
       />
     </header>
   )

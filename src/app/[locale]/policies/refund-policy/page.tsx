@@ -45,7 +45,7 @@ const content = {
     sections: [
       {
         title: '1. How Credits and Payments Work',
-        text: 'Milestis uses internal credits to publish projects and access premium features. Credits have no cash value and cannot be redeemed for fiat currency.\n• Purchased credits: Bought as one-time packages, they never expire.\n• Subscription credits: Included in your recurring plan, they expire at the end of the billing cycle and do not roll over.\n• Bonus credits: Granted via promotions; expiration depends on the offer terms.\nThe required number of credits is always displayed before you confirm a publication. Credits are only deducted upon your confirmation.',
+        text: 'Milestis uses internal credits to publish projects and access premium features. Credits have no cash value and cannot be redeemed for fiat currency.\n• Purchased credits: Bought as one-time packages, they never expire.\n• Subscription credits: Included in your recurring plan, they expire at the end of the billing cycle and do not roll over.\n• Bonus credits: Granted via promotions; expiration depends on the offer terms.\nThe required number of credits is always displayed before you confirm a publication. Credits are only deducted upon your confirmation.\n\nPublication costs (charged once per project, on first publish only):\n• Portfolio: 20 credits\n• Photobook: 20–40 credits, depending on the number of photos\n• Republishing an existing project is always free of charge.',
       },
       {
         title: '2. Subscriptions and Cancellation',
@@ -57,7 +57,7 @@ const content = {
       },
       {
         title: '4. Payment Processing & Contact Us',
-        text: 'Payments are handled by secure third-party providers. If you believe you were charged in error, contact us within 14 days at support@milestis.com with your account and transaction details. We will manually review your exceptional case.',
+        text: 'Payments are handled by secure third-party providers. Credit top-ups have a minimum purchase of $10. The number of credits per dollar depends on your subscription plan — Free: 1 credit/$1; Creator and Archive: 5 credits/$1. If you believe you were charged in error, contact us within 14 days at support@milestis.com with your account and transaction details. We will manually review your exceptional case.',
       },
     ],
   },
@@ -69,7 +69,7 @@ const content = {
     sections: [
       {
         title: '1. Как работают кредиты и оплата',
-        text: 'Milestis использует внутренние кредиты для публикации проектов и доступа к платным функциям. Кредиты не имеют денежной стоимости и не могут быть выведены в реальную валюту.\n• Купленные кредиты: приобретаются разово и не имеют срока действия.\n• Кредиты подписки: начисляются регулярно, сгорают в конце расчетного периода и не переносятся.\n• Бонусные кредиты: выдаются по акциям, их срок зависит от условий предложения.\nСтоимость действия всегда отображается до подтверждения публикации. Кредиты списываются только после вашего явного согласия.',
+        text: 'Milestis использует внутренние кредиты для публикации проектов и доступа к платным функциям. Кредиты не имеют денежной стоимости и не могут быть выведены в реальную валюту.\n• Купленные кредиты: приобретаются разово и не имеют срока действия.\n• Кредиты подписки: начисляются регулярно, сгорают в конце расчетного периода и не переносятся.\n• Бонусные кредиты: выдаются по акциям, их срок зависит от условий предложения.\nСтоимость действия всегда отображается до подтверждения публикации. Кредиты списываются только после вашего явного согласия.\n\nСтоимость публикаций (списывается один раз, только при первой публикации):\n• Портфолио: 20 кредитов\n• Фотокнига: 20–40 кредитов в зависимости от количества фотографий\n• Повторная публикация существующего проекта всегда бесплатна.',
       },
       {
         title: '2. Подписка и ее отмена',
@@ -81,7 +81,7 @@ const content = {
       },
       {
         title: '4. Обработка платежей и связь с нами',
-        text: 'Все платежи обрабатываются безопасными сторонними провайдерами. Если вы считаете, что списание произошло по ошибке, свяжитесь с нами в течение 14 дней по адресу support@milestis.com, указав детали аккаунта и транзакции. Мы рассмотрим вашу ситуацию в индивидуальном порядке.',
+        text: 'Все платежи обрабатываются безопасными сторонними провайдерами. Минимальная сумма пополнения кредитов — $10. Количество кредитов за доллар зависит от тарифного плана: бесплатный план — 1 кредит за $1; планы Creator и Archive — 5 кредитов за $1. Если вы считаете, что списание произошло по ошибке, свяжитесь с нами в течение 14 дней по адресу support@milestis.com, указав детали аккаунта и транзакции. Мы рассмотрим вашу ситуацию в индивидуальном порядке.',
       },
     ],
   },

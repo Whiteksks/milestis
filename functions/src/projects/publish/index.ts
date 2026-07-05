@@ -116,6 +116,7 @@ interface QuoteData {
 	uid: string;
 	slug: string;
 	creditCost: number;
+	photoCount: number;
 	expiresAt: FirebaseFirestore.Timestamp;
 }
 
@@ -383,6 +384,7 @@ export const publishProject = onRequest(
 					content: migratedData.content,
 				},
 				creditCost: quotedCreditCost,
+				photoCount: quoteData.photoCount ?? 0,
 				freedBytes,
 				previewHeroUrl: projectData.preview?.heroImageUrl
 					? (urlMapping.get(projectData.preview.heroImageUrl) ?? projectData.preview.heroImageUrl)

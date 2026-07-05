@@ -23,7 +23,7 @@ import {
   CreditCard,
 } from 'lucide-react'
 import { usePublishModal } from '@/hooks/usePublishModal'
-import { usePublishMutation } from '@/hooks/useProjectMutations'
+import { usePublishMutation, useRepublishMutation } from '@/hooks/useProjectMutations'
 import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useUserStore, selectSubscription } from '@/hooks/useUserStore'
@@ -40,23 +40,29 @@ interface PublishModalProps {
   initialSlug?: string
   initialAccessToken?: string
   autoAdvance?: boolean
+  /** When true, runs the republish flow (analyzeRepublish → republishProject). */
+  republishMode?: boolean
 }
 
-export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug, initialAccessToken, autoAdvance }: PublishModalProps) {
+export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug, initialAccessToken, autoAdvance, republishMode }: PublishModalProps) {
   const t = useTranslations('editor.modal.publish')
   const { setIsPublished, setPublishedInfo } = useUiSelector((s) => ({
     setIsPublished: s.setIsPublished,
     setPublishedInfo: s.setPublishedInfo,
   }))
 
-  // Rate must be read before usePublishModal so it can be forwarded for min-purchase logic.
   const subscription = useUserStore(selectSubscription)
   const ratePerDollar = getEffectiveSubscriptionFeatures(subscription).creditTopupRatePerDollar || 1
 
   const publishMutation = usePublishMutation()
-  const modalData = usePublishModal(projectId, mode, { initialSlug, initialAccessToken, ratePerDollar })
+  const republishMutation = useRepublishMutation()
+  const modalData = usePublishModal(projectId, mode, { initialSlug, initialAccessToken, ratePerDollar, republishMode })
   const isMobile = useIsMobile()
   const [termsAccepted, setTermsAccepted] = useState(false)
+
+  // Free republish — terms not required
+  const isFreeRepublish = republishMode && (modalData.quoteData?.creditCost ?? 1) === 0
+  const effectiveTermsAccepted = isFreeRepublish || termsAccepted
 
   // Derived: is the user short on credits in the review step?
   const insufficient =
@@ -74,6 +80,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
   const priceDollars = (topupCredits / ratePerDollar).toFixed(2)
 
   // Auto-advance to review when returning from payment (afterTopup flow)
+  // OR when republishMode opens — immediately run analyzeRepublish
   const { step: modalStep, canProceedToReview, advanceToReview } = modalData
   const hasAutoAdvanced = useRef(false)
   useEffect(() => {
@@ -81,12 +88,13 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
       hasAutoAdvanced.current = false
       return
     }
-    if (!autoAdvance || !open || hasAutoAdvanced.current) return
-    if (modalStep === 'slug' && canProceedToReview) {
+    if (hasAutoAdvanced.current) return
+    const shouldAdvance = autoAdvance || republishMode
+    if (shouldAdvance && modalStep === 'slug' && canProceedToReview) {
       hasAutoAdvanced.current = true
       advanceToReview()
     }
-  }, [open, autoAdvance, modalStep, canProceedToReview, advanceToReview])
+  }, [open, autoAdvance, republishMode, modalStep, canProceedToReview, advanceToReview])
 
   // Re-analyze after Polar payment if balance was not yet updated when we first analyzed.
   // The Polar webhook may fire after the redirect back, so onSnapshot updates the store
@@ -140,6 +148,18 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
     )
   }
 
+  function handleRepublish() {
+    if (!modalData.canPublish && !isFreeRepublish) return
+    if (!modalData.quoteData) return
+    republishMutation.mutate(
+      { projectId, quoteId: modalData.quoteData.quoteId },
+      { onSuccess: () => handleClose(false) },
+    )
+  }
+
+  const onConfirm = republishMode ? handleRepublish : handlePublish
+  const confirmMutation = republishMode ? republishMutation : publishMutation
+
   const modeIcon = mode === 'portfolio'
     ? <Globe className="size-4 text-primary" />
     : <Lock className="size-4 text-primary" />
@@ -148,6 +168,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
   const step1Description = mode === 'portfolio'
     ? t('description.portfolio')
     : t('description.photobook')
+  const reviewTitle = republishMode ? t('title.republish') : t('title.review')
+  const reviewDescription = republishMode ? t('description.republish') : t('description.reviewDesktop')
 
   if (isMobile) {
     const mobileFooter = modalData.step === 'slug' ? (
@@ -170,18 +192,21 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
       <>
         <ReviewPrimaryButton
             insufficient={insufficient}
+            isFreeRepublish={isFreeRepublish}
+            republishMode={republishMode}
             priceDollars={priceDollars}
-            termsAccepted={termsAccepted}
+            effectiveTermsAccepted={effectiveTermsAccepted}
             modalData={modalData}
-            publishMutation={publishMutation}
-            onPublish={handlePublish}
+            confirmMutation={confirmMutation}
+            onConfirm={onConfirm}
             t={t}
             fullWidth
           />
+        {!republishMode && (
         <Button
           variant="ghost"
           onClick={modalData.analyzeError ? modalData.advanceToReview : modalData.goBack}
-          disabled={publishMutation.isPending || modalData.isAnalyzing || modalData.isBuyingCredits}
+          disabled={confirmMutation.isPending || modalData.isAnalyzing || modalData.isBuyingCredits}
           className="gap-1.5 w-full"
         >
           {modalData.analyzeError
@@ -189,6 +214,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
             : <><ArrowLeft className="size-3" /> {t('actions.back')}</>
           }
         </Button>
+        )}
       </>
     )
 
@@ -196,7 +222,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
       <MobileDrawer
         open={open}
         onOpenChange={handleClose}
-        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : t('title.review')}</span>}
+        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : reviewTitle}</span>}
         description={modalData.step === 'slug' ? step1Description : t('description.review')}
         showHeader
         footer={mobileFooter}
@@ -205,7 +231,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
         {modalData.step === 'slug' ? (
           <PublishForm mode={mode} data={modalData} />
         ) : (
-          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} />
+          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} republishMode={republishMode} />
         )}
       </MobileDrawer>
     )
@@ -217,19 +243,19 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
         <DialogHeader className="gap-1">
           <DialogTitle className="flex items-center gap-2 text-base">
             {modeIcon}
-            {modalData.step === 'slug' ? step1Title : t('title.review')}
+            {modalData.step === 'slug' ? step1Title : reviewTitle}
           </DialogTitle>
           <DialogDescription className="text-xs">
             {modalData.step === 'slug'
               ? step1Description
-              : t('description.reviewDesktop')}
+              : reviewDescription}
           </DialogDescription>
         </DialogHeader>
 
         {modalData.step === 'slug' ? (
           <PublishForm mode={mode} data={modalData} />
         ) : (
-          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} />
+          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} republishMode={republishMode} />
         )}
 
         <DialogFooter className="gap-2">
@@ -252,11 +278,12 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
             </>
           ) : (
             <>
+              {!republishMode && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={modalData.analyzeError ? modalData.advanceToReview : modalData.goBack}
-                disabled={publishMutation.isPending || modalData.isAnalyzing || modalData.isBuyingCredits}
+                disabled={confirmMutation.isPending || modalData.isAnalyzing || modalData.isBuyingCredits}
                 className="gap-1.5"
               >
                 {modalData.analyzeError
@@ -264,13 +291,16 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
                   : <><ArrowLeft className="size-3" /> {t('actions.back')}</>
                 }
               </Button>
+              )}
               <ReviewPrimaryButton
                 insufficient={insufficient}
+                isFreeRepublish={isFreeRepublish}
+                republishMode={republishMode}
                 priceDollars={priceDollars}
-                termsAccepted={termsAccepted}
+                effectiveTermsAccepted={effectiveTermsAccepted}
                 modalData={modalData}
-                publishMutation={publishMutation}
-                onPublish={handlePublish}
+                confirmMutation={confirmMutation}
+                onConfirm={onConfirm}
                 t={t}
                 size="sm"
               />
@@ -288,33 +318,37 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
 
 function ReviewPrimaryButton({
   insufficient,
+  isFreeRepublish,
+  republishMode,
   priceDollars,
-  termsAccepted,
+  effectiveTermsAccepted,
   modalData,
-  publishMutation,
-  onPublish,
+  confirmMutation,
+  onConfirm,
   t,
   fullWidth,
   size,
 }: {
   insufficient: boolean
+  isFreeRepublish?: boolean
+  republishMode?: boolean
   priceDollars: string
-  termsAccepted: boolean
+  effectiveTermsAccepted: boolean
   modalData: ReturnType<typeof usePublishModal>
-  publishMutation: { isPending: boolean }
-  onPublish: () => void
+  confirmMutation: { isPending: boolean }
+  onConfirm: () => void
   t: ReturnType<typeof useTranslations>
   fullWidth?: boolean
   size?: 'sm' | 'default'
 }) {
   const cls = `gap-2${fullWidth ? ' w-full' : ''}`
 
-  if (insufficient) {
+  if (insufficient && !republishMode) {
     return (
       <Button
         size={size}
         onClick={modalData.initiateBuyAndPublish}
-        disabled={modalData.isBuyingCredits || !termsAccepted}
+        disabled={modalData.isBuyingCredits || !effectiveTermsAccepted}
         className={cls}
       >
         {modalData.isBuyingCredits
@@ -324,21 +358,24 @@ function ReviewPrimaryButton({
     )
   }
 
+  const label = republishMode ? t('actions.republish') : t('actions.publish')
+  const pendingLabel = republishMode ? t('actions.republishing') : t('actions.publishing')
+
   return (
     <Button
       size={size}
-      onClick={onPublish}
+      onClick={onConfirm}
       disabled={
-        !modalData.canPublish ||
-        publishMutation.isPending ||
+        (!modalData.canPublish && !isFreeRepublish) ||
+        confirmMutation.isPending ||
         modalData.isAnalyzing ||
-        !termsAccepted
+        !effectiveTermsAccepted
       }
       className={cls}
     >
-      {publishMutation.isPending
-        ? <><Loader2 className="size-3 animate-spin" /> {t('actions.publishing')}</>
-        : <><ExternalLink className="size-3" /> {t('actions.publish')}</>}
+      {confirmMutation.isPending
+        ? <><Loader2 className="size-3 animate-spin" /> {pendingLabel}</>
+        : <><ExternalLink className="size-3" /> {label}</>}
     </Button>
   )
 }

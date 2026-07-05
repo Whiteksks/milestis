@@ -91,6 +91,11 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  - variable: NEXT_PUBLIC_ANALYZE_REPUBLISH_URL
+    value: https://analyzerepublish-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
 
   - variable: NEXT_PUBLIC_EXPORT_USER_DATA_URL
     value: https://exportuserdata-5h4wes5waq-ez.a.run.app

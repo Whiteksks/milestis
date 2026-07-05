@@ -46,6 +46,9 @@ export interface UiStore {
   isPublished: boolean
   setIsPublished: (v: boolean) => void
 
+  projectStatus: 'active' | 'archived' | 'deleted'
+  setProjectStatus: (status: 'active' | 'archived' | 'deleted') => void
+
   publishedSlug: string | null
   publishedAccessToken: string | null
   setPublishedInfo: (slug: string, accessToken?: string) => void
@@ -78,6 +81,7 @@ export const useUiStore = create<UiStore>((set) => ({
   projectId: null,
   projectName: null,
   isPublished: false,
+  projectStatus: 'active',
   publishedSlug: null,
   publishedAccessToken: null,
   isDirty: false,
@@ -124,6 +128,7 @@ export const useUiStore = create<UiStore>((set) => ({
   setProjectId: (id) => set(() => ({ projectId: id })),
   setProjectName: (name) => set(() => ({ projectName: name })),
   setIsPublished: (v) => set(() => ({ isPublished: v })),
+  setProjectStatus: (status) => set(() => ({ projectStatus: status })),
   setPublishedInfo: (slug, accessToken) => set(() => ({ publishedSlug: slug, publishedAccessToken: accessToken ?? null })),
   clearPublishedInfo: () => set(() => ({ publishedSlug: null, publishedAccessToken: null })),
 

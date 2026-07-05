@@ -76,92 +76,89 @@ export function BuyCreditsDialog() {
 
   return (
     <>
-      {/* Trigger: small button placed inline */}
+      {/* Улучшенный триггер: теперь это полноценная адаптивная кнопка для размещения вне карточки */}
       <Button
-        variant="outline"
-        size="sm"
-        className="h-7 gap-1 rounded-full px-2.5 text-[11px] font-semibold tracking-wide border-border/60 bg-background/60 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
+        variant="default"
+        size="lg"
+        className="w-full h-11 gap-2 rounded-2xl text-xs font-semibold tracking-wide shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
         onClick={() => setOpen(true)}
       >
-        <Plus className="size-3" />
+        <Plus className="size-4 shrink-0" />
         {t("topup.button")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-xl">{t("topup.dialogTitle")}</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
+        {/* Ограничиваем максимальную ширину окна до аккуратных sm:max-w-[400px], чтобы оно не казалось пустым */}
+        <DialogContent className="sm:max-w-[400px] gap-0 p-6 rounded-3xl border border-border bg-card shadow-lg antialiased">
+          <DialogHeader className="space-y-1 text-left">
+            <DialogTitle className="font-serif text-xl font-medium tracking-tight">
+              {t("topup.dialogTitle")}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground/90 leading-normal">
               {t("topup.dialogDesc")}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mt-2 space-y-6">
-            {/* Rate badge */}
-            <div className="flex items-center gap-2">
+          <div className="mt-5 space-y-5">
+            {/* Информационный бейдж рейта */}
+            <div className="flex items-center justify-start">
               {isPremiumRate ? (
-                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1">
-                  <Zap className="size-3 text-primary" />
-                  <span className="text-xs font-semibold text-primary">
+                <div className="flex items-center gap-1.5 rounded-xl bg-primary/10 border border-primary/20 px-2.5 py-1 text-primary">
+                  <Zap className="size-3.5 fill-current" />
+                  <span className="text-[11px] font-bold tracking-wide">
                     {t("topup.rateNotePremium", { rate: ratePerDollar })}
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 rounded-full bg-muted border border-border/60 px-3 py-1">
-                  <Sparkles className="size-3 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground">
+                <div className="flex items-center gap-1.5 rounded-xl bg-muted border border-border/60 px-2.5 py-1 text-muted-foreground">
+                  <Sparkles className="size-3.5" />
+                  <span className="text-[11px] font-medium tracking-wide">
                     {t("topup.rateNote", { rate: ratePerDollar })}
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Credit amount display */}
-            <div className="rounded-2xl bg-muted/40 border border-border/60 p-5 text-center">
-              <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            {/* Главное табло: Кредиты и Стоимость объединены в один аккуратный блок */}
+            <div className="rounded-2xl border border-border bg-muted/30 p-5 flex flex-col items-center justify-center relative overflow-hidden">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground/80 mb-1">
                 {t("topup.creditLabel")}
-              </p>
-              <p className="text-5xl font-bold tabular-nums tracking-tight">
+              </span>
+              <span className="text-5xl font-extrabold tabular-nums tracking-tight text-foreground">
                 {credits.toLocaleString()}
-              </p>
+              </span>
+              <div className="mt-3 px-3 py-0.5 rounded-lg bg-background border border-border/50 text-xs font-semibold text-muted-foreground shadow-xs tabular-nums">
+                {priceDisplay}
+              </div>
             </div>
 
-            {/* Slider */}
-            <div className="px-1 space-y-3">
+            {/* Контейнер интерактивного слайдера */}
+            <div className="space-y-2.5 px-0.5">
               <Slider
                 min={MIN_CREDITS}
                 max={MAX_CREDITS}
                 step={STEP}
                 value={[credits]}
                 onValueChange={([val]) => setCredits(val)}
+                className="py-2 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-muted-foreground font-medium">
-                <span>{MIN_CREDITS}</span>
-                <span>500</span>
-                <span>{MAX_CREDITS.toLocaleString()}</span>
+              <div className="flex justify-between text-[11px] text-muted-foreground/80 font-medium tabular-nums">
+                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(MIN_CREDITS)}>{MIN_CREDITS}</span>
+                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(500)}>500</span>
+                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(MAX_CREDITS)}>{MAX_CREDITS.toLocaleString()}</span>
               </div>
             </div>
 
-            {/* Price summary */}
-            <div className="rounded-xl border border-border/60 bg-card divide-y divide-border/60">
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-muted-foreground">{t("topup.creditLabel")}</span>
-                <span className="text-sm font-semibold tabular-nums">{credits.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm font-semibold">{t("topup.priceTitle")}</span>
-                <span className="text-lg font-bold tabular-nums">{priceDisplay}</span>
-              </div>
-            </div>
-
-            {/* Error */}
+            {/* Ошибка запроса */}
             {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
+              <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-center">
+                <p className="text-xs font-medium text-destructive">{error}</p>
+              </div>
             )}
 
-            {/* Buy button */}
+            {/* Главная кнопка отправки формы */}
             <Button
-              className="w-full"
+              className="w-full h-11 text-xs font-semibold tracking-wide rounded-2xl shadow-xs"
               size="lg"
               onClick={handleBuy}
               disabled={loading}

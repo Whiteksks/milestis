@@ -14,6 +14,7 @@ import {unpublishProject} from "./projects/unpublishProject";
 import {republishProject} from "./projects/republishProject";
 import {publishProject} from "./projects/publish";
 import {analyzeProject} from "./projects/publish/analyzeProject";
+import {analyzeRepublish} from "./projects/publish/analyzeRepublish";
 import {webhookPolar} from "./transactions/triggers/polar";
 
 export {
@@ -30,5 +31,6 @@ export {
 	republishProject,
 	publishProject,
 	analyzeProject,
+	analyzeRepublish,
 	webhookPolar,
 };

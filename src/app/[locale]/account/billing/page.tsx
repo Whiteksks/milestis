@@ -113,38 +113,44 @@ export default function BillingSettings() {
         {creditsData ? (
           <div className="grid gap-4 md:grid-cols-5 items-stretch">
             
-            {/* Левая колонка: Матовая семантическая "Банковская карта" баланса (2/5 ширины) */}
-            <div className="md:col-span-2 relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-muted/50 p-6 shadow-sm flex flex-col justify-between min-h-[240px] group transition-all hover:shadow-md">
+            {/* Левая колонка: Баланс и Кнопка покупки вне карты (2/5 ширины) */}
+            <div className="md:col-span-2 flex flex-col gap-4">
               
-              {/* Абстрактное семантическое свечение в тон основного бренда акцента */}
-              <div className="absolute -right-8 -top-8 size-36 bg-primary/5 rounded-full blur-3xl pointer-events-none transition-all group-hover:scale-110" />
-              
-              <div className="flex items-center justify-between relative z-10">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-muted border border-border/80 shadow-sm">
-                  <CreditCard className="size-4 text-primary" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <BuyCreditsDialog />
+              {/* Матовая семантическая "Банковская карта" баланса */}
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-muted/50 p-6 shadow-sm flex flex-col justify-between min-h-[240px] group transition-all hover:shadow-md">
+                
+                {/* Абстрактное семантическое свечение в тон основного бренда акцента */}
+                <div className="absolute -right-8 -top-8 size-36 bg-primary/5 rounded-full blur-3xl pointer-events-none transition-all group-hover:scale-110" />
+                
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-muted border border-border/80 shadow-sm">
+                    <CreditCard className="size-4 text-primary" />
+                  </div>
                   <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase bg-muted/80 px-2.5 py-1 rounded-full border border-border/60 backdrop-blur-sm">
                     {t("credits.balanceLabel")}
                   </span>
                 </div>
-              </div>
 
-              <div className="my-auto pt-6 relative z-10">
-                <p className="text-xs font-medium text-muted-foreground tracking-wide">{t("credits.totalAvailable")}</p>
-                <div className="mt-1.5 flex items-baseline gap-2">
-                  <span className="text-5xl font-bold tracking-tight text-foreground tabular-nums">
-                    {totalCredits.toLocaleString()}
-                  </span>
+                <div className="my-auto pt-6 relative z-10">
+                  <p className="text-xs font-medium text-muted-foreground tracking-wide">{t("credits.totalAvailable")}</p>
+                  <div className="mt-1.5 flex items-baseline gap-2">
+                    <span className="text-5xl font-bold tracking-tight text-foreground tabular-nums">
+                      {totalCredits.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Сноска о сгорающих кредитах внизу карты */}
+                {/* Сноска о сгорающих кредитах внизу карты */}
                 <div className="border-t border-border/60 pt-4 mt-2 relative z-10">
                   <p className="text-[11px] text-muted-foreground/90 leading-normal font-normal">
                     <span className="text-primary font-medium">*</span> {t("credits.expirationNotice")}
                   </p>
+                </div>
+              </div>
+
+              {/* Кнопка вынесена вне карточки. Класс [&>button]:w-full растянет внутреннюю кнопку на всю ширину колонки */}
+              <div className="[&>button]:w-full">
+                <BuyCreditsDialog />
               </div>
             </div>
 

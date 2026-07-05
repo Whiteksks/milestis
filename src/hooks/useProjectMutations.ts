@@ -238,6 +238,7 @@ export function usePublishMutation() {
       // the content doc with dead private URLs. Marking clean prevents that save.
       // The next editor open will reload the content doc which already has public URLs.
       useUiStore.getState().markClean()
+      useUiStore.getState().setProjectStatus('archived')
     },
     onError: (_err, _vars, context) => {
       if (!uid || !context) return
@@ -290,17 +291,23 @@ export function useUnpublishMutation() {
 
 // ─── Republish ─────────────────────────────────────────────────────────
 
+export type RepublishVariables = {
+  projectId: string
+  quoteId: string
+}
+
 export function useRepublishMutation() {
   const queryClient = useQueryClient()
   const uid = useUid()
+  const updateBalance = useUserStore((s) => s.updateBalance)
 
   return useMutation({
-    mutationFn: async (projectId: string) => {
-      const promise = republishProject(projectId)
+    mutationFn: async ({ projectId, quoteId }: RepublishVariables) => {
+      const promise = republishProject(projectId, quoteId)
       toastProject.republish(promise)
-      await promise
+      return await promise
     },
-    onMutate: async (projectId) => {
+    onMutate: async ({ projectId }) => {
       if (!uid) return
       await queryClient.cancelQueries({ queryKey: projectKeys.archived(uid) })
       const prevArchived = queryClient.getQueryData<DashboardProject[]>(projectKeys.archived(uid))
@@ -310,13 +317,25 @@ export function useRepublishMutation() {
       )
       return { prevArchived }
     },
-    onError: (_err, _id, context) => {
+    onSuccess: (result) => {
+      if (updateBalance) updateBalance(result.balance)
+      useUiStore.getState().setIsPublished(true)
+      useUiStore.getState().setPublishedInfo(
+        result.publishedSlug,
+        result.publishedAccessToken ?? undefined,
+      )
+      // Republish rewrites the content doc with public URLs (same as publish).
+      // Mark clean so subsequent auto-saves don't overwrite it with stale store data.
+      useUiStore.getState().markClean()
+    },
+    onError: (_err, _vars, context) => {
       if (!uid || !context) return
       if (context.prevArchived !== undefined)
         queryClient.setQueryData(projectKeys.archived(uid), context.prevArchived)
     },
     onSettled: () => {
       if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
     },
   })
 }

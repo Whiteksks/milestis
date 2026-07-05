@@ -43,7 +43,7 @@ export const PUBLISH_MODE_CONFIG = {
 	portfolio: {
 		pricing: {
 			strategy: "flat",
-			creditCost: 10,
+			creditCost: 20,
 		},
 		republishCreditCost: 0,
 		requiresAccessToken: false,
@@ -51,10 +51,15 @@ export const PUBLISH_MODE_CONFIG = {
 	photobook: {
 		pricing: {
 			strategy: "tiered",
+			// Bulk-discount gradient — per-photo cost decreases as the book grows.
+			// Anchor: 20 photos = 20 credits (1.0 cr/photo).
+			// Each 10-photo band costs fewer incremental credits than the last.
 			tiers: [
 				{ upTo: 20,       cost: 20 },
 				{ upTo: 30,       cost: 25 },
+				{ upTo: 40,       cost: 30 },
 				{ upTo: 50,       cost: 35 },
+				{ upTo: 60,       cost: 40 },
 			],
 		},
 		republishCreditCost: 0,

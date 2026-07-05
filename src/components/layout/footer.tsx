@@ -122,11 +122,16 @@ export function Footer({
           ))}
 
           {/* Legal column */}
-          <div className="hidden sm:block">
+          <div className="hidden sm:block w-84">
             <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-current">
               {t("headings.legal")}
             </h3>
             <ul className="space-y-4">
+              <li>
+                <Link href="/policies/acceptable-use-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current">
+                  {t("policies.acceptableUse")}
+                </Link>
+              </li>
               <li>
                 <Link href="/policies/refund-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current">
                   {t("policies.refund")}
@@ -181,6 +186,11 @@ export function Footer({
             </AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-4 pb-4">
+                <li>
+                  <Link href="/policies/acceptable-use-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground">
+                    {t("policies.acceptableUse")}
+                  </Link>
+                </li>
                 <li>
                   <Link href="/policies/refund-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground">
                     {t("policies.refund")}

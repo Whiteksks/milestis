@@ -45,6 +45,7 @@ export interface CommitPublishInput {
 		content: Record<string, unknown> | null;
 	};
 	creditCost: number;
+	photoCount: number;
 	freedBytes: number;
 	previewHeroUrl?: string;
 }
