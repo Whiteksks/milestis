@@ -19,7 +19,6 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
     >
       <div className="max-w-6xl mx-auto w-full">
 
-        {/*   Cinematic video card   */}
         <Animate
           delay={0}
           direction="up"
@@ -29,7 +28,6 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
             theme.card,
           )}
         >
-          {/* Video / placeholder */}
           <div className="relative aspect-video bg-current/5">
             {hasVideo ? (
               <iframe
@@ -53,7 +51,6 @@ export function BentoVideo({ theme, sectionContent }: BentoVideoProps) {
             )}
           </div>
 
-          {/* Caption bar */}
           <div className="px-6 py-4 flex items-baseline justify-between gap-6 border-t border-current/8">
             <div>
               <p className={cn('text-[10px] uppercase tracking-widest opacity-35 mb-0.5', theme.fontBody)}>

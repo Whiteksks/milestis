@@ -22,10 +22,12 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
+          '/auth/',
           '/account/',
           '/dashboard/',
           '/design/',
           '/api/',
+          '/*/auth/',
           '/*/account/',
           '/*/dashboard/',
           '/*/design/',

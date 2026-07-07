@@ -28,7 +28,6 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
         theme.background,
       )}
     >
-      {/* 1. ������� ���: ���� � ������� */}
       <Animate
         trigger="mount"
         direction="none"
@@ -44,12 +43,10 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
         <div className="h-px w-12 bg-current opacity-10" />
       </Animate>
 
-      {/* 2. �������� ������� */}
       <div className="flex-1 flex items-center justify-center px-6 @md:px-12">
         {hasImage && coverImage ? (
           <div className="flex flex-col @md:flex-row items-center justify-center gap-12 @md:gap-20 @lg:gap-32 w-full max-w-7xl">
 
-            {/* ���� � ratio 4/5 ����������� ��������� */}
             <Animate
               trigger="mount"
               delay={0.1}
@@ -57,7 +54,7 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
               direction="up"
               className="w-full @sm:w-[70%] @md:w-[40%] @lg:w-[35%] shrink-0"
             >
-              <div className={cn('rounded-[2px]', theme.shadow)}>
+              <div className="rounded-[2px]">
                 <SlotImage
                   slotId={coverImage.slotId}
                   value={coverImage.value}
@@ -69,7 +66,6 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
               </div>
             </Animate>
 
-            {/* ��������� ���� */}
             <Animate
               trigger="mount"
               delay={0.3}
@@ -101,7 +97,6 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
                 )}
               </div>
 
-              {/* ������������ ������� */}
               <div className="flex items-center gap-4 opacity-20">
                 <div className="h-px w-8 bg-current" />
                 <div className="w-1 h-1 rounded-full bg-current" />
@@ -110,7 +105,6 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
             </Animate>
           </div>
         ) : (
-          /* ������� ��� ����������� */
           <Animate trigger="mount" delay={0.1} className="text-center space-y-8">
             <h1 className={cn('text-6xl @md:text-8xl font-light tracking-tighter', theme.fontTitle)}>
               {cover.title}
@@ -130,7 +124,6 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
         )}
       </div>
 
-      {/* 3. ������ ����� */}
       <Animate
         trigger="mount"
         direction="none"

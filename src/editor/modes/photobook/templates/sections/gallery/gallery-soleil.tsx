@@ -28,7 +28,6 @@ export function GallerySoleil({ sectionContent, theme, imageContent }: GallerySo
       className={cn('overflow-x-clip', theme.background)}
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-20 @md:py-28">
-      {/* Header */}
       <div className="flex items-end justify-between gap-4 mb-12 @md:mb-16">
         <div className="space-y-4">
         {gallery.label && (
@@ -63,7 +62,6 @@ export function GallerySoleil({ sectionContent, theme, imageContent }: GallerySo
         </p>
       )}
 
-      {/* Two-column photo grid ” no borders, gentle hover */}
       {images.length > 0 ? (
         <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
           {images.map((photo, index) => {
@@ -100,7 +98,6 @@ export function GallerySoleil({ sectionContent, theme, imageContent }: GallerySo
           })}
         </div>
       ) : (
-        /* Empty state */
         <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3">
           {[...Array(6)].map((_, i) => (
             <div key={i} className={cn('w-full aspect-[3/4] rounded-sm', theme.muted, 'opacity-40')} />

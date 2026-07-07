@@ -36,22 +36,15 @@ export function EditorialHero({ theme, sectionContent, imageContent }: Editorial
         themeForeground={theme.foreground}
         className="min-h-[88vh] flex flex-col justify-center overflow-hidden"
       >
-        {/* Main grid: 2 cols on desktop, stack on mobile */}
         <div className="flex-1 grid grid-cols-1 @md:grid-cols-2 items-stretch max-w-7xl mx-auto w-full">
-
-          {/* LEFT: label + title + description (desktop only) */}
           <div className="relative z-20 flex flex-col @lg:pl-20 @md:pl-12 pl-6 pr-6 pt-24 @md:pt-32 pb-10 @md:pb-14 w-full">
-
-            {/* Label row */}
             <div className="flex items-center gap-5 mb-10">
               <p className={cn('text-[10px] uppercase opacity-30', theme.letterSpacing, theme.fontBody)}>
                 {sectionContent.hero.subtitle || 'Editorial'}
               </p>
               <div className="w-16 h-px bg-current opacity-10" />
-
             </div>
 
-            {/* Title   overflows onto photo on desktop */}
             <Animate
               direction="left"
               distance={-30}
@@ -69,13 +62,11 @@ export function EditorialHero({ theme, sectionContent, imageContent }: Editorial
               </h1>
             </Animate>
 
-            {/* Description   bottom of left col, desktop only */}
             <div className="mt-auto pt-14 hidden @md:block">
               {descriptionBlock}
             </div>
           </div>
 
-          {/* RIGHT: photo   vertically centered, clears header with top padding */}
           {heroImage && (
             <Animate
               direction="right"
@@ -95,12 +86,10 @@ export function EditorialHero({ theme, sectionContent, imageContent }: Editorial
           )}
         </div>
 
-        {/* Description   mobile only, below photo */}
         <div className="@md:hidden max-w-7xl mx-auto w-full @lg:px-20 @md:px-12 px-6 pb-10 pt-4">
           {descriptionBlock}
         </div>
 
-        {/* Bottom rule */}
         <div className="max-w-7xl mx-auto w-full @lg:px-20 @md:px-12 px-6">
           <EditorialDivider />
         </div>

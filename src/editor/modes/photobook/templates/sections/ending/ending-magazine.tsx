@@ -25,7 +25,6 @@ export function EndingMagazine({ sectionContent, theme, imageContent }: EndingMa
       themeForeground={theme.foreground}
       className={cn('@container relative min-h-screen flex flex-col overflow-hidden', theme.background)}
     >
-      {/* Full-bleed background — mirrors the cover */}
       {hasImage && endingImage && (
         <div className="absolute inset-0">
           <SlotImage
@@ -39,7 +38,6 @@ export function EndingMagazine({ sectionContent, theme, imageContent }: EndingMa
         </div>
       )}
 
-      {/* Top rule */}
       <Animate
         trigger="mount"
         direction="none"
@@ -48,22 +46,9 @@ export function EndingMagazine({ sectionContent, theme, imageContent }: EndingMa
         <div className={cn('h-px', hasImage ? 'bg-white/15' : 'bg-current opacity-10')} />
       </Animate>
 
-      {/* Main content — centered vertically */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-8 @md:px-14 @lg:px-20 py-12">
         <Animate trigger="mount" delay={0.2} distance={32}>
           <div className="max-w-2xl space-y-8 @md:space-y-10">
-
-            {ending.label && (
-              <p
-                className={cn(
-                  'text-[9px] uppercase tracking-[0.4em]',
-                  hasImage ? 'text-white/35' : 'opacity-30',
-                  theme.fontBody,
-                )}
-              >
-                {ending.label}
-              </p>
-            )}
 
             {ending.title && (
               <h2
@@ -119,7 +104,6 @@ export function EndingMagazine({ sectionContent, theme, imageContent }: EndingMa
         </Animate>
       </div>
 
-      {/* Bottom bar — mirrors cover top bar */}
       <Animate
         trigger="mount"
         direction="none"

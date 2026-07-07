@@ -18,7 +18,6 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
       className={cn('relative w-full overflow-hidden', theme.foreground)}
     >
       <div className="relative max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
-        {/* Section label */}
         <Animate direction="left" distance={20} className="flex items-center gap-4 mb-14">
           <span className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
             {subtitle || 'About'}
@@ -26,9 +25,7 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
           <div className="w-12 h-px bg-current opacity-15" />
         </Animate>
 
-        {/* Main grid: image + content */}
         <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 @lg:gap-20 items-start">
-          {/* Image */}
           {bioImage && (
             <Animate direction="up" distance={30} delay={0.1} className="@lg:col-span-4 flex justify-start">
               <SlotImage
@@ -43,9 +40,7 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
             </Animate>
           )}
 
-          {/* Content */}
           <Animate direction="up" distance={30} delay={0.2} className={cn(bioImage ? '@lg:col-span-8' : '@lg:col-span-12', 'space-y-8')}>
-            {/* Name / title */}
             <h2
               className={cn(
                 'font-black uppercase leading-tight tracking-tighter',
@@ -55,8 +50,6 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
             >
               {title}
             </h2>
-
-            {/* Description */}
             <p
               className={cn(
                 'max-w-2xl text-sm @md:text-base opacity-60 font-light leading-relaxed whitespace-pre-line',
@@ -67,7 +60,6 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
               {description}
             </p>
 
-            {/* Achievements */}
             {achievements && achievements.length > 0 && (
               <Animate direction="none" delay={0.3} className="pt-6 border-t border-current/10">
                 <p
@@ -106,7 +98,6 @@ export function ShowcaseBio({ theme, sectionContent, imageContent }: ShowcaseBio
         </div>
       </div>
 
-      {/* Bottom separator */}
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>

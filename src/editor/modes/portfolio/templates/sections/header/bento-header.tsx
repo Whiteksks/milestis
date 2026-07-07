@@ -21,7 +21,6 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
         <>
           <HeaderContent width="compact" className="px-5 h-14 flex items-center justify-between gap-6">
 
-        {/* Logo / name */}
         <a
           {...getLinkProps('#hero', handleAnchorClick)}
           className={cn('text-sm font-bold tracking-tight opacity-80 hover:opacity-100 transition-opacity', theme.foreground, theme.fontBody)}
@@ -29,7 +28,6 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
           {sectionContent.header.title}
         </a>
 
-        {/* Desktop pill nav */}
         {hasLinks && (
           <nav className={cn(
             'hidden @md:flex items-center gap-0.5 px-2 py-1.5 rounded-full border border-current/10',
@@ -51,7 +49,6 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
           </nav>
         )}
 
-        {/* Mobile toggle */}
         {hasLinks && (
           <HeaderMenuToggle
             menu={menu}
@@ -60,7 +57,6 @@ export function BentoHeader({ theme, sectionContent, handleAnchorClick }: BentoH
         )}
           </HeaderContent>
 
-      {/* Mobile drawer */}
       {hasLinks && (
         <HeaderMobileDrawer menu={menu} className={cn('@md:hidden border-t border-current/8', theme.glassPanel)}>
             <nav className="flex flex-col px-5 py-3 gap-0.5">

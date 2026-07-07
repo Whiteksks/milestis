@@ -19,13 +19,8 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
       className="@lg:px-8 @md:px-6 px-4 py-6"
     >
       <div className="max-w-6xl mx-auto w-full">
-        {/* Unified Bento Grid Architecture */}
         <div className="grid grid-cols-1 @md:grid-cols-6 @lg:grid-cols-12 gap-4">
-          
-          {/* LEFT COLUMN: Headline & Quick Email (7/12 on Large desktop) */}
           <div className="grid grid-cols-1 @md:grid-cols-6 @lg:col-span-7 gap-4 @md:col-span-6">
-            
-            {/* [A] Headline Card */}
             <Animate
               delay={0}
               direction="up"
@@ -51,7 +46,6 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
               )}
             </Animate>
 
-            {/* [B] Email CTA Card */}
             <Animate
               delay={0.07}
               direction="up"
@@ -83,7 +77,6 @@ export function BentoContact({ theme, sectionContent }: BentoContactProps) {
             </Animate>
           </div>
 
-          {/* RIGHT COLUMN: Interactive Form Card (5/12 on Large desktop) */}
           <Animate
             delay={0.14}
             direction="up"

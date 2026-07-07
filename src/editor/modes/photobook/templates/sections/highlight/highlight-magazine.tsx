@@ -25,7 +25,6 @@ export function HighlightMagazine({ sectionContent, theme, imageContent }: Highl
       themeForeground={theme.foreground}
       className={cn('overflow-x-clip', theme.muted)}
     >
-      {/* Full-bleed cinematic photo panel */}
       <div className="relative min-h-[60vh] @md:min-h-[75vh] overflow-hidden">
         {hasImage && highlightImage ? (
           <>
@@ -40,7 +39,6 @@ export function HighlightMagazine({ sectionContent, theme, imageContent }: Highl
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20" />
             </div>
 
-            {/* Text anchored bottom-left */}
             <Animate
               trigger="mount"
               delay={0.1}
@@ -79,7 +77,6 @@ export function HighlightMagazine({ sectionContent, theme, imageContent }: Highl
             </Animate>
           </>
         ) : (
-          /* No image: typographic panel */
           <div className={cn('absolute inset-0 flex items-end px-8 @md:px-14 @lg:px-20 pb-14', theme.background)}>
             <div className="space-y-5 max-w-3xl">
               {highlight.label && (
@@ -109,8 +106,6 @@ export function HighlightMagazine({ sectionContent, theme, imageContent }: Highl
           </div>
         )}
       </div>
-
-      {/* Pull quote — editorial full-width strip */}
       {highlight.quote && (
         <Animate
           trigger="mount"

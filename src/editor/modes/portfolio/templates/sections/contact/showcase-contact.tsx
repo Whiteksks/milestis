@@ -18,7 +18,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
       className={cn(theme.foreground)}
     >
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-10 @md:mb-16">
           <span className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
             {sectionContent.contact.subtitle || 'Contact'}
@@ -26,9 +25,7 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
           <div className="w-10 h-px bg-current opacity-15" />
         </div>
 
-        {/* Main layout */}
         <div className="grid grid-cols-1 @lg:grid-cols-2 gap-16 @lg:gap-24 items-start">
-          {/* Left   statement */}
           <Animate direction="left" distance={20} delay={0.1} className="space-y-8">
             <h2
               className={cn(
@@ -52,7 +49,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               </p>
             )}
 
-            {/* Email link */}
             {sectionContent.contact.email && (
               <a
                 href={`mailto:${sectionContent.contact.email}`}
@@ -72,7 +68,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
             )}
           </Animate>
 
-          {/* Right   form */}
           <Animate as="form" onSubmit={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)} direction="right" distance={20} delay={0.2} className="space-y-0">
             {status !== 'idle' && (
               <motion.div
@@ -91,7 +86,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               </motion.div>
             )}
 
-            {/* Name + Email row */}
             <div className="grid @sm:grid-cols-2 gap-0">
               <div className="border-b border-current/15 py-5">
                 <input
@@ -121,7 +115,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               </div>
             </div>
 
-            {/* Subject */}
             <div className="border-b border-current/15 py-5">
               <input
                 type="text"
@@ -136,7 +129,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               />
             </div>
 
-            {/* Message */}
             <div className="border-b border-current/15 py-5">
               <textarea
                 name="message"
@@ -151,7 +143,6 @@ export function ShowcaseContact({ theme, sectionContent }: ShowcaseContactProps)
               />
             </div>
 
-            {/* Submit */}
             <div className="pt-8">
               <button
                 type="submit"

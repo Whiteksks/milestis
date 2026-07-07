@@ -27,7 +27,6 @@ export function GalleryMemoir({ sectionContent, theme, imageContent }: GalleryMe
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28">
 
-        {/* Header */}
         <Animate direction="up" distance={20} className="mb-14 @md:mb-20">
           <div className="flex items-end justify-between gap-8 pb-6 border-b border-current/10">
             <div className="space-y-2">
@@ -55,11 +54,9 @@ export function GalleryMemoir({ sectionContent, theme, imageContent }: GalleryMe
           )}
         </Animate>
 
-        {/* Photo grid ” 3 cols @lg, 2 @sm, 1 mobile. Fixed aspect-[4/5] for editorial consistency */}
         {photos.length > 0 && (
           <div className="space-y-4 @md:space-y-6">
 
-            {/* Hero photo — full-width, cinematic 3:2 */}
             {hero && (
               <Animate direction="up" distance={30} className="group">
                 {(() => {
@@ -93,7 +90,6 @@ export function GalleryMemoir({ sectionContent, theme, imageContent }: GalleryMe
               </Animate>
             )}
 
-            {/* Remaining photos — 2-col @sm, 3-col @lg, passepartout mats */}
             {rest.length > 0 && (
               <div className="grid grid-cols-2 @lg:grid-cols-3 gap-3 @md:gap-4">
                 {rest.map((block, i) => (

@@ -15,8 +15,6 @@ export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
     <SectionWrapper id="video" themeForeground={theme.foreground}>
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-24 @md:py-20 py-14">
         <div className="max-w-7xl mx-auto space-y-14">
-
-          {/* Section header   left-aligned editorial style */}
           <EditorialLabel themeFont={theme.fontBody}>
             {sectionContent.video.subtitle || 'Showreel'}
           </EditorialLabel>
@@ -37,7 +35,6 @@ export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
             )}
           </div>
 
-          {/* Full-width video   no border radius, raw */}
           <Animate direction="up" delay={0.3} className="relative aspect-video overflow-hidden bg-current/5">
             {sectionContent.video.videoUrl ? (
               <iframe
@@ -57,7 +54,6 @@ export function EditorialVideo({ theme, sectionContent }: EditorialVideoProps) {
         </div>
       </div>
 
-      {/* Bottom rule */}
       <div className="max-w-7xl mx-auto w-full @lg:px-20 @md:px-12 px-6">
         <EditorialDivider />
       </div>

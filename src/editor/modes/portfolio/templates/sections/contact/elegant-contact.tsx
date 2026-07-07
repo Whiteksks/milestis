@@ -18,7 +18,6 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
     >
       <div className="max-w-3xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         <div className="space-y-14">
-          {/* Heading */}
           <div className="text-center space-y-4">
             <Animate
               direction="up"
@@ -52,7 +51,6 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
             />
           </div>
 
-          {/* Form */}
           <Animate
             direction="up"
             distance={16}
@@ -74,7 +72,7 @@ export function ElegantContact({ theme, sectionContent }: ElegantContactProps) {
                     theme.fontBody,
                   )}
                 >
-                  <p>{status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}</p>
+                  <p>{status === 'sent' ? 'Message sent! Check your email client.' : 'Please fill in all required fields.'}</p>
                 </Animate>
               )}
               <div className="grid @md:grid-cols-2 grid-cols-1 gap-8">

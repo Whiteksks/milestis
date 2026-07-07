@@ -16,7 +16,6 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
         <div className="space-y-14">
-          {/* Heading */}
           <div className="text-center space-y-4">
             <Animate
               direction="up"
@@ -45,8 +44,6 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
               </Animate>
             )}
           </div>
-
-          {/* Video frame   thin ornamental border */}
           <Animate
             direction="up"
             distance={16}
@@ -74,4 +71,3 @@ export function ElegantVideo({ theme, sectionContent }: ElegantVideoProps) {
     </SectionWrapper>
   )
 }
- 

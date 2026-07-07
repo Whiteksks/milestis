@@ -23,7 +23,6 @@ export function IntroSoleil({ sectionContent, theme, imageContent }: IntroSoleil
   const introImage = imageContent?.introduction
   const hasImage = Boolean(introImage?.value.asset.src)
 
-  // Общие стили для шрифтов, чтобы не дублировать cn()
   const bodyFontStyles = cn(
     'font-light leading-relaxed',
     theme.fontBody,
@@ -57,10 +56,8 @@ export function IntroSoleil({ sectionContent, theme, imageContent }: IntroSoleil
             </Animate>
           )}
 
-          {/* Контентная сетка */}
           <div className="grid grid-cols-1 @md:grid-cols-12 gap-10 @md:gap-16 items-start">
             
-            {/* Левая колонка: Цитата и Дедикация */}
             <div className="order-2 @md:order-1 @md:col-span-7 space-y-10">
               {introduction.quote && (
                 <Animate delay={0.1}>
@@ -84,18 +81,17 @@ export function IntroSoleil({ sectionContent, theme, imageContent }: IntroSoleil
               )}
             </div>
 
-            {/* Правая колонка: Фото */}
             {hasImage && introImage && (
               <div className="order-1 @md:order-2 @md:col-span-5">
                 <Animate delay={0.15} direction="up" distance={30}>
                   <div className="group relative">
-                    <div className="overflow-hidden rounded-sm shadow-sm transition-shadow duration-500 group-hover:shadow-xl">
+                    <div className="">
                       <SlotImage
                         slotId={introImage.slotId}
                         value={introImage.value}
                         alt={introduction.title ?? 'Introduction'}
                         sizes="(max-width: 768px) 90vw, 40vw"
-                        className="transition-transform duration-700 group-hover:scale-105"
+                        className="transition-transform duration-700 group-hover:scale-102"
                       />
                     </div>
 

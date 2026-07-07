@@ -77,7 +77,6 @@ export function GridBio({ theme, sectionContent, imageContent }: GridBioProps) {
                 </p>
               </Animate>
 
-              {/* Achievements */}
               {achievements.length > 0 && (
                 <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 pt-8 border-t border-current/5">
                   {achievements.map((item, i) => (

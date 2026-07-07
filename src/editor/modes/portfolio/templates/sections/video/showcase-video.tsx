@@ -14,7 +14,6 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
       className={cn(theme.foreground)}
     >
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
-        {/* Header row */}
         <div className="flex items-end justify-between gap-8 mb-10">
           <div>
             <p
@@ -47,7 +46,6 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
           )}
         </div>
 
-        {/* Mobile description */}
         {sectionContent.video.description && (
           <p
             className={cn(
@@ -59,7 +57,6 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
           </p>
         )}
 
-        {/* Video   cinematic aspect ratio, no border-radius */}
         <Animate direction="none" scaleOffset={0.98} delay={0.2} className="relative aspect-video w-full overflow-hidden bg-current/5">
           {sectionContent.video.videoUrl ? (
             <iframe
@@ -70,7 +67,6 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-              {/* Decorative play button placeholder */}
               <div className="w-16 h-16 rounded-full border border-current/20 flex items-center justify-center">
                 <div
                   className="w-0 h-0 ml-1 opacity-20"
@@ -89,7 +85,6 @@ export function ShowcaseVideo({ theme, sectionContent }: ShowcaseVideoProps) {
         </Animate>
       </div>
 
-      {/* Bottom separator */}
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>

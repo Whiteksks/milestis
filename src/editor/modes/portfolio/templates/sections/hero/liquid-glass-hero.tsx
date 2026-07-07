@@ -23,7 +23,6 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
           #07070e`,
       }}
     >
-      {/* Deep background orbs   slow, organic drift */}
       <motion.div
         animate={{ x: [0, 50, 18, 0], y: [0, -35, 14, 0], scale: [1, 1.12, 0.96, 1] }}
         transition={{ repeat: Infinity, duration: 18, ease: 'easeInOut' }}
@@ -55,7 +54,6 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
         }}
       />
 
-      {/* Hero image (behind glass) */}
       {heroImage && (
         <Animate trigger="mount" type="scale" scaleOffset={1.06} className="absolute inset-0">
           <SlotImage
@@ -75,10 +73,8 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
         </Animate>
       )}
 
-      {/*   Content layout   */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 @md:px-14 pt-28 pb-20 @md:py-32 flex flex-col gap-8">
 
-        {/* Floating subtitle chip */}
         <Animate trigger="mount" delay={0.25} type="scale" scaleOffset={0.9} direction="down" distance={14} className="flex">
           <div
             className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full"
@@ -119,7 +115,6 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
           {sectionContent.hero.title}
         </Animate>
 
-        {/* Glass info card   description + accent row */}
         <div className="relative max-w-xl">
           <div
             className="relative rounded-2xl overflow-hidden p-6 @md:p-7"
@@ -132,17 +127,14 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
                 '0 20px 60px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06) inset, inset 0 1px 0 rgba(255,255,255,0.22), inset 1px 0 0 rgba(255,255,255,0.08)',
             }}
           >
-            {/* Top edge specular highlight */}
             <div
               className="absolute top-0 left-5 right-5 h-px pointer-events-none"
               style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent)' }}
             />
-            {/* Chromatic color tint line */}
             <div
               className="absolute top-0 left-10 right-16 h-[1.5px] rounded-full pointer-events-none opacity-60"
               style={{ background: `linear-gradient(to right, ${primary}cc, ${secondary}99, transparent)` }}
             />
-            {/* Corner glare */}
             <div
               className="absolute inset-0 pointer-events-none rounded-2xl"
               style={{
@@ -150,12 +142,10 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
                   'linear-gradient(135deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.03) 35%, transparent 65%)',
               }}
             />
-            {/* Left edge glow */}
             <div
               className="absolute top-4 bottom-4 left-0 w-px pointer-events-none"
               style={{ background: `linear-gradient(to bottom, transparent, ${primary}55, transparent)` }}
             />
-            {/* Animated glare sweep */}
             <motion.div
               animate={{ x: ['-120%', '220%'] }}
               transition={{ repeat: Infinity, duration: 4.5, ease: 'easeInOut', repeatDelay: 5 }}
@@ -172,8 +162,6 @@ export function LiquidGlassHero({ theme, sectionContent, imageContent }: LiquidG
             >
               {sectionContent.hero.description}
             </Animate>
-
-            {/* Accent row */}
             <div className="relative mt-5 pt-4 border-t border-white/[0.08] flex items-center justify-end">
               <div className="flex gap-2">
                 {[primary, secondary, accent2].map((c, i) => (

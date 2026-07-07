@@ -28,7 +28,6 @@ export function GridFooter({ theme, sectionContent }: GridFooterProps) {
               © {new Date().getFullYear()} {sectionContent.footer.copyright}
             </p>
 
-            {/* Right: social icons */}
             {socialLinks.length > 0 && (
               <div className="flex items-center gap-4">
                 {socialLinks.map((link, i) => (

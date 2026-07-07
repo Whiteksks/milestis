@@ -19,7 +19,6 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
   const coverImage = imageContent?.cover
   const hasImage = Boolean(coverImage?.value.asset.src)
 
-  // Split title into words ” alternate solid / outline rendering
   const words = (cover.title ?? '').split(' ').filter(Boolean)
   return (
     <SectionWrapper
@@ -30,7 +29,6 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
         theme.background,
       )}
     >
-      {/* Full-bleed background */}
       {hasImage && coverImage && (
         <div className="absolute inset-0">
           <SlotImage
@@ -41,12 +39,10 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
             sizes="100vw"
             priority
           />
-          {/* Gradient: darken bottom 60%, slight top vignette */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
         </div>
       )}
 
-      {/* Top editorial bar */}
       <Animate trigger="mount" direction="none" className="relative z-10 flex items-center justify-between px-8 @md:px-14 @lg:px-20 pt-10 @md:pt-12">
         <div className={cn('h-px w-16 @md:w-24 shrink-0', hasImage ? 'bg-white/25' : 'bg-current opacity-15')} />
         {(cover.date || cover.location) && (
@@ -62,10 +58,8 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
         )}
       </Animate>
 
-      {/* Bottom title block */}
       <div className="relative z-10 flex-1 flex flex-col justify-end px-8 @md:px-14 @lg:px-20 pb-12 @md:pb-20 @lg:pb-28">
 
-        {/* Thin horizontal accent rule */}
         <Animate
           trigger="mount"
           direction="none"
@@ -73,7 +67,6 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
           className={cn('h-px w-full origin-left mb-8 @md:mb-10', hasImage ? 'bg-white/20' : theme.accent)}
         />
 
-        {/* Alternate solid / outline title words */}
         <Animate trigger="mount" delay={0.25} distance={48}>
           <h1
             className={cn(
@@ -105,7 +98,6 @@ export function CoverMagazine({ sectionContent, theme, imageContent }: CoverMaga
             ))}
           </h1>
 
-          {/* Subtitle / tagline */}
           {cover.subtitle && (
             <Animate
               as="p"

@@ -17,7 +17,6 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
       className="@container relative overflow-hidden py-24 @md:py-32"
       style={{ background: `radial-gradient(ellipse at 50% 50%, ${primary}35 0%, transparent 60%), radial-gradient(ellipse at 90% 10%, ${accent2}30 0%, transparent 50%), #0b0b11` }}
     >
-      {/* Blob */}
       <motion.div
         animate={{ scale: [1, 1.15, 1] }}
         transition={{ repeat: Infinity, duration: 9, ease: 'easeInOut', delay: 1 }}
@@ -26,7 +25,6 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
-        {/* Header */}
         <Animate direction="up" distance={16} className="flex items-end justify-between gap-8 mb-10">
           <div>
             <p className={cn('text-[10px] uppercase tracking-[0.3em] text-white/35 mb-3', theme.fontBody)}>
@@ -49,7 +47,6 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
           </p>
         )}
 
-        {/* Video glass frame */}
         <div
           className="relative rounded-3xl overflow-hidden aspect-video"
           style={{
@@ -60,9 +57,7 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
             boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.20)',
           }}
         >
-          {/* Top chromatic line */}
           <div className="absolute top-0 left-8 right-8 h-px z-10 pointer-events-none" style={{ background: `linear-gradient(to right, transparent, ${primary}90 40%, ${secondary}80 60%, transparent)` }} />
-          {/* Corner glare */}
           <div className="absolute inset-0 pointer-events-none rounded-3xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 40%)' }} />
 
           {sectionContent.video.videoUrl ? (
@@ -74,7 +69,6 @@ export function LiquidGlassVideo({ theme, sectionContent }: LiquidGlassVideoProp
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
-              {/* Glass play button */}
               <div
                 className="w-18 h-18 rounded-full flex items-center justify-center border border-white/20"
                 style={{

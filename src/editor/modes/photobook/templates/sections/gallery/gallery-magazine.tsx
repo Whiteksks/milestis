@@ -18,7 +18,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
   const { gallery } = sectionContent
   const photos = gallery.photos ?? []
 
-  // Распределяем фото по строгой, но динамичной журнальной сетке
   const [feature, second, third, ...rest] = photos
 
   return (
@@ -29,11 +28,9 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
     >
       <div className="max-w-[1600px] mx-auto px-6 @md:px-12 @lg:px-20 py-20 @md:py-36">
         
-        {/* Editorial Header */}
         <header className="mb-20 @md:mb-32">
           <Animate trigger="mount" direction="none" className="space-y-12">
             
-            {/* Meta Line */}
             <div className="flex items-center justify-between gap-6">
               {gallery.label && (
                 <span className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.6em] opacity-50 block font-medium", theme.fontBody)}>
@@ -50,7 +47,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
               )}
             </div>
 
-            {/* Title & Description Grid */}
             <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 @lg:gap-16 items-start">
               <div className="@lg:col-span-8 space-y-4">
                 {gallery.title && (
@@ -86,10 +82,8 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
           </Animate>
         </header>
 
-        {/* Сетка медиа-контента */}
         <div className="space-y-20 @md:space-y-36">
           
-          {/* 1. Главный панорамный кадр (Cinematic 21:9 / Роскошный оверсайз) */}
           {feature && (
             <Animate trigger="mount" direction="up" distance={40}>
               {(() => {
@@ -111,7 +105,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                       )}
                     </div>
                     
-                    {/* Meta под главным кадром */}
                     <div className="mt-5 flex justify-between items-baseline px-1">
                       <div className="flex items-center gap-4">
                         <span className="text-[10px] font-mono opacity-40 font-medium">01</span>
@@ -128,11 +121,9 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
             </Animate>
           )}
 
-          {/* 2. Асимметричный парный блок (Журнальный ритм со смещением по вертикали) */}
           {(second || third) && (
             <div className="grid grid-cols-1 @md:grid-cols-12 gap-10 @md:gap-12 items-start">
               
-              {/* Левое фото — шире и выше */}
               {second && (
                 <div className="@md:col-span-7 w-full">
                   <Animate direction="up" delay={0.05} distance={30}>
@@ -170,7 +161,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                 </div>
               )}
               
-              {/* Правое фото — уже и изящно утоплено вниз на больших экранах */}
               {third && (
                 <div className="@md:col-span-5 w-full @md:mt-24">
                   <Animate direction="up" delay={0.15} distance={30}>
@@ -210,14 +200,12 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
             </div>
           )}
 
-          {/* 3. Равномерная бесконечная сетка (Динамический триптих) */}
           {rest.length > 0 && (
             <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-8 @md:gap-12 @lg:gap-16">
               {rest.map((block, index) => {
                 const galleryImage = imageContent ? findPhotobookRepeatingImage(imageContent, 'gallery', block.id) : undefined
                 const absoluteIndex = index + 3
 
-                // Чередуем пропорции кадров в рядах для ощущения живой верстки книги
                 const aspectClass = index % 3 === 1 ? "aspect-[3/4]" : "aspect-[4/5]"
 
                 return (
@@ -241,7 +229,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                           <div className="absolute inset-0 bg-current/[0.03]" />
                         )}
                         
-                        {/* Новое чистое наведение: вместо черного градиента — легкое элегантное тонирование */}
                         <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-between p-6">
                           <span className="text-[10px] font-mono text-current mix-blend-difference opacity-60">
                             #{String(absoluteIndex + 1).padStart(2, '0')}
@@ -254,7 +241,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                         </div>
                       </div>
 
-                      {/* Метаданные под карточкой в спокойном состоянии */}
                       <div className="mt-4 flex items-center gap-3 px-1">
                         <span className="text-[10px] font-mono opacity-40">{String(absoluteIndex + 1).padStart(2, '0')}</span>
                         <div className="h-[0.5px] flex-1 bg-current opacity-10" />
@@ -272,7 +258,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
           )}
         </div>
 
-        {/* Editorial Footer */}
         <footer className="mt-36 pt-12 border-t border-current/10 flex justify-between items-center px-1">
           <div className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.5em] opacity-40 truncate max-w-[300px] font-medium", theme.fontBody)}>
             {gallery.title}

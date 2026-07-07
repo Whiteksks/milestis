@@ -27,11 +27,7 @@ export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProp
       className="@lg:px-6 @md:px-5 px-4 pt-20 @md:pt-24 pb-4"
     >
       <div className="max-w-6xl mx-auto w-full">
-
-        {/*   Bento grid: Row 1   */}
         <div className="grid @lg:grid-cols-12 @md:grid-cols-6 grid-cols-1 gap-3">
-
-          {/* [A] Title / intro card */}
           <Animate
             delay={0}
             direction="up"
@@ -43,7 +39,6 @@ export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProp
               theme.card,
             )}
           >
-            {/* Role chip */}
             <span className={cn(
               'self-start inline-flex items-center px-3 py-1 text-[10px] uppercase tracking-widest',
               'rounded-full border border-current/12 opacity-45',
@@ -52,7 +47,6 @@ export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProp
               {sectionContent.hero.subtitle}
             </span>
 
-            {/* Big heading */}
             <h1 className={cn(
               '@lg:text-[5rem] @md:text-6xl text-5xl font-bold leading-[0.92] tracking-tight',
               theme.fontTitle,
@@ -60,7 +54,6 @@ export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProp
               {sectionContent.hero.title}
             </h1>
 
-            {/* Bottom row: description + status */}
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <p className={cn(
                 'text-xs opacity-50 leading-relaxed max-w-xs',
@@ -72,7 +65,6 @@ export function BentoHero({ theme, sectionContent, imageContent }: BentoHeroProp
             </div>
           </Animate>
 
-          {/* [B] Photo or monogram card */}
           <Animate
             delay={0.1}
             direction="up"

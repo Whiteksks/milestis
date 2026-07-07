@@ -27,7 +27,6 @@ export function HighlightLumiere({ sectionContent, theme, imageContent }: Highli
     >
       <div className="max-w-3xl mx-auto px-8 @md:px-0 py-20 @md:py-28 flex flex-col items-center">
 
-        {/* Thin section divider */}
         <Animate trigger="mount" direction="none" className="w-full flex items-center gap-4 mb-14 @md:mb-18">
           <div className="h-px flex-1 bg-current opacity-10" />
           {highlight.label && (
@@ -39,21 +38,17 @@ export function HighlightLumiere({ sectionContent, theme, imageContent }: Highli
           <div className="h-px flex-1 bg-current opacity-10" />
         </Animate>
 
-        {/* Full-width film-framed statement photo */}
         {hasImage && highlightImage && (
           <Animate trigger="mount" delay={0.1} distance={20} className="w-full mb-10 @md:mb-12">
-            <div className="border border-current/10 p-[3px]">
-              <SlotImage
-                slotId={highlightImage.slotId}
-                value={highlightImage.value}
-                alt={highlight.title ?? 'Highlight'}
-                sizes="(max-width: 768px) 95vw, 70vw"
-              />
-            </div>
+            <SlotImage
+              slotId={highlightImage.slotId}
+              value={highlightImage.value}
+              alt={highlight.title ?? 'Highlight'}
+              sizes="(max-width: 768px) 95vw, 70vw"
+            />
           </Animate>
         )}
 
-        {/* Title below photo */}
         {highlight.title && (
           <Animate trigger="mount" delay={hasImage ? 0.25 : 0.1} distance={16} className="text-center mb-7 @md:mb-8 w-full">
             <h2
@@ -67,7 +62,6 @@ export function HighlightLumiere({ sectionContent, theme, imageContent }: Highli
           </Animate>
         )}
 
-        {/* Description */}
         {highlight.description && (
           <Animate trigger="mount" delay={hasImage ? 0.35 : 0.18} direction="none" className="text-center max-w-[44ch] mb-10">
             <p
@@ -82,7 +76,6 @@ export function HighlightLumiere({ sectionContent, theme, imageContent }: Highli
           </Animate>
         )}
 
-        {/* Pull quote — the emotional centrepiece */}
         {highlight.quote && (
           <Animate trigger="mount" delay={hasImage ? 0.45 : 0.28} direction="none" className="w-full flex flex-col items-center gap-6">
             <div className="flex items-center gap-3">

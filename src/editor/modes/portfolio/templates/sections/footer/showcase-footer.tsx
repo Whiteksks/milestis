@@ -15,7 +15,6 @@ export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
       id="footer"
       className={cn('border-t border-current/10 relative overflow-hidden', theme.foreground)}
     >
-      {/* Faded watermark */}
       <div
         aria-hidden
         className={cn(
@@ -30,12 +29,10 @@ export function ShowcaseFooter({ theme, sectionContent }: ShowcaseFooterProps) {
 
       <div className="relative @lg:px-20 @md:px-12 px-8 py-14 @md:py-16">
         <div className="max-w-7xl mx-auto flex flex-col @md:flex-row items-center justify-between gap-6">
-          {/* Left: copyright */}
           <p className={cn('text-[10px] uppercase tracking-[0.15em] opacity-20', theme.fontBody)}>
             © {new Date().getFullYear()} {sectionContent.footer.copyright}
           </p>
 
-          {/* Right: social icons */}
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-6">
               {socialLinks.map((link, i) => (

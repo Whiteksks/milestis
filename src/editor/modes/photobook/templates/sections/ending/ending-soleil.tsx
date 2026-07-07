@@ -27,19 +27,9 @@ export function EndingSoleil({ sectionContent, theme, imageContent }: EndingSole
     >
       <div className="flex flex-col items-center px-8 @md:px-14 @lg:px-20 py-20 @md:py-28 @lg:py-36">
 
-        {/* Top thin rule */}
         <Animate trigger="mount" direction="none" className="w-full max-w-2xl mb-16 @md:mb-20">
           <div className="h-px w-full bg-current opacity-10" />
         </Animate>
-
-        {/* Label ornament */}
-        {ending.label && (
-          <Animate trigger="mount" direction="none" delay={0.1} className="mb-12 @md:mb-16 flex items-center gap-4">
-            <div className="h-px w-8 bg-current opacity-15" />
-            <span className={cn('text-[9px] uppercase tracking-[0.5em] opacity-25', theme.fontBody)}>{ending.label}</span>
-            <div className="h-px w-8 bg-current opacity-15" />
-          </Animate>
-        )}
 
         {ending.title && (
           <Animate trigger="mount" direction="none" delay={0.15} className="mb-12 @md:mb-16">
@@ -49,7 +39,6 @@ export function EndingSoleil({ sectionContent, theme, imageContent }: EndingSole
           </Animate>
         )}
 
-        {/* Large closing photo */}
         {hasImage && endingImage && (
           <Animate trigger="mount" delay={0.2} distance={32} className="w-full max-w-sm @md:max-w-md mb-14 @md:mb-18">
             <div className="overflow-hidden rounded-sm">
@@ -63,7 +52,6 @@ export function EndingSoleil({ sectionContent, theme, imageContent }: EndingSole
           </Animate>
         )}
 
-        {/* Text block */}
         <Animate trigger="mount" delay={hasImage ? 0.35 : 0.2} direction="none" className="flex flex-col items-center text-center space-y-6 max-w-[38ch]">
           {ending.text && (
             <p
@@ -94,7 +82,6 @@ export function EndingSoleil({ sectionContent, theme, imageContent }: EndingSole
           )}
         </Animate>
 
-        {/* Bottom thin rule */}
         <Animate trigger="mount" direction="none" delay={hasImage ? 0.5 : 0.35} className="w-full max-w-2xl mt-16 @md:mt-20">
           <div className="h-px w-full bg-current opacity-10" />
         </Animate>

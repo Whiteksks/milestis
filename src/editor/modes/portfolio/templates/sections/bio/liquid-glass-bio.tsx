@@ -20,7 +20,6 @@ export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGl
       className="@container relative w-full overflow-hidden py-24 @md:py-32"
       style={{ background: `radial-gradient(ellipse at 80% 20%, ${primary}40 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, ${secondary}35 0%, transparent 50%), #0c0c12` }}
     >
-      {/* Ambient blob */}
       <motion.div
         animate={{ scale: [1, 1.12, 1], opacity: [0.4, 0.6, 0.4] }}
         transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
@@ -29,7 +28,6 @@ export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGl
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 @md:px-12 @lg:px-20">
-        {/* Section label */}
           <Animate direction="left" distance={20} className="flex items-center gap-4 mb-12">
           <div
             className="px-3 py-1.5 rounded-full border border-white/15 text-[10px] uppercase tracking-[0.28em] text-white/50"
@@ -39,7 +37,6 @@ export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGl
           </div>
         </Animate>
 
-        {/* Main glass card */}
         <div
           className="relative rounded-3xl overflow-hidden"
           style={{
@@ -50,12 +47,10 @@ export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGl
             boxShadow: '0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.08)',
           }}
         >
-          {/* Glare */}
           <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%)' }} />
           <div className="absolute top-0 left-8 right-8 h-px pointer-events-none" style={{ background: `linear-gradient(to right, transparent, ${primary}88, transparent)` }} />
 
           <div className="flex flex-col @md:flex-row gap-0">
-            {/* Image panel */}
             {bioImage && (
               <div className="shrink-0 relative @md:rounded-r-none rounded-t-3xl @md:rounded-l-3xl overflow-hidden">
                 <SlotImage
@@ -71,7 +66,6 @@ export function LiquidGlassBio({ theme, sectionContent, imageContent }: LiquidGl
               </div>
             )}
 
-            {/* Text panel */}
             <div className="flex-1 p-7 @md:p-10 @lg:p-14 space-y-6">
               <Animate
                 direction="up"

@@ -26,7 +26,6 @@ export function IntroChronicle({ sectionContent, theme, imageContent }: IntroChr
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32">
 
-        {/* Editorial header */}
         <div className="mb-12 @md:mb-16">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
@@ -76,7 +75,6 @@ export function IntroChronicle({ sectionContent, theme, imageContent }: IntroChr
             )}
           </div>
 
-          {/* Right – image */}
           {hasImage && introImage && (
             <div>
               <SlotImage
@@ -84,7 +82,6 @@ export function IntroChronicle({ sectionContent, theme, imageContent }: IntroChr
                 value={introImage.value}
                 alt={introduction.title ?? 'Introduction'}
                 sizes="(max-width: 768px) 90vw, 38vw"
-                className={theme.shadow}
               />
               {introImage.value.caption && (
                 <p className={cn('mt-2.5 text-[10px] uppercase tracking-wide opacity-35', theme.fontBody)}>

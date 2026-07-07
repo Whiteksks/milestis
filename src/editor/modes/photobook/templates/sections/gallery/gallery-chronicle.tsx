@@ -26,7 +26,6 @@ export function GalleryChronicle({ sectionContent, theme, imageContent }: Galler
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
-        {/* Editorial header */}
         <div className="mb-10 @md:mb-14">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-center justify-between mt-3">
@@ -51,7 +50,6 @@ export function GalleryChronicle({ sectionContent, theme, imageContent }: Galler
         {photos.length > 0 && (
           <div className="space-y-3 @md:space-y-4">
 
-            {/* Feature photo ” full width, cinematic aspect */}
             {feature && (
               <div className="group">
                 <div className="relative aspect-[16/7] @md:aspect-[21/9] overflow-hidden">

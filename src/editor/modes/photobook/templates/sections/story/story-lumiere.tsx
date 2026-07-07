@@ -68,8 +68,8 @@ export function StoryLumiere({ sectionContent, theme, imageContent }: StoryLumie
                 <Animate key={block.id} direction="up" distance={28} delay={0.04}>
                   <div className="flex flex-col items-center">
 
-                    {/* Film-framed photo — generous width */}
-                    <div className="w-full border border-current/10 p-[3px] mb-5">
+                    {/* Photo */}
+                    <div className="w-full mb-5">
                       {storyImage?.value.asset.src ? (
                         <SlotImage
                           slotId={storyImage.slotId}

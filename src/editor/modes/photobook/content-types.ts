@@ -55,7 +55,6 @@ export interface PhotobookSectionContent {
   }
   ending: {
     title?: string
-    label?: string
     text?: string
     date?: string
     signature?: string

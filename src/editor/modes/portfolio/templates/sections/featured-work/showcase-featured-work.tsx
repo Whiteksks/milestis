@@ -23,7 +23,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
       className={cn('w-full', theme.foreground)}
     >
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6 @lg:py-28 @md:py-20 py-16">
-        {/* Section header */}
         <div className="flex items-end justify-between mb-10 @md:mb-16 gap-6">
           <div>
             <p className={cn('text-[10px] uppercase tracking-[0.3em] opacity-35 mb-3', theme.fontBody)}>
@@ -44,7 +43,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
           </span>
         </div>
 
-        {/* Featured project   full-width cinema card */}
         {featured && (
           <Animate as="article" direction="up" distance={40} className="group mb-6 @md:mb-8">
             <div className={cn('relative overflow-hidden bg-current/5', getAspectRatioClass(toCanonicalAspectRatio(featuredImage?.value.presentation?.ratio, 'wide')))}>
@@ -62,7 +60,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
                   imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                 />
               )}
-              {/* Overlay gradient */}
               <div
                 className="absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
                 style={{
@@ -70,7 +67,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
                     'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
                 }}
               />
-              {/* Text overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-5 @md:p-10">
                 <div className="flex items-end justify-between gap-3">
                   <div className="min-w-0">
@@ -110,8 +106,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
             </div>
           </Animate>
         )}
-
-        {/* Remaining projects   2-column grid */}
         {rest.length > 0 && (
           <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
             {rest.map((project, i) => (
@@ -119,7 +113,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
                 const projectImage = getPortfolioFeaturedWorkImage(imageContent, project.id)
                 return (
               <Animate as="article" key={i + 1} direction="up" distance={30} delay={i * 0.1} className="group">
-                {/* Image */}
                 <div
                   className={cn(
                     'relative overflow-hidden mb-5 bg-current/5',
@@ -141,11 +134,9 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
                       imageClassName="object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out"
                     />
                   )}
-                  {/* subtle hover tint */}
                   <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
                 </div>
 
-                {/* Meta */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <h3
@@ -182,7 +173,6 @@ export function ShowcaseFeaturedWork({ theme, sectionContent, imageContent }: Sh
         )}
       </div>
 
-      {/* Bottom separator */}
       <div className="max-w-7xl mx-auto @lg:px-20 @md:px-12 px-6">
         <div className="h-px w-full bg-current opacity-[0.07]" />
       </div>

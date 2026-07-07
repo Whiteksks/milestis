@@ -16,7 +16,6 @@ interface StoryChronicleProps {
 
 export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChronicleProps) {
   const { story } = sectionContent
-  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅ пїЅ StoryMemoir
   const moments = story.moments ?? []
 
   return (
@@ -27,7 +26,6 @@ export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChr
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24">
 
-        {/* Section header */}
         <div className="mb-16 @md:mb-20">
           <div className={cn('border-t-2', theme.border)} />
           <div className="flex items-end justify-between mt-3 gap-4">
@@ -75,7 +73,6 @@ export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChr
                   key={block.id}
                   className="grid grid-cols-1 @md:grid-cols-[1fr_2fr] gap-6 @md:gap-10"
                 >
-                  {/* Number + label sidebar */}
                   <div
                     className={cn(
                       'flex @md:flex-col items-start gap-4 @md:pt-3',
@@ -108,7 +105,6 @@ export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChr
                     )}
                   </div>
 
-                  {/* Photo + Description */}
                   <div className={cn(isEven ? '@md:order-2' : '@md:order-1')}>
                     {storyImage?.value.asset.src ? (
                       <SlotImage
@@ -116,7 +112,6 @@ export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChr
                         value={storyImage.value}
                         alt={block.label ?? story.title ?? `Story ${index + 1}`}
                         sizes="(max-width: 768px) 90vw, 70vw"
-                        className={theme.shadow}
                       />
                     ) : (
                       <ProjectPlaceholder seed={block.id} className="w-full aspect-square" />
@@ -132,7 +127,6 @@ export function StoryChronicle({ sectionContent, theme, imageContent }: StoryChr
             })}
           </div>
         )}
-
       </div>
     </SectionWrapper>
   )

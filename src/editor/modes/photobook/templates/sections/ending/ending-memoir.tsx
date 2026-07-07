@@ -27,22 +27,11 @@ export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemo
     >
       <div className="max-w-3xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-32">
 
-        {/* Top rule with accent */}
         <Animate direction="none" className="mb-14 @md:mb-20">
           <div className={cn('border-t', theme.border)} />
           <div className={cn('h-[2px] w-12 mt-px origin-left', theme.accent)} />
         </Animate>
 
-        {/* Section label */}
-        {ending.label && (
-          <Animate direction="up" distance={16} className="mb-10 @md:mb-14">
-            <span className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30', theme.fontBody)}>
-              {ending.label}
-            </span>
-          </Animate>
-        )}
-
-        {/* Ending title � e.g. "The End" */}
         {ending.title && (
           <Animate direction="up" distance={24} delay={0.05} className="mb-10 @md:mb-12">
             <h2
@@ -56,7 +45,6 @@ export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemo
           </Animate>
         )}
 
-        {/* Closing text as large styled blockquote */}
         {ending.text && (
           <Animate direction="up" distance={24} delay={0.1} className="mb-12 @md:mb-16">
             <p
@@ -71,10 +59,9 @@ export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemo
           </Animate>
         )}
 
-        {/* Optional closing photo */}
         {hasImage && endingImage && (
           <Animate direction="up" distance={24} delay={0.2} className="mb-12 @md:mb-16">
-            <div className={cn('w-full max-w-xs @md:max-w-sm overflow-hidden', theme.shadow)}>
+            <div className={'w-full max-w-xs @md:max-w-sm overflow-hidden'}>
               <SlotImage
                 slotId={endingImage.slotId}
                 value={endingImage.value}
@@ -85,7 +72,6 @@ export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemo
           </Animate>
         )}
 
-        {/* Signature and date */}
         <Animate direction="up" distance={16} delay={hasImage ? 0.35 : 0.25} className="space-y-2">
           {ending.signature && (
             <p className={cn('text-sm opacity-50 italic', theme.fontBody)}>
@@ -99,7 +85,6 @@ export function EndingMemoir({ sectionContent, theme, imageContent }: EndingMemo
           )}
         </Animate>
 
-        {/* Bottom accent line */}
         <Animate direction="none" delay={hasImage ? 0.45 : 0.35} className="mt-16 @md:mt-20">
           <div className={cn('h-px origin-left', theme.accent)} />
         </Animate>

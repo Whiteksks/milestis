@@ -28,7 +28,6 @@ export function CoverLumiere({ sectionContent, theme, imageContent }: CoverLumie
         !hasImage && theme.background,
       )}
     >
-      {/* Full-bleed background — cinematic, like looking through a lens */}
       {hasImage && coverImage && (
         <div className="absolute inset-0">
           <SlotImage
@@ -39,12 +38,10 @@ export function CoverLumiere({ sectionContent, theme, imageContent }: CoverLumie
             sizes="100vw"
             priority
           />
-          {/* Soft cinematic vignette — heavy bottom, gentle top bloom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/10 to-black/45" />
         </div>
       )}
 
-      {/* Top — film caption strip */}
       <Animate
         trigger="mount"
         direction="none"
@@ -66,11 +63,9 @@ export function CoverLumiere({ sectionContent, theme, imageContent }: CoverLumie
         <div className={cn('h-px w-8 @md:w-12 shrink-0', hasImage ? 'bg-white/20' : 'bg-current opacity-10')} />
       </Animate>
 
-      {/* === WITH IMAGE: title anchored at bottom === */}
       {hasImage && (
         <div className="relative z-10 flex-1 flex flex-col justify-end items-center text-center px-8 @md:px-16 @lg:px-20 pb-16 @md:pb-20 @lg:pb-28">
           <Animate trigger="mount" delay={0.2} distance={30}>
-            {/* Film-frame ornament above title */}
             <div className="flex items-center justify-center gap-3 mb-7">
               <div className="h-px w-10 @md:w-16 bg-white/25" />
               <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
@@ -110,7 +105,6 @@ export function CoverLumiere({ sectionContent, theme, imageContent }: CoverLumie
         </div>
       )}
 
-      {/* === NO IMAGE: centered poetry layout === */}
       {!hasImage && (
         <div className="flex-1 flex flex-col items-center justify-center px-8 @md:px-16 text-center">
           <Animate trigger="mount" delay={0.15} distance={20} className="space-y-6 max-w-lg">

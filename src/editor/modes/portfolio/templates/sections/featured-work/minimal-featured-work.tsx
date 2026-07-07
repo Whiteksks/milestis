@@ -19,7 +19,6 @@ export function MinimalFeaturedWork({ theme, sectionContent, imageContent }: Min
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
 
-        {/* Section header */}
         <div className="flex items-center justify-between mb-20 border-t border-current/10 pt-8">
           <Animate
             direction="left"
@@ -31,7 +30,6 @@ export function MinimalFeaturedWork({ theme, sectionContent, imageContent }: Min
           </Animate>
         </div>
 
-        {/* Project list   alternating editorial layout */}
         <div className="space-y-0">
           {projects.map((project, i) => (
             (() => {
@@ -66,7 +64,6 @@ export function MinimalFeaturedWork({ theme, sectionContent, imageContent }: Min
                   )}
                 </div>
 
-                {/* Content */}
                 <div className="@lg:w-2/5 flex flex-col justify-between gap-8">
                   <div className="space-y-5">
                     <h3
@@ -82,7 +79,6 @@ export function MinimalFeaturedWork({ theme, sectionContent, imageContent }: Min
                     </p>
                   </div>
 
-                  {/* Tags */}
                   {(project.tags ?? []).length > 0 && (
                     <div className="flex flex-wrap gap-x-4 gap-y-2">
                       {(project.tags ?? []).slice(0, 4).map((tag, idx) => (

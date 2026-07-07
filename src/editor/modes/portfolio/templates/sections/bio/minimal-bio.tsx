@@ -17,7 +17,6 @@ export function MinimalBio({ theme, sectionContent, imageContent }: MinimalBioPr
       themeForeground={theme.foreground}
     >
       <div className="max-w-3xl mx-auto px-6 @md:px-10 py-20 @md:py-28">
-        {/* Section header row */}
         <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
           <Animate
             direction="left"
@@ -29,7 +28,6 @@ export function MinimalBio({ theme, sectionContent, imageContent }: MinimalBioPr
           </Animate>
         </div>
 
-        {/* Identity block   centered, stacked: photo  ™ name  ™ subtitle */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
           {bioImage && (
             <Animate direction="none" scaleOffset={0.96} delay={0.1}>
@@ -68,7 +66,6 @@ export function MinimalBio({ theme, sectionContent, imageContent }: MinimalBioPr
           </div>
         </div>
 
-        {/* Description block   centered container, left-aligned text */}
         <div className="max-w-xl mx-auto space-y-10">
           <Animate
             direction="up"

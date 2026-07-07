@@ -82,7 +82,6 @@ export function StoryMemoir({ sectionContent, theme, imageContent }: StoryMemoir
                         value={storyImage.value}
                         alt={block.label ?? story.title ?? 'Story'}
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        className={theme.shadow}
                       />
                     ) : (
                       <ProjectPlaceholder seed={block.id} className="w-full aspect-video" />

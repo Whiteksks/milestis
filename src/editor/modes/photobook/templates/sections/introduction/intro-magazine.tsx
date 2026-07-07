@@ -26,8 +26,6 @@ export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMaga
       className={theme.background}
     >
       <div className="relative overflow-hidden max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-16 @md:py-24 @lg:py-32">
-
-        {/* Decorative giant section watermark */}
         <span
           aria-hidden
           className={cn(
@@ -38,7 +36,6 @@ export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMaga
           02
         </span>
 
-        {/* Section header */}
         <Animate trigger="mount" direction="none" className="relative mb-16 @md:mb-20">
           <div className={cn('h-[2px]', theme.accent)} />
           {introduction.label && (
@@ -48,10 +45,8 @@ export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMaga
           )}
         </Animate>
 
-        {/* Main editorial grid */}
         <div className="relative grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-16 @lg:gap-24 items-start">
 
-          {/* Left — editorial text */}
           <div className="space-y-10 @md:space-y-12">
             {introduction.title && (
               <Animate distance={28}>
@@ -93,7 +88,6 @@ export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMaga
             )}
           </div>
 
-          {/* Right — image */}
           {hasImage && introImage && (
             <Animate delay={0.15} type="scale" scaleOffset={0.97}>
               <SlotImage
@@ -101,7 +95,6 @@ export function IntroMagazine({ sectionContent, theme, imageContent }: IntroMaga
                 value={introImage.value}
                 alt={introduction.title ?? 'Introduction'}
                 sizes="(max-width: 768px) 90vw, 38vw"
-                className={theme.shadow}
               />
               {introImage.value.caption && (
                 <p className={cn('mt-3 text-[9px] uppercase tracking-widest opacity-30', theme.fontBody)}>

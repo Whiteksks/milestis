@@ -27,7 +27,6 @@ export function IntroMemoir({ sectionContent, theme, imageContent }: IntroMemoir
     >
       <div className="max-w-7xl mx-auto px-8 @md:px-12 @lg:px-20 py-20 @md:py-28 @lg:py-36">
 
-        {/* Section label */}
         {introduction.label && (
           <Animate direction="up" distance={20} className="flex items-center gap-4 mb-16 @md:mb-20">
             <div className={cn('h-px w-12', theme.accent)} />
@@ -38,7 +37,6 @@ export function IntroMemoir({ sectionContent, theme, imageContent }: IntroMemoir
         )}
         <div className="grid grid-cols-1 @md:grid-cols-[3fr_2fr] gap-12 @md:gap-20 items-start">
 
-          {/* Left Ђњ text */}
           <Animate direction="right" distance={30} delay={0.1} className="space-y-10">
             {introduction.title && (
               <h2
@@ -83,7 +81,6 @@ export function IntroMemoir({ sectionContent, theme, imageContent }: IntroMemoir
                 value={introImage.value}
                 alt={introduction.title ?? 'Introduction'}
                 sizes="(max-width: 768px) 80vw, 35vw"
-                className={theme.shadow}
               />
               {introImage.value.caption && (
                 <p className={cn('mt-2.5 text-[10px] uppercase tracking-wide opacity-35', theme.fontBody)}>

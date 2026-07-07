@@ -39,7 +39,6 @@ export function GridHero({ theme, sectionContent, imageContent }: GridHeroProps)
         >
           <div className="grid grid-cols-1 @lg:grid-cols-12 gap-10 items-center w-full relative z-10">
 
-            {/* [LEFT] Text */}
             <div className="@lg:col-span-6 space-y-8">
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
@@ -63,11 +62,8 @@ export function GridHero({ theme, sectionContent, imageContent }: GridHeroProps)
                   {sectionContent.hero.description}
                 </p>
               </div>
-
-
             </div>
 
-            {/* [RIGHT] Photo   large */}
             <div className="@lg:col-span-6 flex justify-center @lg:justify-end">
               <div className="w-full transition-transform duration-500 hover:-translate-y-1">
                 {heroImage ? (
@@ -90,11 +86,9 @@ export function GridHero({ theme, sectionContent, imageContent }: GridHeroProps)
                 )}
               </div>
             </div>
-
           </div>
         </Animate>
       </div>
     </SectionWrapper>
   )
 }
-

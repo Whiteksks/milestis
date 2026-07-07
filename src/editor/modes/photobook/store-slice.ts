@@ -63,7 +63,6 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
   },
   ending: {
     title: 'The End',
-    label: 'Closing',
     text: 'Thank you for reliving this day with us through these pages.',
     date: '2024',
     signature: 'With love, Emily and James',

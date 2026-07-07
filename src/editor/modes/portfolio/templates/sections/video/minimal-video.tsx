@@ -14,7 +14,6 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
       themeForeground={theme.foreground}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
-        {/* Section header */}
         <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
           <Animate
             direction="left"
@@ -38,7 +37,6 @@ export function MinimalVideo({ theme, sectionContent }: MinimalVideoProps) {
             )}
           </Animate>
 
-          {/* Video frame */}
           <Animate
             direction="up"
             distance={10}

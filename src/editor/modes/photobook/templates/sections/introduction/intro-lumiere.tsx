@@ -27,7 +27,6 @@ export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumie
     >
       <div className="max-w-2xl mx-auto px-8 @md:px-0 py-20 @md:py-28 flex flex-col items-center">
 
-        {/* Thin centred rule — no hardcoded label */}
         <Animate trigger="mount" direction="none" className="w-full flex items-center gap-4 mb-16 @md:mb-20">
           <div className="h-px flex-1 bg-current opacity-10" />
           {introduction.label
@@ -36,17 +35,14 @@ export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumie
           <div className="h-px flex-1 bg-current opacity-10" />
         </Animate>
 
-        {/* Photo — large, film-framed, centred hero */}
         {hasImage && introImage && (
           <Animate trigger="mount" delay={0.1} distance={24} className="w-full max-w-sm @md:max-w-md @lg:max-w-lg mb-12 @md:mb-14">
-            <div className="border border-current/10 p-[3px]">
-              <SlotImage
-                slotId={introImage.slotId}
-                value={introImage.value}
-                alt={introduction.title ?? 'Introduction'}
-                sizes="(max-width: 768px) 85vw, 480px"
-              />
-            </div>
+            <SlotImage
+              slotId={introImage.slotId}
+              value={introImage.value}
+              alt={introduction.title ?? 'Introduction'}
+              sizes="(max-width: 768px) 85vw, 480px"
+            />
             {introImage.value.caption && (
               <p className={cn('mt-2.5 text-[9px] uppercase tracking-widest opacity-25 text-center', theme.fontBody)}>
                 {introImage.value.caption}
@@ -55,7 +51,6 @@ export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumie
           </Animate>
         )}
 
-        {/* Title */}
         {introduction.title && (
           <Animate trigger="mount" delay={hasImage ? 0.25 : 0.1} distance={16} className="text-center mb-8 @md:mb-10">
             <h2
@@ -69,7 +64,6 @@ export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumie
           </Animate>
         )}
 
-        {/* Quote */}
         {introduction.quote && (
           <Animate trigger="mount" delay={hasImage ? 0.35 : 0.18} direction="none" className="text-center max-w-[40ch] mb-8 @md:mb-10">
             <p
@@ -84,12 +78,10 @@ export function IntroLumiere({ sectionContent, theme, imageContent }: IntroLumie
           </Animate>
         )}
 
-        {/* Thin rule */}
         {introduction.dedication && (
           <Animate trigger="mount" direction="none" delay={hasImage ? 0.45 : 0.28} className="w-8 h-px bg-current opacity-15 mb-5" />
         )}
 
-        {/* Dedication */}
         {introduction.dedication && (
           <Animate trigger="mount" direction="none" delay={hasImage ? 0.5 : 0.32}>
             <p className={cn('text-[9px] uppercase tracking-[0.4em] opacity-30 text-center', theme.fontBody)}>

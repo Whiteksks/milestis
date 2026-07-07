@@ -25,12 +25,10 @@ export function BentoFooter({ theme, sectionContent }: BentoFooterProps) {
             theme.card,
           )}
         >
-          {/* Left: copyright */}
           <p className={cn('text-[10px] uppercase tracking-[0.2em] opacity-25', theme.fontBody)}>
             © {new Date().getFullYear()} {sectionContent.footer.copyright}
           </p>
 
-          {/* Right: social icons */}
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-4">
               {socialLinks.map((link, i) => (

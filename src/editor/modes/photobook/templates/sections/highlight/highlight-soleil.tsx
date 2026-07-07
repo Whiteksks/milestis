@@ -38,7 +38,7 @@ export function HighlightSoleil({ sectionContent, theme, imageContent }: Highlig
 
       {hasImage && highlightImage && (
         <div className="px-8 max-w-5xl mx-auto @md:px-14 @lg:px-24 mb-16 @md:mb-24">
-          <Animate className="overflow-hidden rounded-sm shadow-sm">
+          <Animate>
             <SlotImage
               slotId={highlightImage.slotId}
               value={highlightImage.value}

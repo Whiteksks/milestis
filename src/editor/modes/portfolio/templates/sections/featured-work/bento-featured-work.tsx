@@ -40,7 +40,6 @@ function ProjectCard({
         className,
       )}
     >
-      {/* Image Slot */}
       {projectImage ? (
         <SlotImage
           slotId={projectImage.slotId}
@@ -58,11 +57,9 @@ function ProjectCard({
         <ProjectPlaceholder seed={project.id} className="absolute inset-0" />
       )}
 
-      {/* Cinematic Ambient Gradients */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/5 opacity-90 transition-opacity duration-300 group-hover:opacity-95 pointer-events-none" />
       <div className="absolute inset-0 bg-current/0 group-hover:bg-current/[0.02] transition-colors duration-300 pointer-events-none" />
 
-      {/* Top Floating Badge & Action Button */}
       <div className="absolute top-0 left-0 right-0 p-4 @md:p-5 flex items-center justify-between gap-3 z-10">
         <div className="flex flex-wrap gap-1.5 min-w-0">
           {project.tags?.slice(0, 3).map((tag, i) => (
@@ -75,7 +72,6 @@ function ProjectCard({
           ))}
         </div>
         
-        {/* Dynamic Action Arrow */}
         <div className={cn(
           "w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center shrink-0",
           "opacity-0 scale-90 -rotate-45 group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0",
@@ -85,7 +81,6 @@ function ProjectCard({
         </div>
       </div>
 
-      {/* Bottom Info Section */}
       <div className="absolute bottom-0 left-0 right-0 p-5 @md:p-6 z-10 flex flex-col justify-end min-h-[30%]">
         <h3 className={cn('text-white font-semibold leading-snug tracking-tight transition-transform duration-300 group-hover:-translate-y-1', titleSize)}>
           {project.title}
@@ -106,7 +101,6 @@ function ProjectCard({
   )
 }
 
-// Main BentoFeaturedWork Component
 
 export function BentoFeaturedWork({ theme, sectionContent, imageContent }: BentoFeaturedWorkProps) {
   const projects = sectionContent.featuredWork.projects ?? []
@@ -120,7 +114,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
     >
       <div className="max-w-6xl mx-auto space-y-4 w-full">
 
-        {/* Header Block */}
         <Animate
           delay={0}
           direction="up"
@@ -140,11 +133,8 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
           </div>
         </Animate>
 
-        {/* Dynamic Bento Grid Layout System */}
         {projects.length > 0 && (
           <div className="w-full">
-            
-            {/* Case 1: Exactly 1 project */}
             {projects.length === 1 && p1 && (
               <ProjectCard
                 project={p1}
@@ -156,7 +146,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
               />
             )}
 
-            {/* Case 2: Exactly 2 projects */}
             {projects.length === 2 && (
               <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
                 {[p1, p2].map((p, i) => p && (
@@ -173,11 +162,9 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
               </div>
             )}
 
-            {/* Case 3: 3 or more projects (True Flat Grid Structure) */}
             {projects.length >= 3 && (
               <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-12 gap-4 auto-rows-auto">
 
-                {/* [1] Primary Hero Block */}
                 {p1 && (
                   <ProjectCard
                     project={p1}
@@ -188,8 +175,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
                     className="@lg:col-span-8 @lg:row-span-2 min-h-[46vh] @lg:min-h-[580px]"
                   />
                 )}
-
-                {/* [2] Supporting Top Right Block */}
                 {p2 && (
                   <ProjectCard
                     project={p2}
@@ -200,8 +185,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
                     className="@lg:col-span-4 min-h-[30vh] @lg:min-h-[282px]"
                   />
                 )}
-
-                {/* [3] Supporting Bottom Right Block */}
                 {p3 && (
                   <ProjectCard
                     project={p3}
@@ -212,8 +195,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
                     className="@lg:col-span-4 min-h-[30vh] @lg:min-h-[282px]"
                   />
                 )}
-
-                {/* [4+] Remainder Blocks (Flatted out seamlessly into the grid system) */}
                 {rest.map((project, i) => (
                   <ProjectCard
                     key={i}
@@ -225,7 +206,6 @@ export function BentoFeaturedWork({ theme, sectionContent, imageContent }: Bento
                     className="@lg:col-span-4 @md:col-span-1 min-h-[32vh] @lg:min-h-[290px]"
                   />
                 ))}
-
               </div>
             )}
           </div>

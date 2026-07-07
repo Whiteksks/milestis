@@ -18,7 +18,6 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
       themeForeground={theme.foreground}
     >
       <div className="max-w-6xl mx-auto px-6 @md:px-10 @lg:px-16 py-20 @md:py-28">
-        {/* Section header */}
         <div className="flex items-center justify-between mb-16 border-t border-current/10 pt-8">
           <Animate
             direction="left"
@@ -31,7 +30,6 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
         </div>
 
         <div className="grid @lg:grid-cols-2 grid-cols-1 gap-16 @lg:gap-24">
-          {/* Left: title + email CTA */}
           <div className="space-y-10">
             <Animate direction="up" distance={16} delay={0.05} as="h2"
               className={cn('@lg:text-5xl @md:text-4xl text-3xl font-extralight leading-tight', theme.fontTitle)}
@@ -64,7 +62,6 @@ export function MinimalContact({ theme, sectionContent }: MinimalContactProps) {
             )}
           </div>
 
-          {/* Right: minimal form */}
           <Animate
             direction="up"
             distance={16}

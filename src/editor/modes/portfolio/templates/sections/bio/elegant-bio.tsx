@@ -66,7 +66,6 @@ export function ElegantBio({ theme, sectionContent, imageContent }: ElegantBioPr
               </Animate>
             </div>
 
-            {/* Achievements: Р Т‘Р ВµР В»Р В°Р ВµР С Р С‘РЎвЂ¦ Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…РЎвЂ№Р С РЎРѓР С—Р С‘РЎРѓР С”Р С•Р С Р Р†Р Р…Р С‘Р В·РЎС“ */}
             {(sectionContent.bio.achievements ?? []).length > 0 && (
               <div className="grid @sm:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t border-current/10">
                 {(sectionContent.bio.achievements ?? []).map((achievement, i) => (

@@ -20,7 +20,6 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
         theme.foreground,
       )}
     >
-      {/* Background image */}
       {heroImage && (
         <Animate trigger="mount" type="scale" scaleOffset={1.05} className="absolute inset-0">
           <SlotImage
@@ -33,7 +32,6 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
             imageClassName="object-cover object-center"
             priority
           />
-          {/* Gradient: bottom-heavy on mobile, left ™right on desktop */}
           <div
             className="absolute inset-0"
             style={{
@@ -51,9 +49,7 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
         </Animate>
       )}
 
-      {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col justify-end @md:justify-center max-w-7xl mx-auto w-full px-6 @md:px-12 @lg:px-20 pt-28 pb-20 @md:pt-32 @md:pb-24">
-        {/* Tag pill */}
         <Animate trigger="mount" direction="none" delay={0.2} className="mb-5 @md:mb-8 flex items-center gap-3">
           <span
             className={cn(
@@ -66,8 +62,6 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
             {sectionContent.hero.subtitle || 'Portfolio'}
           </span>
         </Animate>
-
-        {/* Title */}
         <Animate
           trigger="mount"
           delay={0.3}
@@ -83,7 +77,6 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
           {sectionContent.hero.title}
         </Animate>
 
-        {/* Description */}
         <Animate
           trigger="mount"
           delay={0.5}
@@ -99,7 +92,6 @@ export function ShowcaseHero({ theme, sectionContent, imageContent }: ShowcaseHe
         </Animate>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

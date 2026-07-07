@@ -19,7 +19,6 @@ export function GridFeaturedWork({ theme, sectionContent, imageContent }: Pick<P
     >
       <div className="max-w-7xl mx-auto px-4 @md:px-6 @lg:px-8">
 
-        {/* Header Section */}
         <Animate direction="up" distance={15} delay={0.1} className="mb-12 flex flex-col gap-4 border-b border-current/10 pb-8">
           <div className="flex justify-between items-end">
             <div>
@@ -44,7 +43,6 @@ export function GridFeaturedWork({ theme, sectionContent, imageContent }: Pick<P
               delay={(index % 3) * 0.1}
               className="group cursor-pointer"
             >
-              {/* Image Wrapper */}
               <div className="relative overflow-hidden">
                 {!projectImage ? (
                   <ProjectPlaceholder seed={project.id} className="w-full" style={{ aspectRatio: '3/4' }} />
@@ -59,13 +57,11 @@ export function GridFeaturedWork({ theme, sectionContent, imageContent }: Pick<P
                   />
                 )}
                 
-                {/* Р СњР С•Р СР ВµРЎР‚ Р С—РЎР‚Р С•Р ВµР С”РЎвЂљР В° Р С—РЎР‚Р С‘ Р Р…Р В°Р Р†Р ВµР Т‘Р ВµР Р…Р С‘Р С‘ (Р С•Р С—РЎ Р С‘Р С•Р Р…Р В°Р В»РЎРЉР Р…Р С•) */}
                 <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
                    <span className="text-[10px] text-white font-mono">{(index + 1).toString().padStart(2, '0')}</span>
                 </div>
               </div>
 
-              {/* Text Content Below Image */}
               <div className="mt-5 space-y-2">
                 <div className="flex justify-between items-start">
                   <h3 className={cn('text-lg font-semibold leading-tight group-hover:underline underline-offset-4 decoration-current/30', theme.fontTitle)}>

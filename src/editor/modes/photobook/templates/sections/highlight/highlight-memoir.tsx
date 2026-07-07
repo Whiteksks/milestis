@@ -28,10 +28,9 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
 
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-8 @md:gap-16 @lg:gap-20 items-center">
 
-          {/* Left “ Photo (order-2 on mobile в†’ shows below text) */}
           <div className="order-2 @md:order-1">
             {hasImage && highlightImage ? (
-              <div className={cn('overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none', theme.shadow, theme.elementGlow)}>
+              <div className={'overflow-hidden mx-auto @md:mx-0 w-full max-w-sm @md:max-w-none'}>
                 <SlotImage
                   slotId={highlightImage.slotId}
                   value={highlightImage.value}
@@ -44,9 +43,7 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
             )}
           </div>
 
-          {/* Right “ Content (order-1 on mobile в†’ shows above photo) */}
           <div className="order-1 @md:order-2 space-y-6 @md:space-y-8">
-            {/* Label */}
             {highlight.label && (
               <div className="flex items-center gap-4">
                 <div className={cn('h-px w-12', theme.accent)} />
@@ -56,7 +53,6 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
               </div>
             )}
 
-            {/* Title */}
             {highlight.title && (
               <h2
                 className={cn(
@@ -68,14 +64,12 @@ export function HighlightMemoir({ sectionContent, theme, imageContent }: Highlig
               </h2>
             )}
 
-            {/* Description */}
             {highlight.description && (
               <p className={cn('text-base font-light opacity-60', theme.lineHeight, theme.fontBody)}>
                 {highlight.description}
               </p>
             )}
 
-            {/* Pull quote */}
             {highlight.quote && (
               <blockquote className="py-6 border-t border-b border-current/10">
                 <p

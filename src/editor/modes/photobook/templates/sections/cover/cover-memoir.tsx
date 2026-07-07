@@ -18,7 +18,6 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
   const { cover } = sectionContent
   const coverImage = imageContent?.cover
 
-  // Стили вынесены для чистоты JSX
   const containerStyles = "max-w-screen-2xl mx-auto w-full flex-1 grid grid-cols-1 @md:grid-cols-[1.2fr_1fr] items-stretch"
   const contentPadding = "px-6 @sm:px-10 @md:px-16 @lg:px-24"
 
@@ -30,7 +29,6 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
     >
       <div className={containerStyles}>
         
-        {/* Left Column – Typography */}
         <div className={cn('relative flex flex-col justify-center py-16 @md:py-24 gap-10', contentPadding)}>
           <Animate trigger="mount" delay={0.1} distance={20} className="space-y-8">
             <h1 className={cn(
@@ -60,7 +58,6 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
             )}
           </Animate>
 
-          {/* Date & Location integrated into the flow */}
           {(cover.date || cover.location) && (
             <Animate trigger="mount" delay={0.3} className="flex items-center gap-4">
               <div className={cn('h-px w-6 shrink-0', theme.accent)} />
@@ -70,11 +67,9 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
             </Animate>
           )}
 
-          {/* Vertical divider for desktop */}
           <div className="hidden @md:block absolute right-0 top-1/4 bottom-1/4 w-px bg-current opacity-5" />
         </div>
 
-        {/* Right Column – Photo Container */}
         <Animate 
           trigger="mount" 
           type="scale" 
@@ -87,7 +82,7 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
                 slotId={coverImage.slotId}
                 value={coverImage.value}
                 alt={cover.title}
-                className={cn('w-full transition-transform duration-700 hover:scale-[1.02]', theme.shadow, theme.elementGlow)}
+                className={cn('w-full transition-transform duration-700 hover:scale-[1.02]', theme.elementGlow)}
                 priority
               />
             ) : (
@@ -97,7 +92,6 @@ export function CoverMemoir({ sectionContent, theme, imageContent }: CoverMemoir
         </Animate>
       </div>
 
-      {/* Footer Branding */}
       <div className={cn('py-8 opacity-[0.08]', contentPadding)}>
         <div className="h-px bg-current w-full" />
       </div>

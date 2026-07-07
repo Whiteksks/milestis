@@ -22,17 +22,14 @@ export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryL
     <SectionWrapper
       id="gallery"
       themeForeground={theme.foreground}
-      // Добавляем относительное позиционирование для декоративных элементов
       className={cn('overflow-x-clip relative', theme.background)}
     >
-      {/* Декоративный эффект зернистости (Grain Overlay) */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
       <div className="max-w-7xl mx-auto px-8 @md:px-14 @lg:px-20 py-24 @md:py-32 relative z-10">
         
-        {/* Шапка галереи в стиле музейной экспликации */}
         <Animate trigger="mount" direction="none" className="mb-20 @md:mb-28 flex flex-col items-center">
-          <div className="w-px h-12 bg-current opacity-20 mb-8" /> {/* Вертикальная линия вместо горизонтальной */}
+          <div className="w-px h-12 bg-current opacity-20 mb-8" /> 
           {gallery.label && (
             <p className={cn('mb-4 text-[9px] uppercase tracking-[0.4em] opacity-30', theme.fontBody)}>
               {gallery.label}
@@ -58,7 +55,6 @@ export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryL
           )}
         </Animate>
 
-        {/* Сетка с эффектом смещения (Offset Grid) */}
         {images.length > 0 ? (
           <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 space-y-4 @md:space-y-6  ">
             {images.map((photo, index) => {
@@ -71,15 +67,13 @@ export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryL
                   direction="up"
                   distance={30}
                   delay={index * 0.08}
-                  // Lumiere Style: Нечетные карточки чуть смещаем вниз для динамики
                   className={cn(
                     "flex flex-col gap-4",
                     index % 2 === 1 ? "@sm:translate-y-12" : ""
                   )}
                 >
-                  {/* Фото в "паспарту" или с тонкой рамкой */}
                   <div className="group relative bg-white/[0.02] p-2 transition-transform duration-700 hover:scale-[1.02]">
-                    <div className="overflow-hidden border border-current/5">
+                    <div className="overflow-hidden">
                       {galleryImage?.value.asset.src && (
                         <SlotImage
                           slotId={galleryImage.slotId}
@@ -92,7 +86,6 @@ export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryL
                     </div>
                   </div>
 
-                  {/* Подпись в стиле каталога */}
                   <div className="flex flex-col gap-1 px-1">
                     <div className="flex justify-between items-center">
                       <span className={cn('text-[9px] font-medium opacity-40 tabular-nums', theme.fontBody)}>
@@ -111,7 +104,6 @@ export function GalleryLumiere({ sectionContent, theme, imageContent }: GalleryL
             })}
           </div>
         ) : (
-          /* Empty state */
           <div className="grid grid-cols-1 @sm:grid-cols-3 gap-8">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="aspect-[3/4] bg-current/[0.02] border border-current/5" />

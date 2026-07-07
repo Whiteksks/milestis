@@ -26,23 +26,14 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
     >
       <div className="max-w-7xl mx-auto w-full px-8 @md:px-14 @lg:px-20 flex flex-col gap-10 @md:gap-14">
 
-        {/* Top editorial header */}
         <div>
           <div className={cn('border-t-2', theme.border)} />
-          <div className="flex items-center justify-between mt-3">
-            {ending.label && (
-              <span className={cn('text-[9px] uppercase tracking-[0.3em] opacity-35', theme.fontBody)}>
-                {ending.label}
-              </span>
-            )}
-          </div>
+          <div className="flex items-center justify-between mt-3" />
         </div>
 
         <div className="flex-1 flex flex-col @md:flex-row gap-12 @md:gap-20 items-start @md:items-center">
 
-          {/* Left � typographic closing */}
           <div className="flex-1 space-y-6 @md:space-y-8">
-            {/* Title masthead */}
             {ending.title && (
               <h2
                 className={cn(
@@ -70,7 +61,7 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
             <div className="space-y-1.5 pt-2">
               {ending.signature && (
                 <p className={cn('text-sm italic opacity-45', theme.fontBody)}>
-                  � {ending.signature}
+                  — {ending.signature}
                 </p>
               )}
               {ending.date && (
@@ -81,7 +72,6 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
             </div>
           </div>
 
-          {/* Right � optional closing photo */}
           {hasImage && endingImage && (
             <div className="w-full @md:w-64 @lg:w-80 shrink-0">
               <SlotImage
@@ -89,13 +79,11 @@ export function EndingChronicle({ sectionContent, theme, imageContent }: EndingC
                 value={endingImage.value}
                 alt={ending.signature ?? 'Ending'}
                 sizes="(max-width: 768px) 80vw, 320px"
-                className={theme.shadow}
               />
             </div>
           )}
         </div>
 
-        {/* Bottom closing accent line */}
         <div className={cn('h-[2px] origin-left', theme.accent)} />
       </div>
     </SectionWrapper>

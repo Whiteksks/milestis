@@ -18,16 +18,11 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
     <SectionWrapper id="contact" themeForeground={theme.foreground}>
       <div className="@lg:px-20 @md:px-12 px-6 @lg:py-24 @md:py-20 py-14">
         <div className="max-w-7xl mx-auto">
-
-          {/* Label row */}
           <EditorialLabel themeFont={theme.fontBody} className="mb-14">
             {sectionContent.contact.subtitle || 'Contact'}
           </EditorialLabel>
 
-          {/* Asymmetric layout: big heading left, form right */}
           <div className="grid @lg:grid-cols-[2fr,3fr] @md:grid-cols-1 grid-cols-1 gap-16 items-start">
-
-            {/* Left   headline */}
             <div className="space-y-6">
               <Animate direction="left" delay={0.1}>
                 <EditorialTitle themeFont={theme.fontTitle} className="@lg:text-5xl @md:text-4xl text-3xl tracking-tight">
@@ -53,7 +48,6 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
               </Animate>
             </div>
 
-            {/* Right   minimalist underline-only form */}
             <Animate direction="up" delay={0.2} as="div">
               <form onSubmit={handleSubmit} className="space-y-0">
                 {status !== 'idle' && (
@@ -69,7 +63,7 @@ export function EditorialContact({ theme, sectionContent }: EditorialContactProp
                       theme.fontBody,
                     )}
                   >
-                    {status === 'sent' ? 'Message sent   check your email client.' : 'Please fill in all required fields.'}
+                    {status === 'sent' ? 'Message sent! Check your email client.' : 'Please fill in all required fields.'}
                   </motion.div>
                 )}
                 <div className="grid @md:grid-cols-2 gap-0">
