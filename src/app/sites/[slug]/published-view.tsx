@@ -25,6 +25,7 @@ interface PublishedViewProps {
   content: Record<string, unknown>
   imageContent?: Record<string, unknown>
   visibility: Record<string, unknown>
+  clickable?: boolean
 }
 
 export function PublishedView({
@@ -36,6 +37,7 @@ export function PublishedView({
   content,
   imageContent,
   visibility,
+  clickable = true,
 }: PublishedViewProps) {
   const theme = getTheme(themeId)
   const isMobile = useIsMobile()
@@ -102,7 +104,7 @@ export function PublishedView({
           {template}
         </div>
 
-        <MilestisWhiteLabel clickable={false} />
+        <MilestisWhiteLabel clickable={clickable} />
       </div>
     </div>
   )

@@ -43,7 +43,6 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
               <div className="h-[0.5px] flex-1 bg-current opacity-10" />
               {photos.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] opacity-20 uppercase tracking-widest font-mono">Index</span>
                   <span className={cn("text-[10px] @md:text-xs opacity-40 font-mono font-light", theme.fontBody)}>
                     ({String(photos.length).padStart(2, '0')})
                   </span>
@@ -98,7 +97,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
 
                 return (
                   <div className="group relative w-full">
-                    <div className="relative aspect-[21/9] @md:aspect-[16/9] overflow-hidden bg-current/[0.02] rounded-[2px] transition-all duration-700 ring-1 ring-current/5 group-hover:ring-current/10">
+                    <div className="relative aspect-[21/9] @md:aspect-[16/9] overflow-hidden bg-current/[0.02] rounded-[2px] transition-all duration-700">
                       {featureImage?.value.asset.src ? (
                         <SlotImage
                           slotId={featureImage.slotId}
@@ -115,7 +114,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                     {/* Meta под главным кадром */}
                     <div className="mt-5 flex justify-between items-baseline px-1">
                       <div className="flex items-center gap-4">
-                        <span className="text-[10px] font-mono opacity-40 font-medium">01 // FEATURE</span>
+                        <span className="text-[10px] font-mono opacity-40 font-medium">01</span>
                       </div>
                       {feature.caption && (
                         <p className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.2em] opacity-40 text-right max-w-md truncate font-light", theme.fontBody)}>
@@ -142,7 +141,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
 
                       return (
                         <div className="group w-full">
-                          <div className="relative aspect-[4/5] overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5">
+                          <div className="relative aspect-[4/5] overflow-hidden bg-current/[0.02] rounded-[2px]">
                             {secondImage?.value.asset.src ? (
                               <SlotImage
                                 slotId={secondImage.slotId}
@@ -180,7 +179,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
 
                       return (
                         <div className="group w-full">
-                          <div className="relative aspect-[2/3] overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5">
+                          <div className="relative aspect-[2/3] overflow-hidden bg-current/[0.02] rounded-[2px]">
                             {thirdImage?.value.asset.src ? (
                               <SlotImage
                                 slotId={thirdImage.slotId}
@@ -229,7 +228,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
                     distance={25}
                   >
                     <div className="group relative w-full">
-                      <div className={cn("relative overflow-hidden bg-current/[0.02] rounded-[2px] ring-1 ring-current/5 transition-all duration-500", aspectClass)}>
+                      <div className={cn("relative overflow-hidden bg-current/[0.02] rounded-[2px] transition-all duration-500", aspectClass)}>
                         {galleryImage?.value.asset.src ? (
                           <SlotImage
                             slotId={galleryImage.slotId}
@@ -276,7 +275,7 @@ export function GalleryMagazine({ sectionContent, theme, imageContent }: Gallery
         {/* Editorial Footer */}
         <footer className="mt-36 pt-12 border-t border-current/10 flex justify-between items-center px-1">
           <div className={cn("text-[9px] @md:text-[10px] uppercase tracking-[0.5em] opacity-40 truncate max-w-[300px] font-medium", theme.fontBody)}>
-            {gallery.title || 'Editorial Archive'}
+            {gallery.title}
           </div>
           
           <button 

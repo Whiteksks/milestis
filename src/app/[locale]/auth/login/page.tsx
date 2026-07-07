@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +14,7 @@ import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
 import Link from "next/link"
 
 export default function LoginPage() {
+  const t = useTranslations()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -160,7 +162,7 @@ export default function LoginPage() {
                         onKeyDown={(e) => e.key === "Enter" && handleSendMagicLink()}
                         className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
                       />
-                      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
+                      {error && <p className="text-xs text-destructive mt-1">{t(error as Parameters<typeof t>[0])}</p>}
                     </div>
 
                     <Button 

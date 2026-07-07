@@ -71,6 +71,7 @@ export function PreviewOverlay() {
         content={content}
         imageContent={imageContent}
         visibility={visibility}
+        clickable={false}
       />
 
       {/* Close button — floats above everything */}

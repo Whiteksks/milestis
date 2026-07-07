@@ -57,7 +57,7 @@ export function CoverSoleil({ sectionContent, theme, imageContent }: CoverSoleil
               direction="up"
               className="w-full @sm:w-[70%] @md:w-[40%] @lg:w-[35%] shrink-0"
             >
-              <div className={cn('rounded-[2px] ring-1 ring-current/5', theme.shadow)}>
+              <div className={cn('rounded-[2px]', theme.shadow)}>
                 <SlotImage
                   slotId={coverImage.slotId}
                   value={coverImage.value}

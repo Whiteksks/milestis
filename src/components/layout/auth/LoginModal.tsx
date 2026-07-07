@@ -11,6 +11,7 @@ import { sendSignInLinkToEmail, signInWithPassword } from "@/lib/auth"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useTranslations } from "next-intl"
 
 interface LoginModalProps {
   open: boolean
@@ -19,7 +20,7 @@ interface LoginModalProps {
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const menuRef = useRef<HTMLDivElement>(null)
-  
+  const t = useTranslations()
   const isMobile = useIsMobile()
   const [email, setEmail] = useState("")
 
@@ -127,7 +128,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
               />
               {error && (
-                <p className="text-xs text-destructive mt-1">{error}</p>
+                <p className="text-xs text-destructive mt-1">{t(error as Parameters<typeof t>[0])}</p>
               )}
             </div>
 
