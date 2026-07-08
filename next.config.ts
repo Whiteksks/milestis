@@ -40,9 +40,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   reactCompiler: true,
   typescript: { ignoreBuildErrors: false },
-  // takumi-js uses a napi-rs native binary (@takumi-rs/core) that cannot be
-  // bundled by Turbopack/webpack — must be loaded as a Node.js external.
-  serverExternalPackages: ['takumi-js', '@takumi-rs/core'],
   async headers() {
     return [
       {
