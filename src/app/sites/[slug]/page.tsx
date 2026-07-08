@@ -87,6 +87,25 @@ async function getPublishedProjectByToken(slug: string, mode: "photobook", plain
 
 // --- SEO metadata ---
 
+function extractCoverUrlFromContent(
+  content: Record<string, unknown> | null,
+  mode: string,
+): string | null {
+  if (!content) return null
+  const imageContent = content.imageContent as Record<string, unknown> | undefined
+  if (!imageContent) return null
+  if (mode === "photobook") {
+    const cover = imageContent.cover as { value?: { asset?: { src?: string } } } | undefined
+    return cover?.value?.asset?.src ?? null
+  }
+  if (mode === "portfolio") {
+    const hero = imageContent.hero as { value?: { asset?: { src?: string } } } | undefined
+    const bio2 = imageContent.bio as { value?: { asset?: { src?: string } } } | undefined
+    return hero?.value?.asset?.src ?? bio2?.value?.asset?.src ?? null
+  }
+  return null
+}
+
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params
   const reqHeaders = await headers()
@@ -105,9 +124,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const title = bio?.title || project.name
     const description = bio?.description?.slice(0, 160) || undefined
 
-    const ogImages = project.ogImageUrl
-      ? [{ url: project.ogImageUrl, width: 1200, height: 630 }]
-      : []
+    // Prefer the pre-generated 1200×630 OG image; fall back to the raw cover
+    const ogImageSrc =
+      project.ogImageUrl ??
+      extractCoverUrlFromContent(project.content as Record<string, unknown> | null, "portfolio")
+    const ogImages = ogImageSrc ? [{ url: ogImageSrc }] : []
 
     return {
       title,
@@ -123,7 +144,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         card: 'summary_large_image',
         title,
         description,
-        ...(project.ogImageUrl ? { images: [project.ogImageUrl] } : {}),
+        ...(ogImageSrc ? { images: [ogImageSrc] } : {}),
       },
     }
   }
@@ -136,9 +157,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
     if (project) {
       const title = project.name
-      const ogImages = project.ogImageUrl
-        ? [{ url: project.ogImageUrl, width: 1200, height: 630 }]
-        : []
+      const ogImageSrc =
+        project.ogImageUrl ??
+        extractCoverUrlFromContent(project.content as Record<string, unknown> | null, "photobook")
+      const ogImages = ogImageSrc ? [{ url: ogImageSrc }] : []
 
       return {
         title,
@@ -150,7 +172,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         twitter: {
           card: 'summary_large_image',
           title,
-          ...(project.ogImageUrl ? { images: [project.ogImageUrl] } : {}),
+          ...(ogImageSrc ? { images: [ogImageSrc] } : {}),
         },
       }
     }

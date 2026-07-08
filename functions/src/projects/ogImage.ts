@@ -4,6 +4,7 @@ import { logger } from "firebase-functions/v2";
 import * as os from "os";
 import * as fs from "fs";
 import * as path from "path";
+import { randomBytes } from "crypto";
 import sharp from "sharp";
 
 const OG_WIDTH = 1200;
@@ -28,8 +29,7 @@ function extractCoverUrl(content: Record<string, unknown> | null, mode: string):
 
 /**
  * Downloads the project cover image, resizes it to 1200×630, uploads it to
- * Firebase Storage at `og/{projectId}.png` with public ACL, and saves the
- * direct `storage.googleapis.com` URL (no redirects) to
+ * Firebase Storage at `og/{projectId}.png` and saves a download-token URL to
  * `published_projects/{projectId}.ogImageUrl`.
  *
  * This is fire-and-forget — call with `.catch(...)` and never await in
@@ -68,9 +68,19 @@ export async function generateAndStoreOgImage(
 			destination: storagePath,
 			metadata: { contentType: "image/png" },
 		});
-		await bucket.file(storagePath).makePublic();
 
-		const ogImageUrl = `https://storage.googleapis.com/${bucket.name}/og/${projectId}.png`;
+		// Use a download token instead of makePublic() — makePublic() fails when
+		// Uniform Bucket-Level Access (UBLA) is enabled on the bucket.
+		const file = bucket.file(storagePath);
+		const [meta] = await file.getMetadata();
+		const existingToken = (meta.metadata as Record<string, string> | undefined)
+			?.firebaseStorageDownloadTokens;
+		const token = existingToken ?? randomBytes(16).toString("hex");
+		if (!existingToken) {
+			await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: token } });
+		}
+		const encodedPath = storagePath.split("/").map(encodeURIComponent).join("%2F");
+		const ogImageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedPath}?alt=media&token=${token}`;
 
 		await db.collection("published_projects").doc(projectId).update({ ogImageUrl });
 		logger.info(`[ogImage] Stored OG image for ${projectId}: ${ogImageUrl}`);
