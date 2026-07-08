@@ -61,8 +61,7 @@ export default async function Image({ params }: Props) {
         {/* Title + subtitle */}
         {title && (
           <div
-            tw="absolute flex flex-col"
-            style={{ bottom: 64, left: 80, right: 80 }}
+            style={{ position: 'absolute', bottom: 64, left: 80, right: 80, display: 'flex', flexDirection: 'column' }}
           >
             <span tw="text-white font-bold" style={{ fontSize: 68, lineHeight: 1.1, letterSpacing: '-1px' }}>
               {title}
