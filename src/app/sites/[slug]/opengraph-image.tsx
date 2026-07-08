@@ -36,6 +36,25 @@ function OgLayout({ imageUrl, title }: { imageUrl: string | null; title?: string
   )
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Satori (used by ImageResponse) cannot reliably fetch external images via URL.
+ * Pre-fetching as a base64 data URL avoids CORS / redirect failures at render time.
+ */
+async function fetchImageAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const buffer = await res.arrayBuffer()
+    const base64 = Buffer.from(buffer).toString('base64')
+    const contentType = res.headers.get('content-type') ?? 'image/jpeg'
+    return `data:${contentType};base64,${base64}`
+  } catch {
+    return null
+  }
+}
+
 // ─── Data fetcher (portfolio only) ────────────────────────────────────────────
 
 type ImageSlot = { value?: { asset?: { src?: string } } }
@@ -74,7 +93,8 @@ export default async function Image({ params }: Props) {
   // Portfolio only — photobooks get their OG image via generateMetadata (token-gated)
   const portfolio = await fetchPortfolio(slug)
   if (portfolio) {
-    return new ImageResponse(<OgLayout title={portfolio.name} imageUrl={portfolio.imageUrl} />, size)
+    const imageDataUrl = portfolio.imageUrl ? await fetchImageAsDataUrl(portfolio.imageUrl) : null
+    return new ImageResponse(<OgLayout title={portfolio.name} imageUrl={imageDataUrl} />, size)
   }
 
   // Fallback — dark canvas so the route always returns a valid PNG

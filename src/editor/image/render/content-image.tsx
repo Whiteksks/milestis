@@ -85,44 +85,50 @@ export function ContentImage({
   }
 
   return (
+    // Outer div: controls user-supplied sizing (w-[160px], w-48, etc.) + frame shape.
+    // Must NOT set width inline — that would override Tailwind w-* classes in className.
+    // overflow:hidden + position:relative are inline to ensure they are never overridden.
     <div
       className={cn(frameClassName, className)}
-      // All layout-critical properties are inline — present in SSR HTML from first paint.
-      // Tailwind classes only apply after CSS loads, causing squeeze/jump on slow connections.
-      style={{ position: 'relative', width: '100%', overflow: 'hidden', aspectRatio }}
+      style={{ position: 'relative', overflow: 'hidden' }}
       data-image-slot={image.slotId}
       data-image-usage={image.usage}
     >
-      {crop ? (
-        // Crop branch: expand the background layer beyond the container and offset it
-        // so only the desired region is visible. This keeps first-paint geometry
-        // stable without relying on img intrinsic sizing.
-        <div
-          style={{
-            position: 'absolute',
-            width: toPercent(1 / crop.rect.width),
-            height: toPercent(1 / crop.rect.height),
-            left: toPercent(-crop.rect.left / crop.rect.width),
-            top: toPercent(-crop.rect.top / crop.rect.height),
-          }}
-        >
+      {/* Inner div: fills the outer frame (width:100%) and establishes the aspect-ratio height.
+          position:relative here so that absolutely-positioned crop/background layers
+          anchor to this element's definite bounding box, not to the outer div. */}
+      <div style={{ width: '100%', aspectRatio, position: 'relative' }}>
+        {crop ? (
+          // Crop branch: expand the background layer beyond the container and offset it
+          // so only the desired region is visible. This keeps first-paint geometry
+          // stable without relying on img intrinsic sizing.
+          <div
+            style={{
+              position: 'absolute',
+              width: toPercent(1 / crop.rect.width),
+              height: toPercent(1 / crop.rect.height),
+              left: toPercent(-crop.rect.left / crop.rect.width),
+              top: toPercent(-crop.rect.top / crop.rect.height),
+            }}
+          >
+            <BackgroundLayer
+              src={image.asset.src}
+              alt={resolvedAlt}
+              backgroundSize="100% 100%"
+              backgroundPosition="top left"
+              className={imageClassName}
+            />
+          </div>
+        ) : (
           <BackgroundLayer
             src={image.asset.src}
             alt={resolvedAlt}
-            backgroundSize="100% 100%"
-            backgroundPosition="top left"
+            backgroundSize={image.fit === 'contain' ? 'contain' : 'cover'}
+            backgroundPosition={image.objectPosition}
             className={imageClassName}
           />
-        </div>
-      ) : (
-        <BackgroundLayer
-          src={image.asset.src}
-          alt={resolvedAlt}
-          backgroundSize={image.fit === 'contain' ? 'contain' : 'cover'}
-          backgroundPosition={image.objectPosition}
-          className={imageClassName}
-        />
-      )}
+        )}
+      </div>
     </div>
   )
 }

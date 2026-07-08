@@ -106,16 +106,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     return {
       title,
       description,
+      // metadataBase must point to the subdomain so Next.js resolves the
+      // auto-discovered opengraph-image.tsx route to the correct absolute URL
+      // (otherwise it defaults to NEXT_APP_URL = milestis.com which is wrong).
+      metadataBase: new URL(`https://${slug}.milestis.site`),
       openGraph: {
         title,
         description,
         type: 'profile',
         url: `https://${slug}.milestis.site`,
+        images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
       },
       twitter: {
         card: 'summary_large_image',
         title,
         description,
+        images: [`https://${slug}.milestis.site/opengraph-image`],
       },
     }
   }
