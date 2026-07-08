@@ -135,7 +135,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     if (project) {
       type Images = Record<string, { value?: { asset?: { src?: string } } } | undefined>
       const images = ((project.content as Record<string, unknown> | null)?.imageContent ?? {}) as Images
-      const coverUrl = images.hero?.value?.asset?.src || images.bio?.value?.asset?.src || null
+      // Photobook cover is stored under 'cover'; portfolio uses 'hero'/'bio'
+      const coverUrl = images.cover?.value?.asset?.src || images.hero?.value?.asset?.src || null
       const title = project.name
 
       return {

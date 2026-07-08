@@ -36,25 +36,6 @@ function OgLayout({ imageUrl, title }: { imageUrl: string | null; title?: string
   )
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-/**
- * Satori (used by ImageResponse) cannot reliably fetch external images via URL.
- * Pre-fetching as a base64 data URL avoids CORS / redirect failures at render time.
- */
-async function fetchImageAsDataUrl(url: string): Promise<string | null> {
-  try {
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const buffer = await res.arrayBuffer()
-    const base64 = Buffer.from(buffer).toString('base64')
-    const contentType = res.headers.get('content-type') ?? 'image/jpeg'
-    return `data:${contentType};base64,${base64}`
-  } catch {
-    return null
-  }
-}
-
 // ─── Data fetcher (portfolio only) ────────────────────────────────────────────
 
 type ImageSlot = { value?: { asset?: { src?: string } } }
@@ -87,20 +68,27 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
-export default async function Image({ params }: Props) {
-  const { slug } = await params
+const FALLBACK = (
+  <div style={{ display: 'flex', width: '100%', height: '100%', background: '#111' }} />
+)
 
-  // Portfolio only — photobooks get their OG image via generateMetadata (token-gated)
-  const portfolio = await fetchPortfolio(slug)
-  if (portfolio) {
-    const imageDataUrl = portfolio.imageUrl ? await fetchImageAsDataUrl(portfolio.imageUrl) : null
-    return new ImageResponse(<OgLayout title={portfolio.name} imageUrl={imageDataUrl} />, size)
+export default async function Image({ params }: Props) {
+  try {
+    const { slug } = await params
+
+    // Portfolio only — photobooks get their OG image via generateMetadata (token-gated)
+    const portfolio = await fetchPortfolio(slug)
+    if (portfolio) {
+      return new ImageResponse(
+        <OgLayout title={portfolio.name} imageUrl={portfolio.imageUrl} />,
+        size,
+      )
+    }
+  } catch {
+    // Never let this route return non-PNG — crawlers would ignore og:image entirely
   }
 
-  // Fallback — dark canvas so the route always returns a valid PNG
-  return new ImageResponse(
-    <div style={{ display: 'flex', width: '100%', height: '100%', background: '#111' }} />,
-    size,
-  )
+  // Fallback — always return a valid PNG so the og:image URL never 404s/500s
+  return new ImageResponse(FALLBACK, size)
 }
 
