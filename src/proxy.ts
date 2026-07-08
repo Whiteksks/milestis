@@ -64,7 +64,10 @@ function isPublishedPhotobookPath(pathname: string): boolean {
   }
 
   const segments = barePath.split('/').filter(Boolean);
-  return segments.length === 1;
+  if (segments.length === 1) return true;
+  // Allow Next.js special file-based routes one level deep under a photobook slug
+  if (segments.length === 2 && (segments[1] === 'opengraph-image' || segments[1] === 'twitter-image')) return true;
+  return false;
 }
 
 function getRequestLocale(request: NextRequest): string {

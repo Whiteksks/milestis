@@ -142,13 +142,17 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       return {
         title,
         robots: "noindex",
+        // Use our own PNG route so Telegram (which rejects Firebase Storage URLs) works too.
+        // The cover image is in public/ storage so no token is needed to render the PNG.
+        metadataBase: new URL('https://milestis.site'),
         openGraph: {
           title,
-          ...(coverUrl ? { images: [{ url: coverUrl, width: 1200, height: 630 }] } : {}),
+          images: [{ url: `/${slug}/opengraph-image`, width: 1200, height: 630 }],
         },
         twitter: {
-          card: coverUrl ? "summary_large_image" : "summary",
+          card: 'summary_large_image',
           title,
+          images: [`https://milestis.site/${slug}/opengraph-image`],
         },
       }
     }

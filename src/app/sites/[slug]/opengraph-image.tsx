@@ -36,12 +36,35 @@ function OgLayout({ imageUrl, title }: { imageUrl: string | null; title?: string
   )
 }
 
-// ─── Data fetcher (portfolio only) ────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Satori does not reliably fetch Firebase Storage URLs on its own
+ * (no redirect-follow, no proper Accept headers). Pre-fetching server-side
+ * and handing Satori a data URL is the only reliable approach.
+ * 5 s timeout so a slow Storage response never hangs the whole route.
+ */
+async function toDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5_000) })
+    if (!res.ok) return null
+    const mime = res.headers.get('content-type') ?? 'image/jpeg'
+    if (!mime.startsWith('image/')) return null
+    const buf = await res.arrayBuffer()
+    return `data:${mime};base64,${Buffer.from(buf).toString('base64')}`
+  } catch {
+    return null
+  }
+}
+
+// ─── Data fetchers ──────────────────────────────────────────────────────────────
 
 type ImageSlot = { value?: { asset?: { src?: string } } }
 type ImageMap = Record<string, ImageSlot | undefined>
 
-async function fetchPortfolio(slug: string): Promise<{ name: string; imageUrl: string | null } | null> {
+type OgData = { name: string; imageUrl: string | null }
+
+async function fetchPortfolio(slug: string): Promise<OgData | null> {
   const slugSnap = await adminDb
     .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
     .doc(getSlugReservationDocId('portfolio', slug))
@@ -62,6 +85,25 @@ async function fetchPortfolio(slug: string): Promise<{ name: string; imageUrl: s
   }
 }
 
+async function fetchPhotobook(slug: string): Promise<OgData | null> {
+  // Photobook slugs live directly on published_projects — no slug-reservation lookup needed
+  const snap = await adminDb
+    .collection('published_projects')
+    .where('slug', '==', slug)
+    .where('mode', '==', 'photobook')
+    .limit(1)
+    .get()
+
+  if (snap.empty) return null
+  const data = snap.docs[0].data()
+  const images = ((data.content as Record<string, unknown>)?.imageContent ?? {}) as ImageMap
+
+  return {
+    name: data.name as string,
+    imageUrl: images.cover?.value?.asset?.src || null,
+  }
+}
+
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 interface Props {
@@ -76,11 +118,12 @@ export default async function Image({ params }: Props) {
   try {
     const { slug } = await params
 
-    // Portfolio only — photobooks get their OG image via generateMetadata (token-gated)
-    const portfolio = await fetchPortfolio(slug)
-    if (portfolio) {
+    // Try portfolio first, then photobook
+    const data = await fetchPortfolio(slug) ?? await fetchPhotobook(slug)
+    if (data) {
+      const imageUrl = data.imageUrl ? await toDataUrl(data.imageUrl) : null
       return new ImageResponse(
-        <OgLayout title={portfolio.name} imageUrl={portfolio.imageUrl} />,
+        <OgLayout title={data.name} imageUrl={imageUrl} />,
         size,
       )
     }
