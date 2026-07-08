@@ -46,6 +46,7 @@ async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") 
     accessToken: null as null,
     content: data.content ?? null,
     theme: data.theme ?? null,
+    ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
   }
 }
 
@@ -80,6 +81,7 @@ async function getPublishedProjectByToken(slug: string, mode: "photobook", plain
     mode: data.mode as "photobook",
     content: data.content ?? null,
     theme: data.theme ?? null,
+    ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
   }
 }
 
@@ -103,25 +105,25 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const title = bio?.title || project.name
     const description = bio?.description?.slice(0, 160) || undefined
 
+    const ogImages = project.ogImageUrl
+      ? [{ url: project.ogImageUrl, width: 1200, height: 630 }]
+      : []
+
     return {
       title,
       description,
-      // metadataBase must point to the subdomain so Next.js resolves the
-      // auto-discovered opengraph-image.tsx route to the correct absolute URL
-      // (otherwise it defaults to NEXT_APP_URL = milestis.com which is wrong).
-      metadataBase: new URL(`https://${slug}.milestis.site`),
       openGraph: {
         title,
         description,
         type: 'profile',
         url: `https://${slug}.milestis.site`,
-        images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
+        images: ogImages,
       },
       twitter: {
         card: 'summary_large_image',
         title,
         description,
-        images: [`https://${slug}.milestis.site/opengraph-image`],
+        ...(project.ogImageUrl ? { images: [project.ogImageUrl] } : {}),
       },
     }
   }
@@ -133,26 +135,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (tokenString) {
     const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
     if (project) {
-      type Images = Record<string, { value?: { asset?: { src?: string } } } | undefined>
-      const images = ((project.content as Record<string, unknown> | null)?.imageContent ?? {}) as Images
-      // Photobook cover is stored under 'cover'; portfolio uses 'hero'/'bio'
-      const coverUrl = images.cover?.value?.asset?.src || images.hero?.value?.asset?.src || null
       const title = project.name
+      const ogImages = project.ogImageUrl
+        ? [{ url: project.ogImageUrl, width: 1200, height: 630 }]
+        : []
 
       return {
         title,
         robots: "noindex",
-        // Use our own PNG route so Telegram (which rejects Firebase Storage URLs) works too.
-        // The cover image is in public/ storage so no token is needed to render the PNG.
-        metadataBase: new URL('https://milestis.site'),
         openGraph: {
           title,
-          images: [{ url: `/${slug}/opengraph-image`, width: 1200, height: 630 }],
+          images: ogImages,
         },
         twitter: {
           card: 'summary_large_image',
           title,
-          images: [`https://milestis.site/${slug}/opengraph-image`],
+          ...(project.ogImageUrl ? { images: [project.ogImageUrl] } : {}),
         },
       }
     }

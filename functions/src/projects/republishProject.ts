@@ -11,6 +11,7 @@ import { VALID_MODES, type ProjectMode } from "./projectInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { recordIubendaConsent } from "../lib/iubendaConsent";
 import type { BalanceSnapshot } from "../transactions/types";
+import { generateAndStoreOgImage } from "./ogImage";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -439,6 +440,11 @@ export const republishProject = onRequest(
 				try { await deletePrivateProjectMedia(uid, pid); }
 				catch (err) { logger.warn(`[republishProject] Private media cleanup failed for ${pid}:`, err); }
 			}
+
+			// Generate OG image — fire-and-forget, never blocks the response
+			generateAndStoreOgImage(pid, mode, migratedData.content).catch((err) => {
+				logger.warn(`[republishProject] OG image generation failed for ${pid}:`, err);
+			});
 
 			// Consent recording for paid republish
 			if (deltaCost > 0) {
