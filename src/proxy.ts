@@ -117,11 +117,14 @@ export function proxy(request: NextRequest) {
 
   // ── Subdomain rewrite: {slug}.milestis.site → /sites/{slug} ──────────────
   // Mode = portfolio (custom subdomain)
+  // Preserve the original pathname so that Next.js special routes like
+  // /opengraph-image, /twitter-image, /sitemap.xml are served correctly.
   const subdomainMatch = host.match(/^([a-z0-9-]+)\.milestis\.site(?::\d+)?$/);
   if (subdomainMatch) {
     const slug = subdomainMatch[1];
     const url = request.nextUrl.clone();
-    url.pathname = `/sites/${slug}`;
+    const trailingPath = pathname === '/' ? '' : pathname;
+    url.pathname = `/sites/${slug}${trailingPath}`;
     const reqHeaders = new Headers(request.headers);
     reqHeaders.set('x-milestis-mode', 'portfolio');
     return NextResponse.rewrite(url, { request: { headers: reqHeaders } });

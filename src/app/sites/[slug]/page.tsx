@@ -97,10 +97,56 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (policy.namespace === "global") {
     const project = await getPublishedProjectBySlugGlobal(slug, mode as "portfolio")
     if (!project) return { title: "Not found" }
-    return { title: project.name }
+
+    const sectionContent = (project.content as Record<string, unknown> | null)?.sectionContent as Record<string, Record<string, string>> | undefined
+    const bio = sectionContent?.bio
+    const title = bio?.title || project.name
+    const description = bio?.description?.slice(0, 160) || undefined
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: 'profile',
+        url: `https://${slug}.milestis.site`,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+      },
+    }
   }
 
-  // token-namespace: no rich metadata without a token — keep minimal and noindex
+  // token-namespace: validate token if present — enrich OG for social sharing
+  const { share } = await searchParams
+  const tokenString = Array.isArray(share) ? share[0] : share
+
+  if (tokenString) {
+    const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
+    if (project) {
+      type Images = Record<string, { value?: { asset?: { src?: string } } } | undefined>
+      const images = ((project.content as Record<string, unknown> | null)?.imageContent ?? {}) as Images
+      const coverUrl = images.hero?.value?.asset?.src || images.bio?.value?.asset?.src || null
+      const title = project.name
+
+      return {
+        title,
+        robots: "noindex",
+        openGraph: {
+          title,
+          ...(coverUrl ? { images: [{ url: coverUrl, width: 1200, height: 630 }] } : {}),
+        },
+        twitter: {
+          card: coverUrl ? "summary_large_image" : "summary",
+          title,
+        },
+      }
+    }
+  }
+
   return { robots: "noindex" }
 }
 

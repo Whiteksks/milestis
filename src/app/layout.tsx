@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   },
   description: 'Create your interactive photo book and share your story with the world.',
   robots: { index: true, follow: true },
+  icons: {
+    icon: [{ url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }],
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     type: 'website',
     siteName: 'Milestis',
