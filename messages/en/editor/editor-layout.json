@@ -11,6 +11,8 @@
         "publish": "Publish",
         "published": "Published",
         "viewSite": "View site",
+        "showQrCode": "Show QR Code",
+        "qrCodeTitle": "Guest QR Code",
         "unpublish": "Unpublish",
         "republish": "Republish",
         "desktop": "Desktop",

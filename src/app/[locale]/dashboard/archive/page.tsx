@@ -3,7 +3,7 @@
 import { memo, useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { ArrowLeft, BookOpen, Check, Copy, Edit, Globe, Layout } from "lucide-react"
+import { ArrowLeft, BookOpen, Camera, Check, Copy, Edit, Globe, Layout } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl"
 const modeConfig = {
   portfolio: { icon: Layout, labelKey: "project.mode.portfolio" as const },
   photobook: { icon: BookOpen, labelKey: "project.mode.photobook" as const },
+  event:     { icon: Camera,   labelKey: "project.mode.event"     as const },
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -120,7 +121,9 @@ function ProjectDetailPanel({
 
   const modeInfo = modeConfig[project.mode]
   const editUrl = `/${locale}/design/${project.id}/edit`
-  const shareUrl = getPublishedProjectShareUrl(project)
+  const shareUrl = project.mode === 'event'
+    ? null  // events don't appear in the published archive
+    : getPublishedProjectShareUrl({ ...project, mode: project.mode })
 
   async function copyLink() {
     if (!shareUrl) return

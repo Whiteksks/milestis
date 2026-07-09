@@ -97,6 +97,12 @@ env:
       - BUILD
       - RUNTIME
 
+  - variable: NEXT_PUBLIC_UPLOAD_EVENT_PHOTO_URL
+    value: https://uploadeventphoto-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_EXPORT_USER_DATA_URL
     value: https://exportuserdata-5h4wes5waq-ez.a.run.app
     availability:

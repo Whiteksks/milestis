@@ -7,6 +7,10 @@ export const SLUG_MODE_POLICY = {
     namespace: "token",
     routeKind: "path",
   },
+  event: {
+    namespace: "token",
+    routeKind: "path",
+  },
 } as const
 
 export type SlugMode = keyof typeof SLUG_MODE_POLICY

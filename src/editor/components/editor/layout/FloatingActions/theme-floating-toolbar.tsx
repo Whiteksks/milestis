@@ -25,6 +25,8 @@ const ICON_BTN =
 const TOOLBAR_REGISTRY: Record<EditorMode, ComponentType> = {
   portfolio: PortfolioFloatingToolbar,
   photobook: PhotobookFloatingToolbar,
+  // Events don't have theme controls in V1
+  event: () => null,
 }
 
 export function ThemeFloatingToolbar() {

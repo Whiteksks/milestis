@@ -39,6 +39,8 @@ export type PublishedRenderArgs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   visibility: Record<string, any>
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
+  /** Firestore project ID — passed only for event mode so the upload page can access subcollections. */
+  projectId?: string
 }
 
 export type TemplateDef = {
@@ -101,6 +103,11 @@ export interface ModeUiConfig {
   /** Resets all background effects for this mode.
    *  @param update — the `updateThemeCustomization` action from the theme store. */
   resetEffects: (update: (patch: Partial<ThemeCustomizations>) => void) => void
+
+  /** When true, the Media Library button is hidden in the editor header for this mode. */
+  hideMediaButton?: boolean
+  /** When true, the Preview button is hidden in the editor header for this mode. */
+  hidePreviewButton?: boolean
 }
 
 export type ResolvedModeUiConfig = Omit<

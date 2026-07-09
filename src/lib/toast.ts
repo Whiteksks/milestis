@@ -115,6 +115,26 @@ export const toastProject = {
         err instanceof Error ? err.message : "Export failed",
     })
   },
+
+  /** Activate an event — deducts credits and opens guest uploads. */
+  openEvent<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Opening event…",
+      success: "Event is now open!",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to open event",
+    })
+  },
+
+  /** Close an event — stops guest uploads (free). */
+  closeEvent<T>(promise: Promise<T>) {
+    return toast.promise(promise, {
+      loading: "Closing event…",
+      success: "Event closed",
+      error: (err) =>
+        err instanceof Error ? err.message : "Failed to close event",
+    })
+  },
 }
 
 // ─── Storage / Upload ──────────────────────────────────────────────────────

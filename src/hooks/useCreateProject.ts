@@ -54,11 +54,11 @@ export function useCreateProject() {
       const promise = createProject(randomProjectName(), mode)
       toastProject.create(promise)
       try {
-        const projectId = await promise
+        const result = await promise
         if (uid) {
           void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
         }
-        router.push(`/${locale}/design/${projectId}/edit`)
+        router.push(`/${locale}/design/${result.projectId}/edit`)
       } catch {
         setPendingMode(null)
       }

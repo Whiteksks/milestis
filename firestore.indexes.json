@@ -26,6 +26,14 @@
       ]
     },
     {
+      "collectionGroup": "eventPhotos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "uploadedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "exports",
       "queryScope": "COLLECTION_GROUP",
       "fields": [

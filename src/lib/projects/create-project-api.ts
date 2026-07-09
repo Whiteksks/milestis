@@ -10,7 +10,7 @@ export class CreateProjectError extends Error {
 export async function createProject(
   name: string,
   mode: ProjectMode
-): Promise<string> {
+): Promise<{ projectId: string; shareCode?: string }> {
   const user = auth.currentUser
   if (!user) throw new CreateProjectError("UNAUTHORIZED", "Not authenticated")
 
@@ -32,5 +32,5 @@ export async function createProject(
     throw new CreateProjectError(data.error ?? "UNKNOWN", data.message ?? "Failed to create project")
   }
 
-  return data.projectId as string
+  return { projectId: data.projectId as string, shareCode: data.shareCode as string | undefined }
 }

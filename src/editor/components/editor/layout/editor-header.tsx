@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
 import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
@@ -18,6 +19,8 @@ import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutat
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
 import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import QRCodeSVG from 'react-qr-code'
 
 interface EditorHeaderProps {
   projectId: string
@@ -28,6 +31,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState(false)
   // Slug pre-filled after returning from a credit topup checkout
   const [afterTopupSlug, setAfterTopupSlug] = useState<string | null>(null)
   const [afterTopupAccessToken, setAfterTopupAccessToken] = useState<string | null>(null)
@@ -63,6 +67,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }))
 
   const [localName, setLocalName] = useState(projectName ?? '')
+
+  const modeUiConfig = MODE_REGISTRY[editorMode].uiConfig
 
   useEffect(() => {
     setLocalName(projectName ?? '')
@@ -266,28 +272,32 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
         {/* RIGHT */}
         <div className="flex items-center gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.currentTarget.blur()
-              toggleMediaLibrary()
-            }}
-            className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
-          >
-            <ImageIcon className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline font-medium">{t('header.media')}</span>
-          </Button>
+          {!modeUiConfig.hideMediaButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.currentTarget.blur()
+                toggleMediaLibrary()
+              }}
+              className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
+            >
+              <ImageIcon className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline font-medium">{t('header.media')}</span>
+            </Button>
+          )}
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsPreviewOpen(true)}
-            className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
-          >
-            <Eye className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{t('header.preview')}</span>
-          </Button>
+          {!modeUiConfig.hidePreviewButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsPreviewOpen(true)}
+              className="gap-2 text-muted-foreground hover:text-foreground inline-flex rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t('header.preview')}</span>
+            </Button>
+          )}
 
           <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
 
@@ -314,7 +324,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   <DropdownMenuItem
                     onClick={() => {
                       const url = buildPublishedProjectUrl(
-                        editorMode as 'portfolio' | 'photobook',
+                        editorMode,
                         publishedSlug,
                         publishedAccessToken,
                       )
@@ -323,6 +333,12 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   >
                     <Globe className="size-4" />
                     {t('header.viewSite')}
+                  </DropdownMenuItem>
+                )}
+                {editorMode === 'event' && publishedSlug && (
+                  <DropdownMenuItem onClick={() => setIsQrDialogOpen(true)}>
+                    <QrCode className="size-4" />
+                    {t('header.showQrCode')}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleUnpublish} className="text-destructive focus:text-destructive">
@@ -366,12 +382,32 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
           }
         }}
         projectId={projectId}
-        mode={editorMode as 'portfolio' | 'photobook'}
-        initialSlug={afterTopupSlug ?? (editorMode === 'photobook' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
+        mode={editorMode}
+        initialSlug={afterTopupSlug ?? (editorMode !== 'portfolio' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
         initialAccessToken={afterTopupAccessToken ?? undefined}
         autoAdvance={afterTopupSlug !== null}
         republishMode={projectStatus === 'archived' && !isPublished}
       />
+
+      {/* QR code dialog for event mode */}
+      {editorMode === 'event' && publishedSlug && publishedAccessToken && (
+        <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+          <DialogContent className="flex flex-col items-center gap-6 max-w-xs">
+            <DialogHeader>
+              <DialogTitle>{t('header.qrCodeTitle')}</DialogTitle>
+            </DialogHeader>
+            <div className="bg-white p-4 rounded-xl">
+              <QRCodeSVG
+                value={buildPublishedProjectUrl('event', publishedSlug, publishedAccessToken)}
+                size={220}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-center break-all">
+              {buildPublishedProjectUrl('event', publishedSlug, publishedAccessToken)}
+            </p>
+          </DialogContent>
+        </Dialog>
+      )}
     </header>
   )
 }

@@ -3,7 +3,7 @@
 import { memo, useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import {
@@ -55,6 +55,7 @@ function formatPurgeDate(date: Date): string {
 const modeConfig = {
   portfolio: { icon: Layout, labelKey: "project.mode.portfolio" },
   photobook: { icon: BookOpen, labelKey: "project.mode.photobook" },
+  event:     { icon: Camera,   labelKey: "project.mode.event" },
 }
 
 const statusStyles = {
@@ -90,7 +91,14 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   const modeInfo = modeConfig[project.mode]
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
-  const viewUrl = getPublishedProjectShareUrl(project)
+
+  // Events now use the standard slug-based URL like photobook
+  const viewUrl = getPublishedProjectShareUrl({
+    mode: project.mode,
+    isPublished: project.isPublished,
+    publishedSlug: project.publishedSlug,
+    publishedAccessToken: project.publishedAccessToken,
+  })
 
   const thumbnail = useMemo(
     () => (
@@ -301,6 +309,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   }
 
   return (
+    <>
     <Link
       href={editUrl}
       prefetch
@@ -342,6 +351,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                   <Eye className="mr-2 size-4" /> {t('project.view')}
                 </DropdownMenuItem>
               )}
+              {/* Unpublish — all modes */}
               {project.isPublished && (
                 <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
                   <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
@@ -364,7 +374,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
         </div>
 
         {/* Bottom badges */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
           <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
             <modeInfo.icon className="size-3" />
             {t(modeInfo.labelKey)}
@@ -380,7 +390,8 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
         <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
       </CardContent>
     </Link>
-  )
+
+  </>)
 }
 
 export const ProjectCard = memo(ProjectCardInner)

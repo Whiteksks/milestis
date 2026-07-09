@@ -5,6 +5,8 @@ import { db } from '@/lib/firebase'
 import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
 import { getPublishedProjectShareUrl } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
+
+export type DashboardProjectMode = SlugMode | 'event'
 import type { ImageCropData } from '@/editor/lib/config/crop-data'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -12,7 +14,7 @@ import type { ImageCropData } from '@/editor/lib/config/crop-data'
 export interface DashboardProject {
   id: string
   name: string
-  mode: SlugMode
+  mode: DashboardProjectMode
   status: 'active' | 'archived' | 'deleted'
   isPublished: boolean
   publishedSlug?: string | null
@@ -21,6 +23,11 @@ export interface DashboardProject {
   updatedAt: Date
   deletedAt?: Date
   purgeAt?: Date
+  /** Event-mode only: current photo counts */
+  eventConfig?: {
+    approvedCount: number
+    pendingCount: number
+  } | null
   preview?: {
     themeId: string
     templateId: string
@@ -66,12 +73,16 @@ export function mapProjectDoc(data: DocumentData, id: string): DashboardProject 
     name: data.name,
     mode: data.mode,
     status: data.status,
+    // Events: isPublished uses the standard flag
     isPublished: data.isPublished ?? false,
     publishedSlug: data.publishedSlug ?? null,
     publishedAccessToken: data.publishedAccessToken ?? null,
     updatedAt: data.updatedAt?.toDate() ?? new Date(),
     deletedAt: data.deletedAt?.toDate(),
     purgeAt: data.purgeAt?.toDate(),
+    eventConfig: data.mode === 'event' && data.eventConfig
+      ? { approvedCount: data.eventConfig.approvedCount as number ?? 0, pendingCount: data.eventConfig.pendingCount as number ?? 0 }
+      : null,
     preview,
   }
 }
@@ -201,7 +212,10 @@ export function useRecentProjectsQuery(limitCount = 4) {
  *   (token is absent if the project was published before the token-persistence change)
  */
 export function getProjectShareUrl(project: DashboardProject): string | null {
-  return getPublishedProjectShareUrl(project)
+  if (project.mode === 'event') {
+    return project.eventConfig?.shareCode ? `/e/${project.eventConfig.shareCode}` : null
+  }
+  return getPublishedProjectShareUrl({ ...project, mode: project.mode })
 }
 
 /**

@@ -26,6 +26,8 @@ interface PublishedViewProps {
   imageContent?: Record<string, unknown>
   visibility: Record<string, unknown>
   clickable?: boolean
+  /** Passed to renderPublished for modes that need direct Firestore access (event). */
+  projectId?: string
 }
 
 export function PublishedView({
@@ -38,6 +40,7 @@ export function PublishedView({
   imageContent,
   visibility,
   clickable = true,
+  projectId,
 }: PublishedViewProps) {
   const theme = getTheme(themeId)
   const isMobile = useIsMobile()
@@ -67,6 +70,7 @@ export function PublishedView({
     imageContent,
     visibility,
     handleAnchorClick,
+    projectId,
   })
 
   // Ensure every decoration has a stable id (same normalisation as the editor)

@@ -7,6 +7,8 @@ import { ALLOWED_ORIGINS } from "../lib/cors";
 import { getEffectiveSubscriptionFeatures } from "../users/subscriptionFeatures";
 import {
   CreateProjectPayload,
+  EventConfig,
+  EVENT_DEFAULTS,
   ProjectMetadata,
   ProjectMode,
   VALID_MODES,
@@ -77,17 +79,20 @@ function validatePayload(body: unknown): CreateProjectPayload {
 class ValidationError extends Error {}
 class UserNotFoundError extends Error {}
 class LimitError extends Error {
+
   constructor(public readonly maxProjects: number) {
     super(`Your plan allows up to ${maxProjects} projects.`);
   }
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
 
 // ─── Document builder ─────────────────────────────────────────────────────
 
 function buildProjectDocument(
   id: string,
   ownerId: string,
-  payload: CreateProjectPayload
+  payload: CreateProjectPayload,
 ): ProjectMetadata {
   const doc: ProjectMetadata = {
     id,
@@ -101,6 +106,15 @@ function buildProjectDocument(
   };
   if (payload.template) {
     doc.template = payload.template;
+  }
+  if (payload.mode === "event") {
+    const eventConfig: EventConfig = {
+      maxPhotos: EVENT_DEFAULTS.maxPhotos,
+      maxPhotosPerGuest: EVENT_DEFAULTS.maxPhotosPerGuest,
+      approvedCount: 0,
+      pendingCount: 0,
+    };
+    doc.eventConfig = eventConfig;
   }
   return doc;
 }
@@ -180,13 +194,18 @@ export const createProject = onRequest(
         const projectDoc = buildProjectDocument(projectRef.id, uid!, payload);
 
         tx.create(projectRef, projectDoc);
+
         tx.update(userRef, {
           "stats.totalProjects": FieldValue.increment(1),
         });
       });
 
       logger.info("Project created", { uid, projectId: projectRef.id, mode: payload.mode });
-      res.status(201).json({ ok: true, projectId: projectRef.id });
+      const responseBody: { ok: true; projectId: string } = {
+        ok: true,
+        projectId: projectRef.id,
+      };
+      res.status(201).json(responseBody);
     } catch (err) {
       if (err instanceof UserNotFoundError) {
         res.status(401).json({ error: ERROR.UNAUTHORIZED });

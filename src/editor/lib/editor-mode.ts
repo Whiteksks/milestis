@@ -13,6 +13,7 @@
 export const EDITOR_MODES = {
   portfolio: 'portfolio',
   photobook: 'photobook',
+  event: 'event',
 } as const
 
 export type EditorMode = (typeof EDITOR_MODES)[keyof typeof EDITOR_MODES]

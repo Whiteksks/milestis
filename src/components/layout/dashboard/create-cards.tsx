@@ -14,7 +14,7 @@ const cards: {
 }[] = [
   {
     mode: "photobook",
-    number: "01", // Добавляем журнальную нумерацию
+    number: "01",
     titleKey: "createCards.photobook.title",
     descriptionKey: "createCards.photobook.description",
   },
@@ -23,6 +23,12 @@ const cards: {
     number: "02",
     titleKey: "createCards.portfolio.title",
     descriptionKey: "createCards.portfolio.description",
+  },
+  {
+    mode: "event",
+    number: "03",
+    titleKey: "createCards.event.title",
+    descriptionKey: "createCards.event.description",
   },
 ]
 

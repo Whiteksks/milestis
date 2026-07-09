@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "event": {
+      "ui": {
+        "backgroundLabel": "Галерея",
+        "backgroundHint": "Совместная фотогалерея",
+        "sectionsTabLabel": "Разделы",
+        "backgroundCatalogTitle": "Макеты галереи",
+        "backgroundCatalogMobileLabel": "Макет"
+      },
+      "tags": {
+        "grid": "Сетка",
+        "minimal": "Минимализм",
+        "film": "Плёнка",
+        "warm": "Тёплый"
+      },
+      "templates": {
+        "gallery": {
+          "name": "Галерея сеткой"
+        },
+        "film": {
+          "name": "Фотоплёнка"
+        }
+      },
+      "sections": {
+        "gallery": "Фотогалерея"
+      }
+    }
+  }
+}

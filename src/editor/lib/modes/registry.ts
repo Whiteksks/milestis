@@ -8,13 +8,14 @@ import type {
 } from './types'
 import { portfolioMode } from '@/editor/modes/portfolio'
 import { photobookMode } from '@/editor/modes/photobook'
+import { eventMode } from '@/editor/modes/event'
 
 type TranslateFn = (key: string) => string
 
 /** Ordered list of all registered modes.
  *  To add a new mode: create modes/<name>/index.ts and append it here.
  *  Also add the id to lib/editor-mode.ts — TypeScript will error on the mode's id field if you forget. */
-export const ALL_MODES = [portfolioMode, photobookMode] as const
+export const ALL_MODES = [portfolioMode, photobookMode, eventMode] as const
 
 /** Central dispatch map — built from ALL_MODES, stays in sync automatically. */
 export const MODE_REGISTRY = Object.fromEntries(

@@ -136,5 +136,26 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Event guest quota ─────────────────────────────────────────────────
+    // Stores per-guest upload counts. Each guest can read only their own doc
+    // to show the "Your uploads: X/5" counter on the event page.
+    // Written exclusively by the uploadEventPhoto Cloud Function (Admin SDK).
+    match /projects/{projectId}/eventGuestQuota/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ─── Event photos ─────────────────────────────────────────────────────
+    // Subcollection: projects/{projectId}/eventPhotos/{photoId}
+    //
+    // Any Firebase-authenticated user (including anonymous sign-in) may read,
+    // so the guest gallery can show approved photos. Writes are handled
+    // exclusively by the uploadEventPhoto Cloud Function (Admin SDK) which
+    // enforces per-event and per-guest quota limits before writing.
+    match /projects/{projectId}/eventPhotos/{photoId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
   }
 }

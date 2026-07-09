@@ -8,7 +8,7 @@ import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/conte
 import { createEmptyPhotobookImageContent, type PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 import { previewTheme, type PreviewColors } from './theme-extract'
 import { ScaledWrapper } from './scaled-wrapper'
-import { PORTFOLIO_PREVIEW_REGISTRY, PHOTOBOOK_PREVIEW_REGISTRY } from './template-registry'
+import { PORTFOLIO_PREVIEW_REGISTRY, PHOTOBOOK_PREVIEW_REGISTRY, EVENT_PREVIEW_REGISTRY } from './template-registry'
 import { AnimationProvider, type TemplateId } from '@/editor/components/templates/primitives/animation-context'
 
 type PC = PreviewColors
@@ -150,6 +150,16 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
         <AnimationProvider templateId={(normalizedId || 'lumiere') as TemplateId} disabled>
           <CoverComponent theme={theme} sectionContent={sectionContent} imageContent={imageContent} />
         </AnimationProvider>
+      </ScaledWrapper>
+    )
+  }
+
+  // Event templates — self-contained, no data props
+  const EventCoverComponent = EVENT_PREVIEW_REGISTRY[templateId ?? '']
+  if (EventCoverComponent) {
+    return (
+      <ScaledWrapper zoom={zoom} background={theme.background}>
+        <EventCoverComponent />
       </ScaledWrapper>
     )
   }

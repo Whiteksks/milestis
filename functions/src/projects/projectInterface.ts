@@ -1,7 +1,41 @@
 import { FieldValue } from "firebase-admin/firestore";
 
-export type ProjectMode = "portfolio" | "photobook";
+export type ProjectMode = "portfolio" | "photobook" | "event";
 export type ProjectStatus = "active" | "archived" | "deleted";
+export type EventPhotoStatus = "pending" | "approved" | "rejected";
+
+/**
+ * Configuration stored inside `projects/{projectId}` when mode === "event".
+ * Written at creation time by createProject; mutated by uploadEventPhoto and the SafeSearch batch.
+ */
+export interface EventConfig {
+  /** Maximum total approved photos allowed for this event. */
+  maxPhotos: number;
+  /** Maximum photos per anonymous guest. */
+  maxPhotosPerGuest: number;
+  /** Count of approved photos. Incremented by the SafeSearch batch trigger. */
+  approvedCount: number;
+  /** Count of photos awaiting SafeSearch review. */
+  pendingCount: number;
+}
+
+/**
+ * Shape of a document in the `projects/{projectId}/eventPhotos/{photoId}` subcollection.
+ */
+export interface EventPhotoRecord {
+  /** Firebase anonymous UID of the uploader. */
+  anonymousUid: string;
+  /** Full Storage path (bucket-relative) to the uploaded file. */
+  storageRef: string;
+  /** Original filename from the client upload. */
+  originalFileName: string;
+  status: EventPhotoStatus;
+  uploadedAt: FieldValue;
+  /** Set when SafeSearch batch completes review. */
+  reviewedAt?: FieldValue;
+  /** SafeSearch categories that triggered rejection. */
+  violations?: string[];
+}
 
 /** Shape written to `published_projects/{projectId}` */
 export interface PublishedProjectData {
@@ -57,14 +91,23 @@ export interface ProjectMetadata {
    *          deleted Jan 20 → purge Mar 1
    */
   purgeAt?: FieldValue;
+  /** Present only when mode === "event". */
+  eventConfig?: EventConfig;
 }
 
 /** Payload the client sends to the createProject Cloud Function. */
 export type CreateProjectPayload =
   | { mode: "portfolio"; name: string; template?: { id: string } }
-  | { mode: "photobook"; name: string; template?: { id: string } };
+  | { mode: "photobook"; name: string; template?: { id: string } }
+  | { mode: "event"; name: string; template?: { id: string } };
 
 
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
-export const VALID_MODES: ProjectMode[] = ["portfolio", "photobook"];
+export const VALID_MODES: ProjectMode[] = ["portfolio", "photobook", "event"];
+
+/** Default limits applied when creating an event project. */
+export const EVENT_DEFAULTS = {
+  maxPhotos: 200,
+  maxPhotosPerGuest: 5,
+} as const;

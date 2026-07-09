@@ -11,6 +11,8 @@
         "publish": "Опубликовать",
         "published": "Опубликовано",
         "viewSite": "Открыть сайт",
+        "showQrCode": "Показать QR-код",
+        "qrCodeTitle": "QR-код для гостей",
         "unpublish": "Снять с публикации",
         "republish": "Переопубликовать",
         "desktop": "Компьютер",

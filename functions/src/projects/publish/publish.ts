@@ -107,17 +107,37 @@ export async function commitPublish(
 
 		const publishVersion = typeof projectData.publishVersion === "number" ? projectData.publishVersion : 0;
 
-		const debit = await processTransactionInFirestoreTransaction(tx, {
-			uid,
-			idempotencyKey: `publish:${projectId}:v${publishVersion + 1}`,
-			category: "credit",
-			direction: "out",
-			credit: {
-				type: "spend",
-				amount: creditCost,
-				meta: { projectId, projectName, mode, slug: prepared.slug },
-			},
-		});
+		// Skip debit when credit cost is 0 (e.g. event mode is free to publish).
+		let debit: Awaited<ReturnType<typeof processTransactionInFirestoreTransaction>> | null = null;
+		if (creditCost > 0) {
+			debit = await processTransactionInFirestoreTransaction(tx, {
+				uid,
+				idempotencyKey: `publish:${projectId}:v${publishVersion + 1}`,
+				category: "credit",
+				direction: "out",
+				credit: {
+					type: "spend",
+					amount: creditCost,
+					meta: { projectId, projectName, mode, slug: prepared.slug },
+				},
+			});
+		}
+
+		// Read user balance for the response when no debit was performed.
+		let balanceSnapshot: BalanceSnapshot;
+		if (debit) {
+			balanceSnapshot = debit.balanceSnapshot;
+		} else {
+			const userSnap = await tx.get(db.collection("users").doc(uid));
+			const userData = userSnap.data() ?? {};
+			const b = userData.balance as Record<string, unknown> | undefined;
+			balanceSnapshot = {
+				total: typeof b?.total === "number" ? b.total : 0,
+				purchased: typeof b?.purchased === "number" ? b.purchased : 0,
+				subscription: typeof b?.subscription === "number" ? b.subscription : 0,
+				bonus: typeof b?.bonus === "number" ? b.bonus : 0,
+			};
+		}
 
 		const publishedData: Record<string, unknown> = {
 			ownerId: uid,
@@ -149,7 +169,7 @@ export async function commitPublish(
 			publishedAt: FieldValue.serverTimestamp(),
 			publishLockId: FieldValue.delete(),
 			publishLockExpiresAtMillis: FieldValue.delete(),
-			publishTransactionId: debit.tid,
+			...(debit ? { publishTransactionId: debit.tid } : {}),
 			publishVersion: FieldValue.increment(1),
 			...(previewHeroUrl ? { "preview.heroImageUrl": previewHeroUrl } : {}),
 			updatedAt: FieldValue.serverTimestamp(),
@@ -171,9 +191,9 @@ export async function commitPublish(
 		});
 
 		return {
-			balanceSnapshot: debit.balanceSnapshot,
+			balanceSnapshot,
 			publishedSlug: prepared.slug,
-			transactionId: debit.tid,
+			transactionId: debit?.tid ?? "",
 		};
 	});
 }

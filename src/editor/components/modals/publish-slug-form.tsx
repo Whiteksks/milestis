@@ -13,7 +13,7 @@ export function PublishForm({
   mode,
   data,
 }: {
-  mode: 'portfolio' | 'photobook'
+  mode: 'portfolio' | 'photobook' | 'event'
   data: ReturnType<typeof usePublishModal>
 }) {
   const { slug, handleSlugChange, slugStatus } = data

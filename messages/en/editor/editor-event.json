@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "event": {
+      "ui": {
+        "backgroundLabel": "Gallery",
+        "backgroundHint": "Shared photo gallery",
+        "sectionsTabLabel": "Sections",
+        "backgroundCatalogTitle": "Gallery Layouts",
+        "backgroundCatalogMobileLabel": "Layout"
+      },
+      "tags": {
+        "grid": "Grid",
+        "minimal": "Minimal",
+        "film": "Film",
+        "warm": "Warm"
+      },
+      "templates": {
+        "gallery": {
+          "name": "Gallery Grid"
+        },
+        "film": {
+          "name": "Film Roll"
+        }
+      },
+      "sections": {
+        "gallery": "Photo Gallery"
+      }
+    }
+  }
+}

@@ -16,6 +16,11 @@ export const SLUG_MODE_POLICY = {
 		namespace: "token",
 		routeKind: "path",
 	},
+	// Events use shareCode-based routing (/e/[shareCode]), not slugs.
+	event: {
+		namespace: "token",
+		routeKind: "path",
+	},
 } as const satisfies Record<ProjectMode, SlugModePolicy>;
 
 export function getSlugModePolicy(mode: ProjectMode): SlugModePolicy {

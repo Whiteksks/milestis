@@ -16,6 +16,11 @@
       "description": "Build a clean personal portfolio without design skills. Showcase your work beautifully.",
       "secondary": "View examples"
     },
+    "event": {
+      "title": "Event Album",
+      "description": "Share a QR code at a wedding or event. Guests upload photos — you get a shared gallery automatically.",
+      "badge": "Uses credits"
+    },
     "creating": "Creating…",
     "create": "Create"
   },
@@ -47,7 +52,8 @@
   "project": {
     "mode": {
       "portfolio": "Portfolio",
-      "photobook": "Photobook"
+      "photobook": "Photobook",
+      "event": "Event"
     },
     "restore": "Restore",
     "delete": "Delete",
@@ -64,11 +70,19 @@
     "moveToTrash": "Move to Trash",
     "status": {
       "draft": "Draft",
-      "published": "Published"
+      "published": "Published",
+      "open": "Open",
+      "closed": "Closed"
     },
     "edited": "Edited",
     "publish": "Publish",
     "unpublish": "Unpublish",
+    "openEvent": "Open Event",
+    "closeEvent": "Close Event",
+    "activateEventTitle": "Open this event?",
+    "activateEventDescription": "Guests will be able to upload photos by scanning the QR code. This costs 30 credits.",
+    "activateEventConfirm": "Open Event (30 credits)",
+    "activateEventCancel": "Cancel",
     "manageInSettings": "Manage in Settings"
   },
   "projects": {

@@ -30,6 +30,11 @@ const options: {
     titleKey: "createCards.portfolio.title",
     descriptionKey: "createCards.portfolio.description",
   },
+  {
+    mode: "event",
+    titleKey: "createCards.event.title",
+    descriptionKey: "createCards.event.description",
+  },
 ]
 
 function OptionCard({ opt, loadingMode, onCreate }: {

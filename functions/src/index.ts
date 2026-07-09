@@ -8,6 +8,8 @@ import {createUser} from "./users/createUser";
 import {deleteUserAccount, exportProjectContent, exportUserData} from "./users/account";
 import {resizeAvatar, resizeProjectImage} from "./storage";
 import {createProject} from "./projects/createProject";
+import {uploadEventPhoto} from "./projects/uploadEventPhoto";
+import {processEventPhotos} from "./projects/processEventPhotos";
 import {forceDeleteProject} from "./projects/forceDeleteProject";
 import {purgeDeletedProjects} from "./projects/purgeDeletedProjects";
 import {unpublishProject} from "./projects/unpublishProject";
@@ -25,6 +27,8 @@ export {
 	resizeAvatar,
 	resizeProjectImage,
 	createProject,
+	uploadEventPhoto,
+	processEventPhotos,
 	forceDeleteProject,
 	purgeDeletedProjects,
 	unpublishProject,

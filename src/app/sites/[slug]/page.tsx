@@ -51,11 +51,11 @@ async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") 
 }
 
 /**
- * Lookup for token-namespace modes (e.g. photobook).
+ * Lookup for token-namespace modes (photobook, event).
  * The reservation doc ID is sha256(accessToken), not mode:slug.
  * We verify the slug in the URL matches what was published (cosmetic check).
  */
-async function getPublishedProjectByToken(slug: string, mode: "photobook", plainToken: string) {
+async function getPublishedProjectByToken(slug: string, mode: "photobook" | "event", plainToken: string) {
   const hashedToken = createHash("sha256").update(plainToken).digest("hex")
 
   const slugSnap = await adminDb
@@ -78,7 +78,7 @@ async function getPublishedProjectByToken(slug: string, mode: "photobook", plain
     id: doc.id,
     slug: (data.slug as string | undefined) ?? slug,
     name: data.name as string,
-    mode: data.mode as "photobook",
+    mode: data.mode as "photobook" | "event",
     content: data.content ?? null,
     theme: data.theme ?? null,
     ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
@@ -241,6 +241,7 @@ export default async function SitePage({ params, searchParams }: Props) {
       content={(content.sectionContent ?? {}) as Record<string, unknown>}
       imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
       visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
+      projectId={project.id}
     />
   )
 }

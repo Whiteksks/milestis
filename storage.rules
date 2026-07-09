@@ -35,6 +35,15 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
+    // ── Event photos ─────────────────────────────────────────────────────────
+    // Approved guest photos under events/{projectId}/{photoId}.{ext}
+    // Written by the uploadEventPhoto Cloud Function (signed URL PUT).
+    // Publicly readable so the live gallery can render without auth.
+    match /events/{projectId}/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Deny everything else
     // Published project files — publicly readable, only written by Cloud Functions via Admin SDK
     match /public/{projectId}/{allPaths=**} {

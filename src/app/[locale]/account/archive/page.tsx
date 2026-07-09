@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Archive, AlertTriangle, BookOpen, ChevronDown, Layout, Loader2, Trash2 } from "lucide-react"
+import { Archive, AlertTriangle, BookOpen, Camera, ChevronDown, Layout, Loader2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 const modeIcons = {
   portfolio: Layout,
   photobook: BookOpen,
+  event:     Camera,
 }
 
 // ─── Accordion Item ───────────────────────────────────────────────────────────

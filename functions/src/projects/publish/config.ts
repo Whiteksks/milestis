@@ -65,6 +65,13 @@ export const PUBLISH_MODE_CONFIG = {
 		republishCreditCost: 0,
 		requiresAccessToken: true,
 	},
+	// Events are published via the standard slug+token flow.
+	// A flat fee covers hosting the guest upload page.
+	event: {
+		pricing: { strategy: "flat", creditCost: 20 },
+		republishCreditCost: 0,
+		requiresAccessToken: true,
+	},
 } as const satisfies Record<ProjectMode, PublishModeConfig>;
 
 export function getPublishConfig(mode: ProjectMode): PublishModeConfig {

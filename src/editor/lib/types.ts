@@ -53,11 +53,12 @@ export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
  *  Never edit this line directly. */
 import type { PortfolioTemplateId } from '@/editor/modes/portfolio/template-ids'
 import type { PhotobookTemplateId } from '@/editor/modes/photobook/template-ids'
+import type { EventTemplateId } from '@/editor/modes/event/template-ids'
 import type { DecorationAnimation } from './config/decoration-animations'
-export type { PortfolioTemplateId, PhotobookTemplateId, DecorationAnimation }
+export type { PortfolioTemplateId, PhotobookTemplateId, EventTemplateId, DecorationAnimation }
 
 // 3. Создаем составной тип
-export type TemplateId = PortfolioTemplateId | PhotobookTemplateId
+export type TemplateId = PortfolioTemplateId | PhotobookTemplateId | EventTemplateId
 
 // Portfolio background effect types — defined in the portfolio mode, re-exported here for shared consumers.
 export type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/modes/portfolio/content-types'

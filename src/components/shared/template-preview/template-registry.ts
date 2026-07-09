@@ -18,6 +18,9 @@ export type CoverPreviewComponent = ComponentType<{
   disableAnimations?: boolean
 }>
 
+// Event preview components are self-contained — no data props needed.
+export type EventPreviewComponent = ComponentType
+
 // Derived from the mode registry — previewComponent lives alongside its template def.
 // Adding a new template only requires editing portfolio.tsx or photobook.tsx.
 export const PORTFOLIO_PREVIEW_REGISTRY: Record<string, HeroPreviewComponent> =
@@ -32,4 +35,11 @@ export const PHOTOBOOK_PREVIEW_REGISTRY: Record<string, CoverPreviewComponent> =
     MODE_REGISTRY.photobook.templates
       .filter((t) => t.previewComponent != null)
       .map((t) => [t.id, t.previewComponent as CoverPreviewComponent])
+  )
+
+export const EVENT_PREVIEW_REGISTRY: Record<string, EventPreviewComponent> =
+  Object.fromEntries(
+    MODE_REGISTRY.event.templates
+      .filter((t) => t.previewComponent != null)
+      .map((t) => [t.id, t.previewComponent as EventPreviewComponent])
   )

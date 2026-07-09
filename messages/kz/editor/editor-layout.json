@@ -11,6 +11,8 @@
         "publish": "Жариялау",
         "published": "Жарияланды",
         "viewSite": "Сайтты ашу",
+        "showQrCode": "QR-кодты көрсету",
+        "qrCodeTitle": "Қонақтар үшін QR-код",
         "unpublish": "Жариялаудан алып тастау",
         "republish": "Қайта жариялау",
         "desktop": "Компьютер",

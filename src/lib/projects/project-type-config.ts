@@ -78,6 +78,35 @@ export const PROJECT_TYPE_CONFIG = {
       addressLabel: 'Your photobook address',
     },
   },
+
+  event: {
+    label: 'Event',
+
+    /** Events use a private access token like photobooks. */
+    hasAccessToken: true,
+
+    primaryActionLabel: 'Publish Event',
+    republishLabel: 'Republish Event',
+
+    archiveBadge: 'EVENT',
+    archiveRecordTitle: 'Event Photobook',
+    canDownloadFile: false,
+
+    requiresSlug: true,
+    getShareUrl: (slug: string, accessToken?: string) =>
+      buildPublishedProjectUrl('event', slug, accessToken),
+
+    modal: {
+      title: 'Publish Event',
+      description: 'Share a link or QR code with guests. Guests can upload photos without registering.',
+      costLabel: 'Event Publish',
+      costDescription: 'Migrate media & publish event',
+      actionLabel: 'Publish Event',
+      pendingLabel: 'Publishing…',
+      republishWarning: 'The existing event link will be replaced with the new one.',
+      addressLabel: 'Event link',
+    },
+  },
 } as const
 
 export type ProjectMode = keyof typeof PROJECT_TYPE_CONFIG

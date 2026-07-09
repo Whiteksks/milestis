@@ -20,6 +20,8 @@ import {
 const SHEET_REGISTRY: Record<EditorMode, ComponentType> = {
   portfolio: PortfolioThemeSheetActions,
   photobook: PhotobookThemeSheetActions,
+  // Events don't have theme controls in V1
+  event: () => null,
 }
 
 /**

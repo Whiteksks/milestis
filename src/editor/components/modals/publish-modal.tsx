@@ -35,7 +35,7 @@ interface PublishModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: string
-  mode: 'portfolio' | 'photobook'
+  mode: 'portfolio' | 'photobook' | 'event'
   /** Pre-fill the slug field and skip straight to review (used after payment return). */
   initialSlug?: string
   initialAccessToken?: string
@@ -136,12 +136,12 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
         projectId,
         slug: modalData.slug,
         quoteId: modalData.quoteData.quoteId,
-        accessToken: mode === 'photobook' ? modalData.accessToken : undefined,
+        accessToken: (mode === 'photobook' || mode === 'event') ? modalData.accessToken : undefined,
       },
       {
         onSuccess: () => {
           setIsPublished(true)
-          setPublishedInfo(modalData.slug, mode === 'photobook' ? modalData.accessToken : undefined)
+          setPublishedInfo(modalData.slug, (mode === 'photobook' || mode === 'event') ? modalData.accessToken : undefined)
           handleClose(false)
         },
       },

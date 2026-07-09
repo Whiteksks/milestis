@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "event": {
+      "ui": {
+        "backgroundLabel": "Галерея",
+        "backgroundHint": "Бірлескен фотогалерея",
+        "sectionsTabLabel": "Бөлімдер",
+        "backgroundCatalogTitle": "Галерея макеттері",
+        "backgroundCatalogMobileLabel": "Макет"
+      },
+      "tags": {
+        "grid": "Тор",
+        "minimal": "Минимализм",
+        "film": "Фильм",
+        "warm": "Жылы"
+      },
+      "templates": {
+        "gallery": {
+          "name": "Тор галереясы"
+        },
+        "film": {
+          "name": "Фотоплёнка"
+        }
+      },
+      "sections": {
+        "gallery": "Фотогалерея"
+      }
+    }
+  }
+}
