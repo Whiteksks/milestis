@@ -53,20 +53,20 @@ export async function generateAndStoreOgImage(
 	}
 
 	const buffer = Buffer.from(await response.arrayBuffer());
-	const tempFile = path.join(os.tmpdir(), `og_${projectId}_${Date.now()}.png`);
+	const tempFile = path.join(os.tmpdir(), `og_${projectId}_${Date.now()}.webp`);
 
 	try {
 		await sharp(buffer)
 			.resize(OG_WIDTH, OG_HEIGHT, { fit: "cover", position: "centre" })
-			.png({ quality: 90 })
+			.webp({ quality: 85 })
 			.toFile(tempFile);
 
 		const bucket = getStorage().bucket();
-		const storagePath = `og/${projectId}.png`;
+		const storagePath = `og/${projectId}.webp`;
 
 		await bucket.upload(tempFile, {
 			destination: storagePath,
-			metadata: { contentType: "image/png" },
+			metadata: { contentType: "image/webp" },
 		});
 
 		// Use a download token instead of makePublic() — makePublic() fails when

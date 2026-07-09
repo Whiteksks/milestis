@@ -79,6 +79,9 @@ export const purgeDeletedProjects = onSchedule(
         await bucket.deleteFiles({
           prefix: `public/${projectId}/`,
         });
+        // 5. Delete pre-generated OG image
+        await bucket.file(`og/${projectId}.webp`).delete().catch(() => {});
+        await bucket.file(`og/${projectId}.png`).delete().catch(() => {}); // legacy
         logger.info(
           `[purgeDeletedProjects] Deleted Storage files for project ${projectId}.`
         );

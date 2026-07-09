@@ -132,6 +132,9 @@ export const forceDeleteProject = onRequest(
       await storage.bucket().deleteFiles({
         prefix: `public/${projectId}/`,
       });
+      // 6. Delete pre-generated OG image
+      await storage.bucket().file(`og/${projectId}.webp`).delete().catch(() => {});
+      await storage.bucket().file(`og/${projectId}.png`).delete().catch(() => {}); // legacy
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);
 
       // 6. Delete project doc + published snapshot + decrement user counters
