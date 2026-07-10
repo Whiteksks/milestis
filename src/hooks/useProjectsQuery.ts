@@ -6,7 +6,7 @@ import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUs
 import { getPublishedProjectShareUrl } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 
-export type DashboardProjectMode = SlugMode | 'event'
+export type DashboardProjectMode = SlugMode
 import type { ImageCropData } from '@/editor/lib/config/crop-data'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -212,9 +212,6 @@ export function useRecentProjectsQuery(limitCount = 4) {
  *   (token is absent if the project was published before the token-persistence change)
  */
 export function getProjectShareUrl(project: DashboardProject): string | null {
-  if (project.mode === 'event') {
-    return project.eventConfig?.shareCode ? `/e/${project.eventConfig.shareCode}` : null
-  }
   return getPublishedProjectShareUrl({ ...project, mode: project.mode })
 }
 

@@ -25,19 +25,25 @@ export function PreviewOverlay() {
   const content = useContentStore((s) =>
     editorMode === 'portfolio'
       ? s.sectionContent as unknown as Record<string, unknown>
-      : s.photobookSectionContent as unknown as Record<string, unknown>,
+      : editorMode === 'event'
+        ? s.eventSectionContent as unknown as Record<string, unknown>
+        : s.photobookSectionContent as unknown as Record<string, unknown>,
   )
 
   const imageContent = useContentStore((s) =>
     editorMode === 'portfolio'
       ? s.portfolioImageContent as unknown as Record<string, unknown>
-      : s.photobookImageContent as unknown as Record<string, unknown>,
+      : editorMode === 'event'
+        ? undefined
+        : s.photobookImageContent as unknown as Record<string, unknown>,
   )
 
   const visibility = useContentStore((s) =>
     editorMode === 'portfolio'
       ? s.sectionVisibility as unknown as Record<string, unknown>
-      : s.photobookSectionVisibility as unknown as Record<string, unknown>,
+      : editorMode === 'event'
+        ? s.eventSectionVisibility as unknown as Record<string, unknown>
+        : s.photobookSectionVisibility as unknown as Record<string, unknown>,
   )
 
   // Close on Escape

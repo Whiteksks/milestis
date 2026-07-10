@@ -109,7 +109,7 @@ export function SlugStatusMessage({
   mode,
 }: {
   status: ReturnType<typeof usePublishModal>['slugStatus']
-  mode: 'portfolio' | 'photobook'
+  mode: 'portfolio' | 'photobook' | 'event'
 }) {
   const t = useTranslations('editor.modal.publish')
   if (status === 'taken')

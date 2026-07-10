@@ -23,9 +23,6 @@ export interface EventSectionContent {
   // intentionally empty — visual-only mode
 }
 
-// ─── Visibility ───────────────────────────────────────────────────────────────
-// Event mode has a single section so visibility is trivial,
-// but it must satisfy the ModeRegistryEntry<TVisibilityKey> constraint.
 
 export interface EventSectionVisibility {
   showGallery: boolean

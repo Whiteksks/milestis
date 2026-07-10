@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import type { ModeRegistryEntry } from '@/editor/lib/modes/types'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
 import type { EventTemplateId } from './template-ids'
-import type { EventSectionVisibility } from './content-types'
+import type { EventSectionContent, EventSectionVisibility } from './content-types'
 import {
   createEventSlice,
   defaultEventContent,

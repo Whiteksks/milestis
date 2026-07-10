@@ -84,7 +84,8 @@ export function DesignCatalogModal() {
   } | null>(null)
 
   const templates = useMemo(() => getModeTemplates(editorMode, translate), [editorMode, translate])
-  const isPhotobook = editorMode === 'photobook'
+  // Event mode uses the same mood/texture background presets as photobook
+  const isPhotobook = editorMode === 'photobook' || editorMode === 'event'
   const modeConfig = getModeUiConfig(editorMode, translate)
 
   useEffect(() => {

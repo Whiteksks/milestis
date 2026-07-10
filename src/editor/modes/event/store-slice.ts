@@ -26,9 +26,8 @@ export interface EventSlice {
   eventPhotos: EventGuestPhoto[]
 
   // ── Actions ──
-  updateEventSectionContent: (update: Partial<EventSectionContent>) => void
-  toggleEventSection:        (key: keyof EventSectionVisibility) => void
-  setEventPhotos:            (photos: EventGuestPhoto[]) => void
+  toggleEventSection: (key: keyof EventSectionVisibility) => void
+  setEventPhotos:     (photos: EventGuestPhoto[]) => void
 }
 
 // ─── Slice creator ─────────────────────────────────────────────────────────────
@@ -37,11 +36,6 @@ export const createEventSlice: StateCreator<ContentStore, [], [], EventSlice> = 
   eventSectionContent:    defaultEventContent,
   eventSectionVisibility: defaultEventVisibility,
   eventPhotos:            [],
-
-  updateEventSectionContent: (update) =>
-    set((s) => ({
-      eventSectionContent: { ...s.eventSectionContent, ...update },
-    })),
 
   toggleEventSection: (key) =>
     set((s) => ({
