@@ -12,7 +12,15 @@
         "grid": "Grid",
         "minimal": "Minimal",
         "film": "Film",
-        "warm": "Warm"
+        "warm": "Warm",
+        "cosmos": "Cosmos",
+        "dynamic": "Dynamic",
+        "parallax": "Parallax",
+        "horizontal": "Horizontal",
+        "bubbles": "Bubbles",
+        "coverflow": "Coverflow",
+        "threed": "3D",
+        "editorial": "Editorial"
       },
       "templates": {
         "gallery": {
@@ -20,6 +28,21 @@
         },
         "film": {
           "name": "Film Roll"
+        },
+        "cosmos": {
+          "name": "Cosmos"
+        },
+        "parallax": {
+          "name": "Parallax"
+        },
+        "bubbles": {
+          "name": "Bubbles"
+        },
+        "coverflow": {
+          "name": "Coverflow"
+        },
+        "magazine": {
+          "name": "Magazine"
         }
       },
       "sections": {

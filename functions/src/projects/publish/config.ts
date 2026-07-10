@@ -68,7 +68,7 @@ export const PUBLISH_MODE_CONFIG = {
 	// Events are published via the standard slug+token flow.
 	// A flat fee covers hosting the guest upload page.
 	event: {
-		pricing: { strategy: "flat", creditCost: 20 },
+		pricing: { strategy: "flat", creditCost: 150 },
 		republishCreditCost: 0,
 		requiresAccessToken: true,
 	},

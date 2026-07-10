@@ -12,7 +12,15 @@
         "grid": "Сетка",
         "minimal": "Минимализм",
         "film": "Плёнка",
-        "warm": "Тёплый"
+        "warm": "Тёплый",
+        "cosmos": "Космос",
+        "dynamic": "Динамика",
+        "parallax": "Параллакс",
+        "horizontal": "Горизонталь",
+        "bubbles": "Пузыри",
+        "coverflow": "Coverflow",
+        "threed": "3D",
+        "editorial": "Журнал"
       },
       "templates": {
         "gallery": {
@@ -20,6 +28,21 @@
         },
         "film": {
           "name": "Фотоплёнка"
+        },
+        "cosmos": {
+          "name": "Космос"
+        },
+        "parallax": {
+          "name": "Параллакс"
+        },
+        "bubbles": {
+          "name": "Пузыри"
+        },
+        "coverflow": {
+          "name": "Coverflow"
+        },
+        "magazine": {
+          "name": "Журнал"
         }
       },
       "sections": {

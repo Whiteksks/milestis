@@ -49,9 +49,12 @@ export const purgeDeletedProjects = onSchedule(
     for (const projectDoc of snapshot.docs) {
       const projectData = projectDoc.data() as {
         ownerId: string;
+        mode?: string;
       };
       const { ownerId } = projectData;
+      const isEvent = projectData.mode === "event";
       const projectId = projectDoc.id;
+      const projectRef = db.collection("projects").doc(projectId);
 
       let freedStorageBytes = 0;
 
@@ -71,7 +74,27 @@ export const purgeDeletedProjects = onSchedule(
           .doc("content");
         await contentRef.delete();
 
-        // 3. Delete all private Storage files
+        // 3. Event-mode: delete eventPhotos + eventGuestQuota subcollections + Storage files
+        if (isEvent) {
+          const [photosSnap, quotaSnap] = await Promise.all([
+            projectRef.collection("eventPhotos").get(),
+            projectRef.collection("eventGuestQuota").get(),
+          ]);
+          if (!photosSnap.empty || !quotaSnap.empty) {
+            const MAX_BATCH = 400;
+            const allDocs = [...photosSnap.docs, ...quotaSnap.docs];
+            for (let i = 0; i < allDocs.length; i += MAX_BATCH) {
+              const b = db.batch();
+              allDocs.slice(i, i + MAX_BATCH).forEach((d) => b.delete(d.ref));
+              await b.commit();
+            }
+            logger.info(`[purgeDeletedProjects] Deleted ${photosSnap.size} eventPhotos + ${quotaSnap.size} guestQuota docs for ${projectId}.`);
+          }
+          await bucket.deleteFiles({ prefix: `events/${projectId}/` });
+          logger.info(`[purgeDeletedProjects] Deleted event Storage files for ${projectId}.`);
+        }
+
+        // 4. Delete all private Storage files
         await bucket.deleteFiles({
           prefix: `users/${ownerId}/projects/${projectId}/`,
         });

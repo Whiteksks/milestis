@@ -11,8 +11,11 @@ import {
 } from './store-slice'
 import { useContentStore } from '@/editor/lib/store/content'
 import { EventTemplateShell } from './event-template-shell'
-import { EventGalleryCover } from './templates/sections/event-gallery-cover'
 import { EventFilmCover } from './templates/sections/event-film-cover'
+import { EventCosmosCover } from './templates/sections/event-cosmos-cover'
+import { EventParallaxCover } from './templates/sections/event-parallax-cover'
+import { EventBubblesCover } from './templates/sections/event-bubbles-cover'
+import { EventCoverflowCover } from './templates/sections/event-coverflow-cover'
 import { EventPublishedPage } from './event-published-page'
 import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 
@@ -20,19 +23,37 @@ import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/edit
 
 const LoadingTemplate = () => <div className="w-full h-full min-h-screen bg-transparent" />
 
-const TemplateEventGallery = dynamic(
-  () => import('./templates/template-event-gallery').then((m) => m.TemplateEventGallery),
-  { loading: LoadingTemplate },
-)
 
 const TemplateEventFilm = dynamic(
   () => import('./templates/template-event-film').then((m) => m.TemplateEventFilm),
   { loading: LoadingTemplate },
 )
 
+const TemplateEventCosmos = dynamic(
+  () => import('./templates/template-event-cosmos').then((m) => m.TemplateEventCosmos),
+  { loading: LoadingTemplate },
+)
+
+const TemplateEventParallax = dynamic(
+  () => import('./templates/template-event-parallax').then((m) => m.TemplateEventParallax),
+  { loading: LoadingTemplate },
+)
+
+const TemplateEventBubbles = dynamic(
+  () => import('./templates/template-event-bubbles').then((m) => m.TemplateEventBubbles),
+  { loading: LoadingTemplate },
+)
+
+const TemplateEventCoverflow = dynamic(
+  () => import('./templates/template-event-coverflow').then((m) => m.TemplateEventCoverflow),
+  { loading: LoadingTemplate },
+)
 const eventTemplateComponents: Partial<Record<EventTemplateId, React.ComponentType<EventTemplateProps>>> = {
-  'event-gallery': TemplateEventGallery,
-  'event-film':    TemplateEventFilm,
+  'event-film':      TemplateEventFilm,
+  'event-cosmos':    TemplateEventCosmos,
+  'event-parallax':  TemplateEventParallax,
+  'event-bubbles':   TemplateEventBubbles,
+  'event-coverflow': TemplateEventCoverflow,
 }
 
 // ─── Mode entry ───────────────────────────────────────────────────────────────
@@ -64,17 +85,35 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
 
   templates: [
     {
-      id: 'event-gallery',
-      nameKey: 'editor.event.templates.gallery.name',
-      tagKeys: ['editor.event.tags.grid', 'editor.event.tags.minimal'],
-      previewComponent: EventGalleryCover,
-    },
-    {
       id: 'event-film',
       nameKey: 'editor.event.templates.film.name',
       tagKeys: ['editor.event.tags.film', 'editor.event.tags.warm'],
       previewComponent: EventFilmCover,
     },
+    {
+      id: 'event-cosmos',
+      nameKey: 'editor.event.templates.cosmos.name',
+      tagKeys: ['editor.event.tags.cosmos', 'editor.event.tags.dynamic'],
+      previewComponent: EventCosmosCover,
+    },
+    {
+      id: 'event-parallax',
+      nameKey: 'editor.event.templates.parallax.name',
+      tagKeys: ['editor.event.tags.parallax', 'editor.event.tags.horizontal'],
+      previewComponent: EventParallaxCover,
+    },
+    {
+      id: 'event-bubbles',
+      nameKey: 'editor.event.templates.bubbles.name',
+      tagKeys: ['editor.event.tags.bubbles', 'editor.event.tags.dynamic'],
+      previewComponent: EventBubblesCover,
+    },
+    {
+      id: 'event-coverflow',
+      nameKey: 'editor.event.templates.coverflow.name',
+      tagKeys: ['editor.event.tags.coverflow', 'editor.event.tags.threed'],
+      previewComponent: EventCoverflowCover,
+    }
   ],
 
   sections: [
@@ -97,7 +136,7 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     const Design =
       eventTemplateComponents[id] ??
       eventTemplateComponents['event-gallery'] ??
-      TemplateEventGallery
+      TemplateEventCoverflow
 
     return <EventTemplateShell Design={Design} />
   },

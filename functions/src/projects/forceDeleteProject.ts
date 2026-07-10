@@ -101,6 +101,7 @@ export const forceDeleteProject = onRequest(
 
     // ── Cleanup ───────────────────────────────────────────────────────────
     try {
+      const isEvent = data.mode === "event";
       const shouldReleaseStorageBytes = await projectHasPrivateMedia(uid, projectId);
 
       // 1. Delete image metadata from Firestore + sum freed storage
@@ -123,16 +124,39 @@ export const forceDeleteProject = onRequest(
         logger.info(`[forceDeleteProject] Deleted ${exportsSnap.size} export record(s) for ${projectId}.`);
       }
 
-      // 4. Delete all private Storage files for this project
+      // 4. Event-mode: delete eventPhotos + eventGuestQuota subcollections + Storage files
+      if (isEvent) {
+        const [photosSnap, quotaSnap] = await Promise.all([
+          projectRef.collection("eventPhotos").get(),
+          projectRef.collection("eventGuestQuota").get(),
+        ]);
+
+        if (!photosSnap.empty || !quotaSnap.empty) {
+          const MAX_BATCH = 400; // Firestore limit is 500 per batch
+          const allDocs = [...photosSnap.docs, ...quotaSnap.docs];
+          for (let i = 0; i < allDocs.length; i += MAX_BATCH) {
+            const b = db.batch();
+            allDocs.slice(i, i + MAX_BATCH).forEach((d) => b.delete(d.ref));
+            await b.commit();
+          }
+          logger.info(`[forceDeleteProject] Deleted ${photosSnap.size} eventPhotos + ${quotaSnap.size} guestQuota docs for ${projectId}.`);
+        }
+
+        // Delete all uploaded photos from Storage: events/{projectId}/
+        await getStorage().bucket().deleteFiles({ prefix: `events/${projectId}/` });
+        logger.info(`[forceDeleteProject] Deleted event Storage files for ${projectId}.`);
+      }
+
+      // 5. Delete all private Storage files for this project
       const storage = getStorage();
       await storage.bucket().deleteFiles({
         prefix: `users/${uid}/projects/${projectId}/`,
       });
-      // 5. Delete public Storage files (if the project was ever published)
+      // 6. Delete public Storage files (if the project was ever published)
       await storage.bucket().deleteFiles({
         prefix: `public/${projectId}/`,
       });
-      // 6. Delete pre-generated OG image
+      // 7. Delete pre-generated OG image
       await storage.bucket().file(`og/${projectId}.webp`).delete().catch(() => {});
       await storage.bucket().file(`og/${projectId}.png`).delete().catch(() => {}); // legacy
       logger.info(`[forceDeleteProject] Deleted Storage files for ${projectId}.`);

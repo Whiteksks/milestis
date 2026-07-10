@@ -108,6 +108,6 @@ export const VALID_MODES: ProjectMode[] = ["portfolio", "photobook", "event"];
 
 /** Default limits applied when creating an event project. */
 export const EVENT_DEFAULTS = {
-  maxPhotos: 200,
-  maxPhotosPerGuest: 5,
+  maxPhotos: 100,
+  maxPhotosPerGuest: 2,
 } as const;

@@ -12,7 +12,15 @@
         "grid": "Тор",
         "minimal": "Минимализм",
         "film": "Фильм",
-        "warm": "Жылы"
+        "warm": "Жылы",
+        "cosmos": "Галам",
+        "dynamic": "Динамика",
+        "parallax": "Параллакс",
+        "horizontal": "Көлденен",
+        "bubbles": "Көбікшелер",
+        "coverflow": "Coverflow",
+        "threed": "3D",
+        "editorial": "Журнал"
       },
       "templates": {
         "gallery": {
@@ -20,6 +28,21 @@
         },
         "film": {
           "name": "Фотоплёнка"
+        },
+        "cosmos": {
+          "name": "Галам"
+        },
+        "parallax": {
+          "name": "Параллакс"
+        },
+        "bubbles": {
+          "name": "Көбікшелер"
+        },
+        "coverflow": {
+          "name": "Coverflow"
+        },
+        "magazine": {
+          "name": "Журнал"
         }
       },
       "sections": {

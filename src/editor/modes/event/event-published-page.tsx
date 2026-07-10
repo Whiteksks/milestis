@@ -53,8 +53,8 @@ export function EventPublishedPage({
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
   const [approvedPhotos, setApprovedPhotos] = useState<ApprovedPhoto[]>([])
-  const [maxPhotos, setMaxPhotos] = useState(200)
-  const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(5)
+  const [maxPhotos, setMaxPhotos] = useState(100)
+  const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(2)
   const [uploads, setUploads] = useState<UploadItem[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -341,7 +341,11 @@ export function EventPublishedPage({
         accept={ALLOWED_TYPES.join(",")}
         multiple
         className="sr-only"
-        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+        onChange={(e) => {
+          if (e.target.files) handleFiles(e.target.files)
+          // Reset so selecting the same file again still triggers onChange
+          e.target.value = ''
+        }}
       />
 
     </main>
