@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
@@ -25,8 +25,10 @@ function useIsMobile() {
     const mq = window.matchMedia('(max-width: 768px)')
     const update = () => setIsMobile(mq.matches)
     update()
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
+    let timer: ReturnType<typeof setTimeout>
+    const debounced = () => { clearTimeout(timer); timer = setTimeout(update, 200) }
+    mq.addEventListener('change', debounced)
+    return () => { mq.removeEventListener('change', debounced); clearTimeout(timer) }
   }, [])
   return isMobile
 }
@@ -79,39 +81,36 @@ function ParallaxLane({
   const blur = isMobile ? 0 : cfg.blur
   const duration = isMobile ? cfg.dur * 0.85 : cfg.dur
 
-  // Стили инжектируются один раз, минимизируя работу JS-рантайма анимаций
   const laneStyles = {
     '--lane-duration': `${duration}s`,
     '--lane-direction': cfg.dir === 1 ? 'reverse' : 'normal',
-    gap: `${GAP}px`,
   } as React.CSSProperties
 
   return (
     <div
-      className="pointer-events-none absolute left-0 flex select-none items-center"
+      className="pointer-events-none absolute left-0 select-none"
       style={{
         top: cfg.top,
         opacity: cfg.opacity,
         transform: `scale(${cfg.scale}) translateZ(0)`,
         transformOrigin: 'left center',
         filter: blur ? `blur(${blur}px)` : undefined,
-        width: '200%',
       }}
     >
       <div
         className={cn(
           "flex items-center pointer-events-auto",
-          reduceMotion ? "animate-none" : "animate-marquee"
+          !reduceMotion && "animate-marquee"
         )}
-        style={laneStyles}
+        style={{ ...laneStyles, width: 'max-content' }}
       >
         {photos.map((photo, i) => {
           const { w, h } = sizes[i]
           return (
             <div
-              key={`${laneIdx}-${i}`}
+              key={`${laneIdx}-${i}-${photo?.id || 'placeholder'}`}
               className="flex-shrink-0"
-              style={{ transform: `rotate(${cfg.rot}deg)` }}
+              style={{ transform: `rotate(${cfg.rot}deg)`, marginRight: GAP }}
             >
               {photo ? (
                 <button
@@ -127,9 +126,10 @@ function ParallaxLane({
                   <Image
                     src={getPhotoUrl(photo)}
                     alt=""
-                    fill
+                    width={w}
+                    height={h}
                     loading="lazy"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    className="object-cover h-full w-full transition-transform duration-700 ease-out group-hover:scale-110"
                     sizes={`${Math.round(w)}px`}
                     unoptimized
                   />
@@ -150,7 +150,8 @@ function ParallaxLane({
   )
 }
 
-const MIN_PHOTOS_PER_LANE = 4
+// Оптимальное число карточек на одну дорожку для создания бесшовного marquee на экранах до 2K
+const VISIBLE_PHOTOS_PER_LANE = 6 
 
 export function TemplateEventParallax({ theme, eventPhotos }: EventTemplateProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -158,46 +159,54 @@ export function TemplateEventParallax({ theme, eventPhotos }: EventTemplateProps
   const reduceMotion = !!useReducedMotion()
 
   const activeLanes = useMemo(() => (isMobile ? LANES.slice(1, 3) : LANES), [isMobile])
-  const perLane = isMobile ? 3 : MIN_PHOTOS_PER_LANE
 
   const handlePhotoClick = useCallback((photo: EventGuestPhoto) => {
     const idx = eventPhotos.findIndex((p) => p.id === photo.id)
     if (idx !== -1) setLightboxIndex(idx)
   }, [eventPhotos])
 
+  // Оптимизированное распределение картинок
   const lanePhotos = useMemo(() => {
-    const lanes: (EventGuestPhoto | null)[][] = activeLanes.map(() => [])
-
+    const laneCount = activeLanes.length
     if (eventPhotos.length === 0) {
-      return activeLanes.map(() => Array<null>(perLane).fill(null))
+      return activeLanes.map(() => Array<null>(VISIBLE_PHOTOS_PER_LANE * 2).fill(null))
     }
 
-    eventPhotos.forEach((p, i) => lanes[i % activeLanes.length].push(p))
-    
-    const preparedLanes = lanes.map((lane) => {
-      const currentLane = [...lane]
-      if (currentLane.length === 0) {
-        return Array<null>(perLane).fill(null)
-      }
+    // 1. Распределяем ВСЕ 100+ фото по дорожкам равномерно, чтобы они не дублировались сразу
+    const distributedLanes: EventGuestPhoto[][] = activeLanes.map(() => [])
+    eventPhotos.forEach((photo, idx) => {
+      distributedLanes[idx % laneCount].push(photo)
+    })
+
+    return distributedLanes.map((lane) => {
+      let currentLane = [...lane]
+
+      // 2. Ограничиваем максимальное количество фото в DOM на одну дорожку (для производительности),
+      // но следим, чтобы контента хватало для заполнения экрана (не меньше VISIBLE_PHOTOS_PER_LANE)
+      const targetLength = Math.max(VISIBLE_PHOTOS_PER_LANE, Math.min(currentLane.length, 10))
       
-      // Безопасное заполнение без риска бесконечных циклов
+      // Обрезаем лишнее, если фото слишком много (остальные будут доступны в лайтбоксе)
+      if (currentLane.length > targetLength) {
+        currentLane = currentLane.slice(0, targetLength)
+      }
+
+      // Если фото мало — циклически заполняем до минимума
       let idx = 0
       const initialLength = currentLane.length
-      while (currentLane.length < perLane) {
+      while (currentLane.length < VISIBLE_PHOTOS_PER_LANE) {
         currentLane.push(currentLane[idx % initialLength])
         idx++
       }
-      return currentLane
-    })
 
-    return preparedLanes.map((lane) => [...lane, ...lane])
-  }, [eventPhotos, activeLanes, perLane])
+      // 3. Дублируем массив ТОЛЬКО итогового оптимизированного пула для работы CSS Marquee (50% / 50%)
+      return [...currentLane, ...currentLane]
+    })
+  }, [eventPhotos, activeLanes])
 
   const edge = useMemo(() => bgHex(theme.background), [theme.background])
 
   return (
     <>
-      {/* Стили для кастомной CSS-анимации */}
       <style jsx global>{`
         @keyframes marquee {
           0% { transform: translate3d(0, 0, 0); }
@@ -257,7 +266,7 @@ export function TemplateEventParallax({ theme, eventPhotos }: EventTemplateProps
       </div>
 
       <PhotoLightbox
-        photos={eventPhotos}
+        photos={eventPhotos} // Лайтбокс по-прежнему видит все 100+ фотографий!
         index={lightboxIndex}
         onClose={() => setLightboxIndex(null)}
         onPrev={() => setLightboxIndex((i) => (i !== null ? (i - 1 + eventPhotos.length) % eventPhotos.length : null))}

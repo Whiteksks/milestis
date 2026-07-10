@@ -12,30 +12,37 @@ export function EventBubblesCover() {
   ]
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-background select-none">
+    <div className="relative h-full w-full overflow-hidden bg-[#121214] select-none">
       {bubbles.map((b, i) => (
         <div
           key={i}
-          className="absolute rounded-full bg-muted/60 border border-white/20 shadow-md backdrop-blur-[1px] overflow-hidden"
+          className="absolute rounded-full border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.4)] backdrop-blur-[3px] overflow-hidden"
           style={{
             width: b.size,
             aspectRatio: '1 / 1', // Гарантирует идеальный круг при любых пропорциях экрана
             left: b.x,
             top: b.y,
+            // Сложный базовый градиент: от полупрозрачного графита к глубокому темному тону
+            background: 'linear-gradient(135deg, rgba(39, 39, 42, 0.6) 0%, rgba(15, 15, 17, 0.8) 100%)',
           }}
         >
-          {/* Имитация объемного внутреннего свечения */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10" />
+          {/* Эффект бензинового/перламутрового перелива (неоновый интерес) */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.18),transparent_60%)]" /> {/* Фиолетовый отсвет снизу-справа */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(45,212,191,0.15),transparent_50%)]" /> {/* Бирюзовый отсвет сверху-слева */}
 
-          {/* Блик (specular highlight dot) */}
+          {/* Имитация объемного внутреннего свечения по контуру */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/40" />
+
+          {/* Яркий 3D-блик сверху */}
           <div
-            className="absolute rounded-full bg-white/70"
+            className="absolute rounded-full bg-gradient-to-br from-white/60 to-white/0"
             style={{ 
-              width: '25%', 
-              height: '25%', 
-              top: '15%', 
-              left: '15%', 
-              filter: 'blur(0.5px)' 
+              width: '28%', 
+              height: '28%', 
+              top: '12%', 
+              left: '12%', 
+              filter: 'blur(0.5px)',
+              transform: 'rotate(-15deg)'
             }}
           />
         </div>

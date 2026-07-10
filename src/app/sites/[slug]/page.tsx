@@ -13,6 +13,7 @@ import { PublishedView, TokenGateForm } from "./published-view"
 import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
+import type { EventPublishedData } from "@/editor/modes/event/content-types"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -86,6 +87,32 @@ async function getPublishedProjectByToken(slug: string, plainToken: string) {
     content: data.content ?? null,
     theme: data.theme ?? null,
     ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
+  }
+}
+
+async function getPublishedEventData(projectId: string): Promise<EventPublishedData> {
+  const projectDocPromise = adminDb.collection("projects").doc(projectId).get()
+  const photosQueryPromise = adminDb
+    .collection("projects")
+    .doc(projectId)
+    .collection("eventPhotos")
+    .where("status", "==", "approved")
+    .orderBy("uploadedAt", "desc")
+    .get()
+
+  const [projectDoc, photosSnap] = await Promise.all([projectDocPromise, photosQueryPromise])
+  const cfg = (projectDoc.data()?.eventConfig ?? {}) as { maxPhotos?: number; maxPhotosPerGuest?: number }
+
+  return {
+    approvedPhotos: photosSnap.docs.map((photoDoc) => ({
+      id: photoDoc.id,
+      storageRef: photoDoc.data().storageRef as string,
+      uploadedAt: (photoDoc.data().uploadedAt?.toMillis?.() as number | undefined) ?? null,
+      thumbUrl: photoDoc.data().thumbUrl as string | undefined,
+      fullUrl: photoDoc.data().fullUrl as string | undefined,
+    })),
+    maxPhotos: typeof cfg.maxPhotos === "number" ? cfg.maxPhotos : 100,
+    maxPhotosPerGuest: typeof cfg.maxPhotosPerGuest === "number" ? cfg.maxPhotosPerGuest : 2,
   }
 }
 
@@ -232,6 +259,10 @@ export default async function SitePage({ params, searchParams }: Props) {
     return <TokenGateForm slug={slug} />
   }
 
+  const publishedData = project.mode === "event"
+    ? await getPublishedEventData(project.id)
+    : undefined
+
   // Token verified — render project using the mode stored in the document
   // (may differ from the header mode if middleware can't distinguish photobook vs event)
   const content = project.content ?? {}
@@ -247,6 +278,7 @@ export default async function SitePage({ params, searchParams }: Props) {
       imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
       visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
       projectId={project.id}
+      publishedData={publishedData as Record<string, unknown> | undefined}
     />
   )
 }

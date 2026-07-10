@@ -36,10 +36,10 @@ service firebase.storage {
     }
 
     // ── Event photos ─────────────────────────────────────────────────────────
-    // Approved guest photos under events/{projectId}/{photoId}.{ext}
+    // Approved guest photos under events/{projectId}/{photoId}/{fileName}
     // Written by the uploadEventPhoto Cloud Function (signed URL PUT).
     // Publicly readable so the live gallery can render without auth.
-    match /events/{projectId}/{fileName} {
+    match /events/{projectId}/{photoId}/{fileName} {
       allow read: if true;
       allow write: if false;
     }

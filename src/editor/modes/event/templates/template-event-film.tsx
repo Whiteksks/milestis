@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion, useScroll, useTransform, useSpring, type MotionValue } from 'framer-motion'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -18,9 +18,6 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
 function bgHex(bgClass: string) {
   return bgClass.match(/#[0-9A-Fa-f]{3,8}/)?.[0] ?? '#000000'
 }
-
-// Теперь GAP задаем в Tailwind (gap-4 на мобилках, gap-6 на десктопе)
-// Размеры кадра теперь адаптивные: контролируются через CSS-классы
 
 function FilmFrame({
   photo,
@@ -41,7 +38,6 @@ function FilmFrame({
   const [edgeRange, setEdgeRange] = useState<[number, number]>([0, 0])
   const [centerRange, setCenterRange] = useState<[number, number, number]>([0, 0, 0])
 
-  // Динамически пересчитываем позиции кадра относительно контейнера для идеальной точности
   useEffect(() => {
     const container = containerRef.current
     const frame = frameRef.current
@@ -52,11 +48,8 @@ function FilmFrame({
       const frameW = frame.clientWidth
       const frameLeft = frame.offsetLeft
       
-      // Точка, когда правый край кадра только появляется справа
       const start = frameLeft - containerW
-      // Точка, когда левый край кадра уходит за левую границу
       const end = frameLeft + frameW
-      // Точка точного центра
       const center = frameLeft - (containerW / 2) + (frameW / 2)
 
       setEdgeRange([start, end])
@@ -74,7 +67,6 @@ function FilmFrame({
     }
   }, [containerRef, photo])
 
-  // Анимации теперь абсолютно предсказуемы на любых экранах:
   const imgX = useTransform(scrollX, edgeRange, ['-15%', '15%'])
   const scale = useTransform(scrollX, centerRange, [0.92, 1, 0.92])
   const opacity = useTransform(scrollX, centerRange, [0.6, 1, 0.6])
@@ -93,7 +85,6 @@ function FilmFrame({
             theme.border, theme.card, theme.shadow
           )}
         >
-          {/* Контейнер с overflow-hidden + увеличенная ширина для параллакса */}
           <motion.div className="absolute inset-0 select-none will-change-transform" style={{ x: imgX, width: '130%', left: '-15%' }}>
             <Image
               src={getPhotoUrl(photo)}
@@ -107,7 +98,6 @@ function FilmFrame({
           <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </button>
       ) : (
-        // Передаем адаптивные размеры в плейсхолдер, если они там используются жестко
         <PhotoPlaceholder index={index} w={420} h={300} theme={theme} />
       )}
     </motion.div>
@@ -129,10 +119,8 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const { scrollX } = useScroll({ container: scrollRef })
-  // Оптимизировали spring для большей отзывчивости (уменьшили массу, увеличили жесткость)
   const smoothX = useSpring(scrollX, { stiffness: 150, damping: 28, mass: 0.2 })
 
-  // Плавный кроссбраузерный хак для скролла колесиком мыши
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -142,7 +130,7 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
         e.preventDefault()
         el.scrollBy({
           left: e.deltaY * 1.2,
-          behavior: 'auto' // 'auto' + useSpring дает идеальный плавный синематик-эффект
+          behavior: 'auto'
         })
       }
     }
@@ -150,20 +138,20 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
-  const handlePhotoClick = (photo: EventGuestPhoto) => {
+  const handlePhotoClick = useCallback((photo: EventGuestPhoto) => {
     const idx = eventPhotos.findIndex((p) => p.id === photo.id)
     if (idx !== -1) setLightboxIndex(idx)
-  }
+  }, [eventPhotos])
 
   const frames: (EventGuestPhoto | null)[] =
     eventPhotos.length > 0 ? eventPhotos : Array<null>(6).fill(null)
 
   return (
     <>
-      <div className={cn('relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-10', theme.background)}>
+      <div className={cn('relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-10 w-full', theme.background)}>
         
         {/* Тело кинопленки */}
-        <div className={cn('relative w-full py-2 sm:py-4 shadow-2xl', theme.card)}>
+        <div className={cn('relative w-full py-2 sm:py-4 shadow-2xl overflow-hidden', theme.card)}>
           
           <div className={cn('border-y', theme.border)}>
             <Sprockets theme={theme} />
@@ -171,16 +159,18 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
 
           <div
             ref={scrollRef}
-            // Динамические паддинги: px-[calc(50vw-145px)] для мобилок и px-[calc(50vw-210px)] для ПК 
-            // гарантируют, что первый и последний кадры встанут ровно по центру экрана при крайних положениях скролла.
-            className="no-scrollbar flex items-center gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden px-[calc(50vw-145px)] sm:px-[calc(50vw-210px)] py-4 sm:py-8"
+            // Убрали px-[calc(50vw-...)] — теперь за центрирование первого/последнего кадра отвечают дивы-распорки (spacers)
+            className="no-scrollbar flex items-center gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden py-4 sm:py-8 w-full"
             style={{ 
-              scrollSnapType: 'x mandatory', // Переключили на mandatory для четкой фиксации кадра по центру
+              scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch' 
             }}
           >
+            {/* Левый spacer: сдвигает первый элемент ровно на центр экрана */}
+            <div className="w-[calc(50vw-145px)] sm:w-[calc(50vw-210px)] flex-none pointer-events-none" aria-hidden="true" />
+
             {frames.map((photo, i) => (
-              <div key={photo?.id ?? i} style={{ scrollSnapAlign: 'center' }}>
+              <div key={photo?.id ?? i} style={{ scrollSnapAlign: 'center' }} className="flex-none">
                 <FilmFrame
                   photo={photo}
                   index={i}
@@ -191,6 +181,9 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
                 />
               </div>
             ))}
+
+            {/* Правый spacer: дает доскроллить последний элемент ровно до центра экрана */}
+            <div className="w-[calc(50vw-145px)] sm:w-[calc(50vw-210px)] flex-none pointer-events-none" aria-hidden="true" />
           </div>
 
           <div className={cn('border-y', theme.border)}>
@@ -198,7 +191,7 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
           </div>
         </div>
 
-        {/* Градиентные затемнения по бокам (скрываем на совсем маленьких экранах, чтобы не мешать обзору, либо уменьшаем ширину) */}
+        {/* Градиенты */}
         <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 sm:w-32 md:w-48" style={{ background: `linear-gradient(to right, ${bgHex(theme.background)}, transparent)` }} />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 sm:w-32 md:w-48" style={{ background: `linear-gradient(to left, ${bgHex(theme.background)}, transparent)` }} />
       </div>

@@ -41,6 +41,8 @@ export type PublishedRenderArgs = {
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
   /** Firestore project ID — passed only for event mode so the upload page can access subcollections. */
   projectId?: string
+  /** Extra server-provided published data for modes that should not bootstrap it from the client. */
+  publishedData?: Record<string, unknown>
 }
 
 export type TemplateDef = {

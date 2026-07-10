@@ -19,10 +19,13 @@ export interface EventGuestPhoto {
 // ─── Editor content ─────────────────────────────────────────────────────────
 // Event mode is visual-only — no text fields in the editor canvas.
 
-export interface EventSectionContent {
-  // intentionally empty — visual-only mode
-}
+export type EventSectionContent = Record<string, never>
 
+export interface EventPublishedData {
+  approvedPhotos: EventGuestPhoto[]
+  maxPhotos: number
+  maxPhotosPerGuest: number
+}
 
 export interface EventSectionVisibility {
   showGallery: boolean

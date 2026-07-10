@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
-import { signInAnonymously } from "firebase/auth"
-import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore"
+import { collection, doc, onSnapshot, orderBy, query, where } from "firebase/firestore"
 import { toast } from "sonner"
-import { auth, db } from "@/lib/firebase"
+import { db } from "@/lib/firebase"
 import { cn } from "@/lib/utils"
 import type { ThemeConfig } from "@/editor/lib/config/themes"
 import type { EventTemplateProps } from "@/editor/lib/template-types"
@@ -61,20 +60,35 @@ interface EventPublishedPageProps {
   projectId: string
   templateId?: string
   theme: ThemeConfig
+  initialPhotos?: EventGuestPhoto[]
+  initialMaxPhotos?: number
+  initialMaxPhotosPerGuest?: number
+}
+
+async function getFirebaseUploadAuth() {
+  const [{ auth }, { signInAnonymously }] = await Promise.all([
+    import("@/lib/firebase/firebase"),
+    import("firebase/auth"),
+  ])
+
+  return { auth, signInAnonymously }
 }
 
 export function EventPublishedPage({
   projectId,
   templateId = "event-gallery",
   theme,
+  initialPhotos = [],
+  initialMaxPhotos = 100,
+  initialMaxPhotosPerGuest = 2,
 }: EventPublishedPageProps) {
   const [uid, setUid] = useState<string | null>(null)
   const [authState, setAuthState] = useState<"idle" | "signing-in" | "ready" | "error">("idle")
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
-  const [approvedPhotos, setApprovedPhotos] = useState<EventGuestPhoto[]>([])
-  const [maxPhotos, setMaxPhotos] = useState(100)
-  const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(2)
+  const [approvedPhotos, setApprovedPhotos] = useState<EventGuestPhoto[]>(initialPhotos)
+  const [maxPhotos, setMaxPhotos] = useState(initialMaxPhotos)
+  const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(initialMaxPhotosPerGuest)
   const [uploads, setUploads] = useState<UploadItem[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -88,16 +102,18 @@ export function EventPublishedPage({
     setAccessToken(params.get("share") ?? "")
   }, [])
 
-  // ── Read real limits from Firestore ─────────────────────────────────────
+  // ── Hydrate public data from the server payload ─────────────────────────
   useEffect(() => {
-    if (!projectId) return
-    getDoc(doc(db, "projects", projectId)).then((snap) => {
-      if (!snap.exists()) return
-      const cfg = snap.data().eventConfig as { maxPhotos?: number; maxPhotosPerGuest?: number } | undefined
-      if (typeof cfg?.maxPhotos === "number") setMaxPhotos(cfg.maxPhotos)
-      if (typeof cfg?.maxPhotosPerGuest === "number") setMaxPhotosPerGuest(cfg.maxPhotosPerGuest)
-    }).catch(() => { /* use defaults */ })
-  }, [projectId])
+    setApprovedPhotos(initialPhotos)
+  }, [initialPhotos])
+
+  useEffect(() => {
+    setMaxPhotos(initialMaxPhotos)
+  }, [initialMaxPhotos])
+
+  useEffect(() => {
+    setMaxPhotosPerGuest(initialMaxPhotosPerGuest)
+  }, [initialMaxPhotosPerGuest])
 
   // ── Guest upload quota ──────────────────────────────────────────────────
   useEffect(() => {
@@ -116,15 +132,26 @@ export function EventPublishedPage({
       where("status", "==", "approved"),
       orderBy("uploadedAt", "desc"),
     )
-    return onSnapshot(q, (snap) => {
-      setApprovedPhotos(snap.docs.map((d) => ({
-        id: d.id,
-        storageRef: d.data().storageRef as string,
-        uploadedAt: (d.data().uploadedAt?.toMillis?.() as number | undefined) ?? null,
-        thumbUrl: d.data().thumbUrl as string | undefined,
-        fullUrl: d.data().fullUrl as string | undefined,
-      })))
-    })
+    return onSnapshot(
+      q,
+      (snap) => {
+        setApprovedPhotos(snap.docs.map((d) => ({
+          id: d.id,
+          storageRef: d.data().storageRef as string,
+          uploadedAt: (d.data().uploadedAt?.toMillis?.() as number | undefined) ?? null,
+          thumbUrl: d.data().thumbUrl as string | undefined,
+          fullUrl: d.data().fullUrl as string | undefined,
+        })))
+      },
+      (error) => {
+        const code = typeof error === "object" && error !== null && "code" in error
+          ? String((error as { code?: unknown }).code ?? "")
+          : ""
+        if (code !== "permission-denied") {
+          console.error("Failed to subscribe to event photos:", error)
+        }
+      },
+    )
   }, [projectId])
 
   // ── Auto-clear finished upload tray items ──────────────────────────────
@@ -156,7 +183,9 @@ export function EventPublishedPage({
     setUploads((prev) => [...prev, { id: itemId, name: file.name, state: "uploading" }])
 
     try {
+      const { auth } = await getFirebaseUploadAuth()
       const idToken = await auth.currentUser?.getIdToken()
+      if (!idToken) throw new Error("Could not connect. Please refresh the page.")
       const fnUrl = process.env.NEXT_PUBLIC_UPLOAD_EVENT_PHOTO_URL
       if (!fnUrl) throw new Error("Upload service not configured.")
 
@@ -233,6 +262,13 @@ export function EventPublishedPage({
       // Lazy sign-in — only happens when the user actually wants to upload
       setAuthState("signing-in")
       try {
+        const { auth, signInAnonymously } = await getFirebaseUploadAuth()
+        if (auth.currentUser) {
+          setUid(auth.currentUser.uid)
+          setAuthState("ready")
+          fileInputRef.current?.click()
+          return
+        }
         const { user } = await signInAnonymously(auth)
         setUid(user.uid)
         setAuthState("ready")

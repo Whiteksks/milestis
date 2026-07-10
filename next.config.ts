@@ -17,7 +17,7 @@ const CSP = [
   // Fetch / XHR: Firebase services + Cloud Run functions + Iubenda API
   "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://*.iubenda.com",
   // Frames: Firebase Auth popup + Google Sign-In + YouTube embeds + Iubenda widgets
-  "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://*.iubenda.com",
+  "frame-src 'self' https://milestis.com https://*.milestis.com https://*.firebaseapp.com https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://*.iubenda.com",
   // Media
   "media-src 'self' blob: https://firebasestorage.googleapis.com",
   // Workers (Framer Motion / Next.js)

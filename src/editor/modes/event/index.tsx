@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import type { ModeRegistryEntry } from '@/editor/lib/modes/types'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
 import type { EventTemplateId } from './template-ids'
-import type { EventSectionContent, EventSectionVisibility } from './content-types'
+import type { EventPublishedData, EventSectionContent, EventSectionVisibility } from './content-types'
 import {
   createEventSlice,
   defaultEventContent,
@@ -173,10 +173,11 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     useContentStore.setState({ eventPhotos: [] })
   },
 
-  renderPublished: ({ projectId, templateId, themeCustomizations, theme }) => {
+  renderPublished: ({ projectId, templateId, themeCustomizations, theme, publishedData }) => {
     const mood       = themeCustomizations?.photobookMood    ?? 'none'
     const texture    = themeCustomizations?.photobookTexture ?? 'none'
     const moodFilter = getMoodFilter(mood)
+    const eventData = publishedData as EventPublishedData | undefined
     return (
       <div
         className="relative overflow-hidden"
@@ -186,6 +187,9 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
           projectId={projectId ?? ''}
           templateId={templateId ?? 'event-gallery'}
           theme={theme}
+          initialPhotos={eventData?.approvedPhotos ?? []}
+          initialMaxPhotos={eventData?.maxPhotos ?? 100}
+          initialMaxPhotosPerGuest={eventData?.maxPhotosPerGuest ?? 2}
         />
         <PhotobookTextureOverlay texture={texture} />
       </div>

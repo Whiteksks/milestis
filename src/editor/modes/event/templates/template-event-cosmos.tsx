@@ -17,6 +17,7 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
 
 const GAP = 260 
 const MIN_PHOTOS_PER_COL = 4
+const MAX_PHOTOS_PER_COL = 7 // Оптимизация 1: Ограничиваем физический размер ленты для стабильности GPU
 
 const SIZES = [
   { w: 150, h: 200 },
@@ -33,12 +34,13 @@ function getSize(colIdx: number, photoIdx: number) {
   return SIZES[(colIdx * 3 + photoIdx * 5) % SIZES.length]
 }
 
+// Оптимизация 2: Убран тяжелый filter: blur, глубина планов передается через opacity и scale
 const COLS = [
-  { left: '6%',  dur: 44, startY: -120, rot: -3.0, scale: 0.6,  opacity: 0.45, blur: 2.5, drift: 14 },
-  { left: '26%', dur: 34, startY: -420, rot:  1.8, scale: 0.82, opacity: 0.7,  blur: 1.0, drift: 22 },
-  { left: '47%', dur: 26, startY: -220, rot: -1.2, scale: 1.0,  opacity: 1,     blur: 0,   drift: 30 },
-  { left: '67%', dur: 38, startY: -520, rot:  2.4, scale: 0.74, opacity: 0.6,  blur: 1.6, drift: 18 },
-  { left: '85%', dur: 30, startY: -150, rot: -2.4, scale: 0.9,  opacity: 0.85, blur: 0.4, drift: 26 },
+  { left: '6%',  dur: 44, startY: -120, rot: -3.0, scale: 0.6,  opacity: 0.35, drift: 14 },
+  { left: '26%', dur: 34, startY: -420, rot:  1.8, scale: 0.82, opacity: 0.6,  drift: 22 },
+  { left: '47%', dur: 26, startY: -220, rot: -1.2, scale: 1.0,  opacity: 1,    drift: 30 },
+  { left: '67%', dur: 38, startY: -520, rot:  2.4, scale: 0.74, opacity: 0.5,  drift: 18 },
+  { left: '85%', dur: 30, startY: -150, rot: -2.4, scale: 0.9,  opacity: 0.75, drift: 26 },
 ] as const
 
 type ColCfg = typeof COLS[number]
@@ -52,7 +54,6 @@ interface FloatingColumnProps {
 }
 
 function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingColumnProps) {
-  // Оптимизация 1: Мемоизация тяжелых расчетов размеров и высоты сдвига
   const { doubled, doubledSizes, singleH } = useMemo(() => {
     const sizes = photos.map((_, i) => getSize(colIdx, i))
     const singleH = sizes.reduce((acc, s) => acc + s.h * cfg.scale + GAP, 0)
@@ -65,13 +66,21 @@ function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingCo
   }, [photos, colIdx, cfg.scale])
 
   return (
-    <div
-      className="absolute top-0 bottom-0 pointer-events-none"
+    // Оптимизация 3: Анимация дрейфа (drift) перенесена на родительский контейнер колонки целиком,
+    // вместо того чтобы дергать 40 отдельных дочерних элементов по оси X.
+    <motion.div
+      className="absolute top-0 bottom-0 pointer-events-none origin-center"
+      animate={{ x: [-cfg.drift, cfg.drift, -cfg.drift] }}
+      transition={{
+        duration: cfg.dur * 0.8,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
       style={{ 
         left: cfg.left, 
         opacity: cfg.opacity, 
-        filter: cfg.blur ? `blur(${cfg.blur}px)` : undefined,
-        width: 180 * cfg.scale // Фиксируем ширину колонки для предотвращения Layout Shifts
+        width: 180 * cfg.scale,
+        willChange: 'transform'
       }}
     >
       <motion.div
@@ -84,21 +93,11 @@ function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingCo
           const { w, h } = doubledSizes[i]
           const sw = w * cfg.scale
           const sh = h * cfg.scale
-          const photoIndex = i % photos.length
 
           return (
             <div key={`${colIdx}-${i}`} style={{ paddingBottom: GAP, width: sw }}>
-              <motion.div
-                animate={{ x: [-cfg.drift, cfg.drift, -cfg.drift] }}
-                transition={{
-                  duration: cfg.dur * 0.6,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: photoIndex * 0.4,
-                }}
-                // Оптимизация 2: Объединяем rotate и transform во Framer Motion для стабильности GPU
-                style={{ rotate: cfg.rot }}
-              >
+              {/* Оптимизация 4: Убран внутренний motion.div с анимацией 'x', оставлен только статический поворот */}
+              <div style={{ transform: `rotate(${cfg.rot}deg)` }}>
                 {photo ? (
                   <button
                     onClick={() => onPhotoClick(photo)}
@@ -106,12 +105,12 @@ function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingCo
                     style={{ width: sw, height: sh }}
                   >
                     <span
-                      className="pointer-events-none absolute -inset-3 rounded-[28px] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-                      style={{ background: 'radial-gradient(closest-side, hsla(0,0%,100%,0.35), transparent)' }}
+                      className="pointer-events-none absolute -inset-3 rounded-[28px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      style={{ background: 'radial-gradient(closest-side, hsla(0,0%,100%,0.2), transparent)' }}
                     />
                     <span
                       className={cn(
-                        'relative block h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 transition-all duration-700 ease-out group-hover:scale-105 group-hover:ring-white/40',
+                        'relative block h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 transition-all duration-500 ease-out group-hover:scale-105 group-hover:ring-white/40',
                         theme.shadow,
                       )}
                     >
@@ -119,7 +118,7 @@ function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingCo
                         src={getPhotoUrl(photo)}
                         alt=""
                         fill
-                        className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
+                        className="object-cover transition-transform duration-[700ms] ease-out group-hover:scale-110"
                         sizes={`${Math.round(sw)}px`}
                         unoptimized
                       />
@@ -131,25 +130,23 @@ function FloatingColumn({ photos, cfg, colIdx, onPhotoClick, theme }: FloatingCo
                     <PhotoPlaceholder index={colIdx * 10 + i} w={sw} h={sh} theme={theme} />
                   </div>
                 )}
-              </motion.div>
+              </div>
             </div>
           )
         })}
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
 
 export function TemplateEventCosmos({ theme, eventPhotos }: EventTemplateProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
-  // Оптимизация 3: useCallback для предотвращения ререндеров
   const handlePhotoClick = useCallback((photo: EventGuestPhoto) => {
     const idx = eventPhotos.findIndex((p) => p.id === photo.id)
     if (idx !== -1) setLightboxIndex(idx)
   }, [eventPhotos])
 
-  // Оптимизация 4: Безопасное и производительное распределение фото по колонкам без risk of infinite loop
   const colPhotos = useMemo(() => {
     const buckets: (EventGuestPhoto | null)[][] = COLS.map(() => [])
 
@@ -162,16 +159,19 @@ export function TemplateEventCosmos({ theme, eventPhotos }: EventTemplateProps) 
       buckets[i % COLS.length].push(p)
     })
 
-    // Гарантируем заполнение (минимум 4 элемента) безопасным способом через остаток от деления
     return buckets.map((col) => {
       if (col.length === 0) {
         return Array<null>(MIN_PHOTOS_PER_COL).fill(null)
       }
       
-      const filledSubColumn = [...col]
+      // Оптимизация 5: Если массив фото огромный (до 100), мы ограничиваем высоту одной колонки
+      // до разумного MAX_PHOTOS_PER_COL. Это предотвратит создание бесконечной DOM-ленты.
+      const optimizedCol = col.slice(0, MAX_PHOTOS_PER_COL)
+      
+      const filledSubColumn = [...optimizedCol]
       let index = 0
       while (filledSubColumn.length < MIN_PHOTOS_PER_COL) {
-        filledSubColumn.push(col[index % col.length])
+        filledSubColumn.push(optimizedCol[index % optimizedCol.length])
         index++
       }
       return filledSubColumn

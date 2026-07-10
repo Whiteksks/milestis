@@ -14,6 +14,7 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
   return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(photo.storageRef)}?alt=media`
 }
 
+const MAX_BUBBLES = 40
 const MIN_R = 48
 const MAX_R = 82
 const HITBOX_RATIO = 0.78
@@ -39,7 +40,6 @@ function seeded(i: number, salt: number) {
 
 export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  // Добавляем стейт инициализации, чтобы гарантировать правильный первый рендер размеров
   const [isInitialized, setIsInitialized] = useState(false)
   
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,13 +49,17 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
   const sizeRef = useRef({ w: 0, h: 0 })
   const rafRef = useRef<number>(0)
   
+  // Кэш для координат контейнера, чтобы не вызывать getBoundingClientRect на каждый чих
+  const containerRectRef = useRef<{ left: number; top: number }>({ left: 0, top: 0 })
+  // Единый вектор для акселерометра
+  const gravityRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  
   const pointerStartRef = useRef<{ x: number; y: number; isDown: boolean }>({ x: 0, y: 0, isDown: false })
 
-  const items: (EventGuestPhoto | null)[] =
-    eventPhotos.length > 0 ? eventPhotos : Array<null>(7).fill(null)
+  const items = eventPhotos.length > 0 ? eventPhotos.slice(0, MAX_BUBBLES) : Array<null>(7).fill(null)
 
-  // Предварительно рассчитываем стабильные радиусы и цвета для SSR / первого рендера
-  const precalculatedStatic = items.map((photo, i) => {
+  // Предварительно рассчитываем стабильные радиусы и цвета
+  const precalculatedStatic = items.map((_, i) => {
     const r = MIN_R + seeded(i, 1) * (MAX_R - MIN_R)
     const hue = Math.round(seeded(i, 6) * 360)
     return { r, hue }
@@ -64,6 +68,10 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
   const initBubbles = useCallback(() => {
     const el = containerRef.current
     if (!el) return
+    
+    const rect = el.getBoundingClientRect()
+    containerRectRef.current = { left: rect.left, top: rect.top }
+    
     const w = el.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 1200)
     const h = el.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 800)
     sizeRef.current = { w, h }
@@ -96,19 +104,32 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
       const { w, h } = sizeRef.current
       const bubbles = bubblesRef.current
       const cursor = cursorRef.current
+      const gravity = gravityRef.current
 
       if (w === 0 || h === 0 || bubbles.length === 0) {
         rafRef.current = requestAnimationFrame(step)
         return
       }
 
-      for (const b of bubbles) {
+      // 1. Обновление позиций и внешних сил
+      for (let i = 0; i < bubbles.length; i++) {
+        const b = bubbles[i]
+
+        // Эффект от акселерометра (если есть сила)
+        if (gravity.x !== 0 || gravity.y !== 0) {
+          b.vx += gravity.x * dt * 150
+          b.vy += gravity.y * dt * 150
+        }
+
+        // Эффект от курсора
         if (cursor.active) {
           const dx = b.x - cursor.x
           const dy = b.y - cursor.y
           const dist = Math.hypot(dx, dy) || 0.0001
-          if (dist < CURSOR_RADIUS + b.r) {
-            const push = (CURSOR_FORCE / (dist * dist)) * (CURSOR_RADIUS + b.r)
+          const maxDist = CURSOR_RADIUS + b.r
+          
+          if (dist < maxDist) {
+            const push = (CURSOR_FORCE / (dist * dist)) * maxDist
             b.vx += (dx / dist) * push * dt
             b.vy += (dy / dist) * push * dt
           }
@@ -119,50 +140,62 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
         b.vx *= FRICTION
         b.vy *= FRICTION
 
+        // Столкновения со стенами
         if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * RESTITUTION }
         else if (b.x > w - b.r) { b.x = w - b.r; b.vx = -Math.abs(b.vx) * RESTITUTION }
         if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy) * RESTITUTION }
         else if (b.y > h - b.r) { b.y = h - b.r; b.vy = -Math.abs(b.vy) * RESTITUTION }
       }
 
-      for (let i = 0; i < bubbles.length; i++) {
-        for (let j = i + 1; j < bubbles.length; j++) {
-          const a = bubbles[i]
+      // Затухание всплеска тряски
+      gravity.x *= 0.9
+      gravity.y *= 0.9
+
+      // 2. Оптимизированный цикл столкновений пузырей между собой
+      const len = bubbles.length
+      for (let i = 0; i < len; i++) {
+        const a = bubbles[i]
+        for (let j = i + 1; j < len; j++) {
           const b = bubbles[j]
           const dx = b.x - a.x
           const dy = b.y - a.y
-          const dist = Math.hypot(dx, dy) || 0.0001
           const minDist = (a.r + b.r) * HITBOX_RATIO
           
-          if (dist < minDist) {
-            const nx = dx / dist
-            const ny = dy / dist
-            const overlap = (minDist - dist) / 2
+          // Быстрая проверка по квадрату (AABB), чтобы не считать тяжёлый Math.hypot зря
+          if (Math.abs(dx) < minDist && Math.abs(dy) < minDist) {
+            const dist = Math.hypot(dx, dy) || 0.0001
             
-            a.x -= nx * overlap
-            a.y -= ny * overlap
-            b.x += nx * overlap
-            b.y += ny * overlap
+            if (dist < minDist) {
+              const nx = dx / dist
+              const ny = dy / dist
+              const overlap = (minDist - dist) * 0.5
+              
+              a.x -= nx * overlap
+              a.y -= ny * overlap
+              b.x += nx * overlap
+              b.y += ny * overlap
 
-            const dvx = b.vx - a.vx
-            const dvy = b.vy - a.vy
-            const rel = dvx * nx + dvy * ny
-            if (rel < 0) {
-              const imp = -(1 + RESTITUTION) * rel / 2
-              a.vx -= imp * nx
-              a.vy -= imp * ny
-              b.vx += imp * nx
-              b.vy += imp * ny
+              const dvx = b.vx - a.vx
+              const dvy = b.vy - a.vy
+              const rel = dvx * nx + dvy * ny
+              
+              if (rel < 0) {
+                const imp = (-(1 + RESTITUTION) * rel) * 0.5
+                a.vx -= imp * nx
+                a.vy -= imp * ny
+                b.vx += imp * nx
+                b.vy += imp * ny
+              }
             }
           }
         }
       }
 
-      // Рендеринг
-      for (let i = 0; i < bubbles.length; i++) {
+      // 3. Быстрый рендеринг через мутацию стилей DOM
+      for (let i = 0; i < len; i++) {
         const node = nodesRef.current[i]
-        const b = bubbles[i]
         if (node) {
+          const b = bubbles[i]
           node.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0px)`
         }
       }
@@ -174,7 +207,7 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
     return () => cancelAnimationFrame(rafRef.current)
   }, [initBubbles])
 
-  // Слушатель ресайза
+  // Слушатель ресайза (кэшируем размеры и координаты)
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -183,6 +216,9 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
       if (!entries || entries.length === 0) return
       const { width: w, height: h } = entries[0].contentRect
       sizeRef.current = { w, h }
+      
+      const rect = el.getBoundingClientRect()
+      containerRectRef.current = { left: rect.left, top: rect.top }
       
       for (const b of bubblesRef.current) {
         b.x = Math.min(Math.max(b.x, b.r), w - b.r)
@@ -195,8 +231,7 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
   }, [])
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect) return
+    const rect = containerRectRef.current
     const currentX = e.clientX - rect.left
     const currentY = e.clientY - rect.top
     cursorRef.current = { x: currentX, y: currentY, active: true }
@@ -208,8 +243,7 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
   }
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect) return
+    const rect = containerRectRef.current
     const startX = e.clientX - rect.left
     const startY = e.clientY - rect.top
     pointerStartRef.current = { x: startX, y: startY, isDown: true }
@@ -224,16 +258,20 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
     pointerStartRef.current.isDown = false
   }
 
-  // Акселерометр
+  // Оптимизированный акселерометр
   useEffect(() => {
     const onMotion = (e: DeviceMotionEvent) => {
       const acc = e.accelerationIncludingGravity
       if (!acc) return
-      const magnitude = Math.hypot(acc.x ?? 0, acc.y ?? 0, acc.z ?? 0)
+      const mX = acc.x ?? 0
+      const mY = acc.y ?? 0
+      const magnitude = Math.hypot(mX, mY, acc.z ?? 0)
+      
       if (magnitude > 22) {
-        for (const b of bubblesRef.current) {
-          b.vx += (Math.random() - 0.5) * magnitude * 18
-          b.vy += (Math.random() - 0.5) * magnitude * 18
+        // Задаем вектор силы. Направление зависит от наклона, добавляем легкий хаос
+        gravityRef.current = {
+          x: -mX + (Math.random() - 0.5) * 10,
+          y: mY + (Math.random() - 0.5) * 10
         }
       }
     }
@@ -243,12 +281,12 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
 
   const [needsMotionPerm, setNeedsMotionPerm] = useState(false)
   useEffect(() => {
-    const DME = (window as unknown as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
+    const DME = (window as any).DeviceMotionEvent
     if (typeof DME?.requestPermission === 'function') setNeedsMotionPerm(true)
   }, [])
 
   const requestMotion = async () => {
-    const DME = (window as unknown as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
+    const DME = (window as any).DeviceMotionEvent
     try {
       const res = await DME?.requestPermission?.()
       if (res === 'granted') setNeedsMotionPerm(false)
@@ -266,22 +304,18 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
           onPointerLeave={() => { cursorRef.current.active = false; pointerStartRef.current.isDown = false }}
         >
           {items.map((photo, i) => {
-            // Используем гарантированные статические значения до того, как отработает useEffect
             const { r, hue } = precalculatedStatic[i]
             
             return (
               <div
                 key={photo?.id ?? i}
                 ref={(n) => { nodesRef.current[i] = n }}
-                // Скрываем видимость (`opacity-0`) в самую первую милисекунду на сервере, 
-                // чтобы не было вспышки перемещения из левого верхнего угла
                 className={cn("absolute left-0 top-0 will-change-transform transition-opacity duration-300", 
                   isInitialized ? "opacity-100" : "opacity-0"
                 )}
                 style={{ 
                   width: r * 2, 
                   height: r * 2,
-                  // Первоначальное распределение, пока не завелся JS-движок
                   transform: !isInitialized ? `translate(${r * 0.5 + i * 60}px, ${r * 0.5 + i * 40}px)` : undefined 
                 }}
               >
