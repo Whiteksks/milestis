@@ -15,79 +15,110 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
   return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(photo.storageRef)}?alt=media`
 }
 
-/** Extract the raw hex from a Tailwind bg class like 'bg-[#1C1C1C]' */
 function bgHex(bgClass: string) {
   return bgClass.match(/#[0-9A-Fa-f]{3,8}/)?.[0] ?? '#000000'
 }
 
-const FRAME_W = 420 // width of one film frame
-const FRAME_H = 300 // height of one film frame
-const GAP = 24 // spacing between frames
+// Теперь GAP задаем в Tailwind (gap-4 на мобилках, gap-6 на десктопе)
+// Размеры кадра теперь адаптивные: контролируются через CSS-классы
 
-/** A single film frame with an internal parallax that reacts to horizontal scroll. */
 function FilmFrame({
   photo,
   index,
   scrollX,
-  containerWidth,
+  containerRef,
   onClick,
   theme,
 }: {
   photo: EventGuestPhoto | null
   index: number
   scrollX: MotionValue<number>
-  containerWidth: number
+  containerRef: React.RefObject<HTMLDivElement | null>
   onClick: (photo: EventGuestPhoto) => void
   theme: EventTemplateProps['theme']
 }) {
-  // Position of this frame's center along the track
-  const frameCenter = index * (FRAME_W + GAP) + FRAME_W / 2
-  // How far the frame center is from the viewport center, as scroll progresses
-  const rangeStart = frameCenter - containerWidth
-  const rangeEnd = frameCenter
+  const frameRef = useRef<HTMLDivElement>(null)
+  const [edgeRange, setEdgeRange] = useState<[number, number]>([0, 0])
+  const [centerRange, setCenterRange] = useState<[number, number, number]>([0, 0, 0])
 
-  // Parallax: shift the inner image opposite to scroll for depth
-  const imgX = useTransform(scrollX, [rangeStart, rangeEnd], ['-18%', '18%'])
-  // Focus effects: the frame nearest the viewport center gets fuller scale/opacity
-  const scale = useTransform(scrollX, [rangeStart, frameCenter - containerWidth / 2, rangeEnd], [0.9, 1, 0.9])
-  const opacity = useTransform(scrollX, [rangeStart, frameCenter - containerWidth / 2, rangeEnd], [0.55, 1, 0.55])
+  // Динамически пересчитываем позиции кадра относительно контейнера для идеальной точности
+  useEffect(() => {
+    const container = containerRef.current
+    const frame = frameRef.current
+    if (!container || !frame) return
+
+    const updatePositions = () => {
+      const containerW = container.clientWidth
+      const frameW = frame.clientWidth
+      const frameLeft = frame.offsetLeft
+      
+      // Точка, когда правый край кадра только появляется справа
+      const start = frameLeft - containerW
+      // Точка, когда левый край кадра уходит за левую границу
+      const end = frameLeft + frameW
+      // Точка точного центра
+      const center = frameLeft - (containerW / 2) + (frameW / 2)
+
+      setEdgeRange([start, end])
+      setCenterRange([start, center, end])
+    }
+
+    updatePositions()
+    const ro = new ResizeObserver(updatePositions)
+    ro.observe(container)
+    window.addEventListener('resize', updatePositions)
+    
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', updatePositions)
+    }
+  }, [containerRef, photo])
+
+  // Анимации теперь абсолютно предсказуемы на любых экранах:
+  const imgX = useTransform(scrollX, edgeRange, ['-15%', '15%'])
+  const scale = useTransform(scrollX, centerRange, [0.92, 1, 0.92])
+  const opacity = useTransform(scrollX, centerRange, [0.6, 1, 0.6])
 
   return (
     <motion.div
-      className="relative flex-none"
-      style={{ width: FRAME_W, height: FRAME_H, scale, opacity }}
+      ref={frameRef}
+      className="relative h-[220px] w-[290px] flex-none sm:h-[300px] sm:w-[420px]"
+      style={{ scale, opacity }}
     >
       {photo ? (
         <button
           onClick={() => onClick(photo)}
-          className={cn('group relative block h-full w-full overflow-hidden rounded-md border-2 cursor-zoom-in focus-visible:outline-none', theme.border, theme.card, theme.shadow)}
+          className={cn(
+            'group relative block h-full w-full overflow-hidden rounded-md border-2 cursor-zoom-in focus-visible:outline-none transition-shadow duration-300', 
+            theme.border, theme.card, theme.shadow
+          )}
         >
-          {/* wider inner image so the parallax shift never reveals edges */}
-          <motion.div className="absolute inset-0" style={{ x: imgX, width: '136%', left: '-18%' }}>
+          {/* Контейнер с overflow-hidden + увеличенная ширина для параллакса */}
+          <motion.div className="absolute inset-0 select-none will-change-transform" style={{ x: imgX, width: '130%', left: '-15%' }}>
             <Image
               src={getPhotoUrl(photo)}
               alt=""
               fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              sizes={`${FRAME_W}px`}
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              sizes="(max-width: 640px) 290px, 420px"
               unoptimized
             />
           </motion.div>
-          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </button>
       ) : (
-        <PhotoPlaceholder index={index} w={FRAME_W} h={FRAME_H} theme={theme} />
+        // Передаем адаптивные размеры в плейсхолдер, если они там используются жестко
+        <PhotoPlaceholder index={index} w={420} h={300} theme={theme} />
       )}
     </motion.div>
   )
 }
 
-/** Sprocket-hole strip that runs above and below the film, like real 35mm stock. */
 function Sprockets({ theme }: { theme: EventTemplateProps['theme'] }) {
   return (
-    <div className="flex items-center gap-3 px-2 py-2">
-      {Array.from({ length: 40 }).map((_, i) => (
-        <span key={i} className={cn('h-3 w-6 flex-none rounded-[3px] opacity-60', theme.muted)} />
+    <div className="flex items-center gap-2 px-1 py-1.5 sm:gap-3 sm:px-2 sm:py-2 overflow-hidden select-none">
+      {Array.from({ length: 50 }).map((_, i) => (
+        <span key={i} className={cn('h-2.5 w-5 sm:h-3 sm:w-6 flex-none rounded-[2px] sm:rounded-[3px] opacity-40', theme.muted)} />
       ))}
     </div>
   )
@@ -96,30 +127,23 @@ function Sprockets({ theme }: { theme: EventTemplateProps['theme'] }) {
 export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState(0)
 
   const { scrollX } = useScroll({ container: scrollRef })
-  // Smooth the raw scroll value so parallax feels fluid, not jittery
-  const smoothX = useSpring(scrollX, { stiffness: 120, damping: 30, mass: 0.4 })
+  // Оптимизировали spring для большей отзывчивости (уменьшили массу, увеличили жесткость)
+  const smoothX = useSpring(scrollX, { stiffness: 150, damping: 28, mass: 0.2 })
 
+  // Плавный кроссбраузерный хак для скролла колесиком мыши
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    const update = () => setContainerWidth(el.clientWidth)
-    update()
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
 
-  // Translate vertical wheel gestures into horizontal scroll for trackpads/mice
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        el.scrollLeft += e.deltaY
         e.preventDefault()
+        el.scrollBy({
+          left: e.deltaY * 1.2,
+          behavior: 'auto' // 'auto' + useSpring дает идеальный плавный синематик-эффект
+        })
       }
     }
     el.addEventListener('wheel', onWheel, { passive: false })
@@ -136,17 +160,24 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
 
   return (
     <>
-      <div className={cn('relative flex min-h-screen flex-col items-center justify-center overflow-hidden', theme.background)}>
-        {/* film reel body */}
-        <div className={cn('relative w-full py-3', theme.card)} style={{ boxShadow: '0 0 80px rgba(0,0,0,0.4)' }}>
+      <div className={cn('relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-10', theme.background)}>
+        
+        {/* Тело кинопленки */}
+        <div className={cn('relative w-full py-2 sm:py-4 shadow-2xl', theme.card)}>
+          
           <div className={cn('border-y', theme.border)}>
             <Sprockets theme={theme} />
           </div>
 
           <div
             ref={scrollRef}
-            className="no-scrollbar flex items-center gap-6 overflow-x-auto overflow-y-hidden px-[calc(50vw-210px)] py-6"
-            style={{ scrollSnapType: 'x proximity', WebkitOverflowScrolling: 'touch' }}
+            // Динамические паддинги: px-[calc(50vw-145px)] для мобилок и px-[calc(50vw-210px)] для ПК 
+            // гарантируют, что первый и последний кадры встанут ровно по центру экрана при крайних положениях скролла.
+            className="no-scrollbar flex items-center gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden px-[calc(50vw-145px)] sm:px-[calc(50vw-210px)] py-4 sm:py-8"
+            style={{ 
+              scrollSnapType: 'x mandatory', // Переключили на mandatory для четкой фиксации кадра по центру
+              WebkitOverflowScrolling: 'touch' 
+            }}
           >
             {frames.map((photo, i) => (
               <div key={photo?.id ?? i} style={{ scrollSnapAlign: 'center' }}>
@@ -154,7 +185,7 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
                   photo={photo}
                   index={i}
                   scrollX={smoothX}
-                  containerWidth={containerWidth}
+                  containerRef={scrollRef}
                   onClick={handlePhotoClick}
                   theme={theme}
                 />
@@ -167,9 +198,9 @@ export function TemplateEventFilm({ theme, eventPhotos }: EventTemplateProps) {
           </div>
         </div>
 
-        {/* edge fades — match background color */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-32" style={{ background: `linear-gradient(to right, ${bgHex(theme.background)}, transparent)` }} />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-32" style={{ background: `linear-gradient(to left, ${bgHex(theme.background)}, transparent)` }} />
+        {/* Градиентные затемнения по бокам (скрываем на совсем маленьких экранах, чтобы не мешать обзору, либо уменьшаем ширину) */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 sm:w-32 md:w-48" style={{ background: `linear-gradient(to right, ${bgHex(theme.background)}, transparent)` }} />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 sm:w-32 md:w-48" style={{ background: `linear-gradient(to left, ${bgHex(theme.background)}, transparent)` }} />
       </div>
 
       <PhotoLightbox

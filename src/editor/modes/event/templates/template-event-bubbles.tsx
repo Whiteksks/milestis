@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
@@ -15,13 +14,13 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
   return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(photo.storageRef)}?alt=media`
 }
 
-const MIN_R = 48 // smallest bubble visual radius
-const MAX_R = 82 // largest bubble visual radius
-const HITBOX_RATIO = 0.78 // collision radius is smaller than visual -> slight overlap allowed
-const CURSOR_RADIUS = 170 // how far the cursor push reaches
-const CURSOR_FORCE = 2600 // strength of cursor repulsion
-const FRICTION = 0.94 // velocity damping each frame
-const RESTITUTION = 0.7 // bounciness on wall/bubble collisions
+const MIN_R = 48
+const MAX_R = 82
+const HITBOX_RATIO = 0.78
+const CURSOR_RADIUS = 170
+const CURSOR_FORCE = 2600
+const FRICTION = 0.94
+const RESTITUTION = 0.7
 
 interface Bubble {
   photo: EventGuestPhoto | null
@@ -33,7 +32,6 @@ interface Bubble {
   hue: number
 }
 
-/** Deterministic pseudo-random so the very first paint is SSR-safe. */
 function seeded(i: number, salt: number) {
   const v = Math.sin((i + 1) * 12.9898 + salt * 78.233) * 43758.5453
   return v - Math.floor(v)
@@ -41,27 +39,37 @@ function seeded(i: number, salt: number) {
 
 export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  // Добавляем стейт инициализации, чтобы гарантировать правильный первый рендер размеров
+  const [isInitialized, setIsInitialized] = useState(false)
+  
   const containerRef = useRef<HTMLDivElement>(null)
   const bubblesRef = useRef<Bubble[]>([])
   const nodesRef = useRef<(HTMLDivElement | null)[]>([])
   const cursorRef = useRef<{ x: number; y: number; active: boolean }>({ x: 0, y: 0, active: false })
   const sizeRef = useRef({ w: 0, h: 0 })
   const rafRef = useRef<number>(0)
-  // Track whether a bubble was dragged vs. clicked, to avoid opening lightbox on drag
-  const downRef = useRef<{ moved: boolean }>({ moved: false })
+  
+  const pointerStartRef = useRef<{ x: number; y: number; isDown: boolean }>({ x: 0, y: 0, isDown: false })
 
   const items: (EventGuestPhoto | null)[] =
     eventPhotos.length > 0 ? eventPhotos : Array<null>(7).fill(null)
 
-  // Build the bubble world once we know the container size
+  // Предварительно рассчитываем стабильные радиусы и цвета для SSR / первого рендера
+  const precalculatedStatic = items.map((photo, i) => {
+    const r = MIN_R + seeded(i, 1) * (MAX_R - MIN_R)
+    const hue = Math.round(seeded(i, 6) * 360)
+    return { r, hue }
+  })
+
   const initBubbles = useCallback(() => {
     const el = containerRef.current
     if (!el) return
-    const w = el.clientWidth
-    const h = el.clientHeight
+    const w = el.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 1200)
+    const h = el.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 800)
     sizeRef.current = { w, h }
+
     bubblesRef.current = items.map((photo, i) => {
-      const r = MIN_R + seeded(i, 1) * (MAX_R - MIN_R)
+      const { r, hue } = precalculatedStatic[i]
       return {
         photo,
         x: r + seeded(i, 2) * (w - 2 * r),
@@ -69,26 +77,32 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
         vx: (seeded(i, 4) - 0.5) * 40,
         vy: (seeded(i, 5) - 0.5) * 40,
         r,
-        hue: Math.round(seeded(i, 6) * 360),
+        hue,
       }
     })
+    setIsInitialized(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventPhotos.length])
 
-  // Physics loop
+  // Физический движок
   useEffect(() => {
     initBubbles()
     let last = performance.now()
 
     const step = (now: number) => {
-      const dt = Math.min((now - last) / 1000, 0.033)
+      const dt = Math.min((now - last) / 1000, 0.02)
       last = now
+      
       const { w, h } = sizeRef.current
       const bubbles = bubblesRef.current
       const cursor = cursorRef.current
 
+      if (w === 0 || h === 0 || bubbles.length === 0) {
+        rafRef.current = requestAnimationFrame(step)
+        return
+      }
+
       for (const b of bubbles) {
-        // cursor repulsion
         if (cursor.active) {
           const dx = b.x - cursor.x
           const dy = b.y - cursor.y
@@ -100,20 +114,17 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
           }
         }
 
-        // integrate
         b.x += b.vx * dt
         b.y += b.vy * dt
         b.vx *= FRICTION
         b.vy *= FRICTION
 
-        // walls
         if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * RESTITUTION }
-        if (b.x > w - b.r) { b.x = w - b.r; b.vx = -Math.abs(b.vx) * RESTITUTION }
+        else if (b.x > w - b.r) { b.x = w - b.r; b.vx = -Math.abs(b.vx) * RESTITUTION }
         if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy) * RESTITUTION }
-        if (b.y > h - b.r) { b.y = h - b.r; b.vy = -Math.abs(b.vy) * RESTITUTION }
+        else if (b.y > h - b.r) { b.y = h - b.r; b.vy = -Math.abs(b.vy) * RESTITUTION }
       }
 
-      // bubble-bubble collisions using SMALLER hitboxes so they can overlap a bit
       for (let i = 0; i < bubbles.length; i++) {
         for (let j = i + 1; j < bubbles.length; j++) {
           const a = bubbles[i]
@@ -122,32 +133,38 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
           const dy = b.y - a.y
           const dist = Math.hypot(dx, dy) || 0.0001
           const minDist = (a.r + b.r) * HITBOX_RATIO
+          
           if (dist < minDist) {
             const nx = dx / dist
             const ny = dy / dist
             const overlap = (minDist - dist) / 2
+            
             a.x -= nx * overlap
             a.y -= ny * overlap
             b.x += nx * overlap
             b.y += ny * overlap
-            // exchange velocity along the collision normal
+
             const dvx = b.vx - a.vx
             const dvy = b.vy - a.vy
             const rel = dvx * nx + dvy * ny
             if (rel < 0) {
               const imp = -(1 + RESTITUTION) * rel / 2
-              a.vx -= imp * nx; a.vy -= imp * ny
-              b.vx += imp * nx; b.vy += imp * ny
+              a.vx -= imp * nx
+              a.vy -= imp * ny
+              b.vx += imp * nx
+              b.vy += imp * ny
             }
           }
         }
       }
 
-      // paint via transform (cheap, no React re-render)
+      // Рендеринг
       for (let i = 0; i < bubbles.length; i++) {
         const node = nodesRef.current[i]
         const b = bubbles[i]
-        if (node) node.style.transform = `translate(${b.x - b.r}px, ${b.y - b.r}px)`
+        if (node) {
+          node.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0px)`
+        }
       }
 
       rafRef.current = requestAnimationFrame(step)
@@ -155,39 +172,59 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
 
     rafRef.current = requestAnimationFrame(step)
     return () => cancelAnimationFrame(rafRef.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventPhotos.length])
+  }, [initBubbles])
 
-  // Resize handling
+  // Слушатель ресайза
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
-    const ro = new ResizeObserver(() => {
-      const w = el.clientWidth
-      const h = el.clientHeight
+
+    const ro = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0) return
+      const { width: w, height: h } = entries[0].contentRect
       sizeRef.current = { w, h }
-      // keep bubbles inside new bounds
+      
       for (const b of bubblesRef.current) {
         b.x = Math.min(Math.max(b.x, b.r), w - b.r)
         b.y = Math.min(Math.max(b.y, b.r), h - b.r)
       }
     })
+    
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
-  // Pointer -> cursor repulsion
-  const handlePointer = (e: React.PointerEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
-    cursorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top, active: true }
-    downRef.current.moved = true
-  }
-  const handlePointerLeave = () => {
-    cursorRef.current.active = false
+    const currentX = e.clientX - rect.left
+    const currentY = e.clientY - rect.top
+    cursorRef.current = { x: currentX, y: currentY, active: true }
+
+    if (pointerStartRef.current.isDown) {
+      const distMoved = Math.hypot(currentX - pointerStartRef.current.x, currentY - pointerStartRef.current.y)
+      if (distMoved > 6) pointerStartRef.current.isDown = false 
+    }
   }
 
-  // Mobile: shake to scatter the bubbles
+  const handlePointerDown = (e: React.PointerEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const startX = e.clientX - rect.left
+    const startY = e.clientY - rect.top
+    pointerStartRef.current = { x: startX, y: startY, isDown: true }
+    cursorRef.current = { x: startX, y: startY, active: true }
+  }
+
+  const handleBubbleRelease = (photo: EventGuestPhoto | null) => {
+    if (pointerStartRef.current.isDown && photo) {
+      const idx = eventPhotos.findIndex((p) => p.id === photo.id)
+      if (idx !== -1) setLightboxIndex(idx)
+    }
+    pointerStartRef.current.isDown = false
+  }
+
+  // Акселерометр
   useEffect(() => {
     const onMotion = (e: DeviceMotionEvent) => {
       const acc = e.accelerationIncludingGravity
@@ -204,12 +241,12 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
     return () => window.removeEventListener('devicemotion', onMotion)
   }, [])
 
-  // iOS requires an explicit permission gesture for motion events
   const [needsMotionPerm, setNeedsMotionPerm] = useState(false)
   useEffect(() => {
     const DME = (window as unknown as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
     if (typeof DME?.requestPermission === 'function') setNeedsMotionPerm(true)
   }, [])
+
   const requestMotion = async () => {
     const DME = (window as unknown as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
     try {
@@ -218,56 +255,57 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
     } catch { /* ignore */ }
   }
 
-  const handleBubbleClick = (photo: EventGuestPhoto | null) => {
-    if (!photo) return
-    const idx = eventPhotos.findIndex((p) => p.id === photo.id)
-    if (idx !== -1) setLightboxIndex(idx)
-  }
-
   return (
     <>
-      <div className={cn('relative min-h-screen overflow-hidden', theme.background)}>
+      <div className={cn('relative min-h-screen overflow-hidden select-none', theme.background)}>
         <div
           ref={containerRef}
           className="absolute inset-0 touch-none"
-          onPointerMove={handlePointer}
-          onPointerDown={(e) => { downRef.current.moved = false; handlePointer(e) }}
-          onPointerLeave={handlePointerLeave}
+          onPointerMove={handlePointerMove}
+          onPointerDown={handlePointerDown}
+          onPointerLeave={() => { cursorRef.current.active = false; pointerStartRef.current.isDown = false }}
         >
           {items.map((photo, i) => {
-            const b = bubblesRef.current[i]
-            const r = b?.r ?? MIN_R
-            const hue = b?.hue ?? 200
+            // Используем гарантированные статические значения до того, как отработает useEffect
+            const { r, hue } = precalculatedStatic[i]
+            
             return (
               <div
                 key={photo?.id ?? i}
                 ref={(n) => { nodesRef.current[i] = n }}
-                className="absolute left-0 top-0 will-change-transform"
-                style={{ width: r * 2, height: r * 2 }}
+                // Скрываем видимость (`opacity-0`) в самую первую милисекунду на сервере, 
+                // чтобы не было вспышки перемещения из левого верхнего угла
+                className={cn("absolute left-0 top-0 will-change-transform transition-opacity duration-300", 
+                  isInitialized ? "opacity-100" : "opacity-0"
+                )}
+                style={{ 
+                  width: r * 2, 
+                  height: r * 2,
+                  // Первоначальное распределение, пока не завелся JS-движок
+                  transform: !isInitialized ? `translate(${r * 0.5 + i * 60}px, ${r * 0.5 + i * 40}px)` : undefined 
+                }}
               >
                 <button
-                  onPointerUp={() => { if (!downRef.current.moved) handleBubbleClick(photo) }}
+                  onPointerUp={() => handleBubbleRelease(photo)}
                   className="group relative block h-full w-full cursor-pointer rounded-full focus-visible:outline-none"
                   aria-label="Open photo"
                 >
-                  {photo ? (
-                    <span className="relative block h-full w-full overflow-hidden rounded-full">
+                  <span className="relative block h-full w-full overflow-hidden rounded-full">
+                    {photo ? (
                       <Image
                         src={getPhotoUrl(photo)}
                         alt=""
                         fill
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-110 pointer-events-none"
                         sizes={`${Math.round(r * 2)}px`}
                         unoptimized
                       />
-                    </span>
-                  ) : (
-                    <span className="relative block h-full w-full overflow-hidden rounded-full">
+                    ) : (
                       <PhotoPlaceholder index={i} w={r * 2} h={r * 2} />
-                    </span>
-                  )}
+                    )}
+                  </span>
 
-                  {/* glossy bubble skin: rim light + specular highlight */}
+                  {/* Скин мыльного пузыря */}
                   <span
                     className="pointer-events-none absolute inset-0 rounded-full"
                     style={{

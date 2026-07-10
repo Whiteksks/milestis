@@ -61,6 +61,12 @@ export default function FirebaseInitializer() {
         return
       }
 
+      if (user.isAnonymous) {
+        clearProfile()
+        void clearServerSession()
+        return
+      }
+
       // On token rotation — only refresh the server session cookie, keep UI state intact.
       void user.getIdToken().then(
         (idToken) => syncServerSession(idToken).then(setSessionSynced),

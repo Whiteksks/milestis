@@ -79,7 +79,7 @@ export default async function RootLayout({
         className={`${alice.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <FirebaseInitializer />
+        {!isPublishedSite && <FirebaseInitializer />}
 
         <ThemeProvider
           attribute="class"
