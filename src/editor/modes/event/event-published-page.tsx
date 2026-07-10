@@ -41,12 +41,15 @@ function getPhotoUrl(photo: ApprovedPhoto): string {
 
 interface EventPublishedPageProps {
   projectId: string
-  eventName: string
+  /** 'event-gallery' (default masonry) | 'event-film' (2-col portrait) */
+  templateId?: string
 }
 
-export function EventPublishedPage({ projectId, eventName }: EventPublishedPageProps) {
+export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: EventPublishedPageProps) {
+  const isFilm = templateId === 'event-film'
   const [uid, setUid] = useState<string | null>(null)
   const [authReady, setAuthReady] = useState(false)
+  const [authError, setAuthError] = useState(false)
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
   const [approvedPhotos, setApprovedPhotos] = useState<ApprovedPhoto[]>([])
@@ -87,7 +90,9 @@ export function EventPublishedPage({ projectId, eventName }: EventPublishedPageP
           const { user: anon } = await signInAnonymously(auth)
           setUid(anon.uid)
           setAuthReady(true)
+          setAuthError(false)
         } catch {
+          setAuthError(true)
           toast.error("Could not connect. Please refresh the page.")
         }
       }
@@ -207,14 +212,13 @@ export function EventPublishedPage({ projectId, eventName }: EventPublishedPageP
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col">
+    <main className="min-h-screen flex flex-col">
 
       {/* ── Header ── */}
-      <header className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur-sm px-4 py-3">
+      <header className="sticky top-0 z-10 border-b border-current/10 backdrop-blur-md px-4 py-3">
         <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="font-serif text-lg font-semibold truncate">{eventName}</h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs opacity-60">
               {approvedCount} / {maxPhotos} photos
             </p>
           </div>
@@ -252,7 +256,20 @@ export function EventPublishedPage({ projectId, eventName }: EventPublishedPageP
                 </svg>
               </div>
 
-              {!authReady ? (
+              {authError ? (
+                <>
+                  <p className="font-medium text-destructive">Connection failed</p>
+                  <p className="text-sm text-muted-foreground">Could not connect to the upload service.</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-1"
+                    onClick={() => window.location.reload()}
+                  >
+                    Retry
+                  </Button>
+                </>
+              ) : !authReady ? (
                 <p className="text-sm text-muted-foreground">Connecting…</p>
               ) : guestCount >= maxPhotosPerGuest ? (
                 <>
@@ -313,20 +330,38 @@ export function EventPublishedPage({ projectId, eventName }: EventPublishedPageP
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Gallery · {approvedCount} photo{approvedCount !== 1 ? "s" : ""}
             </h2>
-            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-              {approvedPhotos.map((photo) => (
-                <div key={photo.id} className="relative aspect-square overflow-hidden rounded-md bg-muted">
-                  <Image
-                    src={getPhotoUrl(photo)}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 33vw, 25vw"
-                    unoptimized
-                  />
-                </div>
-              ))}
-            </div>
+            {isFilm ? (
+              <div className="grid grid-cols-2 gap-px">
+                {approvedPhotos.map((photo) => (
+                  <div key={photo.id} className="relative aspect-[3/4] overflow-hidden">
+                    <Image
+                      src={getPhotoUrl(photo)}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="columns-2 gap-2 sm:columns-3 md:columns-4">
+                {approvedPhotos.map((photo) => (
+                  <div key={photo.id} className="mb-2 overflow-hidden rounded-sm">
+                    <Image
+                      src={getPhotoUrl(photo)}
+                      alt=""
+                      width={400}
+                      height={400}
+                      className="w-full object-cover"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
 

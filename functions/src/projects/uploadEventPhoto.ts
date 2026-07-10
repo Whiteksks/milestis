@@ -191,7 +191,9 @@ export const uploadEventPhoto = onRequest(
           maxPhotosPerGuest: number;
           approvedCount:     number;
           pendingCount:      number;
-        };
+        } | undefined;
+
+        if (!cfg) throw new Error(ERROR.EVENT_NOT_FOUND);
 
         // Authoritative checks inside the transaction
         if (cfg.approvedCount + cfg.pendingCount >= cfg.maxPhotos) {
@@ -235,13 +237,27 @@ export const uploadEventPhoto = onRequest(
       });
 
       // ── Generate signed PUT URL ──────────────────────────────────────
+      // NOTE: In Cloud Run (Functions v2) the compute service account must have
+      // the "Service Account Token Creator" IAM role to sign blobs.
+      // Grant it via Cloud Console → IAM → compute service account → add role.
       const bucket = getStorage().bucket();
-      const [uploadUrl] = await bucket.file(storageRef).getSignedUrl({
-        version:     "v4",
-        action:      "write",
-        expires:     Date.now() + SIGNED_URL_EXPIRY_MS,
-        contentType,
-      });
+      let uploadUrl: string;
+      try {
+        const result = await (bucket.file(storageRef) as { getSignedUrl(cfg: object): Promise<[string]> }).getSignedUrl({
+          version:  "v4",
+          action:   "write",
+          expires:  Date.now() + SIGNED_URL_EXPIRY_MS,
+          contentType,
+        });
+        uploadUrl = result[0];
+      } catch (signErr) {
+        logger.error("uploadEventPhoto: getSignedUrl failed — verify compute service account has Service Account Token Creator role", {
+          projectId,
+          storageRef,
+          signErr,
+        });
+        throw signErr;
+      }
 
       logger.info("Event upload URL issued", {
         projectId,

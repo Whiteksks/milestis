@@ -127,10 +127,10 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     useContentStore.setState({ eventPhotos: [] })
   },
 
-  renderPublished: ({ projectId }) => (
+  renderPublished: ({ projectId, templateId }) => (
     <EventPublishedPage
       projectId={projectId ?? ''}
-      eventName=""
+      templateId={templateId ?? 'event-gallery'}
     />
   ),
 
