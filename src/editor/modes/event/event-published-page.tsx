@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth"
@@ -6,7 +6,6 @@ import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "fire
 import Image from "next/image"
 import { toast } from "sonner"
 import { auth, db } from "@/lib/firebase"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 // ─── Constants ────────────────────────────────────────────────────────────
@@ -26,7 +25,6 @@ interface UploadItem {
   id: string
   name: string
   state: "uploading" | "pending" | "error"
-  errorMessage?: string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -43,24 +41,30 @@ interface EventPublishedPageProps {
   projectId: string
   /** 'event-gallery' (default masonry) | 'event-film' (2-col portrait) */
   templateId?: string
+  /** Tailwind background class from the active theme, e.g. "bg-white" */
+  themeBackground?: string
 }
 
-export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: EventPublishedPageProps) {
-  const isFilm = templateId === 'event-film'
+export function EventPublishedPage({
+  projectId,
+  templateId = "event-gallery",
+  themeBackground = "bg-white",
+}: EventPublishedPageProps) {
+  const isFilm = templateId === "event-film"
   const [uid, setUid] = useState<string | null>(null)
   const [authReady, setAuthReady] = useState(false)
   const [authError, setAuthError] = useState(false)
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
   const [approvedPhotos, setApprovedPhotos] = useState<ApprovedPhoto[]>([])
-  const [approvedCount, setApprovedCount] = useState(0)
   const [maxPhotos, setMaxPhotos] = useState(200)
   const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(5)
   const [uploads, setUploads] = useState<UploadItem[]>([])
-  const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const canUpload = authReady && guestCount < maxPhotosPerGuest && approvedCount < maxPhotos
+  const activeUploads = uploads.filter((u) => u.state === "uploading").length
+  const isFull = approvedPhotos.length >= maxPhotos
+  const quotaReached = guestCount >= maxPhotosPerGuest
 
   // ── Read access token from URL ──────────────────────────────────────────
   useEffect(() => {
@@ -122,13 +126,33 @@ export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: 
         storageRef: d.data().storageRef as string,
         thumbUrl: d.data().thumbUrl as string | undefined,
       })))
-      setApprovedCount(snap.size)
     })
   }, [projectId, authReady])
+
+  // ── Auto-clear finished upload tray items ──────────────────────────────
+  useEffect(() => {
+    const pendingIds = uploads.filter((u) => u.state === "pending").map((u) => u.id)
+    if (pendingIds.length === 0) return
+    const timer = setTimeout(() => {
+      setUploads((prev) => prev.filter((u) => !pendingIds.includes(u.id)))
+    }, 3500)
+    return () => clearTimeout(timer)
+  }, [uploads])
 
   // ── Upload logic ────────────────────────────────────────────────────────
   const uploadFile = useCallback(async (file: File) => {
     if (!uid || !accessToken) return
+
+    // Read file bytes into memory FIRST — before any async network calls.
+    // On iOS/mobile the File handle can become stale after awaiting getIdToken
+    // or the signed-URL fetch, causing the browser to crash the page.
+    let fileBuffer: ArrayBuffer
+    try {
+      fileBuffer = await file.arrayBuffer()
+    } catch {
+      toast.error(`${file.name}: could not read file.`)
+      return
+    }
 
     const itemId = crypto.randomUUID()
     setUploads((prev) => [...prev, { id: itemId, name: file.name, state: "uploading" }])
@@ -161,7 +185,7 @@ export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: 
       const putRes = await fetch(uploadUrl, {
         method: "PUT",
         headers: { "Content-Type": file.type },
-        body: file,
+        body: fileBuffer,
       })
 
       if (!putRes.ok) throw new Error("File transfer failed. Please try again.")
@@ -173,15 +197,16 @@ export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: 
       const message = err instanceof Error ? err.message : "Upload failed."
       toast.error(message)
       setUploads((prev) =>
-        prev.map((u) => (u.id === itemId ? { ...u, state: "error", errorMessage: message } : u)),
+        prev.map((u) => (u.id === itemId ? { ...u, state: "error" } : u)),
       )
     }
   }, [uid, accessToken, projectId])
 
   const handleFiles = useCallback((files: FileList | File[]) => {
     const fileArray = Array.from(files)
-    const remaining = maxPhotosPerGuest - guestCount - uploads.filter((u) => u.state !== "error").length
-    const toUpload = fileArray.slice(0, Math.max(0, remaining))
+    const inFlight = uploads.filter((u) => u.state !== "error").length
+    const remaining = Math.max(0, maxPhotosPerGuest - guestCount - inFlight)
+    const toUpload = fileArray.slice(0, remaining)
 
     for (const file of toUpload) {
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -200,178 +225,150 @@ export function EventPublishedPage({ projectId, templateId = 'event-gallery' }: 
     }
   }, [guestCount, maxPhotosPerGuest, uploads, uploadFile])
 
-  const onDragOver  = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true) }
-  const onDragLeave = () => setIsDragging(false)
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    if (canUpload) handleFiles(e.dataTransfer.files)
+  const onFabClick = () => {
+    if (!authReady) return
+    if (authError)    { toast.error("Connection failed. Please reload."); return }
+    if (isFull)       { toast.info("This event gallery is full."); return }
+    if (quotaReached) { toast.info(`You've already uploaded your ${maxPhotosPerGuest} photos.`); return }
+    fileInputRef.current?.click()
   }
-
-  const isFull = approvedCount >= maxPhotos
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className={cn("min-h-screen relative", themeBackground)}>
 
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-10 border-b border-current/10 backdrop-blur-md px-4 py-3">
-        <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs opacity-60">
-              {approvedCount} / {maxPhotos} photos
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 space-y-6">
-
-        {/* ── Upload zone ── */}
-        {isFull ? (
-          <div className="rounded-2xl border bg-muted/30 p-8 text-center">
-            <p className="font-medium">Event gallery is full</p>
-            <p className="mt-1 text-sm text-muted-foreground">All {maxPhotos} photo slots have been filled. Thank you!</p>
-          </div>
-        ) : (
-          <section>
-            <div
-              className={cn(
-                "rounded-2xl border-2 border-dashed transition-colors cursor-pointer",
-                "flex flex-col items-center justify-center gap-3 p-10 text-center",
-                isDragging
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/50 hover:bg-muted/30",
-                !canUpload && "pointer-events-none opacity-50",
-              )}
-              onClick={() => canUpload && fileInputRef.current?.click()}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            >
-              <div className="rounded-full bg-muted p-4">
-                <svg className="size-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-                </svg>
-              </div>
-
-              {authError ? (
-                <>
-                  <p className="font-medium text-destructive">Connection failed</p>
-                  <p className="text-sm text-muted-foreground">Could not connect to the upload service.</p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-1"
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </Button>
-                </>
-              ) : !authReady ? (
-                <p className="text-sm text-muted-foreground">Connecting…</p>
-              ) : guestCount >= maxPhotosPerGuest ? (
-                <>
-                  <p className="font-medium">You&apos;ve uploaded your {maxPhotosPerGuest} photos</p>
-                  <p className="text-sm text-muted-foreground">Thank you for contributing!</p>
-                </>
-              ) : (
-                <>
-                  <p className="font-medium">Tap to add photos</p>
-                  <p className="text-sm text-muted-foreground">
-                    {maxPhotosPerGuest - guestCount} upload{maxPhotosPerGuest - guestCount !== 1 ? "s" : ""} remaining for you
-                    &nbsp;·&nbsp; JPG, PNG, WebP or HEIC &nbsp;·&nbsp; max {MAX_FILE_SIZE_MB} MB
-                  </p>
-                  <Button size="sm" className="mt-1" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}>
-                    Choose photos
-                  </Button>
-                </>
-              )}
+      {/* ── Gallery — mirrors template layout exactly ── */}
+      {isFilm ? (
+        <div className="p-1">
+          {approvedPhotos.length === 0 ? (
+            <EmptyState onFabClick={onFabClick} />
+          ) : (
+            <div className="grid grid-cols-2 gap-px">
+              {approvedPhotos.map((photo) => (
+                <div key={photo.id} className="relative aspect-[3/4] overflow-hidden">
+                  <Image
+                    src={getPhotoUrl(photo)}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                    unoptimized
+                  />
+                </div>
+              ))}
             </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={ALLOWED_TYPES.join(",")}
-              multiple
-              className="sr-only"
-              onChange={(e) => e.target.files && handleFiles(e.target.files)}
-            />
-          </section>
-        )}
-
-        {/* ── Upload queue ── */}
-        {uploads.length > 0 && (
-          <section className="space-y-2">
-            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your uploads</h2>
-            {uploads.map((u) => (
-              <div key={u.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">
-                <span className={cn(
-                  "size-2 shrink-0 rounded-full",
-                  u.state === "uploading" && "animate-pulse bg-blue-500",
-                  u.state === "pending"   && "bg-amber-400",
-                  u.state === "error"     && "bg-destructive",
-                )} />
-                <span className="min-w-0 flex-1 truncate text-foreground">{u.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {u.state === "uploading" && "Uploading…"}
-                  {u.state === "pending"   && "Under review"}
-                  {u.state === "error"     && "Failed"}
-                </span>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {/* ── Approved gallery ── */}
-        {approvedPhotos.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Gallery · {approvedCount} photo{approvedCount !== 1 ? "s" : ""}
-            </h2>
-            {isFilm ? (
-              <div className="grid grid-cols-2 gap-px">
-                {approvedPhotos.map((photo) => (
-                  <div key={photo.id} className="relative aspect-[3/4] overflow-hidden">
+          )}
+        </div>
+      ) : (
+        <div className="px-4 py-4">
+          {approvedPhotos.length === 0 ? (
+            <EmptyState onFabClick={onFabClick} />
+          ) : (
+            <div className="columns-2 gap-2 sm:columns-3 md:columns-4">
+              {approvedPhotos.map((photo) => (
+                <div key={photo.id} className="mb-2 overflow-hidden rounded-md break-inside-avoid">
+                  <div className="relative aspect-square w-full">
                     <Image
                       src={getPhotoUrl(photo)}
                       alt=""
                       fill
                       className="object-cover"
-                      sizes="(max-width: 640px) 50vw, 33vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       unoptimized
                     />
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="columns-2 gap-2 sm:columns-3 md:columns-4">
-                {approvedPhotos.map((photo) => (
-                  <div key={photo.id} className="mb-2 overflow-hidden rounded-sm">
-                    <Image
-                      src={getPhotoUrl(photo)}
-                      alt=""
-                      width={400}
-                      height={400}
-                      className="w-full object-cover"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                      unoptimized
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Upload tray — floats above the FAB, only when there are uploads ── */}
+      {uploads.length > 0 && (
+        <div className="fixed right-4 z-50 flex flex-col gap-1.5 items-end" style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
+          {uploads.map((u) => (
+            <div
+              key={u.id}
+              className="flex items-center gap-2 rounded-full border bg-background/90 backdrop-blur-sm px-3 py-1.5 text-xs shadow-md max-w-[200px]"
+            >
+              <span className={cn(
+                "size-1.5 shrink-0 rounded-full",
+                u.state === "uploading" && "animate-pulse bg-blue-500",
+                u.state === "pending"   && "bg-amber-400",
+                u.state === "error"     && "bg-destructive",
+              )} />
+              <span className="truncate text-foreground">{u.name}</span>
+              <span className="shrink-0 text-muted-foreground">
+                {u.state === "uploading" && "…"}
+                {u.state === "pending"   && "✓"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Camera FAB ── */}
+      <button
+        type="button"
+        aria-label="Upload photos"
+        onClick={onFabClick}
+        style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
+        className={cn(
+          "fixed right-6 z-50",
+          "size-14 rounded-full shadow-lg",
+          "flex items-center justify-center",
+          "bg-foreground text-background transition-opacity",
+          !authReady && "opacity-60",
+        )}
+      >
+        {!authReady ? (
+          <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          </svg>
+        ) : (
+          <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+          </svg>
         )}
 
-        {approvedPhotos.length === 0 && uploads.length === 0 && !isFull && (
-          <p className="text-center text-sm text-muted-foreground py-4">
-            No photos yet. Be the first to add one!
-          </p>
+        {/* Active uploads badge */}
+        {activeUploads > 0 && (
+          <span className="absolute -top-1 -right-1 size-5 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center">
+            {activeUploads}
+          </span>
         )}
+      </button>
 
-      </div>
+      {/* ── Hidden file input ── */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={ALLOWED_TYPES.join(",")}
+        multiple
+        className="sr-only"
+        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+      />
+
     </main>
+  )
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────
+
+function EmptyState({ onFabClick }: { onFabClick: () => void }) {
+  return (
+    <div
+      className="flex min-h-[60vh] flex-col items-center justify-center gap-3 cursor-pointer select-none"
+      onClick={onFabClick}
+    >
+      <svg className="size-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+      </svg>
+      <p className="text-sm opacity-40">Tap to add the first photo</p>
+    </div>
   )
 }
