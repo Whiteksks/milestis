@@ -14,10 +14,10 @@ function getPhotoUrl(photo: EventGuestPhoto): string {
   return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(photo.storageRef)}?alt=media`
 }
 
-const MAX_BUBBLES = 40
+const MAX_BUBBLES = 30
 const MIN_R = 48
 const MAX_R = 82
-const HITBOX_RATIO = 0.78
+const HITBOX_RATIO = 0.65
 const CURSOR_RADIUS = 170
 const CURSOR_FORCE = 2600
 const FRICTION = 0.94
@@ -58,9 +58,14 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
 
   const items = eventPhotos.length > 0 ? eventPhotos.slice(0, MAX_BUBBLES) : Array<null>(7).fill(null)
 
+  // Чем больше пузырей — тем меньше радиус (scale от 1.0 при 5 до 0.65 при MAX_BUBBLES)
+  const radiusScale = Math.max(0.65, 1 - (items.length - 5) * 0.025)
+  const dynMinR = MIN_R * radiusScale
+  const dynMaxR = MAX_R * radiusScale
+
   // Предварительно рассчитываем стабильные радиусы и цвета
   const precalculatedStatic = items.map((_, i) => {
-    const r = MIN_R + seeded(i, 1) * (MAX_R - MIN_R)
+    const r = dynMinR + seeded(i, 1) * (dynMaxR - dynMinR)
     const hue = Math.round(seeded(i, 6) * 360)
     return { r, hue }
   })

@@ -141,8 +141,11 @@ export function PhotoLightbox({ photos, index, onClose, onPrev, onNext }: PhotoL
 
             {/* Счетчик */}
             {photos.length > 1 && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 rounded-full bg-black/50 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm tabular-nums tracking-wider">
-                {index + 1} / {photos.length}
+              <div
+                key={`counter-${index}`}
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 rounded-full bg-black/50 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm tabular-nums tracking-wider"
+              >
+                {(index ?? 0) + 1} / {photos.length}
               </div>
             )}
           </div>
