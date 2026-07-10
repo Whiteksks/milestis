@@ -74,9 +74,10 @@ async function resizeEventPhoto(
       .toFormat("webp", { quality: 85 })
       .toFile(tmpFull);
 
+    // folder = events/{projectId}/{photoId} — files land in the same photo folder
     const [thumbUrl, fullUrl] = await Promise.all([
-      uploadResized(bucketName, tmpThumb, `${folder}/${photoId}-thumb.webp`, "image/webp"),
-      uploadResized(bucketName, tmpFull,  `${folder}/${photoId}-full.webp`,  "image/webp"),
+      uploadResized(bucketName, tmpThumb, `${folder}/thumb.webp`, "image/webp"),
+      uploadResized(bucketName, tmpFull,  `${folder}/full.webp`,  "image/webp"),
     ]);
 
     return { thumbUrl, fullUrl };
@@ -105,15 +106,17 @@ export const processEventPhotos = onObjectFinalized(
     if (!filePath?.startsWith("events/")) return;
 
     const parts = filePath.split("/");
-    if (parts.length !== 3) return;
+    // Expect: events/{projectId}/{photoId}/original.{ext}
+    if (parts.length !== 4) return;
 
     const projectId = parts[1];
-    const fileName  = parts[2];
-    const dotIndex  = fileName.lastIndexOf(".");
-    const photoId   = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName;
+    const photoId   = parts[2];
+    const fileName  = parts[3];
 
-    // Ignore files we generated ourselves (thumb / full variants)
-    if (photoId.endsWith("-thumb") || photoId.endsWith("-full")) return;
+    // Ignore files we generated ourselves (thumb.webp / full.webp)
+    if (fileName === "thumb.webp" || fileName === "full.webp") return;
+    // Only process the original upload
+    if (!fileName.startsWith("original.")) return;
 
     // ── Idempotency ───────────────────────────────────────────────────────
     const projectRef = db.collection("projects").doc(projectId);

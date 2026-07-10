@@ -6,6 +6,7 @@ import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
+import { MODE_REGISTRY } from "@/editor/lib/modes"
 import type { MobileEditorTab } from "@/editor/lib/config/editor-tabs"
 
 import { MobileSnapSheet, type MobileSnapSheetRenderProps } from "./mobile-snap-sheet"
@@ -27,7 +28,7 @@ const FULL_SNAP_INDEX = 2
 const CONTENT_FADE = { duration: 0.16, ease: "linear" } as const
 const PANEL_SWITCH_FADE = { duration: 0.14, ease: "easeOut" } as const
 
-const TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
+const ALL_TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
   { id: "sections",     icon: Layers,        label: "Sections"   },
   { id: "background",   icon: Paintbrush,    label: "Background" },
   { id: "decorations",  icon: Sparkles,      label: "Decor"      },
@@ -135,10 +136,12 @@ const SheetNav = memo(function SheetNav({
   activeTab,
   onTabPress,
   dragHandleProps,
+  tabs,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
   dragHandleProps: MobileSnapSheetRenderProps["dragHandleProps"]
+  tabs: typeof ALL_TABS
 }) {
   return (
     // Entire nav area is the drag surface — tabs stop propagation individually
@@ -153,8 +156,11 @@ const SheetNav = memo(function SheetNav({
       </div>
 
       {/* Tab bar */}
-      <div className="mb-2 grid h-12 shrink-0 grid-cols-4 pb-2 items-center justify-items-center">
-        {TABS.map((tab) => (
+      <div
+        className="mb-2 shrink-0 grid h-12 pb-2 items-center justify-items-center"
+        style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
+      >
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             aria-label={tab.label}
@@ -246,6 +252,21 @@ export function MobileEditorSheet({
   const openDesignModal = useUiSelector((state) => state.openDesignModal)
   const designModalSection = useUiSelector((state) => state.designModalSection)
   const setSelectedDecorationId = useUiSelector((state) => state.setSelectedDecorationId)
+  const editorMode = useUiSelector((state) => state.editorMode)
+
+  const tabs = useMemo(() => {
+    const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
+    return hideSections ? ALL_TABS.filter((t) => t.id !== 'sections') : ALL_TABS
+  }, [editorMode])
+
+  // If sections tab becomes hidden while active, redirect to background
+  useEffect(() => {
+    const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
+    if (hideSections && activeTab === 'sections') {
+      onTabChange('background')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorMode])
 
   // Collapse to nav when design tab is active (it opens a modal instead)
   useEffect(() => {
@@ -294,6 +315,7 @@ export function MobileEditorSheet({
             activeTab={activeTab}
             onTabPress={handleTabPress}
             dragHandleProps={dragHandleProps}
+            tabs={tabs}
           />
           <SheetBody
             mode={mode}

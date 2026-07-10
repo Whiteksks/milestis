@@ -148,12 +148,11 @@ service cloud.firestore {
     // ─── Event photos ─────────────────────────────────────────────────────
     // Subcollection: projects/{projectId}/eventPhotos/{photoId}
     //
-    // Any Firebase-authenticated user (including anonymous sign-in) may read,
-    // so the guest gallery can show approved photos. Writes are handled
-    // exclusively by the uploadEventPhoto Cloud Function (Admin SDK) which
-    // enforces per-event and per-guest quota limits before writing.
+    // Anyone may read approved event photos — the gallery is public by design.
+    // Writes are handled exclusively by the uploadEventPhoto Cloud Function
+    // (Admin SDK) which enforces per-event and per-guest quota limits.
     match /projects/{projectId}/eventPhotos/{photoId} {
-      allow read: if request.auth != null;
+      allow read: if true;
       allow write: if false;
     }
 

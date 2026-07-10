@@ -108,6 +108,8 @@ export interface ModeUiConfig {
   hideMediaButton?: boolean
   /** When true, the Preview button is hidden in the editor header for this mode. */
   hidePreviewButton?: boolean
+  /** When true, the Sections tab is hidden from the sidebar and mobile sheet for this mode. */
+  hideSectionsTab?: boolean
 }
 
 export type ResolvedModeUiConfig = Omit<

@@ -175,7 +175,7 @@ export const uploadEventPhoto = onRequest(
 
       const photoId   = randomUUID();
       const ext       = ALLOWED_MIME_TYPES[contentType];
-      const storageRef = `events/${projectId}/${photoId}.${ext}`;
+      const storageRef = `events/${projectId}/${photoId}/original.${ext}`;
       const originalFileName = fileName ?? `photo.${ext}`;
 
       await db.runTransaction(async (tx) => {

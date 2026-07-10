@@ -2,6 +2,7 @@
 
 import { memo, useMemo, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -63,6 +64,28 @@ const statusStyles = {
   published: "bg-primary/10 text-primary",
 }
 
+// ─── Event thumbnail ──────────────────────────────────────────────────────
+
+function EventThumbnail({ heroImageUrl, approvedCount }: { heroImageUrl?: string; approvedCount: number }) {
+  const extra = approvedCount - 1
+  return (
+    <>
+      {heroImageUrl ? (
+        <Image src={heroImageUrl} alt="" fill className="object-cover" unoptimized />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Camera className="size-8 opacity-20" />
+        </div>
+      )}
+      {extra > 0 && (
+        <span className="absolute bottom-2 right-2 rounded-full bg-background/80 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium">
+          +{extra}
+        </span>
+      )}
+    </>
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────
 
 interface ProjectCardProps {
@@ -101,7 +124,12 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   })
 
   const thumbnail = useMemo(
-    () => (
+    () => project.mode === 'event' ? (
+      <EventThumbnail
+        heroImageUrl={project.preview?.heroImageUrl}
+        approvedCount={project.eventConfig?.approvedCount ?? 0}
+      />
+    ) : (
       <TemplatePreview
         themeId={project.preview?.themeId}
         templateId={project.preview?.templateId}
@@ -116,15 +144,17 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
       />
     ),
     [
+      project.mode,
+      project.preview?.heroImageUrl,
       project.preview?.themeId,
       project.preview?.templateId,
-      project.preview?.heroImageUrl,
       project.preview?.title,
       project.preview?.subtitle,
       project.preview?.date,
       project.preview?.aspectRatio,
       project.preview?.frameStyle,
       project.preview?.cropData,
+      project.eventConfig?.approvedCount,
       zoom,
     ]
   )

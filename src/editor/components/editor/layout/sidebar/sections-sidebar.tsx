@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
@@ -35,13 +35,26 @@ export function SectionsSidebar({
   }))
 
   const tabs = useMemo(
-    () => [
-      { id: 'sections' as const, icon: Layers, label: getModeUiConfig(editorMode, translate).sectionsTabLabel },
-      { id: 'background' as const, icon: WandSparkles, label: t('sidebar.background') },
-      { id: 'decorations' as const, icon: Sparkles, label: t('sidebar.decorations') },
-    ],
+    () => {
+      const cfg = getModeUiConfig(editorMode, translate)
+      const all = [
+        { id: 'sections' as const, icon: Layers, label: cfg.sectionsTabLabel },
+        { id: 'background' as const, icon: WandSparkles, label: t('sidebar.background') },
+        { id: 'decorations' as const, icon: Sparkles, label: t('sidebar.decorations') },
+      ]
+      return cfg.hideSectionsTab ? all.filter((tab) => tab.id !== 'sections') : all
+    },
     [editorMode, t, translate],
   )
+
+  // If the sections tab becomes hidden while it's active, redirect to background
+  useEffect(() => {
+    const cfg = getModeUiConfig(editorMode, translate)
+    if (cfg.hideSectionsTab && activeTab === 'sections') {
+      onTabChange('background')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorMode])
 
   const handleTabChange = (tab: DesktopEditorTab) => {
     onTabChange(tab)

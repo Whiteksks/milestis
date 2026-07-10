@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase'
 import { useUiSelector, useThemeSelector } from '@/editor/lib/store'
 import { useContentStore } from '@/editor/lib/store/content'
 import { getTheme } from '@/editor/lib/config/themes'
+import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
 import type { EventGuestPhoto } from '@/editor/modes/event/content-types'
 
@@ -33,8 +34,15 @@ export function EventTemplateShell({ Design }: EventTemplateShellProps) {
   const eventPhotos    = useContentStore((s) => s.eventPhotos)
   const setEventPhotos = useContentStore((s) => s.setEventPhotos)
 
-  const currentTheme = useThemeSelector((s) => s.currentTheme)
+  const { currentTheme, themeCustomizations } = useThemeSelector((s) => ({
+    currentTheme:        s.currentTheme,
+    themeCustomizations: s.themeCustomizations,
+  }))
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
+
+  const mood       = themeCustomizations.photobookMood    ?? 'none'
+  const texture    = themeCustomizations.photobookTexture ?? 'none'
+  const moodFilter = getMoodFilter(mood)
 
   // Sync approved photos from Firestore into the store
   useEffect(() => {
@@ -51,6 +59,8 @@ export function EventTemplateShell({ Design }: EventTemplateShellProps) {
         id:         d.id,
         storageRef: d.data().storageRef as string,
         uploadedAt: (d.data().uploadedAt?.toMillis?.() as number | undefined) ?? null,
+        thumbUrl:   d.data().thumbUrl   as string | undefined,
+        fullUrl:    d.data().fullUrl    as string | undefined,
       }))
       setEventPhotos(photos)
     })
@@ -59,9 +69,15 @@ export function EventTemplateShell({ Design }: EventTemplateShellProps) {
   }, [projectId, setEventPhotos])
 
   return (
-    <Design
-      theme={theme}
-      eventPhotos={eventPhotos}
-    />
+    <div
+      className="relative overflow-hidden"
+      style={moodFilter !== 'none' ? { filter: moodFilter } : undefined}
+    >
+      <Design
+        theme={theme}
+        eventPhotos={eventPhotos}
+      />
+      <PhotobookTextureOverlay texture={texture} />
+    </div>
   )
 }

@@ -14,6 +14,7 @@ import { EventTemplateShell } from './event-template-shell'
 import { EventGalleryCover } from './templates/sections/event-gallery-cover'
 import { EventFilmCover } from './templates/sections/event-film-cover'
 import { EventPublishedPage } from './event-published-page'
+import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 
 // ─── Template dynamic imports ─────────────────────────────────────────────────
 
@@ -47,10 +48,13 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     backgroundCatalogTitleKey:       'editor.event.ui.backgroundCatalogTitle',
     backgroundCatalogMobileIcon:     Images,
     backgroundCatalogMobileLabelKey: 'editor.event.ui.backgroundCatalogMobileLabel',
-    getActiveEffectsCount: () => 0,
-    resetEffects: () => {},
+    getActiveEffectsCount: (c) =>
+      [c.photobookMood, c.photobookTexture].filter((v) => v && v !== 'none').length,
+    resetEffects: (update) =>
+      update({ photobookMood: 'none', photobookTexture: 'none' }),
     hideMediaButton:   true,
     hidePreviewButton: true,
+    hideSectionsTab:   true,
   },
 
   createSlice: createEventSlice,
@@ -105,11 +109,14 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     imageContent:      null,
   }),
 
-  extractPreviewMeta: (store) => ({
-    heroThumbUrl: store.eventPhotos[0]
-      ? `https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? ''}/o/${encodeURIComponent(store.eventPhotos[0].storageRef)}?alt=media`
-      : undefined,
-  }),
+  extractPreviewMeta: (store) => {
+    const firstPhoto = store.eventPhotos[0]
+    const heroThumbUrl = firstPhoto?.thumbUrl
+      ?? (firstPhoto
+        ? `https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? ''}/o/${encodeURIComponent(firstPhoto.storageRef)}?alt=media`
+        : undefined)
+    return { heroThumbUrl }
+  },
 
   hydrateStore: (savedContent) => {
     if (savedContent) {
@@ -127,13 +134,23 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     useContentStore.setState({ eventPhotos: [] })
   },
 
-  renderPublished: ({ projectId, templateId, theme }) => (
-    <EventPublishedPage
-      projectId={projectId ?? ''}
-      templateId={templateId ?? 'event-gallery'}
-      themeBackground={theme?.background}
-    />
-  ),
+  renderPublished: ({ projectId, templateId, themeCustomizations }) => {
+    const mood       = themeCustomizations?.photobookMood    ?? 'none'
+    const texture    = themeCustomizations?.photobookTexture ?? 'none'
+    const moodFilter = getMoodFilter(mood)
+    return (
+      <div
+        className="relative overflow-hidden"
+        style={moodFilter !== 'none' ? { filter: moodFilter } : undefined}
+      >
+        <EventPublishedPage
+          projectId={projectId ?? ''}
+          templateId={templateId ?? 'event-gallery'}
+        />
+        <PhotobookTextureOverlay texture={texture} />
+      </div>
+    )
+  },
 
   visibilitySelector: (s) => s.eventSectionVisibility,
   toggleSelector:     (s) => s.toggleEventSection,

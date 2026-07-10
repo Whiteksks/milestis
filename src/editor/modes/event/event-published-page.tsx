@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { onAuthStateChanged, signInAnonymously } from "firebase/auth"
+import { signInAnonymously } from "firebase/auth"
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -41,19 +41,15 @@ interface EventPublishedPageProps {
   projectId: string
   /** 'event-gallery' (default masonry) | 'event-film' (2-col portrait) */
   templateId?: string
-  /** Tailwind background class from the active theme, e.g. "bg-white" */
-  themeBackground?: string
 }
 
 export function EventPublishedPage({
   projectId,
   templateId = "event-gallery",
-  themeBackground = "bg-white",
 }: EventPublishedPageProps) {
   const isFilm = templateId === "event-film"
   const [uid, setUid] = useState<string | null>(null)
-  const [authReady, setAuthReady] = useState(false)
-  const [authError, setAuthError] = useState(false)
+  const [authState, setAuthState] = useState<"idle" | "signing-in" | "ready" | "error">("idle")
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
   const [approvedPhotos, setApprovedPhotos] = useState<ApprovedPhoto[]>([])
@@ -83,26 +79,6 @@ export function EventPublishedPage({
     }).catch(() => { /* use defaults */ })
   }, [projectId])
 
-  // ── Anonymous auth ──────────────────────────────────────────────────────
-  useEffect(() => {
-    return onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUid(user.uid)
-        setAuthReady(true)
-      } else {
-        try {
-          const { user: anon } = await signInAnonymously(auth)
-          setUid(anon.uid)
-          setAuthReady(true)
-          setAuthError(false)
-        } catch {
-          setAuthError(true)
-          toast.error("Could not connect. Please refresh the page.")
-        }
-      }
-    })
-  }, [])
-
   // ── Guest upload quota ──────────────────────────────────────────────────
   useEffect(() => {
     if (!uid || !projectId) return
@@ -112,9 +88,9 @@ export function EventPublishedPage({
     )
   }, [uid, projectId])
 
-  // ── Real-time approved gallery ──────────────────────────────────────────
+  // ── Real-time approved gallery (public — no auth required) ───────────────
   useEffect(() => {
-    if (!authReady || !projectId) return
+    if (!projectId) return
     const q = query(
       collection(db, "projects", projectId, "eventPhotos"),
       where("status", "==", "approved"),
@@ -127,7 +103,7 @@ export function EventPublishedPage({
         thumbUrl: d.data().thumbUrl as string | undefined,
       })))
     })
-  }, [projectId, authReady])
+  }, [projectId])
 
   // ── Auto-clear finished upload tray items ──────────────────────────────
   useEffect(() => {
@@ -225,17 +201,33 @@ export function EventPublishedPage({
     }
   }, [guestCount, maxPhotosPerGuest, uploads, uploadFile])
 
-  const onFabClick = () => {
-    if (!authReady) return
-    if (authError)    { toast.error("Connection failed. Please reload."); return }
+  const onFabClick = async () => {
+    if (authState === "signing-in") return
+    if (authState === "error") { toast.error("Connection failed. Please reload."); return }
     if (isFull)       { toast.info("This event gallery is full."); return }
     if (quotaReached) { toast.info(`You've already uploaded your ${maxPhotosPerGuest} photos.`); return }
+
+    if (authState === "idle") {
+      // Lazy sign-in — only happens when the user actually wants to upload
+      setAuthState("signing-in")
+      try {
+        const { user } = await signInAnonymously(auth)
+        setUid(user.uid)
+        setAuthState("ready")
+        // Fall through to open file picker immediately after auth
+      } catch {
+        setAuthState("error")
+        toast.error("Could not connect. Please refresh the page.")
+        return
+      }
+    }
+
     fileInputRef.current?.click()
   }
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <main className={cn("min-h-screen relative", themeBackground)}>
+    <main className="min-h-screen relative">
 
       {/* ── Gallery — mirrors template layout exactly ── */}
       {isFilm ? (
@@ -319,10 +311,10 @@ export function EventPublishedPage({
           "size-14 rounded-full shadow-lg",
           "flex items-center justify-center",
           "bg-foreground text-background transition-opacity",
-          !authReady && "opacity-60",
+          authState === "signing-in" && "opacity-60",
         )}
       >
-        {!authReady ? (
+        {authState === "signing-in" ? (
           <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
