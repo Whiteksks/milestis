@@ -79,7 +79,8 @@ export function ThemeSettingsPanel() {
   }))
 
   const editorMode = useUiSelector((state) => state.editorMode)
-  const isPhotobook = editorMode === 'photobook'
+  // Event mode uses the same mood/texture effects as photobook
+  const isPhotobook = editorMode === 'photobook' || editorMode === 'event'
   const modeConfig = getModeUiConfig(editorMode, translate)
 
   const {

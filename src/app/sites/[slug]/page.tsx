@@ -53,9 +53,11 @@ async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") 
 /**
  * Lookup for token-namespace modes (photobook, event).
  * The reservation doc ID is sha256(accessToken), not mode:slug.
- * We verify the slug in the URL matches what was published (cosmetic check).
+ * The middleware cannot distinguish photobook vs event slugs without a DB call,
+ * so we do NOT validate against the header mode here — instead we trust the
+ * mode stored on the published_projects document itself (token-namespace modes only).
  */
-async function getPublishedProjectByToken(slug: string, mode: "photobook" | "event", plainToken: string) {
+async function getPublishedProjectByToken(slug: string, plainToken: string) {
   const hashedToken = createHash("sha256").update(plainToken).digest("hex")
 
   const slugSnap = await adminDb
@@ -72,13 +74,15 @@ async function getPublishedProjectByToken(slug: string, mode: "photobook" | "eve
   if (!doc.exists) return null
 
   const data = doc.data()
-  if (!data || data.isPublished !== true || data.mode !== mode) return null
+  // Accept any token-namespace mode; reject non-token-namespace modes (e.g. portfolio)
+  const docMode = data?.mode as string | undefined
+  if (!data || data.isPublished !== true || !docMode || !['photobook', 'event'].includes(docMode)) return null
 
   return {
     id: doc.id,
     slug: (data.slug as string | undefined) ?? slug,
     name: data.name as string,
-    mode: data.mode as "photobook" | "event",
+    mode: docMode as "photobook" | "event",
     content: data.content ?? null,
     theme: data.theme ?? null,
     ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
@@ -154,7 +158,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const tokenString = Array.isArray(share) ? share[0] : share
 
   if (tokenString) {
-    const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
+    const project = await getPublishedProjectByToken(slug, tokenString)
     if (project) {
       const title = project.name
       const ogImageSrc =
@@ -222,18 +226,19 @@ export default async function SitePage({ params, searchParams }: Props) {
     return <TokenGateForm slug={slug} />
   }
 
-  const project = await getPublishedProjectByToken(slug, mode as "photobook", tokenString)
+  const project = await getPublishedProjectByToken(slug, tokenString)
   if (!project) {
     // Token is wrong or project doesn't exist — show gate again
     return <TokenGateForm slug={slug} />
   }
 
-  // Token verified — render project
+  // Token verified — render project using the mode stored in the document
+  // (may differ from the header mode if middleware can't distinguish photobook vs event)
   const content = project.content ?? {}
   const theme = project.theme ?? {}
   return (
     <PublishedView
-      mode={mode}
+      mode={project.mode}
       templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[mode].defaultTemplateId}
       themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
       themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
