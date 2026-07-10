@@ -173,7 +173,7 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
     useContentStore.setState({ eventPhotos: [] })
   },
 
-  renderPublished: ({ projectId, templateId, themeCustomizations }) => {
+  renderPublished: ({ projectId, templateId, themeCustomizations, theme }) => {
     const mood       = themeCustomizations?.photobookMood    ?? 'none'
     const texture    = themeCustomizations?.photobookTexture ?? 'none'
     const moodFilter = getMoodFilter(mood)
@@ -185,6 +185,7 @@ export const eventMode: ModeRegistryEntry<keyof EventSectionVisibility> = {
         <EventPublishedPage
           projectId={projectId ?? ''}
           templateId={templateId ?? 'event-gallery'}
+          theme={theme}
         />
         <PhotobookTextureOverlay texture={texture} />
       </div>

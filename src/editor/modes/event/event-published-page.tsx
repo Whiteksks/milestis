@@ -1,12 +1,46 @@
 ﻿"use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import dynamic from "next/dynamic"
 import { signInAnonymously } from "firebase/auth"
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore"
-import Image from "next/image"
 import { toast } from "sonner"
 import { auth, db } from "@/lib/firebase"
 import { cn } from "@/lib/utils"
+import type { ThemeConfig } from "@/editor/lib/config/themes"
+import type { EventTemplateProps } from "@/editor/lib/template-types"
+import type { EventGuestPhoto } from "./content-types"
+
+// ─── Template components (loaded lazily per-template) ────────────────────────
+
+const TemplateEventFilm = dynamic(
+  () => import('./templates/template-event-film').then((m) => m.TemplateEventFilm),
+  { ssr: false },
+)
+const TemplateEventCosmos = dynamic(
+  () => import('./templates/template-event-cosmos').then((m) => m.TemplateEventCosmos),
+  { ssr: false },
+)
+const TemplateEventParallax = dynamic(
+  () => import('./templates/template-event-parallax').then((m) => m.TemplateEventParallax),
+  { ssr: false },
+)
+const TemplateEventBubbles = dynamic(
+  () => import('./templates/template-event-bubbles').then((m) => m.TemplateEventBubbles),
+  { ssr: false },
+)
+const TemplateEventCoverflow = dynamic(
+  () => import('./templates/template-event-coverflow').then((m) => m.TemplateEventCoverflow),
+  { ssr: false },
+)
+
+const TEMPLATE_MAP: Record<string, React.ComponentType<EventTemplateProps>> = {
+  'event-film':      TemplateEventFilm,
+  'event-cosmos':    TemplateEventCosmos,
+  'event-parallax':  TemplateEventParallax,
+  'event-bubbles':   TemplateEventBubbles,
+  'event-coverflow': TemplateEventCoverflow,
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -15,44 +49,30 @@ const MAX_FILE_SIZE_MB = 20
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
-interface ApprovedPhoto {
-  id: string
-  storageRef: string
-  thumbUrl?: string
-}
-
 interface UploadItem {
   id: string
   name: string
   state: "uploading" | "pending" | "error"
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-
-function getPhotoUrl(photo: ApprovedPhoto): string {
-  if (photo.thumbUrl) return photo.thumbUrl
-  const bucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? ""
-  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(photo.storageRef)}?alt=media`
-}
-
 // ─── Component ────────────────────────────────────────────────────────────
 
 interface EventPublishedPageProps {
   projectId: string
-  /** 'event-gallery' (default masonry) | 'event-film' (2-col portrait) */
   templateId?: string
+  theme: ThemeConfig
 }
 
 export function EventPublishedPage({
   projectId,
   templateId = "event-gallery",
+  theme,
 }: EventPublishedPageProps) {
-  const isFilm = templateId === "event-film"
   const [uid, setUid] = useState<string | null>(null)
   const [authState, setAuthState] = useState<"idle" | "signing-in" | "ready" | "error">("idle")
   const [accessToken, setAccessToken] = useState<string>("")
   const [guestCount, setGuestCount] = useState(0)
-  const [approvedPhotos, setApprovedPhotos] = useState<ApprovedPhoto[]>([])
+  const [approvedPhotos, setApprovedPhotos] = useState<EventGuestPhoto[]>([])
   const [maxPhotos, setMaxPhotos] = useState(100)
   const [maxPhotosPerGuest, setMaxPhotosPerGuest] = useState(2)
   const [uploads, setUploads] = useState<UploadItem[]>([])
@@ -100,7 +120,9 @@ export function EventPublishedPage({
       setApprovedPhotos(snap.docs.map((d) => ({
         id: d.id,
         storageRef: d.data().storageRef as string,
+        uploadedAt: (d.data().uploadedAt?.toMillis?.() as number | undefined) ?? null,
         thumbUrl: d.data().thumbUrl as string | undefined,
+        fullUrl: d.data().fullUrl as string | undefined,
       })))
     })
   }, [projectId])
@@ -225,56 +247,14 @@ export function EventPublishedPage({
     fileInputRef.current?.click()
   }
 
+  // ── Resolve template component ──────────────────────────────────────────
+  const TemplateComponent = TEMPLATE_MAP[templateId] ?? TemplateEventCoverflow
+
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen relative">
-
-      {/* ── Gallery — mirrors template layout exactly ── */}
-      {isFilm ? (
-        <div className="p-1">
-          {approvedPhotos.length === 0 ? (
-            <EmptyState onFabClick={onFabClick} />
-          ) : (
-            <div className="grid grid-cols-2 gap-px">
-              {approvedPhotos.map((photo) => (
-                <div key={photo.id} className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={getPhotoUrl(photo)}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    unoptimized
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="px-4 py-4">
-          {approvedPhotos.length === 0 ? (
-            <EmptyState onFabClick={onFabClick} />
-          ) : (
-            <div className="columns-2 gap-2 sm:columns-3 md:columns-4">
-              {approvedPhotos.map((photo) => (
-                <div key={photo.id} className="mb-2 overflow-hidden rounded-md break-inside-avoid">
-                  <div className="relative aspect-square w-full">
-                    <Image
-                      src={getPhotoUrl(photo)}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      unoptimized
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+    <>
+      {/* ── Template renders the gallery (cosmos / parallax / film / etc.) ── */}
+      <TemplateComponent theme={theme} eventPhotos={approvedPhotos} />
 
       {/* ── Upload tray — floats above the FAB, only when there are uploads ── */}
       {uploads.length > 0 && (
@@ -348,23 +328,6 @@ export function EventPublishedPage({
         }}
       />
 
-    </main>
-  )
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────
-
-function EmptyState({ onFabClick }: { onFabClick: () => void }) {
-  return (
-    <div
-      className="flex min-h-[60vh] flex-col items-center justify-center gap-3 cursor-pointer select-none"
-      onClick={onFabClick}
-    >
-      <svg className="size-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-      </svg>
-      <p className="text-sm opacity-40">Tap to add the first photo</p>
-    </div>
+    </>
   )
 }
