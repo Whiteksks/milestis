@@ -153,7 +153,15 @@ service cloud.firestore {
     // (Admin SDK) which enforces per-event and per-guest quota limits.
     match /projects/{projectId}/eventPhotos/{photoId} {
       allow read: if true;
-      allow write: if false;
+
+      // Project owner may update status (e.g. approve / reject during moderation).
+      // Only the `status` field may change; value must be a known state.
+      allow update: if isAuthed()
+        && isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId)
+        && onlyAllowedKeys(['status'])
+        && request.resource.data.status in ['pending', 'approved', 'rejected'];
+
+      allow create, delete: if false;
     }
 
   }

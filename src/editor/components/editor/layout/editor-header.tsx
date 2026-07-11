@@ -9,13 +9,15 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode, SlidersHorizontal } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { projectKeys } from '@/hooks/useProjectsQuery'
 import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
+import { useUiStore } from '@/editor/lib/store/ui'
+import { useContentStore } from '@/editor/lib/store/content'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
 import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
@@ -65,6 +67,9 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     projectStatus: state.projectStatus,
     setIsPreviewOpen: state.setIsPreviewOpen,
   }))
+
+  const setIsModerationOpen = useUiStore((s) => s.setIsModerationOpen)
+  const eventPhotosCount    = useContentStore((s) => s.eventPhotos.length)
 
   const [localName, setLocalName] = useState(projectName ?? '')
 
@@ -296,6 +301,20 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             >
               <Eye className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{t('header.preview')}</span>
+            </Button>
+          )}
+
+          {editorMode === 'event' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsModerationOpen(true)}
+              disabled={eventPhotosCount === 0}
+              title={t('header.moderation')}
+              className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-2.5 sm:px-4 transition-all text-xs font-medium disabled:opacity-40"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t('header.moderation')}</span>
             </Button>
           )}
 

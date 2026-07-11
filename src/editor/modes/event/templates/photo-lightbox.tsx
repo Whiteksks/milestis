@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 import type { EventGuestPhoto } from '@/editor/modes/event/content-types'
 
 function getBestUrl(photo: EventGuestPhoto): string {
@@ -21,9 +21,12 @@ interface PhotoLightboxProps {
   onClose: () => void
   onPrev:  () => void
   onNext:  () => void
+  /** Включает режим модерации с кнопкой удаления */
+  moderation?: boolean
+  onDelete?: (photo: EventGuestPhoto) => void
 }
 
-export function PhotoLightbox({ photos, index, onClose, onPrev, onNext }: PhotoLightboxProps) {
+export function PhotoLightbox({ photos, index, onClose, onPrev, onNext, moderation, onDelete }: PhotoLightboxProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -31,22 +34,29 @@ export function PhotoLightbox({ photos, index, onClose, onPrev, onNext }: PhotoL
   }, [])
 
   // Стабильные ссылки на колбэки для предотвращения лишних перезапусков useEffect
-  const handleClose = useCallback(() => onClose(), [onClose])
-  const handlePrev  = useCallback(() => onPrev(), [onPrev])
-  const handleNext  = useCallback(() => onNext(), [onNext])
+  const handleClose  = useCallback(() => onClose(), [onClose])
+  const handlePrev   = useCallback(() => onPrev(),  [onPrev])
+  const handleNext   = useCallback(() => onNext(),  [onNext])
+  const handleDelete = useCallback(() => {
+    if (index !== null && onDelete) onDelete(photos[index])
+  }, [index, photos, onDelete])
 
   // Навигация с клавиатуры
   useEffect(() => {
     if (index === null) return
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape')     { e.preventDefault(); handleClose() }
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); handlePrev()  }
-      if (e.key === 'ArrowRight') { e.preventDefault(); handleNext()  }
+      if (e.key === 'Escape')                          { e.preventDefault(); handleClose()  }
+      if (e.key === 'ArrowLeft')                       { e.preventDefault(); handlePrev()   }
+      if (e.key === 'ArrowRight')                      { e.preventDefault(); handleNext()   }
+      if (moderation && (e.key === 'Delete' || e.key === 'Backspace')) {
+        e.preventDefault()
+        handleDelete()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [index, handleClose, handlePrev, handleNext])
+  }, [index, handleClose, handlePrev, handleNext, handleDelete, moderation])
 
   // Блокировка скролла (исправлено для SSR)
   useEffect(() => {
@@ -118,6 +128,18 @@ export function PhotoLightbox({ photos, index, onClose, onPrev, onNext }: PhotoL
             >
               <X size={20} />
             </button>
+
+            {/* Кнопка удаления (только в режиме модерации) */}
+            {moderation && onDelete && (
+              <button
+                onClick={handleDelete}
+                className="absolute top-4 left-4 z-20 flex items-center gap-2 rounded-full bg-red-600/80 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-red-600 active:scale-95"
+                aria-label="Delete photo"
+              >
+                <Trash2 size={16} />
+                Delete
+              </button>
+            )}
 
             {/* Навигация (Стрелки) */}
             {photos.length > 1 && (

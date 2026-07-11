@@ -1,14 +1,16 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore'
+import { useEffect, useMemo, useState, useCallback } from 'react'
+import { collection, doc, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useUiSelector, useThemeSelector } from '@/editor/lib/store'
+import { useUiStore } from '@/editor/lib/store/ui'
 import { useContentStore } from '@/editor/lib/store/content'
 import { getTheme } from '@/editor/lib/config/themes'
 import { PhotobookTextureOverlay, getMoodFilter } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 import type { EventTemplateProps } from '@/editor/lib/template-types'
 import type { EventGuestPhoto } from '@/editor/modes/event/content-types'
+import { PhotoLightbox } from './templates/photo-lightbox'
 
 interface EventTemplateShellProps {
   Design: React.ComponentType<EventTemplateProps>
@@ -33,6 +35,40 @@ export function EventTemplateShell({ Design }: EventTemplateShellProps) {
   const projectId      = useUiSelector((s) => s.projectId)
   const eventPhotos    = useContentStore((s) => s.eventPhotos)
   const setEventPhotos = useContentStore((s) => s.setEventPhotos)
+
+  const isModerationOpen    = useUiSelector((s) => s.isModerationOpen)
+  const setIsModerationOpen = useUiStore((s) => s.setIsModerationOpen)
+
+  const [modIndex, setModIndex] = useState<number | null>(null)
+
+  // Открыть лайтбокс при нажатии кнопки «Модерация» в хедере
+  useEffect(() => {
+    if (!isModerationOpen) return
+    if (eventPhotos.length > 0) {
+      setModIndex(0)
+    } else {
+      setIsModerationOpen(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModerationOpen])
+
+  const handleModClose = useCallback(() => {
+    setModIndex(null)
+    setIsModerationOpen(false)
+  }, [setIsModerationOpen])
+
+  const handleModDelete = useCallback(async (photo: EventGuestPhoto) => {
+    if (!projectId) return
+    const currentIdx = modIndex!
+    const newLen = eventPhotos.length - 1
+    if (newLen === 0) {
+      setModIndex(null)
+      setIsModerationOpen(false)
+    } else {
+      setModIndex(Math.min(currentIdx, newLen - 1))
+    }
+    await updateDoc(doc(db, 'projects', projectId, 'eventPhotos', photo.id), { status: 'rejected' })
+  }, [projectId, modIndex, eventPhotos.length, setIsModerationOpen])
 
   const { currentTheme, themeCustomizations } = useThemeSelector((s) => ({
     currentTheme:        s.currentTheme,
@@ -78,6 +114,17 @@ export function EventTemplateShell({ Design }: EventTemplateShellProps) {
         eventPhotos={eventPhotos}
       />
       <PhotobookTextureOverlay texture={texture} />
+
+      {/* Кнопка модерации перенесена в editor-header */}
+      <PhotoLightbox
+        photos={eventPhotos}
+        index={modIndex}
+        onClose={handleModClose}
+        onPrev={() => setModIndex((i) => i !== null ? (i - 1 + eventPhotos.length) % eventPhotos.length : null)}
+        onNext={() => setModIndex((i) => i !== null ? (i + 1) % eventPhotos.length : null)}
+        moderation
+        onDelete={handleModDelete}
+      />
     </div>
   )
 }
