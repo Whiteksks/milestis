@@ -50,6 +50,15 @@ env:
       - BUILD
       - RUNTIME
 
+  # reCAPTCHA v3 site key for App Check — without this, App Check never initializes
+  # in production and requests to Firebase AI Logic get rejected with 401.
+  # Must allow the milestis.com domain in the reCAPTCHA admin console.
+  - variable: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    value: 6LcL83QtAAAAALNTReiv1ZjwJg1bTJDeUjE3-IXV
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_CREATEUSER_URL
     value: https://createuser-5h4wes5waq-ez.a.run.app
     availability:
