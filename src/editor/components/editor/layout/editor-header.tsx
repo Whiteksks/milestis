@@ -9,7 +9,7 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode, SlidersHorizontal } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode, SlidersHorizontal, Sparkles } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
@@ -69,6 +69,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }))
 
   const setIsModerationOpen = useUiStore((s) => s.setIsModerationOpen)
+  const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
   const eventPhotosCount    = useContentStore((s) => s.eventPhotos.length)
 
   const [localName, setLocalName] = useState(projectName ?? '')
@@ -277,6 +278,19 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
         {/* RIGHT */}
         <div className="flex items-center gap-1.5">
+          {!modeUiConfig.hideMediaButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsAiChatOpen(true)}
+              className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
+              title={t('header.aiAssistant')}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline font-medium">{t('header.aiAssistant')}</span>
+            </Button>
+          )}
+
           {!modeUiConfig.hideMediaButton && (
             <Button
               variant="ghost"

@@ -159,7 +159,7 @@ export function TemplateEventCoverflow({ theme, eventPhotos }: EventTemplateProp
   }, [go])
 
   // Плавный жест Drag с помощью встроенной физики Framer Motion на контейнере сцены
-  const handleDragEnd = (_: any, info: { offset: { x: number }; velocity: { x: number } }) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number }; velocity: { x: number } }) => {
     const threshold = spacing / 2
     if (info.offset.x < -threshold || info.velocity.x < -300) {
       go(1)

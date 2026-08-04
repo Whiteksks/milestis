@@ -3,6 +3,12 @@ import type { DeviceView, EditorMode, DecorationsConfig } from '../types'
 
 export type DesignModalSection = 'templates' | 'themes' | 'backgrounds'
 
+export type AiChatMessage = {
+  role: 'user' | 'assistant'
+  content: string
+  photos?: string[]
+}
+
 export interface UiStore {
   deviceView: DeviceView
   editorMode: EditorMode
@@ -63,6 +69,17 @@ export interface UiStore {
 
   isPreviewOpen: boolean
   setIsPreviewOpen: (open: boolean) => void
+
+  isAiChatOpen: boolean
+  setIsAiChatOpen: (open: boolean) => void
+
+  aiChatMessages: AiChatMessage[]
+  aiChatInput: string
+  aiChatIsLoading: boolean
+  addAiChatMessage: (msg: AiChatMessage) => void
+  setAiChatInput: (input: string) => void
+  setAiChatIsLoading: (loading: boolean) => void
+  clearAiChat: () => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -90,6 +107,11 @@ export const useUiStore = create<UiStore>((set) => ({
   isDirty: false,
   isModerationOpen: false,
   isPreviewOpen: false,
+  isAiChatOpen: false,
+
+  aiChatMessages: [],
+  aiChatInput: '',
+  aiChatIsLoading: false,
 
   setDeviceView: (view) => set({ deviceView: view }),
 
@@ -141,4 +163,10 @@ export const useUiStore = create<UiStore>((set) => ({
 
   setIsModerationOpen: (open) => set(() => ({ isModerationOpen: open })),
   setIsPreviewOpen: (open) => set(() => ({ isPreviewOpen: open })),
+  setIsAiChatOpen: (open) => set(() => ({ isAiChatOpen: open })),
+
+  addAiChatMessage: (msg) => set((s) => ({ aiChatMessages: [...s.aiChatMessages, msg] })),
+  setAiChatInput: (input) => set(() => ({ aiChatInput: input })),
+  setAiChatIsLoading: (loading) => set(() => ({ aiChatIsLoading: loading })),
+  clearAiChat: () => set(() => ({ aiChatMessages: [], aiChatInput: '', aiChatIsLoading: false })),
 }))

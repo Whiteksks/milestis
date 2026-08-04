@@ -103,6 +103,12 @@ export interface PortfolioSlice {
     image: PortfolioManagedImage,
   ) => void
   removePortfolioRepeatingImage: (section: PortfolioRepeatingImageSectionId, imageId: string) => void
+  /** Single source of truth for featured-work cards: writes sectionContent.featuredWork.projects
+   *  (text) and portfolioImageContent.featuredWork (images) together in one call, keyed by each
+   *  entry's own id — the two arrays can never drift apart because there is only one place that sets either. */
+  setFeaturedWorkItems: (
+    entries: Array<{ id: string; title: string; description: string; tags?: string[]; image?: PortfolioManagedImage }>,
+  ) => void
   addMediaImage: (image: MediaImage) => void
   removeMediaImage: (id: string) => void
 }
@@ -154,6 +160,23 @@ export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioS
   removePortfolioRepeatingImage: (section, imageId) =>
     set((state) => ({
       portfolioImageContent: removePortfolioRepeatingImage(state.portfolioImageContent, imageId),
+    })),
+
+  setFeaturedWorkItems: (entries) =>
+    set((state) => ({
+      sectionContent: {
+        ...state.sectionContent,
+        featuredWork: {
+          ...state.sectionContent.featuredWork,
+          projects: entries.map(({ id, title, description, tags }) => ({ id, title, description, tags })),
+        },
+      },
+      portfolioImageContent: {
+        ...state.portfolioImageContent,
+        featuredWork: entries
+          .filter((e): e is typeof e & { image: PortfolioManagedImage } => !!e.image)
+          .map((e) => ({ ...e.image, id: e.id })),
+      },
     })),
 
   addMediaImage: (image) =>

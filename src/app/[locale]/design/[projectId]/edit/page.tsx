@@ -20,6 +20,7 @@ import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
 import type { EditorMode } from '@/editor/lib/editor-mode'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
+import { AiChatModal } from '@/editor/components/editor/layout/Modals/ai-chat-modal'
 
 type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
 
@@ -191,6 +192,8 @@ export default function EditorPage() {
       <MediaLibraryModal mode="manage" />
       {/* Full-screen preview — renders the real PublishedView with current store state */}
       <PreviewOverlay />
+      {/* AI chat panel */}
+      <AiChatModal />
     </div>
   )
 }

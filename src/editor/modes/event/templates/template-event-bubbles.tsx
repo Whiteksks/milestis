@@ -286,12 +286,12 @@ export function TemplateEventBubbles({ theme, eventPhotos }: EventTemplateProps)
 
   const [needsMotionPerm, setNeedsMotionPerm] = useState(false)
   useEffect(() => {
-    const DME = (window as any).DeviceMotionEvent
+    const DME = (window as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
     if (typeof DME?.requestPermission === 'function') setNeedsMotionPerm(true)
   }, [])
 
   const requestMotion = async () => {
-    const DME = (window as any).DeviceMotionEvent
+    const DME = (window as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent
     try {
       const res = await DME?.requestPermission?.()
       if (res === 'granted') setNeedsMotionPerm(false)

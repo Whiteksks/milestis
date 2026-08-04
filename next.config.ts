@@ -6,18 +6,18 @@ const withNextIntl = createNextIntlPlugin()
 // ── Content Security Policy ───────────────────────────────────────────────────
 const CSP = [
   "default-src 'self'",
-  // Scripts: Добавлен http://cdn.iubenda.com и http://*.iubenda.com, чтобы разрешить загрузку старых/динамических модулей iubenda
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://accounts.google.com https://cdn.iubenda.com https://www.iubenda.com https://embeds.iubenda.com http://cdn.iubenda.com http://*.iubenda.com",
+  // Scripts: Google reCAPTCHA + Firebase + Iubenda
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://accounts.google.com https://www.google.com https://www.gstatic.com https://cdn.iubenda.com https://www.iubenda.com https://embeds.iubenda.com http://cdn.iubenda.com http://*.iubenda.com",
   // Styles: inline styles used by Tailwind / Radix + Iubenda
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.iubenda.com https://cdn.iubenda.com",
   // Fonts
   "font-src 'self' https://fonts.gstatic.com",
   // Images: Firebase Storage + Google Avatars + Next.js optimizer + Iubenda + AWS S3 Icons
   "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com https://*.iubenda.com https://*.amazonaws.com",
-  // Fetch / XHR: Firebase services + Cloud Run functions + Iubenda API
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://*.iubenda.com",
-  // Frames: Firebase Auth popup + Google Sign-In + YouTube embeds + Iubenda widgets
-  "frame-src 'self' https://milestis.com https://*.milestis.com https://*.firebaseapp.com https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://*.iubenda.com",
+  // Fetch / XHR: Добавлены https://www.google.com и https://*.google.com для App Check и reCAPTCHA API
+  "connect-src 'self' https://*.googleapis.com https://*.google.com https://www.google.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://*.iubenda.com",
+  // Frames: Google reCAPTCHA + Firebase Auth + YouTube + Iubenda
+  "frame-src 'self' https://milestis.com https://*.milestis.com https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.youtube-nocookie.com https://*.iubenda.com",
   // Media
   "media-src 'self' blob: https://firebasestorage.googleapis.com",
   // Workers (Framer Motion / Next.js)
@@ -25,7 +25,7 @@ const CSP = [
   // Автоматически переводит HTTP запросы в HTTPS там, где это возможно
   "upgrade-insecure-requests",
 ]
-  .join("; ")
+  .join("; ");
   
 const securityHeaders = [
   { key: "Content-Security-Policy", value: CSP },

@@ -91,6 +91,14 @@ export interface PhotobookSlice {
     image: PhotobookManagedImage,
   ) => void
   removePhotobookRepeatingImage: (section: PhotobookRepeatingImageSectionId, imageId: string) => void
+  /** Single source of truth for gallery photos: writes sectionContent.gallery.photos and
+   *  photobookImageContent.gallery together in one call, keyed by each image's own id —
+   *  the two arrays can never drift apart because there is only one place that sets either. */
+  setPhotobookGalleryPhotos: (entries: Array<{ image: PhotobookManagedImage; caption?: string }>) => void
+  /** Same guarantee as setPhotobookGalleryPhotos, for story moments. */
+  setPhotobookStoryMoments: (
+    entries: Array<{ image: PhotobookManagedImage; label?: string; caption?: string; description?: string }>,
+  ) => void
   setPhotobookSectionVisibility: (updates: Partial<PhotobookSectionVisibility>) => void
   togglePhotobookSection: (section: keyof PhotobookSectionVisibility) => void
 }
@@ -133,6 +141,36 @@ export const createPhotobookSlice: StateCreator<ContentStore, [], [], PhotobookS
   removePhotobookRepeatingImage: (section, imageId) =>
     set((state) => ({
       photobookImageContent: removePhotobookRepeatingImage(state.photobookImageContent, section, imageId),
+    })),
+
+  setPhotobookGalleryPhotos: (entries) =>
+    set((state) => ({
+      photobookSectionContent: {
+        ...state.photobookSectionContent,
+        gallery: {
+          ...state.photobookSectionContent.gallery,
+          photos: entries.map(({ image, caption }) => ({ id: image.id, caption })),
+        },
+      },
+      photobookImageContent: {
+        ...state.photobookImageContent,
+        gallery: entries.map((e) => e.image),
+      },
+    })),
+
+  setPhotobookStoryMoments: (entries) =>
+    set((state) => ({
+      photobookSectionContent: {
+        ...state.photobookSectionContent,
+        story: {
+          ...state.photobookSectionContent.story,
+          moments: entries.map(({ image, label, caption, description }) => ({ id: image.id, label, caption, description })),
+        },
+      },
+      photobookImageContent: {
+        ...state.photobookImageContent,
+        story: entries.map((e) => e.image),
+      },
     })),
 
   setPhotobookSectionVisibility: (updates) =>
