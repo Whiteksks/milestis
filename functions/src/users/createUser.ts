@@ -92,7 +92,7 @@ export const createUser = onRequest(
 
       logger.info("User document created", { uid });
 
-      // Record consent in iubenda — fire-and-forget, must not block the response
+      // Record consent in iubenda — fire-and-forget, must not block the response (currently a no-op, see iubendaConsent.ts)
       recordIubendaConsent(
         { id: uid, email },
         ["terms_and_conditions", "privacy_policy"],

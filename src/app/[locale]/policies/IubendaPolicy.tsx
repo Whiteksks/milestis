@@ -30,7 +30,11 @@ function useIubendaConfig(): IubendaConfig {
 // 1. Условия использования
 export function IubendaTerms() {
   const { terms } = useIubendaConfig();
+  void terms;
   useIubenda();
+  // Iubenda temporarily disabled
+  return null;
+  /*
   return (
     <div className="w-full overflow-x-hidden">
       <a
@@ -42,12 +46,17 @@ export function IubendaTerms() {
       </a>
     </div>
   );
+  */
 }
 
 // 2. Куки
 export function IubendaCookie() {
   const { cookie } = useIubendaConfig();
+  void cookie;
   useIubenda();
+  // Iubenda temporarily disabled
+  return null;
+  /*
   return (
     <div className="w-full overflow-x-hidden">
       <a
@@ -59,12 +68,17 @@ export function IubendaCookie() {
       </a>
     </div>
   );
+  */
 }
 
 // 3. Политика конфиденциальности
 export function IubendaPrivacy() {
   const { privacy } = useIubendaConfig();
+  void privacy;
   useIubenda();
+  // Iubenda temporarily disabled
+  return null;
+  /*
   return (
     <div className="w-full overflow-x-hidden">
       <a
@@ -76,4 +90,5 @@ export function IubendaPrivacy() {
       </a>
     </div>
   );
+  */
 }

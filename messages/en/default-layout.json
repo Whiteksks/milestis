@@ -13,7 +13,8 @@
     "themes": {
       "light": "Light",
       "cozy": "Cozy",
-      "dark": "Dark"
+      "dark": "Dark",
+      "testtheme": "Test"
     },
     "headings": {
       "product": "Product",

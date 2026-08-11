@@ -446,7 +446,7 @@ export const republishProject = onRequest(
 				logger.warn(`[republishProject] OG image generation failed for ${pid}:`, err);
 			});
 
-			// Consent recording for paid republish
+			// Consent recording for paid republish (currently a no-op, see iubendaConsent.ts)
 			if (deltaCost > 0) {
 				recordIubendaConsent(
 					{ id: uid, email: userEmail },

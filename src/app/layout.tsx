@@ -66,6 +66,7 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? 'en'} suppressHydrationWarning>
       <head>
+        {/* Iubenda temporarily disabled — was causing a stuck cookie banner
         {!isPublishedSite && (
           <Script
             id="iubenda-cookie-solution"
@@ -73,6 +74,7 @@ export default async function RootLayout({
             src="https://embeds.iubenda.com/widgets/f6bff847-fa8b-4753-8ce9-3dc2137f21d0.js"
           />
         )}
+        */}
       </head>
 
       <body
@@ -83,7 +85,7 @@ export default async function RootLayout({
 
         <ThemeProvider
           attribute="class"
-          themes={['light', 'dark', 'cozy']}
+          themes={['light', 'dark', 'cozy', 'testtheme']}
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange

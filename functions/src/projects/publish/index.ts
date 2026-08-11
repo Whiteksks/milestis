@@ -491,7 +491,7 @@ export const publishProject = onRequest(
 				transactionId: result.transactionId,
 			});
 
-			// Record publish consent in iubenda — fire-and-forget, must not block the response
+			// Record publish consent in iubenda — fire-and-forget, must not block the response (currently a no-op, see iubendaConsent.ts)
 			recordIubendaConsent(
 				{ id: uid, email: userEmail },
 				["terms_and_conditions", "privacy_policy"],

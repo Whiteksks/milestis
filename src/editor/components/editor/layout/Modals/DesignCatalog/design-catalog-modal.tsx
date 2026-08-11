@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Drawer,
@@ -29,7 +28,6 @@ import { cn } from '@/lib/utils'
 import { ChevronRight, Eye, EyeOff, Filter, LayoutTemplate, Palette } from 'lucide-react'
 
 import type { DesignCatalogSection } from './types'
-import { DesignCatalogSidebar } from './design-catalog-sidebar'
 import { DesignCatalogFooter } from './design-catalog-footer'
 import { BackgroundsSection, PhotobookPresetsSection, ThemesSection, TemplatesSection } from './sections'
 
@@ -76,7 +74,8 @@ export function DesignCatalogModal() {
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null)
   const [selectedBackgroundId, setSelectedBackgroundId] = useState<string | null>(null)
   const [selectedPhotobookPresetId, setSelectedPhotobookPresetId] = useState<string | null>(null)
-  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  // Momentary "hold to compare" — every selection below is already live on the real canvas
+  const [isComparing, setIsComparing] = useState(false)
   const originalRef = useRef<{
     templateId: TemplateId
     theme: Theme
@@ -95,7 +94,7 @@ export function DesignCatalogModal() {
         theme: currentTheme,
         customizations: { ...themeCustomizations },
       }
-      setIsPreviewMode(false)
+      setIsComparing(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDesignModalOpen])
@@ -147,8 +146,6 @@ export function DesignCatalogModal() {
     return (itemsForSection as Array<{ tags?: string[] }>).filter((item) => (item.tags ?? []).includes(activeTag))
   }, [activeTag, itemsForSection])
 
-  const activeTagLabel = activeTag === 'all' ? t('all') : activeTag
-
   const currentTemplateName = useMemo(
     () => templates.find((t) => t.id === currentTemplateId)?.name ?? currentTemplateId ?? null,
     [templates, currentTemplateId]
@@ -169,10 +166,35 @@ export function DesignCatalogModal() {
     updateThemeCustomization(originalRef.current.customizations)
   }
 
+  // Re-applies whatever the user picked so far — used after a "hold to compare" release
+  const applyCurrentSelection = () => {
+    if (effectiveSelectedTemplatesId) setTemplate(effectiveSelectedTemplatesId as TemplateId)
+    if (effectiveSelectedThemeId) setTheme(effectiveSelectedThemeId as Theme)
+    if (isPhotobook) {
+      const preset = PHOTOBOOK_PRESETS.find((p) => p.id === effectivePhotobookPresetId)
+      if (preset) {
+        updateThemeCustomization({
+          photobookMood: preset.mood as PhotobookMood,
+          photobookTexture: preset.texture as PhotobookTexture,
+        })
+      }
+    } else {
+      const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
+      if (preset) {
+        updateThemeCustomization({
+          depthEffect: preset.depth,
+          raysEffect: preset.rays,
+          textureEffect: preset.texture,
+          backgroundLayersTheme: preset.theme,
+        })
+      }
+    }
+  }
+
   const closeModal = () => {
     clearPreviewDecorations()
     setActiveTag('all')
-    setIsPreviewMode(false)
+    setIsComparing(false)
     setSelectedTemplatesId(null)
     setSelectedThemeId(null)
     setSelectedBackgroundId(null)
@@ -180,8 +202,9 @@ export function DesignCatalogModal() {
     closeDesignModal()
   }
 
+  // Cancel always reverts — every pick is already live on the canvas by the time this runs
   const handleClose = () => {
-    if (isPreviewMode) revertAll()
+    revertAll()
     closeModal()
   }
 
@@ -190,70 +213,21 @@ export function DesignCatalogModal() {
     setActiveTag('all')
   }
 
-  const togglePreviewMode = () => {
-    const next = !isPreviewMode
-    setIsPreviewMode(next)
-    if (next) {
-      if (designModalSection === 'templates' && effectiveSelectedTemplatesId) {
-        setTemplate(effectiveSelectedTemplatesId as TemplateId)
-      } else if (designModalSection === 'themes' && effectiveSelectedThemeId) {
-        setTheme(effectiveSelectedThemeId as Theme)
-      } else if (designModalSection === 'backgrounds') {
-        if (isPhotobook) {
-          const preset = PHOTOBOOK_PRESETS.find((p) => p.id === effectivePhotobookPresetId)
-          if (preset) {
-            updateThemeCustomization({
-              photobookMood: preset.mood as PhotobookMood,
-              photobookTexture: preset.texture as PhotobookTexture,
-            })
-          }
-        } else if (effectiveSelectedBackgroundId) {
-          const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
-          if (preset) {
-            updateThemeCustomization({
-              depthEffect: preset.depth,
-              raysEffect: preset.rays,
-              textureEffect: preset.texture,
-              backgroundLayersTheme: preset.theme,
-            })
-          }
-        }
-      }
-    } else {
-      revertAll()
-    }
+  const startCompare = () => {
+    if (isComparing) return
+    setIsComparing(true)
+    revertAll()
+  }
+
+  const endCompare = () => {
+    if (!isComparing) return
+    setIsComparing(false)
+    applyCurrentSelection()
   }
 
   const applySelected = () => {
-    if (!isPreviewMode) {
-      if (selectedTemplatesId) setTemplate(selectedTemplatesId as TemplateId)
-      if (selectedThemeId) setTheme(selectedThemeId as Theme)
-      if (isPhotobook) {
-        if (selectedPhotobookPresetId) {
-          const preset = PHOTOBOOK_PRESETS.find((p) => p.id === selectedPhotobookPresetId)
-          if (preset) {
-            updateThemeCustomization({
-              photobookMood: preset.mood as PhotobookMood,
-              photobookTexture: preset.texture as PhotobookTexture,
-            })
-          }
-        }
-      } else if (selectedBackgroundId) {
-        const preset = BACKGROUND_PRESETS.find((p) => p.id === selectedBackgroundId)
-        if (preset) {
-          updateThemeCustomization({
-            depthEffect: preset.depth,
-            raysEffect: preset.rays,
-            textureEffect: preset.texture,
-            backgroundLayersTheme: preset.theme,
-          })
-        }
-      }
-    }
     closeModal()
   }
-
-  const isApplyDisabled = !selectedTemplatesId && !selectedThemeId && !selectedBackgroundId && !selectedPhotobookPresetId
 
   const selectedLabel = useMemo(() => {
     if (designModalSection === 'templates') {
@@ -291,39 +265,47 @@ export function DesignCatalogModal() {
 
   const isMobile = useIsMobile()
 
+  // Desktop has no dialog chrome to trap focus/escape, so wire it up manually
+  useEffect(() => {
+    if (!isDesignModalOpen || isMobile) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesignModalOpen, isMobile])
+
   const sectionContent = useMemo(() => {
+    // Every selection is applied to the store immediately — the real canvas behind the dock is the preview
     const onTemplateSelect = (id: string) => {
       setSelectedTemplatesId(id)
-      if (isPreviewMode) setTemplate(id as TemplateId)
+      setTemplate(id as TemplateId)
     }
     const onThemeSelect = (id: string) => {
       setSelectedThemeId(id)
-      if (isPreviewMode) setTheme(id as Theme)
+      setTheme(id as Theme)
     }
     const onBackgroundSelect = (id: string) => {
       setSelectedBackgroundId(id)
-      if (isPreviewMode) {
-        const preset = BACKGROUND_PRESETS.find((p) => p.id === id)
-        if (preset) {
-          updateThemeCustomization({
-            depthEffect: preset.depth,
-            raysEffect: preset.rays,
-            textureEffect: preset.texture,
-            backgroundLayersTheme: preset.theme,
-          })
-        }
+      const preset = BACKGROUND_PRESETS.find((p) => p.id === id)
+      if (preset) {
+        updateThemeCustomization({
+          depthEffect: preset.depth,
+          raysEffect: preset.rays,
+          textureEffect: preset.texture,
+          backgroundLayersTheme: preset.theme,
+        })
       }
     }
     const onPresetSelect = (id: string) => {
       setSelectedPhotobookPresetId(id)
-      if (isPreviewMode) {
-        const preset = PHOTOBOOK_PRESETS.find((p) => p.id === id)
-        if (preset) {
-          updateThemeCustomization({
-            photobookMood: preset.mood as PhotobookMood,
-            photobookTexture: preset.texture as PhotobookTexture,
-          })
-        }
+      const preset = PHOTOBOOK_PRESETS.find((p) => p.id === id)
+      if (preset) {
+        updateThemeCustomization({
+          photobookMood: preset.mood as PhotobookMood,
+          photobookTexture: preset.texture as PhotobookTexture,
+        })
       }
     }
     return (
@@ -366,7 +348,6 @@ export function DesignCatalogModal() {
     effectiveSelectedThemeId,
     effectiveSelectedBackgroundId,
     effectivePhotobookPresetId,
-    isPreviewMode,
     setTemplate,
     setTheme,
     updateThemeCustomization,
@@ -394,7 +375,7 @@ export function DesignCatalogModal() {
       >
         <DrawerContent
           hideOverlay
-          className={cn("md:hidden flex flex-col bg-card border-border/60 focus:outline-none transition-opacity duration-200", isPreviewMode && "opacity-60")}
+          className={cn("md:hidden flex flex-col bg-card border-border/60 focus:outline-none transition-opacity duration-200", isComparing && "opacity-60")}
         >
           <DrawerHeader className="sr-only">
             <DrawerTitle>{t('title')}</DrawerTitle>
@@ -420,13 +401,17 @@ export function DesignCatalogModal() {
                 </Button>
               ))}
               <Button
-                variant={isPreviewMode ? 'outline' : 'ghost'}
+                variant={isComparing ? 'outline' : 'ghost'}
                 size="sm"
-                onClick={togglePreviewMode}
-                className={cn('shrink-0', isPreviewMode && 'border-primary/40 text-primary hover:text-primary')}
+                onMouseDown={startCompare}
+                onMouseUp={endCompare}
+                onMouseLeave={() => isComparing && endCompare()}
+                onTouchStart={startCompare}
+                onTouchEnd={endCompare}
+                className={cn('shrink-0', isComparing && 'border-primary/40 text-primary hover:text-primary')}
               >
-                {isPreviewMode ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                <span className="hidden sm:inline">{t('preview')}</span>
+                {isComparing ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                <span className="hidden sm:inline">{t('compare')}</span>
               </Button>
             </div>
           </div>
@@ -487,7 +472,7 @@ export function DesignCatalogModal() {
           <DrawerFooter className="shrink-0 border-t border-border bg-sidebar/50 flex-row items-center justify-between gap-4 mt-0 px-4 py-4">
             <DesignCatalogFooter
               selectedLabel={selectedLabel}
-              isApplyDisabled={isApplyDisabled}
+              isApplyDisabled={false}
               onCancel={handleClose}
               onApply={applySelected}
             />
@@ -497,79 +482,142 @@ export function DesignCatalogModal() {
     )
   }
 
-  // ── DESKTOP: Dialog ─────────────────────────────────────────────
-  return (
-    <Dialog
-      open={isDesignModalOpen}
-      onOpenChange={(open) => {
-        if (!open) handleClose()
-      }}
-    >
-      <DialogTitle className="sr-only">{t('title')}</DialogTitle>
-      <DialogDescription className="sr-only">{t('description')}</DialogDescription>
+  // ── DESKTOP: floating live-canvas dock — the real canvas stays fully visible ──
+  if (!isDesignModalOpen) return null
 
-      <DialogContent
+  const desktopSections: Array<{ id: DesignCatalogSection; icon: typeof LayoutTemplate; label: string }> = [
+    { id: 'templates', icon: LayoutTemplate, label: t('templates') },
+    { id: 'themes', icon: Palette, label: t('themes') },
+    { id: 'backgrounds', icon: modeConfig.backgroundIcon, label: modeConfig.backgroundLabel },
+  ]
+
+  return (
+    <div role="dialog" aria-modal="true" aria-label={t('title')} className="fixed inset-0 z-50">
+      {/* Transparent click-catcher — closes the dock, never dims the canvas */}
+      <button
+        type="button"
+        aria-label={t('cancel')}
+        onClick={handleClose}
+        className="absolute inset-0 h-full w-full cursor-default"
+      />
+
+      {/* Currently applied combo — floats above the canvas, always accurate since picks are live */}
+      <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center">
+        <div className="pointer-events-none flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 backdrop-blur-xl shadow-lg px-4 py-2 text-xs">
+          <span className="font-medium text-foreground/80 truncate max-w-[120px]">{currentTemplateName ?? '—'}</span>
+          <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
+          <span className="font-medium text-foreground/80 truncate max-w-[120px]">{currentThemeName ?? '—'}</span>
+          <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
+          <span className="font-medium text-foreground/80 truncate max-w-[120px]">{currentBackgroundName ?? t('none')}</span>
+        </div>
+      </div>
+
+      {/* Expandable catalog panel — sits just above the dock, canvas remains visible around it */}
+      <div
         className={cn(
-          `max-w-5xl
-          h-[82vh]
-          flex flex-col
-          bg-background
-          border-border p-0 
-          overflow-hidden
-          transition-opacity duration-200`,
-          isPreviewMode && 'opacity-55'
+          'absolute inset-x-0 bottom-24 mx-auto w-full max-w-3xl px-4 transition-all duration-200',
+          isComparing ? 'opacity-0 translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0'
         )}
       >
-        <div className="flex flex-col md:flex-row h-full min-h-0">
-          <DesignCatalogSidebar
-            section={designModalSection}
-            onSectionChange={onSectionChange}
-            tagMeta={tagMeta}
-            activeTag={activeTag}
-            onTagChange={setActiveTag}
-            activeTagLabel={activeTagLabel}
-            totalCount={itemsForSection.length}
-            visibleCount={visibleItems.length}
-            editorMode={editorMode}
-          />
-
-          <main className="flex-1 flex flex-col min-h-0 min-w-0">
-            <DialogHeader className="shrink-0 px-4 md:px-6 py-4 border-b border-border flex-row items-center justify-between gap-4">
-              <div className="hidden md:flex items-center gap-1.5 text-xs min-w-0 flex-1 overflow-hidden">
-                <span className="text-muted-foreground shrink-0">{t('applied')}</span>
-                <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentTemplateName ?? '—'}</span>
-                <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
-                <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentThemeName ?? '—'}</span>
-                <ChevronRight className="h-3 w-3 text-muted-foreground/40 shrink-0" />
-                <span className="font-medium text-foreground/80 truncate max-w-[100px]">{currentBackgroundName ?? t('none')}</span>
-              </div>
-              <Button
-                variant={isPreviewMode ? 'outline' : 'ghost'}
-                size="sm"
-                onClick={togglePreviewMode}
-                className={cn('shrink-0 mr-6', isPreviewMode && 'border-primary/40 text-primary hover:text-primary')}
-              >
-                {isPreviewMode ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                <span>{t('preview')}</span>
-              </Button>
-            </DialogHeader>
-
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 min-h-0">
-              {sectionContent}
+        <div className="rounded-2xl border border-border/60 bg-background/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+          {tagMeta.availableTags.length > 0 && (
+            <div className="flex items-center justify-between gap-3 px-4 pt-3">
+              <span className="text-xs text-muted-foreground">
+                {visibleItems.length} {t('items')}
+                {activeTag !== 'all' && (
+                  <> · <span className="font-medium text-foreground">{activeTag}</span></>
+                )}
+              </span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={activeTag !== 'all' ? 'outline' : 'ghost'}
+                    size="sm"
+                    className={cn('h-7 gap-1.5 text-xs', activeTag !== 'all' && 'border-primary/40 text-primary hover:text-primary')}
+                  >
+                    <Filter className="h-3.5 w-3.5" />
+                    {t('filter')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" side="top" className="w-52 p-1.5">
+                  <Button
+                    variant={activeTag === 'all' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="w-full justify-between"
+                    onClick={() => setActiveTag('all')}
+                  >
+                    {t('all')}
+                    <span className="text-xs text-muted-foreground">{itemsForSection.length}</span>
+                  </Button>
+                  {tagMeta.availableTags.map((tag) => (
+                    <Button
+                      key={tag}
+                      variant={activeTag === tag ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="w-full justify-between"
+                      onClick={() => setActiveTag(tag)}
+                    >
+                      <span className="truncate">{tag}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{tagMeta.counts.get(tag)}</span>
+                    </Button>
+                  ))}
+                </PopoverContent>
+              </Popover>
             </div>
+          )}
 
-            <DialogFooter className="shrink-0 px-4 md:px-6 py-4 border-t border-border bg-sidebar/50 flex-row items-center justify-between gap-4">
-              <DesignCatalogFooter
-                selectedLabel={selectedLabel}
-                isApplyDisabled={isApplyDisabled}
-                onCancel={handleClose}
-                onApply={applySelected}
-              />
-            </DialogFooter>
-          </main>
+          <div className="max-h-[38vh] overflow-y-auto p-4">
+            {sectionContent}
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+
+      {/* Floating dock — section switcher, hold-to-compare, cancel/save */}
+      <div className="absolute inset-x-0 bottom-6 flex justify-center">
+        <div className="flex items-center gap-1 rounded-full border border-border/60 bg-background/90 backdrop-blur-xl shadow-2xl px-2 py-2">
+          {desktopSections.map(({ id, icon: Icon, label }) => (
+            <Button
+              key={id}
+              variant="ghost"
+              size="sm"
+              onClick={() => onSectionChange(id)}
+              className={cn(
+                'rounded-full gap-1.5',
+                designModalSection === id && 'bg-accent text-accent-foreground hover:bg-accent/80 hover:text-accent-foreground'
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </Button>
+          ))}
+
+          <div className="w-px h-5 bg-border mx-1" />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn('rounded-full gap-1.5', isComparing && 'border-primary/40 text-primary')}
+            onMouseDown={startCompare}
+            onMouseUp={endCompare}
+            onMouseLeave={() => isComparing && endCompare()}
+            onTouchStart={startCompare}
+            onTouchEnd={endCompare}
+          >
+            {isComparing ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {t('compare')}
+          </Button>
+
+          <div className="w-px h-5 bg-border mx-1" />
+
+          <Button variant="ghost" size="sm" className="rounded-full text-muted-foreground hover:text-foreground" onClick={handleClose}>
+            {t('cancel')}
+          </Button>
+          <Button size="sm" className="rounded-full" onClick={applySelected}>
+            {t('apply')}
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
 

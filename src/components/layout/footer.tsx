@@ -92,6 +92,7 @@ export function Footer({
                     <SelectItem value="light">{t("themes.light")}</SelectItem>
                     <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
                     <SelectItem value="dark">{t("themes.dark")}</SelectItem>
+                    {/* <SelectItem value="testtheme">{t("themes.testtheme")}</SelectItem> */}
                   </SelectContent>
                 </Select>
               )}

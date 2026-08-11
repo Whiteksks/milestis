@@ -23,8 +23,10 @@ export default function LoginPage() {
   const [consentChecked, setConsentChecked] = useState(false) // Стейт чекбокса
   const [newsletterChecked, setNewsletterChecked] = useState(false) // Согласие на рассылку
 
-  // Логика интеграции с Iubenda
+  // Iubenda temporarily disabled — no-op until re-enabled
   const recordIubendaConsent = (email: string) => {
+    void email
+    /*
     ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
       "submit",
       {
@@ -36,6 +38,7 @@ export default function LoginPage() {
         },
       },
     ])
+    */
   }
 
   const handleSendMagicLink = async () => {

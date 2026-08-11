@@ -13,7 +13,8 @@
     "themes": {
       "light": "Жарық",
       "cozy": "Жайлы",
-      "dark": "Қараңғы"
+      "dark": "Қараңғы",
+      "testtheme": "Тест"
     },
     "headings": {
       "product": "Өнім",
