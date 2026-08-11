@@ -1,100 +1,98 @@
 {
-  "Hero": {
-    "titlePrefix": "Milestis is",
-    "description": "Milestis transforms your life’s turning points into premium interactive experiences. Keep the depth of your memories without the complexity of design.",
-    "ctaPrimary": "Capture a milestone",
-    "ctaSecondary": "See the experience",
-    "imageAlt": "A significant life milestone captured beautifully",
-    "rotatingWords": {
-      "legacy": "legacy",
-      "freedom": "freedom",
-      "emotions": "emotions",
-      "moment": "the moment",
-      "story": "your story",
-      "stillness": "stillness"
+  "landing": {
+    "hero": {
+      "eyebrow": "Milestis",
+      "titleLine1": "Turn scattered photos into",
+      "titleItalic": "a story worth keeping.",
+      "description": "Milestis turns your photos into an interactive book you can actually finish — no design skills, no subscription cliff, just a page that’s really yours.",
+      "imageAlt": "An open interactive photo book page",
+      "combinationsLabel": "Combinations",
+      "combinationsValue": "10,000+"
+    },
+    "stats": [
+      { "number": "10,000+", "label": "Design combinations" },
+      { "number": "5 min", "label": "To publish" },
+      { "number": "0", "label": "Design skills needed" }
+    ],
+    "manifesto": {
+      "eyebrow": "Why it matters",
+      "quote": "Nobody remembers a folder of raw files. Everyone remembers a story."
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "From folder to finished page.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Pick a template",
+          "description": "Choose a structure that already knows how to look good — spacing and hierarchy are solved before you start."
+        },
+        {
+          "number": "02",
+          "title": "Add your photos",
+          "description": "Drop in your best shots. AI handles the cropping, pacing and layout for you, instantly."
+        },
+        {
+          "number": "03",
+          "title": "Make it yours",
+          "description": "Swap a palette, add a caption, adjust the pacing — the structure never breaks no matter what you change."
+        },
+        {
+          "number": "04",
+          "title": "Publish & share",
+          "description": "One link. No app to download, no account required for anyone to view it."
+        }
+      ]
+    },
+    "features": {
+      "eyebrow": "What’s inside",
+      "items": [
+        {
+          "title": "Unbreakable layouts",
+          "description": "Every template is pixel-tested. However you rearrange it, the composition never falls apart."
+        },
+        {
+          "title": "Depth & atmosphere",
+          "description": "Light, shadow and parallax give every page a sense of real physical space."
+        },
+        {
+          "title": "Curated palettes",
+          "description": "Dozens of ready palettes, or build your own from a single photo in your book."
+        },
+        {
+          "title": "Interactive animations",
+          "description": "Pages that respond to scroll and touch, so reading feels like turning real pages."
+        },
+        {
+          "title": "One shareable link",
+          "description": "No login wall for your readers — just a link that works everywhere."
+        }
+      ]
+    },
+    "useCases": {
+      "eyebrow": "Who it’s for",
+      "items": [
+        {
+          "id": "events",
+          "title": "Event stories",
+          "description": "Turn a wedding, a trip or a birthday into a book your guests will actually open again."
+        },
+        {
+          "id": "portfolios",
+          "title": "Instant portfolios",
+          "description": "Freelancers and creators use Milestis as a portfolio that updates itself in minutes."
+        },
+        {
+          "id": "upsell",
+          "title": "Photographer upsell",
+          "description": "Studios hand clients a finished, branded gallery instead of a folder of raw files."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Your photos deserve better than a folder.",
+      "description": "Start free. No credit card, no watermark.",
+      "button": "Get started"
     }
-  },
-  "EmotionalContext": {
-    "subtitle": "One platform. Every format. Always premium.",
-    "labels": {
-      "eventStories": "Event stories",
-      "clientGifts": "Client gifts",
-      "shareableLinks": "Shareable links"
-    }
-  },
-  "HowItWorks": {
-    "title": "From content to finished project in 4 steps",
-    "subtitle": "No design skills. No guesswork. Quality is guaranteed by the platform.",
-    "steps": {
-      "pickTemplate": {
-        "title": "Pick a template",
-        "description": "Choose from premium rigid layouts — professionally designed so the result always looks stunning, no matter the content."
-      },
-      "addContent": {
-        "title": "Add your content",
-        "description": "Upload visuals, write your copy, select a curated color palette. The structure handles itself."
-      },
-      "personalTouch": {
-        "title": "Add your personal touch",
-        "description": "Place decorative elements freely, add depth effects and light layers — make the project unmistakably yours."
-      },
-      "publishShare": {
-        "title": "Publish and share",
-        "description": "One link. Anyone you send it to opens a fully interactive digital experience — no app, no download, any device."
-      }
-    }
-  },
-  "Features": {
-    "title": "Everything your project deserves",
-    "subtitle": "Built around one principle: the result should always look premium — regardless of who made it",
-    "items": {
-      "unbreakableDesign": {
-        "title": "Design you can't break",
-        "description": "Rigid layouts lock in professional structure. You only change the content — premium quality is baked into every template."
-      },
-      "depthAtmosphere": {
-        "title": "Depth & atmosphere",
-        "description": "Light rays, cinematic textures and layered shadows make every visual look like it belongs in a high-end production."
-      },
-      "freeformDecorations": {
-        "title": "Freeform decorations",
-        "description": "Drag and place decorative elements anywhere on the page. Add personality without disrupting the underlying layout."
-      },
-      "colorPalettes": {
-        "title": "Curated color palettes",
-        "description": "Handcrafted palettes engineered for aesthetic harmony. Pick one — the entire project falls into place automatically."
-      },
-      "interactiveAnimations": {
-        "title": "Interactive animations",
-        "description": "Every project comes alive with smooth motion powered by Framer Motion — the kind of feel that rivals native apps."
-      },
-      "shareableLink": {
-        "title": "Share with one link",
-        "description": "Publish and send. The recipient opens a fully interactive digital presentation on any device — no app, no download."
-      }
-    }
-  },
-  "UseCases": {
-    "title": "One platform, multiple ways to wow",
-    "subtitle": "From instant wedding gifts to professional photography deliverables — quality is built-in by design.",
-    "cases": {
-      "eventStories": {
-        "title": "Event Stories",
-        "description": "Turn any wedding or party into a living digital story. Created in 5 minutes from a phone, delivered as a premium gift link instantly."
-      },
-      "instantPortfolios": {
-        "title": "Instant Portfolios",
-        "description": "Showcase your vision without touching a design tool. A high-end digital space for artists and creators to express themselves beautifully."
-      },
-      "photographerUpsell": {
-        "title": "Professional Client Delivery",
-        "description": "Send clients a polished, branded digital product instead of a folder of raw files. Elevate every project you deliver and stand out from the crowd."
-      }
-    }
-  },
-  "FinalCTA": {
-    "title": "Ready to create something premium?",
-    "subtitle": "Build your first project in 5 minutes — from any device, no design skills required. Quality guaranteed.",
-    "cta": "Start for free"
   }
 }

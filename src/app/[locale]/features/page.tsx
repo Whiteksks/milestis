@@ -1,20 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next'
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { CTAButton } from '@/components/shared/cta-button';
-import {
-  Palette,
-  Layers,
-  Zap,
-  CloudLightning,
-  Maximize,
-  Infinity,
-  ShieldCheck,
-  Briefcase,
-  GripHorizontal,
-  Check,
-} from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
+import { ShieldCheck, Palette, Zap, Briefcase, Check } from 'lucide-react';
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 
@@ -27,138 +15,192 @@ export async function generateMetadata({
 
   const titles: Record<string, string> = {
     en: 'Features',
-    ru: 'Возможности',
-    kz: 'Мүмкіндіктер',
   }
   const descriptions: Record<string, string> = {
-    en: 'Discover all Milestis features — interactive layouts, stunning templates, drag-and-drop media uploads, and more.',
-    ru: 'Откройте все возможности Milestis — интерактивные макеты, красивые шаблоны, загрузка медиа и многое другое.',
-    kz: 'Milestis мүмкіндіктерін ашыңыз — интерактивті макеттер, үлгілер, медиа жүктеу және тағы басқа.',
+    en: 'Discover all Milestis features — interactive layouts, stunning templates, and more.',
   }
 
-  const title = titles[locale] ?? titles.en
-  const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/features`
-
   return {
-    title,
-    description,
-    alternates: {
-      canonical: url,
-      languages: {
-        'en': 'https://milestis.com/en/features',
-        'ru': 'https://milestis.com/ru/features',
-        'kk': 'https://milestis.com/kz/features',
-        'x-default': 'https://milestis.com/en/features',
-      },
-    },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      siteName: 'Milestis',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
+    title: titles[locale] ?? titles.en,
+    description: descriptions[locale] ?? descriptions.en,
   }
 }
 
-export default function FeaturesPage() {
-  const t = useTranslations('features');
+const swatches = [
+  'bg-primary/70', 'bg-foreground/15', 'bg-foreground/30', 'bg-primary/30',
+  'bg-foreground/30', 'bg-primary/30', 'bg-primary/70', 'bg-foreground/15',
+];
 
-  // Получаем массив профессиональных фич
-  const proList = t.raw('sections.professionals.list') as string[];
+const pillarIcons = [ShieldCheck, Palette, Zap];
 
-  // Массив иконок и ключей для бейджей в секции "Atmosphere"
-  const atmosphereBadges = [
-    { icon: Layers, key: 'textures' },
-    { icon: CloudLightning, key: 'rays' },
-    { icon: GripHorizontal, key: 'decorations' },
-    { icon: Palette, key: 'palettes' },
-  ];
+export default async function FeaturesPage() {
+  const t = await getTranslations('features');
+  const stats = t.raw('stats') as { number: string; label: string }[];
+  const pillars = (t.raw('designSystem.pillars') as { number: string; title: string; description: string }[])
+    .map((pillar, i) => ({ ...pillar, icon: pillarIcons[i] }));
+  const professionalFeatures = t.raw('professionals.items') as { title: string; emphasis?: boolean }[];
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/10">
+      {/* Subtle paper grain — keeps flat surfaces from reading as vector fills */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-50 opacity-[0.035] mix-blend-multiply"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
+
       <Header />
 
-      {/* Hero */}
-      <header className="pt-32 pb-20 px-6 text-center border-b border-border/40 relative overflow-hidden">
-        {/* Мягкий фоновый градиент для уюта */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-        
-        <div className="max-w-3xl mx-auto relative z-10">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            {t('hero.titleStart')} <br />
-            <span className="text-muted-foreground italic font-serif">
-              {t('hero.titleItalic')}
-            </span>
-          </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            {t('hero.description')}
-          </p>
+      {/* Hero — asymmetric split; a layered card stack stands in for a photo */}
+      <header className="px-6 pt-32 pb-20 md:pt-40 md:pb-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-16 md:grid-cols-2 md:gap-12">
+          <div>
+            <div className="mb-5 flex items-center gap-4">
+              <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60">
+                {t('hero.eyebrow')}
+              </span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <h1 className="font-serif text-4xl leading-[1.1] tracking-tight text-balance md:text-6xl">
+              {t('hero.titleLine1')}
+              <br />
+              <span className="text-primary italic">{t('hero.titleItalic')}</span>
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
+              {t('hero.description')}
+            </p>
+
+            <div className="mt-12 grid grid-cols-3 gap-6 border-t border-border/60 pt-6">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="font-mono text-2xl font-medium tabular-nums text-foreground md:text-3xl">
+                    {stat.number}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Fanned card stack — overlap creates depth without a photograph */}
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="absolute inset-0 rounded-2xl border border-border/50 bg-muted/40 rotate-[-6deg]" />
+            <div className="absolute inset-0 rounded-2xl border border-border/60 bg-card shadow-md rotate-[4deg]" />
+            <div className="relative rounded-2xl border border-border bg-card p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground/60">
+                  {t('hero.templateLabel')}
+                </span>
+                <span className="font-mono text-xs text-muted-foreground/50">04</span>
+              </div>
+              <div className="mt-6 grid grid-cols-4 gap-2">
+                {swatches.map((swatch, i) => (
+                  <div key={i} className={`aspect-square rounded-xs ${swatch}`} />
+                ))}
+              </div>
+              <div className="mt-6 h-2 w-2/3 rounded-full bg-muted" />
+              <div className="mt-2 h-2 w-1/2 rounded-full bg-muted" />
+            </div>
+
+            <div className="absolute -bottom-6 -left-6 rounded-2xl bg-foreground p-5 text-background shadow-xl md:-left-8">
+              <p className="font-mono text-xs uppercase tracking-widest text-background/60">{t('hero.templatesLabel')}</p>
+              <p className="mt-1 font-serif text-2xl italic">50+</p>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Section 1: Design System */}
-      <section className="py-24 px-6 bg-muted/20 border-b border-border/40">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-16 text-center">
-            {t('sections.designSystem.badge')}
+      {/* High-contrast manifesto break */}
+      <section className="bg-foreground px-6 py-24 text-background">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="font-mono text-xs font-medium uppercase tracking-widest text-background/50">
+            {t('manifesto.eyebrow')}
+          </span>
+          <p className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
+            &ldquo;{t('manifesto.quote')}&rdquo;
+          </p>
+        </div>
+      </section>
+
+      {/* Value pillars — no cards; oversized faint numerals + Swiss divider rules carry the depth */}
+      <section className="border-b border-border/40 px-6 py-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-4 flex items-center gap-4">
+            <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60">
+              {t('designSystem.eyebrow')}
+            </span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <h2 className="font-serif text-3xl tracking-tight text-foreground md:text-4xl">
+            {t('designSystem.title')}
+          </h2>
+          <p className="mt-2 font-serif text-lg italic text-muted-foreground">
+            {t('designSystem.subtitle')}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
-            {/* Rigid Design */}
-            <div className="space-y-6 flex flex-col justify-between">
-              <div className="space-y-6">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <ShieldCheck className="w-6 h-6" />
+          <div className="mt-16 grid grid-cols-1 divide-y divide-border/60 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {pillars.map((pillar) => (
+              <div
+                key={pillar.number}
+                className="relative overflow-hidden py-10 first:pt-0 md:px-10 md:py-0 md:first:pl-0 md:last:pr-0"
+              >
+                <span className="pointer-events-none absolute -top-6 right-0 font-serif text-8xl italic text-foreground/5 select-none">
+                  {pillar.number}
+                </span>
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-xs border border-border text-foreground/70">
+                  <pillar.icon className="h-4 w-4" />
                 </div>
-                <h2 className="text-3xl font-semibold tracking-tight">{t('sections.designSystem.rigid.title')}</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('sections.designSystem.rigid.description')}
-                </p>
+                <h3 className="relative mt-6 text-lg font-medium text-foreground">{pillar.title}</h3>
+                <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">{pillar.description}</p>
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 mt-auto">
-                <div className="rounded-2xl border border-border bg-background p-5 text-sm shadow-sm">
-                  <p className="font-semibold mb-1.5">{t('sections.designSystem.rigid.handleTitle')}</p>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    {t('sections.designSystem.rigid.handleDesc')}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-5 text-sm shadow-sm">
-                  <p className="font-semibold mb-1.5 text-primary">{t('sections.designSystem.rigid.controlTitle')}</p>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    {t('sections.designSystem.rigid.controlDesc')}
-                  </p>
-                </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Professionals — one lifted, emphasized card among quiet ones */}
+      <section className="bg-muted/20 px-6 py-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-14 flex items-center gap-4">
+            <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60">
+              {t('professionals.eyebrow')}
+            </span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="space-y-5 lg:col-span-5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xs border border-border text-foreground/70">
+                <Briefcase className="h-4 w-4" />
               </div>
+              <h2 className="font-serif text-3xl tracking-tight text-foreground md:text-4xl">
+                {t('professionals.title')}
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+                {t('professionals.description')}
+              </p>
             </div>
 
-            {/* Visual Depth + Decorations */}
-            <div className="space-y-6 flex flex-col justify-between">
-              <div className="space-y-6">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <Palette className="w-6 h-6" />
-                </div>
-                <h2 className="text-3xl font-semibold tracking-tight">{t('sections.designSystem.atmosphere.title')}</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('sections.designSystem.atmosphere.description')}
-                </p>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 pt-6 mt-auto">
-                {atmosphereBadges.map((item) => (
-                  <div 
-                    key={item.key} 
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-medium hover:border-primary/30 transition-colors shadow-sm"
+            <div className="w-full lg:col-span-7">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {professionalFeatures.map((item) => (
+                  <div
+                    key={item.title}
+                    className={`flex flex-col justify-between rounded-2xl p-6 transition-colors duration-300 ${
+                      item.emphasis
+                        ? 'relative z-10 -mt-4 bg-card border border-primary/30 shadow-xl sm:col-span-2'
+                        : 'bg-card border border-border/40 shadow-sm hover:border-border'
+                    }`}
                   >
-                    <item.icon className="w-4 h-4 text-primary" />
-                    {t(`sections.designSystem.atmosphere.badges.${item.key}`)}
+                    <div className="flex items-start gap-3">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-foreground/40" />
+                      <p className="text-sm leading-relaxed font-medium text-foreground/90 sm:text-base">
+                        {item.title}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -167,120 +209,23 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Section 2: Platform */}
-      <section className="py-24 px-6 border-b border-border/40">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-4 text-center">
-            {t('sections.platform.badge')}
-          </p>
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">{t('sections.platform.title')}</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto italic font-serif">
-              {t('sections.platform.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-background border-border shadow-sm hover:border-primary/20 transition-colors">
-              <CardContent className="p-8">
-                <Zap className="w-6 h-6 text-primary mb-4" />
-                <h4 className="font-bold mb-2">{t('sections.platform.cards.instant.title')}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {t('sections.platform.cards.instant.description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-background border-border shadow-sm hover:border-primary/20 transition-colors">
-              <CardContent className="p-8">
-                <Maximize className="w-6 h-6 text-primary mb-4" />
-                <h4 className="font-bold mb-2">{t('sections.platform.cards.responsive.title')}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {t('sections.platform.cards.responsive.description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-background border-border shadow-sm hover:border-primary/20 transition-colors">
-              <CardContent className="p-8">
-                <Infinity className="w-6 h-6 text-primary mb-4" />
-                <h4 className="font-bold mb-2">{t('sections.platform.cards.upToDate.title')}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {t('sections.platform.cards.upToDate.description')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-{/* Section 3: For Professionals (ОБНОВЛЕННАЯ СЕКЦИЯ) */}
-      <section className="py-24 px-6 bg-gradient-to-b from-muted/10 to-muted/30 border-b border-border/40 overflow-hidden">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Левая колонка — Заголовки */}
-            <div className="lg:col-span-5 space-y-5 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/15 backdrop-blur-sm">
-                <Briefcase className="w-3.5 h-3.5" />
-                <span className="text-xs font-semibold uppercase tracking-widest">
-                  {t('sections.professionals.badge')}
-                </span>
-              </div>
-              
-              <div className="space-y-4">
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
-                  {t('sections.professionals.title')}
-                </h2>
-                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                  {t('sections.professionals.description')}
-                </p>
-              </div>
-            </div>
-
-            {/* Правая колонка — Карточки для двух пунктов */}
-            <div className="lg:col-span-7 w-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {proList
-                  ?.filter((item: string) => !item.toLowerCase().includes('white label')) // Надежная фильтрация от white label
-                  ?.map((item: string, index: number) => (
-                    <div 
-                      key={index} 
-                      className="group relative flex flex-col justify-between p-6 bg-background border border-border/60 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/20 hover:bg-background/80 transition-all duration-300"
-                    >
-                      {/* Декоративный легкий светящийся элемент при ховере */}
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                      
-                      <div className="space-y-4 relative z-10">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                          <Check className="h-4 w-4 stroke-[3]" />
-                        </div>
-                        <p className="text-sm sm:text-base font-medium text-foreground/90 leading-relaxed">
-                          {item}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <footer className="py-28 px-6 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="relative z-10 max-w-md mx-auto">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">{t('cta.title')}</h2>
-          <p className="text-muted-foreground mb-8 leading-relaxed">
+      {/* CTA — dark contrast panel, lifted to overlap the seam above */}
+      <section className="px-6 py-24">
+        <div className="relative z-10 mx-auto -mt-16 max-w-md rounded-2xl bg-foreground p-12 text-center text-background shadow-2xl md:-mt-20">
+          <h2 className="font-serif text-3xl italic tracking-tight">
+            {t('cta.title')}
+          </h2>
+          <p className="mt-4 leading-relaxed text-background/70">
             {t('cta.description')}
           </p>
-          <CTAButton className="bg-foreground text-background px-10 py-4 rounded-full font-bold hover:opacity-90 transition-all active:scale-95 shadow-xl">
-            {t('cta.button')}
-          </CTAButton>
+          <div className="mt-8">
+            <CTAButton className="rounded-xs bg-background px-10 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background/90">
+              {t('cta.button')}
+            </CTAButton>
+          </div>
         </div>
-      </footer>
+      </section>
+
       <Footer />
     </div>
   );

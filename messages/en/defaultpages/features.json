@@ -1,65 +1,58 @@
 {
   "features": {
     "hero": {
-      "titleStart": "No design skills. ",
+      "eyebrow": "The Toolkit",
+      "titleLine1": "No design skills.",
       "titleItalic": "No compromise.",
-      "description": "Milestis gives you rigid, unbreakable layouts so every project you build looks premium — regardless of your experience."
+      "description": "Milestis gives you rigid, unbreakable layouts so every project you build looks premium — regardless of your experience.",
+      "templateLabel": "Template",
+      "templatesLabel": "Templates"
     },
-    "sections": {
-      "designSystem": {
-        "badge": "01 — Design System",
-        "rigid": {
-          "title": "Rigid Design — Quality by Default",
-          "description": "Every template in Milestis is a carefully engineered preset — structure, proportions, and visual hierarchy are already worked out by design. You choose from a curated collection and combine with color palettes. The result is always professional, whoever assembled it.",
-          "handleTitle": "What we handle",
-          "handleDesc": "Structure, proportions, typography, spacing — fully engineered presets.",
-          "controlTitle": "What you control",
-          "controlDesc": "Content, palette, atmosphere, decorations — your creative freedom."
+    "stats": [
+      { "number": "50+", "label": "Templates" },
+      { "number": "1-click", "label": "AI layouts" },
+      { "number": "0", "label": "Design skills needed" }
+    ],
+    "manifesto": {
+      "eyebrow": "Why it looks this way",
+      "quote": "Good design shouldn’t require good taste. It should already be built in."
+    },
+    "designSystem": {
+      "eyebrow": "The Design System",
+      "title": "Structure you can’t break.",
+      "subtitle": "Freedom you can actually feel.",
+      "pillars": [
+        {
+          "number": "01",
+          "title": "Rigid by design",
+          "description": "Every template is a carefully engineered preset — spacing, hierarchy and proportion are already solved."
         },
-        "atmosphere": {
-          "title": "Atmosphere & Personal Touch",
-          "description": "Add depth to any project with textures, light effects, and decorative elements. Layer cinematic overlays, place ornaments across the page, combine everything with a curated color palette — and the project becomes unmistakably yours.",
-          "badges": {
-            "textures": "Depth Textures",
-            "rays": "Light Rays",
-            "decorations": "Decorations",
-            "palettes": "Color Palettes"
-          }
+        {
+          "number": "02",
+          "title": "Total creative control",
+          "description": "Swap palettes, textures and light effects freely. The structure underneath never breaks."
+        },
+        {
+          "number": "03",
+          "title": "Opens instantly",
+          "description": "No app, no download. Every project loads in an instant, on any device."
         }
-      },
-      "platform": {
-        "badge": "02 — Platform",
-        "title": "Built for Real-World Sharing",
-        "subtitle": "Every project published through Milestis is a fully interactive digital presentation — accessible from any link.",
-        "cards": {
-          "instant": {
-            "title": "Opens in an Instant",
-            "description": "Anyone you share the link with gets an instant-loading experience — no app, no download, no friction."
-          },
-          "responsive": {
-            "title": "Responsive on Every Screen",
-            "description": "Whether opened on a phone, tablet, or large display — every project adapts and always looks its best."
-          },
-          "upToDate": {
-            "title": "Always Up to Date",
-            "description": "Milestis automatically handles browser compatibility so your projects open correctly on any device, always."
-          }
-        }
-      },
-      "professionals": {
-        "badge": "03 — For Professionals",
-        "title": "A Tool for Photographers & Creators",
-        "description": "Stop delivering a folder of files. With Milestis, you hand over a finished, branded digital product. A powerful upsell that increases your average order value — and makes clients remember you.",
-        "list": [
-          "Wholesale credits at 80% off retail",
-          "Professional workspace for 25+ active projects"
-        ]
-      }
+      ]
+    },
+    "professionals": {
+      "eyebrow": "For Professionals",
+      "title": "Built for people who deliver client work.",
+      "description": "Photographers, planners and studios use Milestis to hand over a finished, branded product — not just a folder of files.",
+      "items": [
+        { "title": "Client proofing links", "emphasis": true },
+        { "title": "Personal Workspace" },
+        { "title": "AI-assisted photo placement" }
+      ]
     },
     "cta": {
-      "title": "Ready to build your first project?",
-      "description": "Start for free. No design skills required. Quality guaranteed.",
-      "button": "Get Started for Free"
+      "title": "Build your first page today.",
+      "description": "No credit card, no watermark, no catch.",
+      "button": "Get started"
     }
   }
 }

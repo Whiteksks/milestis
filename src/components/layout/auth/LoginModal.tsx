@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useRef, useState } from "react"
+import Image from "next/image"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,7 @@ import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTranslations } from "next-intl"
+import modalPhoto from "@/components/assets/story-photo-3.jpg"
 
 interface LoginModalProps {
   open: boolean
@@ -34,6 +36,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [password, setPassword] = useState("")
   const [consentChecked, setConsentChecked] = useState(false)
   const [newsletterChecked, setNewsletterChecked] = useState(false)
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false)
 
   // Iubenda temporarily disabled — no-op until re-enabled
   const recordIubendaConsent = (email: string) => {
@@ -97,6 +100,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       setPassword("")
       setConsentChecked(false)
       setNewsletterChecked(false)
+      setShowPasswordLogin(false)
     }
     onOpenChange(open)
   }
@@ -106,11 +110,14 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       {!sent ? (
         <div className="space-y-8">
           <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Sign In To Milestis
+            <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
+              {t("loginModal.brand")}
+            </span>
+            <h2 className="font-serif text-2xl tracking-tight">
+              {t("loginModal.titleStart")} <span className="text-primary italic">{t("loginModal.titleHighlight")}</span>
             </h2>
             <p className="text-muted-foreground font-light italic font-serif">
-              Enter your email to start creating.
+              {t("loginModal.subtitle")}
             </p>
           </div>
 
@@ -120,16 +127,16 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 htmlFor="email"
                 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70"
               >
-                Email Address
+                {t("loginModal.emailLabel")}
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder={t("loginModal.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMagicLink()}
-                className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
+                className="h-12 bg-background/50 border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
               />
               {error && (
                 <p className="text-xs text-destructive mt-1">{t(error as Parameters<typeof t>[0])}</p>
@@ -139,46 +146,55 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <Button
               onClick={handleSendMagicLink}
               disabled={loading || !email || !consentChecked}
-              className="w-full h-12 text-base font-semibold rounded-xl shadow-lg shadow-primary/5 hover:scale-[1.01] transition-all active:scale-95 group"
+              className="w-full h-12 text-base font-semibold rounded-xl transition-colors group"
             >
-              {loading ? "Sending..." : "Send Magic Link"}
+              {loading ? t("loginModal.sendingButton") : t("loginModal.sendButton")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
 
-            <div className="relative flex items-center gap-3">
-              <div className="h-px flex-1 bg-border/40" />
-              <span className="text-xs text-muted-foreground/50 font-light">or</span>
-              <div className="h-px flex-1 bg-border/40" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70"
-                >
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
-                  className="h-12 bg-background/50 backdrop-blur-sm border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
-                />
-              </div>
-              <Button
-                variant="outline"
-                onClick={handleSignInWithPassword}
-                disabled={loading || !email || !password || !consentChecked}
-                className="w-full h-10 text-sm font-medium rounded-xl border-border/60 hover:border-border hover:bg-muted/30 transition-all group"
+            {!showPasswordLogin ? (
+              <button
+                type="button"
+                onClick={() => setShowPasswordLogin(true)}
+                className="w-full text-center text-xs font-light text-muted-foreground/70 underline underline-offset-4 transition-colors hover:text-foreground"
               >
-                {loading ? "Signing in..." : "Sign in with Password"}
-                <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </div>
+                {t("loginModal.orSignInWithPassword")}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border/40" />
+                  <span className="text-xs text-muted-foreground/50 font-light">{t("loginModal.orSeparator")}</span>
+                  <div className="h-px flex-1 bg-border/40" />
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="password"
+                    className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70"
+                  >
+                    {t("loginModal.passwordLabel")}
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder={t("loginModal.passwordPlaceholder")}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSignInWithPassword()}
+                    className="h-12 bg-background/50 border-border/60 focus-visible:ring-primary/20 rounded-xl px-4"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleSignInWithPassword}
+                  disabled={loading || !email || !password || !consentChecked}
+                  className="w-full h-10 text-sm font-medium rounded-xl border-border/60 hover:border-border hover:bg-muted/30 transition-colors group"
+                >
+                  {loading ? t("loginModal.signingInButton") : t("loginModal.signInPasswordButton")}
+                  <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -193,13 +209,13 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 htmlFor="auth-consent"
                 className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
               >
-                I agree to the{" "}
+                {t("loginModal.consentAgreePrefix")}{" "}
                 <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                  Terms of Service
+                  {t("loginModal.termsOfService")}
                 </Link>
-                {" "}and{" "}
+                {" "}{t("loginModal.consentAnd")}{" "}
                 <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                  Privacy Policy
+                  {t("loginModal.privacyPolicy")}
                 </Link>
               </label>
             </div>
@@ -214,24 +230,23 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 htmlFor="newsletter-consent"
                 className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
               >
-                I&apos;d like to receive product news and updates from Milestis (optional)
+                {t("loginModal.newsletterConsent")}
               </label>
             </div>
           </div>
         </div>
       ) : (
         <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 mx-auto border border-primary/10 relative">
-            <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl scale-125" />
-            <CheckCircle2 className="h-10 w-10 text-primary relative z-10" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mx-auto border border-border">
+            <CheckCircle2 className="h-10 w-10 text-primary" />
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Check your inbox
+            <h2 className="font-serif text-2xl tracking-tight">
+              {t("loginModal.checkInboxTitle")}
             </h2>
             <p className="text-muted-foreground font-light leading-relaxed italic font-serif">
-              We&apos;ve sent a magic link to{" "}
+              {t("loginModal.checkInboxDescription")}{" "}
               <span className="text-foreground not-italic font-sans font-medium">{email}</span>
             </p>
           </div>
@@ -243,10 +258,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               className="w-full h-12 rounded-xl border-border/60 bg-background/50 hover:bg-muted/30 transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Change Email
+              {t("loginModal.changeEmailButton")}
             </Button>
             <p className="text-xs text-muted-foreground font-light">
-              Didn&apos;t receive it? Check your spam folder or try again in a minute.
+              {t("loginModal.resendHint")}
             </p>
           </div>
         </div>
@@ -264,8 +279,8 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             }}
           >
           <DrawerHeader className="sr-only">
-            <DrawerTitle>Login Modal</DrawerTitle>
-            <DrawerDescription>mobile login modal</DrawerDescription>
+            <DrawerTitle>{t("loginModal.dialogTitle")}</DrawerTitle>
+            <DrawerDescription>{t("loginModal.dialogDescription")}</DrawerDescription>
           </DrawerHeader>
           <div ref={menuRef} tabIndex={-1} className="pb-4 px-2 outline-none">
             {innerContent}
@@ -277,12 +292,26 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-105 rounded-2xl border-border/30 bg-card p-0 shadow-2xl shadow-black/10">
+      <DialogContent className="sm:max-w-105 lg:max-w-4xl lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl border-border/30 bg-card p-0 shadow-2xl shadow-black/10">
           <DialogHeader className="sr-only">
-            <DialogTitle>Login Modal</DialogTitle>
-            <DialogDescription>mobile login modal</DialogDescription>
+            <DialogTitle>{t("loginModal.dialogTitle")}</DialogTitle>
+            <DialogDescription>{t("loginModal.dialogDescription")}</DialogDescription>
           </DialogHeader>
         {innerContent}
+        {/* Photo panel — desktop only, mirrors the split layout used on the full /auth/login page */}
+        <div className="relative hidden lg:block">
+          <Image
+            src={modalPhoto}
+            alt="An open interactive photo book page"
+            fill
+            sizes="400px"
+            className="object-cover"
+          />
+          <div className="absolute bottom-6 left-6 rounded-2xl bg-foreground p-4 text-background shadow-xl">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-background/60">Publish in</p>
+            <p className="mt-0.5 font-serif text-lg italic">5 minutes</p>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

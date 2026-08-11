@@ -1,6 +1,7 @@
 {
   "pricing": {
     "header": {
+      "eyebrow": "Тарифы",
       "titleStart": "Простое, ",
       "titleItalic": "честное",
       "titleEnd": " ценообразование.",

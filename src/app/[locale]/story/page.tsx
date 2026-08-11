@@ -1,11 +1,12 @@
 import React from 'react';
 import type { Metadata } from 'next'
-import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 import { CTAButton } from '@/components/shared/cta-button';
-import { Heart, Sparkles, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Share2, Wand2, Infinity as InfinityIcon } from 'lucide-react';
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';
+import heroPhoto from '@/components/assets/story-photo-1.jpg';
 
 export async function generateMetadata({
   params,
@@ -16,195 +17,152 @@ export async function generateMetadata({
 
   const titles: Record<string, string> = {
     en: 'Our Story',
-    ru: 'Наша история',
-    kz: 'Біздің тарих',
   }
   const descriptions: Record<string, string> = {
-    en: 'Learn about the mission behind Milestis — building a platform to preserve and share life\'s most precious memories.',
-    ru: 'Узнайте о миссии Milestis — платформе для сохранения и передачи самых ценных воспоминаний.',
-    kz: 'Milestis миссиясы туралы біліңіз — қымбат естеліктерді сақтауға арналған платформа.',
+    en: 'Milestis exists because memories are fragile, and platforms shouldn\u2019t be.',
   }
 
-  const title = titles[locale] ?? titles.en
-  const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/story`
-
   return {
-    title,
-    description,
-    alternates: {
-      canonical: url,
-      languages: {
-        'en': 'https://milestis.com/en/story',
-        'ru': 'https://milestis.com/ru/story',
-        'kk': 'https://milestis.com/kz/story',
-        'x-default': 'https://milestis.com/en/story',
-      },
-    },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      siteName: 'Milestis',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
+    title: titles[locale] ?? titles.en,
+    description: descriptions[locale] ?? descriptions.en,
   }
 }
 
-const MissionPage = () => {
-  const t = useTranslations('MissionPage');
+const permanenceIcons = [Share2, Wand2, InfinityIcon];
+
+const MissionPage = async () => {
+  const t = await getTranslations('story');
+  const stats = t.raw('stats') as { number: string; label: string }[];
+  const permanenceFeatures = (t.raw('permanence.items') as { number: string; title: string; description: string }[])
+    .map((feature, i) => ({ ...feature, icon: permanenceIcons[i] }));
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/10">
+      {/* Subtle paper grain — keeps flat surfaces from reading as vector fills */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-50 opacity-[0.035] mix-blend-multiply"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
+
       <Header />
-      
-      {/* Hero Section */}
-      <header className="relative pt-32 pb-24 px-6 border-b border-border/40 overflow-hidden">
-        {/* Мягкое свечение в бэкграунде для премиальности */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/[0.03] via-transparent to-transparent pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-8">
-            <Heart className="w-3.5 h-3.5 fill-current" />
-            <span>{t('hero.badge')}</span>
+
+      {/* Hero — asymmetric split, photo carries the depth */}
+      <header className="px-6 pt-32 pb-20 md:pt-40 md:pb-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-16 md:grid-cols-2 md:gap-12">
+          <div>
+            <div className="mb-5 flex items-center gap-4">
+              <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60">
+                {t('hero.eyebrow')}
+              </span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <h1 className="font-serif text-4xl leading-[1.1] tracking-tight text-balance md:text-6xl">
+              {t('hero.titleLine1')}
+              <br />
+              <span className="text-primary italic">{t('hero.titleItalic')}</span>
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
+              {t('hero.description')}
+            </p>
+
+            <div className="mt-12 grid grid-cols-3 gap-6 border-t border-border/60 pt-6">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="font-mono text-2xl font-medium tabular-nums text-foreground md:text-3xl">
+                    {stat.number}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-foreground leading-[1.1]">
-            {t('hero.titleMain')} <br /> 
-            <span className="text-muted-foreground italic font-serif font-normal">{t('hero.titleSub')}</span>
-          </h1>
-          
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {t('hero.description')}
-          </p>
+
+          {/* Photo panel with an overlapping floating card — literal layered depth */}
+          <div className="relative">
+            <div className="relative aspect-4/5 overflow-hidden rounded-2xl shadow-xl">
+              <Image
+                src={heroPhoto}
+                alt={'Story hero photo'}
+                fill
+                sizes="(min-width: 768px) 40vw, 90vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+            <div className="absolute -bottom-6 -left-6 rounded-2xl bg-foreground p-5 text-background shadow-xl md:-left-8">
+              <p className="font-mono text-xs uppercase tracking-widest text-background/60">{t('hero.sinceLabel')}</p>
+              <p className="mt-1 font-serif text-2xl italic">2026</p>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* The Soul of the Project */}
-      <article className="py-24 px-6 bg-muted/20 border-b border-border/40">
-        <div className="max-w-4xl mx-auto"> {/* Сжали контейнер с 5xl до 4xl для баланса массы */}
-          <div className="grid md:grid-cols-5 gap-12 md:gap-16 items-center">
-            
-            {/* Левая колонка с текстом (занимает чуть больше места) */}
-            <div className="md:col-span-3 space-y-6">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                {t('soul.title')}
-              </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                {t('soul.description')}
-              </p>
-              
-              <div className="space-y-5 pt-2">
-                <div className="flex items-start gap-4">
-                  <div className="mt-1 p-2 bg-background rounded-xl border border-border shadow-sm text-primary shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground text-base mb-0.5">{t('soul.features.stunning.title')}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {t('soul.features.stunning.description')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="mt-1 p-2 bg-background rounded-xl border border-border shadow-sm text-primary shrink-0">
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground text-base mb-0.5">{t('soul.features.gift.title')}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {t('soul.features.gift.description')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Правая колонка с цитатой (работает вместо фото) */}
-            <div className="md:col-span-2 relative aspect-[4/5] md:aspect-square rounded-3xl overflow-hidden border border-border bg-background shadow-sm flex items-center justify-center p-8 text-center">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/[0.02] via-transparent to-primary/[0.05]" />
-              <div className="relative space-y-4">
-                <Sparkles className="w-8 h-8 text-primary/40 mx-auto" />
-                <p className="text-base md:text-lg font-serif italic text-foreground/90 leading-relaxed px-2">
-                  "{t('soul.quote')}"
-                </p>
-              </div>
-            </div>
-
-          </div>
+      {/* High-contrast manifesto break */}
+      <section className="bg-foreground px-6 py-24 text-background">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="font-mono text-xs font-medium uppercase tracking-widest text-background/50">
+            {t('manifesto.eyebrow')}
+          </span>
+          <p className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
+            &ldquo;{t('manifesto.quote')}&rdquo;
+          </p>
         </div>
-      </article>
+      </section>
 
-      {/* Speed & Simplicity */}
-      <section className="py-24 px-6 border-b border-border/40">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16 space-y-3">
-            <h2 className="text-3xl font-bold tracking-tight">{t('simplicity.title')}</h2>
-            <p className="text-muted-foreground italic text-lg font-serif">{t('simplicity.subtitle')}</p>
+      {/* Value pillars — no photo here; oversized faint numerals + Swiss divider rules carry the depth instead */}
+      <section className="border-b border-border/40 px-6 py-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-4 flex items-center gap-4">
+            <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60">
+              {t('permanence.eyebrow')}
+            </span>
+            <span className="h-px flex-1 bg-border" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            <div className="flex flex-col items-center text-center group">
-              <div className="mb-5 w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary/10 transition-colors group-hover:bg-primary/10">
-                <Zap className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">{t('simplicity.features.speed.title')}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                {t('simplicity.features.speed.description')}
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center text-center group">
-              <div className="mb-5 w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary/10 transition-colors group-hover:bg-primary/10">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">{t('simplicity.features.unbreakable.title')}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                {t('simplicity.features.unbreakable.description')}
-              </p>
-            </div>
+          <h2 className="max-w-2xl font-serif text-3xl tracking-tight text-foreground md:text-4xl">
+            {t('permanence.title')}
+          </h2>
 
-            <div className="flex flex-col items-center text-center group">
-              <div className="mb-5 w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary/10 transition-colors group-hover:bg-primary/10">
-                <ArrowRight className="w-5 h-5" />
+          <div className="mt-16 grid grid-cols-1 divide-y divide-border/60 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {permanenceFeatures.map((feature) => (
+              <div
+                key={feature.number}
+                className="relative overflow-hidden py-10 first:pt-0 md:px-10 md:py-0 md:first:pl-0 md:last:pr-0"
+              >
+                <span className="pointer-events-none absolute -top-6 right-0 font-serif text-8xl italic text-foreground/5 select-none">
+                  {feature.number}
+                </span>
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-xs border border-border text-foreground/70">
+                  <feature.icon className="h-4 w-4" />
+                </div>
+                <h3 className="relative mt-6 text-lg font-medium text-foreground">{feature.title}</h3>
+                <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
               </div>
-              <h3 className="text-lg font-bold mb-2">{t('simplicity.features.mobile.title')}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                {t('simplicity.features.mobile.description')}
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <footer className="py-24 px-6">
-        <Card className="max-w-4xl mx-auto bg-gradient-to-br from-primary to-primary/90 text-primary-foreground overflow-hidden border-none relative shadow-xl hover:shadow-2xl rounded-3xl transition-all duration-500 ease-out hover:-translate-y-1 group">
-          {/* Декоративные светящиеся сферы (Blur эффекты) */}
-          <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl transition-transform duration-700 group-hover:scale-110" />
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl transition-transform duration-700 group-hover:scale-110" />
-          
-          <CardContent className="p-12 md:p-16 text-center relative z-10">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 italic font-serif leading-tight tracking-tight">
-              {t('cta.title')}
-            </h2>
-            <p className="text-primary-foreground/80 mb-10 max-w-lg mx-auto text-base md:text-lg leading-relaxed">
-              {t('cta.description')}
-            </p>
-            
-            {/* Кнопка с продвинутым hover-эффектом */}
-            <CTAButton className="bg-background text-foreground px-12 py-4 rounded-full font-semibold transition-all duration-300 ease-in-out shadow-md hover:shadow-xl hover:bg-background/95 hover:-translate-y-0.5 active:scale-98 transform-gpu">
+      {/* CTA — dark contrast panel, lifted to overlap the seam above */}
+      <section className="px-6 py-24">
+        <div className="relative z-10 mx-auto -mt-16 max-w-3xl rounded-2xl bg-foreground p-12 text-center text-background shadow-2xl md:-mt-20">
+          <h2 className="font-serif text-3xl italic tracking-tight md:text-5xl">
+            {t('cta.title')}
+          </h2>
+          <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-background/70 md:text-lg">
+            {t('cta.description')}
+          </p>
+          <div className="mt-10">
+            <CTAButton className="rounded-xs bg-background px-10 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background/90">
               {t('cta.button')}
             </CTAButton>
-          </CardContent>
-        </Card>
-      </footer>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
