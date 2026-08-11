@@ -10,7 +10,7 @@ import {
 import { EventStoriesIcon } from '@/components/assets/use-case1';
 import { InstantPortfoliosIcon } from '@/components/assets/use-case2';
 import { PhotographerUpsellIcon } from '@/components/assets/use-case3';
-import heroPhoto from '@/components/assets/story-photo-2.jpg';
+import heroPhoto from '@/components/assets/n1ce-unsplash.webp';
 
 const stepIcons = [LayoutTemplate, ImagePlus, Sparkles, Share2];
 const featureIcons = [ShieldCheck, Layers, Palette, Sparkles, Link2];

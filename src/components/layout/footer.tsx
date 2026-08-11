@@ -233,6 +233,11 @@ export function Footer({
             <Link href="/policies/terms" className="transition-colors hover:text-current">
               {t("policies.terms")}
             </Link>
+            <span className="text-muted-foreground/30 select-none hidden sm:inline">|</span>
+
+            <Link href="/sitemap" className="transition-colors hover:text-current">
+              {t("policies.sitemap")}
+            </Link>
           </div>
         </div>
       </div>

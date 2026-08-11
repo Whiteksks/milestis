@@ -27,7 +27,7 @@ const PUBLIC_PAGES: Page[] = [
   { path: '/pricing',  changeFrequency: 'weekly',  priority: 0.9 },
   { path: '/story',    changeFrequency: 'monthly', priority: 0.6 },
   // ── Updates ───────────────────────────────────────────────────────────────
-  { path: '/releases', changeFrequency: 'weekly',  priority: 0.7, lastModified: new Date() },
+  { path: '/releases', changeFrequency: 'weekly',  priority: 0.7 },
   // ── Help ──────────────────────────────────────────────────────────────────
   { path: '/help',     changeFrequency: 'weekly',  priority: 0.7 },
   { path: '/help/faq', changeFrequency: 'monthly', priority: 0.5 },
@@ -35,6 +35,8 @@ const PUBLIC_PAGES: Page[] = [
   { path: '/policies/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/policies/terms',          changeFrequency: 'yearly', priority: 0.2 },
   { path: '/policies/cookie-policy',  changeFrequency: 'yearly', priority: 0.2 },
+  // ── Sitemap (human-readable index) ────────────────────────────────────────
+  { path: '/sitemap', changeFrequency: 'monthly', priority: 0.3 },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -47,6 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const locale of LOCALES) {
       alternates[locale] = `${BASE_URL}/${locale}${page.path}`
     }
+    alternates['x-default'] = `${BASE_URL}/en${page.path}`
 
     entries.push({
       url: `${BASE_URL}/en${page.path}`,

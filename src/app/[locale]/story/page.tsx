@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Metadata } from 'next'
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
@@ -6,7 +5,7 @@ import { CTAButton } from '@/components/shared/cta-button';
 import { Share2, Wand2, Infinity as InfinityIcon } from 'lucide-react';
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';
-import heroPhoto from '@/components/assets/story-photo-1.jpg';
+import heroPhoto from '@/components/assets/nik-unsplash.webp';
 
 export async function generateMetadata({
   params,

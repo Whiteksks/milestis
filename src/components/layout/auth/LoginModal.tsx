@@ -13,7 +13,7 @@ import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTranslations } from "next-intl"
-import modalPhoto from "@/components/assets/story-photo-3.jpg"
+import modalPhoto from "@/components/assets/n1ce-unsplash-2.webp"
 
 interface LoginModalProps {
   open: boolean
