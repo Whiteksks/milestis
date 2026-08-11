@@ -43,12 +43,12 @@ export interface AiPhotobookContentChanges {
   ending?:       { title?: string; text?: string; date?: string; signature?: string }
 }
 
-/** Each field is a stable photo id (see AiPhotoRef) — never a position/index. */
+/** Optional override of ONE of these single-photo slots with a different photo than the one
+ *  already auto-placed there (see currentImageAssignments). story/gallery are managed
+ *  automatically and are never part of this — omit a field to keep its current photo. */
 export interface AiPhotobookImageChanges {
   cover?: string
   introduction?: string
-  story?: string[]
-  gallery?: string[]
   highlight?: string
   ending?: string
 }
@@ -92,6 +92,8 @@ export interface AiPortfolioContentChanges {
   footer?:       { copyright?: string }
 }
 
+/** Optional override of hero/bio with a different photo than the one already auto-placed
+ *  there (see currentImageAssignments) — omit a field to keep its current photo. */
 export interface AiPortfolioImageChanges {
   hero?: string
   bio?: string

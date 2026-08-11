@@ -11,7 +11,7 @@ import { useUiStore } from '@/editor/lib/store/ui'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { sendMessage } from '@/lib/ai/service'
-import { applyChanges } from '@/lib/ai/apply'
+import { applyChanges, applyDefaultPlacement } from '@/lib/ai/apply'
 import { getProjectImageSelectUrl } from '@/editor/hooks/use-project-images'
 import type { AiChatMode, AiPhotoRef } from '@/lib/ai/types'
 
@@ -128,6 +128,10 @@ export function AiChatContent() {
       // placed in the project don't need to be resent, the model sees them via currentImageAssignments
       const newPhotoIds = photosCopy.map((url) => urlToId.get(url)).filter((id): id is string => id !== undefined)
       const photos: AiPhotoRef[] = newPhotoIds.map((id) => ({ id, url: getProjectImageSelectUrl(idToDoc.get(id)!) }))
+
+      // Deterministic placement runs before the AI ever sees the photos, so it only has to
+      // review/override a few slots and write captions instead of arranging everything itself
+      applyDefaultPlacement(editorMode as AiChatMode, idToDoc, newPhotoIds)
 
       const result = await sendMessage({
         mode: editorMode as AiChatMode,

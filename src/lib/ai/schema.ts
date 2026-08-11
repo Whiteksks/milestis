@@ -51,8 +51,6 @@ export const PHOTOBOOK_SCHEMA: SchemaRequest = {
           properties: {
             cover:        { type: 'string' },
             introduction: { type: 'string' },
-            story:        { type: 'array', items: { type: 'string' } },
-            gallery:      { type: 'array', items: { type: 'string' } },
             highlight:    { type: 'string' },
             ending:       { type: 'string' },
           },
