@@ -11,7 +11,7 @@ import { useUiStore } from '@/editor/lib/store/ui'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { sendMessage } from '@/lib/ai/service'
-import { applyChanges, applyDefaultPlacement } from '@/lib/ai/apply'
+import { applyChanges, applyDefaultPlacement, isProjectBlank } from '@/lib/ai/apply'
 import { getProjectImageSelectUrl } from '@/editor/hooks/use-project-images'
 import type { AiChatMode, AiPhotoRef } from '@/lib/ai/types'
 
@@ -129,6 +129,12 @@ export function AiChatContent() {
       const newPhotoIds = photosCopy.map((url) => urlToId.get(url)).filter((id): id is string => id !== undefined)
       const photos: AiPhotoRef[] = newPhotoIds.map((id) => ({ id, url: getProjectImageSelectUrl(idToDoc.get(id)!) }))
 
+      // Must read before applyDefaultPlacement mutates the store, so it reflects whether the
+      // project truly had zero photos placed prior to this message.
+      const currentImageContent =
+        editorMode === 'photobook' ? useContentStore.getState().photobookImageContent : useContentStore.getState().portfolioImageContent
+      const isBlankProject = isProjectBlank(editorMode as AiChatMode, currentImageContent)
+
       // Deterministic placement runs before the AI ever sees the photos, so it only has to
       // review/override a few slots and write captions instead of arranging everything itself
       applyDefaultPlacement(editorMode as AiChatMode, idToDoc, newPhotoIds)
@@ -140,6 +146,7 @@ export function AiChatContent() {
         language: locale,
         projectId,
         currentContent: buildCurrentContent(editorMode as AiChatMode, urlToId),
+        isBlankProject,
       })
 
       addMessage({ role: 'assistant', content: result.message })

@@ -1,12 +1,16 @@
 "use client"
 
-import { Loader2, ArrowRight } from "lucide-react"
-import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog"
+import { ArrowRight, Loader2 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { useCreateProject } from "@/hooks/useCreateProject"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { DialogTitle } from "@radix-ui/react-dialog"
 import type { ProjectMode } from "@/lib/projects/project-type-config"
 import { useTranslations } from "next-intl"
 
@@ -41,8 +45,12 @@ const options: {
   },
 ]
 
-function OptionCard({ opt, loadingMode, onCreate }: {
-  opt: typeof options[0]
+function OptionCard({
+  opt,
+  loadingMode,
+  onCreate,
+}: {
+  opt: (typeof options)[number]
   loadingMode: ProjectMode | null
   onCreate: (mode: ProjectMode) => void
 }) {
@@ -52,68 +60,96 @@ function OptionCard({ opt, loadingMode, onCreate }: {
 
   return (
     <button
+      type="button"
       disabled={isDisabled}
       onClick={() => onCreate(opt.mode)}
       className={cn(
-        "group relative flex flex-col justify-between text-left transition-all duration-500 ease-out",
-        "min-h-[240px] sm:min-h-[280px] border border-border/40 p-5 md:p-6",
-        "rounded-2xl bg-transparent hover:bg-muted/5 hover:border-border",
-        "disabled:opacity-40"
+        "group relative flex h-full min-h-[280px] flex-col text-left",
+        "rounded-2xl border border-border/50 bg-card p-5 md:p-6",
+        "transition-colors duration-300",
+        "hover:border-border hover:bg-muted/5",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        "disabled:pointer-events-none disabled:opacity-40"
       )}
     >
-      {/* Топ: Моноширинный номер */}
-      <div className="flex items-center justify-between w-full">
-        <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50 transition-colors duration-300 group-hover:text-muted-foreground">
+      {/* Top Bar: Number */}
+      <div className="flex h-6 items-center justify-between">
+        <span className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground/60 transition-colors duration-300 group-hover:text-muted-foreground">
           {opt.number}
         </span>
       </div>
 
-      {/* Середина: Заголовок и описание */}
-      <div className="mt-6 flex-1">
-        <p className="font-serif text-xl font-medium tracking-tight text-foreground md:text-2xl mb-2">
-          {t(opt.titleKey)}
-        </p>
-        <p className="text-xs text-muted-foreground/90 leading-relaxed font-light line-clamp-3">
+      {/* Fixed Main Content Area */}
+      <div className="mt-6 flex flex-1 flex-col justify-start">
+        {/* Title Container with minimum height alignment */}
+        <div className="min-h-[3rem] flex items-start">
+          <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground">
+            {t(opt.titleKey)}
+          </h3>
+        </div>
+
+        {/* Description with fixed clamping and spacing */}
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
           {t(opt.descriptionKey)}
         </p>
       </div>
 
-      {/* Низ: Анимированный экшен в углу */}
-      <div className="mt-5 flex justify-end h-5 items-center overflow-hidden text-sm font-medium">
-        {isLoading ? (
-          <span className="flex items-center gap-1.5 text-primary">
-            <Loader2 className="size-3.5 animate-spin" />
-            <span className="text-[10px] uppercase tracking-wider font-mono">{t('createCards.creating')}</span>
-          </span>
-        ) : (
-          <span className="flex items-center gap-1 text-muted-foreground transition-all duration-300 ease-out group-hover:translate-x-0.5 group-hover:text-foreground">
-            <span className="text-[10px] uppercase tracking-wider font-mono opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
-              {t('createCards.create')}
-            </span>
-            <ArrowRight className="size-4 text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground" />
-          </span>
-        )}
+      {/* Bottom Action Section pinned to bottom */}
+      <div className="mt-6 flex items-center justify-between border-t border-border/30 pt-4">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+          {isLoading
+            ? t("createCards.creating")
+            : t("createCards.create")}
+        </span>
+
+        <span
+          className={cn(
+            "flex size-7 items-center justify-center rounded-xs",
+            "border border-border/60",
+            "transition-colors duration-300",
+            "group-hover:border-primary/40 group-hover:text-primary"
+          )}
+        >
+          {isLoading ? (
+            <Loader2 className="size-3.5 animate-spin text-primary" />
+          ) : (
+            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+          )}
+        </span>
       </div>
+
+      {/* Hover Line */}
+      <span
+        aria-hidden="true"
+        className="absolute bottom-0 left-5 h-px w-0 bg-primary transition-[width] duration-300 group-hover:w-8"
+      />
     </button>
   )
 }
 
-function ModalBody({ onClose: _onClose }: { onClose?: () => void }) {
+function ModalBody() {
   const { handleCreate, loadingMode } = useCreateProject()
   const t = useTranslations()
 
   return (
-    <div className="flex flex-col p-6 md:p-10">
-      <header className="mb-10 space-y-2.5 text-center sm:text-left">
-        <h2 className="font-serif text-3xl font-light tracking-tight italic">
-          {t('createModal.title')}
+    <div className="p-6 md:p-8">
+      {/* Header */}
+      <header className="mb-8">
+        <div className="mb-4 flex items-center gap-4">
+          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground/60">
+            {t("createModal.description")}
+          </span>
+
+          <div className="h-px flex-1 bg-border/60" />
+        </div>
+
+        <h2 className="font-serif text-3xl font-medium tracking-tight text-foreground">
+          {t("createModal.title")}
         </h2>
-        <div className="h-px w-12 bg-primary/20 mx-auto sm:mx-0" />
-        <p className="text-xs text-muted-foreground mt-2">{t('createModal.description')}</p>
       </header>
 
-      {/* Строгая линия из 3-х колонок на десктопе */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* Options Grid */}
+      <div className="grid gap-2 sm:grid-cols-3 items-stretch">
         {options.map((opt) => (
           <OptionCard
             key={opt.mode}
@@ -127,7 +163,10 @@ function ModalBody({ onClose: _onClose }: { onClose?: () => void }) {
   )
 }
 
-export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
+export function NewProjectModal({
+  open,
+  onOpenChange,
+}: NewProjectModalProps) {
   const isMobile = useIsMobile()
 
   if (isMobile) {
@@ -138,7 +177,7 @@ export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
         title="New Project"
         description="Choose your format"
       >
-        <ModalBody onClose={() => onOpenChange(false)} />
+        <ModalBody />
       </MobileDrawer>
     )
   }
@@ -146,9 +185,17 @@ export function NewProjectModal({ open, onOpenChange }: NewProjectModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTitle className="sr-only">New Project</DialogTitle>
-      <DialogDescription className="sr-only">Choose your format</DialogDescription>
-      {/* Немного увеличили ширину до max-w-4xl, чтобы 3 колонки дышали идеально */}
-      <DialogContent className="sm:max-w-4xl rounded-3xl border border-border/30 p-0 bg-background overflow-hidden">
+
+      <DialogDescription className="sr-only">
+        Choose your format
+      </DialogDescription>
+
+      <DialogContent
+        className={cn(
+          "overflow-hidden rounded-2xl border border-border/40",
+          "bg-background p-0 sm:max-w-4xl"
+        )}
+      >
         <ModalBody />
       </DialogContent>
     </Dialog>

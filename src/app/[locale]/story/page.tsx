@@ -109,6 +109,9 @@ const MissionPage = async () => {
           <p className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
             &ldquo;{t('manifesto.quote')}&rdquo;
           </p>
+          <p className="mt-5 font-mono text-xs uppercase tracking-widest text-background/50">
+            — {t('manifesto.author')}
+          </p>
         </div>
       </section>
 

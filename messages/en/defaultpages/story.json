@@ -1,46 +1,47 @@
 {
   "story": {
     "hero": {
-      "eyebrow": "The Mission",
-      "titleLine1": "Every photo tells a story worth",
-      "titleItalic": "keeping forever.",
-      "description": "Milestis exists because memories are fragile, and platforms shouldn’t be. We build tools that turn scattered photos into a legacy you actually own.",
+      "eyebrow": "Why we started",
+      "titleLine1": "Every photo holds a moment worth",
+      "titleItalic": "keeping for good.",
+      "description": "We started Milestis because photos get lost — buried in a camera roll, or locked inside an app that might not exist in five years. So we built a place where they actually stay found.",
       "imageAlt": "A printed photo book laid open on a table",
       "sinceLabel": "Since"
     },
     "stats": [
       { "number": "2026", "label": "Founded" },
       { "number": "50+", "label": "Templates" },
-      { "number": "0", "label": "Subscription cliffs" }
+      { "number": "0", "label": "Surprise paywalls" }
     ],
     "manifesto": {
-      "eyebrow": "Why we exist",
-      "quote": "A photo you can’t find is a memory you’ve already lost."
+      "eyebrow": "On forgetting",
+      "quote": "The struggle of man against power is the struggle of memory against forgetting.",
+      "author": "Milan Kundera"
     },
     "permanence": {
       "eyebrow": "Built to last",
-      "title": "Not a feed. An archive.",
+      "title": "Still here, long after the feed moves on.",
       "items": [
         {
           "number": "01",
-          "title": "Share with whoever you want",
-          "description": "Public link, a private circle, or just for yourself — you decide who ever gets to see it."
+          "title": "Share it your way",
+          "description": "A public link, a small circle, or just you — you're always the one who decides who sees it."
         },
         {
           "number": "02",
-          "title": "Create in one click",
-          "description": "AI turns a folder of photos into a finished, laid-out page — no design skills required."
+          "title": "Ready in one click",
+          "description": "Hand it a folder of photos and it comes back looking like someone actually designed it."
         },
         {
           "number": "03",
-          "title": "Never expires",
-          "description": "No subscription cliff, no algorithm change. Your archive keeps working for as long as you need it."
+          "title": "It doesn't expire",
+          "description": "No subscription to keep paying, no algorithm to keep up with. It keeps working for as long as you want it to."
         }
       ]
     },
     "cta": {
-      "title": "Start your archive today.",
-      "description": "Bring your photos. Leave with something permanent.",
+      "title": "Give your photos somewhere to stay.",
+      "description": "Bring your photos. Leave with something that lasts.",
       "button": "Get started"
     }
   }

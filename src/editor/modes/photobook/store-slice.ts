@@ -31,7 +31,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
   cover: {
     title: 'Emily & James',
     subtitle: 'The Wedding Album',
-    date: 'August 12, 2024',
+    date: 'August 12, 2026',
     location: 'London',
     tagline: 'The story of a single day that changed everything',
   },
@@ -44,7 +44,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
   story: {
     label: 'Story',
     title: 'The Day Unfolds',
-    date: 'August 12, 2024',
+    date: 'August 12, 2026',
     location: 'London',
     moments: [],
   },
@@ -64,7 +64,7 @@ export const defaultPhotobookContent: PhotobookSectionContent = {
   ending: {
     title: 'The End',
     text: 'Thank you for reliving this day with us through these pages.',
-    date: '2024',
+    date: '2026',
     signature: 'With love, Emily and James',
   },
 }

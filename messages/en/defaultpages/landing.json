@@ -2,21 +2,22 @@
   "landing": {
     "hero": {
       "eyebrow": "Milestis",
-      "titleLine1": "Turn scattered photos into",
-      "titleItalic": "a story worth keeping.",
-      "description": "Milestis turns your photos into an interactive book you can actually finish — no design skills, no subscription cliff, just a page that’s really yours.",
+      "titleLine1": "Turn your photos into",
+      "titleItalic": "a story people actually finish.",
+      "description": "You've probably got hundreds of good shots sitting in a folder somewhere. Milestis turns them into a page you can flip through, share, and actually be proud of — built in minutes, no design tools required.",
       "imageAlt": "An open interactive photo book page",
-      "combinationsLabel": "Combinations",
+      "combinationsLabel": "Layouts",
       "combinationsValue": "10,000+"
     },
     "stats": [
-      { "number": "10,000+", "label": "Design combinations" },
-      { "number": "5 min", "label": "To publish" },
-      { "number": "0", "label": "Design skills needed" }
+      { "number": "10,000+", "label": "Ways to lay out your photos" },
+      { "number": "5 min", "label": "From upload to published page" },
+      { "number": "0", "label": "Design skills required" }
     ],
     "manifesto": {
-      "eyebrow": "Why it matters",
-      "quote": "Nobody remembers a folder of raw files. Everyone remembers a story."
+      "eyebrow": "On memory",
+      "quote": "Memory is the only paradise from which we cannot be driven away.",
+      "author": "Jean Paul"
     },
     "howItWorks": {
       "eyebrow": "How it works",
@@ -24,74 +25,74 @@
       "steps": [
         {
           "number": "01",
-          "title": "Pick a template",
-          "description": "Choose a structure that already knows how to look good — spacing and hierarchy are solved before you start."
+          "title": "Pick a layout",
+          "description": "Every template already has good spacing and structure built in, so the hard part is done before you even start."
         },
         {
           "number": "02",
           "title": "Add your photos",
-          "description": "Drop in your best shots. AI handles the cropping, pacing and layout for you, instantly."
+          "description": "Drop in the shots you love. Milestis handles the cropping and placement automatically."
         },
         {
           "number": "03",
           "title": "Make it yours",
-          "description": "Swap a palette, add a caption, adjust the pacing — the structure never breaks no matter what you change."
+          "description": "Swap the colors, add captions, reorder pages — however far you push it, the layout keeps its shape."
         },
         {
           "number": "04",
-          "title": "Publish & share",
-          "description": "One link. No app to download, no account required for anyone to view it."
+          "title": "Publish and share",
+          "description": "You get one link you can send to anyone. No app to install, no account needed to view it."
         }
       ]
     },
     "features": {
-      "eyebrow": "What’s inside",
+      "eyebrow": "What's inside",
       "items": [
         {
-          "title": "Unbreakable layouts",
-          "description": "Every template is pixel-tested. However you rearrange it, the composition never falls apart."
+          "title": "Layouts that hold up",
+          "description": "Rearrange your photos as much as you like — the composition stays clean no matter what you throw at it."
         },
         {
-          "title": "Depth & atmosphere",
-          "description": "Light, shadow and parallax give every page a sense of real physical space."
+          "title": "Light and depth",
+          "description": "Soft shadows and parallax make each page feel like real space instead of a flat image."
         },
         {
-          "title": "Curated palettes",
-          "description": "Dozens of ready palettes, or build your own from a single photo in your book."
+          "title": "Color palettes",
+          "description": "Choose from dozens of ready-made palettes, or pull one straight from a photo already in your book."
         },
         {
-          "title": "Interactive animations",
-          "description": "Pages that respond to scroll and touch, so reading feels like turning real pages."
+          "title": "Pages that respond",
+          "description": "Scroll or tap and the page reacts, so reading feels closer to turning real pages."
         },
         {
-          "title": "One shareable link",
-          "description": "No login wall for your readers — just a link that works everywhere."
+          "title": "One link to share",
+          "description": "Anyone can open your book — no login, no app, no waiting."
         }
       ]
     },
     "useCases": {
-      "eyebrow": "Who it’s for",
+      "eyebrow": "Who it's for",
       "items": [
         {
           "id": "events",
-          "title": "Event stories",
-          "description": "Turn a wedding, a trip or a birthday into a book your guests will actually open again."
+          "title": "Big days worth reliving",
+          "description": "A wedding, a trip, a birthday — give it a book your guests will actually open again, instead of scrolling past once."
         },
         {
           "id": "portfolios",
-          "title": "Instant portfolios",
-          "description": "Freelancers and creators use Milestis as a portfolio that updates itself in minutes."
+          "title": "A portfolio in minutes",
+          "description": "Freelancers and creators use Milestis to put a portfolio together fast, and update it just as easily."
         },
         {
           "id": "upsell",
-          "title": "Photographer upsell",
-          "description": "Studios hand clients a finished, branded gallery instead of a folder of raw files."
+          "title": "Something better than a folder",
+          "description": "Studios hand clients a finished, branded gallery instead of a drive full of raw files."
         }
       ]
     },
     "cta": {
-      "title": "Your photos deserve better than a folder.",
-      "description": "Start free. No credit card, no watermark.",
+      "title": "Give your photos a place to be seen.",
+      "description": "Start free — no credit card needed.",
       "button": "Get started"
     }
   }

@@ -360,7 +360,7 @@ export const publishProject = onRequest(
 			const rawContent = editorData.content ?? null;
 			const contentJson = JSON.stringify({ theme: rawTheme, content: rawContent });
 
-			const { urlMapping, freedBytes } = await migrateProjectMedia(uid, projectId, contentJson);
+			const { urlMapping, freedBytes, usedImageIds } = await migrateProjectMedia(uid, projectId, contentJson);
 
 			const migratedJson = contentJson.replace(
 				/"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\\]+)"/g,
@@ -423,53 +423,44 @@ export const publishProject = onRequest(
 			// Without this, reopening the editor after unpublish shows broken images.
 			// Also deletes docs for images that were NOT placed in the content
 			// (unused uploads) — their private Storage files are about to be deleted.
-			if (urlMapping.size > 0) {
-				try {
-					const imagesSnap = await db
-						.collection("images")
-						.where("projectId", "==", projectId)
-						.get();
-					if (!imagesSnap.empty) {
-						const imagesBatch = db.batch();
-						let patchCount = 0;
-						let deleteCount = 0;
-						for (const imageDoc of imagesSnap.docs) {
-							const data = imageDoc.data() as { urls?: Record<string, string> };
-							if (!data.urls) {
-								// No URLs — image was never processed; remove orphan doc.
-								imagesBatch.delete(imageDoc.ref);
-								deleteCount++;
-								continue;
-							}
-							const newUrls: Record<string, string> = {};
-							let changed = false;
-							for (const [variant, url] of Object.entries(data.urls)) {
-								const mapped = urlMapping.get(url);
-								if (mapped) {
-									newUrls[variant] = mapped;
-									changed = true;
-								} else {
-									newUrls[variant] = url;
-								}
-							}
-							if (changed) {
-								imagesBatch.update(imageDoc.ref, { urls: newUrls });
-								patchCount++;
-							} else {
-								// None of this image's URLs were migrated — it was not placed
-								// in the content. Delete the doc; its Storage files are gone.
-								imagesBatch.delete(imageDoc.ref);
-								deleteCount++;
-							}
+			//
+			// The keep/delete decision uses `usedImageIds` from migrateProjectMedia,
+			// which is derived by checking each doc's own known `urls` values against
+			// the content JSON directly — NOT by re-deriving "was anything migrated"
+			// from urlMapping. This avoids false-negative deletions if a variant's URL
+			// mapping ever fails to line up exactly (encoding, token, timing, etc.).
+			try {
+				const imagesSnap = await db
+					.collection("images")
+					.where("projectId", "==", projectId)
+					.get();
+				if (!imagesSnap.empty) {
+					const imagesBatch = db.batch();
+					let patchCount = 0;
+					let deleteCount = 0;
+					for (const imageDoc of imagesSnap.docs) {
+						const data = imageDoc.data() as { urls?: Record<string, string> };
+						if (!data.urls || !usedImageIds.has(imageDoc.id)) {
+							// Not referenced in the editor content — unused upload, or never
+							// processed. Delete the doc; its Storage files are removed below.
+							imagesBatch.delete(imageDoc.ref);
+							deleteCount++;
+							continue;
 						}
-						if (patchCount > 0 || deleteCount > 0) {
-							await imagesBatch.commit();
-							logger.info(`[publishProject] Rewrote ${patchCount} and removed ${deleteCount} image doc(s) for ${projectId}.`);
+						const newUrls: Record<string, string> = {};
+						for (const [variant, url] of Object.entries(data.urls)) {
+							newUrls[variant] = urlMapping.get(url) ?? url;
 						}
+						imagesBatch.update(imageDoc.ref, { urls: newUrls });
+						patchCount++;
 					}
-				} catch (err) {
-					logger.warn(`[publishProject] Failed to rewrite images collection for ${projectId}:`, err);
+					if (patchCount > 0 || deleteCount > 0) {
+						await imagesBatch.commit();
+						logger.info(`[publishProject] Rewrote ${patchCount} and removed ${deleteCount} image doc(s) for ${projectId}.`);
+					}
 				}
+			} catch (err) {
+				logger.warn(`[publishProject] Failed to rewrite images collection for ${projectId}:`, err);
 			}
 
 			try {

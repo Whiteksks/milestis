@@ -4,45 +4,46 @@
       "eyebrow": "The Toolkit",
       "titleLine1": "No design skills.",
       "titleItalic": "No compromise.",
-      "description": "Milestis gives you rigid, unbreakable layouts so every project you build looks premium — regardless of your experience.",
+      "description": "Every layout in Milestis is already balanced, spaced and proportioned. You don't need an eye for design — the template already has one.",
       "templateLabel": "Template",
       "templatesLabel": "Templates"
     },
     "stats": [
       { "number": "50+", "label": "Templates" },
-      { "number": "1-click", "label": "AI layouts" },
-      { "number": "0", "label": "Design skills needed" }
+      { "number": "1-click", "label": "AI-assisted layouts" },
+      { "number": "0", "label": "Design skills required" }
     ],
     "manifesto": {
-      "eyebrow": "Why it looks this way",
-      "quote": "Good design shouldn’t require good taste. It should already be built in."
+      "eyebrow": "About beauty",
+      "quote": "Beauty shouldn’t be something you have to design.",
+      "author": "Milestis Manifesto"
     },
     "designSystem": {
       "eyebrow": "The Design System",
-      "title": "Structure you can’t break.",
-      "subtitle": "Freedom you can actually feel.",
+      "title": "A structure you can’t break.",
+      "subtitle": "Plenty of room to make it yours.",
       "pillars": [
         {
           "number": "01",
-          "title": "Rigid by design",
-          "description": "Every template is a carefully engineered preset — spacing, hierarchy and proportion are already solved."
+          "title": "Set up right from the start",
+          "description": "Spacing, hierarchy, proportion — all figured out before you ever open the editor."
         },
         {
           "number": "02",
-          "title": "Total creative control",
-          "description": "Swap palettes, textures and light effects freely. The structure underneath never breaks."
+          "title": "Room to make it yours",
+          "description": "Change the palette, textures, lighting — whatever you touch, the structure underneath holds."
         },
         {
           "number": "03",
           "title": "Opens instantly",
-          "description": "No app, no download. Every project loads in an instant, on any device."
+          "description": "No app, no download — every project just opens, on whatever device you're using."
         }
       ]
     },
     "professionals": {
       "eyebrow": "For Professionals",
-      "title": "Built for people who deliver client work.",
-      "description": "Photographers, planners and studios use Milestis to hand over a finished, branded product — not just a folder of files.",
+      "title": "For people whose job is handing off finished work.",
+      "description": "Photographers, planners and studios use Milestis to hand clients something finished and branded, instead of a drive full of raw files.",
       "items": [
         { "title": "Client proofing links", "emphasis": true },
         { "title": "Personal Workspace" },
@@ -50,8 +51,8 @@
       ]
     },
     "cta": {
-      "title": "Build your first page today.",
-      "description": "No credit card, no watermark, no catch.",
+      "title": "Make your first page today.",
+      "description": "Free to start, no card needed, no catch.",
       "button": "Get started"
     }
   }

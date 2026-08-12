@@ -1,6 +1,7 @@
 import { getStorage } from "firebase-admin/storage";
 import { logger } from "firebase-functions/v2";
 import { randomBytes } from "crypto";
+import { db } from "../../lib/firebaseAdmin";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -9,6 +10,9 @@ export interface MigrateResult {
 	urlMapping: Map<string, string>;
 	/** Bytes freed from the user's private quota (users/ files only). */
 	freedBytes: number;
+	/** imageIds confirmed referenced in the editor content — anything else in the
+	 *  `images` collection for this project is an unplaced/orphaned upload. */
+	usedImageIds: Set<string>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -44,25 +48,25 @@ async function ensureDownloadToken(
 }
 
 /**
- * Extracts all Firebase Storage URLs from a JSON string that belong to this
- * project — private (users/), previous exports (exports/), or already public.
- * Returns a map of originalUrl → storagePath.
+ * Extracts Storage URLs referenced in contentJson that live under exports/ or
+ * public/ prefixes — previous export artifacts or already-public URLs from an
+ * earlier publish. Photo URLs are handled separately via the images collection
+ * (see migrateProjectMedia) so the used/orphan decision never depends on
+ * reverse-parsing a path out of a regex match.
  */
-function extractProjectUrls(
+function extractOtherProjectUrls(
 	contentJson: string,
 	uid: string,
 	projectId: string,
+	exclude: Set<string>,
 ): Map<string, string> {
 	const result = new Map<string, string>();
-	const prefixes = [
-		`users/${uid}/projects/${projectId}/`,
-		`exports/${uid}/${projectId}/`,
-		`public/${projectId}/`,
-	];
+	const prefixes = [`exports/${uid}/${projectId}/`, `public/${projectId}/`];
 	const re = /"(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\\]+)"/g;
 	let m: RegExpExecArray | null;
 	while ((m = re.exec(contentJson)) !== null) {
 		const url = m[1];
+		if (exclude.has(url)) continue;
 		const path = extractStoragePath(url);
 		if (path && prefixes.some((p) => path.startsWith(p))) {
 			result.set(url, path);
@@ -90,8 +94,8 @@ export async function migrateProjectMedia(
 ): Promise<MigrateResult> {
 	const bucket = getStorage().bucket();
 	const bucketName = bucket.name;
-	const urlToPath = extractProjectUrls(contentJson, uid, projectId);
 	const urlMapping = new Map<string, string>();
+	const usedImageIds = new Set<string>();
 	let freedBytes = 0;
 
 	const usersPrefix = `users/${uid}/projects/${projectId}/`;
@@ -102,19 +106,22 @@ export async function migrateProjectMedia(
 	// already in public/ and would vanish before we copy them.
 	const newPublicPaths = new Set<string>();
 
-	// ── Pass 1: content-referenced files ────────────────────────────────────
-	// Build urlMapping for every URL found in the editor content JSON.
-	// These are the URLs that need to be rewritten in the content doc.
-	for (const [oldUrl, oldPath] of urlToPath) {
+	async function migrateFile(oldUrl: string): Promise<void> {
+		if (urlMapping.has(oldUrl)) return;
+		const oldPath = extractStoragePath(oldUrl);
+		if (!oldPath) return;
+
 		let relativePath: string;
 		if (oldPath.startsWith(usersPrefix)) {
 			relativePath = oldPath.slice(usersPrefix.length);
 		} else if (oldPath.startsWith(publicPrefix)) {
 			relativePath = oldPath.slice(publicPrefix.length);
-		} else {
+		} else if (oldPath.startsWith(`exports/${uid}/${projectId}/`)) {
 			// exports/{uid}/{projectId}/{exportId}/{relative} — strip the exportId segment.
 			const afterProject = oldPath.slice(`exports/${uid}/${projectId}/`.length);
 			relativePath = afterProject.replace(/^[^/]+\//, "");
+		} else {
+			return; // not this project's own storage — ignore defensively
 		}
 
 		const newPath = `${publicPrefix}${relativePath}`;
@@ -143,63 +150,67 @@ export async function migrateProjectMedia(
 		}
 	}
 
-	// ── Pass 2: used-image variant scan ────────────────────────────────────
-	// Content JSON only references one variant per image (e.g. full.webp).
-	// The images/ collection also stores middle.webp, print.jpg etc.
-	// We extract the imageIds that are actually placed in the content and
-	// migrate only their variant files — skipping unused/orphaned uploads.
-	const usedImageIds = new Set<string>();
-	for (const oldPath of urlToPath.values()) {
-		if (oldPath.startsWith(usersPrefix)) {
-			// Path: users/{uid}/projects/{projectId}/images/{imageId}/variant.ext
-			const relative = oldPath.slice(usersPrefix.length);
-			const parts = relative.split("/");
-			if (parts[0] === "images" && parts[1]) {
-				usedImageIds.add(parts[1]);
-			}
+	// ── Pass 1: images collection — ground truth for this project's uploaded photos ──
+	// A photo is "used" iff one of its own known variant URLs (straight from Firestore,
+	// not reconstructed) literally appears in the editor content JSON. This is what
+	// decides whether the doc — and its private files — survive publish, so it must
+	// never depend on regex-reverse-parsing a path out of an arbitrary URL string.
+	const imagesSnap = await db
+		.collection("images")
+		.where("projectId", "==", projectId)
+		.where("ownerId", "==", uid)
+		.get();
+
+	for (const imageDoc of imagesSnap.docs) {
+		const data = imageDoc.data() as { urls?: Record<string, string> };
+		const variantUrls = Object.values(data.urls ?? {}).filter((u): u is string => !!u);
+		if (variantUrls.length === 0) continue;
+		if (!variantUrls.some((url) => contentJson.includes(url))) continue;
+		usedImageIds.add(imageDoc.id);
+
+		// Migrate every variant we know about, then broaden to a prefix scan so
+		// variants missing from the `urls` field (or added out of band) aren't left behind.
+		await Promise.all(variantUrls.map(migrateFile));
+		try {
+			const imagePrefix = `${usersPrefix}images/${imageDoc.id}/`;
+			const [variantFiles] = await bucket.getFiles({ prefix: imagePrefix });
+			await Promise.all(
+				variantFiles.map(async (file) => {
+					const newPath = `${publicPrefix}${file.name.slice(usersPrefix.length)}`;
+					if (newPublicPaths.has(newPath)) return; // already handled above
+					try {
+						const [oldMeta] = await file.getMetadata();
+						const oldToken = (oldMeta.metadata as Record<string, string> | undefined)
+							?.firebaseStorageDownloadTokens;
+
+						await file.copy(bucket.file(newPath));
+						newPublicPaths.add(newPath);
+
+						const newToken = await ensureDownloadToken(bucket, newPath);
+						const newUrl = makeDownloadUrl(bucketName, newPath, newToken);
+						if (oldToken) {
+							urlMapping.set(makeDownloadUrl(bucketName, file.name, oldToken), newUrl);
+						}
+
+						const size =
+							typeof oldMeta.size === "string"
+								? parseInt(oldMeta.size, 10)
+								: (oldMeta.size as number | undefined) ?? 0;
+						if (!isNaN(size)) freedBytes += size;
+					} catch (err) {
+						logger.warn(`[migrate] Failed to copy ${file.name} → ${newPath}`, err);
+					}
+				}),
+			);
+		} catch (err) {
+			logger.warn(`[migrate] Failed to scan variants for imageId ${imageDoc.id}`, err);
 		}
 	}
 
-	await Promise.all(
-		[...usedImageIds].map(async (imageId) => {
-			const imagePrefix = `${usersPrefix}images/${imageId}/`;
-			try {
-				const [variantFiles] = await bucket.getFiles({ prefix: imagePrefix });
-				await Promise.all(
-					variantFiles.map(async (file) => {
-						const relativePath = file.name.slice(usersPrefix.length);
-						const newPath = `${publicPrefix}${relativePath}`;
-						if (newPublicPaths.has(newPath)) return; // already handled in pass 1
-						try {
-							const [oldMeta] = await file.getMetadata();
-							const oldToken = (oldMeta.metadata as Record<string, string> | undefined)
-								?.firebaseStorageDownloadTokens;
-
-							await file.copy(bucket.file(newPath));
-							newPublicPaths.add(newPath);
-
-							const newToken = await ensureDownloadToken(bucket, newPath);
-							const newUrl = makeDownloadUrl(bucketName, newPath, newToken);
-							if (oldToken) {
-								const oldUrl = makeDownloadUrl(bucketName, file.name, oldToken);
-								urlMapping.set(oldUrl, newUrl);
-							}
-
-							const size =
-								typeof oldMeta.size === "string"
-									? parseInt(oldMeta.size, 10)
-									: (oldMeta.size as number | undefined) ?? 0;
-							if (!isNaN(size)) freedBytes += size;
-						} catch (err) {
-							logger.warn(`[migrate] Pass 2: failed to copy ${file.name} → ${newPath}`, err);
-						}
-					}),
-				);
-			} catch (err) {
-				logger.warn(`[migrate] Pass 2: failed to scan variants for imageId ${imageId}`, err);
-			}
-		}),
-	);
+	// ── Pass 2: anything else referenced in content under exports/ or public/ ──
+	// (previous export artifacts, or URLs already migrated by an earlier publish).
+	const otherUrls = extractOtherProjectUrls(contentJson, uid, projectId, new Set(urlMapping.keys()));
+	await Promise.all([...otherUrls.keys()].map(migrateFile));
 
 	// ── Prune orphans ────────────────────────────────────────────────────────
 	// Delete public files from a previous export that are no longer in use.
@@ -220,7 +231,7 @@ export async function migrateProjectMedia(
 		logger.warn("[migrate] Orphan pruning failed — skipping", err);
 	}
 
-	return { urlMapping, freedBytes };
+	return { urlMapping, freedBytes, usedImageIds };
 }
 
 /**

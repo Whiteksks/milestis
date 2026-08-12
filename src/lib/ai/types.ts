@@ -21,6 +21,9 @@ export interface AiAgentRequest {
   language: string
   projectId?: string | null
   currentContent?: string
+  /** True if the project had zero photos placed anywhere before this turn — lets the prompt
+   *  state plainly that the section content shown is still template sample text, not real content. */
+  isBlankProject?: boolean
 }
 
 export type AiPhotoCaptions = Array<{ photoId: string; caption: string }>

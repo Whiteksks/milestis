@@ -9,7 +9,9 @@ import type {
 } from './types'
 import { getProjectImageSelectUrl, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
 import type { PhotobookManagedImage } from '@/editor/modes/photobook/image/types'
+import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 import type { PortfolioManagedImage } from '@/editor/modes/portfolio/image/types'
+import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
 import type { ImageValue } from '@/editor/image/data'
 import {
   computePhotobookDefaults,
@@ -20,7 +22,15 @@ import {
 
 function buildImageValue(doc: ProjectImageDoc, caption: string | undefined): ImageValue {
   return {
-    asset: { src: getProjectImageSelectUrl(doc), width: doc.meta?.width ?? 0, height: doc.meta?.height ?? 0 },
+    // blurDataUrl must be the thumb variant — the dashboard card preview (mapProjectDoc's
+    // isThumbPreviewUrl check) only accepts thumb URLs and silently drops anything else,
+    // so without this an AI-placed cover never shows up on the project card.
+    asset: {
+      src: getProjectImageSelectUrl(doc),
+      width: doc.meta?.width ?? 0,
+      height: doc.meta?.height ?? 0,
+      ...(doc.urls?.thumb ? { blurDataUrl: doc.urls.thumb } : {}),
+    },
     ...(caption ? { caption } : {}),
   }
 }
@@ -57,11 +67,44 @@ const PORTFOLIO_SLOT_IDS: Record<PortfolioSingleSlot, PortfolioManagedImage['slo
 // (orientation/resolution match, attach order) — the AI never places from scratch, it only
 // reviews/overrides a handful of single-photo slots afterwards and writes captions.
 
+// Photo pickers may resend ids that are already placed somewhere (e.g. "select all" reopens
+// with previously-arranged photos still checked) — always re-derive which ids are genuinely
+// unplaced before handing them to the placement heuristics, so nothing gets inserted twice.
+function collectPhotobookPlacedIds(current: PhotobookImageContent, urlToId: Map<string, string>): Set<string> {
+  const ids = new Set<string>()
+  const add = (img?: PhotobookManagedImage) => {
+    const id = img && urlToId.get(img.value.asset.src)
+    if (id) ids.add(id)
+  }
+  add(current.cover)
+  add(current.introduction)
+  add(current.highlight)
+  add(current.ending)
+  current.story.forEach(add)
+  current.gallery.forEach(add)
+  return ids
+}
+
+function collectPortfolioPlacedIds(current: PortfolioImageContent, urlToId: Map<string, string>): Set<string> {
+  const ids = new Set<string>()
+  const add = (img?: PortfolioManagedImage) => {
+    const id = img && urlToId.get(img.value.asset.src)
+    if (id) ids.add(id)
+  }
+  add(current.hero)
+  add(current.bio)
+  current.featuredWork.forEach(add)
+  return ids
+}
+
 function applyPhotobookDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): void {
   const store = useContentStore.getState()
   const current = store.photobookImageContent
+  const alreadyPlaced = collectPhotobookPlacedIds(current, urlToIdMap(idToDoc))
+  const freshIds = newPhotoIds.filter((id) => !alreadyPlaced.has(id))
+  if (freshIds.length === 0) return
   const emptySlots = new Set(PHOTOBOOK_SINGLE_SLOTS.filter((slot) => !current[slot]))
-  const { singles, story, gallery } = computePhotobookDefaults(newPhotoIds, idToDoc, emptySlots)
+  const { singles, story, gallery } = computePhotobookDefaults(freshIds, idToDoc, emptySlots)
   const doc = (id: string) => idToDoc.get(id)!
 
   for (const slot of PHOTOBOOK_SINGLE_SLOTS) {
@@ -90,8 +133,11 @@ function applyPhotobookDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, n
 function applyPortfolioDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): void {
   const store = useContentStore.getState()
   const current = store.portfolioImageContent
+  const alreadyPlaced = collectPortfolioPlacedIds(current, urlToIdMap(idToDoc))
+  const freshIds = newPhotoIds.filter((id) => !alreadyPlaced.has(id))
+  if (freshIds.length === 0) return
   const emptySlots = new Set(PORTFOLIO_SINGLE_SLOTS.filter((slot) => !current[slot]))
-  const { hero, bio } = computePortfolioDefaults(newPhotoIds, idToDoc, emptySlots)
+  const { hero, bio } = computePortfolioDefaults(freshIds, idToDoc, emptySlots)
   const doc = (id: string) => idToDoc.get(id)!
 
   if (hero) store.setPortfolioSingleImage('hero', makePortfolioImage(doc(hero), PORTFOLIO_SLOT_IDS.hero, undefined))
@@ -103,6 +149,20 @@ export function applyDefaultPlacement(mode: AiChatMode, idToDoc: Map<string, Pro
   if (newPhotoIds.length === 0) return
   if (mode === 'photobook') applyPhotobookDefaultPlacement(idToDoc, newPhotoIds)
   else applyPortfolioDefaultPlacement(idToDoc, newPhotoIds)
+}
+
+// Section content always starts out holding the template's sample copy (kept on purpose so a
+// brand-new project doesn't look empty in the editor) — the model can't reliably tell that text
+// apart from real user content on its own. Call this BEFORE applyDefaultPlacement runs, so the
+// check reflects whether the project had zero photos placed prior to this turn; that fact gets
+// passed to the AI explicitly instead of asking it to guess from the sample text.
+export function isProjectBlank(mode: AiChatMode, current: PhotobookImageContent | PortfolioImageContent): boolean {
+  if (mode === 'photobook') {
+    const img = current as PhotobookImageContent
+    return !img.cover && !img.introduction && !img.highlight && !img.ending && img.story.length === 0 && img.gallery.length === 0
+  }
+  const img = current as PortfolioImageContent
+  return !img.hero && !img.bio && img.featuredWork.length === 0
 }
 
 // ─── Photobook: AI overrides + captions (runs AFTER the AI responds) ──────────

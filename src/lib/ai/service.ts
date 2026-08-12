@@ -52,7 +52,7 @@ async function fetchAsBase64(url: string): Promise<{ mimeType: string; data: str
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export async function sendMessage(request: AiAgentRequest): Promise<AiResponse> {
-  const { mode, prompt, photos, language, currentContent, projectId } = request
+  const { mode, prompt, photos, language, currentContent, projectId, isBlankProject } = request
   const session = getOrCreateSession(mode, projectId ?? null)
 
   // Label each image with its stable id so the model can reference it by id, never by position
@@ -65,7 +65,7 @@ export async function sendMessage(request: AiAgentRequest): Promise<AiResponse> 
     )
   ).flat()
 
-  const textPart = { text: buildUserMessage(prompt, photos.map((p) => p.id), language, currentContent) }
+  const textPart = { text: buildUserMessage(prompt, photos.map((p) => p.id), language, currentContent, isBlankProject) }
 
   const raw = await session.sendMessage([...photoParts, textPart])
   const parsed = JSON.parse(raw.response.text())
