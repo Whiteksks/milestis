@@ -4,9 +4,20 @@ import { memo, useMemo, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, BookOpen, Layout, RotateCcw, AlertTriangle, Settings, Camera } from "lucide-react"
+import { 
+  MoreHorizontal, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  EyeOff, 
+  BookOpen, 
+  Layout, 
+  RotateCcw, 
+  AlertTriangle, 
+  Settings, 
+  Camera 
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CardContent } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,40 +70,33 @@ const modeConfig = {
   event:     { icon: Camera,   labelKey: "project.mode.event" },
 }
 
-const statusStyles = {
-  draft: "bg-muted text-muted-foreground",
-  published: "bg-primary/10 text-primary",
-}
-
 // ─── Event thumbnail ──────────────────────────────────────────────────────
 
 function EventThumbnail({ heroImageUrl, approvedCount }: { heroImageUrl?: string; approvedCount: number }) {
   const extra = approvedCount - 1
   return (
-    <>
+    <div className="relative size-full bg-muted">
       {heroImageUrl ? (
         <Image src={heroImageUrl} alt="" fill className="object-cover" unoptimized />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Camera className="size-8 opacity-20" />
+          <Camera className="size-8 stroke-[1.25] text-muted-foreground/40" />
         </div>
       )}
       {extra > 0 && (
-        <span className="absolute bottom-2 right-2 rounded-full bg-background/80 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium">
+        <span className="absolute bottom-2 right-2 rounded-md border border-border/60 bg-background/90 backdrop-blur-md px-2 py-0.5 text-[11px] font-medium text-foreground shadow-sm">
           +{extra}
         </span>
       )}
-    </>
+    </div>
   )
 }
 
-// ─── Component ────────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────────────
 
 interface ProjectCardProps {
   project: DashboardProject
-  /** If true, renders the trash variant (restore + permanent delete) */
   trash?: boolean
-  /** If true, renders the archive variant (edit only, delete redirects to settings) */
   archive?: boolean
   zoom?: number
 }
@@ -106,16 +110,16 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
   const restoreMutation = useRestoreMutation()
   const forceDeleteMutation = useForceDeleteMutation()
   const unpublishMutation = useUnpublishMutation()
-  const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending
-    || unpublishMutation.isPending
+  const busy = softDeleteMutation.isPending || restoreMutation.isPending || forceDeleteMutation.isPending || unpublishMutation.isPending
+  
   const t = useTranslations()
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const modeInfo = modeConfig[project.mode]
+  const ModeIcon = modeInfo.icon
   const displayStatus = deriveDisplayStatus(project)
   const editUrl = `/${locale}/design/${project.id}/edit`
 
-  // Events now use the standard slug-based URL like photobook
   const viewUrl = getPublishedProjectShareUrl({
     mode: project.mode,
     isPublished: project.isPublished,
@@ -159,98 +163,69 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
     ]
   )
 
-  function handleSoftDelete() {
-    softDeleteMutation.mutate(project.id)
-  }
-
-  function handleRestore() {
-    restoreMutation.mutate(project.id)
-  }
-
-  function handleForceDelete() {
-    setConfirmOpen(false)
-    forceDeleteMutation.mutate(project.id)
-  }
-
-  function handleUnpublish() {
-    unpublishMutation.mutate(project.id)
-  }
-
+  // ── ARCHIVE VARIANT ──────────────────────────────────────────────────────
   if (archive) {
     return (
-      <Link
-        href={editUrl}
-        prefetch
-        className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md block"
-      >
-        <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-          <div className="absolute inset-0">{thumbnail}</div>
-          <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(editUrl) }}>
-              <Edit className="mr-1.5 size-3.5" />
-              {t('project.edit')}
-            </Button>
+      <div className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:border-foreground/30 hover:shadow-sm">
+        <Link href={editUrl} prefetch className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+          {thumbnail}
+        </Link>
+        <div className="flex items-center justify-between border-t border-border/60 p-3">
+          <div className="min-w-0 flex-1 pr-2">
+            <Link href={editUrl} prefetch className="truncate text-sm font-medium hover:underline block text-foreground">
+              {project.name}
+            </Link>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t('project.edited')} {formatRelativeDate(project.updatedAt, t)}
+            </p>
           </div>
-          <div
-            className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
-            onClick={(e) => e.preventDefault()}
-          >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="size-8 rounded-full shadow-md">
-                  <MoreHorizontal className="size-4" />
-                  <span className="sr-only">{t('project.openMenu')}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-xl">
-                <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
-                  <Edit className="mr-2 size-4" /> {t('project.edit')}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer rounded-lg"
-                  onClick={() => router.push(`/${locale}/account/archive`)}
-                >
-                  <Settings className="mr-2 size-4" /> {t('project.manageInSettings')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
-            <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
-              <modeInfo.icon className="size-3" />
-              {t(modeInfo.labelKey)}
-            </span>
-            {project.isPublished && (
-              <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">
-                {t('project.status.published')}
-              </span>
-            )}
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-md hover:bg-accent">
+                <MoreHorizontal className="size-4" />
+                <span className="sr-only">{t('project.openMenu')}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-lg border-border">
+              <DropdownMenuItem className="rounded-md cursor-pointer" onClick={() => router.push(editUrl)}>
+                <Edit className="mr-2 size-4" /> {t('project.edit')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="rounded-md cursor-pointer"
+                onClick={() => router.push(`/${locale}/account/archive`)}
+              >
+                <Settings className="mr-2 size-4" /> {t('project.manageInSettings')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <CardContent className="p-3">
-          <p className="truncate text-sm font-medium">{project.name}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
-        </CardContent>
-      </Link>
+      </div>
     )
   }
 
+  // ── TRASH VARIANT ────────────────────────────────────────────────────────
   if (trash) {
     return (
       <>
-        <div className="group overflow-hidden rounded-2xl shadow-sm border border-border/50 transition-opacity md:opacity-80 md:hover:opacity-100">
-          {/* Thumbnail */}
-          <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-            <div className="absolute inset-0">{thumbnail}</div>
-            {/* Overlay — desktop only */}
-            <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
+          <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted opacity-60">
+            {thumbnail}
+          </div>
+          <div className="flex flex-col border-t border-border/60 p-3">
+            <p className="truncate text-sm font-medium text-foreground">{project.name}</p>
+            <p className="mt-0.5 text-xs text-destructive">
+              {project.purgeAt
+                ? t('project.deletesOn', { date: formatPurgeDate(project.purgeAt) })
+                : t('project.pendingPurge')}
+            </p>
+            <div className="mt-3 flex gap-2">
               <Button
                 size="sm"
-                variant="secondary"
-                className="rounded-full shadow-md"
+                variant="outline"
+                className="flex-1 rounded-md border-border text-xs"
                 disabled={busy}
-                onClick={handleRestore}
+                onClick={() => restoreMutation.mutate(project.id)}
               >
                 <RotateCcw className="mr-1.5 size-3.5" />
                 {t('project.restore')}
@@ -258,7 +233,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
               <Button
                 size="sm"
                 variant="destructive"
-                className="rounded-full shadow-md"
+                className="flex-1 rounded-md text-xs"
                 disabled={busy}
                 onClick={() => setConfirmOpen(true)}
               >
@@ -266,69 +241,40 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
                 {t('project.delete')}
               </Button>
             </div>
-            {/* Mode badge */}
-            <div className="absolute bottom-2 left-2">
-              <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
-                <modeInfo.icon className="size-3" />
-                {t(modeInfo.labelKey)}
-              </span>
-            </div>
           </div>
-          <CardContent className="p-3">
-            <p className="truncate text-sm font-medium">{project.name}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-              {project.purgeAt
-                ? t('project.deletesOn', { date: formatPurgeDate(project.purgeAt) })
-                : t('project.pendingPurge')}
-            </p>
-            {/* Mobile action row — desktop uses hover overlay */}
-           {/* Mobile action row — desktop uses hover overlay */}
-<div className="mt-2 flex gap-1.5 md:hidden">
-  <Button
-    size="sm"
-    variant="outline"
-    className="flex-1 h-8 rounded-full text-xs gap-1"
-    disabled={busy}
-    onClick={handleRestore}
-  >
-    <RotateCcw className="size-3" />
-    {/* Скрываем текст на мобилке, показываем на md+ */}
-    <span className="hidden md:inline">{t('project.restore')}</span>
-  </Button>
-  <Button
-    size="sm"
-    variant="destructive"
-    className="flex-1 h-8 rounded-full text-xs gap-1"
-    disabled={busy}
-    onClick={() => setConfirmOpen(true)}
-  >
-    <Trash2 className="size-3" />
-    {/* Скрываем текст на мобилке, показываем на md+ */}
-    <span className="hidden md:inline">{t('project.delete')}</span>
-  </Button>
-</div>
-          </CardContent>
         </div>
 
-        {/* Confirm permanent delete dialog */}
         <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-          <DialogContent className="rounded-2xl sm:max-w-md">
+          <DialogContent className="rounded-xl border-border sm:max-w-md">
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10">
-                  <AlertTriangle className="size-5 text-destructive" />
+                <div className="flex size-9 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                  <AlertTriangle className="size-4.5" />
                 </div>
-                <DialogTitle>{t('project.confirmDeleteTitle')}</DialogTitle>
+                <DialogTitle className="text-base font-medium">{t('project.confirmDeleteTitle')}</DialogTitle>
               </div>
-              <DialogDescription className="pt-1">
+              <DialogDescription className="pt-2 text-xs text-muted-foreground">
                 {t('project.confirmDeleteDescription', { name: project.name })}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" className="rounded-full" onClick={() => setConfirmOpen(false)} disabled={busy}>
+              <Button
+                variant="outline"
+                className="rounded-md border-border text-xs"
+                onClick={() => setConfirmOpen(false)}
+                disabled={busy}
+              >
                 {t('project.cancel')}
               </Button>
-              <Button variant="destructive" className="rounded-full" onClick={handleForceDelete} disabled={busy}>
+              <Button
+                variant="destructive"
+                className="rounded-md text-xs"
+                onClick={() => {
+                  setConfirmOpen(false)
+                  forceDeleteMutation.mutate(project.id)
+                }}
+                disabled={busy}
+              >
                 {busy ? t('project.deleting') : t('project.deleteForever')}
               </Button>
             </DialogFooter>
@@ -338,64 +284,77 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
     )
   }
 
+  // ── STANDARD VARIANT ─────────────────────────────────────────────────────
   return (
-    <>
-    <Link
-      href={editUrl}
-      prefetch
-      className="group overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-md block"
-    >
-      {/* Thumbnail area */}
-      <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-        <div className="absolute inset-0">{thumbnail}</div>
-
-        {/* Hover action overlay — desktop only */}
-        <div className="absolute inset-0 hidden md:flex items-center justify-center gap-2 bg-foreground/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <Button size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(editUrl) }}>
+    <div className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:border-foreground/30 hover:shadow-sm">
+      {/* Visual Thumbnail Area */}
+      <Link href={editUrl} prefetch className="relative aspect-[16/10] w-full overflow-hidden bg-muted block">
+        {thumbnail}
+        
+        {/* Editorial Soft Overlay on Hover */}
+        <div className="absolute inset-0 hidden items-end justify-between bg-black/25 p-3 opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:opacity-100 md:flex">
+          <Button
+            size="sm"
+            className="rounded-md bg-background/90 text-foreground hover:bg-background text-xs shadow-sm backdrop-blur-md"
+            onClick={(e) => {
+              e.preventDefault()
+              router.push(editUrl)
+            }}
+          >
             <Edit className="mr-1.5 size-3.5" />
             {t('project.edit')}
           </Button>
+
           {project.isPublished && viewUrl && (
-            <Button variant="secondary" size="sm" className="rounded-full shadow-md" onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(viewUrl, '_blank') }}>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="rounded-md bg-background/90 text-foreground hover:bg-background text-xs shadow-sm backdrop-blur-md"
+              onClick={(e) => {
+                e.preventDefault()
+                window.open(viewUrl, '_blank')
+              }}
+            >
               <Eye className="mr-1.5 size-3.5" />
               {t('project.view')}
             </Button>
           )}
         </div>
+      </Link>
 
-        {/* More menu — always visible on mobile, hover on desktop */}
-        <div
-          className="absolute right-2 top-2 md:opacity-0 md:transition-opacity md:duration-200 md:group-hover:opacity-100"
-          onClick={(e) => e.preventDefault()}
-        >
+      {/* Metadata & Actions Box */}
+      <div className="flex flex-col border-t border-border/60 p-3">
+        <div className="flex items-start justify-between gap-2">
+          <Link href={editUrl} prefetch className="truncate text-sm font-medium text-foreground hover:underline">
+            {project.name}
+          </Link>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="size-8 rounded-full shadow-md">
-                <MoreHorizontal className="size-4" />
+              <Button variant="ghost" size="icon" className="-mr-1.5 -mt-1 size-7 shrink-0 rounded-md hover:bg-accent">
+                <MoreHorizontal className="size-4 text-muted-foreground" />
                 <span className="sr-only">{t('project.openMenu')}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl">
+            <DropdownMenuContent align="end" className="rounded-lg border-border">
               {project.isPublished && viewUrl && (
-                <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => window.open(viewUrl, '_blank')}>
+                <DropdownMenuItem className="rounded-md cursor-pointer" onClick={() => window.open(viewUrl, '_blank')}>
                   <Eye className="mr-2 size-4" /> {t('project.view')}
                 </DropdownMenuItem>
               )}
-              {/* Unpublish — all modes */}
               {project.isPublished && (
-                <DropdownMenuItem className="cursor-pointer rounded-lg" disabled={busy} onClick={handleUnpublish}>
+                <DropdownMenuItem className="rounded-md cursor-pointer" disabled={busy} onClick={() => unpublishMutation.mutate(project.id)}>
                   <EyeOff className="mr-2 size-4" /> {t('project.unpublish')}
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem className="cursor-pointer rounded-lg" onClick={() => router.push(editUrl)}>
+              <DropdownMenuItem className="rounded-md cursor-pointer" onClick={() => router.push(editUrl)}>
                 <Edit className="mr-2 size-4" /> {t('project.edit')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="cursor-pointer rounded-lg"
-                variant="destructive"
+                className="rounded-md cursor-pointer text-destructive focus:text-destructive"
                 disabled={busy}
-                onClick={handleSoftDelete}
+                onClick={() => softDeleteMutation.mutate(project.id)}
               >
                 <Trash2 className="mr-2 size-4" /> {t('project.moveToTrash')}
               </DropdownMenuItem>
@@ -403,26 +362,28 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
           </DropdownMenu>
         </div>
 
-        {/* Bottom badges */}
-        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
-          <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
-            <modeInfo.icon className="size-3" />
-            {t(modeInfo.labelKey)}
-          </span>
-          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[displayStatus]}`}>
-            {t(`project.status.${displayStatus}`)}
-          </span>
+        {/* Clean Single-Line Metadata Chain */}
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground truncate">
+          <div className="flex items-center gap-1 shrink-0">
+            <ModeIcon className="size-3.5 stroke-[1.5]" />
+            <span className="capitalize">{t(modeInfo.labelKey)}</span>
+          </div>
+
+          <div className={`items-center gap-1.5 shrink-0 ${displayStatus === "draft" ? "hidden sm:flex" : "flex"}`}>
+            <span className="text-muted-foreground/40">•</span>
+            <span className={`size-1.5 rounded-full ${displayStatus === "published" ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
+            <span className={displayStatus === "published" ? "text-foreground font-medium" : "text-muted-foreground"}>
+              {t(`project.status.${displayStatus}`)}
+            </span>
+          </div>
+
+          <span className="text-muted-foreground/40">•</span>
+
+          <span className="truncate">{formatRelativeDate(project.updatedAt, t)}</span>
         </div>
       </div>
-
-      <CardContent className="p-3">
-        <p className="truncate text-sm font-medium">{project.name}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">{t('project.edited')} {formatRelativeDate(project.updatedAt, t)}</p>
-      </CardContent>
-    </Link>
-
-  </>)
+    </div>
+  )
 }
 
 export const ProjectCard = memo(ProjectCardInner)
-

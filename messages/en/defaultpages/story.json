@@ -1,48 +1,47 @@
 {
   "story": {
     "hero": {
-      "eyebrow": "Why we started",
-      "titleLine1": "Every photo holds a moment worth",
-      "titleItalic": "keeping for good.",
-      "description": "We started Milestis because photos get lost — buried in a camera roll, or locked inside an app that might not exist in five years. So we built a place where they actually stay found.",
-      "imageAlt": "A printed photo book laid open on a table",
-      "sinceLabel": "Since"
+      "eyebrow": "Why We Started",
+      "titleLine1": "Every photograph holds a moment worth",
+      "titleItalic": "keeping forever.",
+      "description": "We created Milestis to give your most cherished photographs a place of their own. We help turn the chaos of your smartphone gallery into a beautiful, complete story.",
+      "sinceLabel": "Founded in"
     },
     "stats": [
-      { "number": "2026", "label": "Founded" },
-      { "number": "50+", "label": "Templates" },
-      { "number": "0", "label": "Surprise paywalls" }
+      { "number": "2026", "label": "Year Founded" },
+      { "number": "50+", "label": "Design Templates" },
+      { "number": "1", "label": "Link to Your Story" }
     ],
     "manifesto": {
-      "eyebrow": "On forgetting",
+      "eyebrow": "On Memory",
       "quote": "The struggle of man against power is the struggle of memory against forgetting.",
       "author": "Milan Kundera"
     },
     "permanence": {
-      "eyebrow": "Built to last",
-      "title": "Still here, long after the feed moves on.",
+      "eyebrow": "Built to Last",
+      "title": "A beautiful place for the things that matter most.",
       "items": [
         {
           "number": "01",
-          "title": "Share it your way",
-          "description": "A public link, a small circle, or just you — you're always the one who decides who sees it."
+          "title": "Flexible privacy settings",
+          "description": "Public access, link-only viewing, or a private archive — you have complete control over who can see your projects."
         },
         {
           "number": "02",
-          "title": "Ready in one click",
-          "description": "Hand it a folder of photos and it comes back looking like someone actually designed it."
+          "title": "Fast, effortless design",
+          "description": "Simply upload your favorite photographs and get a complete page with a carefully crafted aesthetic composition."
         },
         {
           "number": "03",
-          "title": "It doesn't expire",
-          "description": "No subscription to keep paying, no algorithm to keep up with. It keeps working for as long as you want it to."
+          "title": "Reliable story preservation",
+          "description": "Your projects are always available whenever you need them, on any device, without complicated rules or algorithms."
         }
       ]
     },
     "cta": {
-      "title": "Give your photos somewhere to stay.",
-      "description": "Bring your photos. Leave with something that lasts.",
-      "button": "Get started"
+      "title": "Create a space for your most cherished memories.",
+      "description": "Upload your photographs and bring them together into a beautiful story today.",
+      "button": "Get Started"
     }
   }
 }

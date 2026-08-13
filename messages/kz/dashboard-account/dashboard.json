@@ -85,6 +85,7 @@
   },
   "projects": {
     "title": "Жобалар",
+    "newProject": "Жоба жасау",
     "recentTitle": "Соңғы жобалар",
     "recentDescription": "Тоқтаған жеріңізден жалғастырыңыз",
     "viewAll": "Барлығын көру →",

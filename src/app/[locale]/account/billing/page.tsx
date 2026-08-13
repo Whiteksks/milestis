@@ -25,15 +25,15 @@ export default function BillingSettings() {
 
   if (loading) {
     return (
-      <div className="space-y-12 max-w-5xl mx-auto py-6">
-        <section className="space-y-6">
+      <div className="mx-auto max-w-5xl space-y-8 pb-12">
+        <section className="space-y-4">
           <div className="space-y-2">
-            <Skeleton className="h-9 w-48 rounded-lg" />
-            <Skeleton className="h-4 w-72 rounded-lg" />
+            <Skeleton className="h-8 w-48 rounded-xs" />
+            <Skeleton className="h-4 w-72 rounded-xs" />
           </div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Skeleton className="h-48 rounded-3xl lg:col-span-2" />
-            <Skeleton className="h-48 rounded-3xl" />
+          <div className="grid gap-4 lg:grid-cols-3">
+            <Skeleton className="h-48 rounded-xs lg:col-span-2" />
+            <Skeleton className="h-48 rounded-xs" />
           </div>
         </section>
       </div>
@@ -61,7 +61,7 @@ export default function BillingSettings() {
         : "credits.items.monthly.sub",
       subVars: { total: creditsData.monthly.total, resetDate: creditsData.monthly.resetDate },
       progress: monthlyPercentage,
-      iconClass: "text-primary bg-primary/10 border-primary/20",
+      iconClass: "text-foreground bg-secondary/50 border-border",
     },
     {
       icon: Gift,
@@ -69,7 +69,7 @@ export default function BillingSettings() {
       value: creditsData.bonus.amount,
       subKey: "credits.items.bonus.sub",
       progress: null,
-      iconClass: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+      iconClass: "text-foreground bg-secondary/50 border-border",
     },
     {
       icon: ShoppingBag,
@@ -77,26 +77,30 @@ export default function BillingSettings() {
       value: creditsData.purchased.amount,
       subKey: "credits.items.purchased.sub",
       progress: null,
-      iconClass: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+      iconClass: "text-foreground bg-secondary/50 border-border",
     },
   ] : []
 
   return (
-    <div className="space-y-12 max-w-5xl mx-auto md:py-6 md:px-4 p-0 antialiased">
+    <div className="mx-auto max-w-5xl space-y-10 pb-12">
       
       {/* СЕКЦИЯ 1: Тариф и Оплата */}
-      <section className="space-y-6">
-        <div className="space-y-1">
-          <h2 className="font-serif text-2xl md:text-3xl">{t("plan.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("plan.description")}</p>
+      <section className="space-y-4">
+        <div className="flex items-center gap-4">
+          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {t("plan.title")}
+          </h2>
+          <span className="h-px flex-1 bg-border/80" />
         </div>
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
+        <p className="font-sans text-sm text-muted-foreground">{t("plan.description")}</p>
+
+        <div className="space-y-4">
+          <div className="rounded-xs border border-border bg-card p-5 md:p-6">
             <BillingPlanCard />
           </div>
 
           {isPro && (
-            <div className="rounded-3xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
+            <div className="rounded-xs border border-border bg-card p-5 md:p-6">
               <PaymentMethodCard paymentMethod={{}} />
             </div>
           )}
@@ -104,78 +108,75 @@ export default function BillingSettings() {
       </section>
 
       {/* СЕКЦИЯ 2: Кредиты */}
-      <section className="space-y-6">
-        <div className="space-y-1">
-          <h2 className="font-serif text-2xl md:text-3xl">{t("credits.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("credits.description")}</p>
+      <section className="space-y-4">
+        <div className="flex items-center gap-4">
+          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {t("credits.title")}
+          </h2>
+          <span className="h-px flex-1 bg-border/80" />
         </div>
+        <p className="font-sans text-sm text-muted-foreground">{t("credits.description")}</p>
 
         {creditsData ? (
           <div className="grid gap-4 md:grid-cols-5 items-stretch">
             
-            {/* Левая колонка: Баланс и Кнопка покупки вне карты (2/5 ширины) */}
+            {/* Левая колонка: Баланс и Кнопка покупки (2/5 ширины) */}
             <div className="md:col-span-2 flex flex-col gap-4">
               
-              {/* Матовая семантическая "Банковская карта" баланса */}
-              <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-muted/50 p-6 shadow-sm flex flex-col justify-between min-h-[240px] group transition-all hover:shadow-md">
+              <div className="rounded-xs border border-border bg-card p-5 md:p-6 flex flex-col justify-between min-h-[220px] flex-1">
                 
-                {/* Абстрактное семантическое свечение в тон основного бренда акцента */}
-                <div className="absolute -right-8 -top-8 size-36 bg-primary/5 rounded-full blur-3xl pointer-events-none transition-all group-hover:scale-110" />
-                
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-muted border border-border/80 shadow-sm">
-                    <CreditCard className="size-4 text-primary" />
+                <div className="flex items-center justify-between">
+                  <div className="flex size-9 items-center justify-center rounded-xs border border-border bg-secondary/50">
+                    <CreditCard className="size-4 text-foreground" />
                   </div>
-                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase bg-muted/80 px-2.5 py-1 rounded-full border border-border/60 backdrop-blur-sm">
+                  <span className="font-sans text-[10px] font-medium tracking-wider text-muted-foreground uppercase bg-secondary/50 px-2 py-0.5 rounded-xs border border-border">
                     {t("credits.balanceLabel")}
                   </span>
                 </div>
 
-                <div className="my-auto pt-6 relative z-10">
-                  <p className="text-xs font-medium text-muted-foreground tracking-wide">{t("credits.totalAvailable")}</p>
-                  <div className="mt-1.5 flex items-baseline gap-2">
-                    <span className="text-5xl font-bold tracking-tight text-foreground tabular-nums">
+                <div className="my-auto pt-4">
+                  <p className="font-sans text-xs text-muted-foreground">{t("credits.totalAvailable")}</p>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="font-mono text-4xl font-semibold tracking-tight text-foreground tabular-nums">
                       {totalCredits.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
-                {/* Сноска о сгорающих кредитах внизу карты */}
-                <div className="border-t border-border/60 pt-4 mt-2 relative z-10">
-                  <p className="text-[11px] text-muted-foreground/90 leading-normal font-normal">
-                    <span className="text-primary font-medium">*</span> {t("credits.expirationNotice")}
+                <div className="border-t border-border/80 pt-3 mt-2">
+                  <p className="font-sans text-xs text-muted-foreground leading-normal">
+                    <span className="text-foreground font-medium">*</span> {t("credits.expirationNotice")}
                   </p>
                 </div>
               </div>
 
-              {/* Кнопка вынесена вне карточки. Класс [&>button]:w-full растянет внутреннюю кнопку на всю ширину колонки */}
-              <div className="[&>button]:w-full">
+              <div className="[&>button]:w-full [&>button]:h-9 [&>button]:rounded-xs [&>button]:bg-foreground [&>button]:text-background [&>button]:font-sans [&>button]:text-xs [&>button]:font-medium [&>button]:hover:bg-foreground/90">
                 <BuyCreditsDialog />
               </div>
             </div>
 
             {/* Правая колонка: Детализация по типам (3/5 ширины) */}
-            <div className="md:col-span-3 border border-border bg-card/60 backdrop-blur-xs rounded-3xl p-6 flex flex-col justify-center space-y-2 shadow-sm">
+            <div className="md:col-span-3 rounded-xs border border-border bg-card p-5 md:p-6 flex flex-col justify-center space-y-3">
               {creditTypes.map((type) => {
                 const Icon = type.icon
                 return (
-                  <div key={type.labelKey} className="flex items-start gap-4 p-2.5 rounded-2xl hover:bg-muted/40 transition-colors border border-transparent hover:border-border/40">
-                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl border ${type.iconClass}`}>
+                  <div key={type.labelKey} className="flex items-start gap-3.5 p-3 rounded-xs border border-border bg-background/50">
+                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-xs border ${type.iconClass}`}>
                       <Icon className="size-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground/90">{t(type.labelKey)}</span>
-                        <span className="text-sm font-semibold tabular-nums text-foreground">{type.value.toLocaleString()}</span>
+                        <span className="font-sans text-sm font-medium text-foreground">{t(type.labelKey)}</span>
+                        <span className="font-mono text-sm font-semibold tabular-nums text-foreground">{type.value.toLocaleString()}</span>
                       </div>
                       
                       {type.progress !== null && (
                         <div className="relative w-full">
-                          <Progress value={type.progress} className="mt-2.5 h-1.5 bg-muted" />
+                          <Progress value={type.progress} className="mt-2 h-1 bg-secondary rounded-none" />
                         </div>
                       )}
                       
-                      <p className="mt-1.5 text-xs text-muted-foreground/85 font-normal">
+                      <p className="mt-1.5 font-sans text-xs text-muted-foreground">
                         {type.subVars ? t(type.subKey, type.subVars) : t(type.subKey)}
                       </p>
                     </div>
@@ -186,20 +187,23 @@ export default function BillingSettings() {
 
           </div>
         ) : (
-          <div className="py-12 border border-dashed border-border rounded-3xl flex items-center justify-center text-muted-foreground bg-muted/10">
-            <p className="text-sm">{t("unavailable")}</p>
+          <div className="py-12 border border-dashed border-border rounded-xs flex items-center justify-center text-muted-foreground bg-card/50">
+            <p className="font-sans text-sm">{t("unavailable")}</p>
           </div>
         )}
       </section>
 
       {/* СЕКЦИЯ 3: История операций */}
-      <section className="space-y-6">
-        <div className="space-y-1">
-          <h2 className="font-serif text-2xl md:text-3xl">{t("history.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("history.description")}</p>
+      <section className="space-y-4">
+        <div className="flex items-center gap-4">
+          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {t("history.title")}
+          </h2>
+          <span className="h-px flex-1 bg-border/80" />
         </div>
+        <p className="font-sans text-sm text-muted-foreground">{t("history.description")}</p>
 
-        <div className="rounded-3xl border border-border bg-card/40 p-4 shadow-sm">
+        <div className="rounded-xs border border-border bg-card p-5 md:p-6">
           <BillingHistory 
             view="all"
             historyLoading={historyLoading}

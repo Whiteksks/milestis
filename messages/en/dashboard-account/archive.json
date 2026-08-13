@@ -27,6 +27,12 @@
         "deleteButton": "Delete permanently",
         "deleting": "Deleting…"
       }
+    },
+    "domains": {
+      "shareVia": "Share",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "openProject": "Open project"
     }
   }
 }

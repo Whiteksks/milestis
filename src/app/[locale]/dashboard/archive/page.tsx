@@ -3,10 +3,20 @@
 import { memo, useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { ArrowLeft, BookOpen, Camera, Check, Copy, Edit, Globe, Layout } from "lucide-react"
+import {
+  ArrowLeft,
+  BookOpen,
+  Camera,
+  Check,
+  Copy,
+  Edit,
+  Globe,
+  Layout,
+  Archive,
+  ExternalLink,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
 import { TemplatePreview } from "@/components/shared/template-preview"
 import { useArchivedProjectsQuery, type DashboardProject } from "@/hooks/useProjectsQuery"
 import { getPublishedProjectShareUrl } from "@/lib/slug"
@@ -25,11 +35,14 @@ const modeConfig = {
 
 function GridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
-          <Skeleton className="h-4 w-2/3" />
+        <div key={i} className="space-y-3 rounded-xs border border-border/80 p-3 bg-background">
+          <Skeleton className="aspect-[16/10] w-full rounded-xs" />
+          <div className="space-y-2 pt-1">
+            <Skeleton className="h-4 w-2/3 rounded-xs" />
+            <Skeleton className="h-3 w-1/3 rounded-xs" />
+          </div>
         </div>
       ))}
     </div>
@@ -83,23 +96,38 @@ const PublishedProjectCard = memo(function PublishedProjectCard({
       type="button"
       onClick={() => onSelect(project.id)}
       className={cn(
-        "group w-full overflow-hidden rounded-2xl text-left shadow-sm transition-all duration-200",
+        "group relative flex flex-col w-full text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground rounded-xs border bg-background p-2.5",
         isSelected
-          ? "ring-2 ring-primary shadow-md"
-          : "hover:shadow-md hover:ring-1 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+          ? "border-foreground bg-secondary/40 ring-1 ring-foreground/20"
+          : "border-border hover:border-foreground/40 hover:bg-secondary/20"
       )}
     >
-      <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-muted">
-        <div className="absolute inset-0">{thumbnail}</div>
-        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
-          <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
-            <modeInfo.icon className="size-3" />
+      {/* Thumbnail Container */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xs bg-secondary/30 border border-border/60">
+        <div className="absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-[1.02]">
+          {thumbnail}
+        </div>
+        
+        {/* Mode Tag — Friendly sans font */}
+        <div className="absolute bottom-2 left-2 z-10">
+          <span className="inline-flex items-center gap-1.5 rounded-xs border border-border/70 bg-background/95 px-2 py-0.5 font-sans text-xs font-medium text-foreground backdrop-blur-xs shadow-2xs">
+            <modeInfo.icon className="size-3.5 text-muted-foreground" />
             {t(modeInfo.labelKey)}
           </span>
         </div>
       </div>
-      <div className="p-3">
-        <p className="truncate text-sm font-medium">{project.name}</p>
+
+      {/* Title & Status */}
+      <div className="mt-2.5 flex items-center justify-between gap-2 px-0.5 pb-0.5">
+        <p className="truncate font-serif text-base font-medium tracking-tight text-foreground">
+          {project.name}
+        </p>
+        {project.isPublished && (
+          <span className="inline-flex items-center gap-1.5 rounded-xs bg-secondary px-2 py-0.5 font-sans text-[11px] font-medium text-foreground border border-border/60">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            {t("project.status.published")}
+          </span>
+        )}
       </div>
     </button>
   )
@@ -165,86 +193,119 @@ function ProjectDetailPanel({
   )
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_340px] gap-6 md:gap-10">
-      {/* Left: Preview */}
+    <div className="space-y-6">
+      {/* Top back button */}
       <div>
         <button
           type="button"
           onClick={onBack}
-          className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex h-8 items-center gap-1.5 rounded-xs border border-border bg-background px-3 font-sans text-xs text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
-          {t("archive.backToList")}
+          <span>{t("archive.backToList")}</span>
         </button>
+      </div>
 
-        <div className="overflow-hidden rounded-2xl bg-muted shadow-md">
-          <div className="relative aspect-[16/10]">
-            <div className="absolute inset-0">{thumbnail}</div>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-[1fr_320px]">
+        {/* Left: Preview Section */}
+        <div className="space-y-4">
+          <div className="relative overflow-hidden rounded-xs border border-border bg-background p-2">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-xs bg-secondary/30">
+              <div className="absolute inset-0">{thumbnail}</div>
+            </div>
 
-        <div className="mt-4">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight">{project.name}</h2>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="gap-1.5 rounded-full font-normal">
-              <modeInfo.icon className="size-3" />
-              {t(modeInfo.labelKey)}
-            </Badge>
+            {/* Status Tag */}
             {project.isPublished && (
-              <Badge className="rounded-full border-0 bg-primary/10 text-primary hover:bg-primary/20">
+              <div className="absolute top-4 right-4 rounded-xs border border-border/80 bg-background/90 backdrop-blur-md px-2.5 py-1 font-sans text-xs font-medium text-foreground shadow-2xs">
                 {t("project.status.published")}
-              </Badge>
+              </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Right: Actions */}
-      <div className="flex flex-col gap-4 md:pt-[52px]">
-        {shareUrl && (
-          <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
-            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-              {t("archive.shareUrl")}
-            </p>
-            <p className="break-all font-mono text-xs leading-relaxed text-foreground/70">
-              {shareUrl}
-            </p>
+          <div className="space-y-2 pt-1">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+              {project.name}
+            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-xs border border-border/80 bg-secondary/60 px-2.5 py-1 font-sans text-xs font-medium text-secondary-foreground">
+                <modeInfo.icon className="size-3.5 text-muted-foreground" />
+                {t(modeInfo.labelKey)}
+              </span>
+            </div>
           </div>
-        )}
+        </div>
 
-        <div className="flex flex-col gap-2">
-          <Button asChild className="h-10 rounded-xl">
-            <Link href={editUrl}>
-              <Edit className="mr-2 size-4" />
-              {t("archive.edit")}
-            </Link>
-          </Button>
+        {/* Right: Actions Panel (Light & Clean layout) */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 rounded-xs border border-border bg-secondary/20 p-4">
+            {shareUrl && (
+              <div className="space-y-1.5">
+                <span className="font-sans text-xs font-medium text-muted-foreground">
+                  {t("archive.shareUrl")}
+                </span>
+                <div className="rounded-xs border border-border bg-background p-2.5 font-sans text-xs leading-relaxed break-all text-foreground/80 shadow-2xs">
+                  {shareUrl}
+                </div>
+              </div>
+            )}
 
-          {shareUrl && (
-            <>
-              <Button variant="outline" className="h-10 rounded-xl" asChild>
-                <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-                  <Globe className="mr-2 size-4" />
-                  {t("archive.viewSite")}
-                </a>
-              </Button>
-
+            <div className="flex flex-col gap-2 pt-1">
+              {/* Primary High-Contrast Button */}
               <Button
-                variant="outline"
-                className="h-10 rounded-xl"
-                onClick={copyLink}
+                asChild
+                className="h-9 w-full rounded-xs bg-foreground text-xs font-medium text-background transition-colors hover:bg-foreground/90 shadow-2xs"
               >
-                {copied ? (
-                  <Check className="mr-2 size-4 text-green-500" />
-                ) : (
-                  <Copy className="mr-2 size-4" />
-                )}
-                {copied ? t("archive.linkCopied") : t("archive.copyLink")}
+                <Link href={editUrl}>
+                  <Edit className="mr-2 size-3.5" />
+                  {t("archive.edit")}
+                </Link>
               </Button>
-            </>
-          )}
+
+              {shareUrl && (
+                <>
+                  {/* Secondary Contrasting Action Buttons */}
+                  <Button
+                    variant="outline"
+                    className="h-9 w-full rounded-xs border-border bg-background text-xs font-normal text-foreground hover:bg-secondary/60"
+                    asChild
+                  >
+                    <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                      <Globe className="mr-2 size-3.5 text-muted-foreground" />
+                      {t("archive.viewSite")}
+                      <ExternalLink className="ml-auto size-3 opacity-50" />
+                    </a>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="h-9 w-full rounded-xs border-border bg-background text-xs font-normal text-foreground hover:bg-secondary/60"
+                    onClick={copyLink}
+                  >
+                    {copied ? (
+                      <Check className="mr-2 size-3.5 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <Copy className="mr-2 size-3.5 text-muted-foreground" />
+                    )}
+                    {copied ? t("archive.linkCopied") : t("archive.copyLink")}
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function ArchiveEmpty() {
+  const t = useTranslations()
+  return (
+    <div className="flex flex-col items-center justify-center border border-dashed border-border/80 py-16 text-center md:py-24">
+      <div className="flex size-12 items-center justify-center rounded-xs border border-border bg-secondary/30 text-secondary-foreground">
+        <Archive className="size-5" />
+      </div>
+      <h3 className="mt-4 font-serif text-xl font-medium">{t('archive.empty')}</h3>
     </div>
   )
 }
@@ -258,46 +319,47 @@ export default function ArchivePage() {
   const selectedProject = projects.find((p) => p.id === selectedId) ?? null
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 md:px-4 md:py-8">
-      {/* Header — hidden when detail panel is open */}
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:py-8">
+      {/* Header — Matches Dashboard Projects Header */}
       {!selectedProject && (
-        <header className="flex flex-col gap-4 border-b pb-6">
-          <div className="flex items-baseline gap-3">
-            <h1 className="font-serif text-3xl md:text-5xl tracking-tight">
-              {t("archive.title")}
-            </h1>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              {t("projects.totalCount", { count: projects.length })}
-            </span>
+        <div className="flex flex-col gap-4 border-b border-border/80 pb-5 md:pb-6">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-baseline gap-2.5 sm:gap-3">
+              <h1 className="font-serif text-2xl font-medium tracking-tight sm:text-3xl md:text-5xl">
+                {t("archive.title")}
+              </h1>
+              <span className="rounded-xs bg-secondary/80 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-secondary-foreground border border-secondary sm:text-[11px]">
+                {t("projects.totalCount", { count: projects.length })}
+              </span>
+            </div>
           </div>
-        </header>
+        </div>
       )}
 
-      {selectedProject ? (
-        <ProjectDetailPanel
-          project={selectedProject}
-          onBack={() => setSelectedId(null)}
-        />
-      ) : isLoading ? (
-        <GridSkeleton />
-      ) : projects.length === 0 ? (
-        <div className="border-t border-dashed border-border/60 py-40 text-center">
-          <p className="font-serif text-2xl italic text-muted-foreground/50">
-            {t("archive.empty")}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-          {projects.map((project) => (
-            <PublishedProjectCard
-              key={project.id}
-              project={project}
-              isSelected={selectedId === project.id}
-              onSelect={setSelectedId}
-            />
-          ))}
-        </div>
-      )}
+      {/* Main Content Area */}
+      <main className="min-h-[400px]">
+        {selectedProject ? (
+          <ProjectDetailPanel
+            project={selectedProject}
+            onBack={() => setSelectedId(null)}
+          />
+        ) : isLoading ? (
+          <GridSkeleton />
+        ) : projects.length === 0 ? (
+          <ArchiveEmpty />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+            {projects.map((project) => (
+              <PublishedProjectCard
+                key={project.id}
+                project={project}
+                isSelected={selectedId === project.id}
+                onSelect={setSelectedId}
+              />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   )
 }

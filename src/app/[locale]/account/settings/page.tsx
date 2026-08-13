@@ -187,185 +187,215 @@ export default function AccountSettings() {
 
   return (
     <>
-    <div className="space-y-16 max-w-5xl mx-auto pb-12">
-      <section className="space-y-6">
-        <div className="space-y-1 px-1">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("preferences.title")}</h2>
-          <p className="text-sm text-muted-foreground/90">{t("preferences.description")}</p>
-        </div>
-
-        <div className="group rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:border-border/100 hover:shadow-md">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            
-            <div className="flex flex-1 items-center gap-4">
-              <div className="hidden rounded-xl border border-border/60 bg-secondary/30 p-2.5 shadow-sm sm:block transition-colors group-hover:bg-secondary">
-                <Globe className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[16px] font-semibold tracking-tight">{t("interfaceLanguage.label")}</Label>
-                <p className="max-w-xl text-xs leading-relaxed text-muted-foreground/80">
-                  {t("interfaceLanguage.description")} 
-                  <span className="ml-1.5 text-primary/80 font-medium italic">{t("interfaceLanguage.note")}</span>
-                </p>
-              </div>
-            </div>
-
-            <div className="w-full sm:w-auto sm:min-w-[200px]">
-              <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as 'en' | 'ru' | 'kz')}>
-                <SelectTrigger className="h-10 w-full rounded-full px-4 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="ru">Русский</SelectItem>
-                  <SelectItem value="kz">Қазақша</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
+      <div className="mx-auto max-w-5xl space-y-10 pb-12">
+        
+        {/* Preferences / Interface Language */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              {t("preferences.title")}
+            </h2>
+            <span className="h-px flex-1 bg-border/80" />
           </div>
-        </div>
-      </section>
+          <p className="font-sans text-sm text-muted-foreground">{t("preferences.description")}</p>
 
-      {/* Notifications */}
-      <section className="space-y-6">
-        <div className="px-1">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("notifications.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground/90">{t("notifications.description")}</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {notificationItems.map(({ key, icon: Icon, labelKey, descKey }) => (
-            <div 
-              key={key} 
-              className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-card shadow-sm border border-border/50 hover:border-border/90"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary/50 group-hover:bg-primary/10 transition-colors duration-300">
-                  <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+          <div className="rounded-xs border border-border bg-card p-5 md:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              
+              <div className="flex flex-1 items-start gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xs border border-border bg-secondary/50">
+                  <Globe className="size-5 text-foreground" />
                 </div>
-                <div className="flex flex-col gap-0.5">
-                  <p className="font-medium text-[15px] leading-tight text-foreground">{t(labelKey)}</p>
-                  <p className="text-xs text-muted-foreground/80 leading-normal max-w-[260px] sm:max-w-none">{t(descKey)}</p>
+                <div className="space-y-1">
+                  <Label className="font-sans text-sm font-medium text-foreground">
+                    {t("interfaceLanguage.label")}
+                  </Label>
+                  <p className="font-sans text-sm text-muted-foreground">
+                    {t("interfaceLanguage.description")}{" "}
+                    <span className="font-medium text-foreground/80 italic">{t("interfaceLanguage.note")}</span>
+                  </p>
                 </div>
               </div>
-              <Switch
-                className="shrink-0 data-[state=checked]:bg-primary"
-                checked={notifications[key]}
-                onCheckedChange={(v) => toggle(key, v)}
-              />
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex justify-end pt-2">
-          <Button className="rounded-full px-8 h-10 shadow-sm font-medium hover:opacity-90 transition-opacity" onClick={handleSaveSettings} disabled={saving}>
-            {saving ? t("save.saving") : t("save.saveSettings")}
-          </Button>
-        </div>
-      </section>
 
-      {/* Data Management */}
-      <section className="space-y-6">
-        <div className="px-1">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("data.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground/90">{t("data.description")}</p>
-        </div>
-        <div className="rounded-2xl bg-card border border-border/50 p-6 shadow-sm space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <Button
-              variant="outline"
-              className="w-full justify-center gap-2 rounded-full bg-transparent h-10 sm:w-auto px-5 border-border/80 hover:bg-secondary/50 transition-colors"
-              onClick={handleExportAccountData}
-              disabled={exportingAccountData || exportingProjectContent || deletingAccount}
-            >
-              <Download className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">{t("data.downloadAccountData")}</span>
-            </Button>
-
-            {exportableProjects.length > 0 && (
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center w-full lg:w-auto">
-                <Select
-                  value={selectedProjectId}
-                  onValueChange={setSelectedProjectId}
-                  disabled={exportingProjectContent || deletingAccount}
-                >
-                  <SelectTrigger className="h-10 w-full sm:w-[220px] rounded-full text-sm border-border/80 px-4">
-                    <SelectValue placeholder={t("data.selectProject")} />
+              <div className="w-full sm:w-auto sm:min-w-[200px] shrink-0 pt-2 sm:pt-0">
+                <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as 'en' | 'ru' | 'kz')}>
+                  <SelectTrigger className="h-9 w-full rounded-xs border-border bg-background font-sans text-sm focus:ring-1 focus:ring-foreground">
+                    <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {exportableProjects.map((p) => (
-                      <SelectItem key={p.id} value={p.id} className="rounded-lg">
-                        {p.name}
-                      </SelectItem>
-                    ))}
+                  <SelectContent className="rounded-xs border-border bg-popover font-sans text-sm">
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="ru">Русский</SelectItem>
+                    <SelectItem value="kz">Қазақша</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto shrink-0 gap-2 rounded-full bg-transparent h-10 px-5 border-border/80 hover:bg-secondary/50 transition-colors"
-                  onClick={handleExportProjectContent}
-                  disabled={!selectedProjectId || exportingProjectContent || deletingAccount}
-                >
-                  <Package className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{t("data.exportProjectContent")}</span>
-                </Button>
               </div>
-            )}
-          </div>
-          <div className="border-t border-border/40 pt-4">
-            <p className="text-xs text-muted-foreground/70 leading-relaxed">{t("data.descriptionLong")}</p>
-          </div>
-        </div>
-      </section>
 
-      {/* Privacy & Cookies */}
-      <section className="space-y-6">
-        <div className="px-1">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">{t("privacy.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground/90">{t("privacy.description")}</p>
-        </div>
-        <div className="rounded-2xl bg-card border border-border/50 p-6 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <p className="font-semibold text-foreground text-[15px]">{t("privacy.preferencesButton")}</p>
-              <p className="text-xs text-muted-foreground/80 max-w-xl leading-normal">{t("privacy.preferencesDescription")}</p>
             </div>
-            <Button
-              variant="outline"
-              className="shrink-0 rounded-full h-10 px-6 border-border/80 hover:bg-secondary/50 font-medium transition-colors"
-              onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
-            >
-              {t("privacy.preferencesButton")}
-            </Button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Danger Zone */}
-      <section className="space-y-6">
-        <div className="px-1">
-          <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-destructive/90">{t("danger.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground/90">{t("danger.description")}</p>
-        </div>
-        <div className="rounded-2xl border border-destructive/20 bg-destructive/[0.01] p-6 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <p className="font-semibold text-foreground text-[15px]">{t("danger.deleteTitle")}</p>
-              <p className="text-xs text-muted-foreground/80 max-w-xl leading-normal">{t("danger.deleteDescription")}</p>
+        {/* Notifications */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              {t("notifications.title")}
+            </h2>
+            <span className="h-px flex-1 bg-border/80" />
+          </div>
+          <p className="font-sans text-sm text-muted-foreground">{t("notifications.description")}</p>
+
+          <div className="rounded-xs border border-border bg-card p-5 md:p-6 space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {notificationItems.map(({ key, icon: Icon, labelKey, descKey }) => (
+                <div 
+                  key={key} 
+                  className="flex items-start justify-between gap-4 p-4 rounded-xs border border-border bg-background/50"
+                >
+                  <div className="flex items-start gap-3.5 min-w-0">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-xs border border-border bg-secondary/50">
+                      <Icon className="size-4 text-foreground" />
+                    </div>
+                    <div className="space-y-1 min-w-0">
+                      <p className="font-sans text-sm font-medium leading-none text-foreground">{t(labelKey)}</p>
+                      <p className="font-sans text-xs leading-relaxed text-muted-foreground">{t(descKey)}</p>
+                    </div>
+                  </div>
+                  <Switch
+                    className="shrink-0 data-[state=checked]:bg-foreground"
+                    checked={notifications[key]}
+                    onCheckedChange={(v) => toggle(key, v)}
+                  />
+                </div>
+              ))}
             </div>
-            <Button
-              className="shrink-0 rounded-full h-10 px-6 border-destructive/60 text-primary-foreground hover:bg-destructive hover:text-destructive-foreground font-medium transition-all duration-200"
-              onClick={() => setDeleteModalOpen(true)}
-              disabled={deletingAccount || exportingAccountData || exportingProjectContent}
-            >
-              {t("danger.deleteButton")}
-            </Button>
-          </div>
-        </div>
-      </section>
 
-    </div>
+            <div className="flex justify-end border-t border-border/80 pt-4">
+              <Button 
+                className="h-9 rounded-xs bg-foreground px-5 font-sans text-xs font-medium text-background transition-colors hover:bg-foreground/90" 
+                onClick={handleSaveSettings} 
+                disabled={saving}
+              >
+                {saving ? t("save.saving") : t("save.saveSettings")}
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Data Management */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              {t("data.title")}
+            </h2>
+            <span className="h-px flex-1 bg-border/80" />
+          </div>
+          <p className="font-sans text-sm text-muted-foreground">{t("data.description")}</p>
+
+          <div className="rounded-xs border border-border bg-card p-5 md:p-6 space-y-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <Button
+                variant="outline"
+                className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-secondary/60 w-full sm:w-auto"
+                onClick={handleExportAccountData}
+                disabled={exportingAccountData || exportingProjectContent || deletingAccount}
+              >
+                <Download className="mr-2 size-4 text-muted-foreground" />
+                <span>{t("data.downloadAccountData")}</span>
+              </Button>
+
+              {exportableProjects.length > 0 && (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center w-full lg:w-auto">
+                  <Select
+                    value={selectedProjectId}
+                    onValueChange={setSelectedProjectId}
+                    disabled={exportingProjectContent || deletingAccount}
+                  >
+                    <SelectTrigger className="h-9 w-full sm:w-[220px] rounded-xs border-border bg-background font-sans text-sm">
+                      <SelectValue placeholder={t("data.selectProject")} />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xs border-border bg-popover font-sans text-sm">
+                      {exportableProjects.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-secondary/60 w-full sm:w-auto"
+                    onClick={handleExportProjectContent}
+                    disabled={!selectedProjectId || exportingProjectContent || deletingAccount}
+                  >
+                    <Package className="mr-2 size-4 text-muted-foreground" />
+                    <span>{t("data.exportProjectContent")}</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-border/80 pt-4">
+              <p className="font-sans text-xs leading-relaxed text-muted-foreground">{t("data.descriptionLong")}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Privacy & Cookies */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              {t("privacy.title")}
+            </h2>
+            <span className="h-px flex-1 bg-border/80" />
+          </div>
+          <p className="font-sans text-sm text-muted-foreground">{t("privacy.description")}</p>
+
+          <div className="rounded-xs border border-border bg-card p-5 md:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1 min-w-0">
+                <p className="font-sans text-sm font-medium text-foreground">{t("privacy.preferencesButton")}</p>
+                <p className="font-sans text-sm text-muted-foreground">{t("privacy.preferencesDescription")}</p>
+              </div>
+              <Button
+                variant="outline"
+                className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-secondary/60 shrink-0"
+                onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
+              >
+                {t("privacy.preferencesButton")}
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Danger Zone */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-destructive sm:text-3xl">
+              {t("danger.title")}
+            </h2>
+            <span className="h-px flex-1 bg-destructive/30" />
+          </div>
+          <p className="font-sans text-sm text-muted-foreground">{t("danger.description")}</p>
+
+          <div className="rounded-xs border border-destructive/30 bg-destructive/5 p-5 md:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1 min-w-0">
+                <p className="font-sans text-sm font-medium text-foreground">{t("danger.deleteTitle")}</p>
+                <p className="font-sans text-sm text-muted-foreground">{t("danger.deleteDescription")}</p>
+              </div>
+              <Button
+                variant="destructive"
+                className="h-9 rounded-xs px-4 font-sans text-xs font-medium shrink-0"
+                onClick={() => setDeleteModalOpen(true)}
+                disabled={deletingAccount || exportingAccountData || exportingProjectContent}
+              >
+                {t("danger.deleteButton")}
+              </Button>
+            </div>
+          </div>
+        </section>
+
+      </div>
 
       <DeleteAccountModal
         open={deleteModalOpen}
@@ -376,6 +406,6 @@ export default function AccountSettings() {
         hasActiveSub={hasBlockingSubscription}
         billingHref={`/${locale}/account/billing`}
       />
-      </>
+    </>
   )
 }

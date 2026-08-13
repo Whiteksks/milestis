@@ -1,59 +1,59 @@
 {
   "features": {
     "hero": {
-      "eyebrow": "The Toolkit",
-      "titleLine1": "No design skills.",
-      "titleItalic": "No compromise.",
-      "description": "Every layout in Milestis is already balanced, spaced and proportioned. You don't need an eye for design — the template already has one.",
+      "eyebrow": "Tools",
+      "titleLine1": "Ready-made design.",
+      "titleItalic": "Attention to every detail.",
+      "description": "Every Milestis template is already balanced in its grid, proportions, and spacing. Professional design is built directly into the system, so you can focus entirely on your content.",
       "templateLabel": "Template",
       "templatesLabel": "Templates"
     },
     "stats": [
-      { "number": "50+", "label": "Templates" },
-      { "number": "1-click", "label": "AI-assisted layouts" },
-      { "number": "0", "label": "Design skills required" }
+      { "number": "50+", "label": "Ready-made Templates" },
+      { "number": "1 click", "label": "AI Generation" },
+      { "number": "0", "label": "Design Skills Needed" }
     ],
     "manifesto": {
-      "eyebrow": "About beauty",
-      "quote": "Beauty shouldn’t be something you have to design.",
-      "author": "Milestis Manifesto"
+      "eyebrow": "On Aesthetics",
+      "quote": "Beauty becomes effortless when everything is thoughtfully designed for you.",
+      "author": "The Milestis Manifesto"
     },
     "designSystem": {
-      "eyebrow": "The Design System",
-      "title": "A structure you can’t break.",
-      "subtitle": "Plenty of room to make it yours.",
+      "eyebrow": "Design System",
+      "title": "A reliable foundation for harmony.",
+      "subtitle": "With plenty of room for your individuality.",
       "pillars": [
         {
           "number": "01",
-          "title": "Set up right from the start",
-          "description": "Spacing, hierarchy, proportion — all figured out before you ever open the editor."
+          "title": "Thoughtfully designed from the start",
+          "description": "Perfect spacing, visual hierarchy, and balance are carefully set up in advance for every project."
         },
         {
           "number": "02",
-          "title": "Room to make it yours",
-          "description": "Change the palette, textures, lighting — whatever you touch, the structure underneath holds."
+          "title": "Room for your own style",
+          "description": "Customize colors, textures, and mood to suit your needs. The composition keeps its structure and aesthetic integrity."
         },
         {
           "number": "03",
-          "title": "Opens instantly",
-          "description": "No app, no download — every project just opens, on whatever device you're using."
+          "title": "Instant access for everyone",
+          "description": "Your finished page opens instantly through a link and looks equally great on any device."
         }
       ]
     },
     "professionals": {
       "eyebrow": "For Professionals",
-      "title": "For people whose job is handing off finished work.",
-      "description": "Photographers, planners and studios use Milestis to hand clients something finished and branded, instead of a drive full of raw files.",
+      "title": "A ready-to-use tool for delivering your projects.",
+      "description": "Photographers, event planners, and studios use Milestis to present their work to clients in a stylish, branded, and convenient format.",
       "items": [
-        { "title": "Client proofing links", "emphasis": true },
-        { "title": "Personal Workspace" },
-        { "title": "AI-assisted photo placement" }
+        { "title": "Convenient links for client approval", "emphasis": true },
+        { "title": "A personal, organized workspace" },
+        { "title": "AI-powered automatic photo arrangement" }
       ]
     },
     "cta": {
-      "title": "Make your first page today.",
-      "description": "Free to start, no card needed, no catch.",
-      "button": "Get started"
+      "title": "Create your first page today.",
+      "description": "Start for free and experience the editor for yourself.",
+      "button": "Get Started"
     }
   }
 }

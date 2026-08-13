@@ -16,6 +16,7 @@ import {
   FaPixiv,
 } from "react-icons/fa6"
 import { IconType } from 'react-icons/lib'
+
 // ─── Slug detection ─────────────────────────────────────────────────────────
 
 /** Derives a platform slug from a raw URL string. */
@@ -35,7 +36,7 @@ export function detectSocialSlug(url: string): string {
   return 'link'
 }
 
-const SLUG_ICONS: Record<string, IconType > = {
+const SLUG_ICONS: Record<string, IconType> = {
   instagram: FaInstagram,
   github: FaGithub,
   facebook: FaFacebook,
@@ -49,8 +50,8 @@ const SLUG_ICONS: Record<string, IconType > = {
   pixiv: FaPixiv,
 }
 
-/** Returns the LucideIcon for a raw URL. */
-export function getLinkIcon(url: string): IconType  {
+/** Returns the IconType for a raw URL. */
+export function getLinkIcon(url: string): IconType {
   return SLUG_ICONS[detectSocialSlug(url)] ?? FaLink
 }
 
@@ -99,62 +100,63 @@ export function SocialLinksEditor({
     <div className={cn('space-y-2', className)}>
       {value.map((link, index) => {
         const Icon = getLinkIcon(link)
-          if (editorial) {
-            const isFilled = link.length > 0;
+        const isFilled = link.length > 0
 
-            return (
-              <div key={index} className="group relative flex items-center gap-3 py-1">
-                {/* Иконка с динамическим цветом */}
-                <Icon 
-                  className={cn(
-                    "size-3.5 shrink-0 transition-all duration-300",
-                    isFilled 
-                      ? "text-foreground/70" 
-                      : "text-muted-foreground/25 group-focus-within:text-muted-foreground/60"
-                  )} 
-                />
-                
-                <Input
-                  value={link}
-                  onChange={(e) => updateLink(index, e.target.value)}
-                  onBlur={(e) => handleBlur(index, e.target.value)}
-                  placeholder={placeholders?.[index] ?? `Link ${index + 1}`}
-                  className={cn(
-                    "flex-1 border-0 border-b border-border/30 bg-transparent rounded-none px-0 py-2 h-auto",
-                    "text-sm tracking-tight shadow-none transition-all duration-300",
-                    "placeholder:text-muted-foreground/20 placeholder:font-light",
-                    "focus-visible:ring-0 focus-visible:border-foreground/40 focus-visible:placeholder:text-muted-foreground/40"
-                  )}
-                />
-
-                {/* Опционально: микро-индикатор протокола (https://) при фокусе */}
-                {!isFilled && (
-                  <span className="absolute right-0 text-[10px] text-muted-foreground/10 pointer-events-none uppercase tracking-widest opacity-0 group-focus-within:opacity-100 transition-opacity">
-                    URL
-                  </span>
+        if (editorial) {
+          return (
+            <div key={index} className="group relative flex items-center gap-3 py-1">
+              {/* Dynamic Icon */}
+              <Icon 
+                className={cn(
+                  "size-3.5 shrink-0 transition-colors duration-200",
+                  isFilled 
+                    ? "text-foreground" 
+                    : "text-muted-foreground/30 group-focus-within:text-foreground/80"
+                )} 
+              />
+              
+              <Input
+                value={link}
+                onChange={(e) => updateLink(index, e.target.value)}
+                onBlur={(e) => handleBlur(index, e.target.value)}
+                placeholder={placeholders?.[index] ?? `Link ${index + 1}`}
+                className={cn(
+                  "flex-1 border-0 border-b border-border/40 bg-transparent rounded-none px-0 py-1.5 h-auto",
+                  "font-sans text-xs tracking-tight shadow-none transition-colors duration-200",
+                  "placeholder:text-muted-foreground/30",
+                  "focus-visible:ring-0 focus-visible:border-foreground"
                 )}
-              </div>
-            )
-          }
+              />
+
+              {!isFilled && (
+                <span className="absolute right-0 font-mono text-[9px] text-muted-foreground/30 pointer-events-none uppercase tracking-widest opacity-0 group-focus-within:opacity-100 transition-opacity">
+                  URL
+                </span>
+              )}
+            </div>
+          )
+        }
+
+        // Standard Swiss-Style (Clean & Flat, No Glow / Roundness)
         return (
-         <div 
-          key={index} 
-          className="flex items-center gap-3 group/link transition-colors p-1 rounded-2xl border border-transparent focus-within:bg-secondary/10"
-        >
-          {/* Контейнер иконки: плавно меняет фон при фокусе на инпут или ховере */}
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary/60 border border-border/40 transition-colors duration-300 group-focus-within/link:bg-primary/10 group-focus-within/link:border-primary/20 group-hover/link:bg-secondary">
-            <Icon className="size-4 text-muted-foreground/80 transition-colors duration-300 group-focus-within/link:text-primary group-hover/link:text-foreground" />
+          <div 
+            key={index} 
+            className="group/link flex items-center gap-2.5"
+          >
+            {/* Square Low-profile Icon Container */}
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xs border border-border bg-muted/30 transition-colors duration-200 group-focus-within/link:border-foreground/40 group-focus-within/link:bg-background">
+              <Icon className="size-3.5 text-muted-foreground transition-colors duration-200 group-focus-within/link:text-foreground" />
+            </div>
+            
+            {/* Clean Input with Subtle Focus Ring */}
+            <Input
+              value={link}
+              onChange={(e) => updateLink(index, e.target.value)}
+              onBlur={(e) => handleBlur(index, e.target.value)}
+              placeholder={placeholders?.[index] ?? `Social link ${index + 1}`}
+              className="h-9 flex-1 rounded-xs border-border bg-background px-3 font-sans text-xs focus-visible:ring-1 focus-visible:ring-foreground transition-colors"
+            />
           </div>
-          
-          {/* Инпут: аккуратная граница и мягкое свечение при фокусе */}
-          <Input
-            value={link}
-            onChange={(e) => updateLink(index, e.target.value)}
-            onBlur={(e) => handleBlur(index, e.target.value)}
-            placeholder={placeholders?.[index] ?? `Social link ${index + 1}`}
-            className="rounded-xl h-10 flex-1 border-border/80 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary focus-visible:bg-background transition-all duration-200"
-          />
-        </div>
         )
       })}
     </div>

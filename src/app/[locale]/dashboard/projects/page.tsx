@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, Suspense, useDeferredValue } from "react"
-import { Search, Plus, Trash2, Archive, X } from "lucide-react"
+import { Search, Plus, Trash2, Archive, Folder } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -27,7 +27,6 @@ type View = "active" | "trash" | "archive"
 function ViewToggleButton({
   id,
   label,
-  activeWidth,
   icon: Icon,
   currentView,
   onToggle,
@@ -35,7 +34,6 @@ function ViewToggleButton({
 }: {
   id: View
   label: string
-  activeWidth: string
   icon: React.ElementType
   currentView: View
   onToggle: () => void
@@ -43,41 +41,39 @@ function ViewToggleButton({
 }) {
   const isActive = currentView === id
   return (
-    <Button
-      variant={isActive ? "secondary" : "ghost"}
-      size="sm"
-      className={`rounded-full text-muted-foreground relative h-8 overflow-hidden transition-all duration-200 ${
-        isActive ? `${activeWidth} px-2.5` : "w-8 px-0"
-      }`}
+    <button
       onClick={onToggle}
+      className={`relative flex h-8 items-center gap-1.5 rounded-xs px-2.5 font-sans text-xs font-normal transition-all duration-200 sm:px-3 ${
+        isActive
+          ? "bg-secondary/70 text-secondary-foreground font-medium shadow-2xs"
+          : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+      }`}
     >
-      <span className="shrink-0">
-        {isActive ? <X className="size-3.5" /> : <Icon className="size-4" />}
-      </span>
-
-      {/* Рендерим текст только если кнопка активна */}
-      {isActive && (
-        <span className="text-xs font-medium whitespace-nowrap ml-1.5 transition-all duration-200">
-          {label}
+      <Icon className="size-3.5 opacity-80" />
+      <span>{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span
+          className={`ml-0.5 flex h-4 min-w-4 items-center justify-center rounded-xs px-1 font-mono text-[10px] font-medium ${
+            isActive
+              ? "bg-foreground text-background"
+              : "bg-secondary text-secondary-foreground"
+          }`}
+        >
+          {badge > 99 ? "99+" : badge}
         </span>
       )}
-      {badge !== undefined && badge > 0 && !isActive && (
-        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground border-2 border-background">
-          {badge > 9 ? "9+" : badge}
-        </span>
-      )}
-    </Button>
+    </button>
   )
 }
 
 function NoResults() {
   const t = useTranslations()
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
-        <Search className="size-6 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center border border-dashed border-border/80 py-16 text-center md:py-24">
+      <div className="flex size-12 items-center justify-center rounded-xs border border-border bg-secondary/30 text-secondary-foreground">
+        <Search className="size-5" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">{t('projects.noResultsTitle')}</h3>
+      <h3 className="mt-4 font-serif text-xl font-medium">{t('projects.noResultsTitle')}</h3>
       <p className="mt-2 text-sm text-muted-foreground">{t('projects.noResultsDescription')}</p>
     </div>
   )
@@ -86,11 +82,11 @@ function NoResults() {
 function TrashEmpty() {
   const t = useTranslations()
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
-        <Trash2 className="size-6 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center border border-dashed border-border/80 py-16 text-center md:py-24">
+      <div className="flex size-12 items-center justify-center rounded-xs border border-border bg-secondary/30 text-secondary-foreground">
+        <Trash2 className="size-5" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">{t('projects.trashEmptyTitle')}</h3>
+      <h3 className="mt-4 font-serif text-xl font-medium">{t('projects.trashEmptyTitle')}</h3>
       <p className="mt-2 text-sm text-muted-foreground">{t('projects.trashEmptyDescription')}</p>
     </div>
   )
@@ -99,11 +95,11 @@ function TrashEmpty() {
 function ArchiveEmpty() {
   const t = useTranslations()
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
-        <Archive className="size-6 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center border border-dashed border-border/80 py-16 text-center md:py-24">
+      <div className="flex size-12 items-center justify-center rounded-xs border border-border bg-secondary/30 text-secondary-foreground">
+        <Archive className="size-5" />
       </div>
-      <h3 className="mt-5 font-serif text-xl">{t('projects.archiveEmptyTitle')}</h3>
+      <h3 className="mt-4 font-serif text-xl font-medium">{t('projects.archiveEmptyTitle')}</h3>
       <p className="mt-2 text-sm text-muted-foreground">{t('projects.archiveEmptyDescription')}</p>
     </div>
   )
@@ -111,10 +107,10 @@ function ArchiveEmpty() {
 
 function ProjectsGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
+        <div key={i} className="space-y-3 rounded-2xl border border-border/40 p-4">
+          <Skeleton className="aspect-[4/3] w-full rounded-xl" />
           <Skeleton className="h-4 w-2/3" />
         </div>
       ))}
@@ -132,7 +128,7 @@ function ActiveContent({ uid, typeFilter, searchQuery }: { uid: string; typeFilt
   if (projects.length === 0) return <EmptyState />
   if (filtered.length === 0) return <NoResults />
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
     </div>
   )
@@ -143,7 +139,7 @@ function TrashContent({ uid, searchQuery }: { uid: string; searchQuery: string }
   const filtered = projects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
   if (filtered.length === 0) return <TrashEmpty />
   return (
-    <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {filtered.map((p) => <ProjectCard key={p.id} project={p} trash />)}
     </div>
   )
@@ -154,7 +150,7 @@ function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string
   const filtered = projects.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
   if (filtered.length === 0) return <ArchiveEmpty />
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {filtered.map((p) => <ProjectCard key={p.id} project={p} archive />)}
     </div>
   )
@@ -163,10 +159,11 @@ function ArchiveContent({ uid, searchQuery }: { uid: string; searchQuery: string
 export default function ProjectsPage() {
   const t = useTranslations()
   const [view, setView] = useState<View>("active")
-  // Used only for counts/badges — shares the same cache entries as Suspense inner components
+  
   const { data: activeProjects = [] } = useActiveProjectsQuery()
   const { data: trashedProjects = [] } = useTrashedProjectsQuery({ enabled: view === "trash" })
   const { data: archivedProjects = [] } = useArchivedProjectsQuery({ enabled: view === "archive" })
+  
   const [modalOpen, setModalOpen] = useState(false)
   const [typeFilter, setTypeFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -176,88 +173,98 @@ export default function ProjectsPage() {
     useShallow((state) => ({ uid: selectCurrentUid(state), userLoading: selectAuthLoading(state) }))
   )
 
+  const currentCount = view === "active" ? activeProjects.length : view === "trash" ? trashedProjects.length : archivedProjects.length
+
   return (
-    <div className="mx-auto max-w-6xl space-y-6 md:px-4 md:py-8">
-      
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:py-8">
       {/* Header */}
-        <div className="flex flex-col gap-4 border-b pb-6">
-          {/* Row 1: Title and Count */}
-          <div className="flex items-baseline gap-3">
-            <h1 className="font-serif text-3xl md:text-5xl tracking-tight">
+      <div className="flex flex-col gap-4 border-b border-border/80 pb-5 md:gap-6 md:pb-6">
+        
+        {/* Row 1: Title + Count (Left) and Dark Create Button (Right) */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-baseline gap-2.5 sm:gap-3">
+            <h1 className="font-serif text-2xl font-medium tracking-tight sm:text-3xl md:text-5xl">
               {view === "active" ? t('projects.title') : view === "archive" ? t('archive.title') : t('projects.tabs.trash')}
             </h1>
-            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full">
-              {t('projects.totalCount', { count: view === "active" ? activeProjects.length : view === "trash" ? trashedProjects.length : archivedProjects.length })}
+            <span className="rounded-xs bg-secondary/80 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-secondary-foreground border border-secondary sm:text-[11px]">
+              {t('projects.totalCount', { count: currentCount })}
             </span>
           </div>
 
-          {/* Row 2: Search and Controls */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            
-            {/* Search - Full width on mobile, limited on desktop */}
-            <div className="relative w-full md:max-w-xs">
+          {/* Dark Create Project Button — Mobile Icon / Desktop Full Text */}
+          {view === "active" && (
+            <Button
+              onClick={() => setModalOpen(true)}
+              className="h-9 rounded-xs bg-foreground px-3 text-xs font-medium text-background transition-colors hover:bg-foreground/90 sm:h-10 sm:px-4"
+            >
+              <Plus className="size-4 sm:mr-2" />
+              <span className="hidden sm:inline">
+                {t('projects.newProject', { defaultValue: 'Создать проект' })}
+              </span>
+            </Button>
+          )}
+        </div>
+
+        {/* Row 2: Search + Select (Left) and View Switcher (Right) */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          
+          {/* Search & Select Group — Row layout on mobile for compact fit */}
+          <div className="flex items-center gap-2 flex-1">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
               <Input
                 placeholder={t('projects.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 md:h-10 w-full rounded-full pl-9 bg-muted/50 border-none focus-visible:ring-1"
+                className="h-9 sm:h-10 w-full rounded-xs border-border bg-background pl-9 font-sans text-xs placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground"
               />
             </div>
 
-            {/* Controls Row: Filter (Left) and Actions (Right) */}
-            <div className={`flex items-center ${view === "active" ? "justify-between" : "justify-end"} md:justify-end gap-2 w-full md:w-auto`}>
-              
-              {/* Type Filter */}
-                {view === "active" ? (
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-10 w-[140px] rounded-full bg-muted/50 border-none">
-                    <SelectValue placeholder={t('projects.typePlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent align="start" className="rounded-xl">
-                    <SelectItem value="all">{t('projects.filters.all')}</SelectItem>
-                    <SelectItem value="photobooks">{t('projects.filters.photobooks')}</SelectItem>
-                    <SelectItem value="portfolios">{t('projects.filters.portfolios')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : null}
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-1">
-                {view === "active" && (
-                  <Button
-                    size="icon"
-                    className="size-10 rounded-full shadow-md"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    <Plus className="size-5" />
-                  </Button>
-                )}
-                
-                <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-full ml-1">
-                  <ViewToggleButton
-                    id="archive"
-                    label={t('archive.title')}
-                    activeWidth="w-[82px]"
-                    icon={Archive}
-                    currentView={view}
-                    onToggle={() => { setView((v) => v === "archive" ? "active" : "archive"); setSearchQuery("") }}
-                  />
-                  <ViewToggleButton
-                    id="trash"
-                    label={t('projects.tabs.trash')}
-                    activeWidth="w-[68px]"
-                    icon={Trash2}
-                    currentView={view}
-                    onToggle={() => { setView((v) => v === "trash" ? "active" : "trash"); setSearchQuery("") }}
-                  />
-                </div>
-              </div>
-            </div>
+            {/* Type Filter Select */}
+            {view === "active" ? (
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="h-9 sm:h-10 w-[120px] sm:w-[140px] shrink-0 rounded-xs border-border bg-background font-sans text-xs text-muted-foreground">
+                  <SelectValue placeholder={t('projects.typePlaceholder')} />
+                </SelectTrigger>
+                <SelectContent align="end" className="rounded-xs border-border">
+                  <SelectItem value="all" className="font-sans text-xs">{t('projects.filters.all')}</SelectItem>
+                  <SelectItem value="photobooks" className="font-sans text-xs">{t('projects.filters.photobooks')}</SelectItem>
+                  <SelectItem value="portfolios" className="font-sans text-xs">{t('projects.filters.portfolios')}</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : null}
           </div>
-        </div>
 
-      {/* Контентная область */}
+          {/* View Toggles (Right) — Clean horizontal bar on mobile */}
+          <div className="inline-flex items-center gap-1 rounded-xs border border-border bg-background p-1 self-start sm:self-auto">
+            <ViewToggleButton
+              id="active"
+              label={t('projects.title')}
+              icon={Folder}
+              currentView={view}
+              onToggle={() => { setView("active"); setSearchQuery("") }}
+            />
+            <ViewToggleButton
+              id="archive"
+              label={t('archive.title')}
+              icon={Archive}
+              currentView={view}
+              onToggle={() => { setView("archive"); setSearchQuery("") }}
+            />
+            <ViewToggleButton
+              id="trash"
+              label={t('projects.tabs.trash')}
+              icon={Trash2}
+              currentView={view}
+              onToggle={() => { setView("trash"); setSearchQuery("") }}
+            />
+          </div>
+
+        </div>
+      </div>
+
+      {/* Main Content Area */}
       <main className="min-h-[400px]">
         {userLoading || !uid ? (
           <ProjectsGridSkeleton />

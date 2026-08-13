@@ -2,98 +2,98 @@
   "landing": {
     "hero": {
       "eyebrow": "Milestis",
-      "titleLine1": "Turn your photos into",
-      "titleItalic": "a story people actually finish.",
-      "description": "You've probably got hundreds of good shots sitting in a folder somewhere. Milestis turns them into a page you can flip through, share, and actually be proud of — built in minutes, no design tools required.",
-      "imageAlt": "An open interactive photo book page",
-      "combinationsLabel": "Layouts",
+      "titleLine1": "Turn your photographs into",
+      "titleItalic": "a story you’ll want to see through to the end.",
+      "description": "You probably have hundreds of great shots sitting untouched in your gallery. Milestis turns them into an interactive page that’s beautiful to explore and easy to share with the people you love.",
+      "imageAlt": "Open interactive page featuring photographs",
+      "combinationsLabel": "Combinations",
       "combinationsValue": "10,000+"
     },
     "stats": [
-      { "number": "10,000+", "label": "Ways to lay out your photos" },
-      { "number": "5 min", "label": "From upload to published page" },
-      { "number": "0", "label": "Design skills required" }
+      { "number": "10,000+", "label": "Template Variations" },
+      { "number": "5 min", "label": "From Upload to Publish" },
+      { "number": "0", "label": "Design Skills Needed" }
     ],
     "manifesto": {
-      "eyebrow": "On memory",
-      "quote": "Memory is the only paradise from which we cannot be driven away.",
-      "author": "Jean Paul"
+      "eyebrow": "On Memory",
+      "quote": "Memory is the only paradise from which we cannot be expelled.",
+      "author": "Jean-Paul"
     },
     "howItWorks": {
-      "eyebrow": "How it works",
-      "title": "From folder to finished page.",
+      "eyebrow": "How It Works",
+      "title": "From a folder of photos to a finished page.",
       "steps": [
         {
           "number": "01",
-          "title": "Pick a layout",
-          "description": "Every template already has good spacing and structure built in, so the hard part is done before you even start."
+          "title": "Choose a template",
+          "description": "Milestis takes care of the grid, spacing, and structure — everything is thoughtfully arranged in advance."
         },
         {
           "number": "02",
-          "title": "Add your photos",
-          "description": "Drop in the shots you love. Milestis handles the cropping and placement automatically."
+          "title": "Add your photographs",
+          "description": "Upload your favorite photographs, and we’ll make sure they come together beautifully."
         },
         {
           "number": "03",
-          "title": "Make it yours",
-          "description": "Swap the colors, add captions, reorder pages — however far you push it, the layout keeps its shape."
+          "title": "Create in one click",
+          "description": "Ask the built-in AI assistant to generate a complete project for you with a single click."
         },
         {
           "number": "04",
-          "title": "Publish and share",
-          "description": "You get one link you can send to anyone. No app to install, no account needed to view it."
+          "title": "Share in one click",
+          "description": "Share the finished link with family, friends, or clients."
         }
       ]
     },
     "features": {
-      "eyebrow": "What's inside",
+      "eyebrow": "What's Inside",
       "items": [
         {
-          "title": "Layouts that hold up",
-          "description": "Rearrange your photos as much as you like — the composition stays clean no matter what you throw at it."
+          "title": "Templates with effortless composition",
+          "description": "We take care of the composition and balance of every element, leaving you with just one thing to add — your photographs."
         },
         {
           "title": "Light and depth",
-          "description": "Soft shadows and parallax make each page feel like real space instead of a flat image."
+          "description": "Soft shadows and subtle parallax create a sense of depth and a living, dimensional space."
         },
         {
           "title": "Color palettes",
-          "description": "Choose from dozens of ready-made palettes, or pull one straight from a photo already in your book."
+          "description": "Dozens of thoughtfully designed palettes help bring out the mood of your photographs."
         },
         {
-          "title": "Pages that respond",
-          "description": "Scroll or tap and the page reacts, so reading feels closer to turning real pages."
+          "title": "Living interactions",
+          "description": "Smooth scrolling and subtle touch interactions bring the page to life with every gesture."
         },
         {
-          "title": "One link to share",
-          "description": "Anyone can open your book — no login, no app, no waiting."
+          "title": "Instant access",
+          "description": "A simple link lets anyone open your project instantly on any device."
         }
       ]
     },
     "useCases": {
-      "eyebrow": "Who it's for",
+      "eyebrow": "Who It's For",
       "items": [
         {
           "id": "events",
-          "title": "Big days worth reliving",
-          "description": "A wedding, a trip, a birthday — give it a book your guests will actually open again, instead of scrolling past once."
+          "title": "Days worth reliving",
+          "description": "A wedding, family trip, or a warm celebration. Bring your most meaningful photographs together in a beautiful story you’ll love returning to years later."
         },
         {
           "id": "portfolios",
-          "title": "A portfolio in minutes",
-          "description": "Freelancers and creators use Milestis to put a portfolio together fast, and update it just as easily."
+          "title": "An aesthetic portfolio in minutes",
+          "description": "Perfect for designers, photographers, and creators. Showcase your best work in minutes and update your project just as easily as you grow."
         },
         {
           "id": "upsell",
-          "title": "Something better than a folder",
-          "description": "Studios hand clients a finished, branded gallery instead of a drive full of raw files."
+          "title": "A premium way to present your work",
+          "description": "A beautiful solution for studios and freelancers. Deliver finished shoots to clients as a stylish branded gallery instead of a collection of ordinary files."
         }
       ]
     },
     "cta": {
-      "title": "Give your photos a place to be seen.",
-      "description": "Start free — no credit card needed.",
-      "button": "Get started"
+      "title": "Give your photographs a place to be seen.",
+      "description": "Start for free today.",
+      "button": "Get Started"
     }
   }
 }

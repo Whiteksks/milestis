@@ -10,17 +10,16 @@
   --popover-foreground: oklch(0.25 0.02 60);
   --primary: oklch(0.65 0.12 30);
   --primary-foreground: oklch(0.99 0.005 80);
-  --secondary: oklch(0.94 0.01 80);
-  --secondary-foreground: oklch(0.35 0.02 60);
+  /* Secondary doubles as the brand's sage/olive accent — pulled from the landing photography
+     (plant leaves). Keeps the original neutral-fill lightness (badges/icon-boxes/hover states
+     stay legible) but with real olive hue/chroma instead of a flat warm-grey. Content/editorial
+     accent — never for actions/CTAs, that stays --primary. See design-system.md "Color" section. */
+  --secondary: oklch(0.93 0.025 140);
+  --secondary-foreground: oklch(0.32 0.06 140);
   --muted: oklch(0.95 0.008 80);
   --muted-foreground: oklch(0.45 0.02 60);
   --accent: oklch(0.92 0.025 320);
   --accent-foreground: oklch(0.35 0.02 60);
-  /* Dedicated secondary accent — muted sage/olive pulled from the landing photography (plant
-     leaves). Content/editorial accent only (tags, dots, link hover) — never for actions/CTAs,
-     that stays --primary. See /memories/repo/design-system.md "Color" section. */
-  --olive: oklch(0.47 0.055 140);
-  --olive-foreground: oklch(0.98 0.01 90);
   --destructive: oklch(0.6 0.18 25);
   --destructive-foreground: oklch(0.95 0.02 30);
   --border: oklch(0.9 0.01 80);
@@ -65,14 +64,12 @@
   --popover-foreground: oklch(0.94 0.005 80);
   --primary: oklch(0.75 0.12 30);
   --primary-foreground: oklch(0.18 0.01 60);
-  --secondary: oklch(0.28 0.015 60);
-  --secondary-foreground: oklch(0.94 0.005 80);
+  --secondary: oklch(0.3 0.03 140);
+  --secondary-foreground: oklch(0.92 0.025 140);
   --muted: oklch(0.28 0.015 60);
   --muted-foreground: oklch(0.65 0.02 60);
   --accent: oklch(0.32 0.03 320);
   --accent-foreground: oklch(0.94 0.005 80);
-  --olive: oklch(0.72 0.075 140);
-  --olive-foreground: oklch(0.18 0.02 140);
   --destructive: oklch(0.45 0.15 25);
   --destructive-foreground: oklch(78.7% 0.1215 20.742);
   --border: oklch(0.3 0.015 60);
@@ -150,8 +147,6 @@ html[data-high-contrast].dark {
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-olive: var(--olive);
-  --color-olive-foreground: var(--olive-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);

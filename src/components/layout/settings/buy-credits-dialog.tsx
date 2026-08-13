@@ -76,11 +76,10 @@ export function BuyCreditsDialog() {
 
   return (
     <>
-      {/* Улучшенный триггер: теперь это полноценная адаптивная кнопка для размещения вне карточки */}
       <Button
         variant="default"
         size="lg"
-        className="w-full h-11 gap-2 rounded-2xl text-xs font-semibold tracking-wide shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
+        className="w-full h-9 gap-2 rounded-xs bg-foreground px-4 font-sans text-xs font-medium text-background transition-colors hover:bg-foreground/90"
         onClick={() => setOpen(true)}
       >
         <Plus className="size-4 shrink-0" />
@@ -88,13 +87,12 @@ export function BuyCreditsDialog() {
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        {/* Ограничиваем максимальную ширину окна до аккуратных sm:max-w-[400px], чтобы оно не казалось пустым */}
-        <DialogContent className="sm:max-w-[400px] gap-0 p-6 rounded-3xl border border-border bg-card shadow-lg antialiased">
+        <DialogContent className="sm:max-w-[400px] gap-0 p-6 rounded-xs border border-border bg-card antialiased">
           <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="font-serif text-xl font-medium tracking-tight">
+            <DialogTitle className="font-serif text-xl font-medium tracking-tight text-foreground">
               {t("topup.dialogTitle")}
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground/90 leading-normal">
+            <DialogDescription className="font-sans text-xs text-muted-foreground">
               {t("topup.dialogDesc")}
             </DialogDescription>
           </DialogHeader>
@@ -103,37 +101,37 @@ export function BuyCreditsDialog() {
             {/* Информационный бейдж рейта */}
             <div className="flex items-center justify-start">
               {isPremiumRate ? (
-                <div className="flex items-center gap-1.5 rounded-xl bg-primary/10 border border-primary/20 px-2.5 py-1 text-primary">
+                <div className="flex items-center gap-1.5 rounded-xs bg-secondary/50 border border-border px-2.5 py-1 text-foreground">
                   <Zap className="size-3.5 fill-current" />
-                  <span className="text-[11px] font-bold tracking-wide">
+                  <span className="font-sans text-[11px] font-medium">
                     {t("topup.rateNotePremium", { rate: ratePerDollar })}
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 rounded-xl bg-muted border border-border/60 px-2.5 py-1 text-muted-foreground">
+                <div className="flex items-center gap-1.5 rounded-xs bg-secondary/50 border border-border px-2.5 py-1 text-muted-foreground">
                   <Sparkles className="size-3.5" />
-                  <span className="text-[11px] font-medium tracking-wide">
+                  <span className="font-sans text-[11px] font-medium">
                     {t("topup.rateNote", { rate: ratePerDollar })}
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Главное табло: Кредиты и Стоимость объединены в один аккуратный блок */}
-            <div className="rounded-2xl border border-border bg-muted/30 p-5 flex flex-col items-center justify-center relative overflow-hidden">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground/80 mb-1">
+            {/* Главное табло: Кредиты и Стоимость */}
+            <div className="rounded-xs border border-border bg-background p-5 flex flex-col items-center justify-center relative">
+              <span className="font-sans text-[10px] font-medium tracking-wider uppercase text-muted-foreground mb-1">
                 {t("topup.creditLabel")}
               </span>
-              <span className="text-5xl font-extrabold tabular-nums tracking-tight text-foreground">
+              <span className="font-mono text-4xl font-semibold tabular-nums tracking-tight text-foreground">
                 {credits.toLocaleString()}
               </span>
-              <div className="mt-3 px-3 py-0.5 rounded-lg bg-background border border-border/50 text-xs font-semibold text-muted-foreground shadow-xs tabular-nums">
+              <div className="mt-3 px-2.5 py-0.5 rounded-xs bg-secondary/50 border border-border font-mono text-xs font-medium text-foreground tabular-nums">
                 {priceDisplay}
               </div>
             </div>
 
-            {/* Контейнер интерактивного слайдера */}
-            <div className="space-y-2.5 px-0.5">
+            {/* Слайдер */}
+            <div className="space-y-2 px-0.5">
               <Slider
                 min={MIN_CREDITS}
                 max={MAX_CREDITS}
@@ -142,23 +140,23 @@ export function BuyCreditsDialog() {
                 onValueChange={([val]) => setCredits(val)}
                 className="py-2 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-muted-foreground/80 font-medium tabular-nums">
-                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(MIN_CREDITS)}>{MIN_CREDITS}</span>
-                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(500)}>500</span>
-                <span className="hover:text-foreground transition-colors" onClick={() => !loading && setCredits(MAX_CREDITS)}>{MAX_CREDITS.toLocaleString()}</span>
+              <div className="flex justify-between font-mono text-[11px] text-muted-foreground tabular-nums">
+                <span className="hover:text-foreground cursor-pointer transition-colors" onClick={() => !loading && setCredits(MIN_CREDITS)}>{MIN_CREDITS}</span>
+                <span className="hover:text-foreground cursor-pointer transition-colors" onClick={() => !loading && setCredits(500)}>500</span>
+                <span className="hover:text-foreground cursor-pointer transition-colors" onClick={() => !loading && setCredits(MAX_CREDITS)}>{MAX_CREDITS.toLocaleString()}</span>
               </div>
             </div>
 
             {/* Ошибка запроса */}
             {error && (
-              <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-center">
-                <p className="text-xs font-medium text-destructive">{error}</p>
+              <div className="p-3 rounded-xs bg-destructive/10 border border-destructive/20 text-center">
+                <p className="font-sans text-xs font-medium text-destructive">{error}</p>
               </div>
             )}
 
-            {/* Главная кнопка отправки формы */}
+            {/* Кнопка действия */}
             <Button
-              className="w-full h-11 text-xs font-semibold tracking-wide rounded-2xl shadow-xs"
+              className="w-full h-9 rounded-xs bg-foreground px-4 font-sans text-xs font-medium text-background transition-colors hover:bg-foreground/90"
               size="lg"
               onClick={handleBuy}
               disabled={loading}

@@ -27,6 +27,12 @@
         "deleteButton": "Біржола жою",
         "deleting": "Жойылуда…"
       }
+    },
+    "domains": {
+      "shareVia": "Бөлісу",
+      "copyLink": "Сілтемені көшіру",
+      "copied": "Көшірілді!",
+      "openProject": "Жобаны ашу"
     }
   }
 }

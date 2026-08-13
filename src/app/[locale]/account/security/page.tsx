@@ -40,7 +40,6 @@ export default function SecuritySettings() {
   }, [])
 
   // Re-read providerData from the current user object after a link/unlink call
-  // (auth.currentUser.providerData is updated in-place synchronously after the call)
   const reloadProviders = () => {
     setProviders(auth.currentUser?.providerData.map((p) => p.providerId) ?? [])
   }
@@ -81,39 +80,54 @@ export default function SecuritySettings() {
   const userEmail = auth.currentUser?.email ?? ""
 
   return (
-    <div className="space-y-12">
-
-      <section className="space-y-6">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl">{t("signIn.title")}</h2>
-          <p className="mt-1 text-muted-foreground">{t("signIn.description")}</p>
+    <div className="mx-auto max-w-5xl space-y-10 pb-12">
+      <section className="space-y-4">
+        <div className="flex items-center gap-4">
+          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {t("signIn.title")}
+          </h2>
+          <span className="h-px flex-1 bg-border/80" />
         </div>
+        <p className="font-sans text-sm text-muted-foreground">
+          {t("signIn.description")}
+        </p>
 
-        <div className="rounded-2xl bg-card shadow-sm">
-          <div className="divide-y divide-border/40">
-
+        <div className="rounded-xs border border-border bg-card p-5 md:p-6">
+          <div className="divide-y divide-border/80">
+            
             {/* ── Email (Magic Link) row ── */}
-            <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Mail className="size-5 text-primary" />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xs border border-border bg-secondary/50">
+                  <Mail className="size-5 text-foreground" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">{t("email.title")}</span>
+                    <span className="font-sans text-sm font-medium text-foreground">
+                      {t("email.title")}
+                    </span>
                     {isEmailLinked && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{t("email.primary")}</span>
+                      <span className="rounded-xs border border-border bg-secondary/80 px-2 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-secondary-foreground">
+                        {t("email.primary")}
+                      </span>
                     )}
                     {isEmailLinked && (
-                      <span className="flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600">
+                      <span className="flex items-center gap-1 rounded-xs border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                         <Check className="size-3" /> Connected
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{t("email.description")}</p>
+                  
+                  <p className="font-sans text-sm text-muted-foreground">
+                    {t("email.description")}
+                  </p>
+
                   {isEmailLinked && userEmail && (
-                    <p className="text-sm font-medium">{userEmail}</p>
+                    <p className="font-sans text-sm font-medium text-foreground pt-1">
+                      {userEmail}
+                    </p>
                   )}
+
                   {/* Email input shown for Google-first users who haven't linked email yet */}
                   {!isEmailLinked && !emailLinkSent && (
                     <div className="mt-3 flex items-center gap-2">
@@ -123,11 +137,11 @@ export default function SecuritySettings() {
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSendEmailLink()}
-                        className="h-8 max-w-64 text-sm"
+                        className="h-9 max-w-xs rounded-xs border-border bg-background font-sans text-sm focus-visible:ring-1 focus-visible:ring-foreground"
                       />
                       <Button
                         size="sm"
-                        className="rounded-full shrink-0"
+                        className="h-9 shrink-0 rounded-xs bg-foreground px-4 font-sans text-xs font-medium text-background transition-colors hover:bg-foreground/90"
                         onClick={handleSendEmailLink}
                         disabled={emailLoading || !emailInput}
                       >
@@ -135,15 +149,29 @@ export default function SecuritySettings() {
                       </Button>
                     </div>
                   )}
+
                   {!isEmailLinked && emailLinkSent && (
-                    <p className="text-sm text-green-600 mt-2">{t("email.checkInbox")}</p>
+                    <p className="mt-2 font-sans text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                      {t("email.checkInbox")}
+                    </p>
                   )}
-                  {emailError && <p className="text-sm text-destructive mt-1">{g(emailError)}</p>}
+
+                  {emailError && (
+                    <p className="mt-1 font-sans text-xs font-medium text-destructive">
+                      {g(emailError)}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="shrink-0">
+
+              <div className="shrink-0 pt-2 sm:pt-0">
                 {isEmailLinked && (
-                  <Button variant="ghost" size="sm" className="rounded-full" disabled>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-transparent" 
+                    disabled
+                  >
                     {t("email.alwaysEnabled")}
                   </Button>
                 )}
@@ -151,39 +179,46 @@ export default function SecuritySettings() {
             </div>
 
             {/* ── Google row ── */}
-            {false && <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            {false && <div className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <FaChrome className="size-5 text-primary" />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xs border border-border bg-secondary/50">
+                  <FaChrome className="size-5 text-foreground" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">{t("google.title")}</span>
-                    {/* Show Primary badge when Google is the only sign-in method */}
+                    <span className="font-sans text-sm font-medium text-foreground">
+                      {t("google.title")}
+                    </span>
                     {isGoogleLinked && !isEmailLinked && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Primary</span>
+                      <span className="rounded-xs border border-border bg-secondary/80 px-2 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-secondary-foreground">
+                        Primary
+                      </span>
                     )}
                     {isGoogleLinked && (
-                      <span className="flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600">
+                      <span className="flex items-center gap-1 rounded-xs border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                         <Check className="size-3" /> Connected
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{t("google.description")}</p>
+
+                  <p className="font-sans text-sm text-muted-foreground">
+                    {t("google.description")}
+                  </p>
+
                   {isGoogleLinked && !canDisconnectGoogle && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="mt-1 font-sans text-xs text-muted-foreground">
                       {t("google.cannotDisconnectNote")}
                     </p>
                   )}
-                  {/* {googleError && <p className="text-sm text-destructive mt-1">{g(googleError)}</p>} */}
                 </div>
               </div>
-              <div className="shrink-0">
+
+              <div className="shrink-0 pt-2 sm:pt-0">
                 {isGoogleLinked ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full px-5"
+                    className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-secondary/60"
                     onClick={handleDisconnectGoogle}
                     disabled={googleLoading || !canDisconnectGoogle}
                   >
@@ -191,9 +226,8 @@ export default function SecuritySettings() {
                   </Button>
                 ) : (
                   <Button
-                    variant="default"
                     size="sm"
-                    className="rounded-full px-5"
+                    className="h-9 rounded-xs bg-foreground px-4 font-sans text-xs font-medium text-background transition-colors hover:bg-foreground/90"
                     onClick={handleConnectGoogle}
                     disabled={googleLoading}
                   >
@@ -202,13 +236,14 @@ export default function SecuritySettings() {
                 )}
               </div>
             </div>
-            }
+            } 
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground px-1">{t("note.recoveryPrimary")}</p>
+        <p className="font-sans text-xs text-muted-foreground">
+          {t("note.recoveryPrimary")}
+        </p>
       </section>
-
     </div>
   )
 }

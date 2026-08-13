@@ -87,6 +87,7 @@
   },
   "projects": {
     "title": "Projects",
+    "newProject": "Create project",
     "recentTitle": "Recent projects",
     "recentDescription": "Pick up where you left off",
     "viewAll": "View all →",
