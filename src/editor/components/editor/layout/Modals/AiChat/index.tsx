@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sparkles } from 'lucide-react'
-import { resetChatSession } from '@/lib/ai/service'
 import {
   Sheet,
   SheetContent,
@@ -24,10 +23,10 @@ export function AiChatModal() {
   const clearAiChat = useUiStore((s) => s.clearAiChat)
   const isMobile = useIsMobile()
 
-  // Reset chat and AI session when navigating to a different project
+  // Reset chat when navigating to a different project — requests are stateless per call, so this
+  // is also what bounds the text-only history sent for conversational continuity (see service.ts)
   useEffect(() => {
     clearAiChat()
-    resetChatSession()
   }, [projectId, clearAiChat])
 
   if (isMobile) {

@@ -31,6 +31,12 @@ export function getProjectImageSelectUrl(img: ProjectImageDoc): string {
   return img.urls?.full ?? img.urls?.middle ?? ''
 }
 
+// For sending to the AI for vision/captioning — a thumbnail is plenty and far cheaper/faster
+// to fetch+encode than the full-resolution asset used for the actual placed image.
+export function getProjectImageThumbUrl(img: ProjectImageDoc): string {
+  return img.urls?.thumb ?? img.urls?.middle ?? img.urls?.full ?? ''
+}
+
 export function useProjectImages(): ProjectImageDoc[] {
   const projectId = useUiStore((s) => s.projectId)
   const uid = useUserStore((s) => s.profile?.uid)

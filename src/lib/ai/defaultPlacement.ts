@@ -40,12 +40,21 @@ export interface PhotobookDefaultPlacement {
   gallery: string[]
 }
 
+// Matches the story panel's own cap (panel-ui.tsx LIMITS.storyImages) — story photos each get
+// their own vision pass + caption, so leaving this unbounded means a 30/50/100-photo upload
+// would dump half of them into story and send all of it to the model in one turn. Gallery has
+// no vision cost, so overflow past this cap goes there instead of growing story indefinitely.
+const MAX_STORY_PHOTOS = 20
+
 // Only fills slots listed in `emptySlots`; every other new id lands in gallery/story, split
-// so both fill up evenly, in the order the photos were attached.
+// so both fill up evenly, in the order the photos were attached — story stops accepting new
+// photos once `existingStoryCount` + newly added reaches MAX_STORY_PHOTOS, the rest overflow
+// into gallery.
 export function computePhotobookDefaults(
   newIds: string[],
   idToDoc: Map<string, ProjectImageDoc>,
   emptySlots: Set<PhotobookSingleSlot>,
+  existingStoryCount = 0,
 ): PhotobookDefaultPlacement {
   const pool = rankPhotos(newIds, idToDoc)
   const singles: PhotobookDefaultPlacement['singles'] = {}
@@ -76,7 +85,15 @@ export function computePhotobookDefaults(
   pool.sort((a, b) => a.order - b.order)
   const story: string[] = []
   const gallery: string[] = []
-  pool.forEach((p, i) => (i % 2 === 0 ? gallery : story).push(p.id))
+  let storyRoom = Math.max(0, MAX_STORY_PHOTOS - existingStoryCount)
+  pool.forEach((p, i) => {
+    if (i % 2 === 1 && storyRoom > 0) {
+      story.push(p.id)
+      storyRoom--
+    } else {
+      gallery.push(p.id)
+    }
+  })
 
   return { singles, story, gallery }
 }

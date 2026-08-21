@@ -32,6 +32,7 @@
         "assistantSuccess": "Done! I've set up your project. Feel free to adjust anything in the editor.",
         "assistantError": "Something went wrong. Please try again.",
         "assistantRateLimit": "Too many requests. Please wait a moment and try again.",
+        "assistantNoChanges": "Hmm, I wasn't able to apply that. Could you rephrase or be more specific about what to change?",
         "assistantNeedsInfo": "Sure! To get started, tell me a bit more: What's the occasion (wedding, birthday, trip…)? What mood or style are you going for? You can also attach some photos.",
         "assistantFewPhotos": "Just a heads up: photobooks look their best with 5+ photos. I'll do my best with what you've attached!",
         "greetingPhotobook": "Hey! I'm your AI assistant. I can set up your entire photobook \u2014 pick a template, choose a theme, arrange your photos, and write captions. Tell me about your occasion \u2014 what are we celebrating?",

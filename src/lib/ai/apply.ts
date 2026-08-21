@@ -13,6 +13,7 @@ import type { PhotobookImageContent } from '@/editor/modes/photobook/image/conte
 import type { PortfolioManagedImage } from '@/editor/modes/portfolio/image/types'
 import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
 import type { ImageValue } from '@/editor/image/data'
+import { LIMITS } from '@/editor/components/editor/section-settings/ui/panel-ui'
 import {
   computePhotobookDefaults,
   computePortfolioDefaults,
@@ -62,6 +63,40 @@ const PORTFOLIO_SLOT_IDS: Record<PortfolioSingleSlot, PortfolioManagedImage['slo
   bio: 'portfolio.bio.primary',
 }
 
+// ─── Defensive text limits (system boundary) ───────────────────────────────────
+// Gemini's structured-output schema has no way to cap a string's length, so nothing stops the
+// model from ignoring the schema's char-budget hints and cramming a huge chunk of text into one
+// field (seen in practice: everything piled into cover.title). Clamp every AI-authored string to
+// the same limit the manual editor inputs already enforce, right before it reaches the store —
+// only ever shortens fields that are actually present, so the "omit a field to keep its old
+// value" partial-merge contract is untouched.
+function clampStrings<T extends Record<string, unknown>>(obj: T, limits: Partial<Record<keyof T, number>>): T {
+  const out = { ...obj }
+  for (const key of Object.keys(out) as (keyof T)[]) {
+    const limit = limits[key]
+    const value = out[key]
+    if (limit !== undefined && typeof value === 'string') out[key] = value.slice(0, limit) as T[keyof T]
+  }
+  return out
+}
+
+const PHOTOBOOK_CONTENT_LIMITS = {
+  cover:        { title: LIMITS.title, subtitle: LIMITS.subtitle, date: LIMITS.date, location: LIMITS.location, tagline: LIMITS.tagline },
+  introduction: { label: LIMITS.label, title: LIMITS.title, quote: LIMITS.quote, dedication: LIMITS.dedication },
+  story:        { label: LIMITS.label, title: LIMITS.title, date: LIMITS.date, location: LIMITS.location },
+  gallery:      { label: LIMITS.label, title: LIMITS.title, description: LIMITS.description },
+  highlight:    { label: LIMITS.label, title: LIMITS.title, description: LIMITS.description, quote: LIMITS.quote },
+  ending:       { title: LIMITS.title, text: LIMITS.description, date: LIMITS.date, signature: LIMITS.signature },
+} as const
+
+const PORTFOLIO_CONTENT_LIMITS = {
+  header:  { title: LIMITS.title },
+  hero:    { title: LIMITS.title, subtitle: LIMITS.subtitle, description: LIMITS.description },
+  bio:     { title: LIMITS.title, subtitle: LIMITS.subtitle, description: LIMITS.bio },
+  contact: { title: LIMITS.title, subtitle: LIMITS.subtitle, description: LIMITS.description, email: LIMITS.email },
+  footer:  { copyright: LIMITS.copyright },
+} as const
+
 // ─── Default placement (runs BEFORE the AI call) ───────────────────────────────
 // Guarantees every newly attached photo already has a sensible home using cheap heuristics
 // (orientation/resolution match, attach order) — the AI never places from scratch, it only
@@ -104,7 +139,7 @@ function applyPhotobookDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, n
   const freshIds = newPhotoIds.filter((id) => !alreadyPlaced.has(id))
   if (freshIds.length === 0) return
   const emptySlots = new Set(PHOTOBOOK_SINGLE_SLOTS.filter((slot) => !current[slot]))
-  const { singles, story, gallery } = computePhotobookDefaults(freshIds, idToDoc, emptySlots)
+  const { singles, story, gallery } = computePhotobookDefaults(freshIds, idToDoc, emptySlots, current.story.length)
   const doc = (id: string) => idToDoc.get(id)!
 
   for (const slot of PHOTOBOOK_SINGLE_SLOTS) {
@@ -208,7 +243,8 @@ function applyPhotobookImageChanges(changes: AiPhotobookChanges, idToDoc: Map<st
 
   // Captions apply to a photo wherever it currently lives, regardless of whether it was
   // auto-placed by the default or just overridden above.
-  for (const { photoId, caption } of captions ?? []) {
+  for (const { photoId, caption: rawCaption } of captions ?? []) {
+    const caption = rawCaption.slice(0, LIMITS.caption)
     for (const slot of PHOTOBOOK_SINGLE_SLOTS) {
       if (singles[slot]?.photoId === photoId) singles[slot] = { photoId, caption }
     }
@@ -248,12 +284,12 @@ function applyPhotobookChanges(changes: AiPhotobookChanges, idToDoc: Map<string,
 
   if (changes.content) {
     const c = changes.content
-    if (c.cover)        store.updatePhotobookSection('cover', c.cover)
-    if (c.introduction) store.updatePhotobookSection('introduction', c.introduction)
-    if (c.story)        store.updatePhotobookSection('story', c.story)
-    if (c.gallery)      store.updatePhotobookSection('gallery', c.gallery)
-    if (c.highlight)    store.updatePhotobookSection('highlight', c.highlight)
-    if (c.ending)       store.updatePhotobookSection('ending', c.ending)
+    if (c.cover)        store.updatePhotobookSection('cover', clampStrings(c.cover, PHOTOBOOK_CONTENT_LIMITS.cover))
+    if (c.introduction) store.updatePhotobookSection('introduction', clampStrings(c.introduction, PHOTOBOOK_CONTENT_LIMITS.introduction))
+    if (c.story)        store.updatePhotobookSection('story', clampStrings(c.story, PHOTOBOOK_CONTENT_LIMITS.story))
+    if (c.gallery)      store.updatePhotobookSection('gallery', clampStrings(c.gallery, PHOTOBOOK_CONTENT_LIMITS.gallery))
+    if (c.highlight)    store.updatePhotobookSection('highlight', clampStrings(c.highlight, PHOTOBOOK_CONTENT_LIMITS.highlight))
+    if (c.ending)       store.updatePhotobookSection('ending', clampStrings(c.ending, PHOTOBOOK_CONTENT_LIMITS.ending))
   }
 
   applyPhotobookImageChanges(changes, idToDoc)
@@ -286,7 +322,8 @@ function applyPortfolioImageChanges(changes: AiPortfolioChanges, idToDoc: Map<st
     singles[slot] = { photoId: newId }
   }
 
-  for (const { photoId, caption } of captions ?? []) {
+  for (const { photoId, caption: rawCaption } of captions ?? []) {
+    const caption = rawCaption.slice(0, LIMITS.caption)
     for (const slot of PORTFOLIO_SINGLE_SLOTS) {
       if (singles[slot]?.photoId === photoId) singles[slot] = { photoId, caption }
     }
@@ -344,15 +381,27 @@ function applyPortfolioChanges(changes: AiPortfolioChanges, idToDoc: Map<string,
 
   if (changes.content) {
     const c = changes.content
-    if (c.header)  store.updateSectionContent('header', c.header)
-    if (c.hero)    store.updateSectionContent('hero', c.hero)
-    if (c.bio)     store.updateSectionContent('bio', c.bio)
-    if (c.contact) store.updateSectionContent('contact', c.contact)
-    if (c.footer)  store.updateSectionContent('footer', c.footer)
+    if (c.header) {
+      const header = clampStrings(c.header, PORTFOLIO_CONTENT_LIMITS.header)
+      store.updateSectionContent('header', {
+        ...header,
+        ...(header.links ? { links: header.links.slice(0, LIMITS.links).map((l) => ({ ...l, label: l.label.slice(0, LIMITS.linkLabel) })) } : {}),
+      })
+    }
+    if (c.hero)    store.updateSectionContent('hero', clampStrings(c.hero, PORTFOLIO_CONTENT_LIMITS.hero))
+    if (c.bio) {
+      const bio = clampStrings(c.bio, PORTFOLIO_CONTENT_LIMITS.bio)
+      store.updateSectionContent('bio', {
+        ...bio,
+        ...(bio.achievements ? { achievements: bio.achievements.slice(0, LIMITS.count).map((a) => a.slice(0, LIMITS.achievement)) } : {}),
+      })
+    }
+    if (c.contact) store.updateSectionContent('contact', clampStrings(c.contact, PORTFOLIO_CONTENT_LIMITS.contact))
+    if (c.footer)  store.updateSectionContent('footer', clampStrings(c.footer, PORTFOLIO_CONTENT_LIMITS.footer))
     if (c.featuredWork && (c.featuredWork.title !== undefined || c.featuredWork.subtitle !== undefined)) {
       store.updateSectionContent('featuredWork', {
-        ...(c.featuredWork.title !== undefined    ? { title: c.featuredWork.title } : {}),
-        ...(c.featuredWork.subtitle !== undefined ? { subtitle: c.featuredWork.subtitle } : {}),
+        ...(c.featuredWork.title !== undefined    ? { title: c.featuredWork.title.slice(0, LIMITS.title) } : {}),
+        ...(c.featuredWork.subtitle !== undefined ? { subtitle: c.featuredWork.subtitle.slice(0, LIMITS.subtitle) } : {}),
       })
     }
   }
@@ -372,8 +421,12 @@ function applyPortfolioChanges(changes: AiPortfolioChanges, idToDoc: Map<string,
     )
     const validIds = new Set(idToDoc.keys())
     const mustPlaceIds = new Set(newPhotoIds.filter((id) => !claimedBySingles.has(id)))
-    const projects = repairPortfolioProjects(projectsInput, validIds, mustPlaceIds)
-    const captionMap = new Map((changes.captions ?? []).map((c) => [c.photoId, c.caption]))
+    const projects = repairPortfolioProjects(projectsInput, validIds, mustPlaceIds).map((p) => ({
+      ...p,
+      title: p.title.slice(0, LIMITS.projectTitle),
+      description: p.description.slice(0, LIMITS.projectDesc),
+    }))
+    const captionMap = new Map((changes.captions ?? []).map((c) => [c.photoId, c.caption.slice(0, LIMITS.caption)]))
     const doc = (id: string) => idToDoc.get(id)!
 
     // Each card carries its own text AND (optionally) its photo, keyed by the same project id —
@@ -402,6 +455,13 @@ function applyPortfolioChanges(changes: AiPortfolioChanges, idToDoc: Map<string,
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
+
+/** Detects an "edit" response that claims to change something but actually carries nothing
+ *  actionable (model hallucinating success) — lets the caller avoid a misleading confirmation. */
+export function hasActionableChanges(changes: AiPhotobookChanges | AiPortfolioChanges | undefined): boolean {
+  if (!changes) return false
+  return !!(changes.theme || changes.content || changes.imageAssignments || (changes.captions && changes.captions.length > 0))
+}
 
 export function applyChanges(
   response: AiResponse,

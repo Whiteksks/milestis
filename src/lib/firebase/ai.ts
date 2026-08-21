@@ -3,7 +3,7 @@
 import { getApp } from 'firebase/app'
 import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai'
 
-const MODEL = 'gemini-3.5-flash-lite'
+const MODEL = 'gemini-3.7-flash'
 
 let _model: ReturnType<typeof getGenerativeModel> | null = null
 

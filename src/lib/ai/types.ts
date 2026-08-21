@@ -14,16 +14,24 @@ export interface AiPhotoRef {
   url: string
 }
 
+/** Prior turn, text only — no photos. Requests are stateless (see service.ts), so this is the
+ *  only conversational memory carried forward; keep it short, not the full session. */
+export interface AiChatHistoryEntry {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 export interface AiAgentRequest {
   mode: AiChatMode
   prompt: string
   photos: AiPhotoRef[]
   language: string
-  projectId?: string | null
   currentContent?: string
   /** True if the project had zero photos placed anywhere before this turn — lets the prompt
    *  state plainly that the section content shown is still template sample text, not real content. */
   isBlankProject?: boolean
+  /** Recent conversation, oldest first, text only. */
+  history?: AiChatHistoryEntry[]
 }
 
 export type AiPhotoCaptions = Array<{ photoId: string; caption: string }>
@@ -95,8 +103,8 @@ export interface AiPortfolioContentChanges {
   footer?:       { copyright?: string }
 }
 
-/** Optional override of hero/bio with a different photo than the one already auto-placed
- *  there (see currentImageAssignments) — omit a field to keep its current photo. */
+/** Placement is fully automatic — only set a field here if the user explicitly asked, this
+ *  message, to swap/replace a specific photo. */
 export interface AiPortfolioImageChanges {
   hero?: string
   bio?: string
