@@ -8,7 +8,7 @@ export {
 export { getSlugModePolicy, isSlugMode } from "./policy"
 export type { SlugMode, SlugModePolicy } from "./policy"
 export { getSlugReservationDocId } from "./reservation"
-export { getSlugValidationError, isSlugBlocked, isSlugValid, normalizeSlug } from "./validation"
+export { getSlugValidationError, isSlugBlocked, isSlugValid, normalizeSlug, normalizeSlugInput } from "./validation"
 export {
   buildPublishedProjectUrl,
   getPublishedProjectShareUrl,

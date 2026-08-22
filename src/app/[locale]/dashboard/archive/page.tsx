@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TemplatePreview } from "@/components/shared/template-preview"
+import { EventThumbnail } from "@/components/layout/dashboard/project-card"
 import { useArchivedProjectsQuery, type DashboardProject } from "@/hooks/useProjectsQuery"
 import { getPublishedProjectShareUrl } from "@/lib/slug"
 import { cn } from "@/lib/utils"
@@ -64,7 +65,12 @@ const PublishedProjectCard = memo(function PublishedProjectCard({
   const modeInfo = modeConfig[project.mode]
 
   const thumbnail = useMemo(
-    () => (
+    () => project.mode === 'event' ? (
+      <EventThumbnail
+        heroImageUrl={project.preview?.heroImageUrl}
+        approvedCount={project.eventConfig?.approvedCount ?? 0}
+      />
+    ) : (
       <TemplatePreview
         themeId={project.preview?.themeId}
         templateId={project.preview?.templateId}
@@ -79,6 +85,7 @@ const PublishedProjectCard = memo(function PublishedProjectCard({
       />
     ),
     [
+      project.mode,
       project.preview?.themeId,
       project.preview?.templateId,
       project.preview?.heroImageUrl,
@@ -88,6 +95,7 @@ const PublishedProjectCard = memo(function PublishedProjectCard({
       project.preview?.aspectRatio,
       project.preview?.frameStyle,
       project.preview?.cropData,
+      project.eventConfig?.approvedCount,
     ]
   )
 
@@ -165,7 +173,12 @@ function ProjectDetailPanel({
   }
 
   const thumbnail = useMemo(
-    () => (
+    () => project.mode === 'event' ? (
+      <EventThumbnail
+        heroImageUrl={project.preview?.heroImageUrl}
+        approvedCount={project.eventConfig?.approvedCount ?? 0}
+      />
+    ) : (
       <TemplatePreview
         themeId={project.preview?.themeId}
         templateId={project.preview?.templateId}
@@ -180,6 +193,7 @@ function ProjectDetailPanel({
       />
     ),
     [
+      project.mode,
       project.preview?.themeId,
       project.preview?.templateId,
       project.preview?.heroImageUrl,
@@ -189,6 +203,7 @@ function ProjectDetailPanel({
       project.preview?.aspectRatio,
       project.preview?.frameStyle,
       project.preview?.cropData,
+      project.eventConfig?.approvedCount,
     ]
   )
 

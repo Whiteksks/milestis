@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   buildPublishedProjectUrl,
   getSlugValidationError,
-  normalizeSlug,
+  normalizeSlugInput,
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
@@ -83,7 +83,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   }
 
   const handleSlugChange = (value: string) => {
-    const normalized = normalizeSlug(value)
+    const normalized = normalizeSlugInput(value)
     setSlug(normalized)
     setSlugStatus('idle')
     if (debounceRef.current) clearTimeout(debounceRef.current)

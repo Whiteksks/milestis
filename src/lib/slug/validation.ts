@@ -9,6 +9,19 @@ export function normalizeSlug(raw: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
+/**
+ * Live-typing variant: converts a trailing space to a trailing hyphen instead of
+ * silently dropping it, so typing a space behaves the same as pasting one mid-string.
+ * The trailing hyphen is stripped later by `normalizeSlug` on submit/validation.
+ */
+export function normalizeSlugInput(raw: string): string {
+  return raw
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+/, "")
+}
+
 export function isSlugBlocked(slug: string): boolean {
   return SLUG_BLOCKLIST.has(slug)
 }

@@ -72,7 +72,7 @@ const modeConfig = {
 
 // ─── Event thumbnail ──────────────────────────────────────────────────────
 
-function EventThumbnail({ heroImageUrl, approvedCount }: { heroImageUrl?: string; approvedCount: number }) {
+export function EventThumbnail({ heroImageUrl, approvedCount }: { heroImageUrl?: string; approvedCount: number }) {
   const extra = approvedCount - 1
   return (
     <div className="relative size-full bg-muted">
