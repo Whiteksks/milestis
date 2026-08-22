@@ -30,6 +30,11 @@ function getModel(mode: AiAgentRequest['mode']) {
       // Keep reasoning shallow — this task is light captioning/copy, not complex problem-solving,
       // and a heavy thinking budget was eating into response time on multi-photo turns
       thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+      // Lower than the API default — this is a rule-following/formatting task (obey prompt.ts's many
+      // paired-field/required-section rules), not creative writing, and a high default temperature was
+      // a likely contributor to reported "ignores half the instructions" behavior (e.g. pairing
+      // templateId with currentTheme).
+      temperature: 0.4,
     },
   })
   _models[mode] = model
@@ -51,7 +56,9 @@ function buildHistory(history: AiChatHistoryEntry[] | undefined): Content[] {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 async function fetchAsBase64(url: string): Promise<{ mimeType: string; data: string }> {
-  const res = await fetch(url)
+  // Timeout so one stuck photo fetch can't stall the whole turn forever — the caller already
+  // wraps this in a per-photo try/catch and just drops the photo on failure.
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) })
   const blob = await res.blob()
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -90,9 +97,26 @@ export async function sendMessage(request: AiAgentRequest): Promise<AiResponse> 
   const textPart = { text: buildUserMessage(prompt, sent.map((r) => r.id), language, currentContent, isBlankProject) }
 
   const contents: Content[] = [...buildHistory(history), { role: 'user', parts: [...photoParts, textPart] }]
-  const raw = await model.generateContent({ contents })
-  const parsed = JSON.parse(raw.response.text())
+  const parsed = await generateWithRetry(model, contents)
   return { mode, ...parsed } as AiResponse
+}
+
+// One retry for transient failures (network blip, or the rare malformed/truncated JSON despite
+// the constrained schema) — never retries a 429, since resending an already-rate-limited request
+// immediately just makes it worse.
+async function generateWithRetry(model: ReturnType<typeof getGenerativeModel>, contents: Content[]): Promise<Record<string, unknown>> {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const raw = await model.generateContent({ contents })
+      return JSON.parse(raw.response.text())
+    } catch (err) {
+      const is429 = err instanceof Error && err.message.includes('429')
+      if (is429 || attempt === 2) throw err
+      console.warn('[ai] generateContent attempt 1 failed, retrying once', err)
+    }
+  }
+  // Unreachable, but keeps TypeScript happy about the loop always returning/throwing.
+  throw new Error('unreachable')
 }
 
 

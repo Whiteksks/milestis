@@ -48,7 +48,6 @@ export function BillingPlanCard() {
   const status = subscription?.status
   const cancelAtPeriodEnd = subscription?.cancelAtPeriodEnd ?? false
 
-  // Firestore onSnapshot returns Timestamps, not JS Dates � handle both safely.
   function toSafeDate(val: unknown): Date | null {
     if (!val) return null
     if (val instanceof Date) return isNaN(val.getTime()) ? null : val

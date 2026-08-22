@@ -29,8 +29,8 @@ export const PHOTOBOOK_SCHEMA: SchemaRequest = {
         theme: {
           type: 'object',
           properties: {
-            templateId:      { type: 'string', enum: ['photobook-memoir', 'photobook-chronicle', 'photobook-magazine', 'photobook-lumiere', 'photobook-soleil'] },
-            currentTheme:    { type: 'string', enum: THEMES_ENUM },
+            templateId:      { type: 'string', enum: ['photobook-memoir', 'photobook-chronicle', 'photobook-magazine', 'photobook-lumiere', 'photobook-soleil'], description: 'Layout/structure only — has no effect on color. Do not set this alone to satisfy a color/mood/dark-or-light request, use currentTheme for that.' },
+            currentTheme:    { type: 'string', enum: THEMES_ENUM, description: 'Color palette — this is what controls dark/light/warm/cool. Any request implying a color or mood (e.g. "dark theme") must set this field.' },
             photobookMood:   { type: 'string', enum: ['none', 'warm', 'cool', 'muted', 'fade', 'golden', 'noir', 'vibrant', 'dreamy', 'earthy'] },
             photobookTexture: { type: 'string', enum: ['none', 'vignette', 'matte', 'warmth', 'silver', 'linen', 'haze', 'grain', 'canvas', 'velvet', 'parchment'] },
           },
@@ -135,8 +135,8 @@ export const PORTFOLIO_SCHEMA: SchemaRequest = {
         theme: {
           type: 'object',
           properties: {
-            templateId:           { type: 'string', enum: ['editorial', 'minimal', 'elegant', 'grid', 'bento', 'showcase', 'liquid-glass'] },
-            currentTheme:         { type: 'string', enum: THEMES_ENUM },
+            templateId:           { type: 'string', enum: ['editorial', 'minimal', 'elegant', 'grid', 'bento', 'showcase', 'liquid-glass'], description: 'Layout/structure only — has no effect on color. Do not set this alone to satisfy a color/mood/dark-or-light request, use currentTheme for that.' },
+            currentTheme:         { type: 'string', enum: THEMES_ENUM, description: 'Color palette — this is what controls dark/light/warm/cool. Any request implying a color or mood (e.g. "dark theme") must set this field.' },
             depthEffect:          { type: 'string', enum: ['none', 'radial-glow', 'vignette', 'ambient-blobs', 'asymmetric-light', 'aurora', 'horizon'] },
             raysEffect:           { type: 'string', enum: ['none', 'diagonal-rays', 'conic-rays', 'soft-streaks', 'lens-flare', 'caustics', 'god-rays', 'prism'] },
             textureEffect:        { type: 'string', enum: ['none', 'grain', 'dots', 'lines', 'grid', 'halftone', 'scanlines', 'diamond-grid', 'woven'] },

@@ -48,13 +48,12 @@ export function StorySoleil({ sectionContent, theme, imageContent }: StorySoleil
           )}
           {(story.date || story.location) && (
             <p className={cn('text-[10px] uppercase tracking-[0.3em] opacity-30', theme.fontBody)}>
-              {[story.date, story.location].filter(Boolean).join('  �  ')}
+              {[story.date, story.location].filter(Boolean).join('  -  ')}
             </p>
           )}
         </Animate>
       )}
 
-      {/* Moments � alternating photo / caption layout */}
       {moments.length > 0 && (
         <div className="space-y-16 @md:space-y-24">
           {moments.map((block, index) => {
