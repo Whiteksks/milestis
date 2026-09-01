@@ -1,20 +1,33 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, ShieldCheck } from "lucide-react"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-// Генерируем динамические метаданные через next-intl
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_account_security.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_account_security.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/account-security",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function AccountSecurityPage() {
-  const t = useTranslations("help_account_security")
+export default async function AccountSecurityPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_account_security" })
 
   // Отрендерим стронг-теги одной функцией, чтобы не дублировать код
   const richTextOption = {
@@ -44,7 +57,9 @@ export default function AccountSecurityPage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/account-security")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* Your account */}
       <h2 id="your-account">{t("toc.your-account")}</h2>
       <p>{t("content.p1")}</p>
@@ -93,5 +108,6 @@ export default function AccountSecurityPage() {
         <span>{t.rich("content.callout_security", richTextOption)}</span>
       </div>
     </ArticleLayout>
+    </>
   )
 }

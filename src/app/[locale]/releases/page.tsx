@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Header from '@/components/layout/header';
@@ -68,8 +68,13 @@ export async function generateMetadata({
   }
 }
 
-const ChangelogPage = () => {
-  const t = useTranslations('ChangelogPage');
+const ChangelogPage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) => {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'ChangelogPage' });
   
   // Получаем массив текстовых переводов из JSON
   const stringEntries = t.raw('entries') as ChangelogTextEntry[];

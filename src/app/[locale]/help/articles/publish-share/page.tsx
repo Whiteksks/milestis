@@ -1,19 +1,33 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, AlertCircle } from "lucide-react"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_publish_share.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_publish_share.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/publish-share",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function PublishSharePage() {
-  const t = useTranslations("help_publish_share")
+export default async function PublishSharePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_publish_share" })
 
   const richTextOption = {
     strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
@@ -42,7 +56,9 @@ export default function PublishSharePage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/publish-share")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What publishing means */}
       <h2 id="what-publish-means">{t("toc.what-publish-means")}</h2>
       <p>{t("content.publish_p1")}</p>
@@ -93,5 +109,6 @@ export default function PublishSharePage() {
       </ul>
       <p>{t("content.sharing_outro")}</p>
     </ArticleLayout>
+    </>
   )
 }

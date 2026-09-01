@@ -1,19 +1,33 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, Lightbulb } from "lucide-react"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_how_credits_work.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_how_credits_work.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/how-credits-work",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function HowCreditsWorkPage() {
-  const t = useTranslations("help_how_credits_work")
+export default async function HowCreditsWorkPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_how_credits_work" })
 
   const richTextOption = {
     strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
@@ -42,7 +56,9 @@ export default function HowCreditsWorkPage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/how-credits-work")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What are credits? */}
       <h2 id="what-are-credits">{t("toc.what-are-credits")}</h2>
       <p>{t("content.credits_p1")}</p>
@@ -105,5 +121,6 @@ export default function HowCreditsWorkPage() {
       <h3>{t("content.faq_q3")}</h3>
       <p>{t("content.faq_a3")}</p>
     </ArticleLayout>
+    </>
   )
 }

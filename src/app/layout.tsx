@@ -2,10 +2,11 @@ import './globals.css';
 
 import { FirebaseInitializer } from '@/lib/firebase';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { JsonLd } from '@/components/shared/json-ld';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/seo/json-ld';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 import Script from 'next/script';
-import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_APP_URL ?? 'https://milestis.com'),
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
     icon: [{ url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }],
     shortcut: '/favicon.ico',
   },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
   openGraph: {
     type: 'website',
     siteName: 'Milestis',
@@ -59,13 +63,15 @@ export default async function RootLayout({
   params: Promise<{ locale?: string }>;
 }) {
   const { locale } = await params;
-  const headersList = await headers();
-  const host = headersList.get('host') ?? '';
-  const isPublishedSite = host.endsWith('.site');
+  // No `[locale]` segment means this render is under /sites/[slug] (a published
+  // photobook) — checked via params, not headers(), so [locale] pages stay
+  // statically optimizable instead of being forced dynamic on every request.
+  const isPublishedSite = locale === undefined;
 
   return (
     <html lang={locale ?? 'en'} suppressHydrationWarning>
       <head>
+        {!isPublishedSite && <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />}
         {/* Iubenda temporarily disabled — was causing a stuck cookie banner
         {!isPublishedSite && (
           <Script

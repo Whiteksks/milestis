@@ -1,19 +1,33 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, Sparkles } from "lucide-react"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_what_is_milestis.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_what_is_milestis.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/what-is-milestis",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function WhatIsMilestisPage() {
-  const t = useTranslations("help_what_is_milestis")
+export default async function WhatIsMilestisPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_what_is_milestis" })
 
   const richTextOption = {
     strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
@@ -41,7 +55,9 @@ export default function WhatIsMilestisPage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/what-is-milestis")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What is Milestis? */}
       <h2 id="what-is-milestis">{t("toc.what-is-milestis")}</h2>
       <p>{t.rich("content.what_is_p1", richTextOption)}</p>
@@ -98,5 +114,6 @@ export default function WhatIsMilestisPage() {
         <span>{t("content.callout_sparkles")}</span>
       </div>
     </ArticleLayout>
+    </>
   )
 }

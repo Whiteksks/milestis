@@ -1,20 +1,34 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Lightbulb } from "lucide-react"
 import Link from "next/link"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_create_edit.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_create_edit.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/getting-started",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function GettingStartedPage() {
-  const t = useTranslations("help_create_edit")
+export default async function GettingStartedPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_create_edit" })
 
   // Конфигурация для Rich Text: маппинг тегов из JSON на React-компоненты
   const richTextComponents = {
@@ -48,7 +62,9 @@ export default function GettingStartedPage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/getting-started")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* Start from the dashboard */}
       <h2 id="start-from-dashboard">{t("toc.start-from-dashboard")}</h2>
       <p>{t.rich("content.dashboard_p1", richTextComponents)}</p>
@@ -104,5 +120,6 @@ export default function GettingStartedPage() {
       </ul>
       <p>{t.rich("content.before_outro", richTextComponents)}</p>
     </ArticleLayout>
+    </>
   )
 }

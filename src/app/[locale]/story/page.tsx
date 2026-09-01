@@ -6,6 +6,7 @@ import { Share2, Wand2, Infinity as InfinityIcon } from 'lucide-react';
 import { Footer } from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import heroPhoto from '@/components/assets/nik-unsplash.webp';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
   params,
@@ -16,21 +17,30 @@ export async function generateMetadata({
 
   const titles: Record<string, string> = {
     en: 'Our Story',
+    ru: 'Наша история',
+    kz: 'Біздің тарихымыз',
   }
   const descriptions: Record<string, string> = {
     en: 'Milestis exists because memories are fragile, and platforms shouldn\u2019t be.',
+    ru: 'Milestis существует, потому что воспоминания хрупки, а платформы для их хранения не должны быть.',
+    kz: 'Milestis бар, себебі естеліктер нәзік, ал оларды сақтайтын платформалар олай болмауы керек.',
   }
 
-  return {
-    title: titles[locale] ?? titles.en,
-    description: descriptions[locale] ?? descriptions.en,
-  }
+  const title = titles[locale] ?? titles.en
+  const description = descriptions[locale] ?? descriptions.en
+
+  return buildPageMetadata({ locale, path: '/story', title, description })
 }
 
 const permanenceIcons = [Share2, Wand2, InfinityIcon];
 
-const MissionPage = async () => {
-  const t = await getTranslations('story');
+const MissionPage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) => {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'story' });
   const stats = t.raw('stats') as { number: string; label: string }[];
   const permanenceFeatures = (t.raw('permanence.items') as { number: string; title: string; description: string }[])
     .map((feature, i) => ({ ...feature, icon: permanenceIcons[i] }));

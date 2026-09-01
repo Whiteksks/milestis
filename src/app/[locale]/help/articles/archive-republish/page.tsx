@@ -1,19 +1,33 @@
 import type { Metadata } from "next"
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { AlertCircle, Info } from "lucide-react"
+import { buildPageMetadata } from "@/lib/seo/metadata"
+import { JsonLd } from "@/components/shared/json-ld"
+import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("help_archive_republish.metadata")
-  return {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_archive_republish.metadata" })
+  return buildPageMetadata({
+    locale,
+    path: "/help/articles/archive-republish",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
-export default function ArchiveRepublishPage() {
-  const t = useTranslations("help_archive_republish")
+export default async function ArchiveRepublishPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "help_archive_republish" })
 
   const richTextOption = {
     strong_tag: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
@@ -42,7 +56,9 @@ export default function ArchiveRepublishPage() {
   ]
 
   return (
-    <ArticleLayout meta={meta} toc={toc} related={related}>
+    <>
+      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/archive-republish")} />
+      <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What is the archive? */}
       <h2 id="what-is-archive">{t("toc.what-is-archive")}</h2>
       <p>{t("content.archive_p1")}</p>
@@ -93,5 +109,6 @@ export default function ArchiveRepublishPage() {
         <li>{t("content.tips_li4")}</li>
       </ul>
     </ArticleLayout>
+    </>
   )
 }

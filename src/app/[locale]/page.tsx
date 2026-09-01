@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect";
 import { LandingContent } from '@/components/layout/landing/landing-content';
+import { JsonLd } from '@/components/shared/json-ld';
+import { softwareApplicationJsonLd } from '@/lib/seo/json-ld';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
   params,
@@ -22,45 +25,28 @@ export async function generateMetadata({
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}`
 
   return {
-    title,
-    description,
+    ...buildPageMetadata({ locale, path: '', title, description }),
     keywords: locale === 'ru'
       ? ['фотокнига', 'интерактивная фотокнига', 'создать фотокнигу', 'онлайн фотокнига', 'milestis']
       : locale === 'kz'
       ? ['фотокітап', 'интерактивті фотокітап', 'milestis']
       : ['photo book', 'interactive photo book', 'create photo book', 'online photo book', 'milestis'],
-    alternates: {
-      canonical: url,
-      languages: {
-        'en': 'https://milestis.com/en',
-        'ru': 'https://milestis.com/ru',
-        'kk': 'https://milestis.com/kz',
-        'x-default': 'https://milestis.com/en',
-      },
-    },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      siteName: 'Milestis',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
   }
 }
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
   return (
     <>
+      <JsonLd data={softwareApplicationJsonLd(locale)} />
       <AuthenticatedRedirect />
-      <LandingContent />
+      <LandingContent locale={locale} />
     </>
   );
 }

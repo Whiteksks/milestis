@@ -17,8 +17,8 @@ const featureIcons = [ShieldCheck, Layers, Palette, Sparkles, Link2];
 const useCaseIcons = { events: EventStoriesIcon, portfolios: InstantPortfoliosIcon, upsell: PhotographerUpsellIcon };
 
 // Shared body used by both the root landing page and /about (which mirrors it, minus the auth redirect).
-export async function LandingContent() {
-  const t = await getTranslations('landing');
+export async function LandingContent({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'landing' });
   const stats = t.raw('stats') as { number: string; label: string }[];
   const steps = (t.raw('howItWorks.steps') as { number: string; title: string; description: string }[])
     .map((step, i) => ({ ...step, icon: stepIcons[i] }));

@@ -5,6 +5,7 @@ import { CTAButton } from '@/components/shared/cta-button';
 import { ShieldCheck, Palette, Zap, Briefcase, Check } from 'lucide-react';
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
   params,
@@ -15,15 +16,19 @@ export async function generateMetadata({
 
   const titles: Record<string, string> = {
     en: 'Features',
+    ru: 'Возможности',
+    kz: 'Мүмкіндіктер',
   }
   const descriptions: Record<string, string> = {
-    en: 'Discover all Milestis features — interactive layouts, stunning templates, and more.',
+    en: 'Discover all Milestis features — interactive layouts, stunning templates, and more for your photo book.',
+    ru: 'Все возможности Milestis — интерактивные макеты, стильные шаблоны и инструменты для создания фотокниги.',
+    kz: 'Milestis мүмкіндіктерін танысыңыз — интерактивті макеттер, әдемі үлгілер және фотокітап құралдары.',
   }
 
-  return {
-    title: titles[locale] ?? titles.en,
-    description: descriptions[locale] ?? descriptions.en,
-  }
+  const title = titles[locale] ?? titles.en
+  const description = descriptions[locale] ?? descriptions.en
+
+  return buildPageMetadata({ locale, path: '/features', title, description })
 }
 
 const swatches = [
@@ -33,8 +38,13 @@ const swatches = [
 
 const pillarIcons = [ShieldCheck, Palette, Zap];
 
-export default async function FeaturesPage() {
-  const t = await getTranslations('features');
+export default async function FeaturesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'features' });
   const stats = t.raw('stats') as { number: string; label: string }[];
   const pillars = (t.raw('designSystem.pillars') as { number: string; title: string; description: string }[])
     .map((pillar, i) => ({ ...pillar, icon: pillarIcons[i] }));
