@@ -5,7 +5,7 @@ import { Lightbulb } from "lucide-react"
 import Link from "next/link"
 import { buildPageMetadata } from "@/lib/seo/metadata"
 import { JsonLd } from "@/components/shared/json-ld"
-import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
+import { helpArticleBreadcrumbJsonLd, howToJsonLd } from "@/lib/seo/json-ld"
 
 export async function generateMetadata({
   params,
@@ -63,7 +63,18 @@ export default async function GettingStartedPage({
 
   return (
     <>
-      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/getting-started")} />
+      <JsonLd
+        data={[
+          helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/getting-started"),
+          howToJsonLd({
+            locale,
+            path: "/help/articles/getting-started",
+            name: meta.title,
+            description: meta.description,
+            steps: toc.map((item) => ({ name: item.label, anchor: item.id })),
+          }),
+        ]}
+      />
       <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* Start from the dashboard */}
       <h2 id="start-from-dashboard">{t("toc.start-from-dashboard")}</h2>

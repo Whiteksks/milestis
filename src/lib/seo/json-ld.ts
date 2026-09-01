@@ -6,7 +6,10 @@
 const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com';
 
 /** Social profile URLs for the `sameAs` entity graph. Populate as profiles go live. */
-const SAME_AS: string[] = [];
+const SAME_AS: string[] = [
+  'https://www.tiktok.com/@milestis.studio',
+  'https://www.instagram.com/milestis.studio/',
+];
 
 export function organizationJsonLd() {
   return {
@@ -104,4 +107,39 @@ export function helpArticleBreadcrumbJsonLd(locale: string, articleTitle: string
     { name: HELP_LABEL[locale] ?? HELP_LABEL.en, url: `${BASE_URL}/${locale}/help` },
     { name: articleTitle, url: `${BASE_URL}/${locale}${articlePath}` },
   ]);
+}
+
+export interface HowToStepInput {
+  name: string;
+  anchor: string;
+}
+
+/** HowTo schema for step-by-step help articles; step text reuses each section's own TOC label (already-translated, non-fabricated content). */
+export function howToJsonLd({
+  locale,
+  path,
+  name,
+  description,
+  steps,
+}: {
+  locale: string;
+  path: string;
+  name: string;
+  description: string;
+  steps: HowToStepInput[];
+}) {
+  const url = `${BASE_URL}/${locale}${path}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    step: steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.name,
+      url: `${url}#${step.anchor}`,
+    })),
+  };
 }

@@ -4,7 +4,7 @@ import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { Info, AlertCircle } from "lucide-react"
 import { buildPageMetadata } from "@/lib/seo/metadata"
 import { JsonLd } from "@/components/shared/json-ld"
-import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
+import { helpArticleBreadcrumbJsonLd, howToJsonLd } from "@/lib/seo/json-ld"
 
 export async function generateMetadata({
   params,
@@ -57,7 +57,18 @@ export default async function PublishSharePage({
 
   return (
     <>
-      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/publish-share")} />
+      <JsonLd
+        data={[
+          helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/publish-share"),
+          howToJsonLd({
+            locale,
+            path: "/help/articles/publish-share",
+            name: meta.title,
+            description: meta.description,
+            steps: toc.map((item) => ({ name: item.label, anchor: item.id })),
+          }),
+        ]}
+      />
       <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What publishing means */}
       <h2 id="what-publish-means">{t("toc.what-publish-means")}</h2>

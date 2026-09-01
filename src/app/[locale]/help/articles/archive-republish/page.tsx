@@ -4,7 +4,7 @@ import { ArticleLayout } from "@/components/layout/kb/article-layout"
 import { AlertCircle, Info } from "lucide-react"
 import { buildPageMetadata } from "@/lib/seo/metadata"
 import { JsonLd } from "@/components/shared/json-ld"
-import { helpArticleBreadcrumbJsonLd } from "@/lib/seo/json-ld"
+import { helpArticleBreadcrumbJsonLd, howToJsonLd } from "@/lib/seo/json-ld"
 
 export async function generateMetadata({
   params,
@@ -57,7 +57,18 @@ export default async function ArchiveRepublishPage({
 
   return (
     <>
-      <JsonLd data={helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/archive-republish")} />
+      <JsonLd
+        data={[
+          helpArticleBreadcrumbJsonLd(locale, meta.title, "/help/articles/archive-republish"),
+          howToJsonLd({
+            locale,
+            path: "/help/articles/archive-republish",
+            name: meta.title,
+            description: meta.description,
+            steps: toc.map((item) => ({ name: item.label, anchor: item.id })),
+          }),
+        ]}
+      />
       <ArticleLayout meta={meta} toc={toc} related={related}>
       {/* What is the archive? */}
       <h2 id="what-is-archive">{t("toc.what-is-archive")}</h2>
