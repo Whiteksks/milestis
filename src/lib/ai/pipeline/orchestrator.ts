@@ -1,6 +1,6 @@
 import { useContentStore } from '@/editor/lib/store/content'
 import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
-import { getProjectImageSelectUrl, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
+import { getProjectImageThumbUrl, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
 import type { AiChatMode, AiPhotoRef } from '../core/types'
 import { classifyIntent } from '../intent/classify'
 import { generateChatReply } from '../chat/respond'
@@ -53,6 +53,12 @@ export type AiPipelineResult =
   | { kind: 'chat'; message: string }
   | { kind: 'applied'; intent: 'generate_all' | 'edit_theme' | 'edit_section'; sectionsWritten: string[]; styleChanged: boolean }
 
+export type AiPipelineStage =
+  | { kind: 'classifying' }
+  | { kind: 'style' }
+  | { kind: 'writing'; done: number; total: number }
+  | { kind: 'replying' }
+
 export interface RunAiPipelineInput {
   mode: AiChatMode
   prompt: string
@@ -61,17 +67,16 @@ export interface RunAiPipelineInput {
   idToDoc: Map<string, ProjectImageDoc>
   /** Ids attached specifically this turn (subset of idToDoc's keys). */
   newPhotoIds: string[]
+  /** Fired at each real pipeline phase transition — lets the UI show an accurate status
+   *  instead of a blind timed cycle. Best-effort only, never awaited. */
+  onStage?: (stage: AiPipelineStage) => void
 }
 
 const MAX_STYLE_SAMPLE_PHOTOS = 6
 
 function pickStyleSamplePhotos(idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): AiPhotoRef[] {
   const ids = newPhotoIds.length > 0 ? newPhotoIds : Array.from(idToDoc.keys())
-  return ids.slice(0, MAX_STYLE_SAMPLE_PHOTOS).map((id) => ({ id, url: getProjectImageSelectUrl(idToDoc.get(id)!) }))
-}
-
-function managedImageToPhotoRef(img: { id: string; value: { asset: { src: string } } } | undefined): AiPhotoRef | undefined {
-  return img ? { id: img.id, url: img.value.asset.src } : undefined
+  return ids.slice(0, MAX_STYLE_SAMPLE_PHOTOS).map((id) => ({ id, url: getProjectImageThumbUrl(idToDoc.get(id)!) }))
 }
 
 // Every section starts out holding the template's nice-looking sample copy (kept on purpose so a
@@ -99,6 +104,7 @@ export async function runAiPipeline(input: RunAiPipelineInput): Promise<AiPipeli
   applyDefaultPlacement(input.mode, input.idToDoc, input.newPhotoIds)
 
   const sectionKeys = input.mode === 'photobook' ? [...PHOTOBOOK_SECTION_KEYS] : [...PORTFOLIO_SECTION_KEYS]
+  input.onStage?.({ kind: 'classifying' })
   const intent = await classifyIntent({
     prompt: input.prompt,
     language: input.language,
@@ -108,6 +114,7 @@ export async function runAiPipeline(input: RunAiPipelineInput): Promise<AiPipeli
   })
 
   if (intent.kind === 'chat') {
+    input.onStage?.({ kind: 'replying' })
     const message = await generateChatReply({ prompt: input.prompt, language: input.language, mode: input.mode })
     return { kind: 'chat', message }
   }
@@ -132,6 +139,7 @@ export async function runAiPipeline(input: RunAiPipelineInput): Promise<AiPipeli
 }
 
 async function runStyleDecision(input: RunAiPipelineInput, photos: AiPhotoRef[]): Promise<void> {
+  input.onStage?.({ kind: 'style' })
   if (input.mode === 'photobook') {
     const result = await decidePhotobookStyle({ prompt: input.prompt, language: input.language, photos })
     applyPhotobookStyle(result)
@@ -144,6 +152,17 @@ async function runStyleDecision(input: RunAiPipelineInput, photos: AiPhotoRef[])
 async function runContentGeneration(input: RunAiPipelineInput, sections: string[]): Promise<void> {
   const inScope = new Set(sections)
   const calls: Promise<void>[] = []
+  // Maps a placed managed image's (full-res) src back to its original doc id — managed images
+  // get a fresh slot uuid on placement (see placement.ts makePhotobookImage/makePortfolioImage),
+  // so this is the only way to recover the real photo id for thumbnail lookup/claim-matching.
+  const urlToId = urlToIdMap(input.idToDoc)
+
+  function managedImageRef(img: { id: string; value: { asset: { src: string } } } | undefined): AiPhotoRef | undefined {
+    if (!img) return undefined
+    const docId = urlToId.get(img.value.asset.src)
+    const doc = docId ? input.idToDoc.get(docId) : undefined
+    return docId && doc ? { id: docId, url: getProjectImageThumbUrl(doc) } : undefined
+  }
 
   if (input.mode === 'photobook') {
     const store = useContentStore.getState()
@@ -152,12 +171,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
 
     if (inScope.has('cover')) {
       calls.push(generatePhotobookCover({
-        prompt: input.prompt, language: input.language, current: blankDefaults(content.cover, defaultPhotobookContent.cover), photo: managedImageToPhotoRef(images.cover),
+        prompt: input.prompt, language: input.language, current: blankDefaults(content.cover, defaultPhotobookContent.cover), photo: managedImageRef(images.cover),
       }).then(applyPhotobookCover))
     }
     if (inScope.has('introduction')) {
       calls.push(generatePhotobookIntroduction({
-        prompt: input.prompt, language: input.language, current: blankDefaults(content.introduction, defaultPhotobookContent.introduction), photo: managedImageToPhotoRef(images.introduction),
+        prompt: input.prompt, language: input.language, current: blankDefaults(content.introduction, defaultPhotobookContent.introduction), photo: managedImageRef(images.introduction),
       }).then(applyPhotobookIntroduction))
     }
     if (inScope.has('gallery')) {
@@ -173,21 +192,17 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
         prompt: input.prompt, language: input.language, current: blankDefaults(
           { label: content.highlight.label, title: content.highlight.title, description: content.highlight.description, quote: content.highlight.quote },
           { label: defaultPhotobookContent.highlight.label, title: defaultPhotobookContent.highlight.title, description: defaultPhotobookContent.highlight.description, quote: defaultPhotobookContent.highlight.quote },
-        ), photo: managedImageToPhotoRef(images.highlight),
+        ), photo: managedImageRef(images.highlight),
       }).then(applyPhotobookHighlight))
     }
     if (inScope.has('ending')) {
       calls.push(generatePhotobookEnding({
-        prompt: input.prompt, language: input.language, current: blankDefaults(content.ending, defaultPhotobookContent.ending), photo: managedImageToPhotoRef(images.ending),
+        prompt: input.prompt, language: input.language, current: blankDefaults(content.ending, defaultPhotobookContent.ending), photo: managedImageRef(images.ending),
       }).then(applyPhotobookEnding))
     }
     if (inScope.has('story')) {
-      const urlToId = urlToIdMap(input.idToDoc)
       const storyPhotos: AiPhotoRef[] = images.story
-        .map((img) => {
-          const id = urlToId.get(img.value.asset.src)
-          return id ? { id, url: img.value.asset.src } : undefined
-        })
+        .map((img) => managedImageRef(img))
         .filter((p): p is AiPhotoRef => !!p)
       calls.push(generatePhotobookStory({
         prompt: input.prompt, language: input.language, current: blankDefaults(
@@ -206,7 +221,7 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
     }
     if (inScope.has('hero')) {
       calls.push(generatePortfolioHero({
-        prompt: input.prompt, language: input.language, current: blankDefaults(content.hero, defaultPortfolioContent.hero), photo: managedImageToPhotoRef(images.hero),
+        prompt: input.prompt, language: input.language, current: blankDefaults(content.hero, defaultPortfolioContent.hero), photo: managedImageRef(images.hero),
       }).then(applyPortfolioHero))
     }
     if (inScope.has('bio')) {
@@ -214,7 +229,7 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
         prompt: input.prompt, language: input.language, current: blankDefaults(
           { title: content.bio.title, subtitle: content.bio.subtitle, description: content.bio.description },
           { title: defaultPortfolioContent.bio.title, subtitle: defaultPortfolioContent.bio.subtitle, description: defaultPortfolioContent.bio.description },
-        ), photo: managedImageToPhotoRef(images.bio),
+        ), photo: managedImageRef(images.bio),
       }).then(applyPortfolioBio))
     }
     if (inScope.has('contact')) {
@@ -224,13 +239,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
       calls.push(generatePortfolioFooter({ prompt: input.prompt, language: input.language, current: blankDefaults(content.footer, defaultPortfolioContent.footer) }).then(applyPortfolioFooter))
     }
     if (inScope.has('featuredWork')) {
-      const urlToId = urlToIdMap(input.idToDoc)
       const claimedIds = new Set(
-        [images.hero, images.bio].map(managedImageToPhotoRef).filter((p): p is AiPhotoRef => !!p).map((p) => urlToId.get(p.url)).filter((id): id is string => !!id),
+        [images.hero, images.bio].map((img) => managedImageRef(img)).filter((p): p is AiPhotoRef => !!p).map((p) => p.id),
       )
       const newPhotos: AiPhotoRef[] = input.newPhotoIds
         .filter((id) => !claimedIds.has(id))
-        .map((id) => ({ id, url: getProjectImageSelectUrl(input.idToDoc.get(id)!) }))
+        .map((id) => ({ id, url: getProjectImageThumbUrl(input.idToDoc.get(id)!) }))
       calls.push(generatePortfolioFeaturedWork({
         prompt: input.prompt,
         language: input.language,
@@ -244,6 +258,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
     }
   }
 
-  await Promise.all(calls)
+  const total = calls.length
+  let done = 0
+  input.onStage?.({ kind: 'writing', done, total })
+  await Promise.all(calls.map((call) => call.then(() => {
+    done += 1
+    input.onStage?.({ kind: 'writing', done, total })
+  })))
   useAiBriefStore.getState().markGenerated(sections)
 }

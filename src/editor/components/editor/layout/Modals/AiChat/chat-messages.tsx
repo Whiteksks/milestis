@@ -11,6 +11,9 @@ interface ChatMessagesProps {
   messages: Message[]
   isLoading?: boolean
   greeting?: string
+  quickPrompts?: string[]
+  onQuickPromptSelect?: (prompt: string) => void
+  loadingCaption?: string
 }
 
 function TypingGreeting({ text }: { text: string }) {
@@ -55,7 +58,7 @@ function TypingGreeting({ text }: { text: string }) {
   )
 }
 
-export function ChatMessages({ messages, isLoading, greeting }: ChatMessagesProps) {
+export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQuickPromptSelect, loadingCaption }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -65,10 +68,24 @@ export function ChatMessages({ messages, isLoading, greeting }: ChatMessagesProp
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
       {messages.length === 0 ? (
-        <div className="pt-2">
+        <div className="pt-2 space-y-3">
           {greeting ? (
             <TypingGreeting key={greeting} text={greeting} />
           ) : null}
+          {quickPrompts && quickPrompts.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pl-9">
+              {quickPrompts.map((prompt, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onQuickPromptSelect?.(prompt)}
+                  className="text-xs rounded-full border border-border bg-background px-3 py-1.5 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         messages.map((msg, i) => (
@@ -105,7 +122,9 @@ export function ChatMessages({ messages, isLoading, greeting }: ChatMessagesProp
                     'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
                     msg.role === 'user'
                       ? 'bg-foreground text-background rounded-br-sm'
-                      : 'bg-muted border border-border rounded-bl-sm',
+                      : msg.isError
+                        ? 'bg-destructive/10 border border-destructive/30 text-destructive rounded-bl-sm'
+                        : 'bg-muted border border-border rounded-bl-sm',
                   )}
                 >
                   {msg.content}
@@ -127,10 +146,15 @@ export function ChatMessages({ messages, isLoading, greeting }: ChatMessagesProp
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted border border-border mt-0.5">
             <Sparkles className="h-3.5 w-3.5 text-foreground/60" />
           </div>
-          <div className="bg-muted border border-border rounded-2xl rounded-bl-sm px-3.5 py-3 flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+          <div className="bg-muted border border-border rounded-2xl rounded-bl-sm px-3.5 py-2.5 flex items-center gap-2">
+            <span className="flex items-center gap-1 shrink-0">
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+            </span>
+            {loadingCaption && (
+              <span className="text-xs text-muted-foreground">{loadingCaption}</span>
+            )}
           </div>
         </div>
       )}

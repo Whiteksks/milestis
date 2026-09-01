@@ -76,6 +76,7 @@ export function ChatInput({
           <Send className="h-4 w-4" />
         </Button>
       </div>
+      <p className="mt-2 text-center text-[11px] text-muted-foreground/70">{t('disclaimer')}</p>
     </div>
   )
 }

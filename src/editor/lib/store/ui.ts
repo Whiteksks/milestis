@@ -7,6 +7,7 @@ export type AiChatMessage = {
   role: 'user' | 'assistant'
   content: string
   photos?: string[]
+  isError?: boolean
 }
 
 export interface UiStore {

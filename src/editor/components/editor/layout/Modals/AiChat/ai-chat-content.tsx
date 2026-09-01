@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useChat } from './use-chat'
 import { usePhotoAttach } from './use-photo-attach'
@@ -8,14 +9,23 @@ import { SelectedPhotos } from './selected-photos'
 import { PhotoPicker } from './photo-picker'
 import { ChatInput } from './chat-input'
 import { useUiStore } from '@/editor/lib/store/ui'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { getProjectImageSelectUrl } from '@/editor/hooks/use-project-images'
-import { runAiPipeline } from '@/lib/ai/pipeline/orchestrator'
+import { runAiPipeline, type AiPipelineStage } from '@/lib/ai/pipeline/orchestrator'
 import type { AiChatMode } from '@/lib/ai/core/types'
+
+const SUCCESS_KEY_BY_INTENT = {
+  generate_all: 'assistantSuccessAll',
+  edit_theme: 'assistantSuccessTheme',
+  edit_section: 'assistantSuccessSection',
+} as const
 
 export function AiChatContent() {
   const t = useTranslations('editor.layout.aiChat')
   const locale = useLocale()
   const editorMode = useUiStore((s) => s.editorMode)
+  const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
+  const [loadingCaption, setLoadingCaption] = useState('')
 
   const { messages, input, setInput, addMessage, isLoading, setIsLoading } = useChat()
   const {
@@ -32,6 +42,15 @@ export function AiChatContent() {
     handleFileUpload,
   } = usePhotoAttach()
 
+  function captionForStage(stage: AiPipelineStage): string {
+    switch (stage.kind) {
+      case 'classifying': return t('loadingClassifying')
+      case 'style': return t('loadingStyle')
+      case 'writing': return t('loadingWriting', { done: stage.done, total: stage.total })
+      case 'replying': return t('loadingReplying')
+    }
+  }
+
   async function handleSend() {
     const trimmed = input.trim()
     if (!trimmed && selectedUrls.length === 0) return
@@ -47,6 +66,7 @@ export function AiChatContent() {
     clearSelection()
     setIsPickerOpen(false)
     setIsLoading(true)
+    setLoadingCaption('')
 
     try {
       const idToDoc = new Map(images.map((img) => [img.id, img]))
@@ -63,17 +83,19 @@ export function AiChatContent() {
         language: locale,
         idToDoc,
         newPhotoIds,
+        onStage: (stage) => setLoadingCaption(captionForStage(stage)),
       })
 
       addMessage({
         role: 'assistant',
-        content: result.kind === 'chat' ? result.message : t('assistantSuccess'),
+        content: result.kind === 'chat' ? result.message : t(SUCCESS_KEY_BY_INTENT[result.intent]),
       })
     } catch (err) {
       const is429 = err instanceof Error && err.message.includes('429')
-      addMessage({ role: 'assistant', content: t(is429 ? 'assistantRateLimit' : 'assistantError') })
+      addMessage({ role: 'assistant', content: t(is429 ? 'assistantRateLimit' : 'assistantError'), isError: true })
     } finally {
       setIsLoading(false)
+      setLoadingCaption('')
     }
   }
 
@@ -90,7 +112,14 @@ export function AiChatContent() {
       <ChatMessages
           messages={messages}
           isLoading={isLoading}
-          greeting={t((editorMode as AiChatMode) === 'photobook' ? 'greetingPhotobook' : 'greetingPortfolio')}
+          greeting={t(
+            (editorMode as AiChatMode) === 'photobook'
+              ? (hasAiGenerated ? 'greetingPhotobookReturn' : 'greetingPhotobook')
+              : (hasAiGenerated ? 'greetingPortfolioReturn' : 'greetingPortfolio'),
+          )}
+          quickPrompts={t.raw((editorMode as AiChatMode) === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
+          onQuickPromptSelect={setInput}
+          loadingCaption={loadingCaption}
         />
       <SelectedPhotos
         selectedUrls={selectedUrls}

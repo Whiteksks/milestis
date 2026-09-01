@@ -18,6 +18,7 @@ import { useUserStore } from '@/hooks/useUserStore'
 import { useRenameMutation, useUnpublishMutation } from '@/hooks/useProjectMutations'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useContentStore } from '@/editor/lib/store/content'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
 import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
@@ -71,6 +72,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const setIsModerationOpen = useUiStore((s) => s.setIsModerationOpen)
   const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
   const eventPhotosCount    = useContentStore((s) => s.eventPhotos.length)
+  const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
 
   const [localName, setLocalName] = useState(projectName ?? '')
 
@@ -283,11 +285,14 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               variant="ghost"
               size="sm"
               onClick={() => setIsAiChatOpen(true)}
-              className="gap-2 text-muted-foreground hover:text-foreground rounded-full h-8 px-4 transition-all text-xs"
+              className="relative gap-2 text-primary hover:bg-primary/15 hover:text-primary rounded-full h-8 px-4 transition-all text-xs"
               title={t('header.aiAssistant')}
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span className="hidden sm:inline font-medium">{t('header.aiAssistant')}</span>
+              {!hasAiGenerated && (
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary animate-pulse" />
+              )}
             </Button>
           )}
 
