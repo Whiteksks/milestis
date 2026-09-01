@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useUiStore } from '@/editor/lib/store/ui'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sparkles } from 'lucide-react'
 import {
@@ -21,13 +22,16 @@ export function AiChatModal() {
   const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
   const projectId = useUiStore((s) => s.projectId)
   const clearAiChat = useUiStore((s) => s.clearAiChat)
+  const resetAiBrief = useAiBriefStore((s) => s.reset)
   const isMobile = useIsMobile()
 
   // Reset chat when navigating to a different project — requests are stateless per call, so this
-  // is also what bounds the text-only history sent for conversational continuity (see service.ts)
+  // is also what bounds the text-only history sent for conversational continuity (see service.ts).
+  // ai-brief is likewise per-project bookkeeping, not persisted yet, so it resets the same way.
   useEffect(() => {
     clearAiChat()
-  }, [projectId, clearAiChat])
+    resetAiBrief()
+  }, [projectId, clearAiChat, resetAiBrief])
 
   if (isMobile) {
     return (

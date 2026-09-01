@@ -1,12 +1,8 @@
 import './globals.css';
 
-import { FirebaseInitializer } from '@/lib/firebase';
 import { ThemeProvider } from '@/components/theme/theme-provider';
-import { JsonLd } from '@/components/shared/json-ld';
-import { organizationJsonLd, websiteJsonLd } from '@/lib/seo/json-ld';
 import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_APP_URL ?? 'https://milestis.com'),
@@ -63,32 +59,17 @@ export default async function RootLayout({
   params: Promise<{ locale?: string }>;
 }) {
   const { locale } = await params;
-  // No `[locale]` segment means this render is under /sites/[slug] (a published
-  // photobook) — checked via params, not headers(), so [locale] pages stay
-  // statically optimizable instead of being forced dynamic on every request.
-  const isPublishedSite = locale === undefined;
-
+  // `locale` here is only ever set for the `[locale]` tree's own layout
+  // rendering pass, not reliably for this shared root layout (it sits above
+  // that segment) — kept only for the `lang` attribute. Locale-only concerns
+  // (FirebaseInitializer, Organization/WebSite JSON-LD) live in
+  // `[locale]/layout.tsx` instead, which never renders for /sites/[slug].
   return (
     <html lang={locale ?? 'en'} suppressHydrationWarning>
-      <head>
-        {!isPublishedSite && <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />}
-        {/* Iubenda temporarily disabled — was causing a stuck cookie banner
-        {!isPublishedSite && (
-          <Script
-            id="iubenda-cookie-solution"
-            strategy="afterInteractive"
-            src="https://embeds.iubenda.com/widgets/f6bff847-fa8b-4753-8ce9-3dc2137f21d0.js"
-          />
-        )}
-        */}
-      </head>
-
       <body
         className={`${alice.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        {!isPublishedSite && <FirebaseInitializer />}
-
         <ThemeProvider
           attribute="class"
           themes={['light', 'dark', 'cozy', 'testtheme']}

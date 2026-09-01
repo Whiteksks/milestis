@@ -15,6 +15,7 @@ import type {
 import type { MediaImage, SectionContent, SectionVisibility } from './content-types'
 // type-only circular import — erased at runtime, safe in TypeScript
 import type { ContentStore } from '@/editor/lib/store/content'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 
 // ─── Default values ────────────────────────────────────────────────────────
 
@@ -90,9 +91,13 @@ export interface PortfolioSlice {
   mediaLibrary: MediaImage[]
 
   toggleSection: (section: keyof SectionVisibility) => void
+  /** `source` defaults to 'user' so every existing manual-edit call site is unaffected — the AI
+   *  pipeline's apply layer passes 'ai' explicitly, so ai-brief.ts can tell the two apart without
+   *  every UI call site needing to know about it. */
   updateSectionContent: <K extends keyof SectionContent>(
     section: K,
     content: Partial<SectionContent[K]>,
+    source?: 'user' | 'ai',
   ) => void
   setPortfolioImageContent: (content: PortfolioImageContent) => void
   setPortfolioSingleImage: (section: PortfolioSingleImageSectionId, image?: PortfolioManagedImage) => void
@@ -129,13 +134,15 @@ export const createPortfolioSlice: StateCreator<ContentStore, [], [], PortfolioS
       },
     })),
 
-  updateSectionContent: (section, content) =>
+  updateSectionContent: (section, content, source = 'user') => {
+    if (source === 'user') useAiBriefStore.getState().markManuallyEdited(section)
     set((state) => ({
       sectionContent: {
         ...state.sectionContent,
         [section]: { ...state.sectionContent[section], ...content },
       },
-    })),
+    }))
+  },
 
   setPortfolioImageContent: (content) =>
     set(() => ({

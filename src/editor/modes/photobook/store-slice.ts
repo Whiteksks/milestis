@@ -15,6 +15,7 @@ import type {
 import type { PhotobookSectionContent, PhotobookSectionVisibility } from './content-types'
 // type-only circular import — erased at runtime, safe in TypeScript
 import type { ContentStore } from '@/editor/lib/store/content'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 
 // ─── Default values ────────────────────────────────────────────────────────
 
@@ -78,9 +79,13 @@ export interface PhotobookSlice {
   photobookSectionVisibility: PhotobookSectionVisibility
   photobookImageContent: PhotobookImageContent
 
+  /** `source` defaults to 'user' so every existing manual-edit call site is unaffected — the AI
+   *  pipeline's apply layer passes 'ai' explicitly, so ai-brief.ts can tell the two apart without
+   *  every UI call site needing to know about it. */
   updatePhotobookSection: <K extends keyof PhotobookSectionContent>(
     section: K,
     updates: Partial<PhotobookSectionContent[K]>,
+    source?: 'user' | 'ai',
   ) => void
   setPhotobookImageContent: (content: PhotobookImageContent) => void
   setPhotobookSingleImage: (section: PhotobookSingleImageSectionId, image?: PhotobookManagedImage) => void
@@ -110,13 +115,15 @@ export const createPhotobookSlice: StateCreator<ContentStore, [], [], PhotobookS
   photobookSectionVisibility: defaultPhotobookVisibility,
   photobookImageContent: defaultPhotobookImageContent,
 
-  updatePhotobookSection: (section, updates) =>
+  updatePhotobookSection: (section, updates, source = 'user') => {
+    if (source === 'user') useAiBriefStore.getState().markManuallyEdited(section)
     set((state) => ({
       photobookSectionContent: {
         ...state.photobookSectionContent,
         [section]: { ...state.photobookSectionContent[section], ...updates },
       },
-    })),
+    }))
+  },
 
   setPhotobookImageContent: (content) =>
     set(() => ({

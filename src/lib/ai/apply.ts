@@ -2,66 +2,32 @@ import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import type {
   AiResponse,
-  AiChatMode,
   AiPhotobookChanges,
   AiPortfolioChanges,
   AiPortfolioProjectChange,
 } from './types'
-import { getProjectImageSelectUrl, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
+import { type ProjectImageDoc } from '@/editor/hooks/use-project-images'
 import type { PhotobookManagedImage } from '@/editor/modes/photobook/image/types'
-import type { PhotobookImageContent } from '@/editor/modes/photobook/image/content'
 import type { PortfolioManagedImage } from '@/editor/modes/portfolio/image/types'
-import type { PortfolioImageContent } from '@/editor/modes/portfolio/image/content'
-import type { ImageValue } from '@/editor/image/data'
 import { LIMITS } from '@/editor/components/editor/section-settings/ui/panel-ui'
+import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
+import type { PhotobookSingleSlot, PortfolioSingleSlot } from './defaultPlacement'
+// Placement/blank-detection logic lives in ./pipeline/placement.ts (shared with the new pipeline
+// being built alongside this file — see /memories/session/ai-rewrite-plan.md). Re-exported here
+// unchanged so this file's public API (used by ai-chat-content.tsx) doesn't need to change yet.
 import {
-  computePhotobookDefaults,
-  computePortfolioDefaults,
-  type PhotobookSingleSlot,
-  type PortfolioSingleSlot,
-} from './defaultPlacement'
+  makePhotobookImage,
+  makePortfolioImage,
+  urlToIdMap,
+  PHOTOBOOK_SINGLE_SLOTS,
+  PHOTOBOOK_SLOT_IDS,
+  PORTFOLIO_SINGLE_SLOTS,
+  PORTFOLIO_SLOT_IDS,
+  applyDefaultPlacement,
+  isProjectBlank,
+} from './pipeline/placement'
 
-function buildImageValue(doc: ProjectImageDoc, caption: string | undefined): ImageValue {
-  return {
-    // blurDataUrl must be the thumb variant — the dashboard card preview (mapProjectDoc's
-    // isThumbPreviewUrl check) only accepts thumb URLs and silently drops anything else,
-    // so without this an AI-placed cover never shows up on the project card.
-    asset: {
-      src: getProjectImageSelectUrl(doc),
-      width: doc.meta?.width ?? 0,
-      height: doc.meta?.height ?? 0,
-      ...(doc.urls?.thumb ? { blurDataUrl: doc.urls.thumb } : {}),
-    },
-    ...(caption ? { caption } : {}),
-  }
-}
-
-function makePhotobookImage(doc: ProjectImageDoc, slotId: PhotobookManagedImage['slotId'], caption: string | undefined): PhotobookManagedImage {
-  return { id: crypto.randomUUID(), slotId, value: buildImageValue(doc, caption) }
-}
-
-// id defaults to a fresh uuid (hero/bio); featured-work cards pass their own stable project id explicitly
-function makePortfolioImage(doc: ProjectImageDoc, slotId: PortfolioManagedImage['slotId'], caption: string | undefined, id = crypto.randomUUID()): PortfolioManagedImage {
-  return { id, slotId, value: buildImageValue(doc, caption) }
-}
-
-function urlToIdMap(idToDoc: Map<string, ProjectImageDoc>): Map<string, string> {
-  return new Map(Array.from(idToDoc.entries()).map(([id, doc]) => [getProjectImageSelectUrl(doc), id]))
-}
-
-const PHOTOBOOK_SINGLE_SLOTS: PhotobookSingleSlot[] = ['cover', 'introduction', 'highlight', 'ending']
-const PHOTOBOOK_SLOT_IDS: Record<PhotobookSingleSlot, PhotobookManagedImage['slotId']> = {
-  cover: 'photobook.cover.primary',
-  introduction: 'photobook.introduction.primary',
-  highlight: 'photobook.highlight.primary',
-  ending: 'photobook.ending.primary',
-}
-
-const PORTFOLIO_SINGLE_SLOTS: PortfolioSingleSlot[] = ['hero', 'bio']
-const PORTFOLIO_SLOT_IDS: Record<PortfolioSingleSlot, PortfolioManagedImage['slotId']> = {
-  hero: 'portfolio.hero.primary',
-  bio: 'portfolio.bio.primary',
-}
+export { applyDefaultPlacement, isProjectBlank }
 
 // ─── Defensive text limits (system boundary) ───────────────────────────────────
 // Gemini's structured-output schema has no way to cap a string's length, so nothing stops the
@@ -98,107 +64,9 @@ const PORTFOLIO_CONTENT_LIMITS = {
 } as const
 
 // ─── Default placement (runs BEFORE the AI call) ───────────────────────────────
-// Guarantees every newly attached photo already has a sensible home using cheap heuristics
-// (orientation/resolution match, attach order) — the AI never places from scratch, it only
-// reviews/overrides a handful of single-photo slots afterwards and writes captions.
-
-// Photo pickers may resend ids that are already placed somewhere (e.g. "select all" reopens
-// with previously-arranged photos still checked) — always re-derive which ids are genuinely
-// unplaced before handing them to the placement heuristics, so nothing gets inserted twice.
-function collectPhotobookPlacedIds(current: PhotobookImageContent, urlToId: Map<string, string>): Set<string> {
-  const ids = new Set<string>()
-  const add = (img?: PhotobookManagedImage) => {
-    const id = img && urlToId.get(img.value.asset.src)
-    if (id) ids.add(id)
-  }
-  add(current.cover)
-  add(current.introduction)
-  add(current.highlight)
-  add(current.ending)
-  current.story.forEach(add)
-  current.gallery.forEach(add)
-  return ids
-}
-
-function collectPortfolioPlacedIds(current: PortfolioImageContent, urlToId: Map<string, string>): Set<string> {
-  const ids = new Set<string>()
-  const add = (img?: PortfolioManagedImage) => {
-    const id = img && urlToId.get(img.value.asset.src)
-    if (id) ids.add(id)
-  }
-  add(current.hero)
-  add(current.bio)
-  current.featuredWork.forEach(add)
-  return ids
-}
-
-function applyPhotobookDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): void {
-  const store = useContentStore.getState()
-  const current = store.photobookImageContent
-  const alreadyPlaced = collectPhotobookPlacedIds(current, urlToIdMap(idToDoc))
-  const freshIds = newPhotoIds.filter((id) => !alreadyPlaced.has(id))
-  if (freshIds.length === 0) return
-  const emptySlots = new Set(PHOTOBOOK_SINGLE_SLOTS.filter((slot) => !current[slot]))
-  const { singles, story, gallery } = computePhotobookDefaults(freshIds, idToDoc, emptySlots, current.story.length)
-  const doc = (id: string) => idToDoc.get(id)!
-
-  for (const slot of PHOTOBOOK_SINGLE_SLOTS) {
-    const id = singles[slot]
-    if (id) store.setPhotobookSingleImage(slot, makePhotobookImage(doc(id), PHOTOBOOK_SLOT_IDS[slot], undefined))
-  }
-  if (story.length > 0) {
-    store.setPhotobookStoryMoments([
-      ...current.story.map((image) => ({ image, caption: image.value.caption })),
-      ...story.map((id) => ({ image: makePhotobookImage(doc(id), 'photobook.story.block', undefined) })),
-    ])
-  }
-  if (gallery.length > 0) {
-    store.setPhotobookGalleryPhotos([
-      ...current.gallery.map((image) => ({ image, caption: image.value.caption })),
-      ...gallery.map((id) => ({ image: makePhotobookImage(doc(id), 'photobook.gallery.item', undefined) })),
-    ])
-  }
-  store.setPhotobookSectionVisibility({
-    showStory:     story.length > 0 || current.story.length > 0,
-    showGallery:   gallery.length > 0 || current.gallery.length > 0,
-    showHighlight: !!(singles.highlight || current.highlight),
-  })
-}
-
-function applyPortfolioDefaultPlacement(idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): void {
-  const store = useContentStore.getState()
-  const current = store.portfolioImageContent
-  const alreadyPlaced = collectPortfolioPlacedIds(current, urlToIdMap(idToDoc))
-  const freshIds = newPhotoIds.filter((id) => !alreadyPlaced.has(id))
-  if (freshIds.length === 0) return
-  const emptySlots = new Set(PORTFOLIO_SINGLE_SLOTS.filter((slot) => !current[slot]))
-  const { hero, bio } = computePortfolioDefaults(freshIds, idToDoc, emptySlots)
-  const doc = (id: string) => idToDoc.get(id)!
-
-  if (hero) store.setPortfolioSingleImage('hero', makePortfolioImage(doc(hero), PORTFOLIO_SLOT_IDS.hero, undefined))
-  if (bio)  store.setPortfolioSingleImage('bio', makePortfolioImage(doc(bio), PORTFOLIO_SLOT_IDS.bio, undefined))
-}
-
-/** Call once, right before sending the message to the AI, for any newly attached photos. */
-export function applyDefaultPlacement(mode: AiChatMode, idToDoc: Map<string, ProjectImageDoc>, newPhotoIds: string[]): void {
-  if (newPhotoIds.length === 0) return
-  if (mode === 'photobook') applyPhotobookDefaultPlacement(idToDoc, newPhotoIds)
-  else applyPortfolioDefaultPlacement(idToDoc, newPhotoIds)
-}
-
-// Section content always starts out holding the template's sample copy (kept on purpose so a
-// brand-new project doesn't look empty in the editor) — the model can't reliably tell that text
-// apart from real user content on its own. Call this BEFORE applyDefaultPlacement runs, so the
-// check reflects whether the project had zero photos placed prior to this turn; that fact gets
-// passed to the AI explicitly instead of asking it to guess from the sample text.
-export function isProjectBlank(mode: AiChatMode, current: PhotobookImageContent | PortfolioImageContent): boolean {
-  if (mode === 'photobook') {
-    const img = current as PhotobookImageContent
-    return !img.cover && !img.introduction && !img.highlight && !img.ending && img.story.length === 0 && img.gallery.length === 0
-  }
-  const img = current as PortfolioImageContent
-  return !img.hero && !img.bio && img.featuredWork.length === 0
-}
+// Moved to ./pipeline/placement.ts (re-exported above) — kept here only as a comment anchor for
+// where this logic used to live, since applyPhotobookImageChanges/applyPortfolioImageChanges
+// below still depend on the slot constants imported above.
 
 // ─── Photobook: AI overrides + captions (runs AFTER the AI responds) ──────────
 // imageAssignments is now an OPTIONAL, partial override of the four single-photo slots only —
@@ -284,12 +152,13 @@ function applyPhotobookChanges(changes: AiPhotobookChanges, idToDoc: Map<string,
 
   if (changes.content) {
     const c = changes.content
-    if (c.cover)        store.updatePhotobookSection('cover', clampStrings(c.cover, PHOTOBOOK_CONTENT_LIMITS.cover))
-    if (c.introduction) store.updatePhotobookSection('introduction', clampStrings(c.introduction, PHOTOBOOK_CONTENT_LIMITS.introduction))
-    if (c.story)        store.updatePhotobookSection('story', clampStrings(c.story, PHOTOBOOK_CONTENT_LIMITS.story))
-    if (c.gallery)      store.updatePhotobookSection('gallery', clampStrings(c.gallery, PHOTOBOOK_CONTENT_LIMITS.gallery))
-    if (c.highlight)    store.updatePhotobookSection('highlight', clampStrings(c.highlight, PHOTOBOOK_CONTENT_LIMITS.highlight))
-    if (c.ending)       store.updatePhotobookSection('ending', clampStrings(c.ending, PHOTOBOOK_CONTENT_LIMITS.ending))
+    if (c.cover)        store.updatePhotobookSection('cover', clampStrings(c.cover, PHOTOBOOK_CONTENT_LIMITS.cover), 'ai')
+    if (c.introduction) store.updatePhotobookSection('introduction', clampStrings(c.introduction, PHOTOBOOK_CONTENT_LIMITS.introduction), 'ai')
+    if (c.story)        store.updatePhotobookSection('story', clampStrings(c.story, PHOTOBOOK_CONTENT_LIMITS.story), 'ai')
+    if (c.gallery)      store.updatePhotobookSection('gallery', clampStrings(c.gallery, PHOTOBOOK_CONTENT_LIMITS.gallery), 'ai')
+    if (c.highlight)    store.updatePhotobookSection('highlight', clampStrings(c.highlight, PHOTOBOOK_CONTENT_LIMITS.highlight), 'ai')
+    if (c.ending)       store.updatePhotobookSection('ending', clampStrings(c.ending, PHOTOBOOK_CONTENT_LIMITS.ending), 'ai')
+    useAiBriefStore.getState().markGenerated(Object.keys(c))
   }
 
   applyPhotobookImageChanges(changes, idToDoc)
@@ -386,24 +255,25 @@ function applyPortfolioChanges(changes: AiPortfolioChanges, idToDoc: Map<string,
       store.updateSectionContent('header', {
         ...header,
         ...(header.links ? { links: header.links.slice(0, LIMITS.links).map((l) => ({ ...l, label: l.label.slice(0, LIMITS.linkLabel) })) } : {}),
-      })
+      }, 'ai')
     }
-    if (c.hero)    store.updateSectionContent('hero', clampStrings(c.hero, PORTFOLIO_CONTENT_LIMITS.hero))
+    if (c.hero)    store.updateSectionContent('hero', clampStrings(c.hero, PORTFOLIO_CONTENT_LIMITS.hero), 'ai')
     if (c.bio) {
       const bio = clampStrings(c.bio, PORTFOLIO_CONTENT_LIMITS.bio)
       store.updateSectionContent('bio', {
         ...bio,
         ...(bio.achievements ? { achievements: bio.achievements.slice(0, LIMITS.count).map((a) => a.slice(0, LIMITS.achievement)) } : {}),
-      })
+      }, 'ai')
     }
-    if (c.contact) store.updateSectionContent('contact', clampStrings(c.contact, PORTFOLIO_CONTENT_LIMITS.contact))
-    if (c.footer)  store.updateSectionContent('footer', clampStrings(c.footer, PORTFOLIO_CONTENT_LIMITS.footer))
+    if (c.contact) store.updateSectionContent('contact', clampStrings(c.contact, PORTFOLIO_CONTENT_LIMITS.contact), 'ai')
+    if (c.footer)  store.updateSectionContent('footer', clampStrings(c.footer, PORTFOLIO_CONTENT_LIMITS.footer), 'ai')
     if (c.featuredWork && (c.featuredWork.title !== undefined || c.featuredWork.subtitle !== undefined)) {
       store.updateSectionContent('featuredWork', {
         ...(c.featuredWork.title !== undefined    ? { title: c.featuredWork.title.slice(0, LIMITS.title) } : {}),
         ...(c.featuredWork.subtitle !== undefined ? { subtitle: c.featuredWork.subtitle.slice(0, LIMITS.subtitle) } : {}),
-      })
+      }, 'ai')
     }
+    useAiBriefStore.getState().markGenerated(Object.keys(c))
   }
 
   applyPortfolioImageChanges(changes, idToDoc)
