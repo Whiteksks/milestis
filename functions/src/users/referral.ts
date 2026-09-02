@@ -6,6 +6,14 @@ import { processTransaction } from "../transactions/engine";
 const SIGNUP_BONUS_CREDITS = 20;
 const REFERRAL_BONUS_CREDITS = 10;
 
+// One-time bonus credits awarded to the referrer once their total referral count reaches
+// a tier, on top of the flat REFERRAL_BONUS_CREDITS per referral.
+const MILESTONE_TIERS: Record<number, number> = {
+  5: 50,
+  10: 100,
+  25: 250,
+};
+
 // Firebase Auth uids are flat, single-segment ids (<=128 chars). Reject anything else so a
 // crafted `ref` value (e.g. containing "/") can't make `.doc(uid)` resolve into an unrelated
 // subcollection path (Firestore path traversal via string concatenation).
@@ -88,7 +96,45 @@ export async function grantReferralBonus(newUid: string, referrerUid: unknown): 
     });
 
     logger.info("[referral] Bonus granted", { newUid, referrerUid, amount: REFERRAL_BONUS_CREDITS });
+
+    await grantMilestoneBonusIfReached(referrerUid, newUid);
   } catch (error) {
     logger.error("[referral] Failed to grant referral bonus", { newUid, referrerUid, error });
+  }
+}
+
+/**
+ * Checks the referrer's total referral count and grants a one-time milestone bonus
+ * (see MILESTONE_TIERS) the first time it hits 5/10/25. Best-effort — must never throw.
+ */
+async function grantMilestoneBonusIfReached(referrerUid: string, triggeringReferredUid: string): Promise<void> {
+  try {
+    const countSnap = await db.collection("referrals").where("referrerUid", "==", referrerUid).count().get();
+    const total = countSnap.data().count;
+    const tierBonus = MILESTONE_TIERS[total];
+    if (!tierBonus) return;
+
+    await processTransaction({
+      uid: referrerUid,
+      idempotencyKey: `referral_milestone:${referrerUid}:${total}`,
+      category: "credit",
+      direction: "in",
+      credit: {
+        type: "grant",
+        amount: tierBonus,
+        creditBucket: "bonus",
+        meta: { reason: "referral_milestone", tier: total },
+      },
+    });
+
+    // Fold the milestone bonus into the triggering referral doc's rewardedReferrer field so
+    // the account/referral stats page's sum-of-rewardedReferrer keeps reflecting total earnings.
+    await db.collection("referrals").doc(triggeringReferredUid).update({
+      rewardedReferrer: FieldValue.increment(tierBonus),
+    });
+
+    logger.info("[referral] Milestone bonus granted", { referrerUid, tier: total, amount: tierBonus });
+  } catch (error) {
+    logger.error("[referral] Failed to grant milestone bonus", { referrerUid, error });
   }
 }

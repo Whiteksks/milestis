@@ -136,6 +136,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Referrals ────────────────────────────────────────────────────────
+    // One doc per referred signup: { referrerUid, referredUid, rewardedReferrer,
+    // rewardedReferred, createdAt }. Only the referrer may read their own referral
+    // records (used to show invite counts/credits earned). Written by Cloud Functions.
+    match /referrals/{referralId} {
+      allow read: if isAuthed() && isOwner(resource.data.referrerUid);
+      allow write: if false;
+    }
+
     // ─── Event guest quota ─────────────────────────────────────────────────
     // Stores per-guest upload counts. Each guest can read only their own doc
     // to show the "Your uploads: X/5" counter on the event page.

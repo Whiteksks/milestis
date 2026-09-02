@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,13 +21,20 @@ import {
   ArrowLeft,
   RefreshCw,
   CreditCard,
+  CheckCircle2,
+  Copy,
+  Check,
+  Gift,
+  Mail,
 } from 'lucide-react'
+import { FaWhatsapp, FaTelegram } from 'react-icons/fa6'
 import { usePublishModal } from '@/hooks/usePublishModal'
 import { usePublishMutation, useRepublishMutation } from '@/hooks/useProjectMutations'
 import { useUiSelector } from '@/editor/lib/store'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useUserStore, selectSubscription } from '@/hooks/useUserStore'
 import { getEffectiveSubscriptionFeatures } from '@/lib/billing/billing.utils'
+import { ReferralModal } from '@/components/layout/dashboard/referral'
 import { PublishForm } from './publish-slug-form'
 import { ReviewPane } from './publish-review'
 
@@ -53,6 +60,8 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
 
   const subscription = useUserStore(selectSubscription)
   const ratePerDollar = getEffectiveSubscriptionFeatures(subscription).creditTopupRatePerDollar || 1
+  const locale = useLocale()
+  const [referralOpen, setReferralOpen] = useState(false)
 
   const publishMutation = usePublishMutation()
   const republishMutation = useRepublishMutation()
@@ -142,7 +151,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
         onSuccess: () => {
           setIsPublished(true)
           setPublishedInfo(modalData.slug, (mode === 'photobook' || mode === 'event') ? modalData.accessToken : undefined)
-          handleClose(false)
+          modalData.showSuccess()
         },
       },
     )
@@ -170,6 +179,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
     : t('description.photobook')
   const reviewTitle = republishMode ? t('title.republish') : t('title.review')
   const reviewDescription = republishMode ? t('description.republish') : t('description.reviewDesktop')
+  const siteUrl = modalData.portfolioUrl ?? modalData.photobookUrl ?? ''
 
   if (isMobile) {
     const mobileFooter = modalData.step === 'slug' ? (
@@ -188,7 +198,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
           {t('actions.cancel')}
         </Button>
       </>
-    ) : (
+    ) : modalData.step === 'review' ? (
       <>
         <ReviewPrimaryButton
             insufficient={insufficient}
@@ -216,46 +226,59 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
         </Button>
         )}
       </>
+    ) : (
+      <Button onClick={() => handleClose(false)} className="w-full">
+        {t('success.done')}
+      </Button>
     )
 
     return (
-      <MobileDrawer
-        open={open}
-        onOpenChange={handleClose}
-        title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : reviewTitle}</span>}
-        description={modalData.step === 'slug' ? step1Description : t('description.review')}
-        showHeader
-        footer={mobileFooter}
-        bodyClassName="px-2 min-h-64"
-      >
-        {modalData.step === 'slug' ? (
-          <PublishForm mode={mode} data={modalData} />
-        ) : (
-          <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} republishMode={republishMode} />
-        )}
-      </MobileDrawer>
+      <>
+        <MobileDrawer
+          open={open}
+          onOpenChange={handleClose}
+          title={<span className="flex items-center gap-2 text-base">{modeIcon}{modalData.step === 'slug' ? step1Title : modalData.step === 'review' ? reviewTitle : t('success.title')}</span>}
+          description={modalData.step === 'slug' ? step1Description : modalData.step === 'review' ? t('description.review') : t('success.description')}
+          showHeader={modalData.step !== 'success'}
+          footer={mobileFooter}
+          bodyClassName="px-2 min-h-64"
+        >
+          {modalData.step === 'slug' ? (
+            <PublishForm mode={mode} data={modalData} />
+          ) : modalData.step === 'review' ? (
+            <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} republishMode={republishMode} />
+          ) : (
+            <PublishSuccessPane siteUrl={siteUrl} t={t} onInviteClick={() => setReferralOpen(true)} />
+          )}
+        </MobileDrawer>
+        <ReferralModal open={referralOpen} onOpenChange={setReferralOpen} locale={locale} />
+      </>
     )
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-xl gap-4">
-        <DialogHeader className="gap-1">
+        <DialogHeader className={modalData.step === 'success' ? 'sr-only' : 'gap-1'}>
           <DialogTitle className="flex items-center gap-2 text-base">
-            {modeIcon}
-            {modalData.step === 'slug' ? step1Title : reviewTitle}
+            {modalData.step === 'success' ? t('success.title') : <>{modeIcon}{modalData.step === 'slug' ? step1Title : reviewTitle}</>}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            {modalData.step === 'slug'
-              ? step1Description
-              : reviewDescription}
+            {modalData.step === 'success'
+              ? t('success.description')
+              : modalData.step === 'slug'
+                ? step1Description
+                : reviewDescription}
           </DialogDescription>
         </DialogHeader>
 
         {modalData.step === 'slug' ? (
           <PublishForm mode={mode} data={modalData} />
-        ) : (
+        ) : modalData.step === 'review' ? (
           <ReviewPane data={modalData} termsAccepted={termsAccepted} onTermsChange={setTermsAccepted} republishMode={republishMode} />
+        ) : (
+          <PublishSuccessPane siteUrl={siteUrl} t={t} onInviteClick={() => setReferralOpen(true)} />
         )}
 
         <DialogFooter className="gap-2">
@@ -276,7 +299,7 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
                 }
               </Button>
             </>
-          ) : (
+          ) : modalData.step === 'review' ? (
             <>
               {!republishMode && (
               <Button
@@ -305,10 +328,16 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
                 size="sm"
               />
             </>
+          ) : (
+            <Button size="sm" onClick={() => handleClose(false)}>
+              {t('success.done')}
+            </Button>
           )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <ReferralModal open={referralOpen} onOpenChange={setReferralOpen} locale={locale} />
+    </>
   )
 }
 
@@ -377,6 +406,111 @@ function ReviewPrimaryButton({
         ? <><Loader2 className="size-3 animate-spin" /> {pendingLabel}</>
         : <><ExternalLink className="size-3" /> {label}</>}
     </Button>
+  )
+}
+
+// ─── Publish success pane ──────────────────────────────────────────────────────
+// Shown right after a first publish: the live link, share shortcuts, and a soft
+// referral nudge — the moment of highest satisfaction is the best time to ask.
+// Shared by both the mobile drawer and desktop dialog.
+
+function PublishSuccessPane({
+  siteUrl,
+  t,
+  onInviteClick,
+}: {
+  siteUrl: string
+  t: ReturnType<typeof useTranslations>
+  onInviteClick: () => void
+}) {
+  const [copied, setCopied] = useState(false)
+
+  const shareMessage = t('success.shareMessage')
+  const encodedLink = encodeURIComponent(siteUrl)
+  const encodedMessage = encodeURIComponent(shareMessage)
+
+  const shareChannels = [
+    {
+      key: 'whatsapp',
+      label: t('success.shareWhatsapp'),
+      icon: FaWhatsapp,
+      href: `https://wa.me/?text=${encodedMessage}%20${encodedLink}`,
+      className: 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20',
+    },
+    {
+      key: 'telegram',
+      label: t('success.shareTelegram'),
+      icon: FaTelegram,
+      href: `https://t.me/share/url?url=${encodedLink}&text=${encodedMessage}`,
+      className: 'bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20',
+    },
+    {
+      key: 'email',
+      label: t('success.shareEmail'),
+      icon: Mail,
+      href: `mailto:?subject=${encodeURIComponent(t('success.emailSubject'))}&body=${encodedMessage}%20${encodedLink}`,
+      className: 'bg-muted text-foreground hover:bg-muted/70',
+    },
+  ]
+
+  const handleCopy = async () => {
+    if (!siteUrl) return
+    try {
+      await navigator.clipboard.writeText(siteUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard API unavailable — user can still select the text manually.
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-5 px-1 py-2 text-center">
+      <div className="flex size-14 items-center justify-center rounded-full bg-emerald-500/10">
+        <CheckCircle2 className="size-7 text-emerald-600" />
+      </div>
+
+      <div className="space-y-1">
+        <h3 className="text-lg font-semibold">{t('success.title')}</h3>
+        <p className="text-sm text-muted-foreground">{t('success.description')}</p>
+      </div>
+
+      <div className="flex w-full items-center gap-2 rounded-xl border border-border/60 bg-muted/30 p-2">
+        <span className="flex-1 truncate px-2 text-xs text-muted-foreground">{siteUrl}</span>
+        <Button size="sm" variant="outline" onClick={handleCopy} disabled={!siteUrl} className="shrink-0 gap-1.5">
+          {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+          {copied ? t('success.copied') : t('success.copy')}
+        </Button>
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        {shareChannels.map(({ key, label, icon: Icon, href, className }) => (
+          <a
+            key={key}
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={label}
+            className={`flex size-10 items-center justify-center rounded-full transition-colors ${siteUrl ? className : 'bg-muted text-muted-foreground/40 pointer-events-none'}`}
+          >
+            <Icon className="size-4.5" />
+          </a>
+        ))}
+      </div>
+
+      <div className="flex w-full items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-left">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
+          <Gift className="size-4.5 text-amber-600" />
+        </div>
+        <div className="flex-1">
+          <p className="text-xs font-semibold">{t('success.referralTitle')}</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{t('success.referralDescription')}</p>
+        </div>
+        <Button size="sm" variant="outline" onClick={onInviteClick} className="shrink-0">
+          {t('success.referralCta')}
+        </Button>
+      </div>
+    </div>
   )
 }
 

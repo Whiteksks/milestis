@@ -85,16 +85,30 @@ export function Footer({
             <div className="flex flex-row items-center gap-4">
               {showThemeSwitcher && (
                 <Select value={theme ?? "light"} onValueChange={setTheme}>
-                  <SelectTrigger className="w-36 rounded-full bg-secondary border-0 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">{t("themes.light")}</SelectItem>
-                    <SelectItem value="cozy">{t("themes.cozy")}</SelectItem>
-                    <SelectItem value="dark">{t("themes.dark")}</SelectItem>
-                    {/* <SelectItem value="testtheme">{t("themes.testtheme")}</SelectItem> */}
-                  </SelectContent>
-                </Select>
+                <SelectTrigger className="w-36 rounded-xs border border-border/50 bg-background/50 text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-background focus:ring-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-xs border border-border bg-popover shadow-sm">
+                  <SelectItem 
+                    value="light" 
+                    className="rounded-xs text-xs font-medium text-foreground/80 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                  >
+                    {t("themes.light")}
+                  </SelectItem>
+                  <SelectItem 
+                    value="cozy" 
+                    className="rounded-xs text-xs font-medium text-foreground/80 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                  >
+                    {t("themes.cozy")}
+                  </SelectItem>
+                  <SelectItem 
+                    value="dark" 
+                    className="rounded-xs text-xs font-medium text-foreground/80 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                  >
+                    {t("themes.dark")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               )}
 
               <LanguageSwitcher />

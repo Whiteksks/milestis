@@ -24,7 +24,7 @@ export default function SecuritySettings() {
 
   // Google sign-in method state
   const [googleLoading, setGoogleLoading] = useState(false)
-  const [_googleError, setGoogleError] = useState<string | null>(null)
+  const [googleError, setGoogleError] = useState<string | null>(null)
 
   // Email linking state (used when the account was created via Google)
   const [emailInput, setEmailInput] = useState("")
@@ -54,7 +54,7 @@ export default function SecuritySettings() {
     setGoogleError(null)
     const { success, error } = await linkGoogleAccount()
     if (success) reloadProviders()
-    else if (error) setGoogleError(t(error))
+    else if (error) setGoogleError(error)
     setGoogleLoading(false)
   }
 
@@ -63,7 +63,7 @@ export default function SecuritySettings() {
     setGoogleError(null)
     const { success, error } = await unlinkGoogleAccount()
     if (success) reloadProviders()
-    else if (error) setGoogleError(t(error))
+    else if (error) setGoogleError(error)
     setGoogleLoading(false)
   }
 
@@ -73,7 +73,7 @@ export default function SecuritySettings() {
     setEmailError(null)
     const { success, error } = await sendEmailLinkForLinking(emailInput)
     if (success) setEmailLinkSent(true)
-    else if (error) setEmailError(t(error))
+    else if (error) setEmailError(error)
     setEmailLoading(false)
   }
 
@@ -179,7 +179,7 @@ export default function SecuritySettings() {
             </div>
 
             {/* ── Google row ── */}
-            {false && <div className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xs border border-border bg-secondary/50">
                   <FaChrome className="size-5 text-foreground" />
@@ -210,6 +210,12 @@ export default function SecuritySettings() {
                       {t("google.cannotDisconnectNote")}
                     </p>
                   )}
+
+                  {googleError && (
+                    <p className="mt-1 font-sans text-xs font-medium text-destructive">
+                      {g(googleError)}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -236,7 +242,6 @@ export default function SecuritySettings() {
                 )}
               </div>
             </div>
-            } 
           </div>
         </div>
 

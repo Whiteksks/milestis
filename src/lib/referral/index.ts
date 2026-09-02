@@ -1,9 +1,15 @@
+export { ReferralConversionToast } from "./referral-conversion-toast"
+
 const REFERRAL_STORAGE_KEY = "milestis_ref"
 
-/** Builds the shareable invite link that carries the current user's uid as the referral code. */
-export function buildReferralLink(uid: string, locale: string): string {
+/**
+ * Builds the shareable invite link that carries the current user's uid as the referral code.
+ * Deliberately locale-less — the middleware detects each visitor's own preferred locale
+ * (Accept-Language / NEXT_LOCALE cookie) rather than forcing the referrer's locale on them.
+ */
+export function buildReferralLink(uid: string): string {
   const origin = typeof window !== "undefined" ? window.location.origin : ""
-  return `${origin}/${locale}/auth/login?ref=${uid}`
+  return `${origin}/auth/login?ref=${uid}`
 }
 
 /** Reads `?ref=` from the current URL (if present) and persists it so it survives the magic-link redirect. */

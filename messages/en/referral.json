@@ -4,6 +4,32 @@
     "title": "Invite Friends, Earn Credits",
     "description": "Share your personal link with friends. When someone signs up through it, you both get 10 bonus credits — free credits to spend on your next photobook.",
     "copy": "Copy link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "shareVia": "Or share directly",
+    "shareWhatsapp": "Share on WhatsApp",
+    "shareTelegram": "Share on Telegram",
+    "shareEmail": "Share by email",
+    "shareMessage": "Join Milestis and get 10 free bonus credits when you sign up with my link!",
+    "emailSubject": "You're invited to Milestis",
+    "trackProgress": "Track your progress",
+    "page": {
+      "title": "Invite Friends, Earn Credits",
+      "description": "Every friend who signs up with your link gets 10 bonus credits — and so do you.",
+      "stats": {
+        "invited": "Friends invited",
+        "earned": "Credits earned"
+      },
+      "linkTitle": "Your invite link",
+      "linkDescription": "Copy your link or share it directly.",
+      "milestone": {
+        "title": "Next milestone",
+        "progress": "{count} of {threshold} friends invited — unlock +{bonus} bonus credits",
+        "complete": "You've unlocked every milestone bonus. Thank you for spreading the word!"
+      }
+    },
+    "toast": {
+      "singleConversion": "A friend just joined using your invite! +10 bonus credits 🎉",
+      "multipleConversions": "{count} friends just joined using your invite! +10 bonus credits each 🎉"
+    }
   }
 }

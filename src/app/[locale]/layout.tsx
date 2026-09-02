@@ -3,6 +3,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/components/providers';
 import { FirebaseInitializer } from '@/lib/firebase';
+import { ReferralConversionToast } from '@/lib/referral';
 import { JsonLd } from '@/components/shared/json-ld';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/seo/json-ld';
 import { routing } from '@/i18n/routing';
@@ -27,6 +28,7 @@ export default async function RootLayout({
     <NextIntlClientProvider messages={messages} locale={locale}>
       <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
       <FirebaseInitializer />
+      <ReferralConversionToast />
       <Providers>
         {children}
         <Toaster position="bottom-right" richColors closeButton />

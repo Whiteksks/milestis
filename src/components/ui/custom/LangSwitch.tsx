@@ -80,14 +80,21 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          {LANG_MAP[urlLang] || 'English'}
-          <ChevronDown className="h-4 w-4 opacity-50 text-current" />
+        <Button 
+          variant="outline" 
+          className="h-9 rounded-xs border-border/50 bg-background/50 text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-background focus-visible:ring-0"
+        >
+          <span>{LANG_MAP[urlLang] || 'English'}</span>
+          <ChevronDown className="h-3.5 w-3.5 opacity-50 transition-transform duration-200" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="rounded-xs border-border bg-popover shadow-sm min-w-[120px]">
         {activeLocales.map((locale) => (
-          <DropdownMenuItem key={locale} onClick={() => changeLang(locale)}>
+          <DropdownMenuItem 
+            key={locale} 
+            onClick={() => changeLang(locale)}
+            className="rounded-xs text-xs font-medium text-foreground/80 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+          >
             {LANG_MAP[locale]}
           </DropdownMenuItem>
         ))}

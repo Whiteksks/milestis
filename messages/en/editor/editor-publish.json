@@ -63,6 +63,21 @@
             "description": "One or more photos in your project were flagged for content that may violate our Acceptable Use Policy. Please review your images, replace any that show graphic violence or explicit content, and try again.",
             "aupLink": "View Acceptable Use Policy"
           }
+        },
+        "success": {
+          "title": "Your site is live!",
+          "description": "Share it with friends, family, or clients — it's ready to view.",
+          "copy": "Copy",
+          "copied": "Copied!",
+          "shareWhatsapp": "Share on WhatsApp",
+          "shareTelegram": "Share on Telegram",
+          "shareEmail": "Share by email",
+          "shareMessage": "Check out what I just created on Milestis!",
+          "emailSubject": "Take a look at my new site",
+          "referralTitle": "Love Milestis?",
+          "referralDescription": "Invite friends and you'll both get bonus credits.",
+          "referralCta": "Invite friends",
+          "done": "Done"
         }
       }
     }

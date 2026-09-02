@@ -12,7 +12,7 @@ import { analyzeRepublish } from '@/lib/projects/analyze-republish-api'
 import { getProjectConfig } from '@/lib/projects/project-type-config'
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
-export type PublishStep = 'slug' | 'review'
+export type PublishStep = 'slug' | 'review' | 'success'
 
 function generateToken(): string {
   const bytes = new Uint8Array(16)
@@ -136,6 +136,9 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     setAnalyzeErrorCode(null)
   }
 
+  // Shown after a successful publish/republish — link + share prompt.
+  const showSuccess = useCallback(() => setStep('success'), [])
+
   // Reset all state — called when the modal closes
   const reset = () => {
     setStep('slug')
@@ -231,5 +234,6 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     isBuyingCredits,
     buyCreditsError,
     initiateBuyAndPublish,
+    showSuccess,
   }
 }

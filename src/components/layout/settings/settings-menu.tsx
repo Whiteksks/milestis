@@ -1,6 +1,6 @@
 "use client"
 
-import { User, CreditCard, Palette, Shield, Building, Archive } from "lucide-react"
+import { User, CreditCard, Palette, Shield, Building, Archive, Gift } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 
@@ -8,6 +8,7 @@ const settingsMenu = [
   { id: "profile", labelKey: "account.menu.profile", navigate: "/account/profile", icon: User },
   { id: "settings", labelKey: "account.menu.account", navigate: "/account/settings", icon: Building },
   { id: "billing", labelKey: "account.menu.billing", navigate: "/account/billing", icon: CreditCard },
+  { id: "referral", labelKey: "account.menu.referral", navigate: "/account/referral", icon: Gift },
   { id: "archive", labelKey: "account.menu.archive", navigate: "/account/archive", icon: Archive },
   { id: "appearance", labelKey: "account.menu.appearance", navigate: "/account/appearance", icon: Palette },
   { id: "security", labelKey: "account.menu.security", navigate: "/account/security", icon: Shield },
