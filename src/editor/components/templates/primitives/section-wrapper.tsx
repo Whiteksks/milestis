@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { motion, type HTMLMotionProps } from 'framer-motion'
+import { motion, type HTMLMotionProps } from 'motion/react'
 import { useBaseTransition, useDisabled } from './animation-context'
 import { useSectionRegistration } from '@/editor/lib/section-registry-context'
 

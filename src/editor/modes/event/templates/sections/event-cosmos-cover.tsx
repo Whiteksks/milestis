@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Image as ImageIcon } from 'lucide-react'
 
 /** Lightweight cover for the template picker — 2 tall, prominent vertical tracks */

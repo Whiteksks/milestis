@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles } from 'lucide-react'
 
 import type { DesktopEditorTab } from '@/editor/lib/config/editor-tabs'

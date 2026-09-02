@@ -12,7 +12,7 @@
  */
 
 import { createContext, useContext } from 'react'
-import { MotionConfig, type Transition } from 'framer-motion'
+import { MotionConfig, type Transition } from 'motion/react'
 
 //   Template IDs   
 
@@ -138,7 +138,7 @@ export function AnimationProvider({
     <AnimationContext.Provider value={value}>
       {/*
         MotionConfig at the provider level:
-         reducedMotion="always" when disabled  ™ all framer-motion transitions are instant globally
+         reducedMotion="always" when disabled  ™ all motion/react transitions are instant globally
          reducedMotion="user" when enabled  ™ respects OS accessibility preference
       */}
       <MotionConfig reducedMotion={disabled ? 'always' : 'user'}>

@@ -4,7 +4,7 @@ import { db } from "../lib/firebaseAdmin";
 import { processTransaction } from "../transactions/engine";
 
 const SIGNUP_BONUS_CREDITS = 20;
-const REFERRAL_BONUS_CREDITS = 10;
+const REFERRAL_BONUS_CREDITS = 5;
 
 // One-time bonus credits awarded to the referrer once their total referral count reaches
 // a tier, on top of the flat REFERRAL_BONUS_CREDITS per referral.

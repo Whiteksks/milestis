@@ -2,7 +2,7 @@
 
 import { memo, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import { useCanvasScrollContainer } from "@/editor/components/editor/canvas-scroll-context"
 import { useScrollAtBottom } from "@/editor/hooks/use-scroll-at-bottom"
 import { useIsMobile } from "@/hooks/use-mobile"

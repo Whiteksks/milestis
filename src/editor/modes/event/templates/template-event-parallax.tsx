@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { useReducedMotion } from 'framer-motion'
+import { useReducedMotion } from 'motion/react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { EventTemplateProps } from '@/editor/lib/template-types'

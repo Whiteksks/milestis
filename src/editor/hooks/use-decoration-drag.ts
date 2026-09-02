@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react"
-import { useMotionValue } from "framer-motion"
+import { useMotionValue } from "motion/react"
 import type { DragBox, DecorationPosition } from "../components/editor/layout/decorationEdit/decorationTypes"
 import { clamp } from "../components/editor/layout/decorationEdit/utils"
 

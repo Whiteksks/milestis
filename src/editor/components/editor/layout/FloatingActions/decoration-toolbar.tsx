@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useId } from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from 'next-intl'
 
 import { Button } from "@/components/ui/button"

@@ -24,7 +24,7 @@ export function DecorationsLayer({ decorations, animation }: DecorationsLayerPro
 
   // Delay rendering until the canvas layout has settled so decorations don't
   // jump from the top to their final percentage-based position during load.
-  // Decorations start at opacity:0 (framer-motion initial), so the extra
+  // Decorations start at opacity:0 (motion/react initial), so the extra
   // 300 ms is invisible to the user.
   const [layoutReady, setLayoutReady] = useState(false)
   useEffect(() => {

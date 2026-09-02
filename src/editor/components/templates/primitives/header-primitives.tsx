@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type ButtonHTMLAttributes, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
-import { AnimatePresence, motion, type Transition } from 'framer-motion'
+import { AnimatePresence, motion, type Transition } from 'motion/react'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {

@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useState, useCallback, useEffect, useMemo, type ReactNode } from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "motion/react"
 import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -210,7 +210,7 @@ const SheetBody = memo(function SheetBody({
       animate={{ opacity: visible ? 1 : 0 }}
       transition={CONTENT_FADE}
     >
-      <AnimatePresence initial={false} mode="wait">
+      <AnimatePresence initial={false} mode="popLayout">
         {visible ? (
           <motion.div
             key={`${mode}:${activeTab}`}

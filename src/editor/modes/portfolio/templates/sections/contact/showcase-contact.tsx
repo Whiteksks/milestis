@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { SectionWrapper } from '@/editor/components/templates/primitives/section-wrapper'
 import { Animate } from '@/editor/components/templates/primitives/animate'
 import { ArrowUpRight } from 'lucide-react'

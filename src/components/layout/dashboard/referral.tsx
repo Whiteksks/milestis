@@ -34,21 +34,21 @@ function ReferralModalBody({ onNavigateToStats }: { onNavigateToStats: () => voi
       label: t("referral.shareWhatsapp"),
       icon: FaWhatsapp,
       href: `https://wa.me/?text=${encodedMessage}%20${encodedLink}`,
-      className: "bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
     {
       key: "telegram",
       label: t("referral.shareTelegram"),
       icon: FaTelegram,
       href: `https://t.me/share/url?url=${encodedLink}&text=${encodedMessage}`,
-      className: "bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
     {
       key: "email",
       label: t("referral.shareEmail"),
       icon: Mail,
       href: `mailto:?subject=${encodeURIComponent(t("referral.emailSubject"))}&body=${encodedMessage}%20${encodedLink}`,
-      className: "bg-muted text-foreground hover:bg-muted/70",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
   ]
 
@@ -89,10 +89,10 @@ function ReferralModalBody({ onNavigateToStats }: { onNavigateToStats: () => voi
         </Button>
       </div>
 
-      {/* Share Channels */}
+      {/* Share Channels - Растянутая сетка без пустого пространства */}
       <div className="space-y-2">
         <p className="font-sans text-xs text-muted-foreground">{t("referral.shareVia")}</p>
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           {shareChannels.map(({ key, label, icon: Icon, href, className }) => (
             <a
               key={key}
@@ -100,9 +100,12 @@ function ReferralModalBody({ onNavigateToStats }: { onNavigateToStats: () => voi
               target="_blank"
               rel="noreferrer"
               aria-label={label}
-              className={`flex size-10 items-center justify-center rounded-xs transition-colors ${link ? className : "bg-muted text-muted-foreground/40 pointer-events-none"}`}
+              className={`flex h-10 w-full items-center justify-center gap-2 rounded-xs border px-3 text-xs font-medium transition-colors ${
+                link ? className : "bg-muted text-muted-foreground/40 border-transparent pointer-events-none"
+              }`}
             >
-              <Icon className="size-4" />
+              <Icon className="size-4 shrink-0" />
+              <span className="truncate">{label}</span>
             </a>
           ))}
         </div>
@@ -120,7 +123,6 @@ function ReferralModalBody({ onNavigateToStats }: { onNavigateToStats: () => voi
     </div>
   )
 }
-
 
 interface ReferralModalProps {
   open: boolean
@@ -149,7 +151,7 @@ export function ReferralModal({ open, onOpenChange, locale }: ReferralModalProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTitle className="sr-only">Invite friends</DialogTitle>
       <DialogDescription className="sr-only">Invite friends and earn credits</DialogDescription>
-      <DialogContent className="overflow-hidden rounded-2xl border border-border/60 bg-background p-0 sm:max-w-xl">
+      <DialogContent className="rounded-2xl border border-border/60 bg-background p-0 sm:max-w-xl duration-150 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
         <ReferralModalBody onNavigateToStats={handleNavigateToStats} />
       </DialogContent>
     </Dialog>
@@ -167,10 +169,14 @@ export function SidebarReferralButton({ locale }: { locale?: string }) {
         <SidebarMenuButton
           onClick={() => setOpen(true)}
           tooltip={t("referral.button")}
-          className="h-9 rounded-xl border border-border/50 bg-muted/30 text-foreground hover:bg-muted hover:text-foreground font-medium transition-all"
+          className="relative h-9 rounded-xl border border-primary/20 bg-primary/5 text-foreground hover:bg-primary/10 hover:text-foreground font-medium transition-colors"
         >
-          <Gift className="!size-4 text-muted-foreground" />
-          <span className="text-sm font-sans">{t("referral.button")}</span>
+          <Gift className="!size-4 text-primary shrink-0" />
+          <span className="text-sm font-sans flex-1 truncate">{t("referral.button")}</span>
+          <span className="relative flex size-2 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+            <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
+          </span>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <ReferralModal open={open} onOpenChange={setOpen} locale={locale} />
@@ -189,9 +195,13 @@ export function MobileReferralButton({ locale }: { locale?: string }) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("referral.button")}
-        className="fixed bottom-20 right-4 z-40 flex size-11 items-center justify-center rounded-full border border-border/80 bg-background text-foreground shadow-lg transition-transform active:scale-95 md:hidden"
+        className="fixed bottom-20 right-4 z-40 flex size-11 items-center justify-center rounded-full border border-primary/30 bg-background text-primary shadow-lg transition-transform active:scale-95 md:hidden"
       >
         <Gift className="size-5" />
+        <span className="absolute top-0 right-0 flex size-2.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+          <span className="relative inline-flex size-2.5 rounded-full bg-primary"></span>
+        </span>
       </button>
       <ReferralModal open={open} onOpenChange={setOpen} locale={locale} />
     </>

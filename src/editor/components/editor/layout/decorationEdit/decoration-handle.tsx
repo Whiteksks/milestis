@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { memo, useRef, useCallback } from "react"
-import { motion, type MotionValue } from "framer-motion"
+import { motion, type MotionValue } from "motion/react"
 import { Move } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DecorationElement } from "./decorationTypes"

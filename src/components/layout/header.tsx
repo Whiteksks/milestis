@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { MenuIcon } from 'lucide-react'
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { motion, useScroll, useMotionValueEvent } from 'motion/react'
 import { useTranslations } from 'next-intl'
 // Импортируем локализованные версии из вашей конфигурации i18n
 import { Link, usePathname } from '@/i18n/routing'

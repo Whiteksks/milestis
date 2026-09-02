@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { motion, useScroll, useTransform, useSpring, type MotionValue } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from 'motion/react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { EventTemplateProps } from '@/editor/lib/template-types'

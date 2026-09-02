@@ -51,7 +51,7 @@ export function PublishedView({
   const isMobile = useIsMobile()
 
   // Disable browser scroll restoration so the browser doesn't try to restore
-  // a saved scroll offset on reload, which conflicts with framer-motion's
+  // a saved scroll offset on reload, which conflicts with motion/react's
   // initial animation states and causes a visible scroll-then-snap-to-top jump.
   useEffect(() => {
     if (typeof window !== 'undefined' && 'scrollRestoration' in history) {

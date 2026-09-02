@@ -5,7 +5,7 @@ import { useUiSelector } from '@/editor/lib/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Palette, WandSparkles, LayoutTemplate } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 export function FloatingActions() {
   const t = useTranslations('editor.layout.floating')

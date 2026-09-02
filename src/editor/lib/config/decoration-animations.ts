@@ -3,15 +3,15 @@
  * ─────────────────────────────
  * To add a new animation:
  *   1. Add an entry to DECORATION_ANIMATIONS below.
- *   2. That's it — the type, framer-motion variants, and UI list update automatically.
+ *   2. That's it — the type, motion/react variants, and UI list update automatically.
  */
 
-import type { Variants } from 'framer-motion'
+import type { Variants } from 'motion/react'
 
 export interface DecorationAnimationConfig {
   /** Human-readable label shown in the sidebar select. */
   label: string
-  /** framer-motion initial/animate variants applied to each decoration element. */
+  /** motion/react initial/animate variants applied to each decoration element. */
   variants: Pick<Variants, 'initial' | 'animate'>
 }
 
@@ -40,7 +40,7 @@ export const decorationAnimationOptions = Object.entries(DECORATION_ANIMATIONS).
   ([id, config]) => ({ id: id as DecorationAnimation, label: config.label }),
 )
 
-/** Returns the framer-motion variants for a given animation key. */
+/** Returns the motion/react variants for a given animation key. */
 export function getDecorationAnimationVariants(animation?: DecorationAnimation | string) {
   const entry = DECORATION_ANIMATIONS[animation as DecorationAnimation]
   return (entry ?? DECORATION_ANIMATIONS.fade).variants

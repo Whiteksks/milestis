@@ -35,21 +35,21 @@ export default function ReferralSettingsPage() {
       label: t("referral.shareWhatsapp"),
       icon: FaWhatsapp,
       href: `https://wa.me/?text=${encodedMessage}%20${encodedLink}`,
-      className: "bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
     {
       key: "telegram",
       label: t("referral.shareTelegram"),
       icon: FaTelegram,
       href: `https://t.me/share/url?url=${encodedLink}&text=${encodedMessage}`,
-      className: "bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
     {
       key: "email",
       label: t("referral.shareEmail"),
       icon: Mail,
       href: `mailto:?subject=${encodeURIComponent(t("referral.emailSubject"))}&body=${encodedMessage}%20${encodedLink}`,
-      className: "bg-muted text-foreground hover:bg-muted/70",
+      className: "bg-muted text-foreground border-border hover:bg-muted/80",
     },
   ]
 
@@ -154,7 +154,8 @@ export default function ReferralSettingsPage() {
         </div>
         <p className="font-sans text-sm text-muted-foreground">{t("referral.page.linkDescription")}</p>
 
-        <div className="space-y-4 rounded-xs border border-border bg-card p-5 md:p-6">
+        <div className="space-y-5 rounded-xs border border-border bg-card p-5 md:p-6">
+          {/* Поле ссылки */}
           <div className="flex items-center gap-2 rounded-xs border border-border bg-background/50 p-2">
             <span className="flex-1 truncate px-2 font-mono text-xs text-muted-foreground">{link}</span>
             <Button size="sm" onClick={handleCopy} disabled={!link} className="shrink-0 rounded-xs">
@@ -163,19 +164,26 @@ export default function ReferralSettingsPage() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-3">
-            {shareChannels.map(({ key, label, icon: Icon, href, className }) => (
-              <a
-                key={key}
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={label}
-                className={`flex size-10 items-center justify-center rounded-xs transition-colors ${link ? className : "bg-muted text-muted-foreground/40 pointer-events-none"}`}
-              >
-                <Icon className="size-4.5" />
-              </a>
-            ))}
+          {/* Каналы шерринга с ограничением по ширине */}
+          <div className="space-y-2">
+            <p className="font-sans text-xs text-muted-foreground">{t("referral.shareVia")}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-lg">
+              {shareChannels.map(({ key, label, icon: Icon, href, className }) => (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className={`flex h-9 items-center justify-center gap-2 rounded-xs border px-3 text-xs font-medium transition-colors ${
+                    link ? className : "bg-muted text-muted-foreground/40 border-transparent pointer-events-none"
+                  }`}
+                >
+                  <Icon className="size-3.5 shrink-0" />
+                  <span className="truncate">{label}</span>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </section>

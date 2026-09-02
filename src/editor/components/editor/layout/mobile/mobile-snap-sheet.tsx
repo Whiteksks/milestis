@@ -8,7 +8,7 @@ import {
   useMotionValue,
   type AnimationPlaybackControls,
   type PanInfo,
-} from "framer-motion"
+} from "motion/react"
 import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
@@ -32,7 +32,7 @@ const SNAP_TWEEN = {
   ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
 }
 
-/** Static object — never changes, avoids object identity churn on framer-motion. */
+/** Static object — never changes, avoids object identity churn on motion/react. */
 const DRAG_ELASTIC = { top: 0.1, bottom: 0.1 } as const
 
 type SnapAnimConfig = typeof SNAP_SPRING | typeof SNAP_TWEEN

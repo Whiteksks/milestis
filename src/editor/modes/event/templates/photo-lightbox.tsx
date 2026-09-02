@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 import type { EventGuestPhoto } from '@/editor/modes/event/content-types'
