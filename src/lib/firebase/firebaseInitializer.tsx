@@ -6,6 +6,7 @@ import { Timestamp, doc, onSnapshot } from 'firebase/firestore'
 import { clearServerSession, syncServerSession } from '@/lib/auth/session-client'
 import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
+import { captureReferralParam, peekReferralCode } from '@/lib/referral'
 
 function buildFallbackProfile(user: User) {
   return {
@@ -40,6 +41,7 @@ export default function FirebaseInitializer() {
 
   useEffect(() => {
     setAuthLoading()
+    captureReferralParam()
 
     let unsubscribeUserDoc: (() => void) | null = null
     let currentUserUid: string | null = null
@@ -96,10 +98,15 @@ export default function FirebaseInitializer() {
             try {
               const idToken = await user.getIdToken()
               const url = process.env.NEXT_PUBLIC_CREATEUSER_URL
+              const ref = peekReferralCode()
               if (url) {
                 await fetch(url, {
                   method: 'POST',
-                  headers: { Authorization: `Bearer ${idToken}` },
+                  headers: {
+                    Authorization: `Bearer ${idToken}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(ref ? { ref } : {}),
                 })
               }
             } catch (err) {

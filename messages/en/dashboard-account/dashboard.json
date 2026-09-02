@@ -28,6 +28,12 @@
     "title": "New Creation",
     "description": "Choose your format"
   },
+  "welcomeModal": {
+    "title": "Welcome to Milestis!",
+    "description": "We've added 20 free credits to your account — enough to publish your first photobook.",
+    "cta": "Create My First Photobook",
+    "dismiss": "Maybe later"
+  },
   "greetings": {
     "midnight": "Burning the midnight oil?",
     "earlyBird": "Early bird! Good morning",

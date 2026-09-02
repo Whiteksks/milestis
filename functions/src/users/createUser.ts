@@ -6,6 +6,7 @@ import { db } from "../lib/firebaseAdmin";
 import { UserDocument } from "./userInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { recordIubendaConsent } from "../lib/iubendaConsent";
+import { grantSignupBonus, grantReferralBonus } from "./referral";
 
 export const createUser = onRequest(
   {
@@ -44,6 +45,7 @@ export const createUser = onRequest(
         photoURL: picture,
         profileTemplate: {},
         settings: {
+          hasSeenWelcome: false,
           notifications: {
             project_updates: true,
             project_reminders: true,
@@ -91,6 +93,13 @@ export const createUser = onRequest(
       await docRef.create(newUser);
 
       logger.info("User document created", { uid });
+
+      // Signup bonus — always granted, independent of any referral.
+      await grantSignupBonus(uid);
+
+      // Referral bonus — best-effort, must not block/fail the signup response.
+      const referrerUid = (req.body as Record<string, unknown> | undefined)?.ref;
+      await grantReferralBonus(uid, referrerUid);
 
       // Record consent in iubenda — fire-and-forget, must not block the response (currently a no-op, see iubendaConsent.ts)
       recordIubendaConsent(

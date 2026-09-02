@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 import PromoCard, { MenuItem, MenuSection } from "./menu-card"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
+import { MobileReferralButton } from "@/components/layout/dashboard/referral"
 
 interface MobileBottomNavProps {
   activeItem?: string
@@ -54,6 +55,8 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
 
   return (
     <>
+      <MobileReferralButton locale={locale} />
+
       {/* Bottom navigation bar */}
       <nav className="fixed rounded-t-md bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden">
         {/* Left nav items */}

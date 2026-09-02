@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { isSignInWithEmailLink, onAuthStateChanged, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { completeLinkWithEmailLink, LINKING_EMAIL_KEY } from '@/lib/auth';
+import { consumeReferralCode } from '@/lib/referral';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
@@ -23,11 +24,14 @@ export default function FinishPage() {
 
       const idToken = await credential.user.getIdToken();
       const createUserUrl = process.env.NEXT_PUBLIC_CREATEUSER_URL!;
+      const ref = consumeReferralCode();
       await fetch(createUserUrl, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify(ref ? { ref } : {}),
       });
 
       setStatus('success');

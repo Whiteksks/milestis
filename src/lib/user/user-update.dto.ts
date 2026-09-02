@@ -12,6 +12,8 @@ export interface UserProfileTemplate {
 
 export interface UserSettings {
   language?: "ru" | "en" | "kz";
+  /** False right after signup; flips to true once the welcome modal is dismissed. */
+  hasSeenWelcome?: boolean;
   notifications: {
     project_updates: boolean;
     project_reminders: boolean;

@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
+import { SidebarReferralButton } from "@/components/layout/dashboard/referral"
 import Logo from "../logo"
 
 interface AppSidebarProps {
@@ -121,6 +122,7 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
 
         <SidebarFooter className="border-t border-sidebar-border/40 p-2">
           <SidebarMenu className="gap-1">
+            <SidebarReferralButton locale={locale} />
             {bottomItems.map((item) => {
               const Icon = item.icon
               const isActive = activeItem === item.id

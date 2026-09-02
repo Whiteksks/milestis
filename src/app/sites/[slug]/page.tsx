@@ -48,6 +48,7 @@ async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") 
     content: data.content ?? null,
     theme: data.theme ?? null,
     ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
+    ownerId: (data.ownerId as string | undefined) ?? null,
   }
 }
 
@@ -87,6 +88,7 @@ async function getPublishedProjectByToken(slug: string, plainToken: string) {
     content: data.content ?? null,
     theme: data.theme ?? null,
     ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
+    ownerId: (data.ownerId as string | undefined) ?? null,
   }
 }
 
@@ -240,6 +242,7 @@ export default async function SitePage({ params, searchParams }: Props) {
         content={(content.sectionContent ?? {}) as Record<string, unknown>}
         imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
         visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
+        referrerUid={project.ownerId ?? undefined}
       />
     )
   }
@@ -277,6 +280,7 @@ export default async function SitePage({ params, searchParams }: Props) {
       content={(content.sectionContent ?? {}) as Record<string, unknown>}
       imageContent={(content.imageContent ?? {}) as Record<string, unknown>}
       visibility={(content.sectionVisibility ?? {}) as Record<string, unknown>}
+      referrerUid={project.ownerId ?? undefined}
       projectId={project.id}
       publishedData={publishedData as Record<string, unknown> | undefined}
     />

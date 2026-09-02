@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/dashboard/sidebar"
 import { DashboardHeader } from "@/components/layout/dashboard/header"
 import { MobileBottomNav } from "@/components/layout/dashboard/mobile-bottom-nav"
+import { WelcomeModal } from "@/components/layout/dashboard/welcome-modal"
 import { selectAuthLoading, selectCurrentUid, useUserStore } from "@/hooks/useUserStore"
 import { prefetchActiveProjects } from "@/hooks/useProjectsQuery"
 
@@ -64,6 +65,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </SidebarInset>
       <MobileBottomNav activeItem={activeItem} locale={locale} />
+      <WelcomeModal />
     </SidebarProvider>
   )
 }

@@ -26,6 +26,8 @@ interface PublishedViewProps {
   imageContent?: Record<string, unknown>
   visibility: Record<string, unknown>
   clickable?: boolean
+  /** uid владельца проекта — прокидывается в MilestisWhiteLabel для реферальной ссылки. */
+  referrerUid?: string
   /** Passed to renderPublished for modes that need direct Firestore access (event). */
   projectId?: string
   publishedData?: Record<string, unknown>
@@ -41,6 +43,7 @@ export function PublishedView({
   imageContent,
   visibility,
   clickable = true,
+  referrerUid,
   projectId,
   publishedData,
 }: PublishedViewProps) {
@@ -111,7 +114,7 @@ export function PublishedView({
           {template}
         </div>
 
-        <MilestisWhiteLabel clickable={clickable} />
+        <MilestisWhiteLabel clickable={clickable} referrerUid={referrerUid} />
       </div>
     </div>
   )
