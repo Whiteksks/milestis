@@ -3,62 +3,28 @@
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Images, Send } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Send } from 'lucide-react'
 
 interface ChatInputProps {
   input: string
   canSend: boolean
   isLoading: boolean
-  isPickerOpen: boolean
-  selectedCount: number
-  hasPhotos: boolean
   onInputChange: (value: string) => void
   onSend: () => void
-  onPhotoButton: () => void
 }
 
 export function ChatInput({
   input,
   canSend,
   isLoading,
-  isPickerOpen,
-  selectedCount,
-  hasPhotos,
   onInputChange,
   onSend,
-  onPhotoButton,
 }: ChatInputProps) {
   const t = useTranslations('editor.layout.aiChat')
 
   return (
     <div className="shrink-0 border-t border-border p-3">
       <div className="flex gap-2 items-end">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onPhotoButton}
-          title={t('attachPhotos')}
-          disabled={isLoading}
-          className={cn(
-            'h-10 rounded-xl shrink-0 transition-colors',
-            hasPhotos ? 'w-10 px-0' : 'px-3 gap-1.5',
-            isPickerOpen || selectedCount > 0
-              ? 'text-foreground bg-muted'
-              : 'text-muted-foreground hover:text-foreground',
-          )}
-        >
-          <div className="relative flex items-center gap-1.5">
-            <Images className="h-4 w-4" />
-            {!hasPhotos && <span className="text-xs font-medium">{t('addPhotos')}</span>}
-            {selectedCount > 0 && !isPickerOpen && (
-              <span className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center leading-none">
-                {selectedCount}
-              </span>
-            )}
-          </div>
-        </Button>
         <Textarea
           value={input}
           onChange={(e) => onInputChange(e.target.value)}

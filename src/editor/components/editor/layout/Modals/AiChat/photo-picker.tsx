@@ -1,8 +1,9 @@
 'use client'
 
-import { Upload, Check } from 'lucide-react'
+import { Upload, Plus, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import {
   getProjectImageDisplayUrl,
   getProjectImageSelectUrl,
@@ -11,39 +12,88 @@ import {
 } from '@/editor/hooks/use-project-images'
 
 interface PhotoPickerProps {
-  isPickerOpen: boolean
   selectedUrls: string[]
   images: ProjectImageDoc[]
   pendingUploads: UploadingEntry[]
   onToggle: (url: string) => void
+  onToggleAll: () => void
   onUploadClick: () => void
 }
 
 export function PhotoPicker({
-  isPickerOpen,
   selectedUrls,
   images,
   pendingUploads,
   onToggle,
+  onToggleAll,
   onUploadClick,
 }: PhotoPickerProps) {
-  if (!isPickerOpen) return null
+  const t = useTranslations('editor.layout.aiChat')
+  const isEmpty = images.length === 0 && pendingUploads.length === 0
+  const allSelected = images.length > 0 && images.every((img) => selectedUrls.includes(getProjectImageSelectUrl(img)))
 
   return (
-    <div className="shrink-0 border-t border-border bg-muted/30">
-      <div className="flex gap-2 p-2 overflow-x-auto">
-        <button
-          type="button"
-          onClick={onUploadClick}
-          className="shrink-0 h-[52px] w-[52px] rounded-xl border-2 border-dashed border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-        >
-          <Upload className="h-4 w-4" />
-        </button>
+    <div className="shrink-0 border-t border-border bg-background p-2.5 space-y-2">
+      {/* Верхняя панель управления */}
+      {images.length > 0 && (
+        <div className="flex items-center justify-between min-h-[20px] px-0.5">
+          <span className="text-xs text-muted-foreground leading-none">
+            {selectedUrls.length > 0 ? t('selectedCount', { count: selectedUrls.length }) : null}
+          </span>
+          <button
+            type="button"
+            onClick={onToggleAll}
+            className="text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded leading-none"
+          >
+            {allSelected ? t('deselectAll') : t('selectAll')}
+          </button>
+        </div>
+      )}
 
+      {/* Горизонтальный скролл с элементами */}
+      <div className="flex gap-2.5 overflow-x-auto items-center scrollbar-none">
+        {/* Кнопка загрузки */}
+        {isEmpty ? (
+          <button
+            type="button"
+            onClick={onUploadClick}
+            className={cn(
+              'flex-1 h-[52px] min-w-[200px] px-3.5 rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary',
+              'flex items-center justify-between transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring'
+            )}
+          >
+            <div className="flex items-center gap-2.5 text-left">
+              <Upload className="h-4 w-4 shrink-0 text-primary" />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-foreground">
+                  {t('addPhotosCta')}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {t('addPhotosCtaSubtitle')}
+                </span>
+              </div>
+            </div>
+            <Plus className="h-4 w-4 shrink-0 text-primary" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onUploadClick}
+            aria-label={t('addPhotosCta')}
+            className={cn(
+              'shrink-0 h-[52px] w-[52px] rounded-lg border-2 border-dashed border-border hover:border-primary hover:bg-accent text-muted-foreground hover:text-foreground',
+              'flex items-center justify-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring'
+            )}
+          >
+            <Upload className="h-5 w-5" />
+          </button>
+        )}
+
+        {/* Процесс загрузки */}
         {pendingUploads.map((u) => (
           <div
             key={u.id}
-            className="relative shrink-0 h-[52px] w-[52px] rounded-xl overflow-hidden border border-border"
+            className="relative shrink-0 h-[52px] w-[52px] rounded-lg overflow-hidden border border-border bg-muted"
           >
             <Image
               src={u.previewUrl}
@@ -53,34 +103,49 @@ export function PhotoPicker({
               sizes="52px"
               className="object-cover opacity-50"
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-background/40">
-              <span className="text-[10px] font-semibold text-foreground/80 tabular-nums">{u.progress}%</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <span className="text-[10px] font-bold text-white tabular-nums">
+                {u.progress}%
+              </span>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-background/50">
-              <div className="h-full bg-primary transition-[width]" style={{ width: `${u.progress}%` }} />
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+              <div
+                className="h-full bg-primary transition-all duration-200"
+                style={{ width: `${u.progress}%` }}
+              />
             </div>
           </div>
         ))}
 
+        {/* Загруженные изображения */}
         {images.map((img) => {
           const displayUrl = getProjectImageDisplayUrl(img)
           const selectUrl = getProjectImageSelectUrl(img)
           const isSelected = selectedUrls.includes(selectUrl)
+
           return (
             <button
               key={img.id}
               type="button"
               onClick={() => onToggle(selectUrl)}
               className={cn(
-                'relative shrink-0 h-[52px] w-[52px] rounded-xl overflow-hidden border-2 transition-all',
-                isSelected ? 'border-foreground' : 'border-transparent',
+                'relative shrink-0 h-[52px] w-[52px] rounded-lg overflow-hidden transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                isSelected ? 'ring-2 ring-inset ring-primary' : 'hover:opacity-90'
               )}
             >
-              <Image src={displayUrl} alt="" fill unoptimized sizes="52px" className="object-cover" />
+              <Image
+                src={displayUrl}
+                alt=""
+                fill
+                unoptimized
+                sizes="52px"
+                className="object-cover"
+              />
+
               {isSelected && (
-                <div className="absolute inset-0 bg-foreground/30 flex items-center justify-center">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
-                    <Check className="h-3 w-3 text-background" />
+                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                    <Check className="h-3 w-3 stroke-[3]" />
                   </div>
                 </div>
               )}

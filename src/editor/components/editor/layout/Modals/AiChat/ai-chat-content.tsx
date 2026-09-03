@@ -5,7 +5,6 @@ import { useTranslations, useLocale } from 'next-intl'
 import { useChat } from './use-chat'
 import { usePhotoAttach } from './use-photo-attach'
 import { ChatMessages } from './chat-messages'
-import { SelectedPhotos } from './selected-photos'
 import { PhotoPicker } from './photo-picker'
 import { ChatInput } from './chat-input'
 import { useUiStore } from '@/editor/lib/store/ui'
@@ -30,11 +29,8 @@ export function AiChatContent() {
   const { messages, input, setInput, addMessage, isLoading, setIsLoading } = useChat()
   const {
     selectedUrls,
-    isPickerOpen,
-    setIsPickerOpen,
-    handlePhotoButton,
     toggleUrl,
-    removeUrl,
+    toggleAll,
     clearSelection,
     fileInputRef,
     images,
@@ -64,7 +60,6 @@ export function AiChatContent() {
     })
     setInput('')
     clearSelection()
-    setIsPickerOpen(false)
     setIsLoading(true)
     setLoadingCaption('')
 
@@ -99,8 +94,6 @@ export function AiChatContent() {
     }
   }
 
-  const hasPhotos = images.length > 0 || pendingUploads.length > 0
-
   return (
     <div className="flex flex-col h-full">
       <input
@@ -122,32 +115,21 @@ export function AiChatContent() {
           quickPrompts={t.raw((editorMode as AiChatMode) === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
           onQuickPromptSelect={setInput}
           loadingCaption={loadingCaption}
-          hasPhotos={hasPhotos}
-          onAddPhotos={handlePhotoButton}
         />
-      <SelectedPhotos
-        selectedUrls={selectedUrls}
-        isPickerOpen={isPickerOpen}
-        onRemove={removeUrl}
-      />
       <PhotoPicker
-        isPickerOpen={isPickerOpen}
         selectedUrls={selectedUrls}
         images={images}
         pendingUploads={pendingUploads}
         onToggle={toggleUrl}
+        onToggleAll={toggleAll}
         onUploadClick={() => fileInputRef.current?.click()}
       />
       <ChatInput
         input={input}
         canSend={input.trim().length > 0 || selectedUrls.length > 0}
         isLoading={isLoading}
-        isPickerOpen={isPickerOpen}
-        selectedCount={selectedUrls.length}
-        hasPhotos={hasPhotos}
         onInputChange={setInput}
         onSend={handleSend}
-        onPhotoButton={handlePhotoButton}
       />
     </div>
   )
