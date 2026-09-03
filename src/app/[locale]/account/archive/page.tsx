@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Image from "next/image"
-import { useTranslations, useTranslations as useGlobalT } from "next-intl"
+import { useTranslations } from "next-intl"
 import {
   Archive,
   AlertCircle,
@@ -55,7 +55,6 @@ const modeIcons = {
 
 export default function ArchiveSettingsPage() {
   const t = useTranslations()
-  const g = useGlobalT()
   const { data: projects = [], isLoading } = useArchivedProjectsQuery()
   const forceDelete = useForceDeleteMutation()
   const queryClient = useQueryClient()
