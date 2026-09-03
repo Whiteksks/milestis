@@ -11,7 +11,7 @@ import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import type { PublishInput, PublishOutput } from "./types";
 import { ALLOWED_ORIGINS } from "../../lib/cors";
 import { recordIubendaConsent } from "../../lib/iubendaConsent";
-import { generateAndStoreOgImage } from "../ogImage";
+import { generateAndStoreOgImageBounded } from "../ogImage";
 
 // ─── Error codes ──────────────────────────────────────────────────────────────
 
@@ -469,8 +469,10 @@ export const publishProject = onRequest(
 				logger.warn(`[publishProject] Private media cleanup failed for ${projectId}:`, err);
 			}
 
-			// Generate OG image — fire-and-forget, never blocks the response
-			generateAndStoreOgImage(projectId, mode, migratedData.content).catch((err) => {
+			// Generate OG image — awaited with a bounded timeout so ogImageUrl is
+			// ready by the time the caller can share the link, but never blocks
+			// the response indefinitely.
+			await generateAndStoreOgImageBounded(projectId, mode, migratedData.content).catch((err) => {
 				logger.warn(`[publishProject] OG image generation failed for ${projectId}:`, err);
 			});
 

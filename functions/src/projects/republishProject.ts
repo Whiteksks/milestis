@@ -11,7 +11,7 @@ import { VALID_MODES, type ProjectMode } from "./projectInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
 import { recordIubendaConsent } from "../lib/iubendaConsent";
 import type { BalanceSnapshot } from "../transactions/types";
-import { generateAndStoreOgImage } from "./ogImage";
+import { generateAndStoreOgImageBounded } from "./ogImage";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -441,8 +441,10 @@ export const republishProject = onRequest(
 				catch (err) { logger.warn(`[republishProject] Private media cleanup failed for ${pid}:`, err); }
 			}
 
-			// Generate OG image — fire-and-forget, never blocks the response
-			generateAndStoreOgImage(pid, mode, migratedData.content).catch((err) => {
+			// Generate OG image — awaited with a bounded timeout so ogImageUrl is
+			// ready by the time the caller can share the link, but never blocks
+			// the response indefinitely.
+			await generateAndStoreOgImageBounded(pid, mode, migratedData.content).catch((err) => {
 				logger.warn(`[republishProject] OG image generation failed for ${pid}:`, err);
 			});
 

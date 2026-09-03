@@ -32,7 +32,10 @@
       "shareVia": "Бөлісу",
       "copyLink": "Сілтемені көшіру",
       "copied": "Көшірілді!",
-      "openProject": "Жобаны ашу"
+      "openProject": "Жобаны ашу",
+      "shareWhatsapp": "WhatsApp-та бөлісу",
+      "shareTelegram": "Telegram-да бөлісу",
+      "shareFacebook": "Facebook-та бөлісу"
     }
   }
 }

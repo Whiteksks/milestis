@@ -1,7 +1,7 @@
 {
   "promo": {
     "creatorPlanTitle": "Creator Plan",
-    "creatorPlanDescription": "Unlock analytics and unlimited projects.",
+    "creatorPlanDescription": "More credits, more creative possibilities.",
     "viewAllPlans": "View All Plans"
   },
   "createCards": {
@@ -164,7 +164,10 @@
     "backToList": "All projects",
     "copyLink": "Copy link",
     "linkCopied": "Copied!",
-    "shareUrl": "Share URL"
+    "shareUrl": "Share URL",
+    "shareWhatsapp": "Share on WhatsApp",
+    "shareTelegram": "Share on Telegram",
+    "shareFacebook": "Share on Facebook"
   },
   "analytics": {
     "title": "Analytics",

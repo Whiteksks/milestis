@@ -32,7 +32,10 @@
       "shareVia": "Share",
       "copyLink": "Copy link",
       "copied": "Copied!",
-      "openProject": "Open project"
+      "openProject": "Open project",
+      "shareWhatsapp": "Share on WhatsApp",
+      "shareTelegram": "Share on Telegram",
+      "shareFacebook": "Share on Facebook"
     }
   }
 }

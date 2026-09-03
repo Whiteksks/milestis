@@ -15,6 +15,7 @@ import {
   Archive,
   ExternalLink,
 } from "lucide-react"
+import { FaWhatsapp, FaTelegram, FaFacebook } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TemplatePreview } from "@/components/shared/template-preview"
@@ -303,6 +304,37 @@ function ProjectDetailPanel({
                     )}
                     {copied ? t("archive.linkCopied") : t("archive.copyLink")}
                   </Button>
+
+                  {/* Direct share links */}
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("archive.shareWhatsapp")}
+                      className="flex size-9 items-center justify-center rounded-xs bg-[#25D366]/10 text-[#25D366] transition-colors hover:bg-[#25D366]/20"
+                    >
+                      <FaWhatsapp className="size-4" />
+                    </a>
+                    <a
+                      href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("archive.shareTelegram")}
+                      className="flex size-9 items-center justify-center rounded-xs bg-[#26A5E4]/10 text-[#26A5E4] transition-colors hover:bg-[#26A5E4]/20"
+                    >
+                      <FaTelegram className="size-4" />
+                    </a>
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("archive.shareFacebook")}
+                      className="flex size-9 items-center justify-center rounded-xs bg-[#1877F2]/10 text-[#1877F2] transition-colors hover:bg-[#1877F2]/20"
+                    >
+                      <FaFacebook className="size-4" />
+                    </a>
+                  </div>
                 </>
               )}
             </div>

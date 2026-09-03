@@ -32,7 +32,10 @@
       "shareVia": "Поделиться",
       "copyLink": "Скопировать ссылку",
       "copied": "Скопировано!",
-      "openProject": "Открыть проект"
+      "openProject": "Открыть проект",
+      "shareWhatsapp": "Поделиться в WhatsApp",
+      "shareTelegram": "Поделиться в Telegram",
+      "shareFacebook": "Поделиться в Facebook"
     }
   }
 }

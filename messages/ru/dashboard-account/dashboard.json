@@ -1,7 +1,7 @@
 {
   "promo": {
     "creatorPlanTitle": "Тариф Creator",
-    "creatorPlanDescription": "Получите доступ к аналитике и неограниченному количеству проектов.",
+    "creatorPlanDescription": "Больше кредитов и больше возможностей для творчества.",
     "viewAllPlans": "Посмотреть все тарифы"
   },
   "createCards": {
@@ -164,7 +164,10 @@
     "backToList": "Все проекты",
     "copyLink": "Копировать ссылку",
     "linkCopied": "Скопировано!",
-    "shareUrl": "Ссылка"
+    "shareUrl": "Ссылка",
+    "shareWhatsapp": "Поделиться в WhatsApp",
+    "shareTelegram": "Поделиться в Telegram",
+    "shareFacebook": "Поделиться в Facebook"
   },
   "analytics": {
     "title": "Аналитика",

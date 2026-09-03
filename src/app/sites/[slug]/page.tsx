@@ -120,6 +120,21 @@ async function getPublishedEventData(projectId: string): Promise<EventPublishedD
 
 // --- SEO metadata ---
 
+// The Cloud Function always produces a 1200×630 JPEG at `ogImageUrl`. Declaring
+// width/height/type explicitly lets WhatsApp/Telegram/Facebook render the
+// preview immediately instead of having to fetch the image first to infer
+// its dimensions — the raw fallback cover has unknown dimensions/format, so
+// only pass those hints when we know the image came from that pipeline.
+function buildOgImages(ogImageUrl: string | null, fallbackCoverUrl: string | null, alt: string) {
+  if (ogImageUrl) {
+    return [{ url: ogImageUrl, width: 1200, height: 630, type: "image/jpeg", alt }]
+  }
+  if (fallbackCoverUrl) {
+    return [{ url: fallbackCoverUrl, alt }]
+  }
+  return []
+}
+
 function extractCoverUrlFromContent(
   content: Record<string, unknown> | null,
   mode: string,
@@ -158,10 +173,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const description = bio?.description?.slice(0, 160) || undefined
 
     // Prefer the pre-generated 1200×630 OG image; fall back to the raw cover
-    const ogImageSrc =
-      project.ogImageUrl ??
-      extractCoverUrlFromContent(project.content as Record<string, unknown> | null, "portfolio")
-    const ogImages = ogImageSrc ? [{ url: ogImageSrc }] : []
+    const fallbackCoverUrl = extractCoverUrlFromContent(
+      project.content as Record<string, unknown> | null,
+      "portfolio",
+    )
+    const ogImageSrc = project.ogImageUrl ?? fallbackCoverUrl
+    const ogImages = buildOgImages(project.ogImageUrl, fallbackCoverUrl, title)
 
     return {
       title,
@@ -190,10 +207,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const project = await getPublishedProjectByToken(slug, tokenString)
     if (project) {
       const title = project.name
-      const ogImageSrc =
-        project.ogImageUrl ??
-        extractCoverUrlFromContent(project.content as Record<string, unknown> | null, "photobook")
-      const ogImages = ogImageSrc ? [{ url: ogImageSrc }] : []
+      const fallbackCoverUrl = extractCoverUrlFromContent(
+        project.content as Record<string, unknown> | null,
+        "photobook",
+      )
+      const ogImageSrc = project.ogImageUrl ?? fallbackCoverUrl
+      const ogImages = buildOgImages(project.ogImageUrl, fallbackCoverUrl, title)
 
       return {
         title,

@@ -19,6 +19,7 @@ import {
   Copy,
   ExternalLink,
 } from "lucide-react"
+import { FaWhatsapp, FaTelegram, FaFacebook } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -106,6 +107,12 @@ export default function ArchiveSettingsPage() {
     setCopiedId(project.id)
     setTimeout(() => setCopiedId(null), 2000)
   }
+
+  const shareChannels = (url: string) => [
+    { key: "whatsapp", label: t("account.domains.shareWhatsapp"), icon: FaWhatsapp, href: `https://wa.me/?text=${encodeURIComponent(url)}` },
+    { key: "telegram", label: t("account.domains.shareTelegram"), icon: FaTelegram, href: `https://t.me/share/url?url=${encodeURIComponent(url)}` },
+    { key: "facebook", label: t("account.domains.shareFacebook"), icon: FaFacebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
+  ]
 
   const canConfirm = confirmText === target?.name
   const ActiveModeIcon = activeProject ? modeIcons[activeProject.mode] ?? Layout : Layout
@@ -336,6 +343,16 @@ export default function ArchiveSettingsPage() {
                           <ExternalLink className="mr-2 size-3.5" />
                           {t("account.domains.openProject") ?? "Открыть проект"}
                         </DropdownMenuItem>
+                        {shareChannels(getProjectShareUrl(activeProject)!).map(({ key, label, icon: Icon, href }) => (
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+                            className="cursor-pointer rounded-xs px-3 py-2 font-sans text-xs focus:bg-secondary/80"
+                          >
+                            <Icon className="mr-2 size-3.5" />
+                            {label}
+                          </DropdownMenuItem>
+                        ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}

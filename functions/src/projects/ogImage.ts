@@ -29,11 +29,13 @@ function extractCoverUrl(content: Record<string, unknown> | null, mode: string):
 
 /**
  * Downloads the project cover image, resizes it to 1200×630, uploads it to
- * Firebase Storage at `og/{projectId}.png` and saves a download-token URL to
+ * Firebase Storage at `og/{projectId}.jpg` and saves a download-token URL to
  * `published_projects/{projectId}.ogImageUrl`.
  *
- * This is fire-and-forget — call with `.catch(...)` and never await in
- * the critical publish path.
+ * Callers should `await` this (ideally via `generateAndStoreOgImageBounded`)
+ * so `ogImageUrl` is populated before the publish response is returned —
+ * otherwise a link shared immediately after publish has no OG image yet and
+ * messaging apps (WhatsApp/Telegram) may render it as plain text.
  */
 export async function generateAndStoreOgImage(
 	projectId: string,
@@ -53,20 +55,22 @@ export async function generateAndStoreOgImage(
 	}
 
 	const buffer = Buffer.from(await response.arrayBuffer());
-	const tempFile = path.join(os.tmpdir(), `og_${projectId}_${Date.now()}.webp`);
+	const tempFile = path.join(os.tmpdir(), `og_${projectId}_${Date.now()}.jpg`);
 
 	try {
 		await sharp(buffer)
 			.resize(OG_WIDTH, OG_HEIGHT, { fit: "cover", position: "centre" })
-			.webp({ quality: 85 })
+			// JPEG, not WebP — Telegram's link-preview crawler frequently fails to
+			// render (or outright rejects) image/webp og:image files.
+			.jpeg({ quality: 85 })
 			.toFile(tempFile);
 
 		const bucket = getStorage().bucket();
-		const storagePath = `og/${projectId}.webp`;
+		const storagePath = `og/${projectId}.jpg`;
 
 		await bucket.upload(tempFile, {
 			destination: storagePath,
-			metadata: { contentType: "image/webp" },
+			metadata: { contentType: "image/jpeg" },
 		});
 
 		// Use a download token instead of makePublic() — makePublic() fails when
@@ -87,4 +91,34 @@ export async function generateAndStoreOgImage(
 	} finally {
 		if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
 	}
+}
+
+/**
+ * Awaits `generateAndStoreOgImage` but never blocks the caller for more than
+ * `timeoutMs`. In the common case (fast network) this lets the publish
+ * response wait for `ogImageUrl` to be ready, so a link shared immediately
+ * after publish already has a working preview. If generation is slow, it
+ * keeps running in the background and the publish response is not delayed
+ * further.
+ */
+export async function generateAndStoreOgImageBounded(
+	projectId: string,
+	mode: string,
+	content: Record<string, unknown> | null,
+	timeoutMs = 8_000,
+): Promise<void> {
+	const task = generateAndStoreOgImage(projectId, mode, content);
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const timeout = new Promise<void>((resolve) => {
+		timer = setTimeout(resolve, timeoutMs);
+	});
+	try {
+		await Promise.race([task, timeout]);
+	} finally {
+		clearTimeout(timer);
+	}
+	// Ensure a slow/failed generation still gets logged even after the race.
+	task.catch((err) => {
+		logger.warn(`[ogImage] Background OG image generation failed for ${projectId}:`, err);
+	});
 }

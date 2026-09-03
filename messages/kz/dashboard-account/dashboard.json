@@ -1,7 +1,7 @@
 {
   "promo": {
     "creatorPlanTitle": "Creator тарифі",
-    "creatorPlanDescription": "Аналитикаға және шектеусіз жобаларға қол жеткізіңіз.",
+    "creatorPlanDescription": "Көбірек кредит және шығармашылыққа көбірек мүмкіндік.",
     "viewAllPlans": "Барлық тарифтерді көру"
   },
   "createCards": {
@@ -162,7 +162,10 @@
     "backToList": "Барлық жобалар",
     "copyLink": "Сілтемені көшіру",
     "linkCopied": "Көшірілді!",
-    "shareUrl": "Сілтеме"
+    "shareUrl": "Сілтеме",
+    "shareWhatsapp": "WhatsApp-та бөлісу",
+    "shareTelegram": "Telegram-да бөлісу",
+    "shareFacebook": "Facebook-та бөлісу"
   },
   "analytics": {
     "title": "Аналитика",
