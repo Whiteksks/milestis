@@ -1,6 +1,6 @@
 'use client'
 
-import { Upload, Loader2, Check } from 'lucide-react'
+import { Upload, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import {
@@ -54,7 +54,10 @@ export function PhotoPicker({
               className="object-cover opacity-50"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-background/40">
-              <Loader2 className="h-4 w-4 animate-spin text-foreground/70" />
+              <span className="text-[10px] font-semibold text-foreground/80 tabular-nums">{u.progress}%</span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-background/50">
+              <div className="h-full bg-primary transition-[width]" style={{ width: `${u.progress}%` }} />
             </div>
           </div>
         ))}

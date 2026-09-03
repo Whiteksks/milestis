@@ -22,7 +22,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
-import { Check, Upload, Loader2 } from 'lucide-react'
+import { Check, Upload } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -115,7 +115,10 @@ export function MediaPickerModal({ ownerId, onSelectImage, onSelectImages }: Med
                 className="object-cover opacity-50"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[2px]">
-                <Loader2 className="h-6 w-6 text-foreground/70 animate-spin" />
+                <span className="text-sm font-semibold text-foreground/80 tabular-nums">{u.progress}%</span>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-background/50">
+                <div className="h-full bg-primary transition-[width]" style={{ width: `${u.progress}%` }} />
               </div>
             </div>
           ))}

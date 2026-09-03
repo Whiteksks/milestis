@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@/components/ui/button"
 import ProfileDropdown from "@/components/layout/auth/dropdown-profile"
@@ -9,6 +10,7 @@ import { selectAuthLoading, useUserStore } from "@/hooks/useUserStore"
 import { UserAvatar } from "@/components/shared/user-avatar"
 
 const HeaderAuthButton = () => {
+  const t = useTranslations("Header")
   const [open, setOpen] = useState(false)
   const { profile, authLoading } = useUserStore(
     useShallow((state) => ({
@@ -36,7 +38,7 @@ const HeaderAuthButton = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Login</Button>
+      <Button onClick={() => setOpen(true)}>{t("login")}</Button>
       <AuthDialogController open={open} setOpen={setOpen} />
     </>
   )

@@ -12,6 +12,7 @@ interface ChatInputProps {
   isLoading: boolean
   isPickerOpen: boolean
   selectedCount: number
+  hasPhotos: boolean
   onInputChange: (value: string) => void
   onSend: () => void
   onPhotoButton: () => void
@@ -23,6 +24,7 @@ export function ChatInput({
   isLoading,
   isPickerOpen,
   selectedCount,
+  hasPhotos,
   onInputChange,
   onSend,
   onPhotoButton,
@@ -35,17 +37,21 @@ export function ChatInput({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={onPhotoButton}
-          title={t('attachPhotos')}            disabled={isLoading}          className={cn(
-            'h-10 w-10 rounded-xl shrink-0 transition-colors',
+          title={t('attachPhotos')}
+          disabled={isLoading}
+          className={cn(
+            'h-10 rounded-xl shrink-0 transition-colors',
+            hasPhotos ? 'w-10 px-0' : 'px-3 gap-1.5',
             isPickerOpen || selectedCount > 0
               ? 'text-foreground bg-muted'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
-          <div className="relative">
+          <div className="relative flex items-center gap-1.5">
             <Images className="h-4 w-4" />
+            {!hasPhotos && <span className="text-xs font-medium">{t('addPhotos')}</span>}
             {selectedCount > 0 && !isPickerOpen && (
               <span className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center leading-none">
                 {selectedCount}

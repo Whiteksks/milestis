@@ -2,12 +2,15 @@
 
 import { memo, useState, useCallback, useEffect, useMemo, type ReactNode } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { Layers, Paintbrush, Sparkles, LayoutTemplate } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { Layers, Paintbrush, Wand2, Sparkles, LayoutTemplate } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
+import { useUiStore } from "@/editor/lib/store/ui"
+import { useAiBriefStore } from "@/editor/lib/store/ai-brief"
 import { MODE_REGISTRY } from "@/editor/lib/modes"
-import type { MobileEditorTab } from "@/editor/lib/config/editor-tabs"
+import type { MobileEditorTab, MobileAppearanceSubTab } from "@/editor/lib/config/editor-tabs"
 
 import { MobileSnapSheet, type MobileSnapSheetRenderProps } from "./mobile-snap-sheet"
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"
@@ -28,11 +31,15 @@ const FULL_SNAP_INDEX = 2
 const CONTENT_FADE = { duration: 0.16, ease: "linear" } as const
 const PANEL_SWITCH_FADE = { duration: 0.14, ease: "easeOut" } as const
 
-const ALL_TABS: { id: MobileEditorTab; icon: React.ElementType; label: string }[] = [
-  { id: "sections",     icon: Layers,        label: "Sections"   },
-  { id: "background",   icon: Paintbrush,    label: "Background" },
-  { id: "decorations",  icon: Sparkles,      label: "Decor"      },
-  { id: "design",       icon: LayoutTemplate, label: "Design"    },
+type TabDef = { id: MobileEditorTab; icon: React.ElementType; label: string }
+
+// Labels come from the editor.layout.mobile namespace — key names match tab ids 1:1.
+// "appearance" merges background+decorations behind an internal sub-tab switcher; "ai" opens the AI chat modal.
+const ALL_TAB_ICONS: { id: MobileEditorTab; icon: React.ElementType }[] = [
+  { id: "sections",    icon: Layers        },
+  { id: "appearance",  icon: Paintbrush    },
+  { id: "design",      icon: LayoutTemplate },
+  { id: "ai",          icon: Sparkles      },
 ]
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -42,6 +49,7 @@ type SheetMode = "nav" | "actions" | "full"
 interface MobileEditorSheetProps {
   activeTab: MobileEditorTab
   onTabChange: (tab: MobileEditorTab) => void
+  onAppearanceSubTabChange?: (subTab: MobileAppearanceSubTab) => void
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }
 
@@ -111,23 +119,61 @@ function resolveNextSnapIndex(
 
 function renderActions(
   tab: MobileEditorTab,
+  appearanceSubTab: MobileAppearanceSubTab,
   scrollContainerRef: React.RefObject<HTMLDivElement | null>,
 ): ReactNode {
   switch (tab) {
-    case "sections":    return <SectionsSheetActions />
-    case "background":  return <ThemeSheetActions />
-    case "decorations": return <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
-    default:            return null
+    case "sections":   return <SectionsSheetActions />
+    case "appearance": return appearanceSubTab === "background"
+      ? <ThemeSheetActions />
+      : <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
+    default:           return null
   }
 }
 
-function renderPanel(tab: MobileEditorTab): ReactNode {
+function renderPanel(tab: MobileEditorTab, appearanceSubTab: MobileAppearanceSubTab): ReactNode {
   switch (tab) {
-    case "sections":    return <SettingsContent />
-    case "background":  return <ThemeSettingsPanel />
-    case "decorations": return <DecorationsSettingsPanel />
-    default:            return null
+    case "sections":   return <SettingsContent />
+    case "appearance": return appearanceSubTab === "background"
+      ? <ThemeSettingsPanel />
+      : <DecorationsSettingsPanel />
+    default:           return null
   }
+}
+
+// Pill switcher between the two panels merged into the "appearance" tab.
+function AppearanceSubTabSwitcher({
+  value,
+  onChange,
+  labels,
+}: {
+  value: MobileAppearanceSubTab
+  onChange: (subTab: MobileAppearanceSubTab) => void
+  labels: Record<MobileAppearanceSubTab, string>
+}) {
+  return (
+    <div className="shrink-0 flex gap-1 px-3 pt-2 pb-1.5 border-b border-border/30">
+      {(["background", "decorations"] as const).map((id) => {
+        const Icon = id === "background" ? Paintbrush : Wand2
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onChange(id)}
+            className={cn(
+              "flex-1 h-8 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors",
+              value === id
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+            {labels[id]}
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -137,11 +183,13 @@ const SheetNav = memo(function SheetNav({
   onTabPress,
   dragHandleProps,
   tabs,
+  aiUnread,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
   dragHandleProps: MobileSnapSheetRenderProps["dragHandleProps"]
-  tabs: typeof ALL_TABS
+  tabs: TabDef[]
+  aiUnread: boolean
 }) {
   return (
     // Entire nav area is the drag surface — tabs stop propagation individually
@@ -160,23 +208,31 @@ const SheetNav = memo(function SheetNav({
         className="mb-2 shrink-0 grid h-12 pb-2 items-center justify-items-center"
         style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
       >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            aria-label={tab.label}
-            aria-current={activeTab === tab.id ? "page" : undefined}
-            // Block the drag from starting when the finger lands on a tab button
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.currentTarget.blur(); onTabPress(tab.id) }}
-            className={cn(
-              "touch-auto cursor-pointer w-12 h-full flex flex-col items-center justify-center gap-1 transition-colors",
-              activeTab === tab.id ? "text-foreground" : "text-muted-foreground",
-            )}
-          >
-            <tab.icon className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[12px] font-medium tracking-tight">{tab.label}</span>
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const isAi = tab.id === "ai"
+          return (
+            <button
+              key={tab.id}
+              aria-label={tab.label}
+              aria-current={activeTab === tab.id ? "page" : undefined}
+              // Block the drag from starting when the finger lands on a tab button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.currentTarget.blur(); onTabPress(tab.id) }}
+              className={cn(
+                "relative touch-auto cursor-pointer w-12 h-full flex flex-col items-center justify-center gap-1 transition-colors",
+                isAi
+                  ? (activeTab === tab.id ? "text-primary" : "text-primary/75")
+                  : (activeTab === tab.id ? "text-foreground" : "text-muted-foreground"),
+              )}
+            >
+              <tab.icon className="h-4 w-4" aria-hidden="true" />
+              <span className="text-[12px] font-medium tracking-tight">{tab.label}</span>
+              {isAi && aiUnread && (
+                <span className="absolute top-1 right-2.5 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              )}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -185,45 +241,57 @@ const SheetNav = memo(function SheetNav({
 const SheetBody = memo(function SheetBody({
   mode,
   activeTab,
+  appearanceSubTab,
+  onAppearanceSubTabChange,
+  subTabLabels,
   scrollContainerRef,
 }: {
   mode: SheetMode
   activeTab: MobileEditorTab
+  appearanceSubTab: MobileAppearanceSubTab
+  onAppearanceSubTabChange: (subTab: MobileAppearanceSubTab) => void
+  subTabLabels: Record<MobileAppearanceSubTab, string>
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
 }) {
   const content = mode === "actions"
-    ? renderActions(activeTab, scrollContainerRef)
+    ? renderActions(activeTab, appearanceSubTab, scrollContainerRef)
     : mode === "full"
-    ? renderPanel(activeTab)
+    ? renderPanel(activeTab, appearanceSubTab)
     : null
 
   const contentClass = mode === "actions"
     ? "overflow-x-auto overscroll-x-contain no-scrollbar"
     : "overflow-y-auto overscroll-contain"
 
-  const visible = mode !== "nav" && activeTab !== "design" && content !== null
+  const visible = mode !== "nav" && activeTab !== "design" && activeTab !== "ai" && content !== null
+  const showSubTabs = visible && activeTab === "appearance"
 
   return (
     <motion.div
-      className="min-h-0 flex-1 overflow-hidden border-t border-border/30"
+      className="min-h-0 flex-1 flex flex-col overflow-hidden border-t border-border/30"
       initial={false}
       animate={{ opacity: visible ? 1 : 0 }}
       transition={CONTENT_FADE}
     >
-      <AnimatePresence initial={false} mode="popLayout">
-        {visible ? (
-          <motion.div
-            key={`${mode}:${activeTab}`}
-            className={cn("h-full", contentClass)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={PANEL_SWITCH_FADE}
-          >
-            {content}
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {showSubTabs && (
+        <AppearanceSubTabSwitcher value={appearanceSubTab} onChange={onAppearanceSubTabChange} labels={subTabLabels} />
+      )}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <AnimatePresence initial={false} mode="popLayout">
+          {visible ? (
+            <motion.div
+              key={`${mode}:${activeTab}:${activeTab === "appearance" ? appearanceSubTab : ""}`}
+              className={cn("h-full", contentClass)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={PANEL_SWITCH_FADE}
+            >
+              {content}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </motion.div>
   )
 })
@@ -233,6 +301,7 @@ const SheetBody = memo(function SheetBody({
 export function MobileEditorSheet({
   activeTab,
   onTabChange,
+  onAppearanceSubTabChange,
   scrollContainerRef,
 }: MobileEditorSheetProps) {
   const [snapIndex, setSnapIndex] = useState(SNAP_NAV_INDEX)
@@ -253,26 +322,42 @@ export function MobileEditorSheet({
   const designModalSection = useUiSelector((state) => state.designModalSection)
   const setSelectedDecorationId = useUiSelector((state) => state.setSelectedDecorationId)
   const editorMode = useUiSelector((state) => state.editorMode)
+  const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
+  const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
 
+  const [appearanceSubTab, setAppearanceSubTab] = useState<MobileAppearanceSubTab>("background")
+
+  const tMobile = useTranslations("editor.layout.mobile")
+  const subTabLabels = useMemo(
+    () => ({ background: tMobile("background"), decorations: tMobile("decorations") }),
+    [tMobile],
+  )
   const tabs = useMemo(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
-    return hideSections ? ALL_TABS.filter((t) => t.id !== 'sections') : ALL_TABS
-  }, [editorMode])
+    const allTabs: TabDef[] = ALL_TAB_ICONS.map(({ id, icon }) => ({ id, icon, label: tMobile(id) }))
+    return hideSections ? allTabs.filter((tab) => tab.id !== 'sections') : allTabs
+  }, [editorMode, tMobile])
 
-  // If sections tab becomes hidden while active, redirect to background
+  // If sections tab becomes hidden while active, redirect to appearance
   useEffect(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
     if (hideSections && activeTab === 'sections') {
-      onTabChange('background')
+      onTabChange('appearance')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorMode])
 
-  // Collapse to nav when design tab is active (it opens a modal instead)
+  // Collapse to nav when design/ai tab is active — both open their own modal instead
   useEffect(() => {
-    if (activeTab !== "design") return
+    if (activeTab !== "design" && activeTab !== "ai") return
     setSnapIndex(SNAP_NAV_INDEX)
   }, [activeTab])
+
+  // Keep the desktop sidebar's tab in sync with whichever appearance sub-tab is showing
+  useEffect(() => {
+    if (activeTab !== "appearance") return
+    onAppearanceSubTabChange?.(appearanceSubTab)
+  }, [activeTab, appearanceSubTab, onAppearanceSubTabChange])
 
   const handleTabPress = useCallback(
     (tab: MobileEditorTab) => {
@@ -283,14 +368,29 @@ export function MobileEditorSheet({
         return
       }
 
-      if (tab !== "decorations") {
+      if (tab === "ai") {
+        onTabChange("ai")
+        setSnapIndex(SNAP_NAV_INDEX)
+        setIsAiChatOpen(true)
+        return
+      }
+
+      if (!(tab === "appearance" && appearanceSubTab === "decorations")) {
         setSelectedDecorationId(null)
       }
 
       onTabChange(tab)
       setSnapIndex((current) => resolveNextSnapIndex(current, activeTab, tab, FULL_SNAP_INDEX))
     },
-    [activeTab, designModalSection, onTabChange, openDesignModal, setSelectedDecorationId],
+    [activeTab, appearanceSubTab, designModalSection, onTabChange, openDesignModal, setIsAiChatOpen, setSelectedDecorationId],
+  )
+
+  const handleAppearanceSubTabChange = useCallback(
+    (subTab: MobileAppearanceSubTab) => {
+      setAppearanceSubTab(subTab)
+      if (subTab !== "decorations") setSelectedDecorationId(null)
+    },
+    [setSelectedDecorationId],
   )
   const handleStopPropagation = useCallback((e: React.PointerEvent) => e.stopPropagation(), [])
   return (
@@ -316,10 +416,14 @@ export function MobileEditorSheet({
             onTabPress={handleTabPress}
             dragHandleProps={dragHandleProps}
             tabs={tabs}
+            aiUnread={!hasAiGenerated}
           />
           <SheetBody
             mode={mode}
             activeTab={activeTab}
+            appearanceSubTab={appearanceSubTab}
+            onAppearanceSubTabChange={handleAppearanceSubTabChange}
+            subTabLabels={subTabLabels}
             scrollContainerRef={scrollContainerRef}
           />
           <div className="shrink-0 h-[env(safe-area-inset-bottom,0px)]" />

@@ -1,5 +1,6 @@
 {
   "Header": {
+    "login": "Войти",
     "navigation": {
       "features": "Функции",
       "story": "Наша история",

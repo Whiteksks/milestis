@@ -13,7 +13,7 @@ import { MediaLibraryModal } from '@/editor/components/editor/layout/Modals/medi
 import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/design-catalog-modal'
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { MobileEditorSheet } from '@/editor/components/editor/layout/mobile/mobile-editor-sheet'
-import type { DesktopEditorTab, MobileEditorTab } from '@/editor/lib/config/editor-tabs'
+import type { DesktopEditorTab, MobileEditorTab, MobileAppearanceSubTab } from '@/editor/lib/config/editor-tabs'
 import { useUiSelector } from '@/editor/lib/store'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
@@ -161,9 +161,15 @@ export default function EditorPage() {
   const handleMobileTabChange = (tab: MobileEditorTab) => {
     setMobileActiveTab(tab)
     // Keep FloatingToolbar (desktop) in sync with mobile tab
-    if (tab === 'sections' || tab === 'background' || tab === 'decorations') {
+    if (tab === 'sections') {
       setDesktopActiveTab(tab)
     }
+  }
+
+  // "appearance" merges background+decorations on mobile — mirror whichever sub-tab is
+  // showing onto the desktop tab so resizing across the breakpoint doesn't lose context.
+  const handleAppearanceSubTabChange = (subTab: MobileAppearanceSubTab) => {
+    setDesktopActiveTab(subTab)
   }
 
   return (
@@ -178,6 +184,7 @@ export default function EditorPage() {
           <MobileEditorSheet
             activeTab={mobileActiveTab}
             onTabChange={handleMobileTabChange}
+            onAppearanceSubTabChange={handleAppearanceSubTabChange}
             scrollContainerRef={scrollContainerRef}
           />
         </CanvasScrollProvider>

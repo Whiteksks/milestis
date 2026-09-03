@@ -29,6 +29,8 @@
         "inputPlaceholder": "Describe your project...",
         "send": "Send",
         "attachPhotos": "Attach photos",
+        "addPhotos": "Add photos",
+        "addPhotosCta": "Add your photos",
         "disclaimer": "AI can make mistakes. Please review the result.",
         "assistantSuccess": "Done! I've set up your project. Feel free to adjust anything in the editor.",
         "assistantSuccessAll": "Done! I've set up your entire project. Feel free to adjust anything in the editor.",
@@ -67,7 +69,9 @@
         "sections": "Sections",
         "background": "Background",
         "decorations": "Decor",
-        "design": "Design"
+        "design": "Design",
+        "appearance": "Style",
+        "ai": "AI"
       },
       "floating": {
         "changeTemplate": "Change Template",

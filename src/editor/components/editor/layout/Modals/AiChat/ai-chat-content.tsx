@@ -99,6 +99,8 @@ export function AiChatContent() {
     }
   }
 
+  const hasPhotos = images.length > 0 || pendingUploads.length > 0
+
   return (
     <div className="flex flex-col h-full">
       <input
@@ -120,6 +122,8 @@ export function AiChatContent() {
           quickPrompts={t.raw((editorMode as AiChatMode) === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
           onQuickPromptSelect={setInput}
           loadingCaption={loadingCaption}
+          hasPhotos={hasPhotos}
+          onAddPhotos={handlePhotoButton}
         />
       <SelectedPhotos
         selectedUrls={selectedUrls}
@@ -140,6 +144,7 @@ export function AiChatContent() {
         isLoading={isLoading}
         isPickerOpen={isPickerOpen}
         selectedCount={selectedUrls.length}
+        hasPhotos={hasPhotos}
         onInputChange={setInput}
         onSend={handleSend}
         onPhotoButton={handlePhotoButton}

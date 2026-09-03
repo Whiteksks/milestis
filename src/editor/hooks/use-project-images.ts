@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
-import { ref as storageRef, uploadBytes } from 'firebase/storage'
+import { ref as storageRef, uploadBytesResumable } from 'firebase/storage'
 import { db } from '@/lib/firebase'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useUserStore } from '@/hooks/useUserStore'
@@ -21,6 +21,8 @@ export interface UploadingEntry {
   id: string
   name: string
   previewUrl: string
+  /** 0-100, based on bytes transferred — lets the UI show real progress instead of a bare spinner. */
+  progress: number
 }
 
 export function getProjectImageDisplayUrl(img: ProjectImageDoc): string {
@@ -168,15 +170,31 @@ export function useProjectMediaLibrary() {
         const imageId = crypto.randomUUID()
         const previewUrl = URL.createObjectURL(file)
 
-        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl }])
+        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl, progress: 0 }])
 
         try {
           const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
 
-          await uploadBytes(
+          const uploadTask = uploadBytesResumable(
             storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
             file,
           )
+
+          await new Promise<void>((resolve, reject) => {
+            uploadTask.on(
+              'state_changed',
+              (snapshot) => {
+                const progress = snapshot.totalBytes > 0
+                  ? Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+                  : 0
+                setUploading((prev) => prev.map((entry) => (
+                  entry.id === imageId ? { ...entry, progress } : entry
+                )))
+              },
+              reject,
+              resolve,
+            )
+          })
         } catch (error) {
           setUploading((prev) => prev.filter((entry) => entry.id !== imageId))
           URL.revokeObjectURL(previewUrl)

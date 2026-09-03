@@ -285,7 +285,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               variant="ghost"
               size="sm"
               onClick={() => setIsAiChatOpen(true)}
-              className="relative gap-2 text-primary hover:bg-primary/15 hover:text-primary rounded-full h-8 px-4 transition-all text-xs"
+              className="relative hidden md:inline-flex gap-2 text-primary hover:bg-primary/15 hover:text-primary rounded-full h-8 px-4 transition-all text-xs"
               title={t('header.aiAssistant')}
             >
               <Sparkles className="h-3.5 w-3.5" />
@@ -346,15 +346,15 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                   size="sm"
                   variant="secondary"
                   disabled={unpublishMutation.isPending}
-                  className="gap-1.5 shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                  className="gap-1.5 shadow-sm inline-flex rounded-full h-8 px-3 sm:px-5 transition-all text-xs font-medium text-emerald-600 dark:text-emerald-400"
                 >
                   {unpublishMutation.isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <Globe className="h-3 w-3" />
                   )}
-                  <span className="hidden sm:inline">{t('header.published')}</span>
-                  <ChevronDown className="h-3 w-3 hidden sm:inline" />
+                  <span>{t('header.published')}</span>
+                  <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -390,20 +390,20 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               size="sm"
               onClick={handleRepublish}
               disabled={saveState === 'saving'}
-              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-3 sm:px-5 transition-all text-xs font-medium"
             >
               <RefreshCw className="h-3 w-3" />
-              <span className="hidden sm:inline">{t('header.republish')}</span>
+              <span>{t('header.republish')}</span>
             </Button>
           ) : (
             <Button
               size="sm"
               onClick={handleOpenPublishModal}
               disabled={saveState === 'saving'}
-              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-2.5 sm:px-5 transition-all text-xs font-medium"
+              className="gap-2 bg-foreground hover:bg-foreground/85 text-background shadow-sm inline-flex rounded-full h-8 px-3 sm:px-5 transition-all text-xs font-medium"
             >
               <Globe className="h-3 w-3" />
-              <span className="hidden sm:inline">{t('header.publish')}</span>
+              <span>{t('header.publish')}</span>
             </Button>
           )}
         </div>

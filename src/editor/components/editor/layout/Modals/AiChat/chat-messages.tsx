@@ -1,9 +1,10 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ImagePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import type { Message } from './types'
 import { UserAvatar } from '@/components/shared/user-avatar'
 
@@ -14,6 +15,8 @@ interface ChatMessagesProps {
   quickPrompts?: string[]
   onQuickPromptSelect?: (prompt: string) => void
   loadingCaption?: string
+  hasPhotos?: boolean
+  onAddPhotos?: () => void
 }
 
 function TypingGreeting({ text }: { text: string }) {
@@ -58,8 +61,9 @@ function TypingGreeting({ text }: { text: string }) {
   )
 }
 
-export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQuickPromptSelect, loadingCaption }: ChatMessagesProps) {
+export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQuickPromptSelect, loadingCaption, hasPhotos, onAddPhotos }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations('editor.layout.aiChat')
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -84,6 +88,18 @@ export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQu
                   {prompt}
                 </button>
               ))}
+            </div>
+          )}
+          {!hasPhotos && onAddPhotos && (
+            <div className="pl-9">
+              <button
+                type="button"
+                onClick={onAddPhotos}
+                className="flex w-full max-w-[280px] items-center gap-3 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary hover:border-primary/60 hover:bg-primary/10 transition-colors"
+              >
+                <ImagePlus className="h-5 w-5 shrink-0" />
+                {t('addPhotosCta')}
+              </button>
             </div>
           )}
         </div>
