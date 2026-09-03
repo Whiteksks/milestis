@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Coins, AlertTriangle, ImageIcon, ShieldAlert } from 'lucide-react'
+import { Coins, AlertTriangle, ImageIcon, ShieldAlert, Loader2, CreditCard, ExternalLink } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 import type { AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
 import type { usePublishModal } from '@/hooks/usePublishModal'
 
@@ -258,5 +259,73 @@ function ReviewError({ message }: { message: string }) {
         <p className="text-xs text-muted-foreground mt-1 max-w-xs">{message}</p>
       </div>
     </div>
+  )
+}
+
+// ─── Review primary action button ─────────────────────────────────────────────
+// Renders either "Pay & Publish" (insufficient balance) or "Publish" (sufficient).
+// Shared by both the mobile drawer and desktop dialog footers.
+
+export function ReviewPrimaryButton({
+  insufficient,
+  isFreeRepublish,
+  republishMode,
+  priceDollars,
+  effectiveTermsAccepted,
+  modalData,
+  confirmMutation,
+  onConfirm,
+  t,
+  fullWidth,
+  size,
+}: {
+  insufficient: boolean
+  isFreeRepublish?: boolean
+  republishMode?: boolean
+  priceDollars: string
+  effectiveTermsAccepted: boolean
+  modalData: ReturnType<typeof usePublishModal>
+  confirmMutation: { isPending: boolean }
+  onConfirm: () => void
+  t: ReturnType<typeof useTranslations>
+  fullWidth?: boolean
+  size?: 'sm' | 'default'
+}) {
+  const cls = `gap-2${fullWidth ? ' w-full' : ''}`
+
+  if (insufficient && !republishMode) {
+    return (
+      <Button
+        size={size}
+        onClick={modalData.initiateBuyAndPublish}
+        disabled={modalData.isBuyingCredits || !effectiveTermsAccepted}
+        className={cls}
+      >
+        {modalData.isBuyingCredits
+          ? <><Loader2 className="size-3 animate-spin" /> {t('actions.checking')}</>
+          : <><CreditCard className="size-3" /> {t('review.payAndPublish', { price: priceDollars })}</>}
+      </Button>
+    )
+  }
+
+  const label = republishMode ? t('actions.republish') : t('actions.publish')
+  const pendingLabel = republishMode ? t('actions.republishing') : t('actions.publishing')
+
+  return (
+    <Button
+      size={size}
+      onClick={onConfirm}
+      disabled={
+        (!modalData.canPublish && !isFreeRepublish) ||
+        confirmMutation.isPending ||
+        modalData.isAnalyzing ||
+        !effectiveTermsAccepted
+      }
+      className={cls}
+    >
+      {confirmMutation.isPending
+        ? <><Loader2 className="size-3 animate-spin" /> {pendingLabel}</>
+        : <><ExternalLink className="size-3" /> {label}</>}
+    </Button>
   )
 }

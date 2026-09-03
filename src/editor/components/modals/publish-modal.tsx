@@ -12,22 +12,7 @@ import {
 import { useTranslations, useLocale } from 'next-intl'
 import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
 import { Button } from '@/components/ui/button'
-import {
-  Globe,
-  Lock,
-  Loader2,
-  ExternalLink,
-  ArrowRight,
-  ArrowLeft,
-  RefreshCw,
-  CreditCard,
-  CheckCircle2,
-  Copy,
-  Check,
-  Gift,
-  Mail,
-} from 'lucide-react'
-import { FaWhatsapp, FaTelegram } from 'react-icons/fa6'
+import { Globe, Lock, Loader2, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react'
 import { usePublishModal } from '@/hooks/usePublishModal'
 import { usePublishMutation, useRepublishMutation } from '@/hooks/useProjectMutations'
 import { useUiSelector } from '@/editor/lib/store'
@@ -36,7 +21,8 @@ import { useUserStore, selectSubscription } from '@/hooks/useUserStore'
 import { getEffectiveSubscriptionFeatures } from '@/lib/billing/billing.utils'
 import { ReferralModal } from '@/components/layout/dashboard/referral'
 import { PublishForm } from './publish-slug-form'
-import { ReviewPane } from './publish-review'
+import { ReviewPane, ReviewPrimaryButton } from './publish-review'
+import { PublishSuccessPane } from './publish-success'
 
 interface PublishModalProps {
   open: boolean
@@ -341,176 +327,5 @@ export function PublishModal({ open, onOpenChange, projectId, mode, initialSlug,
   )
 }
 
-// ─── Review primary action button ─────────────────────────────────────────────
-// Renders either "Pay & Publish" (insufficient balance) or "Publish" (sufficient).
-// Shared by both the mobile drawer and desktop dialog footers.
 
-function ReviewPrimaryButton({
-  insufficient,
-  isFreeRepublish,
-  republishMode,
-  priceDollars,
-  effectiveTermsAccepted,
-  modalData,
-  confirmMutation,
-  onConfirm,
-  t,
-  fullWidth,
-  size,
-}: {
-  insufficient: boolean
-  isFreeRepublish?: boolean
-  republishMode?: boolean
-  priceDollars: string
-  effectiveTermsAccepted: boolean
-  modalData: ReturnType<typeof usePublishModal>
-  confirmMutation: { isPending: boolean }
-  onConfirm: () => void
-  t: ReturnType<typeof useTranslations>
-  fullWidth?: boolean
-  size?: 'sm' | 'default'
-}) {
-  const cls = `gap-2${fullWidth ? ' w-full' : ''}`
-
-  if (insufficient && !republishMode) {
-    return (
-      <Button
-        size={size}
-        onClick={modalData.initiateBuyAndPublish}
-        disabled={modalData.isBuyingCredits || !effectiveTermsAccepted}
-        className={cls}
-      >
-        {modalData.isBuyingCredits
-          ? <><Loader2 className="size-3 animate-spin" /> {t('actions.checking')}</>
-          : <><CreditCard className="size-3" /> {t('review.payAndPublish', { price: priceDollars })}</>}
-      </Button>
-    )
-  }
-
-  const label = republishMode ? t('actions.republish') : t('actions.publish')
-  const pendingLabel = republishMode ? t('actions.republishing') : t('actions.publishing')
-
-  return (
-    <Button
-      size={size}
-      onClick={onConfirm}
-      disabled={
-        (!modalData.canPublish && !isFreeRepublish) ||
-        confirmMutation.isPending ||
-        modalData.isAnalyzing ||
-        !effectiveTermsAccepted
-      }
-      className={cls}
-    >
-      {confirmMutation.isPending
-        ? <><Loader2 className="size-3 animate-spin" /> {pendingLabel}</>
-        : <><ExternalLink className="size-3" /> {label}</>}
-    </Button>
-  )
-}
-
-// ─── Publish success pane ──────────────────────────────────────────────────────
-// Shown right after a first publish: the live link, share shortcuts, and a soft
-// referral nudge — the moment of highest satisfaction is the best time to ask.
-// Shared by both the mobile drawer and desktop dialog.
-
-function PublishSuccessPane({
-  siteUrl,
-  t,
-  onInviteClick,
-}: {
-  siteUrl: string
-  t: ReturnType<typeof useTranslations>
-  onInviteClick: () => void
-}) {
-  const [copied, setCopied] = useState(false)
-
-  const shareMessage = t('success.shareMessage')
-  const encodedLink = encodeURIComponent(siteUrl)
-  const encodedMessage = encodeURIComponent(shareMessage)
-
-  const shareChannels = [
-    {
-      key: 'whatsapp',
-      label: t('success.shareWhatsapp'),
-      icon: FaWhatsapp,
-      href: `https://wa.me/?text=${encodedMessage}%20${encodedLink}`,
-      className: 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20',
-    },
-    {
-      key: 'telegram',
-      label: t('success.shareTelegram'),
-      icon: FaTelegram,
-      href: `https://t.me/share/url?url=${encodedLink}&text=${encodedMessage}`,
-      className: 'bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20',
-    },
-    {
-      key: 'email',
-      label: t('success.shareEmail'),
-      icon: Mail,
-      href: `mailto:?subject=${encodeURIComponent(t('success.emailSubject'))}&body=${encodedMessage}%20${encodedLink}`,
-      className: 'bg-muted text-foreground hover:bg-muted/70',
-    },
-  ]
-
-  const handleCopy = async () => {
-    if (!siteUrl) return
-    try {
-      await navigator.clipboard.writeText(siteUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Clipboard API unavailable — user can still select the text manually.
-    }
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-5 px-1 py-2 text-center">
-      <div className="flex size-14 items-center justify-center rounded-full bg-emerald-500/10">
-        <CheckCircle2 className="size-7 text-emerald-600" />
-      </div>
-
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold">{t('success.title')}</h3>
-        <p className="text-sm text-muted-foreground">{t('success.description')}</p>
-      </div>
-
-      <div className="flex w-full items-center gap-2 rounded-xl border border-border/60 bg-muted/30 p-2">
-        <span className="flex-1 truncate px-2 text-xs text-muted-foreground">{siteUrl}</span>
-        <Button size="sm" variant="outline" onClick={handleCopy} disabled={!siteUrl} className="shrink-0 gap-1.5">
-          {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-          {copied ? t('success.copied') : t('success.copy')}
-        </Button>
-      </div>
-
-      <div className="flex items-center justify-center gap-3">
-        {shareChannels.map(({ key, label, icon: Icon, href, className }) => (
-          <a
-            key={key}
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={label}
-            className={`flex size-10 items-center justify-center rounded-full transition-colors ${siteUrl ? className : 'bg-muted text-muted-foreground/40 pointer-events-none'}`}
-          >
-            <Icon className="size-4.5" />
-          </a>
-        ))}
-      </div>
-
-      <div className="flex w-full items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-left">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
-          <Gift className="size-4.5 text-amber-600" />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs font-semibold">{t('success.referralTitle')}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t('success.referralDescription')}</p>
-        </div>
-        <Button size="sm" variant="outline" onClick={onInviteClick} className="shrink-0">
-          {t('success.referralCta')}
-        </Button>
-      </div>
-    </div>
-  )
-}
 

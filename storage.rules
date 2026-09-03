@@ -44,12 +44,22 @@ service firebase.storage {
       allow write: if false;
     }
 
-    // Deny everything else
     // Published project files — publicly readable, only written by Cloud Functions via Admin SDK
     match /public/{projectId}/{allPaths=**} {
       allow read: if true;
       allow write: if false;
     }
+
+    // Pre-generated 1200×630 OG/social-preview image — written by the ogImage
+    // Cloud Function (Admin SDK). Made explicitly public so link-preview
+    // crawlers (Telegram, WhatsApp, Facebook, etc.) can fetch it without
+    // relying on the undocumented "download token bypasses rules" behavior.
+    match /og/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Deny everything else
 
     match /{allPaths=**} {
       allow read, write: if false;
