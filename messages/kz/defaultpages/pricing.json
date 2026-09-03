@@ -51,6 +51,8 @@
       }
     },
     "labels": {
+      "previousPlan": "Алдыңғы тариф",
+      "nextPlan": "Келесі тариф",
       "perMonth": "/ай",
       "monthly": "Ай сайын",
       "yearly": "Жылдық",

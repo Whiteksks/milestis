@@ -3,19 +3,26 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
 import {
   Home,
   FolderOpen,
-  MoreHorizontal,
   FileText,
   CreditCard,
   Shield,
   User,
   Plus,
   Archive,
+  LogOut,
 } from "lucide-react"
+import { signOut } from "firebase/auth"
 
 import { cn } from "@/lib/utils"
+import { auth } from "@/lib/firebase"
+import { useUserStore } from "@/hooks/useUserStore"
+import { normalizePlanTier } from "@/lib/billing/billing.utils"
+import { PLAN_CONFIG } from "@/components/layout/dashboard/user-menu"
+import { UserAvatar } from "@/components/shared/user-avatar"
 import PromoCard, { MenuItem, MenuSection } from "./menu-card"
 import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
@@ -52,6 +59,22 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
   const [open, setOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const t = useTranslations()
+  const router = useRouter()
+  const { profile } = useUserStore()
+
+  const { displayName = " ", email = " " } = profile || {}
+  const planTier = normalizePlanTier(profile?.subscription?.planTier)
+  const plan = planTier ? PLAN_CONFIG[planTier] : null
+
+  const handleLogout = async () => {
+    setOpen(false)
+    try {
+      await signOut(auth)
+      router.push("/")
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
   return (
     <>
@@ -126,21 +149,35 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
           )
         })}
 
-        {/* More button */}
+        {/* Account button */}
         <button
           onClick={() => setOpen(true)}
           className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground min-w-0"
         >
           <div className="flex items-center justify-center size-8 rounded-xl">
-            <MoreHorizontal className="size-5 shrink-0" />
+            <UserAvatar size="xs" />
           </div>
-          <span className="text-[10px] font-medium">{t('nav.more')}</span>
+          <span className="text-[10px] font-medium">{t('nav.account')}</span>
         </button>
       </nav>
 
-      {/* More drawer */}
+      {/* Account drawer */}
       <MobileDrawer open={open} onOpenChange={setOpen}>
         <div className="flex-1 overflow-y-auto p-4 mt-2">
+            {/* Профиль */}
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/30 p-4 mb-6">
+              <UserAvatar size="md" />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate text-sm font-semibold leading-none">{displayName}</span>
+                <span className="truncate text-xs text-muted-foreground">{email}</span>
+              </div>
+              {plan && (
+                <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", plan.className)}>
+                  {t(plan.labelKey)}
+                </span>
+              )}
+            </div>
+
             {/* Баннер апгрейда */}
             <PromoCard
             title={t('promo.creatorPlanTitle')}
@@ -176,6 +213,19 @@ export function MobileBottomNav({ activeItem = "dashboard", locale }: MobileBott
               showBorder={i !== helpLinks.length - 1}
               />
             ))}
+            </MenuSection>
+
+            {/* Выход */}
+            <MenuSection>
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 px-4 py-3.5 text-sm text-muted-foreground transition-colors active:bg-accent hover:text-destructive"
+              >
+                <div className="flex items-center justify-center size-8 rounded-lg bg-background border shadow-sm">
+                  <LogOut className="size-4" />
+                </div>
+                <span className="flex-1 text-left font-medium">{t('nav.logOut')}</span>
+              </button>
             </MenuSection>
         </div>
         </MobileDrawer>

@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { 
   User, CreditCard, Settings, LogOut, 
-  HelpCircle, LayoutDashboard, Crown 
+  HelpCircle, LayoutDashboard, Crown, ChevronsUpDown 
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -17,12 +17,10 @@ import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { normalizePlanTier } from "@/lib/billing/billing.utils"
 import { useUserStore } from "@/hooks/useUserStore"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { MobileDrawer } from "@/components/ui/custom/mobile-drawer"
 import { UserAvatar } from "@/components/shared/user-avatar"
 
-const PLAN_CONFIG: Record<string, { labelKey: string; className: string }> = {
+export const PLAN_CONFIG: Record<string, { labelKey: string; className: string }> = {
   free: { labelKey: "plans.free", className: "bg-muted text-muted-foreground" },
   explorer: { labelKey: "plans.explorer", className: "bg-muted text-muted-foreground" },
   creator: { labelKey: "plans.creator", className: "bg-primary/10 text-primary" },
@@ -37,20 +35,18 @@ const MAIN_NAV_ITEMS = [
   { href: "/account/settings", icon: Settings,        labelKey: "nav.settings" },
 ]
 
-export function UserMenu() {
-  const [open, setOpen] = useState(false)
+/** Shared profile + navigation + logout content, reused by the desktop sidebar dropdown and the mobile account drawer. */
+export function AccountMenuBody({ onNavigate }: { onNavigate: () => void }) {
   const t = useTranslations()
-  const isMobile = useIsMobile()
   const router = useRouter()
   const { profile } = useUserStore()
 
-  // Данные пользователя
   const { displayName = " ", email = " " } = profile || {}
   const planTier = normalizePlanTier(profile?.subscription?.planTier)
   const plan = planTier ? PLAN_CONFIG[planTier] : null
 
   const handleLogout = async () => {
-    setOpen(false)
+    onNavigate()
     try {
       await signOut(auth)
       router.push("/")
@@ -59,8 +55,7 @@ export function UserMenu() {
     }
   }
 
-
-  const menuBody = (
+  return (
     <div className="flex flex-col">
       {/* Profile Header */}
       <div className="flex items-center gap-3 px-4 py-4">
@@ -84,7 +79,7 @@ export function UserMenu() {
           <Link
             key={item.href}
             href={item.href}
-            onClick={() => setOpen(false)}
+            onClick={onNavigate}
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
           >
             <item.icon className="size-4 text-muted-foreground" />
@@ -99,7 +94,7 @@ export function UserMenu() {
       <nav className="p-1.5">
         <Link
           href="/help"
-          onClick={() => setOpen(false)}
+          onClick={onNavigate}
           className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <HelpCircle className="size-4" />
@@ -109,7 +104,7 @@ export function UserMenu() {
         {(!planTier || planTier === "free") && (
           <Link
             href="/pricing"
-            onClick={() => setOpen(false)}
+            onClick={onNavigate}
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
           >
             <Crown className="size-4" />
@@ -132,39 +127,44 @@ export function UserMenu() {
       </div>
     </div>
   )
-
-  if (isMobile) {
-    return (
-      <MobileDrawer 
-        open={open} 
-        onOpenChange={setOpen} 
-        trigger={
-          <button className="outline-none">
-            <UserAvatar size="sm" />
-          </button>
-        }
-      >
-        {menuBody}
-      </MobileDrawer>
-    )
-  }
+}
+/** Account card for the desktop sidebar footer: avatar + name/email, opens the account dropdown. */
+export function UserMenu() {
+  const [open, setOpen] = useState(false)
+  const { profile } = useUserStore()
+  const { displayName = "Пользователь", email = "" } = profile || {}
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="group flex items-center gap-2.5 rounded-xl p-1.5 outline-none transition-colors hover:bg-accent/50">
-          <UserAvatar size="sm" />
-          <div className="hidden flex-col items-start md:flex">
-            <span className="text-sm font-medium leading-none group-hover:text-foreground">{displayName}</span>
-            <span className="text-[11px] text-muted-foreground">{email}</span>
+        <button
+          aria-label="Меню профиля"
+          className="group flex w-full items-center gap-2.5 rounded-xl border border-sidebar-border/40 bg-gradient-to-r from-sidebar-accent/50 via-sidebar-accent/30 to-transparent p-2 text-left outline-none transition-all duration-200 hover:border-sidebar-border/80 hover:bg-gradient-to-r hover:from-sidebar-accent/80 hover:via-sidebar-accent/50 hover:to-sidebar-accent/20 data-[state=open]:border-sidebar-border data-[state=open]:bg-sidebar-accent group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:bg-none group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0"
+        >
+          <UserAvatar size="md" className="shrink-0" />
+
+          <div className="flex min-w-0 flex-1 flex-col items-start gap-1 group-data-[collapsible=icon]:hidden">
+            <span className="w-full truncate text-sm font-medium leading-none text-sidebar-foreground">
+              {displayName}
+            </span>
+            {email && (
+              <span className="w-full truncate text-[11px] leading-none text-muted-foreground">
+                {email}
+              </span>
+            )}
           </div>
+
+          <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground/70 transition-transform duration-200 group-data-[state=open]:rotate-180 group-data-[collapsible=icon]:hidden" />
         </button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent
-        align="end"
-        className="w-64 overflow-hidden rounded-2xl p-0 shadow-xl"
+        align="start"
+        side="top"
+        sideOffset={6}
+        className="w-64 overflow-hidden rounded-2xl p-0 shadow-md"
       >
-        {menuBody}
+        <AccountMenuBody onNavigate={() => setOpen(false)} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

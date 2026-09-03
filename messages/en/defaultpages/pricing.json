@@ -51,6 +51,8 @@
       }
     },
     "labels": {
+      "previousPlan": "Previous plan",
+      "nextPlan": "Next plan",
       "perMonth": "/month",
       "monthly": "Monthly",
       "yearly": "Yearly",

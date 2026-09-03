@@ -22,9 +22,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { NewProjectModal } from "@/components/layout/dashboard/new-project-modal"
 import { SidebarReferralButton } from "@/components/layout/dashboard/referral"
+import { UserMenu } from "@/components/layout/dashboard/user-menu"
+import { ClientOnly } from "@/components/shared/client-only"
 import Logo from "../logo"
 
 interface AppSidebarProps {
@@ -56,18 +59,13 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
   return (
     <>
       <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader className="border-b border-sidebar-border/40 bg-sidebar/50 backdrop-blur-sm">
-          <div className="flex h-14 items-center px-4 overflow-hidden">
-            <Link href="/dashboard" className="flex items-center justify-center shrink-0">
-              {/* Полное лого: скрывается при collapsed */}
-              <div className="group-data-[collapsible=icon]:hidden">
-                <Logo className="gap-3 size-24" />
-              </div>
-              
-              {/* Одна буква: показывается ТОЛЬКО при collapsed */}
-              <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center">
-              </div>
+        <SidebarHeader className="border-b border-sidebar-border/40 bg-sidebar/50">
+          <div className="flex h-14 items-center justify-between overflow-hidden group-data-[collapsible=icon]:px-2">
+            {/* Лого скрывается полностью при collapsed, оставляя место только под триггер */}
+            <Link href="/dashboard" className="px-4 flex items-center justify-center shrink-0 group-data-[collapsible=icon]:hidden">
+              <Logo className="gap-3 size-24" />
             </Link>
+            <SidebarTrigger className="rounded-lg hover:bg-sidebar-accent/60 transition-colors" />
           </div>
         </SidebarHeader>
 
@@ -121,6 +119,10 @@ export function AppSidebar({ activeItem = "dashboard", locale }: AppSidebarProps
         </SidebarContent>
 
         <SidebarFooter className="border-t border-sidebar-border/40 p-2">
+          <ClientOnly>
+            <UserMenu />
+          </ClientOnly>
+          <div className="my-2 h-px bg-sidebar-border/30 mx-2" />
           <SidebarMenu className="gap-1">
             <SidebarReferralButton locale={locale} />
             {bottomItems.map((item) => {

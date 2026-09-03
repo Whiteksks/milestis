@@ -5,8 +5,13 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import { CTAButton } from '@/components/shared/cta-button';
-import { Check, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
+import { Check, ShieldCheck, RefreshCw, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useUserStore } from '@/hooks/useUserStore';
@@ -139,57 +144,105 @@ export function PricingContent() {
       </div>
 
       {/* Pricing Grid */}
-      <section id="plans" className="px-6 pb-20">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-stretch gap-8 md:grid-cols-3">
-          {/* Explorer Tier */}
-          <PricingCard
-            number="01"
-            title={t('tiers.explorer.title')}
-            price="0"
-            perMonthLabel={t('labels.perMonth')}
-            description={t('tiers.explorer.description')}
-            features={explorerFeatures}
-            buttonText={t('tiers.explorer.buttonText')}
-            variant="outline"
-            isFree
-          />
+      <section id="plans" className="px-2 md:px-6 pb-20">
+        {(() => {
+          const plans: Array<{ key: string } & PricingCardProps> = [
+            {
+              key: 'explorer',
+              number: '01',
+              title: t('tiers.explorer.title'),
+              price: '0',
+              perMonthLabel: t('labels.perMonth'),
+              description: t('tiers.explorer.description'),
+              features: explorerFeatures,
+              buttonText: t('tiers.explorer.buttonText'),
+              variant: 'outline',
+              isFree: true,
+            },
+            {
+              key: 'creator',
+              number: '02',
+              title: t('tiers.creator.title'),
+              price: isYearly ? '49' : '59',
+              perMonthLabel: t('labels.perMonth'),
+              billedYearlyLabel: isYearly ? `$490 ${t('labels.billedYearly')}` : undefined,
+              description: t('tiers.creator.description'),
+              features: creatorFeatures,
+              buttonText: t('tiers.creator.buttonText'),
+              variant: 'default',
+              isPopular: true,
+              badgeText: t('tiers.creator.badge'),
+              interval: isYearly ? 'year' : 'month',
+              planTier: 'creator',
+              activeTier: isPaidActive ? activeTier : undefined,
+              billingHref,
+            },
+            {
+              key: 'archive',
+              number: '03',
+              title: t('tiers.archive.title'),
+              price: isYearly ? '124' : '149',
+              perMonthLabel: t('labels.perMonth'),
+              billedYearlyLabel: isYearly ? `$1240 ${t('labels.billedYearly')}` : undefined,
+              description: t('tiers.archive.description'),
+              features: archiveFeatures,
+              buttonText: t('tiers.archive.buttonText'),
+              variant: 'outline',
+              interval: isYearly ? 'year' : 'month',
+              planTier: 'archive',
+              activeTier: isPaidActive ? activeTier : undefined,
+              billingHref,
+            },
+          ];
+          const initialSlide = plans.findIndex((p) => p.key === 'creator');
 
-          {/* Creator Tier */}
-          <PricingCard
-            number="02"
-            title={t('tiers.creator.title')}
-            price={isYearly ? '49' : '59'}
-            perMonthLabel={t('labels.perMonth')}
-            billedYearlyLabel={isYearly ? `$490 ${t('labels.billedYearly')}` : undefined}
-            description={t('tiers.creator.description')}
-            features={creatorFeatures}
-            buttonText={t('tiers.creator.buttonText')}
-            variant="default"
-            isPopular={true}
-            badgeText={t('tiers.creator.badge')}
-            interval={isYearly ? 'year' : 'month'}
-            planTier="creator"
-            activeTier={isPaidActive ? activeTier : undefined}
-            billingHref={billingHref}
-          />
+          return (
+            <>
+              {/* Mobile — swipeable carousel, centered on Creator by default */}
+              <div className="relative md:hidden [&_.swiper-pagination-bullet]:bg-primary/25 [&_.swiper-pagination-bullet-active]:bg-primary">
+                <Swiper
+                  key={isYearly ? 'yearly' : 'monthly'}
+                  modules={[Pagination, Navigation]}
+                  pagination={{ clickable: true }}
+                  navigation={{ prevEl: '.pricing-swiper-prev', nextEl: '.pricing-swiper-next' }}
+                  centeredSlides
+                  slidesPerView={1.08}
+                  spaceBetween={16}
+                  initialSlide={initialSlide}
+                  grabCursor
+                  className="!pb-10"
+                >
+                  {plans.map(({ key, ...cardProps }) => (
+                    <SwiperSlide key={key} className="h-auto py-2">
+                      <PricingCard {...cardProps} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
 
-          {/* Archive Tier */}
-          <PricingCard
-            number="03"
-            title={t('tiers.archive.title')}
-            price={isYearly ? '124' : '149'}
-            perMonthLabel={t('labels.perMonth')}
-            billedYearlyLabel={isYearly ? `$1240 ${t('labels.billedYearly')}` : undefined}
-            description={t('tiers.archive.description')}
-            features={archiveFeatures}
-            buttonText={t('tiers.archive.buttonText')}
-            variant="outline"
-            interval={isYearly ? 'year' : 'month'}
-            planTier="archive"
-            activeTier={isPaidActive ? activeTier : undefined}
-            billingHref={billingHref}
-          />
-        </div>
+                {/* Subtle hint arrows — signal there's more content to swipe */}
+                <button
+                  aria-label={t('labels.previousPlan')}
+                  className="pricing-swiper-prev absolute left-1 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/60 bg-background/80 text-muted-foreground shadow-sm backdrop-blur-sm transition-opacity duration-200 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-0"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                <button
+                  aria-label={t('labels.nextPlan')}
+                  className="pricing-swiper-next absolute right-1 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/60 bg-background/80 text-muted-foreground shadow-sm backdrop-blur-sm transition-opacity duration-200 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-0"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
+
+              {/* Desktop — static three-column grid */}
+              <div className="mx-auto hidden max-w-6xl grid-cols-1 items-stretch gap-8 md:grid md:grid-cols-3">
+                {plans.map(({ key, ...cardProps }) => (
+                  <PricingCard key={key} {...cardProps} />
+                ))}
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {/* Evergreen & Support Section — High-contrast block matching Manifesto style */}

@@ -55,7 +55,9 @@
       "monthly": "Помесячно",
       "yearly": "Годовой",
       "saveTwoMonths": "Экономия 2 месяца",
-      "billedYearly": "оплата раз в год"
+      "billedYearly": "оплата раз в год",
+      "previousPlan": "Предыдущий тариф",
+      "nextPlan": "Следующий тариф"
     },
     "evergreenSection": {
       "badge": "Всегда совместимо",
