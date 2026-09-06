@@ -14,6 +14,8 @@ export interface UserSettings {
   language?: "ru" | "en" | "kz";
   /** False right after signup; flips to true once the welcome modal is dismissed. */
   hasSeenWelcome?: boolean;
+  /** Flips to true once the user has dismissed the editor's first-visit help guide. */
+  hasSeenEditorHelp?: boolean;
   notifications: {
     project_updates: boolean;
     project_reminders: boolean;

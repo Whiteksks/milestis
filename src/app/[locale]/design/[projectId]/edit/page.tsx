@@ -21,6 +21,7 @@ import type { EditorMode } from '@/editor/lib/editor-mode'
 import { CanvasScrollProvider } from '@/editor/components/editor/canvas-scroll-context'
 import { PreviewOverlay } from '@/editor/components/editor/layout/preview-overlay'
 import { AiChatModal } from '@/editor/components/editor/layout/Modals/ai-chat-modal'
+import { EditorHelpGuide } from '@/editor/components/editor/layout/editor-help-guide'
 
 type LoadState = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error'
 
@@ -126,6 +127,14 @@ export default function EditorPage() {
   const [desktopActiveTab, setDesktopActiveTab] = useState<DesktopEditorTab>('sections')
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileEditorTab>('sections')
 
+  // AI chat's "open this section" button bumps this — forces both tab bars to "sections".
+  const focusSectionRequest = useUiSelector((state) => state.focusSectionRequest)
+  useEffect(() => {
+    if (!focusSectionRequest) return
+    setDesktopActiveTab('sections')
+    setMobileActiveTab('sections')
+  }, [focusSectionRequest])
+
   if (loadState === 'loading') {
     return (
       <div className="h-screen flex items-center justify-center text-muted-foreground text-sm">
@@ -201,6 +210,8 @@ export default function EditorPage() {
       <PreviewOverlay />
       {/* AI chat panel */}
       <AiChatModal />
+      {/* First-visit / on-demand editor guide */}
+      <EditorHelpGuide />
     </div>
   )
 }

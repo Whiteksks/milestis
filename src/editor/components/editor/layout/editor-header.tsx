@@ -9,7 +9,7 @@ import type { DeviceView } from '@/editor/lib/types'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode, SlidersHorizontal, Sparkles } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Eye, Check, Loader2, ChevronRight, Home, CloudUpload, Globe, EyeOff, ChevronDown, RefreshCw, QrCode, SlidersHorizontal, Sparkles, Pencil } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { saveProject } from '@/lib/projects'
 import { useAutoSave } from '@/hooks/useAutoSave'
@@ -21,8 +21,9 @@ import { useContentStore } from '@/editor/lib/store/content'
 import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PublishModal } from '@/editor/components/modals/publish-modal'
-import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
+import { buildPublishedProjectUrl, getStoredPublishSlug, normalizeSlug } from '@/lib/slug'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import QRCodeSVG from 'react-qr-code'
 
 interface EditorHeaderProps {
@@ -75,6 +76,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
 
   const [localName, setLocalName] = useState(projectName ?? '')
+  const [isRenamePopoverOpen, setIsRenamePopoverOpen] = useState(false)
 
   const modeUiConfig = MODE_REGISTRY[editorMode].uiConfig
 
@@ -224,19 +226,50 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               if (e.key === 'Escape') { setLocalName(projectName ?? ''); e.currentTarget.blur() }
             }}
             placeholder={t('header.projectNamePlaceholder')}
-            className="min-w-0 w-24 sm:w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border focus:outline-none transition-colors truncate"
+            className="hidden sm:block min-w-0 w-32 max-w-[180px] bg-transparent text-sm font-medium text-foreground px-1.5 py-0.5 border-b border-border/50 hover:border-border/80 focus:border-border focus:outline-none transition-colors truncate"
           />
+          {/* Mobile: project name field takes up too much header space — collapse it into an icon
+              that opens a small popover with the rename input instead. */}
+          <Popover open={isRenamePopoverOpen} onOpenChange={setIsRenamePopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0 sm:hidden"
+                title={t('header.projectNamePlaceholder')}
+              >
+                <Pencil className="size-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-56 p-2">
+              <input
+                autoFocus
+                value={localName}
+                onChange={(e) => setLocalName(e.target.value)}
+                onBlur={handleRename}
+                maxLength={30}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.currentTarget.blur()
+                  if (e.key === 'Escape') setLocalName(projectName ?? '')
+                  if (e.key === 'Enter' || e.key === 'Escape') { e.currentTarget.blur(); setIsRenamePopoverOpen(false) }
+                }}
+                placeholder={t('header.projectNamePlaceholder')}
+                className="w-full bg-transparent text-sm font-medium text-foreground px-2 py-1.5 border-b border-border/50 focus:border-border focus:outline-none transition-colors"
+              />
+            </PopoverContent>
+          </Popover>
           {/* Inline save icon — always visible, color reflects save state */}
           <Button
             variant="ghost"
             size="lg"
             onClick={handleSave}
             disabled={saveState === 'saving'}
-            title={t('header.saveShortcut')}
+            title={saveState === 'idle' && isDirty ? t('header.unsavedChanges') : t('header.saveShortcut')}
             className={[
-              'h-8 w-6 rounded-full transition-colors shrink-0',
+              'relative h-8 w-6 rounded-full transition-colors shrink-0',
               saveState === 'saved' ? 'text-emerald-500 hover:text-emerald-500' :
               saveState === 'error' ? 'text-destructive hover:text-destructive' :
+              saveState === 'idle' && isDirty ? 'text-amber-500 hover:text-amber-500' :
               'text-muted-foreground/70 hover:text-foreground',
             ].join(' ')}
           >
@@ -246,6 +279,9 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
               <Check className="size-4" />
             ) : (
               <CloudUpload className="size-4.5" />
+            )}
+            {saveState === 'idle' && isDirty && (
+              <span className="absolute top-0.5 right-0 h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
             )}
           </Button>
         </div>
@@ -421,7 +457,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         }}
         projectId={projectId}
         mode={editorMode}
-        initialSlug={afterTopupSlug ?? (editorMode !== 'portfolio' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
+        initialSlug={afterTopupSlug ?? getStoredPublishSlug(projectId) ?? (editorMode !== 'portfolio' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
         initialAccessToken={afterTopupAccessToken ?? undefined}
         autoAdvance={afterTopupSlug !== null}
         republishMode={projectStatus === 'archived' && !isPublished}

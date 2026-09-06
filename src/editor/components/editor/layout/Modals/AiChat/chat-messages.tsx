@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Sparkles, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import type { Message } from './types'
@@ -14,6 +15,7 @@ interface ChatMessagesProps {
   quickPrompts?: string[]
   onQuickPromptSelect?: (prompt: string) => void
   loadingCaption?: string
+  onOpenSection?: (sectionId: string) => void
 }
 
 function TypingGreeting({ text }: { text: string }) {
@@ -58,8 +60,9 @@ function TypingGreeting({ text }: { text: string }) {
   )
 }
 
-export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQuickPromptSelect, loadingCaption }: ChatMessagesProps) {
+export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQuickPromptSelect, loadingCaption, onOpenSection }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations('editor.layout.aiChat')
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -128,6 +131,21 @@ export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQu
                   )}
                 >
                   {msg.content}
+                </div>
+              )}
+              {msg.role === 'assistant' && msg.sectionsToOpen && msg.sectionsToOpen.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {msg.sectionsToOpen.map((section) => (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => onOpenSection?.(section.id)}
+                      className="inline-flex items-center gap-1.5 text-xs rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-primary hover:bg-primary/10 hover:border-primary/50 transition-colors"
+                    >
+                      <PenLine className="h-3 w-3" />
+                      {t('openSectionCta', { name: section.name })}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

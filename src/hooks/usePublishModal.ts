@@ -4,7 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   buildPublishedProjectUrl,
   getSlugValidationError,
+  getStoredPublishSlug,
   normalizeSlugInput,
+  setStoredPublishSlug,
 } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
@@ -21,7 +23,10 @@ function generateToken(): string {
 }
 
 export function usePublishModal(projectId: string, mode: SlugMode, options?: { initialSlug?: string; initialAccessToken?: string; ratePerDollar?: number; republishMode?: boolean }) {
-  const initialSlug = options?.initialSlug ?? ''
+  // Remembered slug takes priority over any project-name-derived guess, and — unlike the
+  // afterTopup URL echo, which only arrives via an effect after the first render — is
+  // available synchronously here, so the very first render already shows the right value.
+  const initialSlug = options?.initialSlug ?? getStoredPublishSlug(projectId) ?? ''
   const ratePerDollar = options?.ratePerDollar ?? 1
   const republishMode = options?.republishMode ?? false
   const [step, setStep] = useState<PublishStep>('slug')
@@ -86,6 +91,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     const normalized = normalizeSlugInput(value)
     setSlug(normalized)
     setSlugStatus('idle')
+    if (normalized.length >= 3) setStoredPublishSlug(projectId, normalized)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => checkAvailability(normalized), 500)
   }

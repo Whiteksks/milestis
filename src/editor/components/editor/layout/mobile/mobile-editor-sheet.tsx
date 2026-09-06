@@ -3,7 +3,7 @@
 import { memo, useState, useCallback, useEffect, useMemo, type ReactNode } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from "next-intl"
-import { Layers, Paintbrush, Wand2, Sparkles, LayoutTemplate } from "lucide-react"
+import { Layers, Paintbrush, Wand2, Sparkles, LayoutTemplate, HelpCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
@@ -184,12 +184,16 @@ const SheetNav = memo(function SheetNav({
   dragHandleProps,
   tabs,
   aiUnread,
+  onHelpPress,
+  helpLabel,
 }: {
   activeTab: MobileEditorTab
   onTabPress: (tab: MobileEditorTab) => void
   dragHandleProps: MobileSnapSheetRenderProps["dragHandleProps"]
   tabs: TabDef[]
   aiUnread: boolean
+  onHelpPress: () => void
+  helpLabel: string
 }) {
   return (
     // Entire nav area is the drag surface — tabs stop propagation individually
@@ -198,9 +202,19 @@ const SheetNav = memo(function SheetNav({
       className="relative shrink-0 select-none touch-none cursor-grab active:cursor-grabbing"
       aria-label="Editor sheet navigation"
     >
-      {/* Handle pill */}
-      <div className="pointer-events-none flex h-5 justify-center pt-2.5 pb-0">
+      {/* Handle pill — help icon shares this thin top strip so it doesn't crowd the tab row below */}
+      <div className="relative flex h-5 items-center justify-center pt-2.5 pb-0">
         <div className="w-10 h-1 rounded-full bg-foreground/20" />
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onHelpPress() }}
+          aria-label={helpLabel}
+          title={helpLabel}
+          className="absolute right-3 -top-0.5 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <HelpCircle className="h-4 w-4" aria-hidden="true" />
+        </button>
       </div>
 
       {/* Tab bar */}
@@ -323,7 +337,9 @@ export function MobileEditorSheet({
   const setSelectedDecorationId = useUiSelector((state) => state.setSelectedDecorationId)
   const editorMode = useUiSelector((state) => state.editorMode)
   const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
+  const setIsHelpGuideOpen = useUiStore((s) => s.setIsHelpGuideOpen)
   const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
+  const tHelpGuide = useTranslations("editor.layout.helpGuide")
 
   const [appearanceSubTab, setAppearanceSubTab] = useState<MobileAppearanceSubTab>("background")
 
@@ -417,6 +433,8 @@ export function MobileEditorSheet({
             dragHandleProps={dragHandleProps}
             tabs={tabs}
             aiUnread={!hasAiGenerated}
+            onHelpPress={() => setIsHelpGuideOpen(true)}
+            helpLabel={tHelpGuide("buttonLabel")}
           />
           <SheetBody
             mode={mode}

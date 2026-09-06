@@ -37,7 +37,8 @@ export function ChatInput({
           placeholder={t('inputPlaceholder')}
           disabled={isLoading}
           rows={2}
-          className="flex-1 resize-none rounded-xl text-sm min-h-[44px] max-h-[120px]"
+          // text-base (16px) below md: prevents iOS Safari from auto-zooming on focus
+          className="flex-1 resize-none rounded-xl text-base md:text-sm min-h-[44px] max-h-[120px]"
         />
         <Button
           onClick={onSend}

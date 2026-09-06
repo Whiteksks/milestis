@@ -8,6 +8,8 @@ export type AiChatMessage = {
   content: string
   photos?: string[]
   isError?: boolean
+  /** Sections the AI just edited — rendered as "open this section" buttons under the message. */
+  sectionsToOpen?: { id: string; name: string }[]
 }
 
 export interface UiStore {
@@ -19,6 +21,10 @@ export interface UiStore {
   isSidebarCollapsed: boolean
 
   activeSectionId: string | null
+
+  /** Bumped by requestFocusSection so pages can react even if the same section is requested twice. */
+  focusSectionRequest: { sectionId: string; nonce: number } | null
+  requestFocusSection: (sectionId: string) => void
 
   isDesignModalOpen: boolean
   designModalSection: DesignModalSection
@@ -74,6 +80,9 @@ export interface UiStore {
   isAiChatOpen: boolean
   setIsAiChatOpen: (open: boolean) => void
 
+  isHelpGuideOpen: boolean
+  setIsHelpGuideOpen: (open: boolean) => void
+
   aiChatMessages: AiChatMessage[]
   aiChatInput: string
   aiChatIsLoading: boolean
@@ -92,6 +101,7 @@ export const useUiStore = create<UiStore>((set) => ({
   isSidebarCollapsed: false,
 
   activeSectionId: null,
+  focusSectionRequest: null,
 
   isDesignModalOpen: false,
   designModalSection: 'templates',
@@ -109,6 +119,7 @@ export const useUiStore = create<UiStore>((set) => ({
   isModerationOpen: false,
   isPreviewOpen: false,
   isAiChatOpen: false,
+  isHelpGuideOpen: false,
 
   aiChatMessages: [],
   aiChatInput: '',
@@ -152,6 +163,15 @@ export const useUiStore = create<UiStore>((set) => ({
 
   setActiveSectionId: (id) => set(() => ({ activeSectionId: id })),
 
+  // Forces the section panel open (uncollapsing the sidebar) and asks the page to switch its
+  // desktop/mobile tab to "sections" — used by the AI chat's "open this section" button.
+  requestFocusSection: (sectionId) =>
+    set(() => ({
+      activeSectionId: sectionId,
+      isSidebarCollapsed: false,
+      focusSectionRequest: { sectionId, nonce: Date.now() },
+    })),
+
   setProjectId: (id) => set(() => ({ projectId: id })),
   setProjectName: (name) => set(() => ({ projectName: name })),
   setIsPublished: (v) => set(() => ({ isPublished: v })),
@@ -165,6 +185,7 @@ export const useUiStore = create<UiStore>((set) => ({
   setIsModerationOpen: (open) => set(() => ({ isModerationOpen: open })),
   setIsPreviewOpen: (open) => set(() => ({ isPreviewOpen: open })),
   setIsAiChatOpen: (open) => set(() => ({ isAiChatOpen: open })),
+  setIsHelpGuideOpen: (open) => set(() => ({ isHelpGuideOpen: open })),
 
   addAiChatMessage: (msg) => set((s) => ({ aiChatMessages: [...s.aiChatMessages, msg] })),
   setAiChatInput: (input) => set(() => ({ aiChatInput: input })),

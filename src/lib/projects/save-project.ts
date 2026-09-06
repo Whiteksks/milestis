@@ -21,10 +21,12 @@ function stripUndefined<T>(val: T): T {
   return JSON.parse(JSON.stringify(val)) as T
 }
 
-async function performSaveProject(
-  projectId: string,
-  { updateDashboardMeta = true, updateTimestamp = true }: SaveProjectOptions = {},
-): Promise<void> {
+/**
+ * Builds the exact { theme, content } document body that gets written to
+ * projects/{id}/data/content — shared by the normal client-side save and the
+ * sendBeacon-based unload fallback in useAutoSave so both write identical shapes.
+ */
+export function buildSaveContentPayload() {
   const contentStore = useContentStore.getState()
 
   const {
@@ -46,6 +48,23 @@ async function performSaveProject(
   }
 
   const content = modeEntry.extractContent(contentStore)
+
+  return {
+    theme: stripUndefined(theme),
+    content: stripUndefined(content),
+  }
+}
+
+async function performSaveProject(
+  projectId: string,
+  { updateDashboardMeta = true, updateTimestamp = true }: SaveProjectOptions = {},
+): Promise<void> {
+  const contentStore = useContentStore.getState()
+  const { currentTheme, currentTemplateId } = useThemeStore.getState()
+  const { editorMode } = useUiStore.getState()
+  const modeEntry = MODE_REGISTRY[editorMode]
+
+  const { theme, content } = buildSaveContentPayload()
 
   const payload: Record<string, unknown> = {}
 
@@ -73,10 +92,7 @@ async function performSaveProject(
   }
 
   const contentDocRef = doc(db, 'projects', projectId, 'data', 'content')
-  await setDoc(contentDocRef, {
-    theme: stripUndefined(theme),
-    content: stripUndefined(content),
-  })
+  await setDoc(contentDocRef, { theme, content })
 
   if (Object.keys(payload).length > 0) {
     await updateDoc(doc(db, 'projects', projectId), payload)

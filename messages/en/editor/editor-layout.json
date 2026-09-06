@@ -6,6 +6,7 @@
         "backToDashboard": "Back to Dashboard",
         "projectNamePlaceholder": "Untitled",
         "saveShortcut": "Save (Ctrl+S)",
+        "unsavedChanges": "Unsaved changes — click to save",
         "media": "Media",
         "preview": "Preview",
         "moderation": "Moderation",
@@ -38,6 +39,7 @@
         "assistantSuccessAll": "Done! I've set up your entire project. Feel free to adjust anything in the editor.",
         "assistantSuccessTheme": "Done! I've updated the style — take a look and let me know if you'd like anything different.",
         "assistantSuccessSection": "Done! I've updated that section — everything else was left untouched.",
+        "openSectionCta": "Open \"{name}\" section",
         "assistantError": "Something went wrong. Please try again.",
         "assistantRateLimit": "Too many requests. Please wait a moment and try again.",
         "assistantNoChanges": "Hmm, I wasn't able to apply that. Could you rephrase or be more specific about what to change?",
@@ -79,6 +81,22 @@
         "changeTemplate": "Change Template",
         "changeTheme": "Change Theme",
         "background": "Background"
+      },
+      "helpGuide": {
+        "buttonLabel": "How it works",
+        "title": "How to use the editor",
+        "aiTitle": "What the AI assistant does",
+        "aiBody": "The AI assistant helps you build faster: it can choose a template and theme, arrange your photos across sections, and draft text from your description. It doesn't replace you — always review and adjust the result yourself. Like any AI, it can make mistakes, so double-check important details like names, dates, and facts before publishing.",
+        "featuresTitle": "Editor features",
+        "featuresBody": "Change the template and color theme, add a background and decorations, upload and rearrange photos — everything saves automatically. Any section can be hidden with the eye icon in the sections list: it disappears from the published site, but its text and photos stay untouched and come back as soon as you show it again.",
+        "sectionsTitle": "Sections",
+        "sectionsBodyPortfolio": "A portfolio is built from blocks: a header with navigation, a hero intro, an about section with your photo and achievements, a featured-work gallery, a video block, a contact form, and a footer with social links. Fill in and style what you need, and hide the rest.",
+        "sectionsBodyPhotobook": "A photobook is built from a cover, an introduction, story sections (text with photos), a gallery, a highlight spread, and an ending. Add photos and text to any section — reorder and restyle them anytime.",
+        "linkTitle": "Your site's link",
+        "linkBodyPortfolio": "When you publish, you choose a short name — it becomes part of your site's address: your-name.milestis.site. Pick something easy to say and remember, since it's the link you'll share with clients and on social media. Portfolios are open to search engines.",
+        "linkBodyPhotobook": "When you publish, you choose a short name — it becomes part of the link: milestis.site/your-name. Only people you send it to will find it — photobooks are hidden from search engines, so pick a name that's easy to share in a message.",
+        "policyBody": "By publishing, you agree to the <policy_link>Acceptable Use Policy</policy_link>.",
+        "gotIt": "Got it"
       }
     }
   }

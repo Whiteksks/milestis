@@ -9,6 +9,7 @@ import { PhotoPicker } from './photo-picker'
 import { ChatInput } from './chat-input'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
+import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { getProjectImageSelectUrl } from '@/editor/hooks/use-project-images'
 import { runAiPipeline, type AiPipelineStage } from '@/lib/ai/pipeline/orchestrator'
 import type { AiChatMode } from '@/lib/ai/core/types'
@@ -24,7 +25,15 @@ export function AiChatContent() {
   const locale = useLocale()
   const editorMode = useUiStore((s) => s.editorMode)
   const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
+  const requestFocusSection = useUiStore((s) => s.requestFocusSection)
+  const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
+  const { sections } = useModeSections()
   const [loadingCaption, setLoadingCaption] = useState('')
+
+  function handleOpenSection(sectionId: string) {
+    requestFocusSection(sectionId)
+    setIsAiChatOpen(false)
+  }
 
   const { messages, input, setInput, addMessage, isLoading, setIsLoading } = useChat()
   const {
@@ -81,9 +90,14 @@ export function AiChatContent() {
         onStage: (stage) => setLoadingCaption(captionForStage(stage)),
       })
 
+      const sectionsToOpen = result.kind === 'applied' && result.intent === 'edit_section'
+        ? result.sectionsWritten.map((id) => ({ id, name: sections.find((s) => s.id === id)?.name ?? id }))
+        : undefined
+
       addMessage({
         role: 'assistant',
         content: result.kind === 'chat' ? result.message : t(SUCCESS_KEY_BY_INTENT[result.intent]),
+        sectionsToOpen,
       })
     } catch (err) {
       const is429 = err instanceof Error && err.message.includes('429')
@@ -115,6 +129,7 @@ export function AiChatContent() {
           quickPrompts={t.raw((editorMode as AiChatMode) === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
           onQuickPromptSelect={setInput}
           loadingCaption={loadingCaption}
+          onOpenSection={handleOpenSection}
         />
       <PhotoPicker
         selectedUrls={selectedUrls}

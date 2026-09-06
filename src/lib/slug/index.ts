@@ -15,3 +15,4 @@ export {
   getSlugInputChrome,
 } from "./url"
 export type { PublishedProjectShareInput } from "./url"
+export { getStoredPublishSlug, setStoredPublishSlug } from "./local-storage"
