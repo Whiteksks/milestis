@@ -1,13 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation'; // Импортируем хук для отслеживания пути
 
-// Iubenda temporarily disabled — hook is now a no-op
 export function useIubenda() {
   const pathname = usePathname(); // Получаем текущий URL-путь
-  void pathname;
 
-  /*
   useEffect(() => {
     // 1. Сначала удаляем старый скрипт, если он уже был добавлен, 
     // чтобы принудительно перезапустить инициализацию виджетов
@@ -39,5 +37,4 @@ export function useIubenda() {
     loader();
 
   }, [pathname]); // <-- Магия здесь: useEffect сработает заново КАЖДЫЙ РАЗ, когда меняется страница!
-  */
 }

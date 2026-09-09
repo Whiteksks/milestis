@@ -34,10 +34,8 @@ export default function LoginPage() {
     setHasReferral(!!(urlRef || peekReferralCode()))
   }, [])
 
-  // Iubenda temporarily disabled — no-op until re-enabled
+  // Логика интеграции с Iubenda
   const recordIubendaConsent = (email: string) => {
-    void email
-    /*
     ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
       "submit",
       {
@@ -49,7 +47,6 @@ export default function LoginPage() {
         },
       },
     ])
-    */
   }
 
   const handleSendMagicLink = async () => {

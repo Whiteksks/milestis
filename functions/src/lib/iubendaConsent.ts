@@ -1,7 +1,6 @@
-// Iubenda temporarily disabled
-// import { logger } from "firebase-functions/v2";
+import { logger } from "firebase-functions/v2";
 
-// const CONSENT_API_URL = "https://consent.iubenda.com/consent";
+const CONSENT_API_URL = "https://consent.iubenda.com/consent";
 
 export interface IubendaConsentSubject {
 	id: string;
@@ -19,14 +18,11 @@ export interface IubendaConsentSubject {
  * Production: set it as a Cloud Run environment variable in the Firebase
  * console → Functions → (function) → Edit → Runtime environment variables.
  */
-// Iubenda temporarily disabled — kept as a no-op so call sites still compile
 export async function recordIubendaConsent(
 	subject: IubendaConsentSubject,
 	legalNoticeIdentifiers: string[],
 	proof: string,
 ): Promise<void> {
-	return;
-	/*
 	const apiKey = process.env.IUBENDA_PRIVATE_API_KEY;
 	if (!apiKey || apiKey === "your_private_api_key_here") {
 		logger.warn("[iubendaConsent] IUBENDA_PRIVATE_API_KEY is not configured — skipping consent recording.");
@@ -63,5 +59,4 @@ export async function recordIubendaConsent(
 	} catch (err) {
 		logger.warn("[iubendaConsent] Network error while recording consent:", err);
 	}
-	*/
 }

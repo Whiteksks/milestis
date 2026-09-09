@@ -12,8 +12,8 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.iubenda.com https://cdn.iubenda.com",
   // Fonts
   "font-src 'self' https://fonts.gstatic.com",
-  // Images: Firebase Storage + Google Avatars + Next.js optimizer + Iubenda + AWS S3 Icons
-  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com https://*.iubenda.com https://*.amazonaws.com",
+  // Images: Firebase Storage + Google Avatars + Next.js optimizer + Iubenda + AWS S3 Icons + Unsplash
+  "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com https://*.iubenda.com https://*.amazonaws.com https://*.unsplash.com https://unsplash.com",
   // Fetch / XHR: Добавлены https://www.google.com и https://*.google.com для App Check и reCAPTCHA API
   "connect-src 'self' https://*.googleapis.com https://*.google.com https://www.google.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://*.iubenda.com",
   // Frames: Google reCAPTCHA + Firebase Auth + YouTube + Iubenda
@@ -53,6 +53,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "firebasestorage.googleapis.com", pathname: "/**" },
       { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
       { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/**" },
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],
   },
   webpack(config) {

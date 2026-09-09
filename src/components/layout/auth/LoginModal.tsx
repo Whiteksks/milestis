@@ -41,10 +41,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [showEmailFlow, setShowEmailFlow] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
-  // Iubenda temporarily disabled — no-op until re-enabled
   const recordIubendaConsent = (email: string) => {
-    void email
-    /*
     ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
       "submit",
       {
@@ -56,7 +53,6 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
         },
       },
     ])
-    */
   }
 
   const handleSendMagicLink = async () => {
