@@ -1,4 +1,5 @@
 export const SLUG_MODE_POLICY = {
+  menu: { namespace: "global", routeKind: "subdomain" },
   portfolio: {
     namespace: "global",
     routeKind: "subdomain",
@@ -17,7 +18,7 @@ export type SlugMode = keyof typeof SLUG_MODE_POLICY
 export type SlugModePolicy = (typeof SLUG_MODE_POLICY)[SlugMode]
 
 export function isSlugMode(value: string | null | undefined): value is SlugMode {
-  return typeof value === "string" && value in SLUG_MODE_POLICY
+  return typeof value === "string" && Object.hasOwn(SLUG_MODE_POLICY, value)
 }
 
 export function getSlugModePolicy(mode: SlugMode): SlugModePolicy {

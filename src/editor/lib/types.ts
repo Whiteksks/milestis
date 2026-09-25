@@ -51,6 +51,7 @@ export type AspectRatio = (typeof ASPECT_RATIOS)[keyof typeof ASPECT_RATIOS]
 /** TemplateId is derived automatically from each mode's ID list.
  *  To add a new template — edit modes/portfolio-ids.ts or modes/photobook-ids.ts.
  *  Never edit this line directly. */
+import type { MenuTemplateId } from '@/editor/modes/menu/template-ids'
 import type { PortfolioTemplateId } from '@/editor/modes/portfolio/template-ids'
 import type { PhotobookTemplateId } from '@/editor/modes/photobook/template-ids'
 import type { EventTemplateId } from '@/editor/modes/event/template-ids'
@@ -58,7 +59,7 @@ import type { DecorationAnimation } from './config/decoration-animations'
 export type { PortfolioTemplateId, PhotobookTemplateId, EventTemplateId, DecorationAnimation }
 
 // 3. Создаем составной тип
-export type TemplateId = PortfolioTemplateId | PhotobookTemplateId | EventTemplateId
+export type TemplateId = PortfolioTemplateId | PhotobookTemplateId | EventTemplateId | MenuTemplateId
 
 // Portfolio background effect types — defined in the portfolio mode, re-exported here for shared consumers.
 export type { DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode } from '@/editor/modes/portfolio/content-types'

@@ -62,7 +62,7 @@ function ensurePublishableProject(project: Record<string, unknown>, uid: string)
 	if (project.ownerId !== uid) {
 		throw new PublishValidationError("FORBIDDEN", "You do not own this project.");
 	}
-	if (project.status !== "active" || project.isPublished === true) {
+	if (project.mode === "menu" || project.status !== "active" || project.isPublished === true) {
 		throw new PublishValidationError("NOT_PUBLISHABLE", "Project is not publishable.");
 	}
 }

@@ -109,7 +109,8 @@ export function TemplatesSection({
   const coverFrameStyle = useContentStore((s) => s.photobookImageContent.cover?.value.presentation?.frameStyle)
   const coverDate = useContentStore((s) => s.photobookSectionContent.cover.date)
 
-  const title = isPhotobook ? coverTitle : heroTitle
+  const menuTitle = useContentStore((s) => s.menuContent.venue.name)
+  const title = editorMode === 'menu' ? menuTitle : isPhotobook ? coverTitle : heroTitle
   const subtitle = isPhotobook ? coverSubtitle : heroSubtitle
   const heroImageUrl = isPhotobook ? coverImage : heroImage
   const aspectRatio = isPhotobook ? coverAspectRatio : heroAspectRatio

@@ -1,19 +1,13 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import {
-  buildPublishedProjectUrl,
-  getSlugValidationError,
-  getStoredPublishSlug,
-  normalizeSlugInput,
-  setStoredPublishSlug,
-} from '@/lib/slug'
+import { useState, useCallback, useEffect } from 'react'
+import { buildPublishedProjectUrl, getStoredPublishSlug } from '@/lib/slug'
 import type { SlugMode } from '@/lib/slug'
 import { analyzeProject, type AnalyzeProjectResult } from '@/lib/projects/analyze-project-api'
 import { analyzeRepublish } from '@/lib/projects/analyze-republish-api'
 import { getProjectConfig } from '@/lib/projects/project-type-config'
 
-type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved'
+import { usePublishSlug } from './usePublishSlug'
 export type PublishStep = 'slug' | 'review' | 'success'
 
 function generateToken(): string {
@@ -30,10 +24,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   const ratePerDollar = options?.ratePerDollar ?? 1
   const republishMode = options?.republishMode ?? false
   const [step, setStep] = useState<PublishStep>('slug')
-  const [slug, setSlug] = useState(initialSlug)
-  const [slugStatus, setSlugStatus] = useState<SlugStatus>(() =>
-    initialSlug.length >= 3 ? 'available' : 'idle',
-  )
+  const { slug, slugStatus, handleSlugChange, resetSlug, retryAvailability } = usePublishSlug(projectId, mode, initialSlug, republishMode)
   // Stable token per modal instance — generated once for modes that require access tokens
   const [accessToken, setAccessToken] = useState<string>(() =>
     getProjectConfig(mode).hasAccessToken ? options?.initialAccessToken ?? generateToken() : '',
@@ -45,56 +36,10 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
   const [analyzeErrorCode, setAnalyzeErrorCode] = useState<string | null>(null)
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    if (!options?.initialSlug) return
-    setSlug(options.initialSlug)
-    setSlugStatus(options.initialSlug.length >= 3 ? 'available' : 'idle')
-  }, [options?.initialSlug])
-
   useEffect(() => {
     if (!options?.initialAccessToken || !getProjectConfig(mode).hasAccessToken) return
     setAccessToken(options.initialAccessToken)
   }, [mode, options?.initialAccessToken])
-
-  const checkAvailability = async (value: string) => {
-    if (!value || value.length < 3) {
-      setSlugStatus('idle')
-      return
-    }
-    if (getSlugValidationError(value)) {
-      setSlugStatus('invalid')
-      return
-    }
-    // Photobooks: uniqueness is checked within the photobook namespace
-    setSlugStatus('checking')
-    try {
-      const params = new URLSearchParams({ slug: value, excludeProjectId: projectId, mode })
-      const res = await fetch(`/api/projects/check-slug?${params}`)
-      if (!res.ok) {
-        setSlugStatus('idle')
-        return
-      }
-      const data = await res.json()
-      if (data.error === 'RESERVED_SLUG') {
-        setSlugStatus('reserved')
-        return
-      }
-      setSlugStatus(data.available ? 'available' : 'taken')
-    } catch {
-      setSlugStatus('idle')
-    }
-  }
-
-  const handleSlugChange = (value: string) => {
-    const normalized = normalizeSlugInput(value)
-    setSlug(normalized)
-    setSlugStatus('idle')
-    if (normalized.length >= 3) setStoredPublishSlug(projectId, normalized)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => checkAvailability(normalized), 500)
-  }
 
   // Step 1: ready to proceed to review
   // In republishMode the slug is fixed — skip all slug validation
@@ -102,11 +47,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     republishMode
       ? !isAnalyzing
       : (
-          slug.length >= 3 &&
-          slugStatus !== 'taken' &&
-          slugStatus !== 'invalid' &&
-          slugStatus !== 'reserved' &&
-          slugStatus !== 'checking' &&
+          slugStatus === 'available' &&
           !isAnalyzing
         )
 
@@ -148,14 +89,12 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   // Reset all state — called when the modal closes
   const reset = () => {
     setStep('slug')
-    setSlug(initialSlug)
-    setSlugStatus(initialSlug.length >= 3 ? 'available' : 'idle')
+    resetSlug(initialSlug)
     setQuoteData(null)
     setIsAnalyzing(false)
     setAnalyzeError(null)
     setAnalyzeErrorCode(null)
     setAccessToken(getProjectConfig(mode).hasAccessToken ? generateToken() : '')
-    if (debounceRef.current) clearTimeout(debounceRef.current)
   }
 
   // ── Pay & Publish flow ────────────────────────────────────────────────────
@@ -224,6 +163,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
     step,
     slug,
     handleSlugChange,
+    retryAvailability,
     slugStatus,
     accessToken,
     portfolioUrl,

@@ -278,7 +278,8 @@ const SheetBody = memo(function SheetBody({
     : "overflow-y-auto overscroll-contain"
 
   const visible = mode !== "nav" && activeTab !== "design" && activeTab !== "ai" && content !== null
-  const showSubTabs = visible && activeTab === "appearance"
+  const editorMode = useUiSelector((s) => s.editorMode)
+  const showSubTabs = visible && activeTab === "appearance" && !MODE_REGISTRY[editorMode].uiConfig.hideDecorations
 
   return (
     <motion.div
@@ -341,7 +342,10 @@ export function MobileEditorSheet({
   const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
   const tHelpGuide = useTranslations("editor.layout.helpGuide")
 
-  const [appearanceSubTab, setAppearanceSubTab] = useState<MobileAppearanceSubTab>("background")
+  const hideDecorations = MODE_REGISTRY[editorMode].uiConfig.hideDecorations
+  const [storedAppearanceSubTab, setAppearanceSubTab] = useState<MobileAppearanceSubTab>("background")
+
+  const appearanceSubTab = hideDecorations ? "background" : storedAppearanceSubTab
 
   const tMobile = useTranslations("editor.layout.mobile")
   const subTabLabels = useMemo(
@@ -351,7 +355,7 @@ export function MobileEditorSheet({
   const tabs = useMemo(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
     const allTabs: TabDef[] = ALL_TAB_ICONS.map(({ id, icon }) => ({ id, icon, label: tMobile(id) }))
-    return hideSections ? allTabs.filter((tab) => tab.id !== 'sections') : allTabs
+    return allTabs.filter((tab) => !(hideSections && tab.id === 'sections') && !(MODE_REGISTRY[editorMode].uiConfig.hideAiButton && tab.id === 'ai'))
   }, [editorMode, tMobile])
 
   // If sections tab becomes hidden while active, redirect to appearance

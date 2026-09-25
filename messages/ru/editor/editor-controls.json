@@ -7,6 +7,20 @@
         "allSections": "Разделы"
       },
       "media": {
+        "uploadQueued": "В очереди",
+        "uploadProcessing": "Обработка…",
+        "uploadRetry": "Повторить",
+        "uploadDismiss": "Скрыть ошибку",
+        "uploadErrors": {
+          "storageLimit": "Недостаточно места в хранилище.",
+          "tooManyPixels": "Изображение больше 100 Мп. Уменьшите его размеры.",
+          "processingFailed": "Не удалось обработать файл. Попробуйте загрузить JPEG, PNG или WebP.",
+          "processingTimeout": "Обработка затянулась. Можно загрузить файл повторно.",
+          "connectionFailed": "Нет связи со статусом обработки. Проверьте подключение.",
+          "uploadFailed": "Не удалось загрузить файл. Повторите попытку.",
+          "unsupportedFormat": "Выберите файл изображения.",
+          "fileTooLarge": "Файл должен быть меньше 100 МБ."
+        },
         "pickImage": "Выбрать изображение",
         "changeImage": "Изменить изображение",
         "removeImage": "Удалить изображение",

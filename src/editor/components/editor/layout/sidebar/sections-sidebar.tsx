@@ -42,7 +42,7 @@ export function SectionsSidebar({
         { id: 'background' as const, icon: WandSparkles, label: t('sidebar.background') },
         { id: 'decorations' as const, icon: Sparkles, label: t('sidebar.decorations') },
       ]
-      return cfg.hideSectionsTab ? all.filter((tab) => tab.id !== 'sections') : all
+      return all.filter((tab) => !(cfg.hideSectionsTab && tab.id === 'sections') && !(cfg.hideDecorations && tab.id === 'decorations'))
     },
     [editorMode, t, translate],
   )
@@ -50,7 +50,7 @@ export function SectionsSidebar({
   // If the sections tab becomes hidden while it's active, redirect to background
   useEffect(() => {
     const cfg = getModeUiConfig(editorMode, translate)
-    if (cfg.hideSectionsTab && activeTab === 'sections') {
+    if ((cfg.hideSectionsTab && activeTab === 'sections') || (cfg.hideDecorations && activeTab === 'decorations')) {
       onTabChange('background')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,7 +133,7 @@ export function SectionsSidebar({
             ) : activeTab === 'background' ? (
               <ThemeTab />
             ) : (
-              <DecorationsTab />
+              getModeUiConfig(editorMode, translate).hideDecorations ? <ThemeTab /> : <DecorationsTab />
             )}
           </div>
         </div>

@@ -101,14 +101,14 @@ export function PublishedView({
         )}
       >
         {/* Decorations layer — read-only (no selection / dragging) */}
-        <DecorationsLayer
+        {!MODE_REGISTRY[mode].uiConfig.hideDecorations && <DecorationsLayer
           decorations={decorations}
           selectedId={null}
           deviceView={deviceView}
           animation={decorationAnimation}
           onUpdate={() => {}}
           onRemove={() => {}}
-        />
+        />}
 
         <div className="relative z-10">
           {template}

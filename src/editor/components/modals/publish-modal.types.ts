@@ -3,7 +3,7 @@
 import type { useTranslations } from 'next-intl'
 import type { usePublishModal } from '@/hooks/usePublishModal'
 
-export type PublishMode = 'portfolio' | 'photobook' | 'event'
+export type PublishMode = 'portfolio' | 'photobook' | 'event' | 'menu'
 
 export interface PublishModalProps {
   open: boolean

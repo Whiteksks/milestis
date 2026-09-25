@@ -3,7 +3,7 @@
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('lib', { recursive: true, force: true })\"",
     "lint": "eslint .",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc && node scripts/check-publish-build.cjs",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",

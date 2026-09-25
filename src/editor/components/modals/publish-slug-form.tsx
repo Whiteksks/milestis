@@ -3,22 +3,30 @@
 import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { Globe, Link2, ShieldCheck, Check, X, Loader2 } from 'lucide-react'
 import { usePublishModal } from '@/hooks/usePublishModal'
-import { getSlugInputChrome } from '@/lib/slug'
+import { getSlugInputChrome, getSlugModePolicy, type SlugMode } from '@/lib/slug'
 
 // ─── Slug form (step 1) ───────────────────────────────────────────────────────
 
 export function PublishForm({
   mode,
   data,
+  disabled = false,
+  hint,
+  notice,
 }: {
-  mode: 'portfolio' | 'photobook' | 'event'
-  data: ReturnType<typeof usePublishModal>
+  mode: SlugMode
+  data: Pick<ReturnType<typeof usePublishModal>, 'slug' | 'handleSlugChange' | 'slugStatus' | 'retryAvailability'>
+  disabled?: boolean
+  hint?: string
+  notice?: string
 }) {
   const { slug, handleSlugChange, slugStatus } = data
   const maxLength = 24
   const chrome = getSlugInputChrome(mode)
+  const subdomain = getSlugModePolicy(mode).routeKind === 'subdomain'
   const t = useTranslations('editor.modal.publish')
 
   return (
@@ -29,10 +37,10 @@ export function PublishForm({
             htmlFor="slug"
             className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] flex items-center gap-2"
           >
-            {mode === 'portfolio'
+            {subdomain
               ? <Globe className="size-3.5 text-primary/60" />
               : <Link2 className="size-3.5 text-primary/60" />}
-            {mode === 'portfolio' ? t('form.subdomainSettings') : t('form.linkIdentifier')}
+            {subdomain ? t('form.subdomainSettings') : t('form.linkIdentifier')}
           </Label>
           <span
             className={`text-[10px] font-mono font-medium ${slug.length >= maxLength ? 'text-destructive' : 'text-muted-foreground/40'}`}
@@ -48,12 +56,13 @@ export function PublishForm({
           <div className="relative flex-1 min-w-0 flex items-center bg-background/50">
             <Input
               id="slug"
+              disabled={disabled}
               value={slug}
               onChange={(e) =>
                 e.target.value.length <= maxLength && handleSlugChange(e.target.value)
               }
               placeholder={
-                mode === 'portfolio'
+                subdomain
                   ? t('form.placeholderPortfolio')
                   : t('form.placeholderPhotobook')
               }
@@ -73,7 +82,8 @@ export function PublishForm({
         </div>
 
         <div className="px-1 min-h-[20px]">
-          <SlugStatusMessage status={slugStatus} mode={mode} />
+          {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : <SlugStatusMessage status={slugStatus} mode={mode} />}
+          {slugStatus === 'error' && <Button type="button" variant="link" size="sm" className="h-auto px-0 py-1" disabled={disabled} onClick={data.retryAvailability}>{t('actions.tryAgain')}</Button>}
         </div>
       </div>
 
@@ -82,7 +92,7 @@ export function PublishForm({
           <ShieldCheck className="w-3.5 h-3.5 text-primary/70" />
         </div>
         <p className="text-[11px] leading-relaxed text-muted-foreground/80 font-medium pt-0.5">
-          {mode === 'photobook' ? t('form.privacyFirst') : t('form.globalAccess')}
+          {notice ?? (mode === 'photobook' ? t('form.privacyFirst') : t('form.globalAccess'))}
         </p>
       </div>
     </div>
@@ -100,6 +110,7 @@ export function SlugStatusIcon({
   if (status === 'available') return <Check className="size-3.5 text-emerald-500" />
   if (status === 'taken') return <X className="size-3.5 text-destructive" />
   if (status === 'invalid') return <X className="size-3.5 text-destructive" />
+  if (status === 'error') return <X className="size-3.5 text-destructive" />
   if (status === 'reserved') return <X className="size-3.5 text-amber-500" />
   return null
 }
@@ -109,16 +120,18 @@ export function SlugStatusMessage({
   mode,
 }: {
   status: ReturnType<typeof usePublishModal>['slugStatus']
-  mode: 'portfolio' | 'photobook' | 'event'
+  mode: SlugMode
 }) {
   const t = useTranslations('editor.modal.publish')
+  if (status === 'error')
+    return <p className="text-xs text-destructive">{t('form.checkFailed')}</p>
   if (status === 'taken')
     return <p className="text-xs text-destructive">{t('form.taken')}</p>
   if (status === 'invalid')
     return <p className="text-xs text-destructive">{t('form.invalid')}</p>
   if (status === 'reserved')
     return <p className="text-xs text-amber-600 dark:text-amber-400">{t('form.reserved')}</p>
-  if (status === 'available' && mode === 'portfolio')
+  if (status === 'available' && getSlugModePolicy(mode).routeKind === 'subdomain')
     return <p className="text-xs text-emerald-600 dark:text-emerald-400">{t('form.available')}</p>
   return null
 }

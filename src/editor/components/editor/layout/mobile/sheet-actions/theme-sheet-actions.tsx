@@ -18,6 +18,7 @@ import {
 // ─── Registry (mirrors ThemeFloatingToolbar) ──────────────────────────────────
 
 const SHEET_REGISTRY: Record<EditorMode, ComponentType> = {
+  menu: PortfolioThemeSheetActions,
   portfolio: PortfolioThemeSheetActions,
   photobook: PhotobookThemeSheetActions,
   // Events don't have theme controls in V1

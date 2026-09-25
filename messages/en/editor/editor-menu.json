@@ -1,0 +1,88 @@
+{
+  "createCards": {
+    "menu": {
+      "title": "Menu",
+      "description": "Create your restaurant menu with categories, dishes, photos and prices."
+    }
+  },
+  "editor": {
+    "menu": {
+      "title": "Menu",
+      "templateName": "Classic menu",
+      "venue": "Restaurant",
+      "venueName": "Restaurant name",
+      "venuePlaceholder": "Your café name",
+      "description": "Description",
+      "currency": "Menu currency",
+      "currencyHint": "Changing the currency changes its label, not the amounts. Review your prices after changing it.",
+      "logo": "Logo",
+      "photo": "Dish photo",
+      "categories": "Menu categories",
+      "category": "Category",
+      "categoryName": "Category name",
+      "newCategory": "New category",
+      "dishName": "Dish name",
+      "newDish": "New dish",
+      "ingredients": "Description and ingredients",
+      "price": "Price",
+      "invalidPrice": "Enter a non-negative price with up to two decimal places, no more than 9,999,999.99.",
+      "addCategory": "Add category",
+      "addDish": "Add dish",
+      "removeCategory": "Delete category",
+      "removeDish": "Delete dish",
+      "removeCategoryHint": "Move or delete this category’s dishes before deleting the category.",
+      "up": "Move up",
+      "down": "Move down",
+      "hide": "Hide",
+      "show": "Show",
+      "hidden": "Hidden",
+      "draftHint": "Only visible categories and dishes with a name and a valid price appear in the menu.",
+      "emptyEditor": "Add a category and a dish with a name and price in the Menu section.",
+      "emptyPublic": "The menu is coming soon.",
+      "limits": "Up to {categories} categories and {dishes} dishes per menu.",
+      "publish": {
+        "title": "Publish menu",
+        "updateTitle": "Update menu",
+        "description": "Guests see the published version. Editor changes appear on the link after you update the publication.",
+        "address": "Menu address",
+        "permanent": "The address is fixed on first publication. Updates keep the same link and QR code.",
+        "publish": "Publish",
+        "update": "Update publication",
+        "publishing": "Publishing…",
+        "success": "Menu published",
+        "saved": "The latest version is available at this link.",
+        "qr": "Menu QR code",
+        "copy": "Copy link",
+        "copied": "Copied",
+        "download": "Download QR",
+        "open": "Open menu",
+        "updateAndShare": "Update menu / QR code",
+        "errors": {
+          "INVALID_SLUG": "Use 3–24 Latin letters, numbers and hyphens, and choose an address that is not reserved.",
+          "SLUG_TAKEN": "This address is taken. Choose another.",
+          "SLUG_IMMUTABLE": "This menu already has a permanent address. Reload the editor.",
+          "VENUE_REQUIRED": "Enter the restaurant name.",
+          "EMPTY_MENU": "Add at least one visible dish with a name and price in a visible category. Enable the menu section.",
+          "INVALID_MENU": "Check menu categories, dishes and prices.",
+          "INVALID_IMAGE": "Check your menu photos: use uploaded images or web URLs.",
+          "PUBLISH_IN_PROGRESS": "Publication is already in progress. Wait and try again.",
+          "DRAFT_CHANGED": "The menu changed during publication. Try updating again.",
+          "PUBLISH_CANCELLED": "Publication was cancelled. Reload the page.",
+          "NOT_PUBLISHABLE": "This project cannot currently be published.",
+          "UNAUTHORIZED": "Please sign in again.",
+          "FORBIDDEN": "You do not have access to this project.",
+          "NOT_FOUND": "Project not found.",
+          "CONFIG_ERROR": "Menu publication is not yet configured on the server.",
+          "COPY_FAILED": "Could not copy the link. Copy the address manually.",
+          "UNKNOWN": "Could not publish the menu. Please try again."
+        },
+        "fixedAddress": "This address is reserved for this menu."
+      }
+    }
+  },
+  "project": {
+    "mode": {
+      "menu": "Menu"
+    }
+  }
+}

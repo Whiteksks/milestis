@@ -22,7 +22,7 @@
           "tryAgain": "Try again",
           "publish": "Publish",
           "republish": "Republish",
-          "republishing": "Republishing\u2026",
+          "republishing": "Republishing…",
           "checking": "Checking…",
           "publishing": "Publishing…"
         },
@@ -36,7 +36,8 @@
           "available": "Subdomain is available!",
           "taken": "This subdomain is already taken.",
           "invalid": "Lowercase letters, numbers, hyphens (3–24 chars).",
-          "reserved": "This name is reserved and cannot be used."
+          "reserved": "This name is reserved and cannot be used.",
+          "checkFailed": "Could not check this address. Please try again."
         },
         "review": {
           "project": "Project",
@@ -57,7 +58,7 @@
           "aupLink": "Acceptable Use Policy",
           "analysisFailed": "Analysis failed",
           "freeRepublish": "No additional cost — same or fewer photos than before.",
-          "deltaNote": "You are charged only the difference: {delta} new credits ({prev}\u2192{new} cr).",
+          "deltaNote": "You are charged only the difference: {delta} new credits ({prev}→{new} cr).",
           "contentPolicyError": {
             "title": "Content Review Required",
             "description": "One or more photos in your project were flagged for content that may violate our Acceptable Use Policy. Please review your images, replace any that show graphic violence or explicit content, and try again.",

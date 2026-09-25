@@ -20,7 +20,7 @@ export function buildPublishedProjectUrl(
       ? `https://${slug}.${PUBLIC_SITE_DOMAIN}`
       : `https://${PUBLIC_SITE_DOMAIN}/${slug}`
 
-  return policy.routeKind === "path" && accessToken
+  return policy.namespace === "token" && accessToken
     ? `${baseUrl}?share=${accessToken}`
     : baseUrl
 }

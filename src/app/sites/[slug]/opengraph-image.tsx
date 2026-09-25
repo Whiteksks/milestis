@@ -1,9 +1,10 @@
 import { ImageResponse } from 'next/og'
 import { headers } from 'next/headers'
 import { createHash } from 'crypto'
+import { getPublishedGlobalProject } from '@/lib/projects/published-global'
 import { adminDb } from '@/lib/firebase/admin'
 import {
-  getSlugReservationDocId,
+  getSlugModePolicy,
   isSlugMode,
   PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from '@/lib/slug'
@@ -61,6 +62,16 @@ function fallback(): ImageResponse {
   )
 }
 
+function menuPreview(name: string, slug: string): ImageResponse {
+  return new ImageResponse(
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', height: '100%', padding: 80, background: '#f6f1e8', color: '#25231e' }}>
+      <div style={{ fontSize: 28, marginBottom: 32 }}>MENU</div>
+      <div style={{ fontSize: 64 }}>{name.slice(0, 100)}</div>
+      <div style={{ fontSize: 24, marginTop: 36 }}>{slug}.milestis.site</div>
+    </div>, size,
+  )
+}
+
 export default async function Image({ params, searchParams }: Props) {
   try {
     const { slug } = await params
@@ -71,20 +82,12 @@ export default async function Image({ params, searchParams }: Props) {
     let ogImageUrl: string | null = null
     let coverUrl: string | null = null
 
-    if (rawMode === 'portfolio') {
-      const slugSnap = await adminDb
-        .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
-        .doc(getSlugReservationDocId('portfolio', slug))
-        .get()
-      if (!slugSnap.exists) return fallback()
-      const { projectId } = slugSnap.data() as { projectId?: string }
-      if (!projectId) return fallback()
-      const docSnap = await adminDb.collection('published_projects').doc(projectId).get()
-      if (!docSnap.exists) return fallback()
-      const data = docSnap.data()!
-      if (data.isPublished !== true) return fallback()
-      ogImageUrl = (data.ogImageUrl as string | undefined) ?? null
-      coverUrl = extractCoverUrl(data.content as Record<string, unknown> | null, 'portfolio')
+    if (getSlugModePolicy(rawMode).namespace === 'global') {
+      const project = await getPublishedGlobalProject(adminDb, slug)
+      if (!project) return fallback()
+      if (project.mode === 'menu') return menuPreview(String(project.content?.sectionContent?.venue?.name || project.name), slug)
+      ogImageUrl = project.ogImageUrl
+      coverUrl = extractCoverUrl(project.content, project.mode)
     } else if (rawMode === 'photobook') {
       const { share } = await searchParams
       const tokenString = Array.isArray(share) ? share[0] : share

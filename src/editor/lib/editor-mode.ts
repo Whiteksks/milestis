@@ -11,6 +11,7 @@
  * The compile-time check in registry.ts will fail if you forget step 1 or 3.
  */
 export const EDITOR_MODES = {
+  menu: 'menu',
   portfolio: 'portfolio',
   photobook: 'photobook',
   event: 'event',

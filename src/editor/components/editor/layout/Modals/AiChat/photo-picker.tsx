@@ -1,5 +1,7 @@
 'use client'
 
+import { UploadTile } from '../upload-tile'
+
 import { Upload, Plus, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -17,6 +19,8 @@ interface PhotoPickerProps {
   pendingUploads: UploadingEntry[]
   onToggle: (url: string) => void
   onToggleAll: () => void
+  onRetry: (id: string) => void
+  onDismiss: (id: string) => void
   onUploadClick: () => void
 }
 
@@ -27,6 +31,8 @@ export function PhotoPicker({
   onToggle,
   onToggleAll,
   onUploadClick,
+  onRetry,
+  onDismiss,
 }: PhotoPickerProps) {
   const t = useTranslations('editor.layout.aiChat')
   const isEmpty = images.length === 0 && pendingUploads.length === 0
@@ -90,32 +96,7 @@ export function PhotoPicker({
         )}
 
         {/* Процесс загрузки */}
-        {pendingUploads.map((u) => (
-          <div
-            key={u.id}
-            className="relative shrink-0 h-[52px] w-[52px] rounded-lg overflow-hidden border border-border bg-muted"
-          >
-            <Image
-              src={u.previewUrl}
-              alt={u.name}
-              fill
-              unoptimized
-              sizes="52px"
-              className="object-cover opacity-50"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <span className="text-[10px] font-bold text-white tabular-nums">
-                {u.progress}%
-              </span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
-              <div
-                className="h-full bg-primary transition-all duration-200"
-                style={{ width: `${u.progress}%` }}
-              />
-            </div>
-          </div>
-        ))}
+        {pendingUploads.map((u) => (<UploadTile key={u.id} entry={u} compact onRetry={onRetry} onDismiss={onDismiss} />))}
 
         {/* Загруженные изображения */}
         {images.map((img) => {

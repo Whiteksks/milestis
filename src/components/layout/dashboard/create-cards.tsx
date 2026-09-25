@@ -30,6 +30,7 @@ const cards: {
     titleKey: "createCards.event.title",
     descriptionKey: "createCards.event.description",
   },
+  { mode: "menu", number: "04", titleKey: "createCards.menu.title", descriptionKey: "createCards.menu.description" },
 ]
 
 export function CreateCards() {
@@ -39,7 +40,7 @@ export function CreateCards() {
   return (
     <div className="mb-8">
       {/* Grid container */}
-      <div className="grid border-y border-border lg:grid-cols-3">
+      <div className="grid border-y border-border sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card, index) => {
           const isLoading = loadingMode === card.mode
           const isDisabled = !!loadingMode

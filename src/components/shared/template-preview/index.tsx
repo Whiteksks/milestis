@@ -1,5 +1,6 @@
 'use client'
 
+import { MenuCoverPreview } from '@/editor/modes/menu/templates/menu-classic'
 import { getTheme } from '@/editor/lib/config/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
 import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
@@ -126,6 +127,8 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
 
   // Normalise: strip 'photobook-' prefix so the id matches TEMPLATE_CONFIG keys
   const normalizedId = (templateId ?? '').replace(/^photobook-/, '')
+
+  if (templateId === 'menu-classic') return <ScaledWrapper zoom={zoom} background={theme.background}><MenuCoverPreview theme={theme} title={title} /></ScaledWrapper>
 
   // Portfolio templates
   const HeroComponent = PORTFOLIO_PREVIEW_REGISTRY[templateId ?? '']

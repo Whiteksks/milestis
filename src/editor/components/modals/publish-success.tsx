@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { CheckCircle2, Copy, Check, Gift, Mail } from 'lucide-react'
 import { FaWhatsapp, FaTelegram } from 'react-icons/fa6'
@@ -16,16 +16,24 @@ export function PublishSuccessPane({
   siteUrl,
   t: customT,
   onInviteClick,
+  title,
+  description,
+  shareMessage: customShareMessage,
+  children,
 }: {
   siteUrl: string
   t?: ReturnType<typeof useTranslations<'editor.modal.publish'>>
-  onInviteClick: () => void
+  onInviteClick?: () => void
+  title?: string
+  description?: string
+  shareMessage?: string
+  children?: ReactNode
 }) {
   const defaultT = useTranslations('editor.modal.publish')
   const t = customT ?? defaultT
   const [copied, setCopied] = useState(false)
 
-  const shareMessage = t('success.shareMessage')
+  const shareMessage = customShareMessage ?? t('success.shareMessage')
   const encodedLink = encodeURIComponent(siteUrl)
   const encodedMessage = encodeURIComponent(shareMessage)
 
@@ -70,10 +78,10 @@ export function PublishSuccessPane({
         </div>
         <div className="space-y-1">
           <h3 className="font-serif text-xl sm:text-2xl font-medium tracking-tight text-foreground">
-            {t('success.title')}
+            {title ?? t('success.title')}
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xs sm:max-w-sm mx-auto leading-relaxed">
-            {t('success.description')}
+            {description ?? t('success.description')}
           </p>
         </div>
       </div>
@@ -117,7 +125,8 @@ export function PublishSuccessPane({
       </div>
 
       {/* Referral card */}
-      <div className="w-full min-w-0 space-y-2.5 rounded-2xl border border-border/50 bg-card p-3.5 sm:p-4 text-left shadow-2xs">
+      {children}
+      {onInviteClick && <div className="w-full min-w-0 space-y-2.5 rounded-2xl border border-border/50 bg-card p-3.5 sm:p-4 text-left shadow-2xs">
         <div className="flex items-center gap-2">
           <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary shrink-0">
             <Gift className="size-3.5" />
@@ -136,7 +145,7 @@ export function PublishSuccessPane({
           <Gift className="size-3.5 text-primary" />
           {t('success.referralCta')}
         </Button>
-      </div>
+      </div>}
     </div>
   )
 }

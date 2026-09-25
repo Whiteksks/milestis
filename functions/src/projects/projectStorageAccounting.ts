@@ -40,6 +40,15 @@ export async function deleteProjectImageDocs(
   logPrefix: string,
   options?: { countFreedBytes?: boolean },
 ): Promise<number> {
+  // Processing records are private project data too; deleting the parent does not delete them.
+  const jobs = db.collection("projects").doc(projectId).collection("imageJobs");
+  let jobPage = await jobs.limit(400).get();
+  while (!jobPage.empty) {
+    const cleanup = db.batch();
+    jobPage.docs.forEach((job) => cleanup.delete(job.ref));
+    await cleanup.commit();
+    jobPage = await jobs.limit(400).get();
+  }
   const imagesSnap = await db
     .collection("images")
     .where("projectId", "==", projectId)

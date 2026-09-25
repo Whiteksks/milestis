@@ -1,4 +1,4 @@
-import { doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/firebase'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useThemeStore } from '@/editor/lib/store/theme'
@@ -8,7 +8,6 @@ import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
 interface SaveProjectOptions {
   updateDashboardMeta?: boolean
   updateTimestamp?: boolean
-  bypassQueue?: boolean
 }
 
 const saveQueues = new Map<string, Promise<void>>()
@@ -23,8 +22,7 @@ function stripUndefined<T>(val: T): T {
 
 /**
  * Builds the exact { theme, content } document body that gets written to
- * projects/{id}/data/content — shared by the normal client-side save and the
- * sendBeacon-based unload fallback in useAutoSave so both write identical shapes.
+ * projects/{id}/data/content.
  */
 export function buildSaveContentPayload() {
   const contentStore = useContentStore.getState()
@@ -44,7 +42,7 @@ export function buildSaveContentPayload() {
     currentTemplateId,
     currentTheme,
     themeCustomizations,
-    customDecorations,
+    customDecorations: modeEntry.uiConfig.hideDecorations ? [] : customDecorations,
   }
 
   const content = modeEntry.extractContent(contentStore)
@@ -55,10 +53,9 @@ export function buildSaveContentPayload() {
   }
 }
 
-async function performSaveProject(
-  projectId: string,
+function captureSave(
   { updateDashboardMeta = true, updateTimestamp = true }: SaveProjectOptions = {},
-): Promise<void> {
+) {
   const contentStore = useContentStore.getState()
   const { currentTheme, currentTemplateId } = useThemeStore.getState()
   const { editorMode } = useUiStore.getState()
@@ -91,25 +88,29 @@ async function performSaveProject(
     payload.updatedAt = serverTimestamp()
   }
 
-  const contentDocRef = doc(db, 'projects', projectId, 'data', 'content')
-  await setDoc(contentDocRef, { theme, content })
-
-  if (Object.keys(payload).length > 0) {
-    await updateDoc(doc(db, 'projects', projectId), payload)
-  }
+  return { theme, content, payload, contentStore, themeStore: useThemeStore.getState() }
 }
 
 export async function saveProject(
   projectId: string,
   options: SaveProjectOptions = {},
 ): Promise<void> {
-  if (options.bypassQueue) {
-    await performSaveProject(projectId, options)
-    return
-  }
+  if (useUiStore.getState().projectId !== projectId) throw new Error('Project changed before saving')
+  // Capture now: a queued save must never read another project's global stores.
+  const snapshot = captureSave(options)
 
   const previousSave = saveQueues.get(projectId) ?? Promise.resolve()
-  const nextSave = previousSave.catch(() => undefined).then(() => performSaveProject(projectId, options))
+  const nextSave = previousSave.catch(() => undefined).then(async () => {
+    const batch = writeBatch(db)
+    batch.set(doc(db, 'projects', projectId, 'data', 'content'), { theme: snapshot.theme, content: snapshot.content })
+    if (Object.keys(snapshot.payload).length > 0) batch.update(doc(db, 'projects', projectId), snapshot.payload)
+    await batch.commit()
+    if (useUiStore.getState().projectId === projectId
+      && useContentStore.getState() === snapshot.contentStore
+      && useThemeStore.getState() === snapshot.themeStore) {
+      useUiStore.getState().markClean()
+    }
+  })
 
   saveQueues.set(projectId, nextSave)
 

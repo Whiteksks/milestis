@@ -1,5 +1,7 @@
 ﻿'use client'
 
+import { UploadTile } from './upload-tile'
+
 import { useUiSelector } from '@/editor/lib/store'
 import {
   getProjectImageDisplayUrl,
@@ -37,7 +39,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
   }))
 
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
-  const { fileInputRef, images, pendingUploads, totalCount, handleFileUpload } = useProjectMediaLibrary()
+  const { fileInputRef, images, pendingUploads, totalCount, handleFileUpload, retryUpload, dismissUpload } = useProjectMediaLibrary()
   const isMobile = useIsMobile()
 
   const handleDelete = async (imageId: string) => {
@@ -126,27 +128,7 @@ export function MediaLibraryModal({ mode = 'manage', onSelectImage }: MediaLibra
 
             {/* Uploading placeholders — hide any whose imageId is already in Firestore
                  to prevent duplicate keys and the flash they cause */}
-            {pendingUploads.map((u) => (
-              <div
-                key={u.id}
-                className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40"
-              >
-                <Image
-                  src={u.previewUrl}
-                  alt={u.name}
-                  fill
-                  unoptimized
-                  sizes="160px"
-                  className="object-cover opacity-50"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[2px]">
-                  <span className="text-sm font-semibold text-foreground/80 tabular-nums">{u.progress}%</span>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-background/50">
-                  <div className="h-full bg-primary transition-[width]" style={{ width: `${u.progress}%` }} />
-                </div>
-              </div>
-            ))}
+            {pendingUploads.map((u) => (<UploadTile key={u.id} entry={u} onRetry={retryUpload} onDismiss={dismissUpload} />))}
 
             {/* Firestore images */}
             {images.map((image) => {

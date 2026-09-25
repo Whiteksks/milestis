@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useTranslations } from 'next-intl'
 import { useQueryClient } from "@tanstack/react-query"
 import { createProject } from "@/lib/projects"
 import { toastProject } from "@/lib/toast"
@@ -38,6 +39,7 @@ export function randomProjectName(): string {
 }
 
 export function useCreateProject() {
+  const t = useTranslations('editor.menu')
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
@@ -51,7 +53,7 @@ export function useCreateProject() {
     if (isPending) return
     setPendingMode(mode)
     startTransition(async () => {
-      const promise = createProject(randomProjectName(), mode)
+      const promise = createProject(mode === 'menu' ? t('title') : randomProjectName(), mode)
       toastProject.create(promise)
       try {
         const result = await promise

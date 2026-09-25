@@ -1,5 +1,5 @@
 import { db } from "../lib/firebaseAdmin";
-import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug";
+import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./publish/slug/index";
 
 export {
   buildStorageUsedBytesReleaseUpdate,

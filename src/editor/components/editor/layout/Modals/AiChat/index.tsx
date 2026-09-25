@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { MODE_REGISTRY } from '@/editor/lib/modes'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -18,7 +19,8 @@ import { AiChatContent } from './ai-chat-content'
 
 export function AiChatModal() {
   const t = useTranslations('editor.layout.aiChat')
-  const isAiChatOpen = useUiStore((s) => s.isAiChatOpen)
+  const editorMode = useUiStore((s) => s.editorMode)
+  const isAiChatOpen = useUiStore((s) => s.isAiChatOpen) && !MODE_REGISTRY[editorMode].uiConfig.hideAiButton
   const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
   const projectId = useUiStore((s) => s.projectId)
   const clearAiChat = useUiStore((s) => s.clearAiChat)
@@ -32,6 +34,8 @@ export function AiChatModal() {
     clearAiChat()
     resetAiBrief()
   }, [projectId, clearAiChat, resetAiBrief])
+
+  if (MODE_REGISTRY[editorMode].uiConfig.hideAiButton) return null
 
   if (isMobile) {
     return (

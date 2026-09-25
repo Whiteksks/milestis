@@ -49,6 +49,7 @@ import { useUserStore } from "@/hooks/useUserStore"
 import { cn } from "@/lib/utils"
 
 const modeIcons = {
+  menu: BookOpen,
   portfolio: Layout,
   photobook: BookOpen,
   event:     Camera,

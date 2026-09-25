@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import {
   useProjectMediaLibrary,
   getProjectImageSelectUrl,
@@ -6,15 +6,20 @@ import {
 
 export function usePhotoAttach() {
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
-  const { fileInputRef, images, pendingUploads, handleFileUpload } = useProjectMediaLibrary()
+  const { fileInputRef, images, pendingUploads, handleFileUpload, retryUpload, dismissUpload } = useProjectMediaLibrary()
 
   // Images uploaded from this chat are auto-selected once Firestore confirms them,
   // so the user doesn't have to upload and then separately tap to select.
   const autoSelectIds = useRef<Set<string>>(new Set())
 
-  useEffect(() => {
-    pendingUploads.forEach((u) => autoSelectIds.current.add(u.id))
-  }, [pendingUploads])
+  function uploadFromChat(event: ChangeEvent<HTMLInputElement>) {
+    handleFileUpload(event).forEach((id) => autoSelectIds.current.add(id))
+  }
+  function retryFromChat(id: string) {
+    autoSelectIds.current.delete(id)
+    const nextId = retryUpload(id)
+    if (nextId) autoSelectIds.current.add(nextId)
+  }
 
   useEffect(() => {
     if (autoSelectIds.current.size === 0) return
@@ -55,6 +60,8 @@ export function usePhotoAttach() {
     fileInputRef,
     images,
     pendingUploads,
-    handleFileUpload,
+    handleFileUpload: uploadFromChat,
+    retryUpload: retryFromChat,
+    dismissUpload,
   }
 }

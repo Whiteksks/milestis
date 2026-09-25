@@ -9,8 +9,7 @@ import type { Content, SchemaRequest } from 'firebase/ai'
 // Small, narrowly-scoped calls are what make per-call `required` schema fields actually reliable.
 
 export interface NarrowCallOptions {
-  /** Cache key for the memoized model instance — one per distinct (systemPrompt, schema) pair,
-   *  e.g. 'intent-classifier', 'style:photobook', 'content:photobook:cover'. */
+  /** Operation label used in diagnostics. Model instances use this request's schema. */
   cacheKey: string
   systemPrompt: string
   schema: SchemaRequest
@@ -21,12 +20,8 @@ export interface NarrowCallOptions {
   thinkingLevel?: ThinkingLevel
 }
 
-const _models = new Map<string, ReturnType<typeof getGenerativeModel>>()
-
 function getModel(opts: NarrowCallOptions) {
-  const cached = _models.get(opts.cacheKey)
-  if (cached) return cached
-
+  // Schemas contain the current photo IDs/counts. Never reuse another request's schema.
   const ai = getAI(getApp(), { backend: new GoogleAIBackend() })
   const model = getGenerativeModel(ai, {
     model: 'gemini-3.7-flash',
@@ -38,7 +33,6 @@ function getModel(opts: NarrowCallOptions) {
       temperature: opts.temperature ?? 0.4,
     },
   })
-  _models.set(opts.cacheKey, model)
   return model
 }
 

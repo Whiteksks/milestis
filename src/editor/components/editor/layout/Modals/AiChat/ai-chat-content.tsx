@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useChat } from './use-chat'
 import { usePhotoAttach } from './use-photo-attach'
@@ -24,6 +24,13 @@ export function AiChatContent() {
   const t = useTranslations('editor.layout.aiChat')
   const locale = useLocale()
   const editorMode = useUiStore((s) => s.editorMode)
+  const projectId = useUiStore((s) => s.projectId)
+  const request = useRef<AbortController | null>(null)
+  useEffect(() => () => {
+    request.current?.abort()
+    request.current = null
+    if (useUiStore.getState().projectId === projectId) useUiStore.getState().setAiChatIsLoading(false)
+  }, [projectId])
   const hasAiGenerated = useAiBriefStore((s) => s.hasGenerated)
   const requestFocusSection = useUiStore((s) => s.requestFocusSection)
   const setIsAiChatOpen = useUiStore((s) => s.setIsAiChatOpen)
@@ -45,6 +52,8 @@ export function AiChatContent() {
     images,
     pendingUploads,
     handleFileUpload,
+    retryUpload,
+    dismissUpload,
   } = usePhotoAttach()
 
   function captionForStage(stage: AiPipelineStage): string {
@@ -57,8 +66,12 @@ export function AiChatContent() {
   }
 
   async function handleSend() {
+    if (!projectId || request.current || useUiStore.getState().aiChatIsLoading) return
     const trimmed = input.trim()
     if (!trimmed && selectedUrls.length === 0) return
+    const controller = new AbortController()
+    request.current = controller
+    const isCurrent = () => request.current === controller && useUiStore.getState().projectId === projectId
 
     const photosCopy = [...selectedUrls]
 
@@ -82,13 +95,16 @@ export function AiChatContent() {
       const newPhotoIds = photosCopy.map((url) => urlToId.get(url)).filter((id): id is string => id !== undefined)
 
       const result = await runAiPipeline({
+        projectId,
+        signal: controller.signal,
         mode: editorMode as AiChatMode,
         prompt: trimmed,
         language: locale,
         idToDoc,
         newPhotoIds,
-        onStage: (stage) => setLoadingCaption(captionForStage(stage)),
+        onStage: (stage) => { if (isCurrent()) setLoadingCaption(captionForStage(stage)) },
       })
+      if (!isCurrent()) return
 
       const sectionsToOpen = result.kind === 'applied' && result.intent === 'edit_section'
         ? result.sectionsWritten.map((id) => ({ id, name: sections.find((s) => s.id === id)?.name ?? id }))
@@ -100,11 +116,20 @@ export function AiChatContent() {
         sectionsToOpen,
       })
     } catch (err) {
+      if (!isCurrent()) return
       const is429 = err instanceof Error && err.message.includes('429')
-      addMessage({ role: 'assistant', content: t(is429 ? 'assistantRateLimit' : 'assistantError'), isError: true })
+      const reason = err instanceof Error ? err.message : ''
+      const key = reason === 'AI_PROJECT_CHANGED' ? 'assistantProjectChanged'
+        : reason === 'AI_CANCELLED' ? 'assistantCancelled'
+        : reason === 'AI_TIMEOUT' ? 'assistantTimeout'
+        : is429 ? 'assistantRateLimit' : 'assistantError'
+      addMessage({ role: 'assistant', content: t(key), isError: true })
     } finally {
-      setIsLoading(false)
-      setLoadingCaption('')
+      if (isCurrent()) {
+        request.current = null
+        setIsLoading(false)
+        setLoadingCaption('')
+      }
     }
   }
 
@@ -138,6 +163,8 @@ export function AiChatContent() {
         onToggle={toggleUrl}
         onToggleAll={toggleAll}
         onUploadClick={() => fileInputRef.current?.click()}
+        onRetry={retryUpload}
+        onDismiss={dismissUpload}
       />
       <ChatInput
         input={input}
@@ -146,6 +173,7 @@ export function AiChatContent() {
         onInputChange={setInput}
         onSend={handleSend}
       />
+      {isLoading && <button type="button" className="text-xs underline pb-3" onClick={() => request.current?.abort()}>{t('cancelGeneration')}</button>}
     </div>
   )
 }

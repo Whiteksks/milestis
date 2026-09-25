@@ -112,6 +112,11 @@ export interface ModeUiConfig {
   hidePreviewButton?: boolean
   /** When true, the Sections tab is hidden from the sidebar and mobile sheet for this mode. */
   hideSectionsTab?: boolean
+  /** Disable decorations in controls and every rendered view. */
+  hideDecorations?: boolean
+  hideAiButton?: boolean
+  /** Draft-only modes cannot open the paid publishing flow. */
+  hidePublishButton?: boolean
 }
 
 export type ResolvedModeUiConfig = Omit<

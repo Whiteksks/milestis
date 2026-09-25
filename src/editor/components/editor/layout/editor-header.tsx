@@ -25,6 +25,7 @@ import { buildPublishedProjectUrl, getStoredPublishSlug, normalizeSlug } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import QRCodeSVG from 'react-qr-code'
+import { toast } from 'sonner'
 
 interface EditorHeaderProps {
   projectId: string
@@ -40,17 +41,18 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [afterTopupSlug, setAfterTopupSlug] = useState<string | null>(null)
   const [afterTopupAccessToken, setAfterTopupAccessToken] = useState<string | null>(null)
   const t = useTranslations('editor.layout')
+  const tMenuPublish = useTranslations('editor.menu.publish')
   const params = useParams()
   const router = useRouter()
   const locale = params.locale as string
   const queryClient = useQueryClient()
   const uid = useUserStore((s) => s.profile?.uid ?? null)
-  const { save: autoSave, isDirty } = useAutoSave(projectId)
+  const { isDirty, saveError, isSaving } = useAutoSave(projectId, isPublishModalOpen)
   const renameMutation = useRenameMutation()
   const unpublishMutation = useUnpublishMutation()
 
   const {
-    deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName, markClean,
+    deviceView, setDeviceView, toggleMediaLibrary, projectName, setProjectName,
     isPublished, setIsPublished, clearPublishedInfo, publishedSlug, publishedAccessToken, editorMode, projectStatus,
     setIsPreviewOpen,
   } = useUiSelector((state) => ({
@@ -59,7 +61,6 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     toggleMediaLibrary: state.toggleMediaLibrary,
     projectName: state.projectName,
     setProjectName: state.setProjectName,
-    markClean: state.markClean,
     isPublished: state.isPublished,
     setIsPublished: state.setIsPublished,
     clearPublishedInfo: state.clearPublishedInfo,
@@ -122,12 +123,11 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }
 
   async function handleSave() {
-    if (saveState === 'saving') return
+    if (isPublishModalOpen || saveState === 'saving') return
     setSaveState('saving')
     try {
       await saveProject(projectId)
-      markClean()
-      setSaveState('saved')
+      setSaveState(useUiStore.getState().isDirty ? 'idle' : 'saved')
       invalidateProjectsCache()
       setTimeout(() => setSaveState('idle'), 2000)
     } catch (err) {
@@ -143,7 +143,8 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
       setSaveState('saving')
       try {
         await saveProject(projectId)
-        markClean()
+        if (useUiStore.getState().projectId !== projectId) return
+        if (useUiStore.getState().isDirty) { setSaveState('idle'); return }
         setSaveState('saved')
         invalidateProjectsCache()
         setTimeout(() => setSaveState('idle'), 2000)
@@ -161,7 +162,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     unpublishMutation.mutate(projectId, {
       onSuccess: () => {
         setIsPublished(false)
-        clearPublishedInfo()
+        if (editorMode !== 'menu') clearPublishedInfo()
       },
     })
   }
@@ -174,14 +175,14 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     if (isDirty) {
       try {
         await saveProject(projectId)
-        markClean()
         invalidateProjectsCache()
       } catch {
-        // Keep navigation behavior unchanged if save fails.
+        setSaveState('error')
+        toast.error(t('header.saveFailed'))
+        return
       }
-    } else {
-      await autoSave()
     }
+    if (useUiStore.getState().projectId !== projectId || useUiStore.getState().isDirty) return
     router.push(`/${locale}/dashboard`)
   }
 
@@ -196,7 +197,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [projectId, saveState, isPublishModalOpen])
 
   return (
     <header className="relative h-16 border-b border-border bg-editor-surface z-50">
@@ -263,17 +264,17 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
             variant="ghost"
             size="lg"
             onClick={handleSave}
-            disabled={saveState === 'saving'}
-            title={saveState === 'idle' && isDirty ? t('header.unsavedChanges') : t('header.saveShortcut')}
+            disabled={saveState === 'saving' || isSaving}
+            title={saveError || saveState === 'error' ? t('header.saveFailed') : saveState === 'idle' && isDirty ? t('header.unsavedChanges') : t('header.saveShortcut')}
             className={[
               'relative h-8 w-6 rounded-full transition-colors shrink-0',
               saveState === 'saved' ? 'text-emerald-500 hover:text-emerald-500' :
-              saveState === 'error' ? 'text-destructive hover:text-destructive' :
+              saveState === 'error' || saveError ? 'text-destructive hover:text-destructive' :
               saveState === 'idle' && isDirty ? 'text-amber-500 hover:text-amber-500' :
               'text-muted-foreground/70 hover:text-foreground',
             ].join(' ')}
           >
-            {saveState === 'saving' ? (
+            {saveState === 'saving' || isSaving ? (
               <Loader2 className="size-4 animate-spin" />
             ) : saveState === 'saved' ? (
               <Check className="size-4" />
@@ -316,7 +317,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
         {/* RIGHT */}
         <div className="flex items-center gap-1.5">
-          {!modeUiConfig.hideMediaButton && (
+          {!modeUiConfig.hideMediaButton && !modeUiConfig.hideAiButton && (
             <Button
               variant="ghost"
               size="sm"
@@ -375,7 +376,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
 
           <Separator orientation="vertical" className="h-4 bg-border/40 mx-1 hidden sm:block" />
 
-          {isPublished ? (
+          {modeUiConfig.hidePublishButton ? null : isPublished ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -394,6 +395,10 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {editorMode === 'menu' && <DropdownMenuItem onClick={() => setIsPublishModalOpen(true)}>
+                  <RefreshCw className="size-4" />
+                  {tMenuPublish('updateAndShare')}
+                </DropdownMenuItem>}
                 {publishedSlug && (
                   <DropdownMenuItem
                     onClick={() => {
@@ -445,7 +450,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         </div>
       </div>
 
-      {/* Publish modal (both modes, costs credits) */}
+      {/* Shared publication window; each mode owns its publishing flow. */}
       <PublishModal
         open={isPublishModalOpen}
         onOpenChange={(o) => {

@@ -1,6 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 
-export type ProjectMode = "portfolio" | "photobook" | "event";
+export type ProjectMode = "portfolio" | "photobook" | "event" | "menu";
 export type ProjectStatus = "active" | "archived" | "deleted";
 export type EventPhotoStatus = "pending" | "approved" | "rejected";
 
@@ -97,6 +97,7 @@ export interface ProjectMetadata {
 
 /** Payload the client sends to the createProject Cloud Function. */
 export type CreateProjectPayload =
+  | { mode: "menu"; name: string; template?: { id: string } }
   | { mode: "portfolio"; name: string; template?: { id: string } }
   | { mode: "photobook"; name: string; template?: { id: string } }
   | { mode: "event"; name: string; template?: { id: string } };
@@ -104,7 +105,7 @@ export type CreateProjectPayload =
 
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
-export const VALID_MODES: ProjectMode[] = ["portfolio", "photobook", "event"];
+export const VALID_MODES: ProjectMode[] = ["portfolio", "photobook", "event", "menu"];
 
 /** Default limits applied when creating an event project. */
 export const EVENT_DEFAULTS = {

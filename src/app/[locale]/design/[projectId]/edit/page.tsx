@@ -14,6 +14,7 @@ import { DesignCatalogModal } from '@/editor/components/editor/layout/Modals/des
 import { SectionsSidebar } from '@/editor/components/editor/layout/sidebar/sections-sidebar'
 import { MobileEditorSheet } from '@/editor/components/editor/layout/mobile/mobile-editor-sheet'
 import type { DesktopEditorTab, MobileEditorTab, MobileAppearanceSubTab } from '@/editor/lib/config/editor-tabs'
+import { useUiStore } from '@/editor/lib/store/ui'
 import { useUiSelector } from '@/editor/lib/store'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { MODE_REGISTRY } from '@/editor/lib/modes/registry'
@@ -52,6 +53,7 @@ export default function EditorPage() {
       return
     }
 
+    setLoadState('loading')
     let cancelled = false
 
     async function loadProject() {
@@ -75,6 +77,9 @@ export default function EditorPage() {
         if (cancelled) return
         const editorData = contentSnap.exists() ? contentSnap.data() : null
 
+        const modeEntry = MODE_REGISTRY[project.mode as EditorMode]
+        if (!modeEntry) { setLoadState('error'); return }
+        useUiStore.setState({ selectedDecorationId: null, previewDecorations: null, activeSectionId: modeEntry.defaultActiveSectionId, isAiChatOpen: false, isPreviewOpen: false, isDirty: false })
         setEditorMode(project.mode)
         setProjectId(projectId)
         setProjectName(project.name)
@@ -87,15 +92,15 @@ export default function EditorPage() {
         }
         if (editorData?.theme) {
           useThemeStore.setState({
-            currentTemplateId: editorData.theme.currentTemplateId,
+            currentTemplateId: modeEntry.templates.some((t) => t.id === editorData.theme.currentTemplateId) ? editorData.theme.currentTemplateId : modeEntry.defaultTemplateId,
             currentTheme: editorData.theme.currentTheme,
             themeCustomizations: editorData.theme.themeCustomizations,
-            customDecorations: editorData.theme.customDecorations ?? [],
+            customDecorations: modeEntry.uiConfig.hideDecorations ? [] : editorData.theme.customDecorations ?? [],
           })
         } else {
           // New project — reset theme to defaults so previous project's theme doesn't bleed in
           useThemeStore.setState({
-            currentTemplateId: 'editorial',
+            currentTemplateId: modeEntry.defaultTemplateId as import("@/editor/lib/types").TemplateId,
             currentTheme: 'parchment',
             themeCustomizations: {
               decorationAnimation: 'fade',
@@ -110,7 +115,6 @@ export default function EditorPage() {
         }
 
         // Rehydrate content store
-        const modeEntry = MODE_REGISTRY[project.mode as EditorMode]
         modeEntry.hydrateStore(editorData?.content ?? null)
 
         setLoadState('ready')

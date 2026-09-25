@@ -38,6 +38,7 @@ export type ResizeRuntimeOptions = {
   maxInstances?: number;
   /** Min instances to keep warm (reduces cold starts, costs more) */
   minInstances?: number;
+  concurrency?: number;
 };
 
 export type ResizeConfig = {
@@ -47,6 +48,10 @@ export type ResizeConfig = {
   keepOriginal: boolean;
   /** Cloud Function runtime options. Defaults: 512MiB, 120s. */
   runtimeOptions?: ResizeRuntimeOptions;
+  /** Claim the job before any downloads; false means it is already running/completed. */
+  onStart?: (event: StorageEvent) => Promise<boolean>;
+  onError?: (event: StorageEvent, error: unknown) => Promise<void>;
+  limitInputPixels?: number;
   /**
    * Output directory in Storage. Defaults to the same folder as the original.
    * Useful when outputs should live in a different path (e.g. avatars → users/{uid}/avatar).
@@ -72,9 +77,9 @@ export type ResizeConfig = {
 };
 
 export function makeResizeFunction(config: ResizeConfig) {
-  const { memory = "512MiB", timeoutSeconds = 120, maxInstances, minInstances } = config.runtimeOptions ?? {};
+  const { memory = "512MiB", timeoutSeconds = 120, maxInstances, minInstances, concurrency = 1 } = config.runtimeOptions ?? {};
   return onObjectFinalized(
-    { memory, timeoutSeconds, ...(maxInstances != null && { maxInstances }), ...(minInstances != null && { minInstances }) },
+    { memory, timeoutSeconds, concurrency, ...(maxInstances != null && { maxInstances }), ...(minInstances != null && { minInstances }) },
 
     async (event) => {
       const { name: filePath, bucket: bucketName, contentType } = event.data;
@@ -89,13 +94,16 @@ export function makeResizeFunction(config: ResizeConfig) {
       if (!fileName.startsWith("original.")) return;
 
       const bucket = getStorage().bucket(bucketName);
-      const tempInput = path.join(os.tmpdir(), `input_${Date.now()}_${fileName}`);
+      if (config.onStart && !await config.onStart(event)) return;
+      const jobId = randomUUID();
+      const tempInput = path.join(os.tmpdir(), `input_${jobId}_${fileName}`);
+      const sharpOptions = { limitInputPixels: config.limitInputPixels ?? 100_000_000 };
 
       try {
         await bucket.file(filePath).download({ destination: tempInput });
 
         // Read dimensions and file size from the original
-        const sharpMeta = await sharp(tempInput).metadata();
+        const sharpMeta = await sharp(tempInput, sharpOptions).metadata();
         const originalSizeBytes = fs.statSync(tempInput).size;
 
         // Output files go into the configured directory (or same folder as original)
@@ -113,12 +121,13 @@ export function makeResizeFunction(config: ResizeConfig) {
           : config.outputs;
 
         for (const spec of outputs) {
-          const tempOut = path.join(os.tmpdir(), `${Date.now()}_${spec.name}`);
+          const tempOut = path.join(os.tmpdir(), `${jobId}_${spec.name}`);
           const destPath = `${resolvedOutputDir}/${spec.name}`;
 
           try {
             try {
-              await sharp(tempInput)
+              await sharp(tempInput, sharpOptions)
+                .rotate()
                 .resize(spec.width, spec.height ?? null, {
                   fit: spec.fit ?? "inside",
                   position: "center",
@@ -157,19 +166,23 @@ export function makeResizeFunction(config: ResizeConfig) {
         }
 
         const meta: ImageMeta = {
-          width: sharpMeta.width ?? 0,
-          height: sharpMeta.height ?? 0,
+          width: (sharpMeta.orientation && sharpMeta.orientation >= 5 ? sharpMeta.height : sharpMeta.width) ?? 0,
+          height: (sharpMeta.orientation && sharpMeta.orientation >= 5 ? sharpMeta.width : sharpMeta.height) ?? 0,
           sizeBytes: originalSizeBytes,
           generatedSizeBytes,
-          originalName: event.data.name.split("/").pop() ?? fileName,
+          originalName: event.data.metadata?.originalName ?? fileName,
         };
 
+        await config.onComplete(event, urls, meta);
         if (!config.keepOriginal) {
-          await bucket.file(filePath).delete();
+          // A cleanup failure must not turn a committed image back into a failed upload.
+          await bucket.file(filePath).delete().catch((error) => logger.warn("Original cleanup failed", { filePath, error }));
         }
 
-        await config.onComplete(event, urls, meta);
         logger.info("Image processed", { filePath, outputs: Object.keys(urls) });
+      } catch (error) {
+        await config.onError?.(event, error);
+        throw error;
       } finally {
         if (fs.existsSync(tempInput)) fs.unlinkSync(tempInput);
       }

@@ -1,3 +1,5 @@
+import { cache } from "react"
+import { getPublishedGlobalProject } from "@/lib/projects/published-global"
 import { notFound } from "next/navigation"
 import { createHash } from "crypto"
 import { headers } from "next/headers"
@@ -5,7 +7,6 @@ import type { Metadata } from "next"
 import { adminDb } from "@/lib/firebase/admin"
 import {
   getSlugModePolicy,
-  getSlugReservationDocId,
   isSlugMode,
   PUBLISHED_PROJECT_SLUGS_COLLECTION,
 } from "@/lib/slug"
@@ -14,6 +15,11 @@ import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
 import type { EventPublishedData } from "@/editor/modes/event/content-types"
+import { NextIntlClientProvider } from "next-intl"
+import { buildPublishedProjectUrl } from "@/lib/slug"
+import menuEn from "../../../../messages/en/editor/editor-menu.json"
+import menuRu from "../../../../messages/ru/editor/editor-menu.json"
+import menuKz from "../../../../messages/kz/editor/editor-menu.json"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -22,35 +28,7 @@ interface Props {
 
 // --- Lookup helpers ---
 
-async function getPublishedProjectBySlugGlobal(slug: string, mode: "portfolio") {
-  const slugSnap = await adminDb
-    .collection(PUBLISHED_PROJECT_SLUGS_COLLECTION)
-    .doc(getSlugReservationDocId(mode, slug))
-    .get()
-
-  if (!slugSnap.exists) return null
-
-  const slugData = slugSnap.data() as { projectId?: string } | undefined
-  if (!slugData?.projectId) return null
-
-  const doc = await adminDb.collection("published_projects").doc(slugData.projectId).get()
-  if (!doc.exists) return null
-
-  const data = doc.data()
-  if (!data || data.isPublished !== true || data.slug !== slug || data.mode !== mode) return null
-
-  return {
-    id: doc.id,
-    slug: data.slug as string,
-    name: data.name as string,
-    mode: data.mode as "portfolio",
-    accessToken: null as null,
-    content: data.content ?? null,
-    theme: data.theme ?? null,
-    ogImageUrl: (data.ogImageUrl as string | undefined) ?? null,
-    ownerId: (data.ownerId as string | undefined) ?? null,
-  }
-}
+const getPublishedProjectBySlugGlobal = cache((slug: string) => getPublishedGlobalProject(adminDb, slug))
 
 /**
  * Lookup for token-namespace modes (photobook, event).
@@ -164,8 +142,21 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const policy = getSlugModePolicy(mode)
 
   if (policy.namespace === "global") {
-    const project = await getPublishedProjectBySlugGlobal(slug, mode as "portfolio")
+    const project = await getPublishedProjectBySlugGlobal(slug)
     if (!project) return { title: "Not found" }
+
+    if (project.mode === "menu") {
+      const venue = project.content?.sectionContent?.venue
+      const title = venue?.name || project.name
+      const description = venue?.description?.slice(0, 160) || undefined
+      const url = buildPublishedProjectUrl("menu", slug)
+      const images = [{ url: `${url}/opengraph-image`, width: 1200, height: 630, alt: title }]
+      return {
+        title, description, alternates: { canonical: url },
+        openGraph: { title, description, type: "website", url, images },
+        twitter: { card: "summary_large_image", title, description, images },
+      }
+    }
 
     const sectionContent = (project.content as Record<string, unknown> | null)?.sectionContent as Record<string, Record<string, string>> | undefined
     const bio = sectionContent?.bio
@@ -246,15 +237,15 @@ export default async function SitePage({ params, searchParams }: Props) {
 
   // ── Global-namespace (subdomain) modes ────────────────────────────────
   if (policy.namespace === "global") {
-    const project = await getPublishedProjectBySlugGlobal(slug, mode as "portfolio")
+    const project = await getPublishedProjectBySlugGlobal(slug)
     if (!project) notFound()
 
     const content = project.content ?? {}
     const theme = project.theme ?? {}
-    return (
+    const view = (
       <PublishedView
-        mode={mode}
-        templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[mode].defaultTemplateId}
+        mode={project.mode}
+        templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[project.mode].defaultTemplateId}
         themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
         themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
         customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}
@@ -264,6 +255,7 @@ export default async function SitePage({ params, searchParams }: Props) {
         referrerUid={project.ownerId ?? undefined}
       />
     )
+    return project.mode === "menu" ? <NextIntlClientProvider locale={project.locale} messages={{ en: menuEn, ru: menuRu, kz: menuKz }[project.locale]}>{view}</NextIntlClientProvider> : view
   }
 
   // ── Token-namespace (path+token) modes ────────────────────────────────
@@ -292,7 +284,7 @@ export default async function SitePage({ params, searchParams }: Props) {
   return (
     <PublishedView
       mode={project.mode}
-      templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[mode].defaultTemplateId}
+      templateId={(theme.currentTemplateId as string | undefined) ?? MODE_REGISTRY[project.mode].defaultTemplateId}
       themeId={(theme.currentTheme as string | undefined) ?? "parchment"}
       themeCustomizations={(theme.themeCustomizations as ThemeCustomizations | undefined) ?? {}}
       customDecorations={(theme.customDecorations as ThemeCustomDecorations[] | undefined) ?? []}

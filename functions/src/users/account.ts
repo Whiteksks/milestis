@@ -5,7 +5,7 @@ import { logger } from "firebase-functions/v2";
 import type { Request, Response } from "express";
 import { db } from "../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../lib/cors";
-import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../projects/publish/slug";
+import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../projects/publish/slug/index";
 import {
   mapAuthPayload,
   mapUserDocument,

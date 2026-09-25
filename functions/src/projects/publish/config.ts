@@ -18,7 +18,7 @@ interface TieredPricing {
 	tiers: Array<{ upTo: number; cost: number }>;
 }
 
-type PricingStrategy = FlatPricing | TieredPricing;
+type PricingStrategy = FlatPricing | TieredPricing | { strategy: "disabled" };
 
 // ─── Config type ──────────────────────────────────────────────────────────────
 
@@ -40,6 +40,8 @@ export interface PublishModeConfig {
 // ─── Per-mode config ──────────────────────────────────────────────────────────
 
 export const PUBLISH_MODE_CONFIG = {
+	// Menu foundation is draft-only until its recurring billing is implemented.
+	menu: { pricing: { strategy: "disabled" }, republishCreditCost: 0, requiresAccessToken: false },
 	portfolio: {
 		pricing: {
 			strategy: "flat",
@@ -87,6 +89,7 @@ export function getPublishConfig(mode: ProjectMode): PublishModeConfig {
  */
 export function calculateCreditCost(mode: ProjectMode, photoCount: number): number {
 	const { pricing } = getPublishConfig(mode);
+	if (pricing.strategy === "disabled") throw new Error("Publishing is not enabled for this mode.");
 
 	if (pricing.strategy === "flat") {
 		return pricing.creditCost;

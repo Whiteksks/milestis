@@ -119,7 +119,7 @@ export function proxy(request: NextRequest) {
     ''
 
   // ── Subdomain rewrite: {slug}.milestis.site → /sites/{slug} ──────────────
-  // Mode = portfolio (custom subdomain)
+  // Header identifies the global namespace; the page resolves portfolio/menu from the stored project.
   // Preserve the original pathname so that Next.js special routes like
   // /opengraph-image, /twitter-image, /sitemap.xml are served correctly.
   const subdomainMatch = host.match(/^([a-z0-9-]+)\.milestis\.site(?::\d+)?$/);

@@ -34,6 +34,16 @@ function applyOptionOverride<T>(
 }
 
 export const IMAGE_POLICY_REGISTRY: Record<ImageSlotId, ImagePolicy> = {
+  'menu.venue.logo': {
+    ratio: { default: 'square', allowed: ALL_IMAGE_RATIO_OPTIONS },
+    frame: { default: 'none', allowed: ALL_IMAGE_FRAME_OPTIONS },
+    render: { fit: 'contain', usage: 'inline' },
+  },
+  'menu.dish.photo': {
+    ratio: { default: 'square', allowed: ALL_IMAGE_RATIO_OPTIONS },
+    frame: { default: 'soft', allowed: ALL_IMAGE_FRAME_OPTIONS },
+    render: { fit: 'cover', usage: 'inline' },
+  },
   'photobook.cover.primary': {
     ratio: { default: 'portrait', allowed: ALL_IMAGE_RATIO_OPTIONS },
     frame: { default: 'none', allowed: ALL_IMAGE_FRAME_OPTIONS },

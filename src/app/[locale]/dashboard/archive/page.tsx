@@ -28,6 +28,7 @@ import { useTranslations } from "next-intl"
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const modeConfig = {
+  menu: { icon: BookOpen, labelKey: "project.mode.menu" as const },
   portfolio: { icon: Layout, labelKey: "project.mode.portfolio" as const },
   photobook: { icon: BookOpen, labelKey: "project.mode.photobook" as const },
   event:     { icon: Camera,   labelKey: "project.mode.event"     as const },

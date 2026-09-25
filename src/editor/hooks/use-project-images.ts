@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
-import { ref as storageRef, uploadBytesResumable } from 'firebase/storage'
 import { db } from '@/lib/firebase'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { useUserStore } from '@/hooks/useUserStore'
-import { storage } from '@/lib/firebase'
+import { useUploadStore, enqueueImageUpload, dismissUpload, PROCESSING_TIMEOUT_MS, type UploadingEntry } from '@/editor/lib/store/uploads'
+export type { UploadingEntry } from '@/editor/lib/store/uploads'
 
 export interface ProjectImageDoc {
   id: string
@@ -15,14 +15,6 @@ export interface ProjectImageDoc {
   meta?: { originalName?: string; width?: number; height?: number }
   name?: string
   createdAt?: { toDate: () => Date } | null
-}
-
-export interface UploadingEntry {
-  id: string
-  name: string
-  previewUrl: string
-  /** 0-100, based on bytes transferred — lets the UI show real progress instead of a bare spinner. */
-  progress: number
 }
 
 export function getProjectImageDisplayUrl(img: ProjectImageDoc): string {
@@ -43,6 +35,7 @@ export function useProjectImages(): ProjectImageDoc[] {
   const projectId = useUiStore((s) => s.projectId)
   const uid = useUserStore((s) => s.profile?.uid)
   const [images, setImages] = useState<ProjectImageDoc[]>([])
+  const [scope, setScope] = useState('')
 
   useEffect(() => {
     if (!projectId || !uid) {
@@ -61,11 +54,13 @@ export function useProjectImages(): ProjectImageDoc[] {
     const unsub = onSnapshot(
       q,
       (snap) => {
+        const firstSnapshot = isFirst
+        isFirst = false
+        setScope(`${projectId}:${uid}`)
         setImages((prev) => {
           // ── Initial load ─────────────────────────────────────────────────
           // Sort the full list once so the gallery opens already ordered.
-          if (isFirst) {
-            isFirst = false
+          if (firstSnapshot) {
             const initial = snap.docs.map((d) => ({
               id: d.id,
               ...(d.data() as Omit<ProjectImageDoc, 'id'>),
@@ -124,96 +119,88 @@ export function useProjectImages(): ProjectImageDoc[] {
     return unsub
   }, [projectId, uid])
 
-  return images
+  return scope === `${projectId}:${uid}` ? images : []
 }
 
 export function useProjectMediaLibrary() {
   const projectId = useUiStore((s) => s.projectId)
   const uid = useUserStore((s) => s.profile?.uid)
   const images = useProjectImages()
-  const [uploading, setUploading] = useState<UploadingEntry[]>([])
+  const entries = useUploadStore((s) => s.entries)
+  const dismissed = useUploadStore((s) => s.dismissed)
+  const [jobs, setJobs] = useState<UploadingEntry[]>([])
+  const [listenerFailed, setListenerFailed] = useState(false)
+  const [now, setNow] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const uploadingRef = useRef<UploadingEntry[]>([])
 
   useEffect(() => {
-    uploadingRef.current = uploading
-  }, [uploading])
-
-  useEffect(() => {
-    if (images.length === 0) return
-
-    setUploading((prev) => {
-      const confirmedIds = new Set(images.map((image) => image.id))
-      const toRemove = prev.filter((entry) => confirmedIds.has(entry.id))
-      if (toRemove.length === 0) return prev
-
-      toRemove.forEach((entry) => URL.revokeObjectURL(entry.previewUrl))
-      return prev.filter((entry) => !confirmedIds.has(entry.id))
-    })
-  }, [images])
-
-  useEffect(() => {
-    return () => {
-      uploadingRef.current.forEach((entry) => URL.revokeObjectURL(entry.previewUrl))
-    }
-  }, [])
-
-  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || !uid || !projectId) return
-
-    const filesArray = Array.from(files)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-
-    await Promise.all(
-      filesArray.map(async (file) => {
-        const imageId = crypto.randomUUID()
-        const previewUrl = URL.createObjectURL(file)
-
-        setUploading((prev) => [...prev, { id: imageId, name: file.name, previewUrl, progress: 0 }])
-
-        try {
-          const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-
-          const uploadTask = uploadBytesResumable(
-            storageRef(storage, `users/${uid}/projects/${projectId}/images/${imageId}/original.${ext}`),
-            file,
-          )
-
-          await new Promise<void>((resolve, reject) => {
-            uploadTask.on(
-              'state_changed',
-              (snapshot) => {
-                const progress = snapshot.totalBytes > 0
-                  ? Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-                  : 0
-                setUploading((prev) => prev.map((entry) => (
-                  entry.id === imageId ? { ...entry, progress } : entry
-                )))
-              },
-              reject,
-              resolve,
-            )
-          })
-        } catch (error) {
-          setUploading((prev) => prev.filter((entry) => entry.id !== imageId))
-          URL.revokeObjectURL(previewUrl)
-          console.error('Upload failed:', error)
-        }
-      }),
+    if (!projectId || !uid) return
+    const unsubscribe = onSnapshot(
+      query(collection(db, 'projects', projectId, 'imageJobs'), where('status', 'in', ['processing', 'failed'])),
+      (snapshot) => {
+        setListenerFailed(false)
+        setJobs(snapshot.docs.map((doc) => {
+          const data = doc.data()
+          return {
+            id: doc.id, projectId, ownerId: uid, name: data.name ?? 'image',
+            progress: 100, status: data.status, errorCode: data.errorCode,
+            updatedAt: data.updatedAt?.toMillis?.() ?? Date.now(),
+          } as UploadingEntry
+        }))
+      },
+      () => setListenerFailed(true),
     )
+    const timer = setInterval(() => setNow(Date.now()), 5000)
+    return () => { unsubscribe(); clearInterval(timer) }
+  }, [projectId, uid])
+
+  useEffect(() => {
+    const ready = new Set(images.map((image) => image.id))
+    if (entries.some((entry) => entry.projectId === projectId && ready.has(entry.id))) {
+      useUploadStore.setState((state) => ({
+        entries: state.entries.filter((entry) => entry.projectId !== projectId || !ready.has(entry.id)),
+      }))
+    }
+  }, [images, entries, projectId])
+
+  const pending = new Map<string, UploadingEntry>()
+  for (const entry of entries) {
+    if (entry.projectId === projectId && entry.ownerId === uid) pending.set(entry.id, entry)
+  }
+  for (const job of jobs) {
+    if (job.projectId !== projectId || job.ownerId !== uid) continue
+    const local = pending.get(job.id)
+    pending.set(job.id, { ...local, ...job, file: local?.file })
+  }
+  const readyIds = new Set(images.map((image) => image.id))
+  const pendingUploads = [...pending.values()]
+    .filter((entry) => !readyIds.has(entry.id) && !dismissed[entry.id])
+    .map((entry) => {
+      if (entry.status !== 'processing') return entry
+      if (listenerFailed) return { ...entry, status: 'failed' as const, errorCode: 'connectionFailed' }
+      if (now - entry.updatedAt > PROCESSING_TIMEOUT_MS) {
+        return { ...entry, status: 'failed' as const, errorCode: 'processingTimeout' }
+      }
+      return entry
+    })
+
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
+    event.target.value = ''
+    if (!uid || !projectId) return []
+    return files.map((file) => enqueueImageUpload(file, uid, projectId))
+  }
+  const retryUpload = (id: string) => {
+    const entry = pendingUploads.find((item) => item.id === id)
+    if (!entry?.file || !uid || !projectId) return
+    dismissUpload(id)
+    return enqueueImageUpload(entry.file, uid, projectId)
   }
 
-  const pendingUploads = uploading.filter(
-    (entry) => !images.some((image) => image.id === entry.id),
-  )
-
   return {
-    fileInputRef,
-    images,
-    pendingUploads,
+    fileInputRef, images, pendingUploads,
     totalCount: images.length + pendingUploads.length,
-    handleFileUpload,
+    handleFileUpload, retryUpload, dismissUpload,
   }
 }
 

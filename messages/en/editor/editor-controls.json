@@ -7,6 +7,20 @@
         "allSections": "Sections"
       },
       "media": {
+        "uploadQueued": "Queued",
+        "uploadProcessing": "Processing…",
+        "uploadRetry": "Retry",
+        "uploadDismiss": "Dismiss error",
+        "uploadErrors": {
+          "storageLimit": "Not enough storage space.",
+          "tooManyPixels": "Image exceeds 100 MP. Reduce its dimensions.",
+          "processingFailed": "Could not process this file. Try JPEG, PNG or WebP.",
+          "processingTimeout": "Processing is taking too long. You can upload the file again.",
+          "connectionFailed": "Cannot receive processing status. Check your connection.",
+          "uploadFailed": "Upload failed. Please retry.",
+          "unsupportedFormat": "Choose an image file.",
+          "fileTooLarge": "File must be smaller than 100 MB."
+        },
         "pickImage": "Pick image",
         "changeImage": "Change image",
         "removeImage": "Remove image",

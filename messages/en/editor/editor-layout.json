@@ -2,6 +2,7 @@
   "editor": {
     "layout": {
       "header": {
+        "saveFailed": "Could not save. Your changes remain in the editor — please retry.",
         "brand": "Milestis",
         "backToDashboard": "Back to Dashboard",
         "projectNamePlaceholder": "Untitled",
@@ -24,6 +25,10 @@
         "aiAssistant": "AI Assistant"
       },
       "aiChat": {
+        "assistantProjectChanged": "The project changed during the request. The AI response was not applied; your edits remain in the editor.",
+        "assistantCancelled": "Generation stopped.",
+        "assistantTimeout": "The AI did not respond in time. Please retry.",
+        "cancelGeneration": "Stop generation",
         "title": "AI Assistant",
         "emptyTitle": "Create with AI",
         "emptyDescription": "Describe what you want to create — I'll pick a template, theme, arrange your photos, and write the text automatically.",

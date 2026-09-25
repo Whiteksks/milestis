@@ -1,4 +1,6 @@
 export type ImageSlotId =
+  | 'menu.venue.logo'
+  | 'menu.dish.photo'
   | 'photobook.cover.primary'
   | 'photobook.introduction.primary'
   | 'photobook.story.block'
@@ -9,7 +11,7 @@ export type ImageSlotId =
   | 'portfolio.bio.primary'
   | 'portfolio.featured-work.item'
 
-export type ImageSlotFamily = 'photobook' | 'portfolio'
+export type ImageSlotFamily = 'photobook' | 'portfolio' | 'menu'
 
 export interface ImageSlotDefinition {
   id: ImageSlotId
@@ -20,6 +22,8 @@ export interface ImageSlotDefinition {
 }
 
 export const IMAGE_SLOT_REGISTRY: Record<ImageSlotId, ImageSlotDefinition> = {
+  'menu.venue.logo': { id: 'menu.venue.logo', family: 'menu', label: 'Restaurant logo', allowsCaption: false, allowsDescription: false },
+  'menu.dish.photo': { id: 'menu.dish.photo', family: 'menu', label: 'Dish photo', allowsCaption: false, allowsDescription: false },
   'photobook.cover.primary': {
     id: 'photobook.cover.primary',
     family: 'photobook',

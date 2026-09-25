@@ -107,6 +107,9 @@ function buildProjectDocument(
   if (payload.template) {
     doc.template = payload.template;
   }
+  if (payload.mode === "menu") {
+    doc.template = { id: "menu-classic" };
+  }
   if (payload.mode === "event") {
     const eventConfig: EventConfig = {
       maxPhotos: EVENT_DEFAULTS.maxPhotos,

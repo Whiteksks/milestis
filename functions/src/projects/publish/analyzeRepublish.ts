@@ -199,6 +199,10 @@ export const analyzeRepublish = onRequest(
 				return;
 			}
 			const mode = rawMode as ProjectMode;
+		if (mode === "menu") {
+			res.status(409).json({ error: "MENU_PUBLISH_NOT_ENABLED", message: "Use publishMenu to publish or update menu projects." });
+			return;
+		}
 
 			const publishedAccessToken =
 				typeof projectData.publishedAccessToken === "string" && projectData.publishedAccessToken

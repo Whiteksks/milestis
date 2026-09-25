@@ -284,7 +284,10 @@ export function useUnpublishMutation() {
         queryClient.setQueryData(projectKeys.archived(uid), context.prevArchived)
     },
     onSettled: () => {
-      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
+      if (uid) {
+        void queryClient.invalidateQueries({ queryKey: projectKeys.archived(uid) })
+        void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+      }
     },
   })
 }

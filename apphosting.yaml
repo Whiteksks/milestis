@@ -49,7 +49,12 @@ env:
     availability:
       - BUILD
       - RUNTIME
-
+  
+  - variable: NEXT_PUBLIC_META_PIXEL_ID
+    value: 957171553330261
+    availability:
+      - BUILD
+      - RUNTIME
   # reCAPTCHA v3 site key for App Check — without this, App Check never initializes
   # in production and requests to Firebase AI Logic get rejected with 401.
   # Must allow the milestis.com domain in the reCAPTCHA admin console.
@@ -91,6 +96,12 @@ env:
 
   - variable: NEXT_PUBLIC_PUBLISH_PROJECT_URL
     value: https://publishproject-5h4wes5waq-ez.a.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PUBLISH_MENU_URL
+    value: https://europe-west4-milestis.cloudfunctions.net/publishMenu
     availability:
       - BUILD
       - RUNTIME

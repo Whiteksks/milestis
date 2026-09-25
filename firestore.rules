@@ -74,6 +74,13 @@ service cloud.firestore {
       allow create, delete: if false;
 
       // ─── Editor content subcollection ─────────────────────────────────
+      // Server-owned processing status, readable even before an image is ready.
+      match /imageJobs/{imageId} {
+        allow read: if isAuthed()
+          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+        allow write: if false;
+      }
+
       // Exact path: projects/{projectId}/data/content
       // Stores the heavy editor payload (theme + content). Checked against
       // parent project ownership via a cross-document read.
@@ -106,9 +113,12 @@ service cloud.firestore {
     }
 
     // ─── Published snapshots ──────────────────────────────────────────────
-    // Publicly readable. Written exclusively by Cloud Functions (Admin SDK).
+    // Menu snapshots are served through the server renderer (Admin SDK).
+    // Direct client reads are owner-only, including after unpublishing/trashing.
+    // Other modes retain their existing access policy.
     match /published_projects/{projectId} {
-      allow read: if true;
+      allow read: if resource.data.get('mode', '') != 'menu'
+        || (isAuthed() && isOwner(resource.data.ownerId));
       allow write: if false;
     }
 

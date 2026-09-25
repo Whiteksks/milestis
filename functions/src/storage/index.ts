@@ -1,4 +1,4 @@
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { logger } from "firebase-functions/v2";
@@ -60,10 +60,61 @@ const BACKEND_MODE_CONFIG: Record<string, { generatePrintVariant: boolean }> = {
  *
  * Firestore: images/{imageId} (top-level, with ownerId + projectId fields)
  */
+
+function imageJob(event: { data: { name: string } }) {
+  const match = /^users\/([^/]+)\/projects\/([^/]+)\/images\/([^/]+)\/original\.[^/]+$/.exec(event.data.name);
+  if (!match) return null;
+  const [, uid, projectId, imageId] = match;
+  return { uid, projectId, imageId, ref: db.doc(`projects/${projectId}/imageJobs/${imageId}`) };
+}
+
 export const resizeProjectImage = makeResizeFunction({
   bucketPrefix: "users/",
   keepOriginal: false,
-  runtimeOptions: { memory: "1GiB", timeoutSeconds: 300, maxInstances: 20 },
+  runtimeOptions: { memory: "1GiB", timeoutSeconds: 300, maxInstances: 20, concurrency: 1 },
+  limitInputPixels: 100_000_000,
+  onStart: async (event) => {
+    const job = imageJob(event);
+    if (!job) return false;
+    return db.runTransaction(async (tx) => {
+      const [existing, image, project] = await Promise.all([
+        tx.get(job.ref), tx.get(db.doc(`images/${job.imageId}`)), tx.get(db.doc(`projects/${job.projectId}`)),
+      ]);
+      if (project.data()?.ownerId !== job.uid || image.exists || existing.data()?.status === "ready") return false;
+      const data = existing.data();
+      if (data?.status === "processing" && (data.updatedAt?.toMillis?.() ?? 0) > Date.now() - 360_000) return false;
+      tx.set(job.ref, {
+        ownerId: job.uid, projectId: job.projectId, status: "processing",
+        name: event.data.metadata?.originalName ?? "image",
+        updatedAt: Timestamp.now(), errorCode: null,
+      });
+      return true;
+    });
+  },
+  onError: async (event, error) => {
+    const job = imageJob(event);
+    if (!job) return;
+    const message = error instanceof Error ? error.message : "";
+    const errorCode = message === "STORAGE_LIMIT" ? "storageLimit"
+      : /pixel limit/i.test(message) ? "tooManyPixels" : "processingFailed";
+    const shouldClean = await db.runTransaction(async (tx) => {
+      const current = await tx.get(job.ref);
+      if (current.data()?.status === "ready") return false;
+      tx.set(job.ref, { status: "failed", errorCode, updatedAt: Timestamp.now() }, { merge: true });
+      return true;
+    });
+    if (!shouldClean) return;
+    // Keep the input after unexpected failures so a server-side retry remains possible.
+    // Definitive quota/pixel-limit failures do not need to retain an unusable original.
+    const bucket = getStorage().bucket(event.data.bucket);
+    const folder = event.data.name.slice(0, event.data.name.lastIndexOf("/"));
+    const cleanupFiles = ["thumb.webp", "middle.webp", "full.webp", "print.jpg"];
+    if (errorCode === "storageLimit" || errorCode === "tooManyPixels") cleanupFiles.push(event.data.name.split("/").pop()!);
+    await Promise.all(cleanupFiles.map(async (name) => {
+      try { await bucket.file(`${folder}/${name}`).delete({ ignoreNotFound: true }); }
+      catch (cleanupError) { logger.warn("Failed image cleanup", { imageId: job.imageId, name, cleanupError }); }
+    }));
+  },
   outputs: async (event) => {
     // Path: users/{uid}/projects/{projectId}/images/{imageId}/original.*
     const parts = event.data.name.split("/");
@@ -71,9 +122,9 @@ export const resizeProjectImage = makeResizeFunction({
     const projectId = parts[3];
 
     const webpOutputs: OutputFile[] = [
-      { name: "full.webp",   width: 2560, height: 2560, format: "webp", quality: 90, fit: "outside" },
-      { name: "middle.webp", width: 1280, format: "webp", quality: 85 },
-      { name: "thumb.webp",  width: 512,  format: "webp", quality: 80 },
+      { name: "thumb.webp", width: 512, height: 512, format: "webp", quality: 80 },
+      { name: "middle.webp", width: 1280, height: 1280, format: "webp", quality: 85 },
+      { name: "full.webp", width: 2560, height: 2560, format: "webp", quality: 85 },
     ];
 
     if (!uid || !projectId) {
@@ -86,8 +137,8 @@ export const resizeProjectImage = makeResizeFunction({
 
     if (modeConfig.generatePrintVariant) {
       return [
-        { name: "print.jpg", width: 2560, height: 2560, format: "jpeg", quality: 95, fit: "outside" },
         ...webpOutputs,
+        { name: "print.jpg", width: 2560, height: 2560, format: "jpeg", quality: 95, fit: "outside" },
       ];
     }
 
@@ -104,41 +155,22 @@ export const resizeProjectImage = makeResizeFunction({
       return;
     }
 
-    // ── Storage limit check ───────────────────────────────────────────────
-    const userSnap = await db.collection("users").doc(uid).get();
-    const userData = userSnap.data();
-    const maxStorageBytes = getEffectiveSubscriptionFeatures(userData?.subscription).maxStorageBytes;
-    const usedStorageBytes: number = userData?.stats?.storageUsedBytes ?? 0;
-
-    if (maxStorageBytes > 0 && usedStorageBytes + meta.generatedSizeBytes > maxStorageBytes) {
-      logger.warn(`[resizeProjectImage] Storage limit exceeded for user ${uid}. Deleting generated files.`, {
-        usedStorageBytes,
-        generatedSizeBytes: meta.generatedSizeBytes,
-        maxStorageBytes,
-      });
-      // Delete all generated files to avoid silent quota creep
-      const bucket = getStorage().bucket();
-      const basePath = `users/${uid}/projects/${projectId}/images/${imageId}`;
-      await Promise.allSettled(
-        Object.keys(urls).map((name) =>
-          bucket.file(`${basePath}/${name}`).delete().catch(() => undefined),
-        ),
-      );
-      return;
-    }
-
-    await Promise.all([
-      db.collection("images").doc(imageId).set({
-        ownerId: uid,
-        projectId,
-        urls,   // photobook: { print, full, middle, thumb } | portfolio: { full, middle, thumb }
-        meta,   // { width, height, sizeBytes, generatedSizeBytes, originalName }
-        createdAt: FieldValue.serverTimestamp(),
-      }),
-      db.collection("users").doc(uid).update({
-        // Track only the generated files — the original is deleted and not stored
-        "stats.storageUsedBytes": FieldValue.increment(meta.generatedSizeBytes),
-      }),
-    ]);
+    const job = imageJob(event)!;
+    const imageRef = db.collection("images").doc(imageId);
+    const userRef = db.collection("users").doc(uid);
+    // The quota decision, media document and accounting must commit together.
+    await db.runTransaction(async (tx) => {
+      const [userSnap, existingImage] = await Promise.all([tx.get(userRef), tx.get(imageRef)]);
+      if (existingImage.exists) return;
+      const userData = userSnap.data();
+      const maxStorageBytes = getEffectiveSubscriptionFeatures(userData?.subscription).maxStorageBytes;
+      const usedStorageBytes: number = userData?.stats?.storageUsedBytes ?? 0;
+      if (maxStorageBytes > 0 && usedStorageBytes + meta.generatedSizeBytes > maxStorageBytes) {
+        throw new Error("STORAGE_LIMIT");
+      }
+      tx.set(imageRef, { ownerId: uid, projectId, urls, meta, createdAt: FieldValue.serverTimestamp() });
+      tx.update(userRef, { "stats.storageUsedBytes": FieldValue.increment(meta.generatedSizeBytes) });
+      tx.set(job.ref, { status: "ready", updatedAt: Timestamp.now(), errorCode: null }, { merge: true });
+    });
   },
 });

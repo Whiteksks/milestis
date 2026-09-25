@@ -112,6 +112,7 @@ async function claimRepublishJob(
 		if (!snap.exists) throw new FlowError(404, ERROR.NOT_FOUND, "Project not found.");
 		const data = snap.data()!;
 		if (data.ownerId !== uid) throw new FlowError(403, ERROR.FORBIDDEN, "You do not own this project.");
+		if (data.mode === "menu") throw new FlowError(409, ERROR.NOT_REPUBLISHABLE, "Use publishMenu for menu projects.");
 		if (data.status !== "archived" || data.isPublished !== false) {
 			throw new FlowError(409, ERROR.NOT_REPUBLISHABLE, "Project must be unpublished (archived) to republish.");
 		}
@@ -256,6 +257,10 @@ export const republishProject = onRequest(
 			return;
 		}
 		const mode = rawMode as ProjectMode;
+		if (mode === "menu") {
+			res.status(409).json({ error: "MENU_PUBLISH_NOT_ENABLED", message: "Use publishMenu to publish or update menu projects." });
+			return;
+		}
 
 		const publishedSlug = typeof projectData.publishedSlug === "string" ? projectData.publishedSlug : null;
 		if (!publishedSlug) {

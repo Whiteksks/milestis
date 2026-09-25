@@ -1,16 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
 import { useTranslations, useLocale } from 'next-intl'
-import { MobileDrawer } from '@/editor/components/editor/layout/mobile/mobile-drawer'
+import { PublishModalFrame } from './publish-modal-frame'
+import { MenuPublishFlow } from './menu-publish-flow'
 import { Globe, Lock } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ReferralModal } from '@/components/layout/dashboard/referral'
@@ -24,6 +17,13 @@ import type { PublishModalProps } from './publish-modal.types'
 export type { PublishModalProps, PublishMode } from './publish-modal.types'
 
 export function PublishModal(props: PublishModalProps) {
+  if (!props.open) return null
+  return props.mode === 'menu'
+    ? <MenuPublishFlow key={props.projectId} {...props} />
+    : <StandardPublishModal key={props.projectId} {...props} />
+}
+
+function StandardPublishModal(props: PublishModalProps) {
   const { open, mode, republishMode } = props
   const t = useTranslations('editor.modal.publish')
   const locale = useLocale()
@@ -70,98 +70,18 @@ export function PublishModal(props: PublishModalProps) {
       <PublishSuccessPane siteUrl={siteUrl} t={t} onInviteClick={() => setReferralOpen(true)} />
     )
 
-  if (isMobile) {
-    return (
-      <>
-        <MobileDrawer
-          open={open}
-          onOpenChange={handleClose}
-          title={
-            <span className="flex items-center gap-2 text-base">
-              {modeIcon}
-              {modalData.step === 'slug'
-                ? step1Title
-                : modalData.step === 'review'
-                  ? reviewTitle
-                  : t('success.title')}
-            </span>
-          }
-          description={
-            modalData.step === 'slug'
-              ? step1Description
-              : modalData.step === 'review'
-                ? t('description.review')
-                : t('success.description')
-          }
-          showHeader={modalData.step !== 'success'}
-          footer={
-            <PublishModalFooter
-              modalData={modalData}
-              insufficient={insufficient}
-              isFreeRepublish={isFreeRepublish}
-              republishMode={republishMode}
-              priceDollars={priceDollars}
-              effectiveTermsAccepted={effectiveTermsAccepted}
-              confirmMutation={confirmMutation}
-              onConfirm={onConfirm}
-              onClose={() => handleClose(false)}
-              t={t}
-              fullWidth
-            />
-          }
-          bodyClassName="px-2 min-h-64"
-        >
-          {modalBody}
-        </MobileDrawer>
-        <ReferralModal open={referralOpen} onOpenChange={setReferralOpen} locale={locale} />
-      </>
-    )
-  }
-
-  return (
-    <>
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-xl w-full min-w-0 overflow-hidden gap-4">
-          <DialogHeader className={modalData.step === 'success' ? 'sr-only' : 'gap-1'}>
-            <DialogTitle className="flex items-center gap-2 text-base">
-              {modalData.step === 'success' ? (
-                t('success.title')
-              ) : (
-                <>
-                  {modeIcon}
-                  {modalData.step === 'slug' ? step1Title : reviewTitle}
-                </>
-              )}
-            </DialogTitle>
-            <DialogDescription className="text-xs">
-              {modalData.step === 'success'
-                ? t('success.description')
-                : modalData.step === 'slug'
-                  ? step1Description
-                  : reviewDescription}
-            </DialogDescription>
-          </DialogHeader>
-
-          {modalBody}
-
-          <DialogFooter className="gap-2">
-            <PublishModalFooter
-              modalData={modalData}
-              insufficient={insufficient}
-              isFreeRepublish={isFreeRepublish}
-              republishMode={republishMode}
-              priceDollars={priceDollars}
-              effectiveTermsAccepted={effectiveTermsAccepted}
-              confirmMutation={confirmMutation}
-              onConfirm={onConfirm}
-              onClose={() => handleClose(false)}
-              t={t}
-              size="sm"
-            />
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <ReferralModal open={referralOpen} onOpenChange={setReferralOpen} locale={locale} />
-    </>
-  )
-}         
+  const success = modalData.step === 'success'
+  const title = success ? t('success.title') : modalData.step === 'slug' ? step1Title : reviewTitle
+  const description = success ? t('success.description') : modalData.step === 'slug' ? step1Description : isMobile ? t('description.review') : reviewDescription
+  return <>
+    <PublishModalFrame open={open} onOpenChange={handleClose} success={success} busy={confirmMutation.isPending}
+      title={<>{!success && modeIcon}{title}</>} description={description}
+      footer={<PublishModalFooter modalData={modalData} insufficient={insufficient} isFreeRepublish={isFreeRepublish}
+        republishMode={republishMode} priceDollars={priceDollars} effectiveTermsAccepted={effectiveTermsAccepted}
+        confirmMutation={confirmMutation} onConfirm={onConfirm} onClose={() => handleClose(false)} t={t}
+        fullWidth={isMobile === true} size={isMobile ? undefined : 'sm'} />}>
+      {modalBody}
+    </PublishModalFrame>
+    <ReferralModal open={referralOpen} onOpenChange={setReferralOpen} locale={locale} />
+  </>
+}

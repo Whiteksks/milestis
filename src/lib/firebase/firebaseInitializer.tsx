@@ -7,6 +7,7 @@ import { clearServerSession, syncServerSession } from '@/lib/auth/session-client
 import { auth, db } from '@/lib/firebase/firebase'
 import { useUserStore } from '@/hooks/useUserStore'
 import { captureReferralParam, peekReferralCode } from '@/lib/referral'
+import { markNewSignup } from '@/lib/analytics'
 
 function buildFallbackProfile(user: User) {
   return {
@@ -100,7 +101,7 @@ export default function FirebaseInitializer() {
               const url = process.env.NEXT_PUBLIC_CREATEUSER_URL
               const ref = peekReferralCode()
               if (url) {
-                await fetch(url, {
+                const res = await fetch(url, {
                   method: 'POST',
                   headers: {
                     Authorization: `Bearer ${idToken}`,
@@ -108,6 +109,10 @@ export default function FirebaseInitializer() {
                   },
                   body: JSON.stringify(ref ? { ref } : {}),
                 })
+                // 201 = doc actually created here (real signup, e.g. Google/password first login).
+                // 409 = already existed — another caller (e.g. auth/finish) created it first, don't double-count.
+                // AuthenticatedRedirect reads this flag and appends ?signup=1 to the first dashboard redirect.
+                if (res.status === 201) markNewSignup()
               }
             } catch (err) {
               console.error('Failed to self-heal user document:', err)

@@ -86,7 +86,7 @@ export function Canvas({
   const decorationAnimation = themeCustomizations.decorationAnimation ?? previewDecorations?.animation ?? 'fade'
 
   const floatingToolbarPanels = {
-    decorations: (
+    decorations: !modeEntry.uiConfig.hideDecorations && (
       <DecorationsFloatingToolbar
         scrollContainerRef={scrollContainerRef}
       />
@@ -153,7 +153,7 @@ export function Canvas({
                 theme.shadow
               )}
             >
-              <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />
+              {!modeEntry.uiConfig.hideDecorations && <DecorationsLayer decorations={allDecorations} animation={decorationAnimation} />}
 
               <div className="relative z-10">
                 {templateNode}

@@ -44,7 +44,7 @@ const VALID_KINDS: readonly AiIntentKind[] = ['generate_all', 'edit_section', 'e
  *  project just received its first photos. No point spending a network round-trip asking a
  *  model to classify something this certain before the real work even starts. */
 function classifyDeterministic(input: ClassifyIntentInput): AiIntent | null {
-  if (input.isBlankProject && input.hasNewPhotos) return { kind: 'generate_all' }
+  if (input.isBlankProject && input.hasNewPhotos && !input.prompt.trim()) return { kind: 'generate_all' }
   return null
 }
 

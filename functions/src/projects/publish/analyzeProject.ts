@@ -214,6 +214,10 @@ export const analyzeProject = onRequest(
 				return;
 			}
 			const mode = rawMode as ProjectMode;
+		if (mode === "menu") {
+			res.status(409).json({ error: "MENU_PUBLISH_NOT_ENABLED", message: "Use publishMenu to publish or update menu projects." });
+			return;
+		}
 			const policy = getSlugModePolicy(mode);
 
 			// ── Slug availability (global-namespace modes only) ────────────

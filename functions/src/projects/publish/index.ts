@@ -57,6 +57,9 @@ async function claimPublishJob(projectId: string, uid: string) {
 		}
 
 		const projectData = projectSnap.data()!;
+		if (projectData.mode === "menu") {
+			throw new PublishFlowError(ERROR.NOT_PUBLISHABLE, 409, "Use publishMenu for menu projects.");
+		}
 		if (projectData.ownerId !== uid) {
 			throw new PublishFlowError(ERROR.FORBIDDEN, 403, "You do not own this project.");
 		}
@@ -312,11 +315,16 @@ export const publishProject = onRequest(
 
 		const rawMode = projectData.mode;
 		if (!VALID_MODES.includes(rawMode as ProjectMode)) {
+			await releasePublishLock(projectId, publishAttemptId!).catch(() => {});
 			logger.error(`[publishProject] Invalid project mode "${rawMode}" for ${projectId}`);
 			res.status(500).json({ error: ERROR.INTERNAL_SERVER_ERROR });
 			return;
 		}
 		const mode = rawMode as ProjectMode;
+		if (mode === "menu") {
+			res.status(409).json({ error: "MENU_PUBLISH_NOT_ENABLED", message: "Use publishMenu to publish or update menu projects." });
+			return;
+		}
 		// creditCost comes from the validated quote — no need to read config here.
 
 		try {

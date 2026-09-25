@@ -65,6 +65,7 @@ function formatPurgeDate(date: Date): string {
 }
 
 const modeConfig = {
+  menu: { icon: BookOpen, labelKey: "project.mode.menu" },
   portfolio: { icon: Layout, labelKey: "project.mode.portfolio" },
   photobook: { icon: BookOpen, labelKey: "project.mode.photobook" },
   event:     { icon: Camera,   labelKey: "project.mode.event" },
@@ -136,7 +137,7 @@ function ProjectCardInner({ project, trash = false, archive = false, zoom }: Pro
     ) : (
       <TemplatePreview
         themeId={project.preview?.themeId}
-        templateId={project.preview?.templateId}
+        templateId={project.preview?.templateId ?? (project.mode === "menu" ? "menu-classic" : undefined)}
         heroImageUrl={project.preview?.heroImageUrl}
         title={project.preview?.title}
         subtitle={project.preview?.subtitle}

@@ -9,6 +9,15 @@
 import { buildPublishedProjectUrl } from '@/lib/slug'
 
 export const PROJECT_TYPE_CONFIG = {
+  menu: {
+    label: 'Menu', hasAccessToken: false, primaryActionLabel: 'Publish', republishLabel: 'Update menu',
+    archiveBadge: 'MENU', archiveRecordTitle: 'Restaurant menu', canDownloadFile: false, requiresSlug: true,
+    getShareUrl: (slug: string) => buildPublishedProjectUrl('menu', slug),
+    modal: {
+      title: 'Publish menu', description: 'Restaurant menu', costLabel: 'Menu', costDescription: '',
+      actionLabel: 'Publish menu', pendingLabel: 'Publishing...', republishWarning: '', addressLabel: 'Menu address',
+    },
+  },
   portfolio: {
     /** Human-readable label */
     label: 'Portfolio',

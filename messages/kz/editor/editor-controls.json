@@ -7,6 +7,20 @@
         "allSections": "Бөлімдер"
       },
       "media": {
+        "uploadQueued": "Кезекте",
+        "uploadProcessing": "Өңделуде…",
+        "uploadRetry": "Қайталау",
+        "uploadDismiss": "Қатені жасыру",
+        "uploadErrors": {
+          "storageLimit": "Қоймада орын жеткіліксіз.",
+          "tooManyPixels": "Сурет 100 Мп-ден үлкен. Өлшемін кішірейтіңіз.",
+          "processingFailed": "Файлды өңдеу мүмкін болмады. JPEG, PNG немесе WebP жүктеп көріңіз.",
+          "processingTimeout": "Өңдеу ұзаққа созылды. Файлды қайта жүктеуге болады.",
+          "connectionFailed": "Өңдеу күйін алу мүмкін емес. Байланысты тексеріңіз.",
+          "uploadFailed": "Жүктеу сәтсіз аяқталды. Қайталап көріңіз.",
+          "unsupportedFormat": "Сурет файлын таңдаңыз.",
+          "fileTooLarge": "Файл 100 МБ-тан кіші болуы керек."
+        },
         "pickImage": "Суретті таңдау",
         "changeImage": "Суретті өзгерту",
         "removeImage": "Суретті өшіру",

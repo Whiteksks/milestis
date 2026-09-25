@@ -8,6 +8,7 @@ export interface SlugModePolicy {
 }
 
 export const SLUG_MODE_POLICY = {
+  menu: { namespace: "global", routeKind: "subdomain" },
 	portfolio: {
 		namespace: "global",
 		routeKind: "subdomain",
