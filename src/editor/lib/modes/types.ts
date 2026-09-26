@@ -29,6 +29,10 @@ export type ModePreviewMeta = {
 
 /** Args passed to each mode's `renderPublished` — no Zustand, data comes from props. */
 export type PublishedRenderArgs = {
+  /** Explicit page selection; omitted on the public root to render the home page. */
+  pageId?: string
+  /** Editor preview navigation; public views use the page's URL. */
+  onPageChange?: (pageId: string) => void
   templateId: string
   theme: ThemeConfig
   themeCustomizations: ThemeCustomizations
@@ -39,7 +43,7 @@ export type PublishedRenderArgs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   visibility: Record<string, any>
   handleAnchorClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
-  /** Firestore project ID — passed only for event mode so the upload page can access subcollections. */
+  /** Firestore project ID for event uploads and project-scoped guest menu selections. */
   projectId?: string
   /** Extra server-provided published data for modes that should not bootstrap it from the client. */
   publishedData?: Record<string, unknown>

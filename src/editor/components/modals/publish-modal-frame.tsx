@@ -13,7 +13,7 @@ export function PublishModalFrame({ open, onOpenChange, title, description, succ
   const isMobile = useIsMobile()
   const handleClose = (next: boolean) => { if (!busy) onOpenChange(next) }
   if (isMobile) return <MobileDrawer open={open} onOpenChange={handleClose} title={<span className="flex items-center justify-center gap-2 text-base">{title}</span>} description={description}
-    showHeader={!success} footer={footer} bodyClassName="px-2 min-h-64">{children}</MobileDrawer>
+    showHeader={!success} footer={footer} bodyClassName="px-2">{children}</MobileDrawer>
   return <Dialog open={open} onOpenChange={handleClose}>
     <DialogContent className="sm:max-w-xl w-full min-w-0 max-h-[90dvh] overflow-y-auto gap-4">
       <DialogHeader className={success ? 'sr-only' : 'gap-1'}>

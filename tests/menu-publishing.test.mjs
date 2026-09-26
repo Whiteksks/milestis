@@ -19,8 +19,8 @@ function load(file) {
   let filename = path.resolve(root, file)
   if (!path.extname(filename)) filename = existsSync(`${filename}.ts`) ? `${filename}.ts` : path.join(filename, 'index.ts')
   if (cache.has(filename)) return cache.get(filename).exports
-  const module = { exports: {} }
-  cache.set(filename, module)
+  const sourceModule = { exports: {} }
+  cache.set(filename, sourceModule)
   const source = ts.transpileModule(readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText
   const require = (id) => {
     // These publication routes must bypass locale routing. Next-intl's ESM
@@ -32,13 +32,14 @@ function load(file) {
     if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
     return dependency(id)
   }
-  vm.runInThisContext(`(function(require,module,exports){${source}\n})`, { filename })(require, module, module.exports)
-  return module.exports
+  vm.runInThisContext(`(function(require,module,exports){${source}\n})`, { filename })(require, sourceModule, sourceModule.exports)
+  return sourceModule.exports
 }
 const { prepareMenuSnapshot } = load('functions/src/projects/menu/snapshot.ts')
 const { publishMenuSnapshot, validateMenuPublishInput } = load('functions/src/projects/menu/publish.ts')
 const { copyMenuMedia } = load('functions/src/projects/menu/media.ts')
-const { buildPublishedProjectUrl } = load('src/lib/slug/url.ts')
+const { buildPublishedProjectUrl, buildPublishedMenuPageUrl } = load('src/lib/slug/url.ts')
+const { resolvePublishedMenuPage, readPublishedMenuLinks, publishedMenuMetadata } = load('src/lib/projects/published-menu.ts')
 const { getPublishedGlobalProject } = load('src/lib/projects/published-global.ts')
 const { isSlugMode } = load('src/lib/slug/policy.ts')
 
@@ -46,7 +47,7 @@ function draft() {
   return {
     theme: { currentTheme: 'parchment', currentTemplateId: 'menu-classic', customDecorations: [{ src: 'private-decoration' }] },
     content: {
-      sectionContent: { venue: { name: 'Cafe', description: '', currency: 'KZT' }, categories: [{ id: 'breakfast', name: 'Breakfast', visible: true }], dishes: [{ id: 'toast', categoryId: 'breakfast', name: 'Toast', description: '', priceMinor: 1299, visible: true }] },
+      sectionContent: { venue: { name: 'Cafe', description: '', currency: 'KZT' }, homePageId: 'home', pages: [{ id: 'home', name: '', path: '/', content: { categoryIds: ['breakfast'] } }], categories: [{ id: 'breakfast', name: 'Breakfast', visible: true }], dishes: [{ id: 'toast', categoryId: 'breakfast', name: 'Toast', description: '', priceMinor: 1299, visible: true }] },
       sectionVisibility: { showVenue: true, showMenu: true }, imageContent: { dishes: {} },
     },
   }
@@ -94,6 +95,66 @@ function database(project = {}) {
 const input = { projectId: 'p1', slug: 'my-cafe', locale: 'ru' }
 const identity = async (snapshot) => snapshot
 const errorCode = (code) => (error) => error.code === code
+
+test('editor and publisher share identifier limits and page-reference validation', () => {
+  const { readMenuContent } = load('functions/src/domain/menu/content.ts')
+  for (const length of [80, 81, 100]) {
+    const data = draft()
+    data.content.sectionContent.dishes[0].id = 'd'.repeat(length)
+    if (length === 80) {
+      assert.doesNotThrow(() => readMenuContent(data.content.sectionContent))
+      assert.doesNotThrow(() => prepareMenuSnapshot(data))
+    } else {
+      assert.throws(() => readMenuContent(data.content.sectionContent))
+      assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_MENU'))
+    }
+  }
+  const data = draft()
+  data.content.sectionContent.pages[0].content.categoryIds.push('missing')
+  assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_MENU'))
+})
+
+test('publication preserves the home page and excludes unassigned catalog entries and images', () => {
+  const data = draft()
+  data.content.sectionContent.categories.push({ id: 'private', name: 'Private', visible: true })
+  data.content.sectionContent.dishes.push({ id: 'secret', categoryId: 'private', name: 'Secret', description: '', priceMinor: 100, visible: true })
+  data.content.imageContent.dishes.secret = { asset: { src: 'private' } }
+  const published = prepareMenuSnapshot(data)
+  assert.deepEqual(published.content.sectionContent.pages, data.content.sectionContent.pages)
+  assert.equal(published.content.sectionContent.homePageId, 'home')
+  assert.equal(published.content.sectionContent.dishes.length, 1)
+  assert.equal(published.content.imageContent.dishes.secret, undefined)
+  data.content.sectionContent.pages[0].content.categoryIds = []
+  assert.throws(() => prepareMenuSnapshot(data), errorCode('EMPTY_MENU'))
+})
+
+test('multi-page publication preserves compositions, shared dishes and empty pages', () => {
+  const data = draft()
+  data.content.sectionContent.pages.push({ id: 'other', name: 'Other', path: '/other', content: { categoryIds: ['breakfast'] } })
+  data.content.sectionContent.pages.push({ id: 'empty', name: 'Soon', path: '/soon', content: { categoryIds: [] } })
+  const background = { asset: { src: 'https://example.com/drinks.webp', width: 1200, height: 800 } }
+  data.content.imageContent.pageBackgrounds = { other: background, removed: { asset: { src: 'private' } } }
+  const published = prepareMenuSnapshot(data)
+  assert.deepEqual(published.content.sectionContent.pages, data.content.sectionContent.pages)
+  assert.equal(published.content.sectionContent.dishes.length, 1, 'shared dishes are stored once')
+  assert.deepEqual(published.content.imageContent.pageBackgrounds, { other: background })
+  data.content.imageContent.pageBackgrounds.other = { asset: { src: 'invalid' } }
+  assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_IMAGE'))
+  data.content.imageContent.pageBackgrounds.other = background
+  data.content.sectionContent.pages[0].content.categoryIds = []
+  assert.doesNotThrow(() => prepareMenuSnapshot(data), 'an empty home page can link to another populated page')
+})
+
+test('publication rejects crops that extend beyond the image and accepts rounding at the edge', () => {
+  const data = draft()
+  const image = { asset: { src: 'https://example.com/dish.webp', width: 100, height: 100 }, crop: { ratio: 'square', rect: { left: 0.8, top: 0, width: 0.4, height: 1 } } }
+  data.content.imageContent.dishes.toast = image
+  assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_IMAGE'))
+  image.crop.rect = { left: 0, top: 0.8, width: 1, height: 0.4 }
+  assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_IMAGE'))
+  image.crop.rect = { left: 0.7, top: 0, width: 0.3000000000000001, height: 1 }
+  assert.doesNotThrow(() => prepareMenuSnapshot(data))
+})
 
 test('publication filters private dishes/images and strips decorations without mutating the draft', () => {
   const data = draft()
@@ -213,6 +274,9 @@ test('media copies only owned uploads, reuses generations, preserves originals a
   const first = await copyMenuMedia(image, 'owner', 'p1')
   assert.match(first.asset.src, /public%2Fp1%2Fmenu%2F/)
   assert.equal(first.asset.src, first.crop.assetSrc)
+  const menuWithBackground = { content: { imageContent: { pageBackgrounds: { home: image } } } }
+  const copiedMenu = await copyMenuMedia(menuWithBackground, 'owner', 'p1')
+  assert.equal(copiedMenu.content.imageContent.pageBackgrounds.home.asset.src, first.asset.src)
   assert.deepEqual(await copyMenuMedia(image, 'owner', 'p1'), first)
   assert.equal(copies, 1)
   assert.ok(files.has(sourcePath))
@@ -264,7 +328,7 @@ test('a successful commit does not perform a fallible cleanup transaction afterw
     if (++transactions > 2) throw new Error('Firestore unavailable after commit')
     return original(callback)
   }
-  assert.deepEqual(await publishMenuSnapshot(db, 'owner', input, identity), { ok: true, publishedSlug: 'my-cafe' })
+  assert.deepEqual(await publishMenuSnapshot(db, 'owner', input, identity), { ok: true, publishedSlug: 'my-cafe', publishedPages: [{ id: 'home', name: '', path: '/' }] })
   assert.equal(records.get('projects/p1').publishLockId, undefined)
 })
 
@@ -279,4 +343,81 @@ test('proxy preserves subdomain paths and private project links', () => {
   const privatePage = proxy(request('https://milestis.site/album?share=secret'))
   assert.equal(new URL(privatePage.headers.get('x-middleware-rewrite')).pathname, '/sites/album')
   assert.equal(new URL(privatePage.headers.get('x-middleware-rewrite')).searchParams.get('share'), 'secret')
+})
+
+test('public routes and share links change together only after a successful publication', async () => {
+  const { db, records, put } = database()
+  const reader = { collection: (name) => ({ doc: (id) => ({ get: async () => ({ id, data: () => records.get(`${name}/${id}`) }) }) }) }
+  const data = draft()
+  const menu = data.content.sectionContent
+  menu.categories.push({ id: 'drinks', name: 'Drinks', visible: true })
+  menu.dishes.push({ id: 'tea', categoryId: 'drinks', name: 'Tea', description: '', priceMinor: 500, visible: true })
+  menu.pages.push({ id: 'drinks', name: 'Drinks', path: '/drinks', content: { categoryIds: ['drinks'] } })
+  data.content.imageContent.dishes.tea = { asset: { src: 'https://example.com/tea.webp', width: 100, height: 100 } }
+  put('projects/p1/data/content', data)
+  const result = await publishMenuSnapshot(db, 'owner', input, identity)
+  const read = () => getPublishedGlobalProject(reader, input.slug)
+  assert.deepEqual(result.publishedPages, readPublishedMenuLinks(records.get('published_projects/p1')))
+  const live = await read()
+  assert.equal(resolvePublishedMenuPage(live, '/').page.id, 'home')
+  assert.equal(resolvePublishedMenuPage(live, '/drinks').page.id, 'drinks')
+  assert.deepEqual(resolvePublishedMenuPage(live, '/drinks').page.content.categoryIds, ['drinks'])
+  assert.equal(live.content.imageContent.dishes.tea.asset.src, 'https://example.com/tea.webp')
+  for (const route of ['/missing', '/Drinks', '/drinks/tea', '/api', '/wp-admin']) {
+    assert.equal(resolvePublishedMenuPage(live, route), null)
+  }
+  menu.pages[1].path = '/beverages'
+  put('projects/p1/data/content', data)
+  assert.equal(resolvePublishedMenuPage(await read(), '/beverages'), null)
+  assert.equal(readPublishedMenuLinks(records.get('published_projects/p1'))[1].path, '/drinks')
+  await assert.rejects(publishMenuSnapshot(db, 'owner', input, async () => { throw new Error('Copy failed') }), /Copy failed/)
+  assert.equal(resolvePublishedMenuPage(await read(), '/drinks').page.id, 'drinks')
+  await publishMenuSnapshot(db, 'owner', input, identity)
+  assert.equal(resolvePublishedMenuPage(await read(), '/drinks'), null)
+  assert.equal(resolvePublishedMenuPage(await read(), '/beverages').page.id, 'drinks')
+  menu.homePageId = 'drinks'
+  menu.pages[0].path = '/food'
+  menu.pages[1].path = '/'
+  put('projects/p1/data/content', data)
+  await publishMenuSnapshot(db, 'owner', input, identity)
+  assert.equal(resolvePublishedMenuPage(await read(), '/').page.id, 'drinks')
+  assert.equal(resolvePublishedMenuPage(await read(), '/food').page.id, 'home')
+  assert.equal(resolvePublishedMenuPage(await read(), '/beverages'), null)
+  menu.pages.splice(0, 1)
+  put('projects/p1/data/content', data)
+  await publishMenuSnapshot(db, 'owner', input, identity)
+  assert.equal(resolvePublishedMenuPage(await read(), '/food'), null)
+  assert.deepEqual((await read()).content.sectionContent.dishes.map((dish) => dish.id), ['tea'])
+  assert.equal(records.get('projects/p1/data/content').content.sectionContent.dishes.length, 2)
+  records.get('published_projects/p1').isPublished = false
+  assert.equal(resolvePublishedMenuPage(await read(), '/'), null)
+  assert.deepEqual(readPublishedMenuLinks(records.get('published_projects/p1')), [])
+})
+
+test('menu route resolution rejects other modes and malformed snapshots', () => {
+  const project = { mode: 'menu', slug: 'my-cafe', name: 'Cafe', content: draft().content }
+  for (const mode of ['portfolio', 'photobook', 'event']) {
+    assert.equal(resolvePublishedMenuPage({ ...project, mode }, '/'), null)
+  }
+  assert.equal(resolvePublishedMenuPage(null, '/'), null)
+  assert.equal(resolvePublishedMenuPage({ ...project, content: {} }, '/'), null)
+  assert.deepEqual(readPublishedMenuLinks(undefined), [])
+  assert.deepEqual(readPublishedMenuLinks({ ...project, mode: 'portfolio', isPublished: true }), [])
+  assert.throws(() => readPublishedMenuLinks({ mode: 'menu', isPublished: true, content: {} }))
+})
+
+test('page metadata and QR URL builders use the canonical page path', () => {
+  const project = { mode: 'menu', slug: 'my-cafe', name: 'Cafe', content: draft().content }
+  project.content.sectionContent.pages.push({ id: 'drinks', name: 'Drinks', path: '/drinks', content: { categoryIds: [] } })
+  const metadata = publishedMenuMetadata(resolvePublishedMenuPage(project, '/drinks'))
+  const url = buildPublishedMenuPageUrl('my-cafe', '/drinks')
+  assert.equal(url, 'https://my-cafe.milestis.site/drinks')
+  assert.deepEqual(metadata.title, { absolute: 'Drinks — Cafe' })
+  assert.equal(metadata.alternates.canonical, url)
+  assert.equal(metadata.openGraph.url, url)
+  assert.equal(metadata.openGraph.images[0].url, 'https://my-cafe.milestis.site/opengraph-image')
+  assert.equal(buildPublishedMenuPageUrl('my-cafe', '/'), 'https://my-cafe.milestis.site')
+  for (const path of ['//external.com', '/drinks?draft=1', '/drinks#tea', '/drinks/tea', '/wp-content', '/twitter-image']) {
+    assert.throws(() => buildPublishedMenuPageUrl('my-cafe', path))
+  }
 })

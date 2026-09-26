@@ -21,6 +21,10 @@ export interface UiStore {
   isSidebarCollapsed: boolean
 
   activeSectionId: string | null
+  activeMenuPageId: string | null
+  setActiveMenuPageId: (id: string | null) => void
+  activeMenuCategoryId: string | null
+  setActiveMenuCategoryId: (id: string | null) => void
 
   /** Bumped by requestFocusSection so pages can react even if the same section is requested twice. */
   focusSectionRequest: { sectionId: string; nonce: number } | null
@@ -101,6 +105,13 @@ export const useUiStore = create<UiStore>((set) => ({
   isSidebarCollapsed: false,
 
   activeSectionId: null,
+  activeMenuPageId: null,
+  setActiveMenuPageId: (id) => set((state) => ({
+    activeMenuPageId: id,
+    activeMenuCategoryId: state.activeMenuPageId === id ? state.activeMenuCategoryId : null,
+  })),
+  activeMenuCategoryId: null,
+  setActiveMenuCategoryId: (id) => set({ activeMenuCategoryId: id }),
   focusSectionRequest: null,
 
   isDesignModalOpen: false,
@@ -172,7 +183,11 @@ export const useUiStore = create<UiStore>((set) => ({
       focusSectionRequest: { sectionId, nonce: Date.now() },
     })),
 
-  setProjectId: (id) => set(() => ({ projectId: id })),
+  setProjectId: (id) => set((state) => ({
+    projectId: id,
+    activeMenuPageId: state.projectId === id ? state.activeMenuPageId : null,
+    activeMenuCategoryId: state.projectId === id ? state.activeMenuCategoryId : null,
+  })),
   setProjectName: (name) => set(() => ({ projectName: name })),
   setIsPublished: (v) => set(() => ({ isPublished: v })),
   setProjectStatus: (status) => set(() => ({ projectStatus: status })),

@@ -31,9 +31,9 @@ export const menuMode: ModeRegistryEntry<keyof MenuVisibility> = {
   extractContent: extractMenuDraft,
   extractPreviewMeta: (s) => ({ title: s.menuContent.venue.name, subtitle: s.menuContent.venue.description, heroThumbUrl: s.menuImages.logo?.asset.blurDataUrl ?? s.menuImages.logo?.asset.src }),
   hydrateStore: (saved) => useContentStore.setState(restoreMenuDraft(saved)),
-  renderPublished: ({ theme, content, imageContent, visibility }) => {
+  renderPublished: ({ theme, content, imageContent, visibility, pageId, onPageChange, projectId }) => {
     const draft = restoreMenuDraft({ sectionContent: content, sectionVisibility: visibility, imageContent })
-    return <MenuClassic theme={theme} content={draft.menuContent} images={draft.menuImages} visibility={draft.menuVisibility} />
+    return <MenuClassic pageId={pageId} onPageChange={onPageChange} projectId={projectId} theme={theme} content={draft.menuContent} images={draft.menuImages} visibility={draft.menuVisibility} />
   },
   visibilitySelector: (s) => s.menuVisibility,
   toggleSelector: (s) => s.toggleMenuSection,

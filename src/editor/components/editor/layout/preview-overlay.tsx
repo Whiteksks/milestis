@@ -8,11 +8,14 @@ import { useUiStore } from '@/editor/lib/store/ui'
 import { useThemeStore } from '@/editor/lib/store/theme'
 import { useContentStore } from '@/editor/lib/store/content'
 import { PublishedView } from '@/app/sites/[slug]/published-view'
+import { useActiveMenuPage } from '@/editor/modes/menu/use-active-menu-page'
 
 export function PreviewOverlay() {
   const isPreviewOpen = useUiStore((s) => s.isPreviewOpen)
   const setIsPreviewOpen = useUiStore((s) => s.setIsPreviewOpen)
   const editorMode = useUiStore((s) => s.editorMode)
+  const menuPage = useActiveMenuPage()
+  const setMenuPage = useUiStore((s) => s.setActiveMenuPageId)
 
   const { currentTemplateId, currentTheme, themeCustomizations, customDecorations } =
     useThemeStore(useShallow((s) => ({
@@ -69,6 +72,8 @@ export function PreviewOverlay() {
   return (
     <div className="fixed inset-0 z-[200] overflow-y-auto bg-background" data-scroll-root>
       <PublishedView
+        pageId={editorMode === 'menu' ? menuPage.id : undefined}
+        onPageChange={editorMode === 'menu' ? setMenuPage : undefined}
         mode={editorMode}
         templateId={currentTemplateId}
         themeId={currentTheme}

@@ -52,7 +52,7 @@ export function MobileDrawer({
           containerRef.current?.focus()
         }}
       >
-        <DrawerHeader className={showHeader ? undefined : 'sr-only'}>
+        <DrawerHeader className={showHeader ? 'shrink-0' : 'sr-only'}>
           <DrawerTitle className="mt-2">{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
@@ -60,13 +60,13 @@ export function MobileDrawer({
         <div 
           ref={containerRef} 
           tabIndex={-1} 
-          className={`overflow-y-auto mt-2 pb-2 px-2 outline-none${bodyClassName ? ` ${bodyClassName}` : ''}`}
+          className={`min-h-0 overflow-y-auto mt-2 pb-2 px-2 outline-none${bodyClassName ? ` ${bodyClassName}` : ''}`}
         >
           {children}
         </div>
 
         {(footer || showCloseButton) && (
-          <DrawerFooter className="pt-2">
+          <DrawerFooter className="shrink-0 pt-2">
             {footer ?? (
               <DrawerClose asChild>
                 <Button variant="outline">Close</Button>

@@ -44,6 +44,11 @@ export const IMAGE_POLICY_REGISTRY: Record<ImageSlotId, ImagePolicy> = {
     frame: { default: 'soft', allowed: ALL_IMAGE_FRAME_OPTIONS },
     render: { fit: 'cover', usage: 'inline' },
   },
+  'menu.page.background': {
+    ratio: { default: 'wide', forced: 'wide' },
+    frame: { default: 'none', forced: 'none' },
+    render: { fit: 'cover', usage: 'background' },
+  },
   'photobook.cover.primary': {
     ratio: { default: 'portrait', allowed: ALL_IMAGE_RATIO_OPTIONS },
     frame: { default: 'none', allowed: ALL_IMAGE_FRAME_OPTIONS },

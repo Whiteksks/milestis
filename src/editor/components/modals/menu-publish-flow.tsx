@@ -2,15 +2,16 @@
 
 import { useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import QRCodeSVG from 'react-qr-code'
 import { Globe, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { saveProject } from '@/lib/projects/save-project'
-import { publishMenu } from '@/lib/projects/publish-menu-api'
+import { getPublishedMenuLinks, publishMenu } from '@/lib/projects/publish-menu-api'
 import { PublishProjectError } from '@/lib/projects/publish-project-api'
-import { buildPublishedProjectUrl, normalizeSlug } from '@/lib/slug'
+import { normalizeSlug } from '@/lib/slug'
+import { buildPublishedMenuPageUrl } from '@/lib/slug/url'
 import { useUserStore } from '@/hooks/useUserStore'
 import { projectKeys } from '@/hooks/useProjectsQuery'
 import { usePublishSlug } from '@/hooks/usePublishSlug'
@@ -22,7 +23,9 @@ import type { PublishModalProps } from './publish-modal.types'
 export function MenuPublishFlow({ projectId, initialSlug, onOpenChange }: PublishModalProps) {
   const t = useTranslations('editor.menu.publish')
   const common = useTranslations('editor.modal.publish')
+  const pagesT = useTranslations('editor.menu.pages')
   const locale = useLocale()
+  const activePageId = useUiStore((state) => state.activeMenuPageId)
   const queryClient = useQueryClient()
   const uid = useUserStore((state) => state.profile?.uid)
   const publishedSlug = useUiStore((state) => state.projectId === projectId ? state.publishedSlug : null)
@@ -32,7 +35,21 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange }: Publis
   const pending = useRef(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const url = buildPublishedProjectUrl('menu', publishedSlug || data.slug)
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null)
+  const publishedPagesKey = ['published-menu-pages', uid, projectId] as const
+  const publishedPages = useQuery({
+    queryKey: publishedPagesKey,
+    queryFn: () => getPublishedMenuLinks(projectId),
+    enabled: !!uid && isPublished,
+    // Another editor tab may have renamed or removed a published page.
+    staleTime: 0,
+    refetchOnMount: 'always',
+    retry: false,
+  })
+  const pages = publishedPages.data ?? []
+  const selectedPage = pages.find((page) => page.id === (selectedPageId ?? activePageId))
+    ?? pages.find((page) => page.path === '/')
+  const url = buildPublishedMenuPageUrl(publishedSlug || data.slug, selectedPage?.path ?? '/')
 
   async function submit() {
     if (pending.current || data.slugStatus !== 'available') return
@@ -43,6 +60,8 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange }: Publis
       await saveProject(projectId)
       if (useUiStore.getState().projectId !== projectId || useUiStore.getState().isDirty) throw new PublishProjectError('DRAFT_CHANGED', 'Draft changed')
       const result = await publishMenu(projectId, data.slug, locale)
+      await queryClient.cancelQueries({ queryKey: publishedPagesKey })
+      queryClient.setQueryData(publishedPagesKey, result.publishedPages)
       // A request can finish after navigation. Never mark a different project published.
       if (useUiStore.getState().projectId === projectId) {
         useUiStore.getState().setPublishedInfo(result.publishedSlug)
@@ -56,7 +75,18 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange }: Publis
     } finally { pending.current = false; setBusy(false) }
   }
 
-  const qr = <MenuQrCode url={url} slug={publishedSlug ?? data.slug} />
+  const qr = publishedPages.isFetching ? <p role="status" className="text-sm text-muted-foreground">{t('loadingPages')}</p>
+    : publishedPages.isError ? <div role="alert" className="space-y-2 text-sm">
+      <p>{t('pagesError')}</p><Button variant="outline" onClick={() => void publishedPages.refetch()}>{t('retry')}</Button>
+    </div> : selectedPage ? <div className="space-y-4">
+      {pages.length > 1 && <label className="flex flex-col gap-2 text-sm">
+        {t('sharePage')}
+        <select value={selectedPage.id} onChange={(event) => setSelectedPageId(event.target.value)} className="w-full min-w-0 rounded-md border bg-background p-2 text-foreground">
+          {pages.map((page) => <option key={page.id} value={page.id}>{page.name || pagesT(page.path === '/' ? 'home' : 'untitled')} · {page.path}</option>)}
+        </select>
+      </label>}
+      <MenuQrCode key={url} url={url} slug={publishedSlug ?? data.slug} path={selectedPage.path} />
+    </div> : null
   return <PublishModalFrame open onOpenChange={onOpenChange} success={success} busy={busy}
     title={<><Globe className="size-4 text-primary" />{success ? t('success') : isPublished ? t('updateTitle') : t('title')}</>}
     description={t('description')}
@@ -74,7 +104,7 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange }: Publis
   </PublishModalFrame>
 }
 
-function MenuQrCode({ url, slug }: { url: string; slug: string }) {
+function MenuQrCode({ url, slug, path }: { url: string; slug: string; path: string }) {
   const t = useTranslations('editor.menu.publish')
   const ref = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
@@ -99,7 +129,7 @@ function MenuQrCode({ url, slug }: { url: string; slug: string }) {
     const objectUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(outer)], { type: 'image/svg+xml' }))
     const link = document.createElement('a')
     link.href = objectUrl
-    link.download = `menu-${slug}-qr.svg`
+    link.download = `menu-${slug}${path === '/' ? '' : `-${path.slice(1)}`}-qr.svg`
     link.click()
     setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
   }

@@ -1,7 +1,15 @@
-import { auth } from '../firebase/firebase'
+import { doc, getDocFromServer } from 'firebase/firestore'
+import { auth, db } from '../firebase/firebase'
 import { PublishProjectError } from './publish-project-api'
+import type { PageLink } from '../../../functions/src/domain/pages'
+import { readPublishedMenuLinks } from './published-menu'
 
-export async function publishMenu(projectId: string, slug: string, locale: string): Promise<{ ok: true; publishedSlug: string }> {
+export async function getPublishedMenuLinks(projectId: string): Promise<PageLink[]> {
+  const snapshot = await getDocFromServer(doc(db, 'published_projects', projectId))
+  return readPublishedMenuLinks(snapshot.data())
+}
+
+export async function publishMenu(projectId: string, slug: string, locale: string): Promise<{ ok: true; publishedSlug: string; publishedPages: PageLink[] }> {
   const user = auth.currentUser
   if (!user) throw new PublishProjectError('UNAUTHORIZED', 'Not authenticated')
   const firebaseProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID

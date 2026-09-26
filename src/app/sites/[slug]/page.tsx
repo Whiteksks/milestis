@@ -1,5 +1,6 @@
-import { cache } from "react"
-import { getPublishedGlobalProject } from "@/lib/projects/published-global"
+import { getPublishedProjectBySlugGlobal } from './published-project'
+import { publishedMenuMetadata, resolvePublishedMenuPage } from '@/lib/projects/published-menu'
+import { MenuPageView } from './menu-page-view'
 import { notFound } from "next/navigation"
 import { createHash } from "crypto"
 import { headers } from "next/headers"
@@ -15,11 +16,6 @@ import type { ThemeCustomizations } from "@/editor/lib/store/theme"
 import type { ThemeCustomDecorations } from "@/editor/lib/types"
 import { MODE_REGISTRY } from "@/editor/lib/modes/registry"
 import type { EventPublishedData } from "@/editor/modes/event/content-types"
-import { NextIntlClientProvider } from "next-intl"
-import { buildPublishedProjectUrl } from "@/lib/slug"
-import menuEn from "../../../../messages/en/editor/editor-menu.json"
-import menuRu from "../../../../messages/ru/editor/editor-menu.json"
-import menuKz from "../../../../messages/kz/editor/editor-menu.json"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -28,7 +24,6 @@ interface Props {
 
 // --- Lookup helpers ---
 
-const getPublishedProjectBySlugGlobal = cache((slug: string) => getPublishedGlobalProject(adminDb, slug))
 
 /**
  * Lookup for token-namespace modes (photobook, event).
@@ -146,16 +141,9 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     if (!project) return { title: "Not found" }
 
     if (project.mode === "menu") {
-      const venue = project.content?.sectionContent?.venue
-      const title = venue?.name || project.name
-      const description = venue?.description?.slice(0, 160) || undefined
-      const url = buildPublishedProjectUrl("menu", slug)
-      const images = [{ url: `${url}/opengraph-image`, width: 1200, height: 630, alt: title }]
-      return {
-        title, description, alternates: { canonical: url },
-        openGraph: { title, description, type: "website", url, images },
-        twitter: { card: "summary_large_image", title, description, images },
-      }
+      const resolved = resolvePublishedMenuPage(project, '/')
+      if (!resolved) notFound()
+      return publishedMenuMetadata(resolved)
     }
 
     const sectionContent = (project.content as Record<string, unknown> | null)?.sectionContent as Record<string, Record<string, string>> | undefined
@@ -240,6 +228,12 @@ export default async function SitePage({ params, searchParams }: Props) {
     const project = await getPublishedProjectBySlugGlobal(slug)
     if (!project) notFound()
 
+    if (project.mode === 'menu') {
+      const resolved = resolvePublishedMenuPage(project, '/')
+      if (!resolved) notFound()
+      return <MenuPageView resolved={resolved} />
+    }
+
     const content = project.content ?? {}
     const theme = project.theme ?? {}
     const view = (
@@ -255,7 +249,7 @@ export default async function SitePage({ params, searchParams }: Props) {
         referrerUid={project.ownerId ?? undefined}
       />
     )
-    return project.mode === "menu" ? <NextIntlClientProvider locale={project.locale} messages={{ en: menuEn, ru: menuRu, kz: menuKz }[project.locale]}>{view}</NextIntlClientProvider> : view
+    return view
   }
 
   // ── Token-namespace (path+token) modes ────────────────────────────────

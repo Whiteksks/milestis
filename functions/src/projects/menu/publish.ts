@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import { getSlugReservationDocId, getSlugValidationError, isSlugBlocked, normalizeSlug, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "../publish/slug/index";
 import { MenuPublishError, prepareMenuSnapshot } from "./snapshot";
+import { pageLinks } from "../../domain/pages";
 
 export interface MenuPublishInput { projectId: string; slug: string; locale: "ru" | "en" | "kz" }
 export function validateMenuPublishInput(body: unknown): MenuPublishInput {
@@ -56,7 +57,7 @@ export async function publishMenuSnapshot(
       if (!project!.publishedSlug) tx.update(db.collection("users").doc(uid), { "stats.projectsPublished": FieldValue.increment(1) });
     });
     committed = true;
-    return { ok: true as const, publishedSlug: slug };
+    return { ok: true as const, publishedSlug: slug, publishedPages: pageLinks(snapshot.content.sectionContent) };
   } finally {
     // Unpublish cancels the lease; never clear a newer worker's lease.
     if (!committed) await db.runTransaction(async (tx) => {

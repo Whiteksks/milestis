@@ -1,6 +1,12 @@
 import { PUBLIC_SITE_DOMAIN } from "./constants"
 import type { SlugMode } from "./policy"
 import { getSlugModePolicy } from "./policy"
+import { isPagePath } from "../../../functions/src/domain/pages"
+
+export function buildPublishedMenuPageUrl(slug: string, path: string): string {
+  if (!isPagePath(path)) throw new Error("Invalid menu page path")
+  return `${buildPublishedProjectUrl('menu', slug)}${path === '/' ? '' : path}`
+}
 
 export interface PublishedProjectShareInput {
   mode: SlugMode

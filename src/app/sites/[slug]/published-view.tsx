@@ -17,6 +17,8 @@ import { MilestisWhiteLabel } from '@/app/sites/[slug]/milestis-white-label'
 // ─── Published view ───────────────────────────────────────────────────────────
 
 interface PublishedViewProps {
+  pageId?: string
+  onPageChange?: (pageId: string) => void
   mode: EditorMode
   templateId: string
   themeId: string
@@ -34,6 +36,8 @@ interface PublishedViewProps {
 }
 
 export function PublishedView({
+  pageId,
+  onPageChange,
   mode,
   templateId,
   themeId,
@@ -68,6 +72,8 @@ export function PublishedView({
   }
 
   const template = MODE_REGISTRY[mode].renderPublished({
+    pageId,
+    onPageChange,
     templateId,
     theme,
     themeCustomizations,
@@ -114,7 +120,7 @@ export function PublishedView({
           {template}
         </div>
 
-        <MilestisWhiteLabel clickable={clickable} referrerUid={referrerUid} />
+        {mode !== 'menu' && <MilestisWhiteLabel clickable={clickable} referrerUid={referrerUid} />}
       </div>
     </div>
   )

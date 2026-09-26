@@ -1,7 +1,7 @@
 import type { ModeContent } from '@/editor/lib/modes/types'
 import type { MenuImageContent, MenuVisibility } from './content-types'
 import type { MenuSlice } from './store-slice'
-import { normalizeMenuContent } from './model'
+import { createMenuContent, readMenuContent } from './model'
 
 type MenuDraftState = Pick<MenuSlice, 'menuContent' | 'menuImages' | 'menuVisibility'>
 
@@ -10,7 +10,7 @@ export function extractMenuDraft(state: MenuDraftState): ModeContent {
 }
 
 export function restoreMenuDraft(saved: ModeContent | null): MenuDraftState {
-  const content = normalizeMenuContent(saved?.sectionContent)
+  const content = saved === null ? createMenuContent() : readMenuContent(saved.sectionContent)
   const images = saved?.imageContent as MenuImageContent | undefined
   const visibility = saved?.sectionVisibility as Partial<MenuVisibility> | undefined
   return {
@@ -21,6 +21,10 @@ export function restoreMenuDraft(saved: ModeContent | null): MenuDraftState {
       dishes: Object.fromEntries(content.dishes.flatMap((dish) => {
         const image = images?.dishes?.[dish.id]
         return image?.asset?.src ? [[dish.id, image]] : []
+      })),
+      pageBackgrounds: Object.fromEntries(content.pages.flatMap((page) => {
+        const image = images?.pageBackgrounds?.[page.id]
+        return image?.asset?.src ? [[page.id, image]] : []
       })),
     },
   }

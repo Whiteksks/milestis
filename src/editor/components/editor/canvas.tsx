@@ -15,6 +15,8 @@ import { SectionsToolbarPanel } from '@/editor/components/editor/layout/Floating
 import { ThemeFloatingToolbar } from '@/editor/components/editor/layout/FloatingActions/theme-floating-toolbar'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { SectionRegistryProvider } from '@/editor/lib/section-registry-context'
+import { MenuPageTabs } from '@/editor/modes/menu/page-tabs'
+import { useActiveMenuPage } from '@/editor/modes/menu/use-active-menu-page'
 
 const StableSectionsPanel = memo(function StableSectionsPanel() {
   return <SectionsToolbarPanel />
@@ -53,11 +55,13 @@ export function Canvas({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile])
 
-  const { deviceView, editorMode, previewDecorations } = useUiSelector(state => ({
+  const { deviceView, editorMode, previewDecorations, projectId } = useUiSelector(state => ({
     deviceView: state.deviceView,
     editorMode: state.editorMode,
     previewDecorations: state.previewDecorations,
+    projectId: state.projectId,
   }))
+  const menuPage = useActiveMenuPage()
 
   const { currentTemplateId, currentTheme, customDecorations, themeCustomizations } = useThemeSelector(state => ({
     currentTemplateId: state.currentTemplateId,
@@ -118,11 +122,16 @@ export function Canvas({
   }, [scrollContainerRef])
 
   return (
-    <div className="flex-1 min-h-0 bg-editor-workspace p-0 md:p-2 lg:p-4 overflow-hidden">
+    <div className="flex min-w-0 flex-1 flex-col min-h-0 bg-editor-workspace p-0 md:p-2 lg:p-4 overflow-hidden">
+      {editorMode === 'menu' && <MenuPageTabs key={projectId} onSelect={() => scrollContainerRef.current?.scrollTo({ top: 0 })} />}
       <div
         ref={viewportRef}
+        id={editorMode === 'menu' ? 'menu-page-panel' : undefined}
+        role={editorMode === 'menu' ? 'tabpanel' : undefined}
+        aria-labelledby={editorMode === 'menu' ? `menu-page-tab-${menuPage.id}` : undefined}
+        tabIndex={editorMode === 'menu' ? 0 : undefined}
         className={cn(
-          '@container mx-auto h-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
+          '@container mx-auto min-h-0 flex-1 w-full relative overflow-hidden transition-[max-width] duration-300 will-change-transform',
           deviceView === 'mobile' && isMobile === true ? 'w-full' : DEVICE_CLASSES[deviceView],
           theme.background,
         )}
