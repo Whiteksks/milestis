@@ -44,7 +44,7 @@ export function AiChatModal() {
         onOpenChange={(v: boolean) => { if (!v) setIsAiChatOpen(false) }}
         title={t('title')}
         showHeader
-        bodyClassName="h-[65vh] !overflow-hidden !p-0 !mt-0"
+        bodyClassName="h-[65dvh] min-w-0 !overflow-hidden !p-0 !mt-0"
       >
         <AiChatContent />
       </MobileDrawer>
@@ -63,7 +63,7 @@ export function AiChatModal() {
           </div>
           <SheetDescription className="sr-only">{t('title')}</SheetDescription>
         </SheetHeader>
-        <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden">
           <AiChatContent />
         </div>
       </SheetContent>

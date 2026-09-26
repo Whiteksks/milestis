@@ -148,7 +148,7 @@ export function AiChatContent() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden">
       <input
         ref={fileInputRef}
         type="file"

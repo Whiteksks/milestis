@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { UploadTile } from '../upload-tile'
 
-import { Upload, Plus, Check } from 'lucide-react'
+import { Upload, Plus, Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
@@ -37,27 +38,58 @@ export function PhotoPicker({
   const t = useTranslations('editor.layout.aiChat')
   const isEmpty = images.length === 0 && pendingUploads.length === 0
   const allSelected = images.length > 0 && images.every((img) => selectedUrls.includes(getProjectImageSelectUrl(img)))
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [scrollEdges, setScrollEdges] = useState({ previous: false, next: false })
+
+  useEffect(() => {
+    const element = scrollRef.current
+    if (!element) return
+    const update = () => setScrollEdges({
+      previous: element.scrollLeft > 1,
+      next: element.scrollLeft + element.clientWidth < element.scrollWidth - 1,
+    })
+    update()
+    element.addEventListener('scroll', update, { passive: true })
+    const observer = new ResizeObserver(update)
+    observer.observe(element)
+    return () => { element.removeEventListener('scroll', update); observer.disconnect() }
+  }, [images.length, pendingUploads.length])
+
+  function scrollPhotos(direction: number) {
+    const element = scrollRef.current
+    if (!element) return
+    element.scrollBy({ left: direction * Math.max(62, element.clientWidth * 0.8), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+  }
 
   return (
-    <div className="shrink-0 border-t border-border bg-background p-2.5 space-y-2">
+    <div className="min-w-0 w-full shrink-0 border-t border-border bg-background p-2.5 space-y-2">
       {/* Верхняя панель управления */}
-      {images.length > 0 && (
-        <div className="flex items-center justify-between min-h-[20px] px-0.5">
+      {!isEmpty && (
+        <div className="flex flex-wrap items-center justify-between gap-2 px-0.5">
           <span className="text-xs text-muted-foreground leading-none">
             {selectedUrls.length > 0 ? t('selectedCount', { count: selectedUrls.length }) : null}
           </span>
-          <button
+          <div className="ml-auto flex items-center gap-2">
+          {images.length > 0 && <button
             type="button"
             onClick={onToggleAll}
             className="text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded leading-none"
           >
             {allSelected ? t('deselectAll') : t('selectAll')}
+          </button>}
+          <button type="button" aria-label={t('previousPhotos')} disabled={!scrollEdges.previous} onClick={() => scrollPhotos(-1)} className="flex size-8 items-center justify-center rounded-lg border hover:bg-muted disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <ChevronLeft className="size-4" />
           </button>
+          <button type="button" aria-label={t('nextPhotos')} disabled={!scrollEdges.next} onClick={() => scrollPhotos(1)} className="flex size-8 items-center justify-center rounded-lg border hover:bg-muted disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <ChevronRight className="size-4" />
+          </button>
+          </div>
         </div>
       )}
 
       {/* Горизонтальный скролл с элементами */}
-      <div className="flex gap-2.5 overflow-x-auto items-center scrollbar-none">
+      <div ref={scrollRef} role="region" aria-label={t('photoList')} tabIndex={isEmpty ? -1 : 0} data-vaul-no-drag
+        className="flex w-full min-w-0 max-w-full gap-2.5 overflow-x-auto overscroll-x-contain items-center px-0.5 py-1.5 [scrollbar-width:thin] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
         {/* Кнопка загрузки */}
         {isEmpty ? (
           <button
@@ -99,7 +131,7 @@ export function PhotoPicker({
         {pendingUploads.map((u) => (<UploadTile key={u.id} entry={u} compact onRetry={onRetry} onDismiss={onDismiss} />))}
 
         {/* Загруженные изображения */}
-        {images.map((img) => {
+        {images.map((img, index) => {
           const displayUrl = getProjectImageDisplayUrl(img)
           const selectUrl = getProjectImageSelectUrl(img)
           const isSelected = selectedUrls.includes(selectUrl)
@@ -108,6 +140,8 @@ export function PhotoPicker({
             <button
               key={img.id}
               type="button"
+              aria-label={t('photoNumber', { number: index + 1 })}
+              aria-pressed={isSelected}
               onClick={() => onToggle(selectUrl)}
               className={cn(
                 'relative shrink-0 h-[52px] w-[52px] rounded-lg overflow-hidden transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring',

@@ -12,6 +12,30 @@ OPENAI_API_KEY=your-api-key
 
 Для Firebase App Hosting создайте секрет `openai-api-key`, предоставьте backend доступ к нему и выполните развёртывание. Привязка `OPENAI_API_KEY` уже добавлена в `apphosting.yaml`. Не добавляйте ключ в `NEXT_PUBLIC_*` или в репозиторий.
 
+### Ошибка App Hosting «Misconfigured secret»
+
+Запись в `apphosting.yaml` ссылается на Secret Manager, но сама секрет не создаёт. Значение из `.env.local` тоже не переносится автоматически. Для проекта `milestis` backend называется `milestis`, регион — `europe-west4`.
+
+Проверить наличие секрета и его версий без вывода ключа:
+
+```powershell
+firebase.cmd apphosting:secrets:describe openai-api-key --project milestis
+```
+
+Если секрет отсутствует, создайте его и введите API-ключ в скрытом приглашении CLI:
+
+```powershell
+firebase.cmd apphosting:secrets:set openai-api-key --project milestis
+```
+
+Выберите использование в production и backend `milestis`. Привязка в YAML уже существует; повторно добавлять переменную не нужно. Если секрет создан отдельно или доступ ещё не выдан:
+
+```powershell
+firebase.cmd apphosting:secrets:grantaccess openai-api-key --backend milestis --location europe-west4 --project milestis
+```
+
+После настройки повторите развёртывание backend в Firebase App Hosting. Не передавайте значение ключа аргументом команды или сообщением в чат. [Документация Firebase](https://firebase.google.com/docs/app-hosting/configure#secret-parameters).
+
 Модель: `gpt-6-sol`, Responses API, `reasoning.effort: low`, `store: false`. [Документация модели](https://developers.openai.com/api/docs/models/gpt-6-sol).
 
 ## Как работает
