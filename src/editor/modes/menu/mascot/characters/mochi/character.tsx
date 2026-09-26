@@ -10,7 +10,7 @@ export function MochiCharacter({ mood, animated }: MascotCharacterProps) {
   const curious = mood === 'curious'
   return <svg viewBox="0 0 160 160" className="size-full overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="80" cy="140" rx="39" ry="5" fill="#583546" opacity=".1" />
-    <motion.g initial={false} animate={animated ? MOCHI_POSES[mood] : MOCHI_STATIC_POSES[mood]}
+    <motion.g initial={animated ? { y: 0, rotate: 0, scaleX: 1, scaleY: 1 } : false} animate={animated ? MOCHI_POSES[mood] : MOCHI_STATIC_POSES[mood]}
       transition={animated ? { duration: mood === 'idle' ? 4 : .95, repeat: mood === 'idle' ? Infinity : 0, ease: 'easeInOut' } : { duration: 0 }}
       style={{ originX: .5, originY: 1 }} stroke="#633C50" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
       <path d="M59 126Q45 134 55 138Q64 141 71 131M92 130Q100 140 108 136Q114 132 101 125" fill="#EBAAC0" />
@@ -18,7 +18,7 @@ export function MochiCharacter({ mood, animated }: MascotCharacterProps) {
       <path d="M29 107C29 78 44 47 80 47C115 47 132 77 132 107C132 126 115 133 81 133C47 133 29 126 29 107Z" fill="#F9D9E5" />
       <path d="M38 115Q52 127 82 125Q107 126 121 117" stroke="#EFBAD0" strokeWidth="5" />
       <path d="M46 78Q51 63 64 61" stroke="#FFF4F8" strokeWidth="6" />
-      <motion.g initial={false} animate={{ rotate: animated && happy ? [0, -12, 10, 0] : sad ? -12 : 0 }}
+      <motion.g initial={animated ? { rotate: 0 } : false} animate={{ rotate: animated && happy ? [0, -12, 10, 0] : sad ? -12 : 0 }}
         transition={{ duration: animated ? .8 : 0 }} style={{ originX: .5, originY: 1 }}>
         <path d="M80 49Q70 40 58 43Q53 24 70 28Q82 31 80 49Z" fill="#9BBC8E" stroke="#496B46" />
         <path d="M80 49Q80 26 103 25Q108 43 80 49Z" fill="#BCD39D" stroke="#496B46" />
@@ -26,7 +26,7 @@ export function MochiCharacter({ mood, animated }: MascotCharacterProps) {
       </motion.g>
       <ellipse cx="48" cy="105" rx="8" ry="4.5" fill="#E991AE" stroke="none" opacity=".7" />
       <ellipse cx="113" cy="105" rx="8" ry="4.5" fill="#E991AE" stroke="none" opacity=".7" />
-      {happy || mood === 'welcome' ? <path d="M55 94Q61 87 67 94M94 94Q100 87 106 94" /> : <motion.g initial={false}
+      {happy || mood === 'welcome' ? <path d="M55 94Q61 87 67 94M94 94Q100 87 106 94" /> : <motion.g initial={animated ? { scaleY: 1 } : false}
         animate={{ scaleY: animated && mood === 'idle' ? [1, 1, .1, 1, 1] : 1 }}
         transition={{ duration: 5.4, times: [0, .82, .85, .88, 1], repeat: animated && mood === 'idle' ? Infinity : 0 }} style={{ originY: .5 }}>
         <ellipse cx={curious ? 58 : 61} cy="94" rx="3.5" ry={sad ? 3 : 4.5} fill="#633C50" stroke="none" />

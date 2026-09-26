@@ -12,7 +12,6 @@ import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { useModeSections } from '@/editor/hooks/use-mode-sections'
 import { getProjectImageSelectUrl } from '@/editor/hooks/use-project-images'
 import { runAiPipeline, type AiPipelineStage } from '@/lib/ai/pipeline/orchestrator'
-import type { AiChatMode } from '@/lib/ai/core/types'
 
 const SUCCESS_KEY_BY_INTENT = {
   generate_all: 'assistantSuccessAll',
@@ -26,6 +25,7 @@ export function AiChatContent() {
   const editorMode = useUiStore((s) => s.editorMode)
   const projectId = useUiStore((s) => s.projectId)
   const request = useRef<AbortController | null>(null)
+  const [undo, setUndo] = useState<(() => boolean) | null>(null)
   useEffect(() => () => {
     request.current?.abort()
     request.current = null
@@ -69,6 +69,12 @@ export function AiChatContent() {
     if (!projectId || request.current || useUiStore.getState().aiChatIsLoading) return
     const trimmed = input.trim()
     if (!trimmed && selectedUrls.length === 0) return
+    if (editorMode !== 'menu' && editorMode !== 'photobook' && editorMode !== 'portfolio') return
+    if (editorMode === 'menu' && selectedUrls.length > 20) {
+      addMessage({ role: 'assistant', content: t('tooManyMenuPhotos'), isError: true })
+      return
+    }
+    setUndo(null)
     const controller = new AbortController()
     request.current = controller
     const isCurrent = () => request.current === controller && useUiStore.getState().projectId === projectId
@@ -97,14 +103,17 @@ export function AiChatContent() {
       const result = await runAiPipeline({
         projectId,
         signal: controller.signal,
-        mode: editorMode as AiChatMode,
+        mode: editorMode,
         prompt: trimmed,
         language: locale,
+        history: messages.filter((message) => !message.isError && message.content.trim()).slice(-8)
+          .map(({ role, content }) => ({ role, content: content.slice(0, 2000) })),
         idToDoc,
         newPhotoIds,
         onStage: (stage) => { if (isCurrent()) setLoadingCaption(captionForStage(stage)) },
       })
       if (!isCurrent()) return
+      if (result.kind === 'applied' && result.undo) setUndo(() => result.undo!)
 
       const sectionsToOpen = result.kind === 'applied' && result.intent === 'edit_section'
         ? result.sectionsWritten.map((id) => ({ id, name: sections.find((s) => s.id === id)?.name ?? id }))
@@ -112,7 +121,7 @@ export function AiChatContent() {
 
       addMessage({
         role: 'assistant',
-        content: result.kind === 'chat' ? result.message : t(SUCCESS_KEY_BY_INTENT[result.intent]),
+        content: result.kind === 'chat' ? result.message : result.message ?? t(SUCCESS_KEY_BY_INTENT[result.intent]),
         sectionsToOpen,
       })
     } catch (err) {
@@ -122,8 +131,13 @@ export function AiChatContent() {
       const key = reason === 'AI_PROJECT_CHANGED' ? 'assistantProjectChanged'
         : reason === 'AI_CANCELLED' ? 'assistantCancelled'
         : reason === 'AI_TIMEOUT' ? 'assistantTimeout'
+        : reason === 'AI_NOT_CONFIGURED' ? 'assistantNotConfigured'
+        : reason.startsWith('AI_DAILY_LIMIT') ? 'assistantDailyLimit'
+        : reason === 'AI_REFUSED' ? 'assistantRefused'
+        : reason === 'UNAUTHENTICATED' || reason === 'INVALID_SESSION' ? 'assistantSignIn'
         : is429 ? 'assistantRateLimit' : 'assistantError'
       addMessage({ role: 'assistant', content: t(key), isError: true })
+      if (reason !== 'AI_CANCELLED') setInput(trimmed)
     } finally {
       if (isCurrent()) {
         request.current = null
@@ -147,15 +161,22 @@ export function AiChatContent() {
           messages={messages}
           isLoading={isLoading}
           greeting={t(
-            (editorMode as AiChatMode) === 'photobook'
+            editorMode === 'menu'
+              ? (hasAiGenerated ? 'greetingMenuReturn' : 'greetingMenu')
+              : editorMode === 'photobook'
               ? (hasAiGenerated ? 'greetingPhotobookReturn' : 'greetingPhotobook')
               : (hasAiGenerated ? 'greetingPortfolioReturn' : 'greetingPortfolio'),
           )}
-          quickPrompts={t.raw((editorMode as AiChatMode) === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
+          quickPrompts={t.raw(editorMode === 'menu' ? 'quickPromptsMenu' : editorMode === 'photobook' ? 'quickPromptsPhotobook' : 'quickPromptsPortfolio') as string[]}
           onQuickPromptSelect={setInput}
           loadingCaption={loadingCaption}
           onOpenSection={handleOpenSection}
         />
+      {undo && !isLoading && <button type="button" className="mx-4 mb-2 self-start rounded-lg border px-3 py-2 text-xs hover:bg-muted" onClick={() => {
+        const restored = undo()
+        setUndo(null)
+        addMessage({ role: 'assistant', content: t(restored ? 'changesUndone' : 'cannotUndo'), isError: !restored })
+      }}>{t('undoChanges')}</button>}
       <PhotoPicker
         selectedUrls={selectedUrls}
         images={images}
@@ -170,6 +191,7 @@ export function AiChatContent() {
         input={input}
         canSend={input.trim().length > 0 || selectedUrls.length > 0}
         isLoading={isLoading}
+        placeholder={editorMode === 'menu' ? t('menuInputPlaceholder') : undefined}
         onInputChange={setInput}
         onSend={handleSend}
       />

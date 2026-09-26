@@ -99,13 +99,13 @@ export function MenuBistro({ theme, visual, content, images, visibility, editing
 
 export function MenuBistroPreview({ theme, title }: { theme: ThemeConfig; title?: string }) {
   const t = useTranslations('editor.menu')
-  return <div className="menu-font-signature min-h-[320px] overflow-hidden bg-[var(--menu-surface)] px-6 py-7 text-[var(--menu-text)]" style={getBistroVisualStyle(theme)}>
-    <div className="mb-5 flex items-center justify-between border-b border-[var(--menu-accent-line)] pb-3 text-[var(--menu-accent)]"><span className="text-[9px] font-semibold uppercase tracking-[0.25em]">{t('title')}</span><ArrowUpRight className="size-4" aria-hidden="true" /></div>
-    <h2 className="mb-6 break-words text-[2.5rem] uppercase leading-[0.95] tracking-tight">{title || t('venuePlaceholder')}</h2>
-    <div className="mb-5 flex gap-2" aria-hidden="true"><span className="h-5 w-20 rounded-sm bg-[var(--menu-accent)]" /><span className="h-5 w-16 rounded-sm border border-[var(--menu-accent-line)]" /></div>
-    <div className="grid grid-cols-[1fr_2fr] gap-4 border-t-2 border-[var(--menu-accent)] pt-3">
-      <h3 className="break-words text-base uppercase">{t('categories')}</h3>
-      <div aria-hidden="true">{[0, 1, 2].map((row) => <div key={row} className="flex items-center gap-3 border-b border-[var(--menu-accent-line)] py-3"><div className="flex-1 space-y-2"><div className="h-1.5 w-full rounded bg-[var(--menu-accent-line)]" /><div className="h-1 w-2/3 rounded bg-[var(--menu-accent-line)]" /></div><div className="size-7 rounded-sm bg-[var(--menu-accent-soft)]" /></div>)}</div>
+  return <div className="menu-font-signature flex h-full flex-col overflow-hidden bg-[var(--menu-surface)] p-[6.67cqmin] text-[var(--menu-text)]" style={getBistroVisualStyle(theme)}>
+    <div className="mb-[4cqmin] flex items-center justify-between border-b border-[var(--menu-accent-line)] pb-[2.67cqmin] text-[var(--menu-accent)]"><span className="text-[3.07cqmin] font-semibold uppercase tracking-[0.25em]">{t('title')}</span><ArrowUpRight className="size-[5.33cqmin]" aria-hidden="true" /></div>
+    <h2 className="mb-[5.33cqmin] line-clamp-2 break-words text-[13.33cqmin] uppercase leading-[0.95] tracking-tight">{title || t('venuePlaceholder')}</h2>
+    <div className="mb-[5.33cqmin] flex shrink-0 gap-[2.67cqmin]" aria-hidden="true"><span className="h-[5.33cqmin] w-[26.67cqmin] bg-[var(--menu-accent)]" /><span className="h-[5.33cqmin] w-[21.33cqmin] border border-[var(--menu-accent-line)]" /></div>
+    <div className="grid min-h-0 flex-1 grid-cols-[1fr_2fr] gap-[5.33cqmin] border-t-[0.67cqmin] border-[var(--menu-accent)] pt-[2.67cqmin]">
+      <div><h3 className="break-words text-[5.33cqmin] uppercase leading-tight">{t('categories')}</h3><div aria-hidden="true" className="mt-[4cqmin] h-[0.67cqmin] w-1/2 bg-[var(--menu-accent)]" /></div>
+      <div aria-hidden="true" className="grid min-h-0 grid-rows-3">{[0, 1, 2].map(row => <div key={row} className="flex min-h-0 items-center gap-[4cqmin] border-b border-[var(--menu-accent-line)] py-[2cqmin]"><div className="flex-1 space-y-[2cqmin]"><div className="h-[2cqmin] w-full bg-[var(--menu-accent-line)]" /><div className="h-[1.33cqmin] w-2/3 bg-[var(--menu-accent-line)]" /></div><div className="aspect-square h-full max-h-[13.33cqmin] bg-[var(--menu-accent-soft)]" /></div>)}</div>
     </div>
   </div>
 }

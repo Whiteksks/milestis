@@ -16,6 +16,8 @@ export interface PublishModalProps {
   autoAdvance?: boolean
   /** When true, runs the republish flow (analyzeRepublish → republishProject). */
   republishMode?: boolean
+  /** Download the live menu QR without publishing draft changes. */
+  menuView?: 'publish' | 'qr'
 }
 
 export type PublishModalData = ReturnType<typeof usePublishModal>

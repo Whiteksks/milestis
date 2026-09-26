@@ -25,6 +25,18 @@
         "aiAssistant": "AI Assistant"
       },
       "aiChat": {
+        "assistantDailyLimit": "You've reached the daily AI limit. It resets at 00:00 UTC.",
+        "greetingMenu": "I can build a menu for your restaurant or cafe. Send a list of dishes and prices, attach photos of your existing menu, or describe your concept. I'll create categories and dishes in your template.",
+        "greetingMenuReturn": "What would you like to change: dishes, prices, descriptions, or the design?",
+        "quickPromptsMenu": ["Create a draft menu for a coffee shop","Help me import a menu from a photo","Shorten the dish descriptions"],
+        "menuInputPlaceholder": "For example: cappuccino — $4, croissant — $3…",
+        "assistantNotConfigured": "The AI assistant is not connected yet. Please try again later.",
+        "assistantRefused": "This request could not be completed. Try describing the task differently.",
+        "assistantSignIn": "Please sign in again to continue using the AI assistant.",
+        "tooManyMenuPhotos": "Attach up to 20 photos per request.",
+        "undoChanges": "Undo AI changes",
+        "changesUndone": "AI changes undone.",
+        "cannotUndo": "The menu has changed since the AI response. Undo is unavailable to preserve your edits.",
         "assistantProjectChanged": "The project changed during the request. The AI response was not applied; your edits remain in the editor.",
         "assistantCancelled": "Generation stopped.",
         "assistantTimeout": "The AI did not respond in time. Please retry.",

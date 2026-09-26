@@ -117,7 +117,7 @@ interface TemplatePreviewProps {
   aspectRatio?: string
   frameStyle?: string
   cropData?: ImageCropData
-  /** Zoom multiplier for the scaled wrapper. Default 3. Use 4 for smaller cards. */
+  /** Zoom for page-based previews. Menu thumbnails fit their container independently. */
   zoom?: number
 }
 
@@ -131,7 +131,10 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
 
   if (isMenuTemplateId(templateId)) {
     const Preview = getMenuTemplate(templateId).previewComponent
-    return <ScaledWrapper zoom={zoom} background={theme.background}><Preview theme={theme} title={title} /></ScaledWrapper>
+    // Menu thumbnails are fluid compositions, not full pages shrunk into a tall canvas.
+    return <div className="relative h-full w-full overflow-hidden pointer-events-none select-none [container-type:size]" data-menu-preview={templateId}>
+      <Preview theme={theme} title={title} />
+    </div>
   }
 
   // Portfolio templates

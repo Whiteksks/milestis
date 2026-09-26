@@ -18,7 +18,7 @@ export const menuMode: ModeRegistryEntry<keyof MenuVisibility> = {
     backgroundCatalogMobileLabelKey: 'editor.menu.appearance.mobileLabel',
     getActiveEffectsCount: (c) => [c.photobookMood, c.photobookTexture].filter((v) => v && v !== 'none').length,
     resetEffects: (update) => update({ photobookMood: 'none', photobookTexture: 'none' }),
-    hideDecorations: true, hideAiButton: true,
+    hideDecorations: true,
   },
   createSlice: createMenuSlice,
   templates: MENU_TEMPLATE_IDS.map((id) => ({ id, nameKey: MENU_TEMPLATES[id].nameKey, previewComponent: MENU_TEMPLATES[id].previewComponent })),

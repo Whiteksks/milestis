@@ -1,4 +1,5 @@
 import { createAiOperation } from './operation'
+import { runMenuPipeline } from '../menu/pipeline'
 import { useContentStore } from '@/editor/lib/store/content'
 import { useAiBriefStore } from '@/editor/lib/store/ai-brief'
 import { getProjectImageThumbUrl, type ProjectImageDoc } from '@/editor/hooks/use-project-images'
@@ -52,7 +53,7 @@ import {
 
 export type AiPipelineResult =
   | { kind: 'chat'; message: string }
-  | { kind: 'applied'; intent: 'generate_all' | 'edit_theme' | 'edit_section'; sectionsWritten: string[]; styleChanged: boolean }
+  | { kind: 'applied'; intent: 'generate_all' | 'edit_theme' | 'edit_section'; sectionsWritten: string[]; styleChanged: boolean; message?: string; undo?: () => boolean }
 
 export type AiPipelineStage =
   | { kind: 'classifying' }
@@ -66,6 +67,7 @@ export interface RunAiPipelineInput {
   mode: AiChatMode
   prompt: string
   language: string
+  history?: Array<{ role: 'user' | 'assistant'; content: string }>
   /** Every photo currently in the project's media library, keyed by its stable id. */
   idToDoc: Map<string, ProjectImageDoc>
   /** Ids attached specifically this turn (subset of idToDoc's keys). */
@@ -97,8 +99,9 @@ function blankDefaults<T extends Record<string, unknown>>(current: T, defaults: 
 }
 
 export async function runAiPipeline(input: RunAiPipelineInput): Promise<AiPipelineResult> {
+  if (input.mode === 'menu') return runMenuPipeline(input)
   const operation = createAiOperation(input.projectId, input.signal)
-  const guardedInput = { ...input, onStage: (stage: AiPipelineStage) => {
+  const guardedInput = { ...input, signal: operation.signal, onStage: (stage: AiPipelineStage) => {
     if (operation.isCurrent()) input.onStage?.(stage)
   } }
   try {
@@ -122,12 +125,12 @@ async function runPipeline(input: RunAiPipelineInput, operation: ReturnType<type
     sectionKeys,
     isBlankProject,
     hasNewPhotos: input.newPhotoIds.length > 0,
-  })
+  }, input)
 
   operation.check()
   if (intent.kind === 'chat') {
     input.onStage?.({ kind: 'replying' })
-    const message = await generateChatReply({ prompt: input.prompt, language: input.language, mode: input.mode })
+    const message = await generateChatReply({ prompt: input.prompt, language: input.language, mode: input.mode }, input)
     operation.check()
     return { kind: 'chat', message }
   }
@@ -163,10 +166,10 @@ async function runPipeline(input: RunAiPipelineInput, operation: ReturnType<type
 async function runStyleDecision(input: RunAiPipelineInput, photos: AiPhotoRef[]): Promise<() => void> {
   input.onStage?.({ kind: 'style' })
   if (input.mode === 'photobook') {
-    const result = await decidePhotobookStyle({ prompt: input.prompt, language: input.language, photos })
+    const result = await decidePhotobookStyle({ prompt: input.prompt, language: input.language, photos }, input)
     return () => applyPhotobookStyle(result)
   } else {
-    const result = await decidePortfolioStyle({ prompt: input.prompt, language: input.language, photos })
+    const result = await decidePortfolioStyle({ prompt: input.prompt, language: input.language, photos }, input)
     return () => applyPortfolioStyle(result)
   }
 }
@@ -194,12 +197,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
     if (inScope.has('cover')) {
       calls.push(generatePhotobookCover({
         prompt: input.prompt, language: input.language, current: blankDefaults(content.cover, defaultPhotobookContent.cover), photo: managedImageRef(images.cover),
-      }).then((result) => () => applyPhotobookCover(result)))
+      }, input).then((result) => () => applyPhotobookCover(result)))
     }
     if (inScope.has('introduction')) {
       calls.push(generatePhotobookIntroduction({
         prompt: input.prompt, language: input.language, current: blankDefaults(content.introduction, defaultPhotobookContent.introduction), photo: managedImageRef(images.introduction),
-      }).then((result) => () => applyPhotobookIntroduction(result)))
+      }, input).then((result) => () => applyPhotobookIntroduction(result)))
     }
     if (inScope.has('gallery')) {
       calls.push(generatePhotobookGallery({
@@ -207,7 +210,7 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
           { label: content.gallery.label, title: content.gallery.title, description: content.gallery.description },
           { label: defaultPhotobookContent.gallery.label, title: defaultPhotobookContent.gallery.title, description: defaultPhotobookContent.gallery.description },
         ),
-      }).then((result) => () => applyPhotobookGallery(result)))
+      }, input).then((result) => () => applyPhotobookGallery(result)))
     }
     if (inScope.has('highlight')) {
       calls.push(generatePhotobookHighlight({
@@ -215,12 +218,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
           { label: content.highlight.label, title: content.highlight.title, description: content.highlight.description, quote: content.highlight.quote },
           { label: defaultPhotobookContent.highlight.label, title: defaultPhotobookContent.highlight.title, description: defaultPhotobookContent.highlight.description, quote: defaultPhotobookContent.highlight.quote },
         ), photo: managedImageRef(images.highlight),
-      }).then((result) => () => applyPhotobookHighlight(result)))
+      }, input).then((result) => () => applyPhotobookHighlight(result)))
     }
     if (inScope.has('ending')) {
       calls.push(generatePhotobookEnding({
         prompt: input.prompt, language: input.language, current: blankDefaults(content.ending, defaultPhotobookContent.ending), photo: managedImageRef(images.ending),
-      }).then((result) => () => applyPhotobookEnding(result)))
+      }, input).then((result) => () => applyPhotobookEnding(result)))
     }
     if (inScope.has('story')) {
       const storyPhotos: AiPhotoRef[] = images.story
@@ -231,7 +234,7 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
           { label: content.story.label, title: content.story.title, date: content.story.date, location: content.story.location },
           { label: defaultPhotobookContent.story.label, title: defaultPhotobookContent.story.title, date: defaultPhotobookContent.story.date, location: defaultPhotobookContent.story.location },
         ), storyPhotos,
-      }).then((result) => () => applyPhotobookStory(result, input.idToDoc)))
+      }, input).then((result) => () => applyPhotobookStory(result, input.idToDoc)))
     }
   } else {
     const store = useContentStore.getState()
@@ -239,12 +242,12 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
     const images = store.portfolioImageContent
 
     if (inScope.has('header')) {
-      calls.push(generatePortfolioHeader({ prompt: input.prompt, language: input.language, current: blankDefaults(content.header, defaultPortfolioContent.header) }).then((result) => () => applyPortfolioHeader(result)))
+      calls.push(generatePortfolioHeader({ prompt: input.prompt, language: input.language, current: blankDefaults(content.header, defaultPortfolioContent.header) }, input).then((result) => () => applyPortfolioHeader(result)))
     }
     if (inScope.has('hero')) {
       calls.push(generatePortfolioHero({
         prompt: input.prompt, language: input.language, current: blankDefaults(content.hero, defaultPortfolioContent.hero), photo: managedImageRef(images.hero),
-      }).then((result) => () => applyPortfolioHero(result)))
+      }, input).then((result) => () => applyPortfolioHero(result)))
     }
     if (inScope.has('bio')) {
       calls.push(generatePortfolioBio({
@@ -252,13 +255,13 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
           { title: content.bio.title, subtitle: content.bio.subtitle, description: content.bio.description },
           { title: defaultPortfolioContent.bio.title, subtitle: defaultPortfolioContent.bio.subtitle, description: defaultPortfolioContent.bio.description },
         ), photo: managedImageRef(images.bio),
-      }).then((result) => () => applyPortfolioBio(result)))
+      }, input).then((result) => () => applyPortfolioBio(result)))
     }
     if (inScope.has('contact')) {
-      calls.push(generatePortfolioContact({ prompt: input.prompt, language: input.language, current: blankDefaults(content.contact, defaultPortfolioContent.contact) }).then((result) => () => applyPortfolioContact(result)))
+      calls.push(generatePortfolioContact({ prompt: input.prompt, language: input.language, current: blankDefaults(content.contact, defaultPortfolioContent.contact) }, input).then((result) => () => applyPortfolioContact(result)))
     }
     if (inScope.has('footer')) {
-      calls.push(generatePortfolioFooter({ prompt: input.prompt, language: input.language, current: blankDefaults(content.footer, defaultPortfolioContent.footer) }).then((result) => () => applyPortfolioFooter(result)))
+      calls.push(generatePortfolioFooter({ prompt: input.prompt, language: input.language, current: blankDefaults(content.footer, defaultPortfolioContent.footer) }, input).then((result) => () => applyPortfolioFooter(result)))
     }
     if (inScope.has('featuredWork')) {
       const claimedIds = new Set(
@@ -276,7 +279,7 @@ async function runContentGeneration(input: RunAiPipelineInput, sections: string[
         },
         existingProjects: content.featuredWork.projects,
         newPhotos,
-      }).then((result) => () => applyPortfolioFeaturedWork(result, input.idToDoc)))
+      }, input).then((result) => () => applyPortfolioFeaturedWork(result, input.idToDoc)))
     }
   }
 

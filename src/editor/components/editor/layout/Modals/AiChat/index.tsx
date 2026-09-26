@@ -28,7 +28,7 @@ export function AiChatModal() {
   const isMobile = useIsMobile()
 
   // Reset chat when navigating to a different project — requests are stateless per call, so this
-  // is also what bounds the text-only history sent for conversational continuity (see service.ts).
+  // keeps conversation history scoped to the current project.
   // ai-brief is likewise per-project bookkeeping, not persisted yet, so it resets the same way.
   useEffect(() => {
     clearAiChat()

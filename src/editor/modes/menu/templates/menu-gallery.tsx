@@ -100,14 +100,15 @@ export function MenuGallery({ theme, visual, content, images, visibility, editin
 
 export function MenuGalleryPreview({ theme, title }: { theme: ThemeConfig; title?: string }) {
   const t = useTranslations('editor.menu')
-  return <div className="menu-font-signature min-h-[320px] overflow-hidden bg-[var(--menu-surface)] text-[var(--menu-text)]" style={getGalleryVisualStyle(theme)}>
-    <div aria-hidden="true" className="h-20 bg-[var(--menu-stage)]" />
-    <div className="relative -mt-7 ml-5 mr-9 bg-[var(--menu-surface)] px-4 pb-5 pt-5">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-[var(--menu-accent)]">{t('title')}</p>
-      <h2 className="mt-3 break-words text-4xl leading-none tracking-tight text-[var(--menu-accent)]">{title || t('venuePlaceholder')}</h2>
+  return <div className="menu-font-signature flex h-full flex-col overflow-hidden bg-[var(--menu-surface)] text-[var(--menu-text)]" style={getGalleryVisualStyle(theme)}>
+    <div aria-hidden="true" className="h-[22%] shrink-0 bg-[var(--menu-stage)]" />
+    <div className="relative -mt-[6.67cqmin] ml-[6.67cqmin] mr-[13.33cqmin] shrink-0 bg-[var(--menu-surface)] px-[5.33cqmin] pb-[4cqmin] pt-[4cqmin]">
+      <p className="text-[3.07cqmin] font-semibold uppercase tracking-[0.25em] text-[var(--menu-accent)]">{t('title')}</p>
+      <h2 className="mt-[2.67cqmin] line-clamp-2 break-words text-[10.67cqmin] leading-none tracking-tight text-[var(--menu-accent)]">{title || t('venuePlaceholder')}</h2>
     </div>
-    <div className="px-5 pb-5"><h3 className="mb-4 border-t border-[var(--menu-accent-line)] pt-4 text-2xl">{t('categories')}</h3>
-      <div aria-hidden="true" className="space-y-3">{[0, 1].map(row => <div key={row} className="grid grid-cols-2 items-center gap-4 border-b border-[var(--menu-accent-line)] pb-3"><div className={cn('h-14 bg-[var(--menu-stage)]', row === 1 && 'order-2')} /><div className="space-y-2"><div className="h-1.5 w-full bg-[var(--menu-accent-line)]" /><div className="h-1 w-2/3 bg-[var(--menu-accent-line)]" /><div className="ml-auto h-3 w-6 border-b border-[var(--menu-accent)]" /></div></div>)}</div>
+    <div className="flex min-h-0 flex-1 flex-col px-[6.67cqmin] pb-[5.33cqmin]">
+      <h3 className="mb-[2.67cqmin] shrink-0 border-t border-[var(--menu-accent-line)] pt-[2.67cqmin] text-[6.67cqmin] leading-none">{t('categories')}</h3>
+      <div aria-hidden="true" className="grid min-h-0 flex-1 grid-rows-2 gap-[2.67cqmin]">{[0, 1].map(row => <div key={row} className="grid min-h-0 grid-cols-2 gap-[5.33cqmin] border-b border-[var(--menu-accent-line)] pb-[2.67cqmin]"><div className={cn('bg-[var(--menu-stage)]', row === 1 && 'order-2')} /><div className="flex flex-col justify-center gap-[2cqmin]"><div className="h-[2cqmin] w-full bg-[var(--menu-accent-line)]" /><div className="h-[1.33cqmin] w-2/3 bg-[var(--menu-accent-line)]" /><div className="ml-auto h-[4cqmin] w-[9.33cqmin] border-b border-[var(--menu-accent)]" /></div></div>)}</div>
     </div>
   </div>
 }

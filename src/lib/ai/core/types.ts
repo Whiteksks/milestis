@@ -1,10 +1,9 @@
 // ─── Mode ───────────────────────────────────────────────────────────────────
-export type AiChatMode = 'photobook' | 'portfolio'
+export type AiChatMode = 'photobook' | 'portfolio' | 'menu'
 
 // ─── Photos ─────────────────────────────────────────────────────────────────
-/** A photo available to a model call this turn, tagged with its stable media-library id so the
- *  model can reference it by id, never by position. `url` is fetched+base64-encoded lazily by
- *  core/photos.ts right before the call that needs it — never persisted as bytes anywhere. */
+/** Stable media-library identity. The server resolves an authorized URL from this ID;
+ *  the client URL is only used by the editor's placement helpers. */
 export interface AiPhotoRef {
   id: string
   url: string

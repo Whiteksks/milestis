@@ -11,6 +11,7 @@ interface ChatInputProps {
   isLoading: boolean
   onInputChange: (value: string) => void
   onSend: () => void
+  placeholder?: string
 }
 
 export function ChatInput({
@@ -19,6 +20,7 @@ export function ChatInput({
   isLoading,
   onInputChange,
   onSend,
+  placeholder,
 }: ChatInputProps) {
   const t = useTranslations('editor.layout.aiChat')
 
@@ -29,18 +31,21 @@ export function ChatInput({
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
               e.preventDefault()
               onSend()
             }
           }}
-          placeholder={t('inputPlaceholder')}
+          placeholder={placeholder ?? t('inputPlaceholder')}
+          aria-label={placeholder ?? t('inputPlaceholder')}
+          maxLength={12000}
           disabled={isLoading}
           rows={2}
           // text-base (16px) below md: prevents iOS Safari from auto-zooming on focus
           className="flex-1 resize-none rounded-xl text-base md:text-sm min-h-[44px] max-h-[120px]"
         />
         <Button
+          aria-label={t('send')}
           onClick={onSend}
           disabled={!canSend || isLoading}
           size="icon"

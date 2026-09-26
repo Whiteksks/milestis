@@ -105,12 +105,15 @@ export function MenuPulse({ theme, visual, content, images, visibility, editing 
 
 export function MenuPulsePreview({ theme, title }: { theme: ThemeConfig; title?: string }) {
   const t = useTranslations('editor.menu')
-  return <div className="menu-font-signature min-h-[320px] overflow-hidden bg-[var(--menu-surface)] p-5 text-[var(--menu-text)]" style={getPulseVisualStyle(theme)}>
-    <div className="bg-[var(--menu-accent)] p-4 text-[var(--menu-accent-ink)]">
-      <div className="mb-4 flex items-center justify-between border-b border-current/30 pb-3"><span className="text-[9px] font-bold uppercase tracking-[0.25em]">{t('title')}</span><Asterisk aria-hidden="true" className="size-6" /></div>
-      <h2 className="break-words text-[2.75rem] uppercase leading-[0.9] tracking-tight">{title || t('venuePlaceholder')}</h2>
+  return <div className="menu-font-signature flex h-full flex-col overflow-hidden bg-[var(--menu-surface)] p-[6.67cqmin] text-[var(--menu-text)]" style={getPulseVisualStyle(theme)}>
+    <div className="shrink-0 bg-[var(--menu-accent)] p-[5.33cqmin] text-[var(--menu-accent-ink)]">
+      <div className="mb-[4cqmin] flex items-center justify-between border-b border-current/30 pb-[2.67cqmin]"><span className="text-[3.07cqmin] font-bold uppercase tracking-[0.25em]">{t('title')}</span><Asterisk aria-hidden="true" className="size-[6.67cqmin]" /></div>
+      <h2 className="line-clamp-2 break-words text-[12cqmin] uppercase leading-[0.9] tracking-tight">{title || t('venuePlaceholder')}</h2>
     </div>
-    <h3 className="mb-3 mt-6 text-2xl uppercase">{t('categories')}</h3>
-    <div className="grid grid-cols-2 gap-3" aria-hidden="true">{[0, 1].map(row => <div key={row} className="bg-[var(--menu-paper)] p-2"><div className="h-12 bg-[var(--menu-stage)]/15" /><div className="mb-2 mt-3 h-1.5 w-3/4 bg-[var(--menu-accent-ink)]/30" /><div className="ml-auto h-4 w-9 bg-[var(--menu-accent-ink)]" /></div>)}</div>
+    <h3 className="mb-[2.67cqmin] mt-[5.33cqmin] text-[6.67cqmin] uppercase leading-none">{t('categories')}</h3>
+    <div className="grid min-h-0 flex-1 grid-cols-2 gap-[4cqmin]" aria-hidden="true">{[0, 1].map(row => <div key={row} className="flex min-h-0 flex-col bg-[var(--menu-paper)] p-[2.67cqmin]">
+      <div className="relative min-h-0 flex-1 bg-[var(--menu-stage)]/15">{row === 0 && <div className="absolute bottom-[1.33cqmin] left-[1.33cqmin] h-[4cqmin] w-[16cqmin] -rotate-3 bg-[var(--menu-accent)]" />}</div>
+      <div className="mb-[2.67cqmin] mt-[2.67cqmin] h-[2cqmin] w-3/4 bg-[var(--menu-accent-ink)]/30" /><div className="ml-auto h-[4.67cqmin] w-[13.33cqmin] bg-[var(--menu-accent-ink)]" />
+    </div>)}</div>
   </div>
 }

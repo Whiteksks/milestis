@@ -101,12 +101,15 @@ export function MenuPicnic({ theme, visual, content, images, visibility, editing
 
 export function MenuPicnicPreview({ theme, title }: { theme: ThemeConfig; title?: string }) {
   const t = useTranslations('editor.menu')
-  return <div className="menu-font-signature min-h-[320px] overflow-hidden bg-[var(--menu-surface)] p-5 text-[var(--menu-text)]" style={getPicnicVisualStyle(theme)}>
-    <div className="overflow-hidden rounded-xl border border-[var(--menu-accent)] bg-[var(--menu-banner)] text-center shadow-[3px_3px_0_var(--menu-accent)]">
-      <div className="px-4 py-5"><Sun aria-hidden="true" className="mx-auto mb-3 size-6" /><p className="text-[9px] font-semibold uppercase tracking-[0.2em]">{t('title')}</p><h2 className="mt-2 break-words text-4xl leading-none tracking-tight">{title || t('venuePlaceholder')}</h2></div>
-      <div aria-hidden="true" className={cn('h-2.5', checkerboard)} />
+  return <div className="menu-font-signature flex h-full flex-col overflow-hidden bg-[var(--menu-surface)] p-[6.67cqmin] text-[var(--menu-text)]" style={getPicnicVisualStyle(theme)}>
+    <div className="shrink-0 overflow-hidden rounded-[4cqmin] border border-[var(--menu-accent)] bg-[var(--menu-banner)] text-center shadow-[1.07cqmin_1.07cqmin_0_var(--menu-accent)]">
+      <div className="px-[5.33cqmin] py-[4cqmin]"><div className="mb-[2.67cqmin] flex items-center justify-center gap-[2.67cqmin]"><Sun aria-hidden="true" className="size-[6.67cqmin]" /><p className="text-[3.07cqmin] font-semibold uppercase tracking-[0.2em]">{t('title')}</p></div><h2 className="line-clamp-2 break-words text-[10.67cqmin] leading-none tracking-tight">{title || t('venuePlaceholder')}</h2></div>
+      <div aria-hidden="true" className={cn('h-[2.67cqmin]', checkerboard)} />
     </div>
-    <h3 className="mb-3 mt-6 text-2xl">{t('categories')}</h3>
-    <div className="grid grid-cols-2 gap-3" aria-hidden="true">{[0, 1].map(row => <div key={row} className={cn('rounded-lg border border-[var(--menu-accent)] p-3 shadow-[2px_2px_0_var(--menu-accent-line)]', row === 0 ? 'bg-[var(--menu-leaf)]' : 'bg-[var(--menu-surface-raised)]')}><div className="mb-2 h-1.5 w-3/4 bg-[var(--menu-accent-line)]" /><div className="h-1 w-1/2 bg-[var(--menu-accent-line)]" /><div className="ml-auto mt-3 h-4 w-7 rounded-sm border border-[var(--menu-accent)] bg-[var(--menu-banner)]" /></div>)}</div>
+    <h3 className="mb-[2.67cqmin] mt-[5.33cqmin] text-[6.67cqmin] leading-none">{t('categories')}</h3>
+    <div className="grid min-h-0 flex-1 grid-cols-2 gap-[4cqmin]" aria-hidden="true">{[0, 1].map(row => <div key={row} className={cn('flex min-h-0 flex-col rounded-[2.67cqmin] border border-[var(--menu-accent)] p-[4cqmin] shadow-[0.67cqmin_0.67cqmin_0_var(--menu-accent-line)]', row === 0 ? 'bg-[var(--menu-leaf)]' : 'bg-[var(--menu-surface-raised)]')}>
+      <div className="mb-[2.67cqmin] min-h-0 flex-1 rounded-t-full bg-[var(--menu-accent-soft)]" />
+      <div className="mb-[2cqmin] h-[2cqmin] w-3/4 bg-[var(--menu-accent-line)]" /><div className="h-[1.33cqmin] w-1/2 bg-[var(--menu-accent-line)]" /><div className="ml-auto mt-[2.67cqmin] h-[4.67cqmin] w-[12cqmin] border border-[var(--menu-accent)] bg-[var(--menu-banner)]" />
+    </div>)}</div>
   </div>
 }

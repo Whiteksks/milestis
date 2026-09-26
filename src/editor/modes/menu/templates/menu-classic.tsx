@@ -113,19 +113,18 @@ export function MenuClassic({ theme, visual, content, images, visibility, editin
 
 export function MenuCoverPreview({ theme, title }: { theme: ThemeConfig; title?: string }) {
   const t = useTranslations('editor.menu')
-  return <div className="menu-font-signature min-h-[320px] overflow-hidden bg-[var(--menu-stage)] p-4 text-[var(--menu-text)]" style={getMenuVisualStyle(theme)}>
-    <div className="min-h-[288px] rounded-t-2xl bg-[var(--menu-surface)] px-5 pb-5 text-left shadow-sm">
-    <div className="mb-6 h-0.5 bg-[var(--menu-accent)]" />
-    <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-[var(--menu-accent)]">{t('title')}</p>
-    <h2 className="mb-5 mt-3 break-words text-4xl leading-none tracking-tight">{title || t('venuePlaceholder')}</h2>
-    <div className="mb-5 flex gap-2 border-y border-[var(--menu-accent-line)] py-3">
-      <span className="h-5 w-16 rounded-full bg-[var(--menu-accent)]" /><span className="h-5 w-16 rounded-full bg-[var(--menu-accent-soft)]" /><span className="h-5 w-12 rounded-full bg-[var(--menu-accent-soft)]" />
-    </div>
-    <h3 className="mb-3 text-2xl">{t('categories')}</h3>
-    <div className="grid grid-cols-2 gap-2" aria-hidden="true">{[0, 1].map((row) => <div key={row} className="overflow-hidden rounded-lg border border-[var(--menu-accent-line)] bg-[var(--menu-surface-raised)]">
-      <div className="h-14 bg-[var(--menu-accent-soft)]" />
-      <div className="space-y-2 p-3"><div className="h-1.5 w-3/4 rounded bg-[var(--menu-accent-line)]" /><div className="h-1 w-1/2 rounded bg-[var(--menu-accent-line)]" /><div className="ml-auto h-4 w-8 rounded-full bg-[var(--menu-accent)]" /></div>
-    </div>)}</div>
+  return <div className="menu-font-signature h-full overflow-hidden bg-[var(--menu-stage)] p-[4cqmin] text-[var(--menu-text)]" style={getMenuVisualStyle(theme)}>
+    <div className="flex h-full flex-col overflow-hidden rounded-t-[5.33cqmin] border-t-[0.8cqmin] border-[var(--menu-accent)] bg-[var(--menu-surface)] p-[5.33cqmin] text-left shadow-sm">
+      <p className="text-[3.07cqmin] font-semibold uppercase tracking-[0.22em] text-[var(--menu-accent)]">{t('title')}</p>
+      <h2 className="mb-[4cqmin] mt-[2.67cqmin] line-clamp-2 break-words text-[10.67cqmin] leading-none tracking-tight">{title || t('venuePlaceholder')}</h2>
+      <div aria-hidden="true" className="mb-[4cqmin] flex shrink-0 gap-[2.67cqmin] border-y border-[var(--menu-accent-line)] py-[2.67cqmin]">
+        <span className="h-[5.33cqmin] w-[24cqmin] rounded-full bg-[var(--menu-accent)]" /><span className="h-[5.33cqmin] w-[21.33cqmin] rounded-full bg-[var(--menu-accent-soft)]" /><span className="h-[5.33cqmin] w-[18.67cqmin] rounded-full bg-[var(--menu-accent-soft)]" />
+      </div>
+      <h3 className="mb-[2.67cqmin] text-[6.67cqmin] leading-none">{t('categories')}</h3>
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-[4cqmin]" aria-hidden="true">{[0, 1].map(row => <div key={row} className="flex min-h-0 flex-col overflow-hidden rounded-[2.67cqmin] border border-[var(--menu-accent-line)] bg-[var(--menu-surface-raised)]">
+        <div className="min-h-0 flex-1 bg-[var(--menu-accent-soft)]" />
+        <div className="space-y-[2cqmin] p-[2.67cqmin]"><div className="h-[1.73cqmin] w-3/4 rounded bg-[var(--menu-accent-line)]" /><div className="h-[1.33cqmin] w-1/2 rounded bg-[var(--menu-accent-line)]" /><div className="ml-auto h-[4cqmin] w-[10.67cqmin] rounded-full bg-[var(--menu-accent)]" /></div>
+      </div>)}</div>
     </div>
   </div>
 }

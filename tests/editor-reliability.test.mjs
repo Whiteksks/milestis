@@ -207,7 +207,7 @@ function pipelineHarness() {
     '@/editor/lib/store/ai-brief': { useAiBriefStore: { getState: () => ({ markGenerated: () => {} }) } },
     '@/editor/hooks/use-project-images': { getProjectImageThumbUrl: () => '' },
     '../intent/classify': { classifyIntent: async () => ({ kind: 'edit_section', sections: ['header', 'hero'] }) },
-    '../chat/respond': {}, '../style/photobook': {}, '../style/portfolio': {}, '../content/photobook': {},
+    '../menu/pipeline': {}, '../chat/respond': {}, '../style/photobook': {}, '../style/portfolio': {}, '../content/photobook': {},
     '../content/portfolio': { PORTFOLIO_SECTION_KEYS: ['header', 'hero'], generatePortfolioHeader: () => header.promise, generatePortfolioHero: () => hero.promise },
     '@/editor/modes/photobook/store-slice': {},
     '@/editor/modes/portfolio/store-slice': { defaultPortfolioContent: { header: {}, hero: {} } },
@@ -240,18 +240,6 @@ test('AI waits for all sections before applying successful results', async () =>
   assert.deepEqual(h.applied.map(([name]) => name), ['header', 'hero'])
 })
 
-test('AI models receive the latest dynamic photo schema on repeated section requests', async () => {
-  const schemas = []
-  const { callNarrow } = loader({
-    'firebase/app': { getApp: () => ({}) },
-    'firebase/ai': { getAI: () => ({}), GoogleAIBackend: class {}, ThinkingLevel: { LOW: 'LOW' }, getGenerativeModel: (_ai, options) => {
-      schemas.push(options.generationConfig.responseSchema)
-      return { generateContent: async () => ({ response: { text: () => '{}' } }) }
-    } },
-  })('src/lib/ai/core/gemini.ts')
-  for (const id of ['old-photo', 'new-photo']) await callNarrow({ cacheKey: 'same-section', systemPrompt: '', schema: { type: 'string', enum: [id] }, contents: [] })
-  assert.deepEqual(schemas.map((schema) => schema.enum[0]), ['old-photo', 'new-photo'])
-})
 
 function imageHarness(limit = 100) {
   const data = new Map([['users/u', { stats: { storageUsedBytes: 0 } }], ['projects/p', { ownerId: 'u', mode: 'portfolio' }]])

@@ -26,7 +26,7 @@ import type {
 // section it's given — nothing here can accidentally clear a section it wasn't handed, unlike
 // the old single-response applyChanges() which had to special-case "field omitted = keep old
 // value" across one giant merged object. Text is still clamped as a defensive system-boundary
-// measure (see ../apply.ts's clampStrings comment — Gemini schemas can't enforce maxLength).
+// measure so generated text respects the editor's field budgets.
 
 function clampStrings<T extends object>(obj: T, limits: Record<string, number | undefined>): T {
   const out: Record<string, unknown> = { ...obj } as Record<string, unknown>

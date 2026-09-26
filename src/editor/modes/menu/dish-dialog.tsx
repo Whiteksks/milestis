@@ -15,6 +15,7 @@ import { useContentStore } from '@/editor/lib/store/content'
 import { useUiStore } from '@/editor/lib/store/ui'
 import { MENU_LIMITS, type MenuDish } from './content-types'
 import { menuPageCategories, menuPriceInput, parseMenuPrice } from './model'
+import { MenuPhotoEnhancement } from './photo-enhancement'
 
 const selectClass = 'h-11 w-full rounded-xl border border-input bg-background px-3 text-sm'
 
@@ -27,6 +28,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
   const t = useTranslations('editor.menu')
   const tf = useTranslations('editor.menu.dishForm')
   const ownerId = useId()
+  const projectId = useUiStore((s) => s.projectId)
   const formId = useId()
   const nameRef = useRef<HTMLInputElement>(null)
   const menuContent = useContentStore((s) => s.menuContent)
@@ -39,6 +41,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
   const [visible, setVisible] = useState(dish?.visible ?? true)
   const [recommended, setRecommended] = useState(dish?.recommended ?? false)
   const [image, setImage] = useState<ImageValue | undefined>(storedImage)
+  const [photoBusy, setPhotoBusy] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [added, setAdded] = useState(false)
@@ -50,6 +53,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (photoBusy) return
     setSubmitted(true)
     if (!name.trim() || priceMinor === null) return
     const details = { name: name.trim(), description: description.trim(), priceMinor, visible, recommended }
@@ -90,8 +94,8 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
     </> : <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
       {dish && <Button variant="ghost" size="icon" className="text-destructive" aria-label={t('removeDish')} onClick={() => setDeleting(true)}><Trash2 className="size-4" /></Button>}
       <Button variant="outline" className="min-w-0" onClick={onClose}>{t('pages.cancel')}</Button>
-      <Button type="submit" form={formId} className="min-w-0 sm:order-3">{dish ? t('pages.save') : t('pages.create')}</Button>
-      {!dish && <Button type="submit" form={formId} variant="secondary" data-add-another="true" className="col-span-2 sm:order-2"><Plus className="size-4" />{tf('saveAndAnother')}</Button>}
+      <Button type="submit" form={formId} disabled={photoBusy} className="min-w-0 sm:order-3">{dish ? t('pages.save') : t('pages.create')}</Button>
+      {!dish && <Button type="submit" form={formId} disabled={photoBusy} variant="secondary" data-add-another="true" className="col-span-2 sm:order-2"><Plus className="size-4" />{tf('saveAndAnother')}</Button>}
     </div>}>
     {deleting ? <p className="rounded-xl border bg-muted/30 p-4 text-sm font-medium">{dish?.name}</p> : <form id={formId} onSubmit={save} className="min-w-0 space-y-5">
       {added && <p role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">{tf('added')}</p>}
@@ -111,21 +115,24 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
         <input type="checkbox" checked={recommended} onChange={(event) => setRecommended(event.target.checked)} className="mt-0.5 size-4 accent-primary" />
         <span><span className="block font-medium">{tf('recommend')}</span><span className="mt-0.5 block text-xs text-muted-foreground">{tf('recommendHint')}</span></span>
       </label>
+      <div className="space-y-2 text-sm">
+        <p>{t('photo')}</p>
+        <MediaPickerModal ownerId={ownerId} onSelectImage={(url, thumbUrl) => {
+          const source = { slotId: 'menu.dish.photo' as const, src: url, blurDataUrl: thumbUrl }
+          setImage((current) => current ? replaceImageValueAsset(current, source) : createImageValue(source))
+        }} />
+        <ImagePicker slotId="menu.dish.photo" value={image ?? { asset: { src: '', width: 0, height: 0 } }} dense
+          onChange={(next) => setImage(next.asset.src ? next : undefined)} onOpenMediaPicker={() => useUiStore.getState().openMediaPicker(ownerId)} />
+        {image?.asset.src && <MenuPhotoEnhancement key={projectId + ':' + image.asset.src} sourceUrl={image.asset.src} onBusyChange={setPhotoBusy}
+          onApply={(url, thumbUrl) => setImage((current) => current?.asset.src === image.asset.src
+            ? replaceImageValueAsset(current, { slotId: 'menu.dish.photo', src: url, blurDataUrl: thumbUrl }) : current)} />}
+      </div>
       <details className="group rounded-xl border bg-muted/20 px-4 py-3">
         <summary className="cursor-pointer text-sm font-medium">{tf('additional')}</summary>
         <div className="mt-5 space-y-5">
           <label className="block space-y-2 text-sm">{t('ingredients')}
             <Textarea value={description} maxLength={MENU_LIMITS.description} onChange={(event) => setDescription(event.target.value)} />
           </label>
-          <div className="space-y-2 text-sm">
-            <p>{t('photo')}</p>
-            <MediaPickerModal ownerId={ownerId} onSelectImage={(url, thumbUrl) => {
-              const source = { slotId: 'menu.dish.photo' as const, src: url, blurDataUrl: thumbUrl }
-              setImage((current) => current ? replaceImageValueAsset(current, source) : createImageValue(source))
-            }} />
-            <ImagePicker slotId="menu.dish.photo" value={image ?? { asset: { src: '', width: 0, height: 0 } }} dense
-              onChange={(next) => setImage(next.asset.src ? next : undefined)} onOpenMediaPicker={() => useUiStore.getState().openMediaPicker(ownerId)} />
-          </div>
           {dish && <label className="block space-y-2 text-sm">{t('category')}
             <select className={selectClass} value={selectedCategoryId} onChange={(event) => setSelectedCategoryId(event.target.value)}>
               {categories.map((category) => <option key={category.id} value={category.id}>{category.name || t('newCategory')}</option>)}

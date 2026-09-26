@@ -36,6 +36,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 export function EditorHeader({ projectId }: EditorHeaderProps) {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  const [menuPublishView, setMenuPublishView] = useState<'publish' | 'qr'>('publish')
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false)
   // Slug pre-filled after returning from a credit topup checkout
   const [afterTopupSlug, setAfterTopupSlug] = useState<string | null>(null)
@@ -138,6 +139,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
   }
 
   async function handleOpenPublishModal() {
+    setMenuPublishView('publish')
     // Auto-save before publishing.
     if (isDirty) {
       setSaveState('saving')
@@ -395,10 +397,16 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {editorMode === 'menu' && <DropdownMenuItem onClick={() => setIsPublishModalOpen(true)}>
-                  <RefreshCw className="size-4" />
-                  {tMenuPublish('updateAndShare')}
-                </DropdownMenuItem>}
+                {editorMode === 'menu' && <>
+                  <DropdownMenuItem onClick={() => { setMenuPublishView('publish'); setIsPublishModalOpen(true) }}>
+                    <RefreshCw className="size-4" />
+                    {tMenuPublish('updateTitle')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setMenuPublishView('qr'); setIsPublishModalOpen(true) }}>
+                    <QrCode className="size-4" />
+                    {tMenuPublish('download')}
+                  </DropdownMenuItem>
+                </>}
                 {publishedSlug && (
                   <DropdownMenuItem
                     onClick={() => {
@@ -462,6 +470,7 @@ export function EditorHeader({ projectId }: EditorHeaderProps) {
         }}
         projectId={projectId}
         mode={editorMode}
+        menuView={menuPublishView}
         initialSlug={afterTopupSlug ?? getStoredPublishSlug(projectId) ?? (editorMode !== 'portfolio' ? (normalizeSlug(projectName ?? '') || undefined) : undefined)}
         initialAccessToken={afterTopupAccessToken ?? undefined}
         autoAdvance={afterTopupSlug !== null}

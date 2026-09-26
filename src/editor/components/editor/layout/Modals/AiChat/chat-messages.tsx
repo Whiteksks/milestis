@@ -25,16 +25,16 @@ function TypingGreeting({ text }: { text: string }) {
   useEffect(() => {
     setDisplayed('')
     let i = 0
+    let interval: ReturnType<typeof setInterval> | undefined
     // Small initial delay before typing starts
     const startTimer = setTimeout(() => {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         i++
         setDisplayed(text.slice(0, i))
         if (i >= text.length) clearInterval(interval)
       }, 20)
-      return () => clearInterval(interval)
     }, 450)
-    return () => clearTimeout(startTimer)
+    return () => { clearTimeout(startTimer); clearInterval(interval) }
   }, [text])
 
   // Blink cursor while typing, hide when done
@@ -122,7 +122,7 @@ export function ChatMessages({ messages, isLoading, greeting, quickPrompts, onQu
               {msg.content && (
                 <div
                   className={cn(
-                    'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                    'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words',
                     msg.role === 'user'
                       ? 'bg-foreground text-background rounded-br-sm'
                       : msg.isError

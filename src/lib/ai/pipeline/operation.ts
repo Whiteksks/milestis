@@ -4,6 +4,7 @@ import { useUiStore } from '@/editor/lib/store/ui'
 
 /** Invalidated immediately by navigation, manual edits, cancellation or the deadline. */
 export function createAiOperation(projectId: string, signal?: AbortSignal, timeoutMs = 120_000) {
+  const controller = new AbortController()
   let active = true
   let applying = false
   let reason = new Error('AI_CANCELLED')
@@ -15,6 +16,7 @@ export function createAiOperation(projectId: string, signal?: AbortSignal, timeo
     if (!active) return
     active = false
     reason = new Error(message)
+    controller.abort(reason)
     reject(reason)
   }
   const changed = () => { if (!applying) invalidate('AI_PROJECT_CHANGED') }
@@ -29,6 +31,7 @@ export function createAiOperation(projectId: string, signal?: AbortSignal, timeo
   if (useUiStore.getState().projectId !== projectId) invalidate('AI_PROJECT_CHANGED')
   const check = () => { if (!active) throw reason }
   return {
+    signal: controller.signal,
     interrupted,
     isCurrent: () => active,
     check,
@@ -46,6 +49,7 @@ export function createAiOperation(projectId: string, signal?: AbortSignal, timeo
     },
     dispose() {
       active = false
+      controller.abort()
       clearTimeout(timer)
       signal?.removeEventListener('abort', cancel)
       unsubscribers.forEach((unsubscribe) => unsubscribe())
