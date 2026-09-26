@@ -1,5 +1,6 @@
 import type { ProjectPage, ProjectPages } from "../pages";
 import { readProjectPages } from "../pages";
+import { createMenuMascotSettings, readMenuMascotSettings, type MenuMascotSettings } from './mascot';
 import { ContentValidationError, readBoolean, readId, readList, readRecord, readText } from "../validation";
 
 export const MENU_LIMITS = { categories: 30, dishes: 200, name: 100, description: 1000, priceMinor: 999999999 } as const;
@@ -13,11 +14,13 @@ export interface MenuDish {
   description: string;
   priceMinor: number | null;
   visible: boolean;
+  recommended: boolean;
 }
 export interface MenuPageContent { categoryIds: string[] }
 export type MenuPage = ProjectPage<MenuPageContent>;
 
 export interface MenuContent extends ProjectPages<MenuPageContent> {
+  mascot: MenuMascotSettings;
   venue: { name: string; description: string; currency: MenuCurrency };
   /** Shared catalog. A page owns its category order; dishes are ordered within their category. */
   categories: MenuCategory[];
@@ -26,6 +29,7 @@ export interface MenuContent extends ProjectPages<MenuPageContent> {
 
 export function createMenuContent(): MenuContent {
   return {
+    mascot: createMenuMascotSettings(),
     venue: { name: "", description: "", currency: "KZT" },
     categories: [], dishes: [],
     homePageId: "home",
@@ -67,6 +71,7 @@ export function readMenuContent(value: unknown): MenuContent {
       description: readText(dish.description, `${path}.description`, MENU_LIMITS.description),
       priceMinor: dish.priceMinor,
       visible: readBoolean(dish.visible, `${path}.visible`),
+      recommended: dish.recommended === undefined ? false : readBoolean(dish.recommended, `${path}.recommended`),
     };
   });
   const pages = readProjectPages(raw.pages, raw.homePageId, (value, path): MenuPageContent => {
@@ -81,6 +86,7 @@ export function readMenuContent(value: unknown): MenuContent {
     }) };
   });
   return {
+    mascot: readMenuMascotSettings(raw.mascot),
     venue: {
       name: readText(venue.name, "venue.name", MENU_LIMITS.name),
       description: readText(venue.description, "venue.description", MENU_LIMITS.description),

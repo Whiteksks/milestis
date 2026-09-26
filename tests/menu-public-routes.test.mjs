@@ -12,10 +12,12 @@ let headerMode = 'portfolio'
 let project
 let lookups = 0
 const MenuPageView = () => null
+const PublishedView = () => null
 const cache = new Map()
 function load(file) {
   let filename = path.resolve(root, file)
   if (!path.extname(filename)) filename += existsSync(`${filename}.ts`) ? '.ts' : '.tsx'
+  if (filename.endsWith('.json')) return JSON.parse(readFileSync(filename, 'utf8'))
   if (cache.has(filename)) return cache.get(filename).exports
   const sourceModule = { exports: {} }
   cache.set(filename, sourceModule)
@@ -28,7 +30,7 @@ function load(file) {
     if (id.endsWith('/menu-page-view')) return { MenuPageView }
     if (id === '@/lib/firebase/admin') return { adminDb: {} }
     if (id === '@/editor/lib/modes/registry') return { MODE_REGISTRY: {} }
-    if (id.endsWith('/published-view')) return {}
+    if (id.endsWith('/published-view')) return { PublishedView }
     if (id === '@/lib/slug') return { ...load('src/lib/slug/policy.ts'), ...load('src/lib/slug/constants.ts') }
     if (id.startsWith('@/')) return load(`src/${id.slice(2)}`)
     if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
@@ -60,6 +62,22 @@ test('root and nested Next routes pass the resolved published page to the shared
   assert.equal(drinks.props.resolved.page.id, 'drinks')
   assert.equal((await rootRoute.generateMetadata(props())).alternates.canonical, 'https://my-cafe.milestis.site')
   assert.equal((await pageRoute.generateMetadata(props('drinks'))).alternates.canonical, 'https://my-cafe.milestis.site/drinks')
+})
+
+test('public menu view forwards the saved template on home and nested pages', () => {
+  reset()
+  const { MenuPageView: ActualMenuPageView } = load('src/app/sites/[slug]/menu-page-view.tsx')
+  for (const templateId of ['menu-classic', 'menu-bistro', 'menu-picnic', 'menu-gallery', 'menu-pulse']) {
+    project.theme = { currentTemplateId: templateId }
+    project.locale = 'ru'
+    const menu = project.content.sectionContent
+    for (const page of menu.pages) {
+      const view = ActualMenuPageView({ resolved: { project, menu, page } }).props.children
+      assert.equal(view.type, PublishedView)
+      assert.equal(view.props.templateId, templateId)
+      assert.equal(view.props.pageId, page.id)
+    }
+  }
 })
 
 test('nested Next routes return notFound for unknown paths, other modes and unavailable projects', async () => {

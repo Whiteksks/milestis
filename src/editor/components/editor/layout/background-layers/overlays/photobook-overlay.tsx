@@ -128,7 +128,7 @@ const TEXTURES: Record<Exclude<PhotobookTexture, 'none'>, React.CSSProperties> =
 
 /** Returns the inline style object for a given texture, or null for 'none'. */
 export function getTextureStyle(texture: PhotobookTexture): React.CSSProperties | null {
-  if (texture === 'none') return null
+  if (texture === 'none' || !Object.hasOwn(TEXTURES, texture)) return null
   return TEXTURES[texture]
 }
 

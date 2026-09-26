@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import type { Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '../types'
 
+export type MenuFontPair = 'signature' | 'editorial' | 'modern'
+
 export interface ThemeCustomizations {
   decorationAnimation?: DecorationAnimation
   customFont?: string
@@ -13,6 +15,7 @@ export interface ThemeCustomizations {
   photobookTexture?: PhotobookTexture
   /** Photobook-only: colour mood filter */
   photobookMood?: PhotobookMood
+  menuFontPair?: MenuFontPair
 }
 
 export interface ThemeStore {
@@ -45,6 +48,7 @@ export const useThemeStore = create<ThemeStore>((set) => ({
     backgroundScrollMode: 'fixed',
     photobookTexture: 'none',
     photobookMood: 'none',
+    menuFontPair: 'signature',
   },
   customDecorations: [],
 

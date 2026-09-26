@@ -1,5 +1,6 @@
 import { publicMenuContent, readMenuContent } from "../../domain/menu/content";
 import { ContentValidationError } from "../../domain/validation";
+import { isMenuTemplateId, resolveMenuTemplateId } from "../../domain/menu/templates";
 
 export class MenuPublishError extends Error {
   constructor(public readonly code: string, public readonly status = 400) { super(code); }
@@ -47,8 +48,9 @@ export function prepareMenuSnapshot(draft: unknown) {
   const publicBackgrounds: Record<string, unknown> = {};
   for (const page of published.pages) if (backgrounds[page.id]) publicBackgrounds[page.id] = image(backgrounds[page.id]);
   const theme = record(data.theme);
+  if (theme.currentTemplateId !== undefined && !isMenuTemplateId(theme.currentTemplateId)) throw new MenuPublishError("INVALID_MENU");
   return {
-    theme: { ...theme, currentTemplateId: "menu-classic", customDecorations: [] },
+    theme: { ...theme, currentTemplateId: resolveMenuTemplateId(theme.currentTemplateId), customDecorations: [] },
     content: {
       sectionContent: published,
       sectionVisibility: { showVenue: visibility.showVenue !== false, showMenu: true },

@@ -23,7 +23,7 @@ const ICON_BTN =
 // it here. ThemeFloatingToolbar stays free of if/else forever.
 
 const TOOLBAR_REGISTRY: Record<EditorMode, ComponentType> = {
-  menu: PortfolioFloatingToolbar,
+  menu: PhotobookFloatingToolbar,
   portfolio: PortfolioFloatingToolbar,
   photobook: PhotobookFloatingToolbar,
   // Events don't have theme controls in V1

@@ -137,16 +137,16 @@ export function Canvas({
         )}
         style={{ '--canvas-scrollbar-width': `${scrollbarWidth}px` } as CSSProperties}
       >
-        <FloatingToolbar
-          tab={(desktopActiveTab ?? 'sections')}
+        {desktopActiveTab !== 'mascot' && <FloatingToolbar
+          tab={desktopActiveTab === 'fonts' ? 'background' : (desktopActiveTab ?? 'sections')}
           panels={floatingToolbarPanels}
-        />
+        />}
 
-        <BackgroundLayers
+        {editorMode !== 'menu' && <BackgroundLayers
           placement="viewport"
           scrollContainerRef={scrollContainerRef}
           viewportRef={viewportRef}
-        />
+        />}
 
         <div ref={scrollContainerRef} className="h-full overflow-auto relative z-10">
             <SectionRegistryProvider>

@@ -18,12 +18,6 @@ export function useGuestSelection(projectId?: string) {
     setInteraction({ kind, dishId, sequence: interactionSequence.current })
   }, [])
 
-  useEffect(() => {
-    if (!interaction) return
-    const timeout = window.setTimeout(() => setInteraction(null), 1800)
-    return () => window.clearTimeout(timeout)
-  }, [interaction])
-
   const update = useCallback((next: MenuSelection) => {
     currentSelection.current = next
     setSelection(next)
@@ -33,6 +27,7 @@ export function useGuestSelection(projectId?: string) {
   }, [projectId])
 
   useEffect(() => {
+    setInteraction(null)
     if (!projectId) return
     try {
       const stored = window.localStorage.getItem(storageKey(projectId))

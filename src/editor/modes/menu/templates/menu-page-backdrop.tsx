@@ -2,10 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import type { ImageValue } from '@/editor/image/data'
+import type { MenuTemplateId } from '../template-ids'
 import { ContentImage } from '@/editor/image/render/content-image'
 import { resolveImage } from '@/editor/image/resolve'
+import type { PhotobookMood, PhotobookTexture } from '@/editor/lib/types'
+import { getMoodFilter, getTextureStyle } from '@/editor/components/editor/layout/background-layers/overlays/photobook-overlay'
 
-export function MenuPageBackdrop({ image }: { image?: ImageValue }) {
+export function MenuPageBackdrop({ image, mood, texture, templateId = 'menu-classic' }: { image?: ImageValue; mood: PhotobookMood; texture: PhotobookTexture; templateId?: MenuTemplateId }) {
   const backdrop = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -32,11 +35,15 @@ export function MenuPageBackdrop({ image }: { image?: ImageValue }) {
     }
   }, [image])
 
-  return <div ref={backdrop} aria-hidden="true" className="pointer-events-none sticky top-0 z-0 -mb-[100dvh] h-[100dvh] overflow-hidden bg-[radial-gradient(ellipse_at_50%_25%,#34302a_0%,#111311_53%,#050606_100%)]">
-    {image?.asset.src && <div className="absolute left-1/2 top-1/2 will-change-transform" style={{ width: 'max(100%, 177.78dvh)', transform: 'translate3d(-50%,calc(-50% + var(--menu-photo-shift,0px)),0) scale(1.08)' }}>
-      <ContentImage image={resolveImage(image, 'menu.page.background', 'menu-classic')} alt="" className="w-full" />
+  const textureStyle = getTextureStyle(texture)
+
+  return <div ref={backdrop} aria-hidden="true" className="pointer-events-none sticky top-0 z-0 -mb-[100dvh] h-[100dvh] overflow-hidden bg-[var(--menu-stage)]">
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_25%,var(--menu-surface-raised)_0%,var(--menu-stage)_85%)]" style={mood !== 'none' ? { filter: getMoodFilter(mood) } : undefined} />
+    {image?.asset.src && <div className="absolute left-1/2 top-1/2 will-change-transform" style={{ width: 'max(100%, 177.78dvh)', filter: mood !== 'none' ? getMoodFilter(mood) : undefined, transform: 'translate3d(-50%,calc(-50% + var(--menu-photo-shift,0px)),0) scale(1.08)' }}>
+      <ContentImage image={resolveImage(image, 'menu.page.background', templateId)} alt="" className="w-full" />
     </div>}
-    <div className="absolute inset-0 bg-[#090b0a]/55" />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_37%,transparent_8%,rgba(0,0,0,.43)_73%,rgba(0,0,0,.85)_100%)]" />
+    <div className="absolute inset-0 bg-[var(--menu-photo-veil)]" />
+    {textureStyle && <div className="absolute inset-0" style={textureStyle} />}
+    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,var(--menu-stage))]" />
   </div>
 }

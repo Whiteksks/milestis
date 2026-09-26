@@ -10,6 +10,7 @@ export interface MenuSlice {
   menuContent: MenuContent
   menuVisibility: MenuVisibility
   menuImages: MenuImageContent
+  updateMenuMascot: (updates: Partial<MenuContent['mascot']>) => void
   updateMenuVenue: (updates: Partial<MenuContent['venue']>) => void
   addMenuPage: (name: string, path: string, background?: ImageValue) => string
   updateMenuPage: (id: string, updates: { name: string; path: string; makeHome?: boolean }, background?: ImageValue | null) => void
@@ -19,7 +20,7 @@ export interface MenuSlice {
   updateMenuCategory: (id: string, updates: Partial<Pick<MenuCategory, 'name' | 'visible'>>) => void
   removeMenuCategory: (id: string) => void
   moveMenuCategory: (pageId: string, id: string, direction: -1 | 1) => void
-  addMenuDish: (pageId: string, categoryId: string, details: Pick<MenuDish, 'name' | 'description' | 'priceMinor' | 'visible'>, image?: ImageValue) => string | null
+  addMenuDish: (pageId: string, categoryId: string, details: Pick<MenuDish, 'name' | 'description' | 'priceMinor' | 'visible' | 'recommended'>, image?: ImageValue) => string | null
   saveMenuDish: (id: string, details: Omit<MenuDish, 'id'>, image?: ImageValue) => boolean
   updateMenuDish: (id: string, updates: Partial<Omit<MenuDish, 'id'>>) => void
   removeMenuDish: (id: string) => void
@@ -32,6 +33,7 @@ export const createMenuSlice: StateCreator<ContentStore, [], [], MenuSlice> = (s
   menuContent: createMenuContent(),
   menuVisibility: { showVenue: true, showMenu: true },
   menuImages: { dishes: {}, pageBackgrounds: {} },
+  updateMenuMascot: (updates) => set((s) => ({ menuContent: readMenuContent({ ...s.menuContent, mascot: { ...s.menuContent.mascot, ...updates } }) })),
   addMenuPage: (name, path, background) => {
     const id = crypto.randomUUID()
     set((s) => ({
@@ -104,7 +106,7 @@ export const createMenuSlice: StateCreator<ContentStore, [], [], MenuSlice> = (s
         !s.menuContent.pages.some((page) => page.id === pageId && page.content.categoryIds.includes(categoryId))) return s
       created = true
       return {
-        menuContent: { ...s.menuContent, dishes: [...s.menuContent.dishes, { id, categoryId, name, description, priceMinor: details.priceMinor, visible: details.visible }] },
+        menuContent: { ...s.menuContent, dishes: [...s.menuContent.dishes, { id, categoryId, name, description, priceMinor: details.priceMinor, visible: details.visible, recommended: details.recommended === true }] },
         ...(image?.asset.src ? { menuImages: { ...s.menuImages, dishes: { ...s.menuImages.dishes, [id]: image } } } : {}),
       }
     })

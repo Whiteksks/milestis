@@ -58,6 +58,7 @@ function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }:
 
 export function ThemeSettingsPanel() {
   const t = useTranslations('editor.controls.theme')
+  const menuAppearance = useTranslations('editor.menu.appearance')
   const translate = useTranslations()
   const {
     depthOptions,
@@ -79,8 +80,8 @@ export function ThemeSettingsPanel() {
   }))
 
   const editorMode = useUiSelector((state) => state.editorMode)
-  // Event mode uses the same mood/texture effects as photobook
-  const isPhotobook = editorMode === 'photobook' || editorMode === 'event'
+  // Event and menu reuse the photographic mood/texture controls.
+  const isPhotobook = editorMode === 'photobook' || editorMode === 'event' || editorMode === 'menu'
   const modeConfig = getModeUiConfig(editorMode, translate)
 
   const {
@@ -135,7 +136,7 @@ export function ThemeSettingsPanel() {
             <CollapsibleSection title={t('photobook.moodTitle')} icon={Sun}>
               <EffectCard
                 label={t('photobook.moodLabel')}
-                description={t('photobook.moodDescription')}
+                description={editorMode === 'menu' ? menuAppearance('moodDescription') : t('photobook.moodDescription')}
                 value={photobookMood}
                 options={photobookMoodOptions}
                 onChange={(v) => setMood(v as PhotobookMood)}
@@ -145,7 +146,7 @@ export function ThemeSettingsPanel() {
             <CollapsibleSection title={t('photobook.overlayTitle')} icon={Sparkles}>
               <EffectCard
                 label={t('photobook.overlayLabel')}
-                description={t('photobook.overlayDescription')}
+                description={editorMode === 'menu' ? menuAppearance('textureDescription') : t('photobook.overlayDescription')}
                 value={photobookTexture}
                 options={photobookTextureOptions}
                 onChange={(v) => setPhotobookTexture(v as PhotobookTexture)}

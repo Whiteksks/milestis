@@ -36,12 +36,69 @@ const { readMenuContent, publicMenuContent } = loadSource('functions/src/domain/
 const { findPageByPath, PAGE_LIMITS } = loadSource('functions/src/domain/pages.ts')
 const { nextMenuPagePath, suggestMenuPagePath } = loadSource('functions/src/domain/menu/page-commands.ts')
 const selection = loadSource('src/editor/modes/menu/guest-selection.ts')
+const mascotBehavior = loadSource('src/editor/modes/menu/mascot/behavior.ts')
+
+test('mascot settings survive edits, draft restoration and public projection', () => {
+  const { store, dishId } = menuWithDish()
+  store.getState().updateMenuMascot({ enabled: false, animations: false })
+  store.getState().updateMenuDish(dishId, { description: 'Updated dish' })
+  const expected = { enabled: false, characterId: 'bun', animations: false }
+  assert.deepEqual(restoreMenuDraft(extractMenuDraft(store.getState())).menuContent.mascot, expected)
+  assert.deepEqual(publicMenuContent(store.getState().menuContent).mascot, expected)
+  assert.deepEqual(createStore(createMenuSlice).getState().menuContent.mascot, { enabled: true, characterId: 'bun', animations: true })
+  for (const characterId of ['bun', 'mochi', 'pepper']) {
+    store.getState().updateMenuMascot({ characterId })
+    const restored = restoreMenuDraft(extractMenuDraft(store.getState())).menuContent
+    assert.deepEqual(restored.mascot, { ...expected, characterId })
+    assert.equal(publicMenuContent(restored).mascot.characterId, characterId)
+  }
+  const before = store.getState().menuContent
+  assert.throws(() => store.getState().updateMenuMascot({ characterId: 'constructor' }))
+  assert.equal(store.getState().menuContent, before)
+})
+
+test('every registered mascot renders every expression and has translations in all locales', () => {
+  const { createElement } = requireDependency('react')
+  const { renderToStaticMarkup } = requireDependency('react-dom/server')
+  const { MENU_MASCOTS } = loadSource('src/editor/modes/menu/mascot/registry.ts')
+  const { MENU_MASCOT_IDS, MASCOT_MOODS } = loadSource('src/editor/modes/menu/mascot/types.ts')
+  const { MenuMascot } = loadSource('src/editor/modes/menu/mascot/mascot.tsx')
+  assert.deepEqual(Object.keys(MENU_MASCOTS), [...MENU_MASCOT_IDS])
+  for (const characterId of MENU_MASCOT_IDS) {
+    for (const locale of ['ru', 'en', 'kz']) {
+      const messages = JSON.parse(readFileSync(path.join(root, `messages/${locale}/editor/editor-menu.json`), 'utf8'))
+      assert.ok(messages.editor.menu.mascot.characters[characterId].name)
+      assert.ok(messages.editor.menu.mascot.characters[characterId].description)
+    }
+    for (const mood of MASCOT_MOODS) {
+      const html = renderToStaticMarkup(createElement(MenuMascot, {
+        settings: { enabled: true, characterId, animations: false }, playback: { mood, sequence: 0 },
+      }))
+      assert.ok(html.includes(`data-mascot="${characterId}"`))
+      assert.ok(html.includes(`data-mood="${mood}"`))
+      assert.match(html, /<svg/)
+      assert.doesNotMatch(html, /NaN|undefined/)
+    }
+  }
+})
+
+test('mascot reactions replace each other and ignore an earlier completion', () => {
+  const { mascotReducer, selectionMood } = mascotBehavior
+  const happy = mascotReducer({ mood: 'idle', sequence: 0 }, { type: 'play', mood: selectionMood('added') })
+  const sad = mascotReducer(happy, { type: 'play', mood: selectionMood('removed') })
+  assert.equal(sad.mood, 'sad')
+  assert.equal(mascotReducer(sad, { type: 'finish', sequence: happy.sequence }), sad)
+  assert.equal(mascotReducer(sad, { type: 'finish', sequence: sad.sequence }).mood, 'idle')
+  const repeated = mascotReducer(happy, { type: 'play', mood: 'happy' })
+  assert.equal(repeated.mood, 'happy')
+  assert.equal(repeated.sequence, happy.sequence + 1)
+})
 // Some domain tests deliberately start with an incomplete saved draft.
 function addDraftDish(store, categoryId) {
   const id = crypto.randomUUID()
   store.setState((state) => ({ menuContent: {
     ...state.menuContent,
-    dishes: [...state.menuContent.dishes, { id, categoryId, name: '', description: '', priceMinor: null, visible: true }],
+    dishes: [...state.menuContent.dishes, { id, categoryId, name: '', description: '', priceMinor: null, visible: true, recommended: false }],
   } }))
   return id
 }
@@ -71,6 +128,16 @@ test('guest selection follows dishes across pages and uses current prices', () =
   assert.equal(selection.resolveMenuSelection(chosen, content).items[0].dish, null)
   assert.equal(selection.resolveMenuSelection(chosen, content).totalPriceMinor, 0)
   assert.deepEqual(selection.changeMenuSelection(chosen, dishId, -1), { [dishId]: 1 })
+})
+
+test('restaurant recommendations persist and only visible dishes reach the public menu', () => {
+  const { store, dishId } = menuWithDish()
+  store.getState().updateMenuDish(dishId, { recommended: true })
+  const restored = restoreMenuDraft(extractMenuDraft(store.getState()))
+  assert.equal(restored.menuContent.dishes[0].recommended, true)
+  assert.equal(publicMenuContent(restored.menuContent).dishes[0].recommended, true)
+  store.getState().updateMenuDish(dishId, { visible: false })
+  assert.equal(publicMenuContent(store.getState().menuContent).dishes.length, 0)
 })
 
 test('stored guest selection accepts only bounded IDs and quantities', () => {
@@ -461,6 +528,30 @@ test('the template renders escaped venue text, exact prices and only visible dis
   assert.doesNotMatch(html, /Toast/)
 })
 
+test('menu theme, font and photographic mood reach the rendered template', () => {
+  const { createElement } = requireDependency('react')
+  const { renderToStaticMarkup } = requireDependency('react-dom/server')
+  const { NextIntlClientProvider } = requireDependency('next-intl')
+  const { MenuClassic } = loadSource('src/editor/modes/menu/templates/menu-classic.tsx')
+  const { getTheme } = loadSource('src/editor/lib/config/themes.ts')
+  const { getMenuVisualStyle, menuFontClassName } = loadSource('src/editor/modes/menu/visual-style.ts')
+  const warm = getMenuVisualStyle(getTheme('parchment'))
+  const cool = getMenuVisualStyle(getTheme('frost'))
+  assert.notEqual(warm['--menu-accent'], cool['--menu-accent'])
+  assert.notEqual(warm['--menu-surface'], cool['--menu-surface'])
+  assert.equal(menuFontClassName('unknown'), 'menu-font-signature')
+  assert.equal(menuFontClassName('constructor'), 'menu-font-signature')
+  const { store } = menuWithDish()
+  const messages = JSON.parse(readFileSync(path.join(root, 'messages/ru/editor/editor-menu.json'), 'utf8'))
+  const html = renderToStaticMarkup(createElement(NextIntlClientProvider, { locale: 'ru', messages, timeZone: 'UTC' },
+    createElement(MenuClassic, { theme: getTheme('frost'), visual: { photobookMood: 'noir', photobookTexture: 'grain', menuFontPair: 'editorial' },
+      content: store.getState().menuContent, images: { dishes: {}, pageBackgrounds: {} }, visibility: store.getState().menuVisibility, editing: true })))
+  assert.match(html, /menu-font-editorial/)
+  assert.match(html, /--menu-accent:/)
+  assert.match(html, /saturate\(0\)/)
+  assert.match(html, /fractalNoise/)
+})
+
 test('page navigation renders public paths and uses buttons inside the editor preview', () => {
   const { createElement } = requireDependency('react')
   const { renderToStaticMarkup } = requireDependency('react-dom/server')
@@ -480,4 +571,44 @@ test('page navigation renders public paths and uses buttons inside the editor pr
   const preview = render({ onPageChange: () => {} })
   assert.match(preview, /<button type="button" aria-current="page"/)
   assert.doesNotMatch(preview, /href="\/drinks"/)
+})
+
+test('all menu templates render the same catalog and switching presentation leaves content intact', () => {
+  const { createElement } = requireDependency('react')
+  const { renderToStaticMarkup } = requireDependency('react-dom/server')
+  const { NextIntlClientProvider } = requireDependency('next-intl')
+  const { getMenuTemplate } = loadSource('src/editor/modes/menu/templates/registry.ts')
+  const { MENU_TEMPLATE_IDS } = loadSource('src/editor/modes/menu/template-ids.ts')
+  const { getTheme } = loadSource('src/editor/lib/config/themes.ts')
+  const { store, dishId } = menuWithDish()
+  store.getState().updateMenuDish(dishId, { recommended: true })
+  const original = JSON.stringify(store.getState().menuContent)
+  for (const locale of ['ru', 'en', 'kz']) {
+    const messages = JSON.parse(readFileSync(path.join(root, `messages/${locale}/editor/editor-menu.json`), 'utf8'))
+    for (const id of MENU_TEMPLATE_IDS) {
+      const template = getMenuTemplate(id)
+      assert.ok(messages.editor.menu[template.nameKey.split('.').at(-1)])
+      const render = (editing) => renderToStaticMarkup(createElement(NextIntlClientProvider, { locale, messages, timeZone: 'UTC' },
+        createElement(template.component, { theme: getTheme('parchment'), content: store.getState().menuContent, images: { dishes: {} }, visibility: store.getState().menuVisibility, editing })))
+      const html = render(false)
+      assert.match(html, /Toast/)
+      assert.match(html, /12[.,]99/)
+      assert.ok(html.includes(messages.editor.menu.recommendations.tab))
+      assert.ok(html.includes(messages.editor.menu.selection.add))
+      assert.match(html, /data-mascot="bun"/)
+      store.getState().updateMenuMascot({ enabled: false })
+      const withoutMascot = render(false)
+      assert.doesNotMatch(withoutMascot, /data-mascot=/)
+      assert.ok(withoutMascot.includes(messages.editor.menu.recommendations.open))
+      store.getState().updateMenuMascot({ enabled: true })
+      assert.ok(!render(true).includes(messages.editor.menu.recommendations.open))
+      if (id === 'menu-bistro') assert.match(html, /data-menu-template="menu-bistro"/)
+      if (id === 'menu-picnic') assert.match(html, /data-menu-template="menu-picnic"/)
+      if (id === 'menu-gallery') assert.match(html, /data-menu-template="menu-gallery"/)
+      if (id === 'menu-pulse') assert.match(html, /data-menu-template="menu-pulse"/)
+      assert.equal(JSON.stringify(store.getState().menuContent), original)
+    }
+  }
+  assert.notEqual(getMenuTemplate('menu-classic').component, getMenuTemplate('menu-bistro').component)
+  assert.equal(getMenuTemplate('constructor'), getMenuTemplate('menu-classic'))
 })

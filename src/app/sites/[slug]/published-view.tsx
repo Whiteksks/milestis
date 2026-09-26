@@ -93,7 +93,7 @@ export function PublishedView({
   return (
     <div className={cn('@container w-full min-h-screen relative', theme.background)}>
       {/* Background effects layer (depth / rays / texture) */}
-      <PublishedBackgroundLayers theme={theme} themeCustomizations={themeCustomizations} />
+      {mode !== 'menu' && <PublishedBackgroundLayers theme={theme} themeCustomizations={themeCustomizations} />}
 
       {/* Content root — mirrors the canvas content-root div with typography classes */}
       <div

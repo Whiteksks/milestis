@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '../editor/modes/menu/fonts/menu-fonts.css';
 @import 'tw-animate-css';
 @import '../components/theme/themes.css';
 @import '../components/layout/kb/article.css';
@@ -42,6 +43,31 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.menu-font-signature { font-family: 'Menu Manrope', system-ui, sans-serif; }
+.menu-font-editorial { font-family: 'Menu Manrope', system-ui, sans-serif; }
+.menu-font-modern { font-family: 'Menu Manrope', system-ui, sans-serif; }
+
+.menu-font-signature :is(h1, h2, h3) {
+  font-family: 'Menu Forum', Georgia, serif;
+  font-weight: 400;
+}
+
+.menu-font-editorial :is(h1, h2, h3) {
+  font-family: 'Menu Noto Serif Display', Georgia, serif;
+  font-weight: 500;
+}
+
+.menu-font-modern :is(h1, h2, h3) {
+  font-family: 'Menu Manrope', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.menu-font-signature :is(button, input, textarea, select),
+.menu-font-editorial :is(button, input, textarea, select),
+.menu-font-modern :is(button, input, textarea, select) {
+  font-family: inherit;
 }
 
 /* ─── View Transitions ─────────────────────────────────────── */

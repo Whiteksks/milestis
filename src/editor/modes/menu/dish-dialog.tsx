@@ -37,6 +37,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
   const [description, setDescription] = useState(dish?.description ?? '')
   const [selectedCategoryId, setSelectedCategoryId] = useState(dish?.categoryId ?? categoryId)
   const [visible, setVisible] = useState(dish?.visible ?? true)
+  const [recommended, setRecommended] = useState(dish?.recommended ?? false)
   const [image, setImage] = useState<ImageValue | undefined>(storedImage)
   const [deleting, setDeleting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -51,7 +52,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
     event.preventDefault()
     setSubmitted(true)
     if (!name.trim() || priceMinor === null) return
-    const details = { name: name.trim(), description: description.trim(), priceMinor, visible }
+    const details = { name: name.trim(), description: description.trim(), priceMinor, visible, recommended }
     const store = useContentStore.getState()
     const done = dish
       ? store.saveMenuDish(dish.id, { ...details, categoryId: selectedCategoryId }, image)
@@ -67,6 +68,7 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
     setDescription('')
     setImage(undefined)
     setVisible(true)
+    setRecommended(false)
     setSubmitted(false)
     setError(false)
     setAdded(true)
@@ -104,6 +106,10 @@ export function MenuDishDialog({ pageId, categoryId, dish, onClose }: {
         <Input value={price} inputMode="decimal" maxLength={12} placeholder="0.00" aria-invalid={priceError}
           onChange={(event) => setPrice(event.target.value)} />
         {priceError && <span role="alert" className="text-xs font-normal text-destructive">{t('invalidPrice')}</span>}
+      </label>
+      <label className="flex items-start gap-3 rounded-xl border bg-muted/20 px-4 py-3 text-sm">
+        <input type="checkbox" checked={recommended} onChange={(event) => setRecommended(event.target.checked)} className="mt-0.5 size-4 accent-primary" />
+        <span><span className="block font-medium">{tf('recommend')}</span><span className="mt-0.5 block text-xs text-muted-foreground">{tf('recommendHint')}</span></span>
       </label>
       <details className="group rounded-xl border bg-muted/20 px-4 py-3">
         <summary className="cursor-pointer text-sm font-medium">{tf('additional')}</summary>

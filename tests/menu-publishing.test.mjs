@@ -53,6 +53,35 @@ function draft() {
   }
 }
 
+test('publication validates mascot settings and only carries persistent configuration', () => {
+  const source = draft()
+  source.content.sectionContent.mascot = { enabled: false, characterId: 'bun', animations: false, mood: 'sad', sequence: 99 }
+  assert.deepEqual(prepareMenuSnapshot(source).content.sectionContent.mascot, { enabled: false, characterId: 'bun', animations: false })
+  for (const characterId of ['bun', 'mochi', 'pepper']) {
+    source.content.sectionContent.mascot = { enabled: true, characterId, animations: true }
+    assert.deepEqual(prepareMenuSnapshot(source).content.sectionContent.mascot, { enabled: true, characterId, animations: true })
+  }
+  for (const invalid of [null, [], { enabled: 'true', characterId: 'bun', animations: true }, { enabled: true, characterId: 'unknown', animations: true }, { enabled: true, characterId: 'constructor', animations: true }, { enabled: true, characterId: 'bun', animations: 1 }]) {
+    source.content.sectionContent.mascot = invalid
+    assert.throws(() => prepareMenuSnapshot(source), (error) => error.code === 'INVALID_MENU')
+  }
+})
+
+test('publication preserves every menu template and rejects templates from other modes', () => {
+  const source = draft()
+  const originalContent = structuredClone(source.content)
+  for (const templateId of ['menu-classic', 'menu-bistro', 'menu-picnic', 'menu-gallery', 'menu-pulse']) {
+    source.theme.currentTemplateId = templateId
+    const published = prepareMenuSnapshot(source)
+    assert.equal(published.theme.currentTemplateId, templateId)
+    assert.deepEqual(source.content, originalContent)
+  }
+  for (const invalid of ['editorial', 'constructor', 'menu-unknown', null]) {
+    source.theme.currentTemplateId = invalid
+    assert.throws(() => prepareMenuSnapshot(source), (error) => error.code === 'INVALID_MENU')
+  }
+})
+
 // Small atomic transaction double. Test the real service against changes between
 // its two transactions; never connect these tests to a real Firebase project.
 function database(project = {}) {
@@ -130,6 +159,7 @@ test('publication preserves the home page and excludes unassigned catalog entrie
 
 test('multi-page publication preserves compositions, shared dishes and empty pages', () => {
   const data = draft()
+  data.theme.themeCustomizations = { photobookMood: 'cool', photobookTexture: 'grain', menuFontPair: 'editorial' }
   data.content.sectionContent.pages.push({ id: 'other', name: 'Other', path: '/other', content: { categoryIds: ['breakfast'] } })
   data.content.sectionContent.pages.push({ id: 'empty', name: 'Soon', path: '/soon', content: { categoryIds: [] } })
   const background = { asset: { src: 'https://example.com/drinks.webp', width: 1200, height: 800 } }
@@ -138,6 +168,7 @@ test('multi-page publication preserves compositions, shared dishes and empty pag
   assert.deepEqual(published.content.sectionContent.pages, data.content.sectionContent.pages)
   assert.equal(published.content.sectionContent.dishes.length, 1, 'shared dishes are stored once')
   assert.deepEqual(published.content.imageContent.pageBackgrounds, { other: background })
+  assert.deepEqual(published.theme.themeCustomizations, data.theme.themeCustomizations)
   data.content.imageContent.pageBackgrounds.other = { asset: { src: 'invalid' } }
   assert.throws(() => prepareMenuSnapshot(data), errorCode('INVALID_IMAGE'))
   data.content.imageContent.pageBackgrounds.other = background

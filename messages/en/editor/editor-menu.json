@@ -9,6 +9,26 @@
     "menu": {
       "title": "Menu",
       "templateName": "Classic menu",
+      "bistroTemplateName": "Bistro",
+      "picnicTemplateName": "Picnic",
+      "galleryTemplateName": "Gallery",
+      "pulseTemplateName": "Pulse",
+      "appearance": {
+        "title": "Menu appearance",
+        "hint": "Choose typography, mood and texture",
+        "mobileLabel": "Appearance",
+        "moodDescription": "Changes the color of photos and ambient menu light.",
+        "textureDescription": "Adds a subtle texture around the menu."
+      },
+      "typography": {
+        "title": "Menu typography",
+        "sample": "Your restaurant",
+        "bodySample": "Good taste starts with the details. Choose what feels right.",
+        "hint": "The font changes all menu text, including descriptions and buttons.",
+        "signature": "Signature",
+        "editorial": "Editorial",
+        "modern": "Modern"
+      },
       "venue": "Restaurant",
       "venueName": "Restaurant name",
       "venuePlaceholder": "Your café name",
@@ -40,6 +60,8 @@
         "nameRequired": "Enter a dish name.",
         "additional": "Description, photo and more",
         "showInMenu": "Show in menu",
+        "recommend": "Recommend to guests",
+        "recommendHint": "This dish appears in the character’s suggestions on this menu page.",
         "saveAndAnother": "Save and add another",
         "added": "Dish added. You can add another.",
         "saveError": "Could not save the dish. Check its category and the menu limit.",
@@ -111,9 +133,44 @@
       },
       "navigation": { "previous": "Scroll pages left", "next": "Scroll pages right" },
       "mascot": {
-        "idle": { "title": "Let's make a selection", "description": "Add dishes and show the list to your waiter." },
-        "added": { "title": "Great choice!", "description": "The dish is in your list." },
-        "removed": { "title": "Removed from your list", "description": "You can choose something else." }
+        "title": "Tamagotchi",
+        "hint": "A little companion that brings your menu to life and reacts to guest choices.",
+        "enabled": "Show character",
+        "enabledHint": "Recommendations also work without it.",
+        "preview": "Preview",
+        "previewHint": "Try an emotion — your dish selection stays the same.",
+        "tryMood": "Emotions",
+        "animations": "Animations",
+        "animationsHint": "System reduced motion shows expressions without movement.",
+        "choose": "Character",
+        "moods": {"idle":"Calm","welcome":"Welcome","happy":"Happy","sad":"Sad","curious":"Curious"},
+        "characters": {
+          "bun": {"name":"Bun","description":"A warm personality in a little chef’s hat."},
+          "mochi": {"name":"Mochi","description":"A shy little sweet with leafy ears and a soft bounce."},
+          "pepper": {"name":"Pepper","description":"A playful dancer with a spark and a big smile."}
+        },
+        "messages": {
+          "idle": {
+            "title": "Here to help you choose",
+            "description": "See what the restaurant recommends."
+          },
+          "welcome": {
+            "title": "Welcome!",
+            "description": "Let’s find something delicious."
+          },
+          "happy": {
+            "title": "Great choice!",
+            "description": "The dish is in your selection."
+          },
+          "sad": {
+            "title": "Removed from your list",
+            "description": "You can choose something else."
+          },
+          "curious": {
+            "title": "What shall we try?",
+            "description": "Explore the restaurant’s recommendations."
+          }
+        }
       },
       "selection": {
         "title": "My selection",
@@ -129,7 +186,16 @@
         "removeUnavailable": "Remove unavailable dish",
         "total": "Total",
         "availableTotal": "Available dishes",
-        "notOrder": "This is a list to discuss with your waiter, not a placed order."
+        "notOrder": "This is a list to discuss with your waiter, not a placed order.",
+        "empty": "Nothing selected yet. Add a dish from the menu or recommendations."
+      },
+      "recommendations": {
+        "open": "Open recommendations",
+        "tab": "Recommendations",
+        "title": "What to try",
+        "description": "Dishes recommended by the restaurant.",
+        "empty": "The restaurant has not added recommendations for this page yet.",
+        "add": "Add to my selection: {name}"
       },
       "publish": {
         "title": "Publish menu",

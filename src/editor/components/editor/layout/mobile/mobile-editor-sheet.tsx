@@ -3,7 +3,7 @@
 import { memo, useState, useCallback, useEffect, useMemo, type ReactNode } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from "next-intl"
-import { Layers, Paintbrush, Wand2, Sparkles, LayoutTemplate, HelpCircle } from "lucide-react"
+import { Layers, Paintbrush, Wand2, Sparkles, LayoutTemplate, HelpCircle, Type, Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useUiSelector } from "@/editor/lib/store"
@@ -11,6 +11,8 @@ import { useUiStore } from "@/editor/lib/store/ui"
 import { useAiBriefStore } from "@/editor/lib/store/ai-brief"
 import { MODE_REGISTRY } from "@/editor/lib/modes"
 import type { MobileEditorTab, MobileAppearanceSubTab } from "@/editor/lib/config/editor-tabs"
+import { isModeEditorTabAvailable } from '@/editor/lib/config/editor-tabs'
+import { MenuMascotSettingsPanel } from '@/editor/modes/menu/mascot/settings-panel'
 
 import { MobileSnapSheet, type MobileSnapSheetRenderProps } from "./mobile-snap-sheet"
 import { SectionsSheetActions } from "./sheet-actions/sections-sheet-actions"
@@ -19,6 +21,7 @@ import { DecorationsSheetActions } from "./sheet-actions/decorations-sheet-actio
 import { SettingsContent } from "./settings-content"
 import { ThemeSettingsPanel } from "../sidebar/theme-settings-panel"
 import { DecorationsSettingsPanel } from "../sidebar/decorations-settings-panel"
+import { MenuTypographyPanel } from "../sidebar/menu-typography-panel"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -38,6 +41,8 @@ type TabDef = { id: MobileEditorTab; icon: React.ElementType; label: string }
 const ALL_TAB_ICONS: { id: MobileEditorTab; icon: React.ElementType }[] = [
   { id: "sections",    icon: Layers        },
   { id: "appearance",  icon: Paintbrush    },
+  { id: "fonts",       icon: Type          },
+  { id: "mascot",      icon: Heart         },
   { id: "design",      icon: LayoutTemplate },
   { id: "ai",          icon: Sparkles      },
 ]
@@ -127,8 +132,14 @@ function renderActions(
     case "appearance": return appearanceSubTab === "background"
       ? <ThemeSheetActions />
       : <DecorationsSheetActions scrollContainerRef={scrollContainerRef} />
+    case "fonts": return <FontSheetActions />
     default:           return null
   }
+}
+
+function FontSheetActions() {
+  const t = useTranslations('editor.menu.typography')
+  return <div className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground"><Type className="size-4 shrink-0" />{t('hint')}</div>
 }
 
 function renderPanel(tab: MobileEditorTab, appearanceSubTab: MobileAppearanceSubTab): ReactNode {
@@ -137,6 +148,8 @@ function renderPanel(tab: MobileEditorTab, appearanceSubTab: MobileAppearanceSub
     case "appearance": return appearanceSubTab === "background"
       ? <ThemeSettingsPanel />
       : <DecorationsSettingsPanel />
+    case "fonts": return <MenuTypographyPanel />
+    case "mascot": return <MenuMascotSettingsPanel />
     default:           return null
   }
 }
@@ -233,14 +246,14 @@ const SheetNav = memo(function SheetNav({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.currentTarget.blur(); onTabPress(tab.id) }}
               className={cn(
-                "relative touch-auto cursor-pointer w-12 h-full flex flex-col items-center justify-center gap-1 transition-colors",
+                "relative touch-auto cursor-pointer min-w-0 w-full h-full px-1 flex flex-col items-center justify-center gap-1 transition-colors",
                 isAi
                   ? (activeTab === tab.id ? "text-primary" : "text-primary/75")
                   : (activeTab === tab.id ? "text-foreground" : "text-muted-foreground"),
               )}
             >
               <tab.icon className="h-4 w-4" aria-hidden="true" />
-              <span className="text-[12px] font-medium tracking-tight">{tab.label}</span>
+              <span className="max-w-full truncate text-[11px] font-medium tracking-tight">{tab.label}</span>
               {isAi && aiUnread && (
                 <span className="absolute top-1 right-2.5 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
               )}
@@ -277,7 +290,7 @@ const SheetBody = memo(function SheetBody({
     ? "overflow-x-auto overscroll-x-contain no-scrollbar"
     : "overflow-y-auto overscroll-contain"
 
-  const visible = mode !== "nav" && activeTab !== "design" && activeTab !== "ai" && content !== null
+  const visible = mode !== "nav" && activeTab !== "design" && activeTab !== "ai" && (content !== null || activeTab === 'fonts')
   const editorMode = useUiSelector((s) => s.editorMode)
   const showSubTabs = visible && activeTab === "appearance" && !MODE_REGISTRY[editorMode].uiConfig.hideDecorations
 
@@ -355,13 +368,13 @@ export function MobileEditorSheet({
   const tabs = useMemo(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
     const allTabs: TabDef[] = ALL_TAB_ICONS.map(({ id, icon }) => ({ id, icon, label: tMobile(id) }))
-    return allTabs.filter((tab) => !(hideSections && tab.id === 'sections') && !(MODE_REGISTRY[editorMode].uiConfig.hideAiButton && tab.id === 'ai'))
+    return allTabs.filter((tab) => !(hideSections && tab.id === 'sections') && !(MODE_REGISTRY[editorMode].uiConfig.hideAiButton && tab.id === 'ai') && isModeEditorTabAvailable(tab.id, editorMode))
   }, [editorMode, tMobile])
 
   // If sections tab becomes hidden while active, redirect to appearance
   useEffect(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
-    if (hideSections && activeTab === 'sections') {
+    if ((hideSections && activeTab === 'sections') || !isModeEditorTabAvailable(activeTab, editorMode)) {
       onTabChange('appearance')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -392,6 +405,12 @@ export function MobileEditorSheet({
         onTabChange("ai")
         setSnapIndex(SNAP_NAV_INDEX)
         setIsAiChatOpen(true)
+        return
+      }
+
+      if (tab === "fonts" || tab === "mascot") {
+        onTabChange(tab)
+        setSnapIndex(FULL_SNAP_INDEX)
         return
       }
 

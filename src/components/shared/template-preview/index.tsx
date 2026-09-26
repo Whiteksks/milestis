@@ -1,6 +1,7 @@
 'use client'
 
-import { MenuCoverPreview } from '@/editor/modes/menu/templates/menu-classic'
+import { getMenuTemplate } from '@/editor/modes/menu/templates/registry'
+import { isMenuTemplateId } from '@/editor/modes/menu/template-ids'
 import { getTheme } from '@/editor/lib/config/themes'
 import type { SectionContent, PhotobookSectionContent } from '@/editor/lib/types'
 import type { AspectRatio, FrameStyle } from '@/editor/lib/types'
@@ -128,7 +129,10 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
   // Normalise: strip 'photobook-' prefix so the id matches TEMPLATE_CONFIG keys
   const normalizedId = (templateId ?? '').replace(/^photobook-/, '')
 
-  if (templateId === 'menu-classic') return <ScaledWrapper zoom={zoom} background={theme.background}><MenuCoverPreview theme={theme} title={title} /></ScaledWrapper>
+  if (isMenuTemplateId(templateId)) {
+    const Preview = getMenuTemplate(templateId).previewComponent
+    return <ScaledWrapper zoom={zoom} background={theme.background}><Preview theme={theme} title={title} /></ScaledWrapper>
+  }
 
   // Portfolio templates
   const HeroComponent = PORTFOLIO_PREVIEW_REGISTRY[templateId ?? '']
@@ -169,4 +173,3 @@ export function TemplatePreview({ themeId, templateId, heroImageUrl, title, subt
 
   return <Fallback c={c} />
 }
-

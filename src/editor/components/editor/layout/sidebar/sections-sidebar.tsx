@@ -6,13 +6,16 @@ import { useUiSelector } from '@/editor/lib/store'
 import { getModeUiConfig } from '@/editor/lib/modes'
 import { cn } from '@/lib/utils'
 import { motion } from 'motion/react'
-import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles } from 'lucide-react'
+import { Layers, Sparkles, PanelRightOpen, PanelLeftClose, WandSparkles, Type, Heart } from 'lucide-react'
 
 import type { DesktopEditorTab } from '@/editor/lib/config/editor-tabs'
+import { isModeEditorTabAvailable } from '@/editor/lib/config/editor-tabs'
+import { MenuMascotSettingsPanel } from '@/editor/modes/menu/mascot/settings-panel'
 import { SectionsTab } from '@/editor/components/editor/section-settings/ui/sections-tab'
 import { ThemeTab } from '@/editor/components/editor/section-settings/ui/theme-tab'
 import { DecorationsTab } from '@/editor/components/editor/section-settings/ui/decorations-tab'
 import { PersistentDrawer } from '@/components/ui/custom/persistent-drawer'
+import { MenuTypographyPanel } from './menu-typography-panel'
 
 export type { DesktopEditorTab } from '@/editor/lib/config/editor-tabs'
 
@@ -40,9 +43,11 @@ export function SectionsSidebar({
       const all = [
         { id: 'sections' as const, icon: Layers, label: cfg.sectionsTabLabel },
         { id: 'background' as const, icon: WandSparkles, label: t('sidebar.background') },
+        { id: 'fonts' as const, icon: Type, label: t('sidebar.fonts') },
+        { id: 'mascot' as const, icon: Heart, label: t('sidebar.mascot') },
         { id: 'decorations' as const, icon: Sparkles, label: t('sidebar.decorations') },
       ]
-      return all.filter((tab) => !(cfg.hideSectionsTab && tab.id === 'sections') && !(cfg.hideDecorations && tab.id === 'decorations'))
+      return all.filter((tab) => !(cfg.hideSectionsTab && tab.id === 'sections') && !(cfg.hideDecorations && tab.id === 'decorations') && isModeEditorTabAvailable(tab.id, editorMode))
     },
     [editorMode, t, translate],
   )
@@ -50,7 +55,7 @@ export function SectionsSidebar({
   // If the sections tab becomes hidden while it's active, redirect to background
   useEffect(() => {
     const cfg = getModeUiConfig(editorMode, translate)
-    if ((cfg.hideSectionsTab && activeTab === 'sections') || (cfg.hideDecorations && activeTab === 'decorations')) {
+    if ((cfg.hideSectionsTab && activeTab === 'sections') || (cfg.hideDecorations && activeTab === 'decorations') || !isModeEditorTabAvailable(activeTab, editorMode)) {
       onTabChange('background')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,20 +105,21 @@ export function SectionsSidebar({
         >
           {/* Tabs */}
           <div className="border-b border-border/40">
-            <div className="flex justify-center gap-1 px-4 pt-1">
+            <div className="grid gap-1 px-3 pt-1" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
               {tabs.map(({ id, icon: Icon, label }) => (
                 <button
                   key={id}
+                  aria-pressed={activeTab === id}
                   onClick={() => handleTabChange(id)}
                   className={cn(
-                    'relative flex items-center gap-1.5 px-3 py-3 text-sm transition-all',
+                    'relative flex min-w-0 flex-col items-center gap-1.5 px-1 py-3 text-sm transition-colors',
                     activeTab === id
                       ? 'text-foreground font-medium'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
-                  <span className="text-[13px] tracking-tight">{label}</span>
+                  <span className="max-w-full truncate text-[12px] tracking-tight">{label}</span>
                   {activeTab === id && (
                     <motion.div
                       layoutId="activeTab"
@@ -132,6 +138,10 @@ export function SectionsSidebar({
               <SectionsTab />
             ) : activeTab === 'background' ? (
               <ThemeTab />
+            ) : activeTab === 'fonts' && editorMode === 'menu' ? (
+              <MenuTypographyPanel />
+            ) : activeTab === 'mascot' && editorMode === 'menu' ? (
+              <MenuMascotSettingsPanel />
             ) : (
               getModeUiConfig(editorMode, translate).hideDecorations ? <ThemeTab /> : <DecorationsTab />
             )}

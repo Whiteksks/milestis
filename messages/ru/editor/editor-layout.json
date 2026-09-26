@@ -62,7 +62,9 @@
         "quickPromptsPortfolio": ["Портфолио фотографа", "Портфолио дизайнера", "Портфолио художника"]
       },
       "sidebar": {
+        "mascot": "Тамагочи",
         "background": "Фон",
+        "fonts": "Шрифты",
         "decorations": "Декорации",
         "expand": "Развернуть боковую панель",
         "collapse": "Свернуть боковую панель",
@@ -75,8 +77,10 @@
         "projectLayers": "Слои проекта"
       },
       "mobile": {
+        "mascot": "Тамагочи",
         "sections": "Разделы",
         "background": "Фон",
+        "fonts": "Шрифты",
         "decorations": "Декор",
         "design": "Дизайн",
         "appearance": "Оформление",

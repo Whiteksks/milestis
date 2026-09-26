@@ -62,7 +62,9 @@
         "quickPromptsPortfolio": ["Фотографтың портфолиосы", "Дизайнердің портфолиосы", "Суретшінің портфолиосы"]
       },
       "sidebar": {
+        "mascot": "Тамагочи",
         "background": "Фон",
+        "fonts": "Қаріптер",
         "decorations": "Безендірулер",
         "expand": "Бүйірлік панельді ашу",
         "collapse": "Бүйірлік панельді жабу",
@@ -75,8 +77,10 @@
         "projectLayers": "Жоба қабаттары"
       },
       "mobile": {
+        "mascot": "Тамагочи",
         "sections": "Бөлімдер",
         "background": "Фон",
+        "fonts": "Қаріптер",
         "decorations": "Декор",
         "design": "Дизайн",
         "appearance": "Стиль",

@@ -1,5 +1,6 @@
 import { NextIntlClientProvider } from 'next-intl'
 import type { PublishedMenuPage } from '@/lib/projects/published-menu'
+import { resolveMenuTemplateId } from '@/editor/modes/menu/template-ids'
 import { PublishedView } from './published-view'
 import menuEn from '../../../../messages/en/editor/editor-menu.json'
 import menuRu from '../../../../messages/ru/editor/editor-menu.json'
@@ -13,7 +14,7 @@ export function MenuPageView({ resolved }: { resolved: PublishedMenuPage }) {
       mode="menu"
       projectId={project.id}
       pageId={page.id}
-      templateId="menu-classic"
+      templateId={resolveMenuTemplateId(theme.currentTemplateId)}
       themeId={theme.currentTheme ?? 'parchment'}
       themeCustomizations={theme.themeCustomizations ?? {}}
       customDecorations={[]}

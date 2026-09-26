@@ -176,6 +176,8 @@ export default function EditorPage() {
     // Keep FloatingToolbar (desktop) in sync with mobile tab
     if (tab === 'sections') {
       setDesktopActiveTab(tab)
+    } else if (tab === 'fonts' || tab === 'mascot') {
+      setDesktopActiveTab(tab)
     }
   }
 
