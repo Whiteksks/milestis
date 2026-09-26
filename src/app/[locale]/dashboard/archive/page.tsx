@@ -274,9 +274,15 @@ function ProjectDetailPanel({
               >
                 <Link href={editUrl}>
                   <Edit className="mr-2 size-3.5" />
-                  {t("archive.edit")}
+                  {t(project.mode === 'menu' ? "archive.editMenu" : "archive.edit")}
                 </Link>
               </Button>
+
+              {project.mode === 'menu' && project.isPublished && (
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t("archive.menuEditHint")}
+                </p>
+              )}
 
               {shareUrl && (
                 <>

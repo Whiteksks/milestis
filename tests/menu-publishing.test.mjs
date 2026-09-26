@@ -214,19 +214,27 @@ test('rejects empty or malformed menus while allowing a deliberate zero price', 
   assert.throws(() => prepareMenuSnapshot(data), errorCode('EMPTY_MENU'))
 })
 
-test('first publication and updates keep the project editable, the draft intact, the address stable and credits untouched', async () => {
+test('first publication archives the project and updates it without unpublishing or changing its address', async () => {
   const { db, records, put } = database()
   const original = structuredClone(records.get('projects/p1/data/content'))
   await publishMenuSnapshot(db, 'owner', input, identity)
   assert.deepEqual(records.get('projects/p1/data/content'), original)
-  assert.equal(records.get('projects/p1').status, 'active')
+  assert.equal(records.get('projects/p1').status, 'archived')
   assert.equal(records.get('projects/p1').isPublished, true)
   assert.equal(records.get('projects/p1').publishLockId, undefined)
   assert.equal(records.get('published_projects/p1').locale, 'ru')
+  const liveContent = structuredClone(records.get('published_projects/p1').content)
   const updated = draft()
   updated.content.sectionContent.dishes[0].priceMinor = 500
   put('projects/p1/data/content', updated)
-  await publishMenuSnapshot(db, 'owner', input, identity)
+  await publishMenuSnapshot(db, 'owner', input, async (snapshot) => {
+    assert.equal(records.get('projects/p1').status, 'archived')
+    assert.equal(records.get('projects/p1').isPublished, true)
+    assert.equal(records.get('published_projects/p1').isPublished, true)
+    assert.deepEqual(records.get('published_projects/p1').content, liveContent)
+    return snapshot
+  })
+  assert.equal(records.get('projects/p1').status, 'archived')
   assert.equal(records.get('published_projects/p1').content.sectionContent.dishes[0].priceMinor, 500)
   assert.equal(records.get('projects/p1').publishVersion, 2)
   assert.equal(records.get('projects/p1').publishedSlug, 'my-cafe')
@@ -234,7 +242,7 @@ test('first publication and updates keep the project editable, the draft intact,
 })
 
 test('unpublished menu reactivates on its reserved URL and cannot change it', async () => {
-  const { db, records, put } = database({ publishedSlug: 'my-cafe', publishVersion: 1 })
+  const { db, records, put } = database({ status: 'archived', publishedSlug: 'my-cafe', publishVersion: 1 })
   put('published_project_slugs/my-cafe', { projectId: 'p1' })
   await assert.rejects(publishMenuSnapshot(db, 'owner', { ...input, slug: 'other-cafe' }, identity), errorCode('SLUG_IMMUTABLE'))
   await publishMenuSnapshot(db, 'owner', input, identity)
@@ -256,6 +264,7 @@ test('slug reservations reject both an existing collision and one created during
     if (!afterCopy) collide()
     await assert.rejects(publishMenuSnapshot(db, 'owner', input, async (snapshot) => { collide(); return snapshot }), errorCode('SLUG_TAKEN'))
     assert.equal(records.get('published_projects/p1'), undefined)
+    assert.equal(records.get('projects/p1').status, 'active')
     assert.equal(records.get('projects/p1').publishLockId, undefined)
   }
 })
@@ -286,6 +295,33 @@ test('storage failures leave both draft and live menu unchanged', async () => {
   assert.deepEqual(records.get('published_projects/p1'), { previous: true })
   assert.deepEqual(records.get('projects/p1/data/content'), original)
   assert.equal(records.get('projects/p1').publishLockId, undefined)
+  assert.equal(records.get('projects/p1').status, 'active')
+})
+
+test('failed updates keep archived menus published at the previous version', async () => {
+  const { db, records, put } = database()
+  await publishMenuSnapshot(db, 'owner', input, identity)
+  const live = structuredClone(records.get('published_projects/p1'))
+  await assert.rejects(publishMenuSnapshot(db, 'owner', input, async (snapshot) => {
+    put('projects/p1/data/content', draft())
+    return snapshot
+  }), errorCode('DRAFT_CHANGED'))
+  assert.deepEqual(records.get('published_projects/p1'), live)
+  assert.equal(records.get('projects/p1').status, 'archived')
+  assert.equal(records.get('projects/p1').isPublished, true)
+  assert.equal(records.get('projects/p1').publishVersion, 1)
+})
+
+test('deletion during an archived menu update cannot restore the project', async () => {
+  const { db, records, put } = database()
+  await publishMenuSnapshot(db, 'owner', input, identity)
+  const live = structuredClone(records.get('published_projects/p1'))
+  await assert.rejects(publishMenuSnapshot(db, 'owner', input, async (snapshot) => {
+    put('projects/p1', { ...records.get('projects/p1'), status: 'deleted' })
+    return snapshot
+  }), errorCode('NOT_PUBLISHABLE'))
+  assert.equal(records.get('projects/p1').status, 'deleted')
+  assert.deepEqual(records.get('published_projects/p1'), live)
 })
 
 test('media copies only owned uploads, reuses generations, preserves originals and rejects cross-project paths', async () => {
@@ -339,6 +375,7 @@ test('the same subdomain resolver returns menu or portfolio by stored mode, neve
   records.get('projects/p1').status = 'deleted'
   assert.equal(await getPublishedGlobalProject(reader, 'my-cafe'), null)
   records.get('projects/p1').status = 'active'
+  assert.equal((await getPublishedGlobalProject(reader, 'my-cafe')).mode, 'menu')
   records.get('published_projects/p1').isPublished = false
   assert.equal(await getPublishedGlobalProject(reader, 'my-cafe'), null)
   records.get('published_projects/p1').isPublished = true

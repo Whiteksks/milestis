@@ -37,6 +37,47 @@ const { findPageByPath, PAGE_LIMITS } = loadSource('functions/src/domain/pages.t
 const { nextMenuPagePath, suggestMenuPagePath } = loadSource('functions/src/domain/menu/page-commands.ts')
 const selection = loadSource('src/editor/modes/menu/guest-selection.ts')
 const mascotBehavior = loadSource('src/editor/modes/menu/mascot/behavior.ts')
+const pairGame = loadSource('src/editor/modes/menu/mascot/game/model.ts')
+
+test('mascot game rewards each pair once, rejects invalid flips and preserves interest on replay', () => {
+  const { INITIAL_GAME, pairGameReducer: reduce } = pairGame
+  const deck = ['cherry', 'cookie', 'iceCream', 'cherry', 'cookie', 'iceCream']
+  let state = reduce(INITIAL_GAME, { type: 'start', deck })
+  for (const index of [-1, 6, 0.5]) assert.equal(reduce(state, { type: 'flip', index }), state)
+  state = reduce(state, { type: 'flip', index: 0 })
+  assert.equal(reduce(state, { type: 'flip', index: 0 }), state)
+  state = reduce(state, { type: 'flip', index: 3 })
+  assert.equal(state.interest, 34)
+  assert.equal(state.moves, 1)
+  assert.equal(reduce(state, { type: 'flip', index: 3 }), state)
+  for (const index of [1, 4, 2, 5]) state = reduce(state, { type: 'flip', index })
+  assert.equal(state.interest, 100)
+  assert.equal(state.matched.length, 6)
+  assert.equal(state.moves, 3)
+  const replay = reduce(state, { type: 'start', deck })
+  assert.equal(replay.interest, 100)
+  assert.equal(replay.matched.length, 0)
+  assert.equal(replay.moves, 0)
+})
+
+test('mascot game locks mismatches and ignores timers from earlier rounds', () => {
+  const { INITIAL_GAME, pairGameReducer: reduce } = pairGame
+  const deck = ['cherry', 'cookie', 'iceCream', 'cherry', 'cookie', 'iceCream']
+  let state = reduce(INITIAL_GAME, { type: 'start', deck })
+  for (const index of [0, 1]) state = reduce(state, { type: 'flip', index })
+  assert.equal(state.interest, 0)
+  assert.equal(state.moves, 1)
+  assert.equal(reduce(state, { type: 'flip', index: 2 }), state)
+  const turn = state.turn
+  assert.equal(reduce(state, { type: 'conceal', turn: turn - 1 }), state)
+  assert.deepEqual(reduce(state, { type: 'conceal', turn }).flipped, [])
+  state = reduce(state, { type: 'start', deck })
+  state = reduce(state, { type: 'flip', index: 2 })
+  assert.equal(reduce(state, { type: 'conceal', turn }), state)
+  for (const random of [() => 0, () => 0.999, Math.random]) {
+    assert.deepEqual(pairGame.shuffledTreats(random).sort(), [...deck].sort())
+  }
+})
 
 test('mascot settings survive edits, draft restoration and public projection', () => {
   const { store, dishId } = menuWithDish()

@@ -14,8 +14,9 @@ import { visibleMenuCategories } from './model'
 import { resolveMenuSelection, type MenuSelection, type MenuSelectionInteraction } from './guest-selection'
 import { MenuMascot, MenuMascotMessage } from './mascot/mascot'
 import { useMascot } from './mascot/use-mascot'
+import { MascotPairGame } from './mascot/game/pair-game'
 
-type DrawerView = 'recommendations' | 'selection'
+type DrawerView = 'recommendations' | 'selection' | 'game'
 
 export function MenuGuestSelectionPanel({ content, images, pageId, theme, menuStyle, selection, interaction, onChangeQuantity, onRemove, templateId = 'menu-classic' }: {
   templateId?: MenuTemplateId
@@ -31,6 +32,7 @@ export function MenuGuestSelectionPanel({ content, images, pageId, theme, menuSt
 }) {
   const t = useTranslations('editor.menu.selection')
   const tr = useTranslations('editor.menu.recommendations')
+  const tg = useTranslations('editor.menu.mascot.game')
   const locale = useLocale()
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<DrawerView>('recommendations')
@@ -68,19 +70,20 @@ export function MenuGuestSelectionPanel({ content, images, pageId, theme, menuSt
         'z-[220] max-h-[85dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[2rem] border-t p-0 [&>div:first-child]:bg-[var(--menu-accent-line)]', theme.card, theme.cardForeground, theme.border, theme.fontBody,
       )} overlayClassName="z-[219] bg-[#242820]/40 backdrop-blur-sm">
         <div className="mx-auto w-full max-w-2xl overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:px-8">
-          <DrawerHeader className="relative px-0 pr-10 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-left">
-            {content.mascot.enabled && <div className="flex items-center gap-3"><MenuMascot settings={content.mascot} playback={playback} className="size-16 shrink-0" /><MenuMascotMessage mood={playback.mood} /></div>}
-            <DrawerTitle className="mt-5 text-4xl tracking-tight !text-[var(--menu-text)]">{view === 'recommendations' ? tr('title') : t('title')}</DrawerTitle>
-            <DrawerDescription className="mt-2 text-sm leading-6 !text-[var(--menu-muted-text)]">{view === 'recommendations' ? tr('description') : t('showWaiter')}</DrawerDescription>
+          <DrawerHeader className="relative min-h-11 px-0 pr-10 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-left">
+            {content.mascot.enabled && view !== 'game' && <div className="flex items-center gap-3"><MenuMascot settings={content.mascot} playback={playback} className="size-16 shrink-0" /><MenuMascotMessage mood={playback.mood} /></div>}
+            <DrawerTitle className={view === 'game' ? 'sr-only' : 'mt-5 text-4xl tracking-tight !text-[var(--menu-text)]'}>{view === 'game' ? tg('title') : view === 'recommendations' ? tr('title') : t('title')}</DrawerTitle>
+            <DrawerDescription className={view === 'game' ? 'sr-only' : 'mt-2 text-sm leading-6 !text-[var(--menu-muted-text)]'}>{view === 'game' ? tg('hint') : view === 'recommendations' ? tr('description') : t('showWaiter')}</DrawerDescription>
             <DrawerClose className="absolute right-0 top-0 grid size-11 place-items-center rounded-full bg-[var(--menu-accent-soft)] text-[var(--menu-muted-text)] hover:opacity-70 focus-visible:outline-2" aria-label={t('close')}><X aria-hidden="true" className="size-5" /></DrawerClose>
           </DrawerHeader>
           <div className="mt-5 flex gap-1 rounded-full bg-[var(--menu-accent-soft)] p-1">
-            {(['recommendations', 'selection'] as const).map((tab) => <button key={tab} type="button" onClick={() => setView(tab)} aria-current={view === tab ? 'page' : undefined}
+            {(['recommendations', 'selection', ...(content.mascot.enabled ? ['game' as const] : [])] as const).map((tab) => <button key={tab} type="button" onClick={() => setView(tab)} aria-current={view === tab ? 'page' : undefined}
               className={cn('min-h-11 flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors', view === tab ? 'bg-[var(--menu-accent)] text-[var(--menu-accent-ink)]' : 'text-[var(--menu-muted-text)] hover:text-[var(--menu-text)]')}>
-              {tab === 'recommendations' ? tr('tab') : t('title')}{tab === 'selection' && count > 0 ? ` · ${count}` : ''}
+              {tab === 'game' ? tg('play') : tab === 'recommendations' ? tr('tab') : t('title')}{tab === 'selection' && count > 0 ? ` · ${count}` : ''}
             </button>)}
           </div>
-          {view === 'recommendations' ? recommended.length > 0 ? <div className="mt-4 divide-y divide-[var(--menu-accent-line)]">
+          {content.mascot.enabled && <div hidden={view !== 'game'} className="mx-auto mt-4 max-w-sm"><MascotPairGame key={content.mascot.characterId} settings={content.mascot} playback={playback} onReaction={play} /></div>}
+          {view === 'game' ? null : view === 'recommendations' ? recommended.length > 0 ? <div className="mt-4 divide-y divide-[var(--menu-accent-line)]">
             {recommended.map((dish) => {
               const image = images.dishes[dish.id]
               const quantity = selection[dish.id] ?? 0

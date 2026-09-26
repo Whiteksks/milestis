@@ -12,6 +12,7 @@ import { useCreateProject } from "@/hooks/useCreateProject"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import type { ProjectMode } from "@/lib/projects/project-type-config"
+import { PROJECT_CREATION_OPTIONS as options } from "@/lib/projects/creation-options"
 import { useTranslations } from "next-intl"
 
 interface NewProjectModalProps {
@@ -19,31 +20,6 @@ interface NewProjectModalProps {
   onOpenChange: (open: boolean) => void
 }
 
-const options: {
-  mode: ProjectMode
-  number: string
-  titleKey: string
-  descriptionKey: string
-}[] = [
-  {
-    mode: "photobook",
-    number: "01",
-    titleKey: "createCards.photobook.title",
-    descriptionKey: "createCards.photobook.description",
-  },
-  {
-    mode: "portfolio",
-    number: "02",
-    titleKey: "createCards.portfolio.title",
-    descriptionKey: "createCards.portfolio.description",
-  },
-  {
-    mode: "event",
-    number: "03",
-    titleKey: "createCards.event.title",
-    descriptionKey: "createCards.event.description",
-  },
-]
 
 function OptionCard({
   opt,

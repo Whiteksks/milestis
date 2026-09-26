@@ -65,8 +65,9 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange, menuView
       if (useUiStore.getState().projectId === projectId) {
         useUiStore.getState().setPublishedInfo(result.publishedSlug)
         useUiStore.getState().setIsPublished(true)
+        useUiStore.getState().setProjectStatus('archived')
       }
-      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.active(uid) })
+      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.all(uid) })
       setSuccess(true)
     } catch (cause) {
       const code = cause instanceof PublishProjectError ? cause.code : 'UNKNOWN'

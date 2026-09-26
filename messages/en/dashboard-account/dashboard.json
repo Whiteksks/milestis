@@ -153,6 +153,8 @@
     }
   },
   "archive": {
+    "editMenu": "Edit menu",
+    "menuEditHint": "Your menu stays available to guests. Make changes in the editor and select “Update menu”. The address and QR code stay the same.",
     "title": "Archive",
     "exportsSummary": "Exported projects · {count} Total",
     "empty": "Your archive is empty",

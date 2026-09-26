@@ -14,7 +14,7 @@ export async function getPublishedGlobalProject(db: Pick<Firestore, 'collection'
   if (reserved.mode && reserved.mode !== data.mode) return null
   if (data.mode === 'menu') {
     const project = await db.collection('projects').doc(document.id).get()
-    if (project.data()?.status !== 'active') return null
+    if (!['active', 'archived'].includes(project.data()?.status)) return null
   }
   return {
     id: document.id,

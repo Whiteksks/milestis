@@ -9,6 +9,7 @@ import { MenuMascot } from './mascot'
 import { MENU_MASCOTS } from './registry'
 import { MASCOT_MOODS, MENU_MASCOT_IDS } from './types'
 import { useMascot } from './use-mascot'
+import { MascotPairGame } from './game/pair-game'
 
 export function MenuMascotSettingsPanel() {
   const t = useTranslations('editor.menu.mascot')
@@ -37,6 +38,10 @@ export function MenuMascotSettingsPanel() {
       </div>
       <div className="border-t border-[#DFD3BE] bg-white/35 px-4 py-3 text-center text-xs leading-5">{t('previewHint')}</div>
     </div>
+
+    {settings.enabled && <div className="mt-5">
+      <MascotPairGame key={settings.characterId} settings={settings} playback={playback} onReaction={play} />
+    </div>}
 
     <fieldset className="mt-5">
       <legend className="mb-3 text-xs font-semibold">{t('tryMood')}</legend>

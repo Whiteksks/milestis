@@ -27,7 +27,7 @@ export async function publishMenuSnapshot(
   const assertProject = (project: FirebaseFirestore.DocumentData | undefined) => {
     if (!project) throw new MenuPublishError("NOT_FOUND", 404);
     if (project.ownerId !== uid) throw new MenuPublishError("FORBIDDEN", 403);
-    if (project.mode !== "menu" || project.status !== "active") throw new MenuPublishError("NOT_PUBLISHABLE", 409);
+    if (project.mode !== "menu" || !["active", "archived"].includes(project.status)) throw new MenuPublishError("NOT_PUBLISHABLE", 409);
     if (project.publishedSlug && project.publishedSlug !== slug) throw new MenuPublishError("SLUG_IMMUTABLE", 409);
   };
   const draft = await db.runTransaction(async (tx) => {
@@ -53,7 +53,7 @@ export async function publishMenuSnapshot(
       const version = (project!.publishVersion ?? 0) + 1;
       tx.set(slugRef, { projectId, ownerId: uid, mode: "menu", slug, updatedAt: FieldValue.serverTimestamp() });
       tx.set(publicRef, { ...snapshot, ownerId: uid, name: snapshot.content.sectionContent.venue.name, mode: "menu", slug, locale, isPublished: true, publishVersion: version, publishedAt: FieldValue.serverTimestamp() });
-      tx.update(projectRef, { isPublished: true, publishedSlug: slug, publishVersion: version, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), publishLockId: FieldValue.delete(), publishLockExpiresAtMillis: FieldValue.delete() });
+      tx.update(projectRef, { status: "archived", isPublished: true, publishedSlug: slug, publishVersion: version, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), publishLockId: FieldValue.delete(), publishLockExpiresAtMillis: FieldValue.delete() });
       if (!project!.publishedSlug) tx.update(db.collection("users").doc(uid), { "stats.projectsPublished": FieldValue.increment(1) });
     });
     committed = true;

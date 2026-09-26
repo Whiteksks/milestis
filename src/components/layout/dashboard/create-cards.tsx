@@ -4,34 +4,8 @@ import { ArrowRight, Loader2 } from "lucide-react"
 import { useCreateProject } from "@/hooks/useCreateProject"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import type { ProjectMode } from "@/lib/projects/project-type-config"
+import { PROJECT_CREATION_OPTIONS as cards } from "@/lib/projects/creation-options"
 
-const cards: {
-  mode: ProjectMode
-  number: string
-  titleKey: string
-  descriptionKey: string
-}[] = [
-  {
-    mode: "photobook",
-    number: "01",
-    titleKey: "createCards.photobook.title",
-    descriptionKey: "createCards.photobook.description",
-  },
-  {
-    mode: "portfolio",
-    number: "02",
-    titleKey: "createCards.portfolio.title",
-    descriptionKey: "createCards.portfolio.description",
-  },
-  {
-    mode: "event",
-    number: "03",
-    titleKey: "createCards.event.title",
-    descriptionKey: "createCards.event.description",
-  },
-  { mode: "menu", number: "04", titleKey: "createCards.menu.title", descriptionKey: "createCards.menu.description" },
-]
 
 export function CreateCards() {
   const { handleCreate, loadingMode } = useCreateProject()
@@ -40,7 +14,7 @@ export function CreateCards() {
   return (
     <div className="mb-8">
       {/* Grid container */}
-      <div className="grid border-y border-border sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid border-y border-border lg:grid-cols-3">
         {cards.map((card, index) => {
           const isLoading = loadingMode === card.mode
           const isDisabled = !!loadingMode
