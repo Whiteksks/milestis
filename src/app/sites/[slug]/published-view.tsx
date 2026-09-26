@@ -58,10 +58,13 @@ export function PublishedView({
   // a saved scroll offset on reload, which conflicts with motion/react's
   // initial animation states and causes a visible scroll-then-snap-to-top jump.
   useEffect(() => {
+    if (mode === 'menu') return
     if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+      const previous = history.scrollRestoration
       history.scrollRestoration = 'manual'
+      return () => { history.scrollRestoration = previous }
     }
-  }, [])
+  }, [mode])
   const deviceView = isMobile === true ? 'mobile' : 'desktop'
 
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {

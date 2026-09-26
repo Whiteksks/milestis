@@ -11,6 +11,7 @@ export type MobileEditorTab = 'sections' | 'appearance' | 'fonts' | 'mascot' | '
 
 /** Shared availability for panels owned by the restaurant menu mode. */
 export function isModeEditorTabAvailable(tab: DesktopEditorTab | MobileEditorTab, mode: string): boolean {
+  if (mode === 'menu' && (tab === 'background' || tab === 'appearance')) return false
   return (tab !== 'fonts' && tab !== 'mascot') || mode === 'menu'
 }
 

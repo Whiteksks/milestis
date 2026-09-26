@@ -23,6 +23,7 @@ interface Page {
 }
 
 const PUBLIC_PAGES: Page[] = [
+  { path: '/restaurants', changeFrequency: 'monthly', priority: 0.8 },
   // ── Core ──────────────────────────────────────────────────────────────────
   { path: '',          changeFrequency: 'weekly',  priority: 1.0 },
   { path: '/about',    changeFrequency: 'monthly', priority: 0.8 },

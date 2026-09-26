@@ -39,7 +39,7 @@ export function DesignCatalogModal() {
   const localizedPhotobookPresets = useLocalizedPhotobookPresets()
   const {
     isDesignModalOpen,
-    designModalSection,
+    designModalSection: requestedSection,
     setDesignModalSection,
     closeDesignModal,
     clearPreviewDecorations,
@@ -86,6 +86,7 @@ export function DesignCatalogModal() {
   // Event mode uses the same mood/texture background presets as photobook
   const isPhotobook = editorMode === 'photobook' || editorMode === 'event'
   const modeConfig = getModeUiConfig(editorMode, translate)
+  const designModalSection = editorMode === 'menu' && requestedSection === 'backgrounds' ? 'templates' : requestedSection
 
   useEffect(() => {
     if (isDesignModalOpen) {
@@ -178,7 +179,7 @@ export function DesignCatalogModal() {
           photobookTexture: preset.texture as PhotobookTexture,
         })
       }
-    } else {
+    } else if (editorMode !== 'menu') {
       const preset = BACKGROUND_PRESETS.find((p) => p.id === effectiveSelectedBackgroundId)
       if (preset) {
         updateThemeCustomization({
@@ -360,7 +361,7 @@ export function DesignCatalogModal() {
       { id: 'templates' as const, icon: LayoutTemplate, label: t('templates') },
       { id: 'themes' as const, icon: Palette, label: t('themes') },
       { id: 'backgrounds' as const, icon: modeConfig.backgroundCatalogMobileIcon, label: modeConfig.backgroundCatalogMobileLabel },
-    ]
+    ].filter((section) => editorMode !== 'menu' || section.id !== 'backgrounds')
 
     return (
       <Drawer
@@ -488,7 +489,7 @@ export function DesignCatalogModal() {
   const desktopSections: Array<{ id: DesignCatalogSection; icon: typeof LayoutTemplate; label: string }> = [
     { id: 'templates', icon: LayoutTemplate, label: t('templates') },
     { id: 'themes', icon: Palette, label: t('themes') },
-    { id: 'backgrounds', icon: modeConfig.backgroundIcon, label: modeConfig.backgroundLabel },
+    ...(editorMode === 'menu' ? [] : [{ id: 'backgrounds' as const, icon: modeConfig.backgroundIcon, label: modeConfig.backgroundLabel }]),
   ]
 
   return (

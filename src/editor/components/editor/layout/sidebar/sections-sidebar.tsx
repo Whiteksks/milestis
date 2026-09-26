@@ -56,7 +56,7 @@ export function SectionsSidebar({
   useEffect(() => {
     const cfg = getModeUiConfig(editorMode, translate)
     if ((cfg.hideSectionsTab && activeTab === 'sections') || (cfg.hideDecorations && activeTab === 'decorations') || !isModeEditorTabAvailable(activeTab, editorMode)) {
-      onTabChange('background')
+      onTabChange(editorMode === 'menu' ? 'sections' : 'background')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorMode])

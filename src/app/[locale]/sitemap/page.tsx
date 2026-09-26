@@ -64,6 +64,10 @@ interface SitemapSection {
 
 const SECTIONS: SitemapSection[] = [
   {
+    heading: { en: 'For restaurants', ru: 'Для ресторанов', kz: 'Мейрамханаларға' },
+    links: [{ href: '/restaurants', label: { en: 'Living menus', ru: 'Живое меню', kz: 'Жанды мәзір' } }],
+  },
+  {
     heading: { en: 'Product', ru: 'Продукт', kz: 'Өнім' },
     links: [
       { href: '/', label: { en: 'Home', ru: 'Главная', kz: 'Басты бет' } },

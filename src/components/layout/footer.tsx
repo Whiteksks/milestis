@@ -28,6 +28,7 @@ const FOOTER_LINKS = [
     id: "product",
     links: [
       { key: "features", href: "/features" },
+      { key: "restaurants", href: "/restaurants" },
       { key: "pricing", href: "/pricing" },
       { key: "releases", href: "/releases" },
     ],

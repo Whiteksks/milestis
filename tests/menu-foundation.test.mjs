@@ -38,6 +38,62 @@ const { nextMenuPagePath, suggestMenuPagePath } = loadSource('functions/src/doma
 const selection = loadSource('src/editor/modes/menu/guest-selection.ts')
 const mascotBehavior = loadSource('src/editor/modes/menu/mascot/behavior.ts')
 const pairGame = loadSource('src/editor/modes/menu/mascot/game/model.ts')
+const { createMenuGuestSession } = loadSource('src/editor/modes/menu/guest-session-store.ts')
+const { isModeEditorTabAvailable } = loadSource('src/editor/lib/config/editor-tabs.ts')
+
+test('menu hides background controls while retaining fonts, mascot and other modes effects', () => {
+  for (const tab of ['background', 'appearance']) {
+    assert.equal(isModeEditorTabAvailable(tab, 'menu'), false)
+    for (const mode of ['portfolio', 'photobook', 'event']) assert.equal(isModeEditorTabAvailable(tab, mode), true)
+  }
+  for (const tab of ['sections', 'fonts', 'mascot', 'design']) assert.equal(isModeEditorTabAvailable(tab, 'menu'), true)
+})
+
+test('menu session retains selection and game across pages and isolates restaurants', () => {
+  const session = createMenuGuestSession()
+  const deck = ['cherry', 'cookie', 'iceCream', 'cherry', 'cookie', 'iceCream']
+  session.getState().initialize('cafe-one')
+  session.getState().changeQuantity('tea', 1)
+  session.getState().changeQuantity('tea', 1)
+  session.getState().dispatchGame({ type: 'start', deck })
+  session.getState().dispatchGame({ type: 'flip', index: 0 })
+  session.getState().dispatchGame({ type: 'flip', index: 3 })
+  const beforeNavigation = session.getState()
+  session.getState().initialize('cafe-one')
+  assert.equal(session.getState(), beforeNavigation)
+  assert.equal(session.getState().selection.tea, 2)
+  assert.equal(session.getState().game.interest, 34)
+  assert.deepEqual(session.getState().game.matched, [0, 3])
+  const anotherVisitor = createMenuGuestSession()
+  assert.deepEqual(anotherVisitor.getState().selection, {})
+  assert.equal(anotherVisitor.getState().game.interest, 0)
+  session.getState().initialize('cafe-two')
+  assert.deepEqual(session.getState().selection, {})
+  assert.equal(session.getState().game.interest, 0)
+})
+
+test('menu session restores saved selection once and survives unavailable storage', () => {
+  const previousWindow = globalThis.window
+  const writes = []
+  globalThis.window = { localStorage: { getItem: () => '{"tea":2}', setItem: (...args) => writes.push(args) } }
+  try {
+    const session = createMenuGuestSession()
+    session.getState().initialize('cafe')
+    assert.equal(session.getState().selection.tea, 2)
+    session.getState().changeQuantity('tea', 1)
+    assert.deepEqual(writes.at(-1), ['milestis:menu-selection:cafe', '{"tea":3}'])
+    session.getState().initialize('cafe')
+    assert.equal(session.getState().selection.tea, 3)
+    globalThis.window.localStorage.getItem = () => { throw new Error('Storage denied') }
+    globalThis.window.localStorage.setItem = () => { throw new Error('Storage denied') }
+    session.getState().initialize('other')
+    session.getState().changeQuantity('cake', 1)
+    assert.deepEqual(session.getState().selection, { cake: 1 })
+  } finally {
+    if (previousWindow === undefined) delete globalThis.window
+    else globalThis.window = previousWindow
+  }
+})
 
 test('mascot game rewards each pair once, rejects invalid flips and preserves interest on replay', () => {
   const { INITIAL_GAME, pairGameReducer: reduce } = pairGame
@@ -606,7 +662,7 @@ test('page navigation renders public paths and uses buttons inside the editor pr
   const render = (extra = {}) => renderToStaticMarkup(createElement(NextIntlClientProvider, { locale: 'en', messages, timeZone: 'UTC' }, createElement(MenuClassic, { ...props, ...extra })))
   const html = render()
   assert.match(html, /href="\/"/)
-  assert.match(html, /href="\/drinks" aria-current="page"/)
+  assert.match(html, /<a\b(?=[^>]*href="\/drinks")(?=[^>]*aria-current="page")[^>]*>/)
   assert.match(html, /The menu is coming soon/)
   assert.doesNotMatch(html, /Toast/)
   const preview = render({ onPageChange: () => {} })

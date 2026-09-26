@@ -37,6 +37,7 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['*.milestis.site'],
   reactStrictMode: false,
   reactCompiler: true,
   typescript: { ignoreBuildErrors: false },

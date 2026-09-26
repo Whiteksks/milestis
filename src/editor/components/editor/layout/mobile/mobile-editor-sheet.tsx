@@ -375,7 +375,7 @@ export function MobileEditorSheet({
   useEffect(() => {
     const hideSections = MODE_REGISTRY[editorMode]?.uiConfig.hideSectionsTab ?? false
     if ((hideSections && activeTab === 'sections') || !isModeEditorTabAvailable(activeTab, editorMode)) {
-      onTabChange('appearance')
+      onTabChange(editorMode === 'menu' ? 'sections' : 'appearance')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorMode])

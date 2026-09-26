@@ -1,0 +1,21 @@
+{
+  "Footer": { "links": { "restaurants": "Living menus" } },
+  "restaurants": {
+    "meta": { "title": "Restaurant menus with personality", "description": "A QR menu with your restaurant’s personality: five designs, animated mascots, a mini game and an easy way to choose dishes. Create yours with Milestis." },
+    "hero": { "eyebrow": "Milestis / For cafés & restaurants", "title": "A menu with", "accent": "a little character.", "description": "Show off your dishes, introduce a tiny host and make choosing dinner a lovely part of the evening.", "cta": "Create your menu", "explore": "Explore the styles", "audience": "For cosy cafés, lively bistros and restaurants with a taste of their own." },
+    "studio": { "sticker": "Yes, you can play with me!", "label": "Your menu’s little host", "back": "Back to characters", "choose": "Choose a character", "treat": "Give a treat", "play": "Play", "caption": "Try the buttons. This is a live demo." },
+    "strip": { "design": "5 designs", "character": "3 characters", "qr": "Open with a QR code", "live": "New dishes, same link" },
+    "styles": { "eyebrow": "The look", "title": "Your taste. Your menu.", "description": "Quiet elegance or a bold statement? Pick a starting point, choose colours and fonts, and add photos of your dishes." },
+    "templates": { "menu-classic": "Warm, understated and timeless.", "menu-bistro": "Expressive bistro typography.", "menu-picnic": "Easygoing weekend energy.", "menu-gallery": "Space to savour every detail.", "menu-pulse": "Bold accents and plenty of energy." },
+    "features": {
+      "eyebrow": "More than a pretty cover", "title": "Less explaining. More exploring.", "description": "Guests explore your food at their own pace. You update the menu whenever your restaurant needs it.",
+      "qr": { "title": "Scan. Open. Choose.", "description": "Your menu opens in a phone browser. Share a link or download a QR code for the table. No app required." },
+      "selection": { "title": "“This one. And that one.”", "description": "Guests build a list, adjust quantities and see the total. When they’re ready, they can show their selection to the waiter." },
+      "updates": { "title": "New dish? On the menu.", "description": "Change a price, add a seasonal special or hide a dish. Select “Update menu” and keep the same address and QR code." },
+      "note": "Give breakfast, drinks and dinner their own pages. Guests switch between them without a full page reload." },
+    "character": { "title": "A tiny host. A reason to smile.", "description": "Bun, Mochi and Pepper greet guests and react to their choices. While waiting, guests can match treats in a mini game and raise their character’s interest. Prefer a quieter menu? You can turn the mascot off.", "link": "Meet your little host" },
+    "steps": { "eyebrow": "From idea to table", "title": "Your menu starts here.", "create": { "title": "Choose Menu mode", "description": "Create a project in your dashboard and find a design that feels like your restaurant." }, "fill": { "title": "Bring your dishes together", "description": "Add categories, dishes, prices and photos. Mark the dishes you recommend trying." }, "share": { "title": "Publish and welcome your guests", "description": "Choose an address, get your QR code and place it on your tables. Edit your published menu from Archive." } },
+    "faq": { "title": "A few more details", "app": { "question": "Do guests need to install anything?", "answer": "No. They open the menu in a browser using a link or QR code. Browsing, choosing dishes and playing do not require an account." }, "qr": { "question": "Do I need a new QR code after every update?", "answer": "No. Update your existing project and its address stays the same. Use the menu’s home page for the QR code on your tables." }, "order": { "question": "Are selections sent straight to the kitchen?", "answer": "No. For now, it’s a handy list with quantities and a total that guests can show to a waiter. Sending orders to the kitchen and taking payments are not included." } },
+    "end": { "eyebrow": "Nice to meet your menu", "title": "Make your menu memorable.", "description": "Your dishes. Your personality. We’ve made a place for your guests to discover both." }
+  }
+}

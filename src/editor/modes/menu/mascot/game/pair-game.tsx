@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useReducer } from 'react'
+import { useEffect } from 'react'
+import { useStore } from 'zustand'
+import { useMenuGuestSession } from '../../guest-session'
 import { Cherry, Cookie, IceCreamBowl, Sparkles, Heart, RotateCcw, Gamepad2, Check } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { MenuMascot } from '../mascot'
 import type { MascotMood, MascotPlayback, MenuMascotSettings } from '../types'
-import { INITIAL_GAME, isMismatch, pairGameReducer, shuffledTreats } from './model'
+import { isMismatch, pairGameReducer, shuffledTreats } from './model'
 
 const ICONS = { cherry: Cherry, cookie: Cookie, iceCream: IceCreamBowl }
 
@@ -17,7 +19,9 @@ export function MascotPairGame({ settings, playback, onReaction }: {
   onReaction: (mood: MascotMood) => void
 }) {
   const t = useTranslations('editor.menu.mascot.game')
-  const [state, dispatch] = useReducer(pairGameReducer, INITIAL_GAME)
+  const store = useMenuGuestSession()
+  const state = useStore(store, (session) => session.game)
+  const dispatch = store.getState().dispatchGame
   const started = state.deck.length > 0
   const won = started && state.matched.length === state.deck.length
   const mismatch = isMismatch(state)
@@ -26,13 +30,14 @@ export function MascotPairGame({ settings, playback, onReaction }: {
     if (!mismatch) return
     const timer = window.setTimeout(() => dispatch({ type: 'conceal', turn: state.turn }), 1000)
     return () => window.clearTimeout(timer)
-  }, [mismatch, state.turn])
+  }, [mismatch, state.turn, dispatch])
 
   function flip(index: number) {
-    const next = pairGameReducer(state, { type: 'flip', index })
-    if (next === state) return
+    const current = store.getState().game
+    const next = pairGameReducer(current, { type: 'flip', index })
+    if (next === current) return
     dispatch({ type: 'flip', index })
-    if (next.matched.length > state.matched.length) onReaction('happy')
+    if (next.matched.length > current.matched.length) onReaction('happy')
     else if (isMismatch(next)) onReaction('sad')
     else onReaction('curious')
   }

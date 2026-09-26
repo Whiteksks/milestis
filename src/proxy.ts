@@ -221,5 +221,5 @@ export const config = {
   // Catch everything except Next.js internals and static assets.
   // The broader matcher lets us intercept bot probes with dotted extensions
   // (e.g. /wp-admin/setup.php) before Next.js attempts to render a page.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/|favicon.ico).*)'],
 };

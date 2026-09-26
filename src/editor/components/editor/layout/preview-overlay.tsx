@@ -9,11 +9,13 @@ import { useThemeStore } from '@/editor/lib/store/theme'
 import { useContentStore } from '@/editor/lib/store/content'
 import { PublishedView } from '@/app/sites/[slug]/published-view'
 import { useActiveMenuPage } from '@/editor/modes/menu/use-active-menu-page'
+import { MenuGuestSessionProvider } from '@/editor/modes/menu/guest-session'
 
 export function PreviewOverlay() {
   const isPreviewOpen = useUiStore((s) => s.isPreviewOpen)
   const setIsPreviewOpen = useUiStore((s) => s.setIsPreviewOpen)
   const editorMode = useUiStore((s) => s.editorMode)
+  const projectId = useUiStore((s) => s.projectId)
   const menuPage = useActiveMenuPage()
   const setMenuPage = useUiStore((s) => s.setActiveMenuPageId)
 
@@ -71,7 +73,7 @@ export function PreviewOverlay() {
 
   return (
     <div className="fixed inset-0 z-[200] overflow-y-auto bg-background" data-scroll-root>
-      <PublishedView
+      <MenuGuestSessionProvider key={projectId ?? 'preview'}><PublishedView
         pageId={editorMode === 'menu' ? menuPage.id : undefined}
         onPageChange={editorMode === 'menu' ? setMenuPage : undefined}
         mode={editorMode}
@@ -83,7 +85,7 @@ export function PreviewOverlay() {
         imageContent={imageContent}
         visibility={visibility}
         clickable={false}
-      />
+      /></MenuGuestSessionProvider>
 
       {/* Close button — floats above everything */}
       {/* On mobile: top-left so it doesn't overlap the burger menu in the template header */}

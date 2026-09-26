@@ -1,14 +1,23 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { useReducedMotion } from 'motion/react'
 import { useTranslations } from 'next-intl'
+import Link, { useLinkStatus } from 'next/link'
 import type { ThemeConfig } from '@/editor/lib/config/themes'
 import { cn } from '@/lib/utils'
 import type { MenuPage } from '../content-types'
 
 const hideScrollbar = 'no-scrollbar min-w-0 overflow-x-auto overscroll-x-contain motion-safe:scroll-smooth'
+
+function PageLinkLabel({ label }: { label: string }) {
+  const { pending } = useLinkStatus()
+  return <span className="inline-flex max-w-full items-center gap-2" aria-busy={pending}>
+    {pending && <Loader2 aria-hidden="true" className="size-3.5 shrink-0 motion-safe:animate-spin" />}
+    <span className="truncate">{label}</span>
+  </span>
+}
 
 export function MenuPageNavigation({ pages, homePageId, pageId, onPageChange, theme, variant = 'classic' }: {
   pages: MenuPage[]
@@ -79,7 +88,7 @@ export function MenuPageNavigation({ pages, homePageId, pageId, onPageChange, th
               onPageChange(page.id)
               event.currentTarget.closest('[data-scroll-root]')?.scrollTo({ top: 0 })
             }}>{label}</button>
-            : <a key={page.id} href={page.path} aria-current={page.id === pageId ? 'page' : undefined} className={className} title={label}>{label}</a>
+            : <Link key={page.id} href={page.path} prefetch={false} aria-current={page.id === pageId ? 'page' : undefined} className={className} title={label}><PageLinkLabel label={label} /></Link>
         })}
       </nav>
       {edges.overflow && <button type="button" aria-label={t('navigation.next')} disabled={!edges.right} onClick={() => scroll(1)} className={cn('hidden size-10 shrink-0 place-items-center rounded-xl transition-colors hover:opacity-70 focus-visible:outline-2 disabled:opacity-30 @md:grid', theme.mutedText)}><ChevronRight aria-hidden="true" className="size-4" /></button>}

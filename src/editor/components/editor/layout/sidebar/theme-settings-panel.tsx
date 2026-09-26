@@ -58,7 +58,6 @@ function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }:
 
 export function ThemeSettingsPanel() {
   const t = useTranslations('editor.controls.theme')
-  const menuAppearance = useTranslations('editor.menu.appearance')
   const translate = useTranslations()
   const {
     depthOptions,
@@ -80,8 +79,7 @@ export function ThemeSettingsPanel() {
   }))
 
   const editorMode = useUiSelector((state) => state.editorMode)
-  // Event and menu reuse the photographic mood/texture controls.
-  const isPhotobook = editorMode === 'photobook' || editorMode === 'event' || editorMode === 'menu'
+  const isPhotobook = editorMode === 'photobook' || editorMode === 'event'
   const modeConfig = getModeUiConfig(editorMode, translate)
 
   const {
@@ -95,6 +93,8 @@ export function ThemeSettingsPanel() {
   } = themeCustomizations
 
   const activeCount = modeConfig.getActiveEffectsCount(themeCustomizations)
+
+  if (editorMode === 'menu') return null
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -136,7 +136,7 @@ export function ThemeSettingsPanel() {
             <CollapsibleSection title={t('photobook.moodTitle')} icon={Sun}>
               <EffectCard
                 label={t('photobook.moodLabel')}
-                description={editorMode === 'menu' ? menuAppearance('moodDescription') : t('photobook.moodDescription')}
+                description={t('photobook.moodDescription')}
                 value={photobookMood}
                 options={photobookMoodOptions}
                 onChange={(v) => setMood(v as PhotobookMood)}
@@ -146,7 +146,7 @@ export function ThemeSettingsPanel() {
             <CollapsibleSection title={t('photobook.overlayTitle')} icon={Sparkles}>
               <EffectCard
                 label={t('photobook.overlayLabel')}
-                description={editorMode === 'menu' ? menuAppearance('textureDescription') : t('photobook.overlayDescription')}
+                description={t('photobook.overlayDescription')}
                 value={photobookTexture}
                 options={photobookTextureOptions}
                 onChange={(v) => setPhotobookTexture(v as PhotobookTexture)}

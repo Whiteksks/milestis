@@ -1,0 +1,22 @@
+.restaurant-page {
+  font-family: 'Menu Manrope', sans-serif;
+  color: #343d2d;
+  background: #faf6ed;
+  overflow-x: clip;
+  --restaurant-line: #d9ccba;
+}
+.restaurant-page .restaurant-display {
+  font-family: 'Menu Forum', Georgia, serif;
+  font-weight: 400;
+}
+.restaurant-page button:focus-visible,
+.restaurant-page a:focus-visible,
+.restaurant-page summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+.restaurant-page [id] { scroll-margin-top: 100px; }
+.restaurant-ticket {
+  background-image: radial-gradient(#c7b89f 1px, transparent 1px);
+  background-size: 12px 12px;
+}
