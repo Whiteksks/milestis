@@ -13,7 +13,7 @@ import { PublishProjectError } from '@/lib/projects/publish-project-api'
 import { normalizeSlug } from '@/lib/slug'
 import { buildPublishedMenuPageUrl } from '@/lib/slug/url'
 import { useUserStore } from '@/hooks/useUserStore'
-import { projectKeys } from '@/hooks/useProjectsQuery'
+import { cachePublishedProject } from '@/lib/projects/published-project-cache'
 import { usePublishSlug } from '@/hooks/usePublishSlug'
 import { PublishModalFrame } from './publish-modal-frame'
 import { PublishForm } from './publish-slug-form'
@@ -67,7 +67,7 @@ export function MenuPublishFlow({ projectId, initialSlug, onOpenChange, menuView
         useUiStore.getState().setIsPublished(true)
         useUiStore.getState().setProjectStatus('archived')
       }
-      if (uid) void queryClient.invalidateQueries({ queryKey: projectKeys.all(uid) })
+      if (uid) await cachePublishedProject(queryClient, uid, projectId, result.publishedSlug)
       setSuccess(true)
     } catch (cause) {
       const code = cause instanceof PublishProjectError ? cause.code : 'UNKNOWN'

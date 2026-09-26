@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Theme, TemplateId, ThemeCustomDecorations, DecorationAnimation, DepthEffect, RayEffect, TextureEffect, BackgroundLayersTheme, BackgroundScrollMode, PhotobookTexture, PhotobookMood } from '../types'
 
-export type MenuFontPair = 'signature' | 'editorial' | 'modern'
+export type MenuFontPair = 'signature' | 'editorial' | 'modern' | 'lora' | 'onest'
 
 export interface ThemeCustomizations {
   decorationAnimation?: DecorationAnimation

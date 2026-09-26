@@ -6,6 +6,7 @@ import path from 'node:path'
 import vm from 'node:vm'
 import ts from 'typescript'
 import { createStore } from 'zustand/vanilla'
+import { QueryClient } from '@tanstack/react-query'
 
 const root = path.resolve(import.meta.dirname, '..')
 const dependency = createRequire(import.meta.url)
@@ -38,6 +39,40 @@ function deferred() {
   return { promise, resolve, reject }
 }
 const tick = () => new Promise((resolve) => setImmediate(resolve))
+
+test('confirmed menu publication moves cached drafts to archive and cancels stale reads', async () => {
+  const projectKeys = {
+    all: (uid) => ['projects', uid],
+    active: (uid) => ['projects', uid, 'active'],
+    archived: (uid) => ['projects', uid, 'archived'],
+  }
+  const { cachePublishedProject } = loader({ '@/hooks/useProjectsQuery': { projectKeys } })('src/lib/projects/published-project-cache.ts')
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } })
+  const menu = { id: 'menu', mode: 'menu', name: 'Cafe', status: 'active', isPublished: false }
+  const other = { id: 'draft', status: 'active' }
+  client.setQueryData(projectKeys.active('owner'), [menu, other])
+  const stale = deferred()
+  const pending = client.fetchQuery({ queryKey: projectKeys.active('owner'), queryFn: () => stale.promise }).catch(() => {})
+  // A cancelled read must not put the newly published menu back into drafts.
+  const refresh = deferred()
+  let reads = 0
+  client.setQueryDefaults(projectKeys.archived('owner'), { queryFn: async () => { reads++; return refresh.promise } })
+  const publishing = cachePublishedProject(client, 'owner', 'menu', 'cafe')
+  await tick()
+  assert.deepEqual(client.getQueryData(projectKeys.active('owner')), [other])
+  const archived = client.getQueryData(projectKeys.archived('owner'))
+  assert.equal(archived[0].status, 'archived')
+  assert.equal(archived[0].publishedSlug, 'cafe')
+  assert.equal(archived[0].isPublished, true)
+  assert.equal(reads, 1)
+  // Refetches return current server data; repeat updates must not duplicate cards.
+  stale.resolve([other])
+  refresh.resolve(archived)
+  await Promise.all([pending, publishing])
+  await cachePublishedProject(client, 'owner', 'menu', 'cafe')
+  assert.equal(client.getQueryData(projectKeys.archived('owner')).length, 1)
+  client.clear()
+})
 
 function stores() {
   const content = createStore(() => ({ title: 'first' }))

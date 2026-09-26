@@ -77,6 +77,31 @@ test('GPT transport uses current dynamic schemas, handles reasoning output and k
   assert.equal(calls[0].text.format.name, 'same_section')
 })
 
+test('follow-up requests serialize assistant history as output text and preserve user photos', async (t) => {
+  const previousKey = process.env.OPENAI_API_KEY
+  process.env.OPENAI_API_KEY = 'test-key'
+  t.after(() => { if (previousKey === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = previousKey })
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    const { input } = JSON.parse(options.body)
+    assert.deepEqual(input, [
+      { role: 'user', content: [{ type: 'input_text', text: 'Create a menu' }] },
+      { role: 'assistant', content: [{ type: 'output_text', text: 'Menu created' }] },
+      { role: 'user', content: [{ type: 'input_text', text: 'Add this dish' }, { type: 'input_image', image_url: 'https://example.com/dish.jpg', detail: 'auto' }] },
+    ])
+    return Response.json({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: '{"name":"Updated menu"}' }] }] })
+  })
+  const { callNarrow } = load('src/lib/ai/server/openai.ts')
+  const result = await callNarrow({ cacheKey: 'followup', systemPrompt: '',
+    contents: [
+      { role: 'user', parts: [{ text: 'Create a menu' }] },
+      { role: 'assistant', parts: [{ text: 'Menu created' }] },
+      { role: 'user', parts: [{ text: 'Add this dish' }, { imageUrl: 'https://example.com/dish.jpg' }] },
+    ],
+    schema: { type: 'object', required: ['name'], properties: { name: { type: 'string' } } },
+  })
+  assert.equal(result.name, 'Updated menu')
+})
+
 test('incomplete, refused and invalid GPT responses never reach the editor', async (t) => {
   const previousKey = process.env.OPENAI_API_KEY
   process.env.OPENAI_API_KEY = 'test-key'

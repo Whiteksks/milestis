@@ -64,6 +64,8 @@ export function getMenuVisualStyle(theme: ThemeConfig): CSSProperties {
 }
 
 const FONT_CLASSES: Record<MenuFontPair, string> = {
+  lora: 'menu-font-lora',
+  onest: 'menu-font-onest',
   signature: 'menu-font-signature',
   editorial: 'menu-font-editorial',
   modern: 'menu-font-modern',

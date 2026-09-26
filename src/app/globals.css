@@ -48,6 +48,18 @@
 .menu-font-signature { font-family: 'Menu Manrope', system-ui, sans-serif; }
 .menu-font-editorial { font-family: 'Menu Manrope', system-ui, sans-serif; }
 .menu-font-modern { font-family: 'Menu Manrope', system-ui, sans-serif; }
+.menu-font-lora { font-family: 'Menu Manrope', system-ui, sans-serif; }
+.menu-font-onest { font-family: 'Menu Onest', system-ui, sans-serif; }
+
+.menu-font-lora :is(h1, h2, h3) {
+  font-family: 'Menu Lora', Georgia, serif;
+  font-weight: 500;
+}
+
+.menu-font-onest :is(h1, h2, h3) {
+  font-family: 'Menu Onest', system-ui, sans-serif;
+  font-weight: 600;
+}
 
 .menu-font-signature :is(h1, h2, h3) {
   font-family: 'Menu Forum', Georgia, serif;
@@ -66,7 +78,9 @@
 
 .menu-font-signature :is(button, input, textarea, select),
 .menu-font-editorial :is(button, input, textarea, select),
-.menu-font-modern :is(button, input, textarea, select) {
+.menu-font-modern :is(button, input, textarea, select),
+.menu-font-lora :is(button, input, textarea, select),
+.menu-font-onest :is(button, input, textarea, select) {
   font-family: inherit;
 }
 

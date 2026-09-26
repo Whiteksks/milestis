@@ -53,7 +53,9 @@
         "hint": "The font changes all menu text, including descriptions and buttons.",
         "signature": "Signature",
         "editorial": "Editorial",
-        "modern": "Modern"
+        "modern": "Modern",
+        "lora": "Lora — classic",
+        "onest": "Onest — minimal"
       },
       "venue": "Restaurant",
       "venueName": "Restaurant name",

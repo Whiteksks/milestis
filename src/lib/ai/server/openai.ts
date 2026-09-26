@@ -29,7 +29,7 @@ export async function callNarrow<T = Record<string, unknown>>(options: NarrowCal
       input: options.contents.map(({ role, parts }) => ({
         role,
         content: parts.map((part) => 'text' in part
-          ? { type: 'input_text', text: part.text }
+          ? { type: role === 'assistant' ? 'output_text' : 'input_text', text: part.text }
           : { type: 'input_image', image_url: part.imageUrl, detail: 'auto' }),
       })),
       text: { format: { type: 'json_schema', name: options.cacheKey.replace(/[^a-zA-Z0-9_-]/g, '_'), strict: true, schema: strictSchema(options.schema) } },

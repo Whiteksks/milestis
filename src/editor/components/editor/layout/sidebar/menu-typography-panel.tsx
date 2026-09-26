@@ -7,7 +7,7 @@ import type { MenuFontPair } from '@/editor/lib/store/theme'
 import { menuFontClassName } from '@/editor/modes/menu/visual-style'
 import { cn } from '@/lib/utils'
 
-const FONT_PAIRS: MenuFontPair[] = ['signature', 'editorial', 'modern']
+const FONT_PAIRS: MenuFontPair[] = ['signature', 'editorial', 'modern', 'lora', 'onest']
 
 export function MenuTypographyPanel() {
   const t = useTranslations('editor.menu.typography')
