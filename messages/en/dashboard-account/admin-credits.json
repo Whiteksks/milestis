@@ -1,0 +1,39 @@
+{
+  "adminCredits": {
+    "title": "Credit administration",
+    "description": "Compensations and bonuses for users. Every grant is recorded in their history.",
+    "loading": "Checking access…",
+    "noAccess": "This section requires credit administrator access.",
+    "refreshAccess": "Refresh access",
+    "identifier": "User email or UID",
+    "search": "Find user",
+    "balance": "Balance: {amount} credits",
+    "available": "Available to spend: {amount} credits",
+    "amount": "Bonus credits",
+    "reason": "Reason for this grant",
+    "permanent": "Bonus credits have no expiry. Each grant must be between 1 and 100,000 credits.",
+    "review": "Review grant",
+    "confirmTitle": "Confirm credit grant",
+    "confirm": "Grant credits",
+    "credits": "credits",
+    "back": "Edit",
+    "processing": "Granting…",
+    "success": "Granted {amount} bonus credits",
+    "receipt": "Transaction: {id}",
+    "retryTitle": "Check grant result",
+    "retryHint": "The previous request has no confirmed response. Retry this same request to complete it without creating a duplicate grant.",
+    "retry": "Check and complete",
+    "errors": {
+      "AUTH_REQUIRED": "Sign in to your administrator account.",
+      "CREDITS_ADMIN_REQUIRED": "You do not have permission to grant credits.",
+      "INVALID_ACCOUNT": "Enter a valid email or UID.",
+      "ACCOUNT_NOT_FOUND": "The user or their profile was not found.",
+      "ACCOUNT_DISABLED": "This user account is disabled.",
+      "INVALID_COMPENSATION": "Enter a whole number from 1 to 100,000 and a reason of 3 to 500 characters.",
+      "BALANCE_INCONSISTENT": "The balance does not match its credit records. This account needs a separate reconciliation before grants can continue.",
+      "REQUEST_CONFLICT": "This request ID belongs to a different operation. Check the history before making a new grant.",
+      "STORAGE_UNAVAILABLE": "Allow storage for this site so an interrupted request can be retried safely.",
+      "UNKNOWN": "Could not confirm the result. If the grant was submitted, retry the same request using “Check and complete”."
+    }
+  }
+}

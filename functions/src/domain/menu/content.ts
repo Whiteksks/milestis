@@ -124,3 +124,11 @@ export function publicMenuContent(content: MenuContent): MenuContent {
       .map((dish) => ({ ...dish, name: dish.name.trim(), description: dish.description.trim() })),
   };
 }
+
+/** One public dish with a photo is one slot, regardless of its occurrences on pages. */
+export function countMenuDishPhotos(content: MenuContent, images: { dishes?: Record<string, unknown> }): number {
+  return publicMenuContent(content).dishes.filter((dish) => {
+    const image = images.dishes?.[dish.id] as { asset?: { src?: unknown } } | undefined;
+    return typeof image?.asset?.src === "string" && image.asset.src.trim().length > 0;
+  }).length;
+}

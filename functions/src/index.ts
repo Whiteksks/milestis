@@ -19,8 +19,13 @@ import {publishMenu} from "./projects/publishMenu";
 import {analyzeProject} from "./projects/publish/analyzeProject";
 import {analyzeRepublish} from "./projects/publish/analyzeRepublish";
 import {webhookPolar} from "./transactions/triggers/polar";
+import {expireCreditsCron} from "./transactions/triggers/expireCreditsCron";
+import {menuBilling} from "./projects/menuBilling";
+import {renewMenuBillingCron} from "./projects/menu/billing/renewal";
+import {adminCredits} from "./transactions/admin";
 
 export {
+  adminCredits,
 	createUser,
 	exportUserData,
 	exportProjectContent,
@@ -39,4 +44,7 @@ export {
 	analyzeProject,
 	analyzeRepublish,
 	webhookPolar,
+	expireCreditsCron,
+	menuBilling,
+	renewMenuBillingCron,
 };

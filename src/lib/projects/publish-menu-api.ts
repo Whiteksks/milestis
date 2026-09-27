@@ -3,13 +3,14 @@ import { auth, db } from '../firebase/firebase'
 import { PublishProjectError } from './publish-project-api'
 import type { PageLink } from '../../../functions/src/domain/pages'
 import { readPublishedMenuLinks } from './published-menu'
+import type { MenuBilling } from '../../../functions/src/projects/menu/billing/model'
 
 export async function getPublishedMenuLinks(projectId: string): Promise<PageLink[]> {
   const snapshot = await getDocFromServer(doc(db, 'published_projects', projectId))
   return readPublishedMenuLinks(snapshot.data())
 }
 
-export async function publishMenu(projectId: string, slug: string, locale: string): Promise<{ ok: true; publishedSlug: string; publishedPages: PageLink[] }> {
+export async function publishMenu(projectId: string, slug: string, locale: string, quoteId: string): Promise<{ ok: true; publishedSlug: string; publishedPages: PageLink[]; billing: MenuBilling }> {
   const user = auth.currentUser
   if (!user) throw new PublishProjectError('UNAUTHORIZED', 'Not authenticated')
   const firebaseProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
@@ -20,7 +21,7 @@ export async function publishMenu(projectId: string, slug: string, locale: strin
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ projectId, slug, locale }),
+    body: JSON.stringify({ projectId, slug, locale, quoteId }),
   })
   const data = await response.json()
   if (!response.ok) throw new PublishProjectError(data.error ?? 'UNKNOWN', 'Menu publication failed')

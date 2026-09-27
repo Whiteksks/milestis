@@ -20,7 +20,10 @@ function formatCurrency(locale: string, amountMinor: number, currency: string) {
   }).format(amountMinor / 100)
 }
 
-function getCreditLabel(t: ReturnType<typeof useTranslations>, type: string, direction: "in" | "out") {
+function getCreditLabel(t: ReturnType<typeof useTranslations>, type: string, direction: "in" | "out", meta?: Record<string, unknown>) {
+  if (type === "admin_adjustment" && direction === "in" && meta?.reason === "support_compensation") return t("types.compensation")
+  if (type === "spend" && meta?.reason === "menu_monthly") return t("types.menuMonthly")
+  if (type === "spend" && meta?.reason === "menu_upgrade") return t("types.menuUpgrade")
   switch (type) {
     case "grant": return t("types.creditGrant")
     case "spend": return t("types.creditSpend")
@@ -134,7 +137,7 @@ export function BillingHistory({
               <div key={item.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between hover:bg-muted/20 transition-colors rounded-xl px-3 -mx-3">
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium text-sm text-foreground/90">{getCreditLabel(t, item.type, item.direction)}</span>
+                    <span className="font-medium text-sm text-foreground/90">{getCreditLabel(t, item.type, item.direction, item.meta)}</span>
                     <Badge variant={isIn ? "secondary" : "outline"} className="rounded-full text-[11px] font-normal px-2 py-0">
                       {isIn ? t("direction.in") : t("direction.out")}
                     </Badge>

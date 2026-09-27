@@ -40,7 +40,7 @@ export interface PublishModeConfig {
 // ─── Per-mode config ──────────────────────────────────────────────────────────
 
 export const PUBLISH_MODE_CONFIG = {
-	// Menu foundation is draft-only until its recurring billing is implemented.
+	// Menu uses its own recurring package billing during publishMenu.
 	menu: { pricing: { strategy: "disabled" }, republishCreditCost: 0, requiresAccessToken: false },
 	portfolio: {
 		pricing: {

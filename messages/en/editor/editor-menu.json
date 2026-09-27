@@ -13,9 +13,18 @@
         "hint": "Processing starts when you press the button. The original stays in your media library.",
         "styleLabel": "Photo style",
         "styles": {
-          "eveningWood": { "name": "Dark wood", "description": "A wooden board replaces the plate, with warm evening restaurant lighting. Soups use a ceramic bowl." },
-          "daylightCeramic": { "name": "Light ceramic", "description": "Ivory ceramic tableware, a limestone table and soft natural daylight." },
-          "darkSlate": { "name": "Dark slate", "description": "A slate serving board, dark stone and soft side lighting. Soups use dark ceramic tableware." }
+          "eveningWood": {
+            "name": "Dark wood",
+            "description": "A wooden board replaces the plate, with warm evening restaurant lighting. Soups use a ceramic bowl."
+          },
+          "daylightCeramic": {
+            "name": "Light ceramic",
+            "description": "Ivory ceramic tableware, a limestone table and soft natural daylight."
+          },
+          "darkSlate": {
+            "name": "Dark slate",
+            "description": "A slate serving board, dark stone and soft side lighting. Soups use dark ceramic tableware."
+          }
         },
         "before": "Before",
         "after": "After",
@@ -159,7 +168,10 @@
           "UNKNOWN": "Could not save the page changes. Please try again."
         }
       },
-      "navigation": { "previous": "Scroll pages left", "next": "Scroll pages right" },
+      "navigation": {
+        "previous": "Scroll pages left",
+        "next": "Scroll pages right"
+      },
       "mascot": {
         "game": {
           "eyebrow": "Time to play",
@@ -176,7 +188,11 @@
           "hiddenCard": "Card {number}: reveal",
           "revealedCard": "Card {number}: {treat}",
           "matchedCard": "Card {number}: {treat}, pair found",
-          "treats": { "cherry": "cherry", "cookie": "cookie", "iceCream": "ice cream" }
+          "treats": {
+            "cherry": "cherry",
+            "cookie": "cookie",
+            "iceCream": "ice cream"
+          }
         },
         "title": "Tamagotchi",
         "hint": "A little companion that brings your menu to life and reacts to guest choices.",
@@ -188,11 +204,26 @@
         "animations": "Animations",
         "animationsHint": "System reduced motion shows expressions without movement.",
         "choose": "Character",
-        "moods": {"idle":"Calm","welcome":"Welcome","happy":"Happy","sad":"Sad","curious":"Curious"},
+        "moods": {
+          "idle": "Calm",
+          "welcome": "Welcome",
+          "happy": "Happy",
+          "sad": "Sad",
+          "curious": "Curious"
+        },
         "characters": {
-          "bun": {"name":"Bun","description":"A warm personality in a little chef’s hat."},
-          "mochi": {"name":"Mochi","description":"A shy little sweet with leafy ears and a soft bounce."},
-          "pepper": {"name":"Pepper","description":"A playful dancer with a spark and a big smile."}
+          "bun": {
+            "name": "Bun",
+            "description": "A warm personality in a little chef’s hat."
+          },
+          "mochi": {
+            "name": "Mochi",
+            "description": "A shy little sweet with leafy ears and a soft bounce."
+          },
+          "pepper": {
+            "name": "Pepper",
+            "description": "A playful dancer with a spark and a big smile."
+          }
         },
         "messages": {
           "idle": {
@@ -263,7 +294,7 @@
         "homeQrHint": "This QR opens the home page. Updating prices, dishes or photos keeps it valid — there is no need to print it again.",
         "pageQrHint": "This QR opens a specific page. Changing its address or deleting it and updating the publication will stop the old QR from opening that page.",
         "updateHint": "Your changes will appear at the same address. The home page QR stays the same — no need to replace printed materials.",
-        "availabilityHint": "The QR opens your menu while the project is published. Unpublishing temporarily disables access.",
+        "availabilityHint": "The menu is available while published and its service period is paid. The QR stays the same when access resumes.",
         "qrUnavailable": "The published menu is unavailable. Reload the editor and check its publication status.",
         "errors": {
           "INVALID_SLUG": "Use 3–24 Latin letters, numbers and hyphens, and choose an address that is not reserved.",
@@ -282,13 +313,52 @@
           "NOT_FOUND": "Project not found.",
           "CONFIG_ERROR": "Menu publication is not yet configured on the server.",
           "COPY_FAILED": "Could not copy the link. Copy the address manually.",
-          "UNKNOWN": "Could not publish the menu. Please try again."
+          "UNKNOWN": "Could not publish the menu. Please try again.",
+          "INVALID_QUOTE": "Review the price before publishing.",
+          "BALANCE_INCONSISTENT": "Your credit balance could not be verified. Contact support to check your credit history. No credits were charged; adding credits alone will not resolve this issue.",
+          "QUOTE_EXPIRED": "This price review expired. Refresh it and confirm payment.",
+          "BILLING_STATE_CHANGED": "Billing changed in another tab or during renewal. Refresh the price.",
+          "INSUFFICIENT_CREDITS": "Not enough available credits. Top up and refresh the price.",
+          "PHOTO_LIMIT_EXCEEDED": "Packages support up to 200 dishes with photos. Remove extra photos or choose a suitable package.",
+          "INVALID_PLAN": "Choose a menu package.",
+          "PAYMENT_REQUIRED": "Pay for a new period through publication before enabling auto-renewal."
         },
         "fixedAddress": "This address is reserved for this menu.",
         "sharePage": "Page to share",
         "loadingPages": "Loading published pages…",
         "pagesError": "Could not load published page addresses.",
         "retry": "Retry"
+      },
+      "billing": {
+        "usage": "Dishes with photos: {count} of {limit} in your current package.",
+        "title": "Menu billing",
+        "review": "Review price",
+        "photos": "Dishes with photos: {count}",
+        "countHint": "Visible dishes with photos across all pages count once per dish. Logos, covers and library images are included at no extra cost.",
+        "limit": "Up to {count} photos",
+        "monthly": "{amount} credits / month",
+        "credits": "{amount} credits",
+        "chargeNow": "Charge now",
+        "available": "Available credits",
+        "next": "Next charge: {amount} credits on {date} (UTC).",
+        "paidUntil": "Paid until {date} (UTC).",
+        "active": "Paid",
+        "grace": "Payment pending",
+        "inactive": "Access paused",
+        "canceled": "Auto-renewal is off. Your menu stays available until the paid period ends.",
+        "cancelRenewal": "Turn off auto-renewal",
+        "resumeRenewal": "Turn on auto-renewal",
+        "upgradeHint": "The full package price difference is charged regardless of days remaining. Your renewal date stays the same.",
+        "downgradeHint": "The smaller package starts on {date}. The current period is not refunded.",
+        "insufficient": "You need {amount} more credits. Refresh the price after topping up.",
+        "topup": "Buy credits",
+        "consent": "I confirm a charge of {amount} credits now and automatic renewal at {monthly} credits per month. I can turn off auto-renewal. If credits run out, I have 3 days to top up before access is paused.",
+        "consentOnce": "I confirm a charge of {amount} credits now. Auto-renewal stays off.",
+        "refresh": "Refresh price",
+        "processing": "Checking and saving…",
+        "pay": "Pay {amount} and publish",
+        "manage": "Manage billing and package",
+        "statusError": "Could not load billing status."
       }
     }
   },

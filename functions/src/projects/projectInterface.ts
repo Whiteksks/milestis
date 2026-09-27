@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
+import type { MenuBilling } from "./menu/billing/model";
 
 export type ProjectMode = "portfolio" | "photobook" | "event" | "menu";
 export type ProjectStatus = "active" | "archived" | "deleted";
@@ -57,6 +58,7 @@ export interface PublishedProjectData {
  * Firestore path: projects/{projectId}
  */
 export interface ProjectMetadata {
+  menuBilling?: MenuBilling;
   id: string;
   ownerId: string;
   name: string;

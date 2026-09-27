@@ -29,6 +29,11 @@ function load(file) {
     if (id === './i18n/routing') return { routing: { defaultLocale: 'en' } }
     if (id === 'firebase-admin/firestore') return { FieldValue: field }
     if (id === 'firebase-admin/storage') return { getStorage: () => ({ bucket: () => storageBucket }) }
+    // Publication lifecycle tests isolate payment; menu-billing.test.mjs exercises the real ledger and quote together.
+    if (id === './billing/service') return {
+      MENU_QUOTES: 'menuBillingQuotes', validateMenuQuote: () => ({ billing: paidBilling() }),
+      payMenuProposal: async (_tx, _projectId, _project, proposal) => proposal.billing,
+    }
     if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
     return dependency(id)
   }
@@ -36,7 +41,17 @@ function load(file) {
   return sourceModule.exports
 }
 const { prepareMenuSnapshot } = load('functions/src/projects/menu/snapshot.ts')
-const { publishMenuSnapshot, validateMenuPublishInput } = load('functions/src/projects/menu/publish.ts')
+const { publishMenuSnapshot: publishWithQuote, validateMenuPublishInput } = load('functions/src/projects/menu/publish.ts')
+function paidBilling() {
+  const { proposeMenuBilling } = load('functions/src/projects/menu/billing/model.ts')
+  return { ...proposeMenuBilling(null, 'menu-50', 0, Date.now()).billing, lastTransactionId: 'test-payment' }
+}
+let quoteSequence = 0
+function publishMenuSnapshot(db, uid, input, copyMedia) {
+  const quoteId = `quote-${++quoteSequence}`
+  db.seedQuote(quoteId, uid, input.projectId)
+  return publishWithQuote(db, uid, { ...input, quoteId }, copyMedia)
+}
 const { copyMenuMedia } = load('functions/src/projects/menu/media.ts')
 const { buildPublishedProjectUrl, buildPublishedMenuPageUrl } = load('src/lib/slug/url.ts')
 const { resolvePublishedMenuPage, readPublishedMenuLinks, publishedMenuMetadata } = load('src/lib/projects/published-menu.ts')
@@ -98,6 +113,7 @@ function database(project = {}) {
     return { exists: records.has(reference.path), data: () => structuredClone(records.get(reference.path)), updateTime: version ? { value: version, isEqual: (other) => other.value === version } : undefined }
   }
   const db = {
+    seedQuote: (id, uid, projectId) => put(`menuBillingQuotes/${id}`, { ownerId: uid, projectId }),
     collection: (name) => ({ doc: (id) => ref(`${name}/${id}`) }),
     runTransaction: async (callback) => {
       const writes = []
@@ -121,7 +137,7 @@ function database(project = {}) {
   }
   return { db, records, put }
 }
-const input = { projectId: 'p1', slug: 'my-cafe', locale: 'ru' }
+const input = { projectId: 'p1', slug: 'my-cafe', locale: 'ru', quoteId: 'quote' }
 const identity = async (snapshot) => snapshot
 const errorCode = (code) => (error) => error.code === code
 
@@ -396,7 +412,8 @@ test('a successful commit does not perform a fallible cleanup transaction afterw
     if (++transactions > 2) throw new Error('Firestore unavailable after commit')
     return original(callback)
   }
-  assert.deepEqual(await publishMenuSnapshot(db, 'owner', input, identity), { ok: true, publishedSlug: 'my-cafe', publishedPages: [{ id: 'home', name: '', path: '/' }] })
+  const result = await publishMenuSnapshot(db, 'owner', input, identity)
+  assert.deepEqual({ ...result, billing: undefined }, { ok: true, publishedSlug: 'my-cafe', publishedPages: [{ id: 'home', name: '', path: '/' }], billing: undefined })
   assert.equal(records.get('projects/p1').publishLockId, undefined)
 })
 

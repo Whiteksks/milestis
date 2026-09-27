@@ -3,6 +3,7 @@
 import { User, CreditCard, Palette, Shield, Building, Archive, Gift } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { useCreditsAdmin } from "@/hooks/useCreditsAdmin"
 
 const settingsMenu = [
   { id: "profile", labelKey: "account.menu.profile", navigate: "/account/profile", icon: User },
@@ -18,6 +19,7 @@ export function SettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
   const t = useTranslations()
+  const creditsAdmin = useCreditsAdmin()
   const locale = pathname.split("/").filter(Boolean)[0] ?? ""
 
   const getIsActive = (itemPath: string) => {
@@ -32,7 +34,7 @@ export function SettingsMenu() {
     <div className="h-fit w-full md:w-56 shrink-0">
       <nav className="sticky top-24 rounded-2xl bg-card/60 p-2 backdrop-blur-sm border border-border/30">
         <div className="space-y-1">
-          {settingsMenu.map((item) => {
+          {[...settingsMenu, ...(creditsAdmin.data ? [{ id: 'admin-credits', labelKey: 'adminCredits.title', navigate: '/account/admin-credits', icon: Shield }] : [])].map((item) => {
             const Icon = item.icon
             const isActive = getIsActive(item.navigate)
             

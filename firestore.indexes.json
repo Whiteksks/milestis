@@ -4,6 +4,14 @@
       "collectionGroup": "projects",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "menuBilling.autoRenew", "order": "ASCENDING" },
+        { "fieldPath": "menuBilling.nextAttemptAtMillis", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "ownerId", "order": "ASCENDING" },
         { "fieldPath": "updatedAt", "order": "DESCENDING" }
       ]
@@ -51,11 +59,10 @@
     },
     {
       "collectionGroup": "creditLots",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "bucket", "order": "ASCENDING" },
         { "fieldPath": "expiresAtMillis", "order": "ASCENDING" },
-        { "fieldPath": "createdAtMillis", "order": "ASCENDING" }
+        { "fieldPath": "remainingAmount", "order": "ASCENDING" }
       ]
     },
     {
@@ -67,5 +74,7 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    { "collectionGroup": "menuBillingQuotes", "fieldPath": "deleteAt", "ttl": true, "indexes": [] }
+  ]
 }

@@ -11,6 +11,7 @@
     "balanceAfter": "{total} left",
     "noDate": "—",
     "types": {
+      "compensation": "Compensation: bonus credits",
       "creditGrant": "Granted",
       "creditSpend": "Credits spent",
       "creditExpire": "Expired",
@@ -20,7 +21,9 @@
       "buyCredits": "Bought Credits",
       "subscriptionPayment": "Subscription Renewal",
       "refund": "Refund",
-      "invoice": "Invoice Payment"
+      "invoice": "Invoice Payment",
+      "menuMonthly": "Monthly menu payment",
+      "menuUpgrade": "Menu package upgrade"
     },
     "direction": {
       "in": "Received",
@@ -145,7 +148,6 @@
       "buyingButton": "Redirecting to checkout…",
       "error": "Failed to start purchase. Please try again."
     },
-    
     "statuses": {
       "free": "Free",
       "active": "Active",

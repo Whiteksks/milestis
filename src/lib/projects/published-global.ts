@@ -1,6 +1,7 @@
 import type { Firestore } from 'firebase-admin/firestore'
 import { getSlugReservationDocId } from '../slug/reservation'
 import { PUBLISHED_PROJECT_SLUGS_COLLECTION } from '../slug/constants'
+import { hasMenuAccess } from '../../../functions/src/projects/menu/billing/model'
 
 /** A subdomain identifies a reservation; the published document defines its mode. */
 export async function getPublishedGlobalProject(db: Pick<Firestore, 'collection'>, slug: string) {
@@ -15,6 +16,7 @@ export async function getPublishedGlobalProject(db: Pick<Firestore, 'collection'
   if (data.mode === 'menu') {
     const project = await db.collection('projects').doc(document.id).get()
     if (!['active', 'archived'].includes(project.data()?.status)) return null
+    if (!hasMenuAccess(project.data()?.menuBilling)) return null
   }
   return {
     id: document.id,

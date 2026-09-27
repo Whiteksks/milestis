@@ -6,8 +6,8 @@ const assert = require('node:assert/strict');
 const { validateMenuPublishInput } = require('../lib/projects/menu/publish.js');
 const { getSlugReservationDocId, normalizeSlug } = require('../lib/projects/publish/slug/index.js');
 
-assert.deepEqual(validateMenuPublishInput({ projectId: 'build-check', slug: ' My-Cafe ', locale: 'ru' }), {
-  projectId: 'build-check', slug: 'my-cafe', locale: 'ru',
+assert.deepEqual(validateMenuPublishInput({ projectId: 'build-check', slug: ' My-Cafe ', locale: 'ru', quoteId: 'quote' }), {
+  projectId: 'build-check', slug: 'my-cafe', locale: 'ru', quoteId: 'quote',
 });
 assert.equal(normalizeSlug(' My-Cafe '), 'my-cafe');
 assert.equal(getSlugReservationDocId('menu', 'my-cafe'), 'my-cafe');

@@ -6,8 +6,10 @@ import { ALLOWED_ORIGINS } from "../lib/cors";
 import { publishMenuSnapshot, validateMenuPublishInput } from "./menu/publish";
 import { copyMenuMedia } from "./menu/media";
 import { MenuPublishError } from "./menu/snapshot";
+import { MenuBillingError } from "./menu/billing/model";
+import { TransactionEngineError } from "../transactions/engine";
 
-// Menu billing is a separate future subscription flow. No legacy one-time debit.
+// The approved charge and public snapshot commit together after media preparation.
 export const publishMenu = onRequest({ cors: ALLOWED_ORIGINS, timeoutSeconds: 300, memory: "512MiB", concurrency: 5, maxInstances: 10 }, async (req, res) => {
   if (req.method !== "POST") { res.status(405).json({ error: "METHOD_NOT_ALLOWED" }); return; }
   if (req.rawBody.length > 4096) { res.status(413).json({ error: "INVALID_PAYLOAD" }); return; }
@@ -19,7 +21,12 @@ export const publishMenu = onRequest({ cors: ALLOWED_ORIGINS, timeoutSeconds: 30
   try {
     res.json(await publishMenuSnapshot(db, uid, validateMenuPublishInput(req.body), copyMenuMedia));
   } catch (error) {
-    if (error instanceof MenuPublishError) { res.status(error.status).json({ error: error.code }); return; }
+    if (error instanceof MenuPublishError || error instanceof MenuBillingError) { res.status(error.status).json({ error: error.code }); return; }
+    if (error instanceof TransactionEngineError && error.code === "insufficient_funds") { res.status(409).json({ error: "INSUFFICIENT_CREDITS" }); return; }
+    if (error instanceof TransactionEngineError && error.code === "balance_inconsistent") {
+      logger.error("[publishMenu] Credit ledger needs reconciliation", { uid, error });
+      res.status(409).json({ error: "BALANCE_INCONSISTENT" }); return;
+    }
     logger.error("[publishMenu] Publication failed", error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }

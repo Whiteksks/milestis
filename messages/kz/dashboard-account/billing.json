@@ -11,6 +11,7 @@
     "balanceAfter": "Қалды: {total}",
     "noDate": "—",
     "types": {
+      "compensation": "Өтемақы: бонустық кредиттер",
       "creditGrant": "Қосылды",
       "creditSpend": "Кредит жұмсалды",
       "creditExpire": "Кредит мерзімі аяқталды",
@@ -20,7 +21,9 @@
       "buyCredits": "Кредит сатып алу",
       "subscriptionPayment": "Жазылымды жаңарту",
       "refund": "Қайтарым",
-      "invoice": "Төлем"
+      "invoice": "Төлем",
+      "menuMonthly": "Мәзірдің айлық төлемі",
+      "menuUpgrade": "Мәзір пакетін жоғарылату"
     },
     "direction": {
       "in": "Қосылды",

@@ -11,6 +11,7 @@
     "balanceAfter": "Остаток: {total}",
     "noDate": "—",
     "types": {
+      "compensation": "Компенсация: бонусные кредиты",
       "creditGrant": "Начисление",
       "creditSpend": "Списание кредитов",
       "creditExpire": "Срок кредитов истёк",
@@ -20,7 +21,9 @@
       "buyCredits": "Покупка кредитов",
       "subscriptionPayment": "Продление подписки",
       "refund": "Возврат",
-      "invoice": "Платёж"
+      "invoice": "Платёж",
+      "menuMonthly": "Оплата меню за месяц",
+      "menuUpgrade": "Повышение пакета меню"
     },
     "direction": {
       "in": "Начислено",
