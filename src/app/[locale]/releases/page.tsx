@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
@@ -39,7 +40,7 @@ export async function generateMetadata({
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/releases`
+  const url = `${siteConfig.appUrl}/${locale}/releases`
 
   return {
     title,
@@ -47,10 +48,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        'en': 'https://milestis.com/en/releases',
-        'ru': 'https://milestis.com/ru/releases',
-        'kk': 'https://milestis.com/kz/releases',
-        'x-default': 'https://milestis.com/en/releases',
+        'en': `${siteConfig.appUrl}/en/releases`,
+        'ru': `${siteConfig.appUrl}/ru/releases`,
+        'kk': `${siteConfig.appUrl}/kz/releases`,
+        'x-default': `${siteConfig.appUrl}/en/releases`,
       },
     },
     openGraph: {

@@ -1,8 +1,6 @@
 import type { ProjectMode } from "../projectInterface";
 
-// ─── Pricing strategies ───────────────────────────────────────────────────────
-
-/** Fixed price regardless of content. Used for portfolios. */
+/** Fixed price regardless of content. */
 interface FlatPricing {
 	strategy: "flat";
 	creditCost: number;
@@ -11,7 +9,7 @@ interface FlatPricing {
 /**
  * Stepped price based on a count (e.g. number of photos).
  * Tiers are evaluated in order; the first matching tier wins.
- * The last tier should always use upTo: Infinity as a catch-all.
+ * Counts above the final threshold use the final tier's price.
  */
 interface TieredPricing {
 	strategy: "tiered";
@@ -19,8 +17,6 @@ interface TieredPricing {
 }
 
 type PricingStrategy = FlatPricing | TieredPricing | { strategy: "disabled" };
-
-// ─── Config type ──────────────────────────────────────────────────────────────
 
 export interface PublishModeConfig {
 	pricing: PricingStrategy;
@@ -36,8 +32,6 @@ export interface PublishModeConfig {
 	 */
 	requiresAccessToken: boolean;
 }
-
-// ─── Per-mode config ──────────────────────────────────────────────────────────
 
 export const PUBLISH_MODE_CONFIG = {
 	// Menu uses its own recurring package billing during publishMenu.
@@ -80,8 +74,6 @@ export function getPublishConfig(mode: ProjectMode): PublishModeConfig {
 	return PUBLISH_MODE_CONFIG[mode];
 }
 
-// ─── Price calculation ────────────────────────────────────────────────────────
-
 /**
  * Returns the credit cost for publishing a project.
  * @param mode    - project mode (determines pricing strategy)
@@ -95,13 +87,11 @@ export function calculateCreditCost(mode: ProjectMode, photoCount: number): numb
 		return pricing.creditCost;
 	}
 
-	// tiered: find the first tier where photoCount <= upTo
 	for (const tier of pricing.tiers) {
 		if (photoCount <= tier.upTo) {
 			return tier.cost;
 		}
 	}
 
-	// Fallback — should never happen if last tier is Infinity
 	return pricing.tiers[pricing.tiers.length - 1].cost;
 }

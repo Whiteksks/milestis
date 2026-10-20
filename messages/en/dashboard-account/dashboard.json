@@ -170,33 +170,5 @@
     "shareWhatsapp": "Share on WhatsApp",
     "shareTelegram": "Share on Telegram",
     "shareFacebook": "Share on Facebook"
-  },
-  "analytics": {
-    "title": "Analytics",
-    "description": "Track views and engagement across your projects",
-    "comingSoon": "Coming Soon",
-    "comingTitle": "Analytics is on the way",
-    "comingDescription": "Soon you'll be able to see how your photobooks and portfolios are performing with detailed insights and engagement metrics.",
-    "stats": {
-      "totalViews": "Total Views",
-      "clicks": "Clicks",
-      "avgTime": "Avg. Time",
-      "growth": "Growth"
-    },
-    "whatToExpectTitle": "What to expect",
-    "features": {
-      "viewTracking": {
-        "title": "View Tracking",
-        "description": "See how many people visit your published projects"
-      },
-      "engagement": {
-        "title": "Engagement Metrics",
-        "description": "Understand how visitors interact with your content"
-      },
-      "time": {
-        "title": "Time Insights",
-        "description": "Learn when your audience is most active"
-      }
-    }
   }
 }

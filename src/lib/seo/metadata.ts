@@ -1,6 +1,7 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com';
+const BASE_URL = siteConfig.appUrl;
 
 /** URL locale slug → correct BCP-47 hreflang value (Kazakh's ISO 639-1 code is "kk", not "kz"). */
 const HREFLANG: Record<string, string> = { en: 'en', ru: 'ru', kz: 'kk' };

@@ -28,12 +28,6 @@ export interface PreparedPublishInput {
 	hashedToken?: string;
 }
 
-export interface PublishCommitResult {
-	balanceSnapshot: BalanceSnapshot;
-	publishedSlug: string;
-	transactionId: string;
-}
-
 export interface CommitPublishInput {
 	projectId: string;
 	uid: string;

@@ -1,4 +1,4 @@
-import { auth } from "../firebase/firebase"
+import { requestProjectFunction } from './request-project-function'
 
 export interface AnalyzeProjectResult {
   ok: true
@@ -24,23 +24,8 @@ export async function analyzeProject(
   projectId: string,
   slug: string,
 ): Promise<AnalyzeProjectResult> {
-  const user = auth.currentUser
-  if (!user) throw new AnalyzeProjectError("UNAUTHORIZED", "Not authenticated")
-
-  const idToken = await user.getIdToken()
-  const url = process.env.NEXT_PUBLIC_ANALYZE_PROJECT_URL
-  if (!url) throw new AnalyzeProjectError("CONFIG_ERROR", "Analyze URL not configured")
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-    body: JSON.stringify({ projectId, slug }),
-  })
-
-  const data = await res.json()
-  if (!res.ok) {
-    throw new AnalyzeProjectError(data.error ?? "UNKNOWN", data.message ?? "Failed to analyze project")
-  }
-
-  return data as AnalyzeProjectResult
+  return requestProjectFunction<AnalyzeProjectResult>(
+    'analyzeProject', { projectId, slug },
+    { errorClass: AnalyzeProjectError, fallbackMessage: 'Failed to analyze project' },
+  )
 }

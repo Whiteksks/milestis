@@ -145,12 +145,7 @@ export async function generatePortfolioFooter(input: PortfolioFooterInput): Prom
   }, input) as unknown as Promise<PortfolioFooterResult>
 }
 
-// ─── Featured work (variable-length — the one non-"flat" section) ─────────
-// Each new photo is its own vision-based candidate card; existing cards are given back by id so
-// the model can keep, edit, or drop them. Reconciling ids/duplicate photo claims deterministically
-// after generation stays a dedicated apply-layer step (see the old apply.ts `repairPortfolioProjects`
-// — that reconciliation is a real data-integrity need, not a reliability workaround, so it carries
-// over to the new pipeline's apply layer unchanged in spirit).
+// Existing cards retain their IDs; the apply layer reconciles IDs and duplicate photo claims.
 
 export interface PortfolioFeaturedWorkInput {
   prompt: string

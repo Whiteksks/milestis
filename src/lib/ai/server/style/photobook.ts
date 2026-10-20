@@ -11,10 +11,7 @@ const THEME_ENUM = ['parchment', 'frost', 'ember', 'obsidian', 'sand', 'noir', '
 const MOOD_ENUM = ['none', 'warm', 'cool', 'muted', 'fade', 'golden', 'noir', 'vibrant', 'dreamy', 'earthy']
 const TEXTURE_ENUM = ['none', 'vignette', 'matte', 'warmth', 'silver', 'linen', 'haze', 'grain', 'canvas', 'velvet', 'parchment']
 
-// Small, single-purpose schema — ALL four fields required, every time. This call decides style
-// ONLY, never copy, so there is no risk of it competing with a 30-field mega-schema for the
-// model's attention (the old system's core reliability problem — see schema.ts's history of
-// propertyOrdering/required patches in /memories/repo/ai-editor-assistant.md).
+// Style generation is independent of section text.
 const SCHEMA: AiSchema = {
   type: 'object',
   required: ['templateId', 'currentTheme', 'photobookMood', 'photobookTexture'],

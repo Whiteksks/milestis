@@ -1,7 +1,8 @@
 import {setGlobalOptions} from "firebase-functions/v2/options";
+import {functionsRegion} from "./config/environment";
 
 setGlobalOptions({
-	region: "europe-west4",
+	region: functionsRegion,
 });
 
 import {createUser} from "./users/createUser";

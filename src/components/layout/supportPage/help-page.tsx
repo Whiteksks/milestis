@@ -1,5 +1,7 @@
 "use client"
 
+import { siteConfig } from '@/config/site'
+
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import {
@@ -204,7 +206,7 @@ export function HelpPage() {
               </p>
             </div>
             <Button className="mt-4 rounded-full px-6 sm:ml-6 sm:mt-0" asChild>
-              <Link href="mailto:support@milestis.com">
+              <Link href={`mailto:${siteConfig.supportEmail}`}>
                 {t("contact.button")}
               </Link>
             </Button>

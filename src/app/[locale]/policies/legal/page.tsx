@@ -1,30 +1,17 @@
 'use client'
 
-import { ShieldCheck, Scale, FileText, ArrowRight, Lock, Mail, CreditCard } from 'lucide-react'
+import { siteConfig } from '@/config/site'
+
+import { ArrowRight, Lock, Mail, CreditCard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 
 const POLICIES = [
   {
-    id: "terms",
-    icon: <Scale className="w-5 h-5" />,
-    link: "/policies/terms"
-  },
-  {
-    id: "privacy",
-    icon: <ShieldCheck className="w-5 h-5" />,
-    link: "/policies/privacy-policy"
-  },
-  {
     id: "refund",
     icon: <CreditCard className="w-5 h-5" />,
     link: "/policies/refund-policy"
   },
-  {
-    id: "cookies",
-    icon: <FileText className="w-5 h-5" />,
-    link: "/policies/cookie-policy"
-  }
 ]
 
 const LegalPage = () => {
@@ -33,7 +20,7 @@ const LegalPage = () => {
   return (
     <div className="min-h-screen text-foreground antialiased selection:bg-primary/10">
       <main className="max-w-3xl mx-auto px-6 py-24">
-        
+
         {/* Header Section */}
         <header className="mb-16 space-y-4">
           <div className="flex items-center gap-2 text-primary font-medium">
@@ -42,11 +29,11 @@ const LegalPage = () => {
               {t('badge')}
             </span>
           </div>
-          
+
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl text-balance">
             {t('title')}
           </h1>
-          
+
           <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
             {t('description')}
           </p>
@@ -64,7 +51,7 @@ const LegalPage = () => {
                 <div className="mt-1 flex items-center justify-center size-10 rounded-md text-secondary-foreground">
                   {policy.icon}
                 </div>
-                
+
                 <div className="space-y-1">
                   <h2 className="font-medium text-lg leading-tight">
                     {t(`policies.${policy.id}.title`)}
@@ -93,16 +80,16 @@ const LegalPage = () => {
                 {t('support.description')}
               </p>
             </div>
-            
-            <a 
-              href="mailto:support@milestis.com" 
+
+            <a
+              href={`mailto:${siteConfig.supportEmail}`}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <Mail className="w-4 h-4" />
               {t('support.cta')}
             </a>
           </div>
-          
+
           <p className="mt-10 text-center text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em]">
             {t('effectiveDate')}
           </p>

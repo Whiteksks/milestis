@@ -1,13 +1,23 @@
 [
   {
     "origin": [
-      "https://milestis.site",
       "https://milestis.com",
+      "https://milestis.site",
       "http://localhost:3000",
       "http://localhost:3001"
     ],
-    "method": ["PUT", "GET", "HEAD", "OPTIONS"],
-    "responseHeader": ["Content-Type", "Authorization", "X-Goog-*", "x-goog-*"],
+    "method": [
+      "PUT",
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "X-Goog-*",
+      "x-goog-*"
+    ],
     "maxAgeSeconds": 3600
   }
 ]

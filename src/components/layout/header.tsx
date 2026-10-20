@@ -75,7 +75,6 @@ const Header = ({
     }
   })
 
-  // Теперь сравнение максимально простое и надежное
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
 

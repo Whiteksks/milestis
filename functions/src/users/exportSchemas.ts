@@ -64,10 +64,6 @@ export interface ExportUserDocument {
   metadata: Pick<UserMetadata, "schemaVersion"> & {
     createdAt: unknown;
     lastLoginAt: unknown;
-    terms: {
-      acceptedVersion: string;
-      acceptedAt: unknown;
-    };
   };
   updatedAt: unknown;
 }
@@ -207,10 +203,6 @@ export function mapUserDocument(snapshot: DocumentSnapshot): ExportUserDocument 
     metadata: {
       createdAt: d.metadata?.createdAt ?? null,
       lastLoginAt: d.metadata?.lastLoginAt ?? null,
-      terms: {
-        acceptedVersion: d.metadata?.terms?.acceptedVersion ?? "",
-        acceptedAt: d.metadata?.terms?.acceptedAt ?? null,
-      },
       schemaVersion: d.metadata?.schemaVersion ?? 0,
     },
     updatedAt: d.updatedAt ?? null,

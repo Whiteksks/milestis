@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { db } from "../../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../../lib/cors";
 import { calculateCreditCost } from "./config";
+import { BODY_SIZE_LIMIT_BYTES, QUOTE_TTL_MS, buildDomain, countUniquePhotos } from "./analysis";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import {
 	getSlugValidationError,
@@ -15,14 +16,6 @@ import {
 } from "./slug/index";
 import { getSlugModePolicy } from "./slug/policy";
 import { runSafeSearchCheck } from "../../lib/safeSearchCheck";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const PUBLIC_SITE_DOMAIN = "milestis.site";
-const QUOTE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const BODY_SIZE_LIMIT_BYTES = 1024;
-
-// ─── Error codes ──────────────────────────────────────────────────────────────
 
 const ERROR = {
 	METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -37,8 +30,6 @@ const ERROR = {
 	CONTENT_POLICY_VIOLATION:     "CONTENT_POLICY_VIOLATION",
 	INTERNAL_SERVER_ERROR:        "INTERNAL_SERVER_ERROR",
 } as const;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 class ValidationError extends Error {}
 
@@ -61,8 +52,6 @@ export interface AnalyzeOutput {
 	expiresAt: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function validatePayload(body: unknown): AnalyzeInput {
 	const b = body as Record<string, unknown> | null | undefined;
 	if (!b || typeof b !== "object")
@@ -78,41 +67,8 @@ function validatePayload(body: unknown): AnalyzeInput {
 }
 
 /**
- * Counts unique photos placed in the project content.
- * Extracts imageId from each Firebase Storage path (images/{imageId}/variant.ext)
- * so that multiple variants of the same photo (full, middle, thumb) count as one.
- */
-function countUniquePhotos(content: unknown): number {
-	const json = JSON.stringify(content);
-	const unique = new Set<string>();
-	// Match both public paths (/o/images%2F{id}%2F) and
-	// private paths (/o/users%2F...%2Fimages%2F{id}%2F) by accepting %2F or / before "images".
-	const re = /"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+(?:\/|%2F)images%2F([^%"]+)%2F[^"]+"/g;
-	let m: RegExpExecArray | null;
-	while ((m = re.exec(json)) !== null) {
-		unique.add(m[1]);
-	}
-	// Fallback: if paths don't follow the images/{imageId}/ structure,
-	// count unique URLs so the result is never zero when photos exist.
-	if (unique.size === 0) {
-		const urls = json.match(/"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+"/g);
-		return urls ? new Set(urls).size : 0;
-	}
-	return unique.size;
-}
-
-function buildDomain(mode: ProjectMode, slug: string): string {
-	const policy = getSlugModePolicy(mode);
-	return policy.routeKind === "subdomain"
-		? `https://${slug}.${PUBLIC_SITE_DOMAIN}`
-		: `https://${PUBLIC_SITE_DOMAIN}/${slug}`;
-}
-
-// ─── Cloud Function ───────────────────────────────────────────────────────────
-
-/**
  * Analyzes a project before publish and returns a short-lived quote.
- * This is step 1.5: called after the user picks a slug and before they confirm payment.
+ * Called after slug selection and before publication is confirmed.
  *
  * POST /analyzeProject
  * Body: { projectId: string, slug: string }
@@ -130,20 +86,17 @@ export const analyzeProject = onRequest(
 		cors: ALLOWED_ORIGINS,
 	},
 	async (req, res) => {
-		// ── Method guard ──────────────────────────────────────────────────
 		if (req.method !== "POST") {
 			res.status(405).json({ error: ERROR.METHOD_NOT_ALLOWED });
 			return;
 		}
 
-		// ── Body size guard ───────────────────────────────────────────────
 		const contentLength = parseInt(req.headers["content-length"] ?? "0", 10);
 		if (contentLength > BODY_SIZE_LIMIT_BYTES) {
 			res.status(413).json({ error: ERROR.INVALID_PAYLOAD, message: "Request body too large." });
 			return;
 		}
 
-		// ── Auth ──────────────────────────────────────────────────────────
 		const authHeader = req.headers.authorization;
 		if (!authHeader?.startsWith("Bearer ")) {
 			res.status(401).json({ error: ERROR.UNAUTHORIZED });
@@ -159,7 +112,6 @@ export const analyzeProject = onRequest(
 			return;
 		}
 
-		// ── Payload ───────────────────────────────────────────────────────
 		let payload: AnalyzeInput;
 		try {
 			payload = validatePayload(req.body);
@@ -172,7 +124,6 @@ export const analyzeProject = onRequest(
 		const { projectId, slug: rawSlug } = payload;
 		const slug = normalizeSlug(rawSlug);
 
-		// ── Slug format validation ─────────────────────────────────────────
 		const slugError = getSlugValidationError(slug);
 		if (slugError) {
 			res.status(400).json({ error: ERROR.INVALID_SLUG, message: slugError });
@@ -184,7 +135,6 @@ export const analyzeProject = onRequest(
 		}
 
 		try {
-			// ── Load project + user in parallel ───────────────────────────
 			const [projectSnap, userSnap] = await Promise.all([
 				db.collection("projects").doc(projectId).get(),
 				db.collection("users").doc(uid).get(),
@@ -220,7 +170,6 @@ export const analyzeProject = onRequest(
 		}
 			const policy = getSlugModePolicy(mode);
 
-			// ── Slug availability (global-namespace modes only) ────────────
 			// Token-namespace modes (photobook) don't reserve by slug.
 			if (policy.namespace === "global") {
 				const slugSnap = await db
@@ -233,7 +182,6 @@ export const analyzeProject = onRequest(
 				}
 			}
 
-			// ── Count unique photos ────────────────────────────────────────
 			const contentSnap = await db
 				.collection("projects")
 				.doc(projectId)
@@ -243,7 +191,6 @@ export const analyzeProject = onRequest(
 			const editorData = contentSnap.exists ? contentSnap.data()! : {};
 			const photoCount = countUniquePhotos(editorData.content ?? null);
 
-			// ── SafeSearch content moderation ──────────────────────────────
 			const safeSearch = await runSafeSearchCheck(editorData.content ?? null);
 			if (!safeSearch.safe) {
 				logger.warn(`[analyzeProject] SafeSearch blocked project ${projectId}`, { violations: safeSearch.violations });
@@ -262,7 +209,6 @@ export const analyzeProject = onRequest(
 			// Credit cost is calculated from photo count — each mode defines its own strategy.
 			const creditCost = calculateCreditCost(mode, photoCount);
 
-			// ── Write quote ───────────────────────────────────────────────
 			const expiresAt = Date.now() + QUOTE_TTL_MS;
 			const quoteId = randomUUID();
 

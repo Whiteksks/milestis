@@ -1,15 +1,4 @@
-/**
- * Single source of truth for valid editor mode identifiers.
- * No dependencies — safe to import from anywhere without circular refs.
- *
- * To add a new mode:
- *  1. Add the id here (e.g.  scrapbook: 'scrapbook')
- *  2. Create src/editor/modes/<name>/ folder with the required files
- *  3. Register in lib/modes/registry.ts → ALL_MODES
- *  4. Add slice to lib/store-content.ts → ALL_SLICE_CREATORS
- *
- * The compile-time check in registry.ts will fail if you forget step 1 or 3.
- */
+/** Editor mode identifiers shared by the registry, store and UI. */
 export const EDITOR_MODES = {
   menu: 'menu',
   portfolio: 'portfolio',

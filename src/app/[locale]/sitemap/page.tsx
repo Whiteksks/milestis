@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 import Header from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
@@ -23,7 +24,7 @@ export async function generateMetadata({
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/sitemap`
+  const url = `${siteConfig.appUrl}/${locale}/sitemap`
 
   return {
     title,
@@ -31,10 +32,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        en: 'https://milestis.com/en/sitemap',
-        ru: 'https://milestis.com/ru/sitemap',
-        kk: 'https://milestis.com/kz/sitemap',
-        'x-default': 'https://milestis.com/en/sitemap',
+        en: `${siteConfig.appUrl}/en/sitemap`,
+        ru: `${siteConfig.appUrl}/ru/sitemap`,
+        kk: `${siteConfig.appUrl}/kz/sitemap`,
+        'x-default': `${siteConfig.appUrl}/en/sitemap`,
       },
     },
     openGraph: {
@@ -99,9 +100,6 @@ const SECTIONS: SitemapSection[] = [
   {
     heading: { en: 'Legal', ru: 'Правовая информация', kz: 'Заңды ақпарат' },
     links: [
-      { href: '/policies/privacy-policy', label: { en: 'Privacy Policy', ru: 'Политика конфиденциальности', kz: 'Құпиялылық саясаты' } },
-      { href: '/policies/terms', label: { en: 'Terms and Conditions', ru: 'Условия использования', kz: 'Пайдалану шарттары' } },
-      { href: '/policies/cookie-policy', label: { en: 'Cookie Policy', ru: 'Политика использования файлов cookie', kz: 'Cookie саясаты' } },
       { href: '/policies/acceptable-use-policy', label: { en: 'Acceptable Use Policy', ru: 'Политика допустимого использования', kz: 'Рұқсат етілген пайдалану саясаты' } },
       { href: '/policies/refund-policy', label: { en: 'Refund Policy', ru: 'Политика возврата', kz: 'Қайтару саясаты' } },
     ],

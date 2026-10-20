@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 import { PricingContent } from './PricingContent';
 
@@ -21,7 +22,7 @@ export async function generateMetadata({
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/pricing`
+  const url = `${siteConfig.appUrl}/${locale}/pricing`
 
   return {
     title,
@@ -29,10 +30,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        'en': 'https://milestis.com/en/pricing',
-        'ru': 'https://milestis.com/ru/pricing',
-        'kk': 'https://milestis.com/kz/pricing',
-        'x-default': 'https://milestis.com/en/pricing',
+        'en': `${siteConfig.appUrl}/en/pricing`,
+        'ru': `${siteConfig.appUrl}/ru/pricing`,
+        'kk': `${siteConfig.appUrl}/kz/pricing`,
+        'x-default': `${siteConfig.appUrl}/en/pricing`,
       },
     },
     openGraph: {

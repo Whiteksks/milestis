@@ -46,10 +46,7 @@ import {
   applyPortfolioFeaturedWork,
 } from './apply'
 
-// The single entry point for the new pipeline — replaces the old one-mega-call sendMessage() +
-// applyChanges(). Every step below is a small, independently-callable, fully-`required`-schema
-// narrow call (see /memories/session/ai-rewrite-plan.md); the orchestrator's only job is deciding
-// WHICH of them to run and committing their results only while the project revision is current.
+// Run the requested steps and apply results only while the project revision is current.
 
 export type AiPipelineResult =
   | { kind: 'chat'; message: string }

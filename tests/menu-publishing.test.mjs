@@ -1,45 +1,28 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import path from 'node:path'
-import vm from 'node:vm'
-import ts from 'typescript'
+import { createSourceLoader } from './support/source-loader.mjs'
 
-const root = path.resolve(import.meta.dirname, '..')
 const dependency = createRequire(import.meta.url)
-const cache = new Map()
+
 let storageBucket
 const field = {
   serverTimestamp: () => ({ operation: 'timestamp' }),
   delete: () => ({ operation: 'delete' }),
   increment: (amount) => ({ operation: 'increment', amount }),
 }
-function load(file) {
-  let filename = path.resolve(root, file)
-  if (!path.extname(filename)) filename = existsSync(`${filename}.ts`) ? `${filename}.ts` : path.join(filename, 'index.ts')
-  if (cache.has(filename)) return cache.get(filename).exports
-  const sourceModule = { exports: {} }
-  cache.set(filename, sourceModule)
-  const source = ts.transpileModule(readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText
-  const require = (id) => {
-    // These publication routes must bypass locale routing. Next-intl's ESM
-    // middleware requires Next's bundler and is deliberately not invoked here.
-    if (id === 'next-intl/middleware') return () => () => assert.fail('Unexpected locale rewrite for a published URL')
-    if (id === './i18n/routing') return { routing: { defaultLocale: 'en' } }
-    if (id === 'firebase-admin/firestore') return { FieldValue: field }
-    if (id === 'firebase-admin/storage') return { getStorage: () => ({ bucket: () => storageBucket }) }
-    // Publication lifecycle tests isolate payment; menu-billing.test.mjs exercises the real ledger and quote together.
-    if (id === './billing/service') return {
-      MENU_QUOTES: 'menuBillingQuotes', validateMenuQuote: () => ({ billing: paidBilling() }),
-      payMenuProposal: async (_tx, _projectId, _project, proposal) => proposal.billing,
-    }
-    if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
-    return dependency(id)
-  }
-  vm.runInThisContext(`(function(require,module,exports){${source}\n})`, { filename })(require, sourceModule, sourceModule.exports)
-  return sourceModule.exports
-}
+const load = createSourceLoader({
+  // Published URLs must bypass locale routing.
+  'next-intl/middleware': () => () => assert.fail('Unexpected locale rewrite for a published URL'),
+  './i18n/routing': { routing: { defaultLocale: 'en' } },
+  'firebase-admin/firestore': { FieldValue: field },
+  'firebase-admin/storage': { getStorage: () => ({ bucket: () => storageBucket }) },
+  // Ledger and quote integration is covered by menu-billing.test.mjs.
+  './billing/service': {
+    MENU_QUOTES: 'menuBillingQuotes', validateMenuQuote: () => ({ billing: paidBilling() }),
+    payMenuProposal: async (_tx, _projectId, _project, proposal) => proposal.billing,
+  },
+})
 const { prepareMenuSnapshot } = load('functions/src/projects/menu/snapshot.ts')
 const { publishMenuSnapshot: publishWithQuote, validateMenuPublishInput } = load('functions/src/projects/menu/publish.ts')
 function paidBilling() {
@@ -377,9 +360,9 @@ test('request validation and share URLs agree without altering legacy URLs', () 
   assert.throws(() => validateMenuPublishInput({ ...input, projectId: '../other' }), errorCode('INVALID_PAYLOAD'))
   assert.throws(() => validateMenuPublishInput({ ...input, locale: 'xx' }), errorCode('INVALID_PAYLOAD'))
   assert.throws(() => validateMenuPublishInput({ ...input, slug: 'ab' }), errorCode('INVALID_SLUG'))
-  assert.equal(buildPublishedProjectUrl('menu', 'my-cafe', 'ignored'), 'https://my-cafe.milestis.site')
-  assert.equal(buildPublishedProjectUrl('portfolio', 'my-cafe'), 'https://my-cafe.milestis.site')
-  assert.equal(buildPublishedProjectUrl('event', 'party', 'token'), 'https://milestis.site/party?share=token')
+  assert.equal(buildPublishedProjectUrl('menu', 'my-cafe', 'ignored'), 'https://my-cafe.pages.example.test')
+  assert.equal(buildPublishedProjectUrl('portfolio', 'my-cafe'), 'https://my-cafe.pages.example.test')
+  assert.equal(buildPublishedProjectUrl('event', 'party', 'token'), 'https://pages.example.test/party?share=token')
 })
 
 test('the same subdomain resolver returns menu or portfolio by stored mode, never a private project', async () => {
@@ -422,10 +405,10 @@ test('proxy preserves subdomain paths and private project links', () => {
   const { NextRequest } = dependency('next/server')
   const request = (url) => new NextRequest(url, { headers: { host: new URL(url).host } })
   for (const suffix of ['/', '/opengraph-image', '/drinks']) {
-    const response = proxy(request(`https://my-cafe.milestis.site${suffix}`))
+    const response = proxy(request(`https://my-cafe.pages.example.test${suffix}`))
     assert.equal(new URL(response.headers.get('x-middleware-rewrite')).pathname, `/sites/my-cafe${suffix === '/' ? '' : suffix}`)
   }
-  const privatePage = proxy(request('https://milestis.site/album?share=secret'))
+  const privatePage = proxy(request('https://pages.example.test/album?share=secret'))
   assert.equal(new URL(privatePage.headers.get('x-middleware-rewrite')).pathname, '/sites/album')
   assert.equal(new URL(privatePage.headers.get('x-middleware-rewrite')).searchParams.get('share'), 'secret')
 })
@@ -496,12 +479,12 @@ test('page metadata and QR URL builders use the canonical page path', () => {
   project.content.sectionContent.pages.push({ id: 'drinks', name: 'Drinks', path: '/drinks', content: { categoryIds: [] } })
   const metadata = publishedMenuMetadata(resolvePublishedMenuPage(project, '/drinks'))
   const url = buildPublishedMenuPageUrl('my-cafe', '/drinks')
-  assert.equal(url, 'https://my-cafe.milestis.site/drinks')
+  assert.equal(url, 'https://my-cafe.pages.example.test/drinks')
   assert.deepEqual(metadata.title, { absolute: 'Drinks — Cafe' })
   assert.equal(metadata.alternates.canonical, url)
   assert.equal(metadata.openGraph.url, url)
-  assert.equal(metadata.openGraph.images[0].url, 'https://my-cafe.milestis.site/opengraph-image')
-  assert.equal(buildPublishedMenuPageUrl('my-cafe', '/'), 'https://my-cafe.milestis.site')
+  assert.equal(metadata.openGraph.images[0].url, 'https://my-cafe.pages.example.test/opengraph-image')
+  assert.equal(buildPublishedMenuPageUrl('my-cafe', '/'), 'https://my-cafe.pages.example.test')
   for (const path of ['//external.com', '/drinks?draft=1', '/drinks#tea', '/drinks/tea', '/wp-content', '/twitter-image']) {
     assert.throws(() => buildPublishedMenuPageUrl('my-cafe', path))
   }

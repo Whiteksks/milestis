@@ -153,20 +153,6 @@ export function Footer({
                   {t("policies.refund")}
                 </Link>
               </li>
-              <li>
-                <Link href="/policies/cookie-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current">
-                  {t("policies.cookie")}
-                </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
-                  className="inline-flex items-center gap-2 text-base text-muted-foreground transition-colors hover:text-current"
-                >
-                  {t("policies.privacyChoices")}
-                </button>
-              </li>
             </ul>
           </div>
         </div>
@@ -212,20 +198,6 @@ export function Footer({
                     {t("policies.refund")}
                   </Link>
                 </li>
-                <li>
-                  <Link href="/policies/cookie-policy" className="inline-flex items-center gap-2 text-base text-muted-foreground">
-                    {t("policies.cookie")}
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
-                    className="inline-flex items-center gap-2 text-base text-muted-foreground"
-                  >
-                    {t("policies.privacyChoices")}
-                  </button>
-                </li>
               </ul>
             </AccordionContent>
           </AccordionItem>
@@ -240,16 +212,6 @@ export function Footer({
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 order-1 sm:order-2 text-sm text-muted-foreground/80 font-normal">
-            <Link href="/policies/privacy-policy" className="transition-colors hover:text-current">
-              {t("policies.privacy")}
-            </Link>
-            <span className="text-muted-foreground/30 select-none hidden sm:inline">|</span>
-
-            <Link href="/policies/terms" className="transition-colors hover:text-current">
-              {t("policies.terms")}
-            </Link>
-            <span className="text-muted-foreground/30 select-none hidden sm:inline">|</span>
-
             <Link href="/sitemap" className="transition-colors hover:text-current">
               {t("policies.sitemap")}
             </Link>

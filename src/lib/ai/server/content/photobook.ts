@@ -4,14 +4,7 @@ import { callNarrow } from '../openai'
 import { fetchPhotoParts } from '../photos'
 import type { AiPhotoRef } from '../../core/types'
 
-// ─── Why this file exists ───────────────────────────────────────────────────
-// One small, fully-`required` schema PER SECTION instead of one mega-schema covering all six
-// sections at once — the old system's `schema.ts` needed `propertyOrdering` + hard `required` on
-// the whole `content` object just to stop the model silently dropping highlight/ending (see
-// /memories/repo/ai-editor-assistant.md). A 4-6 field schema has nothing to drop. The orchestrator
-// (later phase) only calls the sections actually in scope for a turn — so there is no need for the
-// old "echo back sections you weren't asked about" instruction either, sections outside scope are
-// simply never called.
+// Each section has its own required schema; the orchestrator calls only sections in scope.
 
 export const PHOTOBOOK_SECTION_KEYS = ['cover', 'introduction', 'story', 'gallery', 'highlight', 'ending'] as const
 export type PhotobookSectionKey = (typeof PHOTOBOOK_SECTION_KEYS)[number]

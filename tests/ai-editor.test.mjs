@@ -1,36 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import path from 'node:path'
-import vm from 'node:vm'
-import ts from 'typescript'
 import { createStore } from 'zustand/vanilla'
 import { NextRequest } from 'next/server.js'
+import { createSourceLoader } from './support/source-loader.mjs'
 
-const dependency = createRequire(import.meta.url)
-const root = process.cwd()
 function loader(mocks = {}) {
-  const cache = new Map()
-  function load(file) {
-    const filename = path.resolve(root, existsSync(file) ? file : `${file}.ts`)
-    if (cache.has(filename)) return cache.get(filename).exports
-    const sourceModule = { exports: {} }
-    cache.set(filename, sourceModule)
-    const compiled = ts.transpileModule(readFileSync(filename, 'utf8'), {
-      compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, esModuleInterop: true },
-    }).outputText
-    const require = (id) => {
-      if (id === 'server-only') return {}
-      if (Object.hasOwn(mocks, id)) return mocks[id]
-      if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
-      if (id.startsWith('@/')) return load(path.join(root, 'src', id.slice(2)))
-      return dependency(id)
-    }
-    vm.runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename })(require, sourceModule, sourceModule.exports)
-    return sourceModule.exports
-  }
-  return load
+  return createSourceLoader({ 'server-only': {}, ...mocks })
 }
 const load = loader()
 const { createMenuContent } = load('functions/src/domain/menu/content.ts')
@@ -71,7 +46,7 @@ test('GPT transport uses current dynamic schemas, handles reasoning output and k
     })
     assert.equal(result.photoId, photoId)
   }
-  assert.equal(calls[0].model, 'gpt-6-sol')
+  assert.equal(calls[0].model, 'test-text-model')
   assert.equal(calls[0].store, false)
   assert.equal(calls[0].text.format.strict, true)
   assert.equal(calls[0].text.format.name, 'same_section')
@@ -219,7 +194,7 @@ function routeHarness({ uid = 'u', project = { ownerId: 'u', mode: 'menu', statu
   return { calls, reservations, post: (body = { projectId: 'p', task: 'generateMenu', input: validInput() }) => POST(request(body)) }
 }
 
-test('API rejects missing auth, foreign projects and wrong-mode operations before spending credits', async () => {
+test('API rejects missing auth, foreign projects and wrong-mode operations before invoking AI', async () => {
   for (const [options, status] of [[{ uid: null }, 401], [{ project: { ownerId: 'other', mode: 'menu' } }, 403], [{ project: { ownerId: 'u', mode: 'portfolio' } }, 400]]) {
     const h = routeHarness(options)
     assert.equal((await h.post()).status, status)
@@ -313,7 +288,7 @@ test('food enhancement sends each selected style with one source and fixed econo
     assert.equal(calls[0].options.redirect, 'error')
     assert.equal(calls[1].url, 'https://api.openai.com/v1/images/edits')
     const form = calls[1].options.body
-    assert.equal(form.get('model'), 'gpt-image-2.5-flare')
+    assert.equal(form.get('model'), 'test-image-model')
     assert.equal(form.get('size'), '1024x1024')
     assert.equal(form.get('quality'), 'medium')
     assert.equal(form.get('n'), '1')

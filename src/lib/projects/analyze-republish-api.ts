@@ -1,4 +1,4 @@
-import { auth } from "../firebase/firebase"
+import { requestProjectFunction } from './request-project-function'
 import type { AnalyzeProjectResult } from "./analyze-project-api"
 
 export interface AnalyzeRepublishResult extends AnalyzeProjectResult {
@@ -8,7 +8,7 @@ export interface AnalyzeRepublishResult extends AnalyzeProjectResult {
   previousCreditCost: number
   /** The project's existing published slug. */
   publishedSlug: string
-  /** Plaintext access token — only for photobook mode. */
+  /** Share token for private published projects. */
   publishedAccessToken?: string
 }
 
@@ -19,23 +19,8 @@ export class AnalyzeRepublishError extends Error {
 }
 
 export async function analyzeRepublish(projectId: string): Promise<AnalyzeRepublishResult> {
-  const user = auth.currentUser
-  if (!user) throw new AnalyzeRepublishError("UNAUTHORIZED", "Not authenticated")
-
-  const idToken = await user.getIdToken()
-  const url = process.env.NEXT_PUBLIC_ANALYZE_REPUBLISH_URL
-  if (!url) throw new AnalyzeRepublishError("CONFIG_ERROR", "Analyze republish URL not configured")
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-    body: JSON.stringify({ projectId }),
-  })
-
-  const data = await res.json()
-  if (!res.ok) {
-    throw new AnalyzeRepublishError(data.error ?? "UNKNOWN", data.message ?? "Failed to analyze project for republish")
-  }
-
-  return data as AnalyzeRepublishResult
+  return requestProjectFunction<AnalyzeRepublishResult>(
+    'analyzeRepublish', { projectId },
+    { errorClass: AnalyzeRepublishError, fallbackMessage: 'Failed to analyze project for republish' },
+  )
 }

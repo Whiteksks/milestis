@@ -94,7 +94,6 @@ export function BillingHistory({
   const t = useTranslations("billing")
   const locale = useLocale()
   
-  // Явная типизация стейта табов, убрали as any в onValueChange
   const [activeTab, setActiveTab] = useState<"credits" | "billing">(
     view === "invoices" ? "billing" : "credits"
   )

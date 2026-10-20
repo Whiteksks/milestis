@@ -111,12 +111,3 @@ export const frameStyles: Record<FrameStyle, FrameStyleConfig> = {
 export const getFrameStyle = (styleId: FrameStyle): string => {
   return frameStyles[styleId]?.className || ''
 }
-
-export const FRAME_STYLE_CATEGORIES: { id: FrameStyleCategory; label: string }[] = [
-  { id: 'shape', label: 'Shape' },
-  { id: 'border', label: 'Border' },
-]
-
-export const getFrameStylesByCategory = (category: FrameStyleCategory): FrameStyleConfig[] => {
-  return Object.values(frameStyles).filter((s) => s.category === category)
-}

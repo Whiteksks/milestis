@@ -1,4 +1,5 @@
 import 'server-only'
+import { getAiConfig } from '@/config/server'
 import { strictSchema, readAiResult, type AiContent, type AiSchema } from '../core/schema'
 import { aiRequestContext } from './context'
 
@@ -16,12 +17,13 @@ export interface NarrowCallOptions {
 export async function callNarrow<T = Record<string, unknown>>(options: NarrowCallOptions): Promise<T> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) throw new AiServiceError('AI_NOT_CONFIGURED', 503)
+  const { textModel } = getAiConfig()
   const signal = aiRequestContext.getStore()?.signal ?? AbortSignal.timeout(110_000)
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST', signal,
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-6-sol',
+      model: textModel,
       store: false,
       reasoning: { effort: 'low' },
       max_output_tokens: 24000,

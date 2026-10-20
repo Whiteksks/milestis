@@ -1,15 +1,4 @@
-/**
- * Universal toast service built on top of Sonner.
- *
- * Every helper uses toast.promise() so we track the REAL async operation —
- * no fake timers, no simulations. Sonner shows:
- *   ⏳ loading  →  ✅ success  (or ❌ error)
- * automatically when the promise settles.
- *
- * Usage:
- *   import { toastProject } from "@/lib/toast"
- *   toastProject.create(createProject(name, mode))
- */
+/** Promise-based notifications for project and account operations. */
 
 import { toast } from "sonner"
 
@@ -56,16 +45,6 @@ export const toastProject = {
     })
   },
 
-  /** Save project in editor. */
-  save<T>(promise: Promise<T>) {
-    return toast.promise(promise, {
-      loading: "Saving…",
-      success: "Saved",
-      error: (err) =>
-        err instanceof Error ? err.message : "Failed to save project",
-    })
-  },
-
   /** Rename project (from inline name input). */
   rename<T>(promise: Promise<T>) {
     return toast.promise(promise, {
@@ -106,63 +85,7 @@ export const toastProject = {
     })
   },
 
-  /** Export / publish project. For photobooks: downloads a PDF. For portfolios: publishes the site. */
-  export<T>(promise: Promise<T>) {
-    return toast.promise(promise, {
-      loading: "Exporting…",
-      success: "Export complete!",
-      error: (err) =>
-        err instanceof Error ? err.message : "Export failed",
-    })
-  },
 
-  /** Activate an event — deducts credits and opens guest uploads. */
-  openEvent<T>(promise: Promise<T>) {
-    return toast.promise(promise, {
-      loading: "Opening event…",
-      success: "Event is now open!",
-      error: (err) =>
-        err instanceof Error ? err.message : "Failed to open event",
-    })
-  },
-
-  /** Close an event — stops guest uploads (free). */
-  closeEvent<T>(promise: Promise<T>) {
-    return toast.promise(promise, {
-      loading: "Closing event…",
-      success: "Event closed",
-      error: (err) =>
-        err instanceof Error ? err.message : "Failed to close event",
-    })
-  },
-}
-
-// ─── Storage / Upload ──────────────────────────────────────────────────────
-
-export const toastStorage = {
-  /**
-   * Photo or file upload.
-   * Pass the upload promise — Sonner shows real progress states.
-   */
-  upload<T>(promise: Promise<T>, fileName?: string) {
-    const label = fileName ? `"${fileName}"` : "File"
-    return toast.promise(promise, {
-      loading: `Uploading ${label}…`,
-      success: `${label} uploaded`,
-      error: (err) =>
-        err instanceof Error ? err.message : `Failed to upload ${label}`,
-    })
-  },
-
-  /** Generic delete from storage. */
-  remove<T>(promise: Promise<T>) {
-    return toast.promise(promise, {
-      loading: "Removing file…",
-      success: "File removed",
-      error: (err) =>
-        err instanceof Error ? err.message : "Failed to remove file",
-    })
-  },
 }
 
 // ─── User / Profile ────────────────────────────────────────────────────────

@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 // /about always shows the landing page — visible to everyone including logged-in users.
 import type { Metadata } from 'next'
 import { LandingContent } from '@/components/layout/landing/landing-content';
@@ -28,11 +29,11 @@ export async function generateMetadata({
     description,
     // Canonical points to the root landing — /about is a mirror
     alternates: {
-      canonical: `https://milestis.com/${locale}`,
+      canonical: `${siteConfig.appUrl}/${locale}`,
     },
     openGraph: {
       type: 'website',
-      url: `https://milestis.com/${locale}`,
+      url: `${siteConfig.appUrl}/${locale}`,
       title,
       description,
       siteName: 'Milestis',

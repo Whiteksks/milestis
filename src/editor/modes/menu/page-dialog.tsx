@@ -1,5 +1,7 @@
 'use client'
 
+import { buildPublishedProjectUrl } from '@/lib/slug'
+
 import { useId, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { FilePlus2, Globe, Trash2 } from 'lucide-react'
@@ -112,7 +114,7 @@ export function MenuPageDialog({ page, onClose, onSelect }: {
       </div>
       <div className="rounded-2xl border bg-muted/20 px-4 py-3">
         <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t('addressPreview')}</p>
-        <p className="break-all font-mono text-sm">{publishedSlug ? `https://${publishedSlug}.milestis.site${makeHome ? '/' : path}` : path}</p>
+        <p className="break-all font-mono text-sm">{publishedSlug ? `${buildPublishedProjectUrl('menu', publishedSlug)}${makeHome ? '/' : path}` : path}</p>
       </div>
       {page && !isHome && <label className="flex items-start gap-3 rounded-2xl border p-4 text-sm">
         <input type="checkbox" className="mt-0.5 size-4 accent-primary" checked={makeHome} onChange={(event) => setMakeHome(event.target.checked)} />

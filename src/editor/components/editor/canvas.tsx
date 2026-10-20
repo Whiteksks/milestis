@@ -143,7 +143,6 @@ export function Canvas({
         />}
 
         {editorMode !== 'menu' && <BackgroundLayers
-          placement="viewport"
           scrollContainerRef={scrollContainerRef}
           viewportRef={viewportRef}
         />}

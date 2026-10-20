@@ -1,13 +1,12 @@
-# Shared content domain
+# Общий домен контента
 
-Pure TypeScript consumed by the Next.js app and Cloud Functions. No React, Zustand,
-Firebase, Node APIs or environment variables belong here. The sources live inside
-the Functions source tree so the existing standalone Firebase deployment compiles
-and includes them without copying files or maintaining a second set of rules.
+Чистый TypeScript, используемый Next.js и Cloud Functions. Модули не зависят от React, Zustand, Firebase, Node API или окружения. Расположение внутри Functions позволяет включать их в отдельную серверную сборку без копирования.
 
-- `pages.ts`: page identity, canonical paths and the home-page invariant.
-- `menu/content.ts`: shared venue/catalog, page composition, validation and public projection.
-- The editor owns UI state and mutations; the publication service owns permissions,
-  Firestore transactions and image copying.
+| Модуль | Ответственность |
+| --- | --- |
+| `validation.ts` | Проверка примитивов и ошибки контента |
+| `pages.ts` | ID, канонические пути и единственная главная страница |
+| `menu/content.ts` | Каталог, состав страниц, лимиты и публичная проекция меню |
+| `menu/templates.ts`, `menu/mascot.ts` | Допустимые шаблоны и настройки персонажей |
 
-Only menu uses pages at present. Portfolio has not been migrated.
+Контракт страниц используется меню. Редактор отвечает за UI и мутации, сервис публикации — за права, транзакции и копирование медиа. [Описание меню](../../../docs/menu.md).

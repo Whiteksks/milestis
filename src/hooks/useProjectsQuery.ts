@@ -1,5 +1,5 @@
 import { useQuery, useSuspenseQuery, type QueryClient } from '@tanstack/react-query'
-import { type DocumentData, collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore'
+import { type DocumentData, collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { useShallow } from 'zustand/react/shallow'
 import { db } from '@/lib/firebase'
 import { selectAuthLoading, selectCurrentUid, useUserStore } from '@/hooks/useUserStore'
@@ -48,7 +48,6 @@ export const projectKeys = {
   active: (uid: string) => ['projects', uid, 'active'] as const,
   archived: (uid: string) => ['projects', uid, 'archived'] as const,
   deleted: (uid: string) => ['projects', uid, 'deleted'] as const,
-  exports: (uid: string) => ['exports', uid] as const,
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -194,88 +193,13 @@ export function useArchivedProjectsQuery({ enabled: extraEnabled = true }: { ena
   return { ...result, isLoading: userLoading || result.isLoading }
 }
 
-/** Reuses the active projects cache — no separate Firestore read. */
-export function useRecentProjectsQuery(limitCount = 4) {
-  const { data: allActive = [], isLoading } = useActiveProjectsQuery()
-  return {
-    projects: allActive.slice(0, limitCount),
-    loading: isLoading,
-  }
-}
-
 // ─── Published projects ────────────────────────────────────────────────────
 
 /**
  * Returns the canonical share URL for a published project.
- * - Portfolio: https://{slug}.milestis.site
- * - Photobook: https://milestis.site/{slug}?token={accessToken}
- *   (token is absent if the project was published before the token-persistence change)
+ * - Portfolio: a project subdomain on the configured publication origin
+ * - Photobook: a path on the configured publication origin with its share token
  */
 export function getProjectShareUrl(project: DashboardProject): string | null {
   return getPublishedProjectShareUrl({ ...project, mode: project.mode })
-}
-
-/**
- * Returns only published projects (active or archived) with their share URLs.
- * Combines active and archived caches — no extra Firestore read.
- */
-export function usePublishedProjectsQuery() {
-  const { data: allActive = [], isLoading: activeLoading } = useActiveProjectsQuery()
-  const { data: allArchived = [], isLoading: archivedLoading } = useArchivedProjectsQuery()
-  const publishedProjects = [...allActive, ...allArchived].filter((p) => p.isPublished)
-  return { data: publishedProjects, isLoading: activeLoading || archivedLoading }
-}
-
-// ─── Exports ─────────────────────────────────────────────────────
-
-export interface ProjectExportRecord {
-  exportId: string
-  projectId: string
-  projectName: string
-  ownerId: string
-  versionNumber: number
-  mode: SlugMode
-  creditCost: number
-  /** PDF download URL — photobook only. Undefined for portfolio. */
-  fileDownloadUrl?: string
-  /** MIME type of the exported file — photobook only. */
-  mimeType?: string
-  publishedSlug?: string
-  createdAt: Date
-}
-
-async function fetchUserExports(uid: string): Promise<ProjectExportRecord[]> {
-  const q = query(
-    collectionGroup(db, 'exports'),
-    where('ownerId', '==', uid),
-    orderBy('createdAt', 'desc'),
-  )
-  const snap = await getDocs(q)
-  return snap.docs.map((d) => {
-    const data = d.data()
-    return {
-      exportId: data.exportId ?? d.id,
-      projectId: data.projectId ?? '',
-      projectName: data.projectName ?? '',
-      ownerId: data.ownerId ?? uid,
-      versionNumber: data.versionNumber ?? 1,
-      mode: data.mode ?? 'photobook',
-      creditCost: data.creditCost ?? 0,
-      fileDownloadUrl: data.fileDownloadUrl ?? undefined,
-      mimeType: data.mimeType ?? undefined,
-      publishedSlug: data.publishedSlug,
-      createdAt: data.createdAt?.toDate() ?? new Date(),
-    } satisfies ProjectExportRecord
-  })
-}
-
-export function useProjectExportsQuery() {
-  const { uid, userLoading } = useUidAndLoading()
-  const result = useQuery({
-    queryKey: projectKeys.exports(uid ?? ''),
-    queryFn: () => fetchUserExports(uid!),
-    enabled: !userLoading && !!uid,
-    staleTime: STALE_TIME,
-  })
-  return { ...result, isLoading: userLoading || result.isLoading }
 }

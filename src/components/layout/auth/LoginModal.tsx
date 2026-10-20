@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -9,10 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CheckCircle2, ArrowLeft, ArrowRight, Mail } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
-import { sendSignInLinkToEmail, signInWithPassword, signInWithGoogle } from "@/lib/auth"
-import Link from "next/link"
+import { useLoginForm } from "@/hooks/use-login-form"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Checkbox } from "@/components/ui/checkbox"
 import { useTranslations } from "next-intl"
 import modalPhoto from "@/components/assets/n1ce-unsplash-2.webp"
 
@@ -25,97 +23,25 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const menuRef = useRef<HTMLDivElement>(null)
   const t = useTranslations()
   const isMobile = useIsMobile()
-  const [email, setEmail] = useState("")
+  const {
+    email, setEmail,
+    password, setPassword,
+    loading, googleLoading, sent, error,
+    showPasswordLogin, setShowPasswordLogin,
+    showEmailFlow, setShowEmailFlow,
+    handleSendMagicLink,
+    handleSignInWithPassword,
+    handleGoogleSignIn,
+    handleChangeEmail,
+    reset,
+  } = useLoginForm(() => handleOpenChange(false))
 
   // Blur the trigger button before vaul sets aria-hidden on the rest of the page
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) (document.activeElement as HTMLElement)?.blur()
   }, [open])
-  const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [password, setPassword] = useState("")
-  const [consentChecked, setConsentChecked] = useState(false)
-  const [newsletterChecked, setNewsletterChecked] = useState(false)
-  const [showPasswordLogin, setShowPasswordLogin] = useState(false)
-  const [showEmailFlow, setShowEmailFlow] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-
-  const recordIubendaConsent = (email: string) => {
-    ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
-      "submit",
-      {
-        subject: { email },
-        preferences: {
-          terms: true,
-          privacy_policy: true,
-          ...(newsletterChecked ? { newsletter: true } : {}),
-        },
-      },
-    ])
-  }
-
-  const handleSendMagicLink = async () => {
-    if (!email || !consentChecked) return
-    setLoading(true)
-    setError(null)
-
-    const { success, error } = await sendSignInLinkToEmail(email)
-
-    if (success) {
-      recordIubendaConsent(email)
-      setSent(true)
-    } else if (error) {
-      setError(error)
-    }
-
-    setLoading(false)
-  }
-
-  const handleChangeEmail = () => {
-    setSent(false)
-    setError(null)
-  }
-
-  const handleSignInWithPassword = async () => {
-    if (!email || !password || !consentChecked) return
-    setLoading(true)
-    setError(null)
-    const { success, error } = await signInWithPassword(email, password)
-    if (success) {
-      recordIubendaConsent(email)
-    } else if (error) {
-      setError(error)
-    }
-    setLoading(false)
-  }
-
-  const handleGoogleSignIn = async () => {
-    if (!consentChecked) return
-    setGoogleLoading(true)
-    setError(null)
-    const { success, error } = await signInWithGoogle()
-    if (success) {
-      recordIubendaConsent(email)
-      handleOpenChange(false)
-    } else if (error) {
-      setError(error)
-    }
-    setGoogleLoading(false)
-  }
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      setEmail("")
-      setSent(false)
-      setError(null)
-      setLoading(false)
-      setPassword("")
-      setConsentChecked(false)
-      setNewsletterChecked(false)
-      setShowPasswordLogin(false)
-      setShowEmailFlow(false)
-    }
+  function handleOpenChange(open: boolean) {
+    if (!open) reset()
     onOpenChange(open)
   }
 
@@ -141,7 +67,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 type="button"
                 variant="outline"
                 onClick={handleGoogleSignIn}
-                disabled={googleLoading || !consentChecked}
+                disabled={googleLoading}
                 className="w-full h-12 text-base font-semibold rounded-xl border-border/60 hover:bg-muted/30 transition-colors"
               >
                 <FcGoogle className="mr-2 size-5" />
@@ -192,7 +118,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
                 <Button
                   onClick={handleSendMagicLink}
-                  disabled={loading || !email || !consentChecked}
+                  disabled={loading || !email}
                   className="w-full h-12 text-base font-semibold rounded-xl transition-colors group"
                 >
                   {loading ? t("loginModal.sendingButton") : t("loginModal.sendButton")}
@@ -234,7 +160,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                     <Button
                       variant="outline"
                       onClick={handleSignInWithPassword}
-                      disabled={loading || !email || !password || !consentChecked}
+                      disabled={loading || !email || !password}
                       className="w-full h-10 text-sm font-medium rounded-xl border-border/60 hover:border-border hover:bg-muted/30 transition-colors group"
                     >
                       {loading ? t("loginModal.signingInButton") : t("loginModal.signInPasswordButton")}
@@ -246,43 +172,6 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             )}
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="auth-consent"
-                checked={consentChecked}
-                onCheckedChange={(v) => setConsentChecked(v === true)}
-                className="mt-0.5 shrink-0"
-              />
-              <label
-                htmlFor="auth-consent"
-                className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-              >
-                {t("loginModal.consentAgreePrefix")}{" "}
-                <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                  {t("loginModal.termsOfService")}
-                </Link>
-                {" "}{t("loginModal.consentAnd")}{" "}
-                <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                  {t("loginModal.privacyPolicy")}
-                </Link>
-              </label>
-            </div>
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="newsletter-consent"
-                checked={newsletterChecked}
-                onCheckedChange={(v) => setNewsletterChecked(v === true)}
-                className="mt-0.5 shrink-0"
-              />
-              <label
-                htmlFor="newsletter-consent"
-                className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-              >
-                {t("loginModal.newsletterConsent")}
-              </label>
-            </div>
-          </div>
         </div>
       ) : (
         <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">

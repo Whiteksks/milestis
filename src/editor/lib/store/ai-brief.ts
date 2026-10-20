@@ -1,12 +1,7 @@
 import { create } from 'zustand'
 
-/** Tracks what the AI pipeline has actually generated for the current project, and which of
- *  those sections the human has since edited by hand — see src/lib/ai/core/types.ts
- *  `AiBriefSnapshot` for why this exists. Deliberately a separate store from ContentStore/
- *  ThemeStore (not a project-content concept, purely an AI-pipeline bookkeeping concern) and
- *  reset on project switch the same way aiChat messages are (see AiChat/index.tsx). Not yet
- *  persisted to Firestore — in-memory only until the new pipeline (later phase) actually reads
- *  it, to avoid wiring save/load for a value nothing consumes yet. */
+/** Tracks AI-generated sections and later manual edits for the open project.
+ *  In-memory state is reset when the editor switches projects. */
 export interface AiBriefStore {
   hasGenerated: boolean
   generatedAt: number | null

@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import { NextRequest, NextResponse } from "next/server"
 import { getPolarClient } from "@/lib/billing/polar"
 import { resolveBillingProductId } from "@/lib/billing/plans"
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 3. Create Polar Checkout Session ────────────────────────────────────
-  const appUrl = process.env.NEXT_APP_URL ?? request.nextUrl.origin
+  const appUrl = siteConfig.appUrl
   const successUrl = new URL("/account/billing?checkout=success", appUrl).toString()
 
   // Fetch user's email to pre-fill the checkout form.

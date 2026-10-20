@@ -1,3 +1,4 @@
+import { functionUrl } from '@/config/firebase'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
@@ -128,7 +129,7 @@ async function fetchTransactionsFromFirestore(uid: string): Promise<Array<Billin
 }
 
 async function fetchTransactionsFromExport(uid: string): Promise<Array<BillingInvoiceItem | BillingCreditHistoryItem>> {
-  const url = process.env.NEXT_PUBLIC_EXPORT_USER_DATA_URL
+  const url = functionUrl('exportUserData')
   const user = auth.currentUser
 
   if (!url || !user) {

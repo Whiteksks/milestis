@@ -1,4 +1,5 @@
 import 'server-only'
+import { getAiConfig } from '@/config/server'
 import { AiServiceError } from './openai'
 import type { FoodPhotoStyle } from '../menu/photo-styles'
 
@@ -68,7 +69,7 @@ export async function enhanceFoodPhoto(sourceUrl: string, style: FoodPhotoStyle,
   }
   const original = await readImageBytes(source)
   const body = new FormData()
-  body.set('model', 'gpt-image-2.5-flare')
+  body.set('model', getAiConfig().imageModel)
   body.set('image', new Blob([new Uint8Array(original)], { type: mime }), `dish.${mime.split('/')[1]}`)
   body.set('prompt', `${FOOD_PHOTO_PROMPT}\n\n${FOOD_PHOTO_STYLE_PROMPTS[style]}`)
   body.set('size', '1024x1024')

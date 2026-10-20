@@ -1,11 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
-import vm from 'node:vm'
-import ts from 'typescript'
+import { createSourceLoader } from './support/source-loader.mjs'
 
-const root = path.resolve(import.meta.dirname, '..')
 function harness(initial = 'cafe') {
   const states = [], effects = [], timers = new Map(), requests = []
   let stateIndex = 0, effectIndex = 0, timerId = 0, dirty = true, output
@@ -26,37 +22,20 @@ function harness(initial = 'cafe') {
       }
     },
   }
-  const cache = new Map()
-  function load(file) {
-    const filename = path.resolve(root, file)
-    if (cache.has(filename)) return cache.get(filename)
-    const module = { exports: {} }
-    const code = ts.transpileModule(readFileSync(filename, 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText
-    const require = (id) => {
-      if (id === 'react') return react
-      if (id === '@/lib/slug') return {
-        ...load('src/lib/slug/validation.ts'), setStoredPublishSlug: () => {},
-      }
-      if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), `${id}.ts`))
-      throw new Error(`Unexpected dependency ${id}`)
-    }
-    const fetch = (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject }))
-    // Run the real hook with deterministic state/effect/timer adapters, no network.
-    vm.runInThisContext(`(function(require,module,exports,setTimeout,clearTimeout,fetch){${code}\n})`, { filename })(
-      require, module, module.exports,
-      (callback) => { timers.set(++timerId, callback); return timerId },
-      (id) => timers.delete(id), fetch,
-    )
-    cache.set(filename, module.exports)
-    return module.exports
-  }
-  const { usePublishSlug } = load('src/hooks/usePublishSlug.ts')
+  const mocks = { react }
+  const load = createSourceLoader(mocks, {
+    setTimeout: callback => { timers.set(++timerId, callback); return timerId },
+    clearTimeout: id => timers.delete(id),
+    fetch: (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject })),
+  })
+  mocks['@/lib/slug'] = { ...load('src/lib/slug/validation.ts'), setStoredPublishSlug: () => {} }
+  const { usePublishSlug: renderPublishSlug } = load('src/hooks/usePublishSlug.ts')
   function flush() {
     let count = 0
     while (dirty) {
       assert.ok(++count < 20, 'No render loop')
       dirty = false; stateIndex = 0; effectIndex = 0
-      output = usePublishSlug('project', 'menu', initial)
+      output = renderPublishSlug('project', 'menu', initial)
       for (const effect of effects) if (effect.pending) {
         effect.pending = false; effect.cleanup?.(); effect.cleanup = effect.callback()
       }

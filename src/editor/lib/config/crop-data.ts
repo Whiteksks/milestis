@@ -1,12 +1,9 @@
-import type React from 'react'
-
 export interface ImageCropArea {
   x: number
   y: number
   width: number
   height: number
 }
-
 
 export interface ImageCropData {
   /** react-easy-crop viewport position — restores the crop editor UI  */
@@ -19,20 +16,6 @@ export interface ImageCropData {
   /** Intrinsic pixel dimensions of the source image */
   naturalWidth: number
   naturalHeight: number
-}
-
-/**
- * Returns `position: absolute` styles for an inner image wrapper.
- */
-export function getCropWrapperStyle(cropData: ImageCropData): React.CSSProperties {
-  const { area, naturalWidth, naturalHeight } = cropData
-  return {
-    position: 'absolute',
-    width:  `${(naturalWidth  / area.width)  * 100}%`,
-    height: `${(naturalHeight / area.height) * 100}%`,
-    left:   `${-(area.x / area.width)  * 100}%`,
-    top:    `${-(area.y / area.height) * 100}%`,
-  }
 }
 
 /** Load an image URL and return its intrinsic pixel dimensions. */

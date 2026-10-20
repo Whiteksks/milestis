@@ -1,10 +1,10 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 
 interface PageProps {
   params: Promise<{ locale: string }>
 }
 
-// Убрали kz из метаданных, если язык пока не поддерживается
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/policies/refund-policy`
+  const url = `${siteConfig.appUrl}/${locale}/policies/refund-policy`
 
   return {
     title,
@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: url,
       languages: {
-        'en': 'https://milestis.com/en/policies/refund-policy',
-        'ru': 'https://milestis.com/ru/policies/refund-policy',
-        'x-default': 'https://milestis.com/en/policies/refund-policy',
+        'en': `${siteConfig.appUrl}/en/policies/refund-policy`,
+        'ru': `${siteConfig.appUrl}/ru/policies/refund-policy`,
+        'x-default': `${siteConfig.appUrl}/en/policies/refund-policy`,
       },
     },
     openGraph: { type: 'website', url, title, description, siteName: 'Milestis' },
@@ -57,7 +57,7 @@ const content = {
       },
       {
         title: '4. Payment Processing & Contact Us',
-        text: 'Payments are handled by secure third-party providers. Credit top-ups have a minimum purchase of $10. The number of credits per dollar depends on your subscription plan — Free: 1 credit/$1; Creator and Archive: 5 credits/$1. If you believe you were charged in error, contact us within 14 days at support@milestis.com with your account and transaction details. We will manually review your exceptional case.',
+        text: `Payments are handled by secure third-party providers. Credit top-ups have a minimum purchase of $10. The number of credits per dollar depends on your subscription plan — Free: 1 credit/$1; Creator and Archive: 5 credits/$1. If you believe you were charged in error, contact us within 14 days at ${siteConfig.supportEmail} with your account and transaction details. We will manually review your exceptional case.`,
       },
     ],
   },
@@ -81,7 +81,7 @@ const content = {
       },
       {
         title: '4. Обработка платежей и связь с нами',
-        text: 'Все платежи обрабатываются безопасными сторонними провайдерами. Минимальная сумма пополнения кредитов — $10. Количество кредитов за доллар зависит от тарифного плана: бесплатный план — 1 кредит за $1; планы Creator и Archive — 5 кредитов за $1. Если вы считаете, что списание произошло по ошибке, свяжитесь с нами в течение 14 дней по адресу support@milestis.com, указав детали аккаунта и транзакции. Мы рассмотрим вашу ситуацию в индивидуальном порядке.',
+        text: `Все платежи обрабатываются безопасными сторонними провайдерами. Минимальная сумма пополнения кредитов — $10. Количество кредитов за доллар зависит от тарифного плана: бесплатный план — 1 кредит за $1; планы Creator и Archive — 5 кредитов за $1. Если вы считаете, что списание произошло по ошибке, свяжитесь с нами в течение 14 дней по адресу ${siteConfig.supportEmail}, указав детали аккаунта и транзакции. Мы рассмотрим вашу ситуацию в индивидуальном порядке.`,
       },
     ],
   },
@@ -122,11 +122,11 @@ export default async function RefundPolicyPage({ params }: PageProps) {
       <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-center sm:text-left">
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
           {currentContent.footerText}
-          <a 
-            href="mailto:support@milestis.com" 
+          <a
+            href={`mailto:${siteConfig.supportEmail}`}
             className="font-medium text-neutral-900 dark:text-neutral-50 underline underline-offset-4 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
           >
-            support@milestis.com
+            {siteConfig.supportEmail}
           </a>
         </p>
       </div>

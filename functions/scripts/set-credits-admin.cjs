@@ -25,8 +25,7 @@ async function main() {
   let credential;
   if (values['firebase-cli']) {
     const path = require('node:path');
-    const cliPath = process.env.FIREBASE_CLI_PATH || (process.env.APPDATA ? path.join(process.env.APPDATA, 'npm/node_modules/firebase-tools') : null);
-    if (!cliPath) throw new Error('Set FIREBASE_CLI_PATH to the installed firebase-tools directory, or use ADC');
+    const cliPath = process.env.FIREBASE_CLI_PATH || path.dirname(require.resolve('firebase-tools/package.json'));
     const cliAuth = require(path.join(cliPath, 'lib/auth.js'));
     const account = cliAuth.getGlobalDefaultAccount();
     if (!account?.tokens?.refresh_token) throw new Error('Run firebase login first');

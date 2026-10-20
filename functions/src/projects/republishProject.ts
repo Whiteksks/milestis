@@ -9,7 +9,6 @@ import { migrateProjectMedia, deletePrivateProjectMedia } from "./publish/migrat
 import { processTransactionInFirestoreTransaction, TransactionEngineError } from "../transactions/engine";
 import { VALID_MODES, type ProjectMode } from "./projectInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
-import { recordIubendaConsent } from "../lib/iubendaConsent";
 import type { BalanceSnapshot } from "../transactions/types";
 import { generateAndStoreOgImageBounded } from "./ogImage";
 
@@ -197,11 +196,9 @@ export const republishProject = onRequest(
 		}
 
 		let uid: string;
-		let userEmail: string | null;
 		try {
 			const decoded = await getAuth().verifyIdToken(authHeader.split("Bearer ")[1]);
 			uid = decoded.uid;
-			userEmail = decoded.email ?? null;
 		} catch {
 			res.status(401).json({ error: ERROR.INVALID_OR_EXPIRED_TOKEN });
 			return;
@@ -452,15 +449,6 @@ export const republishProject = onRequest(
 			await generateAndStoreOgImageBounded(pid, mode, migratedData.content).catch((err) => {
 				logger.warn(`[republishProject] OG image generation failed for ${pid}:`, err);
 			});
-
-			// Consent recording for paid republish (currently a no-op, see iubendaConsent.ts)
-			if (deltaCost > 0) {
-				recordIubendaConsent(
-					{ id: uid, email: userEmail },
-					["terms_and_conditions", "privacy_policy"],
-					`User accepted Terms and Privacy Policy when re-publishing project "${projectData.name}" on milestis.com`,
-				).catch(() => {});
-			}
 
 			logger.info(`[republishProject] Project ${pid} re-published by ${uid}, slug="${publishedSlug}", deltaCost=${deltaCost}.`);
 			res.status(200).json({

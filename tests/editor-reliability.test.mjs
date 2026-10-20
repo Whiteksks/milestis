@@ -1,38 +1,15 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import vm from 'node:vm'
-import ts from 'typescript'
 import { createStore } from 'zustand/vanilla'
 import { QueryClient } from '@tanstack/react-query'
+import { createSourceLoader as loader } from './support/source-loader.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
-const dependency = createRequire(import.meta.url)
 const functionDependency = createRequire(path.join(root, 'functions/package.json'))
-function loader(mocks = {}) {
-  const cache = new Map()
-  function load(file) {
-    let filename = path.resolve(root, file)
-    if (!path.extname(filename)) filename = existsSync(`${filename}.ts`) ? `${filename}.ts` : path.join(filename, 'index.ts')
-    if (cache.has(filename)) return cache.get(filename).exports
-    const sourceModule = { exports: {} }
-    cache.set(filename, sourceModule)
-    const compiled = ts.transpileModule(readFileSync(filename, 'utf8'), {
-      compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, esModuleInterop: true },
-    }).outputText
-    const require = (id) => {
-      if (Object.hasOwn(mocks, id)) return mocks[id]
-      if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
-      if (id.startsWith('@/')) return load(path.join(root, 'src', id.slice(2)))
-      return dependency(id)
-    }
-    vm.runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename })(require, sourceModule, sourceModule.exports)
-    return sourceModule.exports
-  }
-  return load
-}
+
 function deferred() {
   let resolve, reject
   const promise = new Promise((yes, no) => { resolve = yes; reject = no })
@@ -275,7 +252,6 @@ test('AI waits for all sections before applying successful results', async () =>
   assert.deepEqual(h.applied.map(([name]) => name), ['header', 'hero'])
 })
 
-
 function imageHarness(limit = 100) {
   const data = new Map([['users/u', { stats: { storageUsedBytes: 0 } }], ['projects/p', { ownerId: 'u', mode: 'portfolio' }]])
   const deleted = []
@@ -353,4 +329,106 @@ test('real Sharp processing bounds tall images and deletes the original only aft
     assert.ok(meta.width <= limit && meta.height <= limit, name)
   }
   assert.deepEqual(order, ['commit', 'delete'])
+})
+
+test('project API calls preserve request contracts and operation-specific error classes', async t => {
+  const auth = { currentUser: null }
+  const calls = []
+  let response = { ok: true, data: { ok: true, projectId: 'p1', publishedSlug: 'cafe' } }
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    calls.push({ url, ...options, body: JSON.parse(options.body) })
+    return { ok: response.ok, json: async () => response.data }
+  })
+  const load = loader({
+    '@/config/firebase': { functionUrl: name => `https://functions.example.test/${name}` },
+    '../firebase/firebase': { auth, db: {} },
+  })
+  const scenarios = [
+    ['create-project-api', 'createProject', ['Project', 'portfolio'], { name: 'Project', mode: 'portfolio' }, 'CreateProjectError', 'Failed to create project'],
+    ['force-delete-project-api', 'forceDeleteProject', ['p1'], { projectId: 'p1' }, 'DeleteProjectError', 'Failed to delete project'],
+    ['unpublish-project-api', 'unpublishProject', ['p1'], { projectId: 'p1' }, 'UnpublishProjectError', 'Failed to unpublish project'],
+    ['publish-project-api', 'publishProject', ['p1', 'cafe', 'quote', 'share'], { projectId: 'p1', slug: 'cafe', quoteId: 'quote', accessToken: 'share' }, 'PublishProjectError', 'Failed to publish project'],
+    ['republish-project-api', 'republishProject', ['p1', 'quote'], { projectId: 'p1', quoteId: 'quote' }, 'RepublishProjectError', 'Failed to republish project'],
+    ['analyze-project-api', 'analyzeProject', ['p1', 'cafe'], { projectId: 'p1', slug: 'cafe' }, 'AnalyzeProjectError', 'Failed to analyze project'],
+    ['analyze-republish-api', 'analyzeRepublish', ['p1'], { projectId: 'p1' }, 'AnalyzeRepublishError', 'Failed to analyze project for republish'],
+    ['publish-menu-api', 'publishMenu', ['p1', 'cafe', 'ru', 'quote'], { projectId: 'p1', slug: 'cafe', locale: 'ru', quoteId: 'quote' }, 'PublishProjectError', 'Menu publication failed'],
+    ['menu-billing-api', 'reviewMenuPayment', ['p1', 'menu-50'], { action: 'review', projectId: 'p1', planId: 'menu-50' }, 'PublishProjectError', 'Menu billing failed'],
+  ]
+  for (const [file, name, args, body, errorName, fallback] of scenarios) {
+    const api = load(`src/lib/projects/${file}.ts`)
+    const ErrorClass = api[errorName] ?? load('src/lib/projects/publish-project-api.ts').PublishProjectError
+    auth.currentUser = null
+    const previousCalls = calls.length
+    await assert.rejects(api[name](...args), error => error instanceof ErrorClass && error.code === 'UNAUTHORIZED')
+    assert.equal(calls.length, previousCalls)
+    auth.currentUser = { getIdToken: async () => 'id-token' }
+    response = { ok: true, data: { ok: true, projectId: 'p1', publishedSlug: 'cafe' } }
+    const result = await api[name](...args)
+    const endpoint = file === 'menu-billing-api' ? 'menuBilling' : name
+    assert.deepEqual(calls.at(-1), { url: `https://functions.example.test/${endpoint}`, method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer id-token' }, body })
+    if (name === 'createProject') assert.deepEqual(result, { projectId: 'p1', shareCode: undefined })
+    else if (name === 'forceDeleteProject' || name === 'unpublishProject') assert.equal(result, undefined)
+    else assert.deepEqual(result, response.data)
+    response = { ok: false, data: { error: 'CONFLICT', message: 'Server message' } }
+    const message = file === 'menu-billing-api' || name === 'publishMenu' ? fallback : 'Server message'
+    await assert.rejects(api[name](...args), error => error instanceof ErrorClass && error.code === 'CONFLICT' && error.message === message)
+    response = { ok: false, data: {} }
+    await assert.rejects(api[name](...args), error => error instanceof ErrorClass && error.code === 'UNKNOWN' && error.message === fallback)
+  }
+})
+
+test('shared login form preserves pending email, password errors, Google success and reset behavior', async () => {
+  const states = []
+  let index = 0, googleSuccesses = 0
+  const magicLink = deferred()
+  let googleResult = { success: false, error: 'authErrors.popupClosed' }
+  const { useLoginForm: renderLoginForm } = loader({
+    react: { useState: initial => {
+      const position = index++
+      if (!(position in states)) states[position] = initial
+      return [states[position], value => { states[position] = value }]
+    } },
+    '@/lib/auth': {
+      sendSignInLinkToEmail: email => { assert.equal(email, 'owner@example.test'); return magicLink.promise },
+      signInWithPassword: async (email, password) => {
+        assert.equal(email, 'owner@example.test')
+        assert.equal(password, 'wrong-password')
+        return { success: false, error: 'authErrors.invalidCredentials' }
+      },
+      signInWithGoogle: async () => googleResult,
+    },
+  })('src/hooks/use-login-form.ts')
+  const render = () => { index = 0; return renderLoginForm(() => { googleSuccesses++ }) }
+  let form = render()
+  form.setEmail('owner@example.test')
+  form = render()
+  const sending = form.handleSendMagicLink()
+  assert.equal(render().loading, true)
+  magicLink.resolve({ success: true, error: null })
+  await sending
+  form = render()
+  assert.equal(form.sent, true)
+  assert.equal(form.loading, false)
+  form.handleChangeEmail()
+  form.setPassword('wrong-password')
+  form = render()
+  await form.handleSignInWithPassword()
+  form = render()
+  assert.equal(form.error, 'authErrors.invalidCredentials')
+  assert.equal(form.loading, false)
+  await form.handleGoogleSignIn()
+  form = render()
+  assert.equal(form.error, 'authErrors.popupClosed')
+  assert.equal(googleSuccesses, 0)
+  googleResult = { success: true, error: null }
+  await form.handleGoogleSignIn()
+  form = render()
+  assert.equal(googleSuccesses, 1)
+  assert.equal(form.error, null)
+  assert.equal(form.googleLoading, false)
+  form.setShowEmailFlow(true)
+  form.setShowPasswordLogin(true)
+  render().reset()
+  form = render()
+  assert.deepEqual([form.email, form.password, form.sent, form.error, form.loading, form.showEmailFlow, form.showPasswordLogin], ['', '', false, null, false, false, false])
 })

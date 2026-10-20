@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 import Header from "@/components/layout/header";
 import { HelpPage } from "@/components/layout/supportPage/help-page";
@@ -22,7 +23,7 @@ export async function generateMetadata({
 
   const title = titles[locale] ?? titles.en
   const description = descriptions[locale] ?? descriptions.en
-  const url = `https://milestis.com/${locale}/help`
+  const url = `${siteConfig.appUrl}/${locale}/help`
 
   return {
     title,
@@ -30,10 +31,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        'en': 'https://milestis.com/en/help',
-        'ru': 'https://milestis.com/ru/help',
-        'kk': 'https://milestis.com/kz/help',
-        'x-default': 'https://milestis.com/en/help',
+        'en': `${siteConfig.appUrl}/en/help`,
+        'ru': `${siteConfig.appUrl}/ru/help`,
+        'kk': `${siteConfig.appUrl}/kz/help`,
+        'x-default': `${siteConfig.appUrl}/en/help`,
       },
     },
     openGraph: {

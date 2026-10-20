@@ -150,10 +150,6 @@ export function AnimationProvider({
 
 //   Hooks      
 
-/** Full context. Use when you need both disabled flag and t(). */
-export const useAnimationContext = (): AnimationContextValue =>
-  useContext(AnimationContext)
-
 /** Just the t() transition helper. Preferred for direct section usage. */
 export const useT = (): AnimationContextValue['t'] =>
   useContext(AnimationContext).t

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!project || project.ownerId !== auth.uid || project.status === 'deleted') throw new AiServiceError('AI_PROJECT_UNAVAILABLE', 403)
     if (!taskMatchesMode(task, project.mode)) throw new AiServiceError('AI_INVALID_REQUEST', 400)
     if (!process.env.OPENAI_API_KEY) throw new AiServiceError('AI_NOT_CONFIGURED', 503)
-    // Chat is available without a subscription. Photo enhancement is a separate future feature.
+    // Chat limits apply independently of subscription tier.
     await reserveAiRequest(auth.uid)
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(110_000)])
     const result = await aiRequestContext.run({ signal, resolvePhoto: createPhotoResolver(auth.uid, projectId, task === 'generateMenu') },

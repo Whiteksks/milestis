@@ -1,3 +1,5 @@
+import { getBillingProducts } from '@/config/server'
+import { siteConfig } from '@/config/site'
 import { NextRequest, NextResponse } from "next/server"
 import { getPolarClient } from "@/lib/billing/polar"
 import { requireAuth } from "@/lib/api/require-auth"
@@ -46,10 +48,6 @@ export async function POST(request: NextRequest) {
     body !== null && typeof body === "object" && "returnTo" in body
       ? (body as Record<string, unknown>).returnTo
       : null
-  const returnTo =
-    typeof rawReturnTo === "string" && rawReturnTo.startsWith("/")
-      ? rawReturnTo
-      : null
 
   // ── 3. Read user's credit rate from Firestore (never trust client) ───────
   // Rate is determined by subscription tier:
@@ -82,17 +80,20 @@ export async function POST(request: NextRequest) {
   // ── 5. Create Polar ad-hoc checkout ─────────────────────────────────────
   // The product must be configured as "Custom amount" in the Polar dashboard.
   // Set POLAR_CREDITS_PRODUCT_ID in apphosting.yaml / .env.local.
-  const productId = process.env.POLAR_CREDITS_PRODUCT_ID
+  const productId = getBillingProducts().credits
   if (!productId) {
     console.error("[api/billing/buy-credits] POLAR_CREDITS_PRODUCT_ID is not set")
     return NextResponse.json({ error: "CREDITS_PRODUCT_NOT_CONFIGURED" }, { status: 500 })
   }
 
-  const appUrl = process.env.NEXT_APP_URL ?? request.nextUrl.origin
-  const successUrl = new URL(
-    returnTo ?? "/account/billing?checkout=success&type=credits",
-    appUrl,
-  ).toString()
+  const appUrl = siteConfig.appUrl
+  let successUrl = new URL("/account/billing?checkout=success&type=credits", appUrl).toString()
+  if (typeof rawReturnTo === "string" && rawReturnTo.startsWith("/")) {
+    try {
+      const target = new URL(rawReturnTo, appUrl)
+      if (target.origin === appUrl) successUrl = target.toString()
+    } catch { /* Invalid return paths use the billing page. */ }
+  }
 
   try {
     const polar = getPolarClient()

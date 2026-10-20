@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import './globals.css';
 
 import { ThemeProvider } from '@/components/theme/theme-provider';
@@ -5,7 +6,7 @@ import type { Metadata } from 'next';
 import { Alice, Cormorant_Garamond, IBM_Plex_Mono } from 'next/font/google';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_APP_URL ?? 'https://milestis.com'),
+  metadataBase: new URL(siteConfig.appUrl),
   title: {
     default: 'Milestis',
     template: '%s | Milestis',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     siteName: 'Milestis',
     title: 'Milestis',
     description: 'Create your interactive photo book and share your story with the world.',
-    url: process.env.NEXT_APP_URL ?? 'https://milestis.com',
+    url: siteConfig.appUrl,
   },
   twitter: {
     card: 'summary_large_image',

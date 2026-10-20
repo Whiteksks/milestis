@@ -1,33 +1,13 @@
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync } from 'node:fs'
-import path from 'node:path'
-import vm from 'node:vm'
-import { createRequire } from 'node:module'
-import ts from 'typescript'
+import { createSourceLoader } from './source-loader.mjs'
 
-const root = path.resolve(import.meta.dirname, '../..')
-const dependency = createRequire(import.meta.url)
 export const field = {
   serverTimestamp: () => ({ operation: 'timestamp' }),
   increment: (amount) => ({ operation: 'increment', amount }),
   delete: () => ({ operation: 'delete' }),
 }
 export function load(file, mocks) {
-  const cache = new Map()
-  function visit(file) {
-  let filename = path.resolve(root, file)
-  if (!path.extname(filename)) filename = existsSync(`${filename}.ts`) ? `${filename}.ts` : path.join(filename, 'index.ts')
-  if (cache.has(filename)) return cache.get(filename).exports
-  const compiled = ts.transpileModule(readFileSync(filename, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
-  }).outputText
-  const sourceModule = { exports: {} }
-  cache.set(filename, sourceModule)
-  const require = (id) => Object.hasOwn(mocks, id) ? mocks[id] : id.startsWith('.') ? visit(path.resolve(path.dirname(filename), id)) : dependency(id)
-  vm.runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename })(require, sourceModule, sourceModule.exports)
-  return sourceModule.exports
-  }
-  return visit(file)
+  return createSourceLoader(mocks)(file)
 }
 
 // Snapshot isolation, atomic commits, conflict retries and Firestore's read-before-write rule.
@@ -132,5 +112,4 @@ export function database() {
   const put = (key, value) => { records.set(key, structuredClone(value)); versions.set(key, ++revision) }
   return { db, records, controls, put }
 }
-
 

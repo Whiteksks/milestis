@@ -5,7 +5,6 @@ import { getAuth } from "firebase-admin/auth";
 import { db } from "../lib/firebaseAdmin";
 import { UserDocument } from "./userInterface";
 import { ALLOWED_ORIGINS } from "../lib/cors";
-import { recordIubendaConsent } from "../lib/iubendaConsent";
 import { grantSignupBonus, grantReferralBonus } from "./referral";
 
 export const createUser = onRequest(
@@ -83,10 +82,6 @@ export const createUser = onRequest(
         metadata: {
           createdAt: FieldValue.serverTimestamp(),
           schemaVersion: 1,
-          terms: {
-            acceptedVersion: "v1",
-            acceptedAt: FieldValue.serverTimestamp(),
-          },
         },
       };
 
@@ -100,13 +95,6 @@ export const createUser = onRequest(
       // Referral bonus — best-effort, must not block/fail the signup response.
       const referrerUid = (req.body as Record<string, unknown> | undefined)?.ref;
       await grantReferralBonus(uid, referrerUid);
-
-      // Record consent in iubenda — fire-and-forget, must not block the response (currently a no-op, see iubendaConsent.ts)
-      recordIubendaConsent(
-        { id: uid, email },
-        ["terms_and_conditions", "privacy_policy"],
-        "User accepted Terms and Privacy Policy during account registration on milestis.com",
-      ).catch(() => {});
 
       res.status(201).json({ ok: true, uid });
 

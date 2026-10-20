@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl'
 import { Sparkles, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import type { Message } from './types'
+import type { AiChatMessage } from '@/editor/lib/store/ui'
 import { UserAvatar } from '@/components/shared/user-avatar'
 
 interface ChatMessagesProps {
-  messages: Message[]
+  messages: AiChatMessage[]
   isLoading?: boolean
   greeting?: string
   quickPrompts?: string[]

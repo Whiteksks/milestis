@@ -1,5 +1,7 @@
 'use client'
 
+import { siteConfig } from '@/config/site'
+
 import { useState, useEffect } from 'react'
 import { Gift } from 'lucide-react'
 import {
@@ -44,7 +46,7 @@ export function MilestisWhiteLabel({ clickable = true, referrerUid }: MilestisWh
     ? (isRussian ? 'Вам подарок' : 'You have a gift')
     : (isRussian ? 'Сделано в Milestis' : 'Made with Milestis')
 
-  const registerLink = `https://milestis.com/${isRussian ? 'ru' : 'en'}/auth/login?ref=${activeReferrerUid}`
+  const registerLink = `${siteConfig.appUrl}/${isRussian ? 'ru' : 'en'}/auth/login?ref=${activeReferrerUid}`
 
   const containerClasses = 
     'group fixed bottom-5 left-5 z-[70] focus:outline-none transform transition-all duration-300 ease-out hover:scale-[1.04] active:scale-95'
@@ -192,7 +194,7 @@ export function MilestisWhiteLabel({ clickable = true, referrerUid }: MilestisWh
   if (clickable) {
     return (
       <a
-        href="https://milestis.com"
+        href={`${siteConfig.appUrl}`}
         target="_blank"
         rel="noreferrer"
         className={containerClasses}

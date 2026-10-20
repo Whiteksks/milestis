@@ -1,22 +1,10 @@
 {
   "Legal": {
-    "badge": "Privacy & Rules",
-    "title": "Legal & Privacy",
-    "description": "We value transparency and keep things straightforward. Below you'll find the official rules for using Milestis, along with details on how we protect and handle your data.",
+    "badge": "Policies",
+    "title": "Legal information",
+    "description": "Rules for using Milestis and information about payments and refunds.",
     "effectiveDate": "Last updated: June 2026 • Milestis",
     "policies": {
-      "terms": {
-        "title": "Terms of Service",
-        "description": "The rules and guidelines you agree to when using our platform and services."
-      },
-      "privacy": {
-        "title": "Privacy Policy",
-        "description": "A clear breakdown of what data we collect, why we need it, and how we protect it."
-      },
-      "cookies": {
-        "title": "Cookie Policy",
-        "description": "How we use cookies to keep you logged in and improve your experience."
-      },
       "refund": {
         "title": "Pricing & Refund Policy",
         "description": "Information about digital credits, subscription terms, payments, and refund conditions."

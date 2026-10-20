@@ -4,11 +4,6 @@ import { createPortfolioSlice, type PortfolioSlice } from '@/editor/modes/portfo
 import { createPhotobookSlice, type PhotobookSlice } from '@/editor/modes/photobook/store-slice'
 import { createEventSlice, type EventSlice } from '@/editor/modes/event/store-slice'
 
-/** Full content store — union of all mode slices.
- *  To add a new mode:
- *  1. Create modes/<name>/store-slice.ts exporting XxxSlice + createXxxSlice
- *  2. Add '& XxxSlice' to ContentStore below
- *  3. Add createXxxSlice to ALL_SLICE_CREATORS */
 export type ContentStore = PortfolioSlice & PhotobookSlice & EventSlice & MenuSlice
 
 type ContentStoreSliceCreator = StateCreator<ContentStore, [], [], Partial<ContentStore>>

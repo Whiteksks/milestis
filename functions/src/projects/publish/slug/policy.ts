@@ -17,7 +17,7 @@ export const SLUG_MODE_POLICY = {
 		namespace: "token",
 		routeKind: "path",
 	},
-	// Events use shareCode-based routing (/e/[shareCode]), not slugs.
+	// Events use private path-based URLs.
 	event: {
 		namespace: "token",
 		routeKind: "path",

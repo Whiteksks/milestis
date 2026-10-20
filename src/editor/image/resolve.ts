@@ -31,11 +31,9 @@ function resolveFrameStyle(value: ImageValue, policy: ImagePolicy): FrameStyle {
   return policy.frame.default
 }
 
-function resolveCrop(value: ImageValue, policy: ImagePolicy, ratio: ImageRatioValue) {
-  // Always honor an explicit user crop — the user made this choice deliberately.
+function resolveCrop(value: ImageValue, ratio: ImageRatioValue) {
   if (value.crop && value.crop.ratio === ratio && value.crop.origin === 'user') {
-    // Reject stale crop if it was stamped for a different asset.
-    // assetSrc is optional for backward compat — crops without it are trusted.
+    // Reject crops tied to a different source; unstamped crops remain valid.
     if (!value.crop.assetSrc || value.crop.assetSrc === value.asset.src) {
       return value.crop
     }
@@ -57,7 +55,7 @@ export function resolveImage(
   const policy = getEffectiveImagePolicy(slotId, templateId)
 
   const ratio = resolveRatio(value, policy)
-  const crop = resolveCrop(value, policy, ratio)
+  const crop = resolveCrop(value, ratio)
 
   return {
     slotId,

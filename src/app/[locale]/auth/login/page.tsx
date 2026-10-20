@@ -6,27 +6,26 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox" // Импортировано из UI
-import { CheckCircle2, ArrowLeft, Zap, ArrowRight, Share, Palette, Mail, Gift } from "lucide-react"
+import { CheckCircle2, ArrowLeft, ArrowRight, Mail, Gift } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import Header from "@/components/layout/header"
 import { AuthenticatedRedirect } from "@/components/auth/authenticated-redirect"
-import { sendSignInLinkToEmail, signInWithPassword, signInWithGoogle } from "@/lib/auth"
+import { useLoginForm } from "@/hooks/use-login-form"
 import { peekReferralCode } from "@/lib/referral"
-import Link from "next/link"
 
 export default function LoginPage() {
   const t = useTranslations()
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [password, setPassword] = useState("")
-  const [consentChecked, setConsentChecked] = useState(false) // Стейт чекбокса
-  const [newsletterChecked, setNewsletterChecked] = useState(false) // Согласие на рассылку
-  const [showPasswordLogin, setShowPasswordLogin] = useState(false)
-  const [showEmailFlow, setShowEmailFlow] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const {
+    email, setEmail,
+    password, setPassword,
+    loading, googleLoading, sent, error,
+    showPasswordLogin, setShowPasswordLogin,
+    showEmailFlow, setShowEmailFlow,
+    handleSendMagicLink,
+    handleSignInWithPassword,
+    handleGoogleSignIn,
+    handleChangeEmail,
+  } = useLoginForm()
   const [hasReferral, setHasReferral] = useState(false)
 
   useEffect(() => {
@@ -34,78 +33,7 @@ export default function LoginPage() {
     setHasReferral(!!(urlRef || peekReferralCode()))
   }, [])
 
-  // Логика интеграции с Iubenda
-  const recordIubendaConsent = (email: string) => {
-    ;(window as Window & { _iub?: { cons_instructions?: unknown[] } })._iub?.cons_instructions?.push([
-      "submit",
-      {
-        subject: { email },
-        preferences: {
-          terms: true,
-          privacy_policy: true,
-          ...(newsletterChecked ? { newsletter: true } : {}),
-        },
-      },
-    ])
-  }
-
-  const handleSendMagicLink = async () => {
-    if (!email || !consentChecked) return
-    setLoading(true)
-    setError(null)
-
-    const { success, error } = await sendSignInLinkToEmail(email)
-
-    if (success) {
-      recordIubendaConsent(email) // Вызов согласия
-      setSent(true)
-    } else if (error) {
-      setError(error)
-    }
-
-    setLoading(false)
-  }
-
-  const handleSignInWithPassword = async () => {
-    if (!email || !password || !consentChecked) return
-    setLoading(true)
-    setError(null)
-    const { success, error } = await signInWithPassword(email, password)
-    if (success) {
-      recordIubendaConsent(email) // Вызов согласия
-    } else if (error) {
-      setError(error)
-    }
-    setLoading(false)
-  }
-
-  const handleGoogleSignIn = async () => {
-    if (!consentChecked) return
-    setGoogleLoading(true)
-    setError(null)
-    const { success, error } = await signInWithGoogle()
-    if (success) {
-      recordIubendaConsent(email)
-    } else if (error) {
-      setError(error)
-    }
-    setGoogleLoading(false)
-  }
-
-  const features = [
-    {
-      icon: Zap,
-      key: "instant"
-    },
-    {
-      icon: Palette,
-      key: "design"
-    },
-    {
-      icon: Share,
-      key: "share"
-    }
-  ]
+  const features = ['instant', 'design', 'share'] as const
   
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary/10 flex flex-col">
@@ -135,11 +63,11 @@ export default function LoginPage() {
               </div>  
 
               <div className="space-y-5 pt-6">
-                {features.map((feature, index) => (
-                  <div key={index} className="border-l-2 border-background/25 pl-4 transition-colors hover:border-background/60">
-                    <h3 className="text-sm font-medium text-background">{t(`loginPage.features.${feature.key}.title`)}</h3>
+                {features.map((feature) => (
+                  <div key={feature} className="border-l-2 border-background/25 pl-4 transition-colors hover:border-background/60">
+                    <h3 className="text-sm font-medium text-background">{t(`loginPage.features.${feature}.title`)}</h3>
                     <p className="mt-1 text-xs leading-relaxed text-background/60 font-light">
-                      {t(`loginPage.features.${feature.key}.description`)}
+                      {t(`loginPage.features.${feature}.description`)}
                     </p>
                   </div>
                 ))}
@@ -188,7 +116,7 @@ export default function LoginPage() {
                         type="button"
                         variant="outline"
                         onClick={handleGoogleSignIn}
-                        disabled={googleLoading || !consentChecked}
+                        disabled={googleLoading}
                         className="w-full h-12 text-base font-semibold rounded-xl border-border/60 hover:bg-muted/30 transition-colors"
                       >
                         <FcGoogle className="mr-2 size-5" />
@@ -234,7 +162,7 @@ export default function LoginPage() {
 
                         <Button 
                           onClick={handleSendMagicLink}
-                          disabled={loading || !email || !consentChecked}
+                          disabled={loading || !email}
                           className="w-full h-12 text-base font-semibold rounded-xl transition-colors group"
                         >
                           {loading ? t("loginPage.sendingButton") : t("loginPage.sendButton")}
@@ -273,7 +201,7 @@ export default function LoginPage() {
                             <Button
                               variant="outline"
                               onClick={handleSignInWithPassword}
-                              disabled={loading || !email || !password || !consentChecked}
+                              disabled={loading || !email || !password}
                               className="w-full h-10 text-sm font-medium rounded-xl border-border/60 hover:border-border hover:bg-muted/30 transition-colors group"
                             >
                               {loading ? t("loginPage.signingInButton") : t("loginPage.signInPasswordButton")}
@@ -285,44 +213,6 @@ export default function LoginPage() {
                     )}
                   </div>
 
-                  {/* Блок согласия с чекбоксом */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-start gap-3">
-                      <Checkbox
-                        id="auth-consent"
-                        checked={consentChecked}
-                        onCheckedChange={(v) => setConsentChecked(v === true)}
-                        className="mt-0.5 shrink-0"
-                      />
-                      <label
-                        htmlFor="auth-consent"
-                        className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-                      >
-                        {t("loginPage.consentAgreePrefix")}{" "}
-                        <Link href="/policies/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                          {t("loginPage.termsOfService")}
-                        </Link>
-                        {" "}{t("loginPage.consentAnd")}{" "}
-                        <Link href="/policies/privacy-policy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                          {t("loginPage.privacyPolicy")}
-                        </Link>
-                      </label>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Checkbox
-                        id="newsletter-consent"
-                        checked={newsletterChecked}
-                        onCheckedChange={(v) => setNewsletterChecked(v === true)}
-                        className="mt-0.5 shrink-0"
-                      />
-                      <label
-                        htmlFor="newsletter-consent"
-                        className="text-xs text-muted-foreground font-light leading-relaxed cursor-pointer select-none"
-                      >
-                        {t("loginPage.newsletterConsent")}
-                      </label>
-                    </div>
-                  </div>
                 </div>
               ) : (
                 /* Success State: Airy & Focused */
@@ -342,7 +232,7 @@ export default function LoginPage() {
                   <div className="pt-10 space-y-4">
                     <Button 
                       variant="outline"
-                      onClick={() => setSent(false)}
+                      onClick={handleChangeEmail}
                       className="w-full h-12 rounded-xl border-border/60 bg-background/50 hover:bg-muted/30 transition-colors"
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />

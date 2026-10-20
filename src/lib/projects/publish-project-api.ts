@@ -1,4 +1,4 @@
-import { auth } from "../firebase/firebase"
+import { requestProjectFunction } from './request-project-function'
 
 export interface PublishProjectResult {
   ok: true
@@ -23,28 +23,9 @@ export async function publishProject(
   quoteId: string,
   accessToken?: string,
 ): Promise<PublishProjectResult> {
-  const user = auth.currentUser
-  if (!user) throw new PublishProjectError("UNAUTHORIZED", "Not authenticated")
-
-  const idToken = await user.getIdToken()
-  const url = process.env.NEXT_PUBLIC_PUBLISH_PROJECT_URL
-  if (!url) throw new PublishProjectError("CONFIG_ERROR", "Publish URL not configured")
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-    body: JSON.stringify({
-      projectId,
-      slug,
-      quoteId,
-      ...(accessToken ? { accessToken } : {}),
-    }),
-  })
-
-  const data = await res.json()
-  if (!res.ok) {
-    throw new PublishProjectError(data.error ?? "UNKNOWN", data.message ?? "Failed to publish project")
-  }
-
-  return data as PublishProjectResult
+  return requestProjectFunction<PublishProjectResult>(
+    'publishProject',
+    { projectId, slug, quoteId, ...(accessToken ? { accessToken } : {}) },
+    { errorClass: PublishProjectError, fallbackMessage: 'Failed to publish project' },
+  )
 }

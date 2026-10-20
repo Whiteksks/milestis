@@ -41,9 +41,7 @@ export interface ClassifyIntentInput {
 
 const VALID_KINDS: readonly AiIntentKind[] = ['generate_all', 'edit_section', 'edit_theme', 'chat']
 
-/** Cheap deterministic shortcut for the single most common, unambiguous case: a brand-new
- *  project just received its first photos. No point spending a network round-trip asking a
- *  model to classify something this certain before the real work even starts. */
+/** An empty prompt with the first photos starts generation without a classifier request. */
 function classifyDeterministic(input: ClassifyIntentInput): AiIntent | null {
   if (input.isBlankProject && input.hasNewPhotos && !input.prompt.trim()) return { kind: 'generate_all' }
   return null

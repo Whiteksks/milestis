@@ -1,3 +1,4 @@
+import { publishedProjectUrl } from '@/config/site'
 import { getPublishedProjectBySlugGlobal } from './published-project'
 import { publishedMenuMetadata, resolvePublishedMenuPage } from '@/lib/projects/published-menu'
 import { MenuPageView } from './menu-page-view'
@@ -166,7 +167,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         title,
         description,
         type: 'profile',
-        url: `https://${slug}.milestis.site`,
+        url: publishedProjectUrl(slug, true),
         images: ogImages,
       },
       twitter: {

@@ -1,15 +1,10 @@
+import { siteConfig } from '@/config/site'
 /**
  * Structured data (schema.org) builders. Keep payloads minimal and factual —
  * inflated/incorrect structured data can trigger manual actions from Google.
  */
 
-const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com';
-
-/** Social profile URLs for the `sameAs` entity graph. Populate as profiles go live. */
-const SAME_AS: string[] = [
-  'https://www.tiktok.com/@milestis.studio',
-  'https://www.instagram.com/milestis.studio/',
-];
+const BASE_URL = siteConfig.appUrl;
 
 export function organizationJsonLd() {
   return {
@@ -19,7 +14,7 @@ export function organizationJsonLd() {
     name: 'Milestis',
     url: BASE_URL,
     logo: `${BASE_URL}/favicon.ico`,
-    ...(SAME_AS.length ? { sameAs: SAME_AS } : {}),
+    ...(siteConfig.socialProfiles.length ? { sameAs: siteConfig.socialProfiles } : {}),
   };
 }
 

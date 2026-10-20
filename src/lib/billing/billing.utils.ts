@@ -11,12 +11,6 @@ export const FREE_SUBSCRIPTION_FEATURES: UserSubscriptionFeatures = {
   prioritySupport: false,
 }
 
-const LEGACY_PLAN_TIER_ALIASES: Record<string, SubscriptionPlanTier> = {
-  basic: "explorer",
-  pro: "creator",
-  pro_plus: "archive",
-}
-
 export function normalizePlanTier(planTier?: string | null): SubscriptionPlanTier {
   if (!planTier || planTier === "free") return "free"
 
@@ -26,7 +20,7 @@ export function normalizePlanTier(planTier?: string | null): SubscriptionPlanTie
     case "archive":
       return planTier
     default:
-      return LEGACY_PLAN_TIER_ALIASES[planTier] ?? "free"
+      return "free"
   }
 }
 

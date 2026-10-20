@@ -14,7 +14,6 @@ export const sendSignInLinkToEmail = async (email: string) => {
   } catch (error) {
     const authError = error as AuthError;
     const translationKey = getFirebaseAuthErrorTranslationKey(authError.code);
-    console.log(translationKey);
     return { success: false, error: translationKey };
   }
 };

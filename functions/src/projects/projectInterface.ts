@@ -38,19 +38,6 @@ export interface EventPhotoRecord {
   violations?: string[];
 }
 
-/** Shape written to `published_projects/{projectId}` */
-export interface PublishedProjectData {
-  ownerId: string;
-  slug: string;
-  name: string;
-  mode: ProjectMode;
-  /** SHA-256 hex of the plain-text token. Portfolio projects do not have one. */
-  accessToken?: string;
-  theme: Record<string, unknown> | null;
-  content: Record<string, unknown> | null;
-  publishedAt: FieldValue;
-}
-
 /**
  * Shape of the Firestore document written at creation time.
  * theme and content are absent — the editor writes them on first save.
@@ -78,11 +65,11 @@ export interface ProjectMetadata {
   publishVersion?: number;
   /** The slug used when the project was last published. Preserved on unpublish for safe republish. */
   publishedSlug?: string;
-  /** Plaintext access token for the owner's share link. Preserved on unpublish. Photobooks only. */
+  /** Owner's share token for private photobook/event projects. Preserved on unpublish. */
   publishedAccessToken?: string;
   template?: {
     id: string;
-  };  // Optional template reference for future use
+  };
   /** Set when the user moves a project to the trash. */
   deletedAt?: FieldValue;
   /**
@@ -103,7 +90,6 @@ export type CreateProjectPayload =
   | { mode: "portfolio"; name: string; template?: { id: string } }
   | { mode: "photobook"; name: string; template?: { id: string } }
   | { mode: "event"; name: string; template?: { id: string } };
-
 
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;

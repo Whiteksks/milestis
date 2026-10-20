@@ -41,14 +41,6 @@ export const RATIO_LABELS: Record<AspectRatio, string> = {
   cinematic: '21:9',
 }
 
-export const ASPECT_RATIO_NUM: Record<AspectRatio, number> = {
-  square: 1,
-  portrait: 4 / 5,
-  poster: 2 / 3,
-  wide: 16 / 9,
-  cinematic: 21 / 9,
-}
-
 export function getAspectRatioClass(ratio: AspectRatio = 'square'): string {
   return aspectRatios[ratio]?.className || aspectRatios.square.className
 }

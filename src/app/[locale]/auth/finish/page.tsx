@@ -1,12 +1,13 @@
 'use client';
 
+import { functionUrl } from '@/config/firebase'
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { isSignInWithEmailLink, onAuthStateChanged, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { completeLinkWithEmailLink, LINKING_EMAIL_KEY } from '@/lib/auth';
 import { consumeReferralCode } from '@/lib/referral';
-import { markNewSignup } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
@@ -24,9 +25,9 @@ export default function FinishPage() {
       window.localStorage.removeItem('emailForSignIn');
 
       const idToken = await credential.user.getIdToken();
-      const createUserUrl = process.env.NEXT_PUBLIC_CREATEUSER_URL!;
+      const createUserUrl = functionUrl('createUser');
       const ref = consumeReferralCode();
-      const res = await fetch(createUserUrl, {
+      await fetch(createUserUrl, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -34,9 +35,6 @@ export default function FinishPage() {
         },
         body: JSON.stringify(ref ? { ref } : {}),
       });
-      // 201 = doc actually created here (real signup); 409 = already existed, don't double-count.
-      // AuthenticatedRedirect reads this flag and appends ?signup=1 to the first dashboard redirect.
-      if (res.status === 201) markNewSignup();
 
       setStatus('success');
       const isLinkingFlow = new URLSearchParams(window.location.search).get('flow') === 'link';

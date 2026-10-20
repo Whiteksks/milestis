@@ -1,4 +1,6 @@
-﻿"use client"
+"use client"
+
+import { functionUrl } from '@/config/firebase'
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
@@ -186,8 +188,7 @@ export function EventPublishedPage({
       const { auth } = await getFirebaseUploadAuth()
       const idToken = await auth.currentUser?.getIdToken()
       if (!idToken) throw new Error("Could not connect. Please refresh the page.")
-      const fnUrl = process.env.NEXT_PUBLIC_UPLOAD_EVENT_PHOTO_URL
-      if (!fnUrl) throw new Error("Upload service not configured.")
+      const fnUrl = functionUrl('uploadEventPhoto')
 
       const res = await fetch(fnUrl, {
         method: "POST",

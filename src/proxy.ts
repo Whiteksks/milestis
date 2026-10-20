@@ -1,3 +1,4 @@
+import { siteConfig } from './config/site'
 ﻿import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,10 +30,10 @@ const TRASH_PATTERNS = [
 
 /** Routes under construction — always 404 */
 const BLOCKED_PAGES = [
-  'dashboard/analytics',
-  'dashboard/templates',
-  'admin/settings',
-  'api/internal'
+  '/dashboard/analytics',
+  '/dashboard/templates',
+  '/admin/settings',
+  '/api/internal'
 ];
 
 const APP_PATH_PREFIXES = [
@@ -89,6 +90,11 @@ export function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
+  const bare0 = stripLocale(pathname);
+  if (BLOCKED_PAGES.some((path) => bare0 === path || bare0.startsWith(`${path}/`))) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // Firebase email action links land on /__/auth/action on the custom domain.
   // Route them into the app's existing localized completion page.
   if (pathname === '/__/auth/action') {
@@ -106,6 +112,7 @@ export function proxy(request: NextRequest) {
   if (
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
+    pathname === '/llms.txt' ||
     pathname === '/manifest.json' ||
     pathname === '/manifest.webmanifest'
   ) {
@@ -117,14 +124,16 @@ export function proxy(request: NextRequest) {
     request.headers.get('x-forwarded-host') ??
     request.headers.get('host') ??
     ''
+  const normalizedHost = host.toLowerCase();
 
-  // ── Subdomain rewrite: {slug}.milestis.site → /sites/{slug} ──────────────
+  // Published project subdomains retain their paths and query parameters.
   // Header identifies the global namespace; the page resolves portfolio/menu from the stored project.
   // Preserve the original pathname so that Next.js special routes like
   // /opengraph-image, /twitter-image, /sitemap.xml are served correctly.
-  const subdomainMatch = host.match(/^([a-z0-9-]+)\.milestis\.site(?::\d+)?$/);
-  if (subdomainMatch) {
-    const slug = subdomainMatch[1];
+  const publishedSuffix = `.${siteConfig.publishedSiteHost}`;
+  const subdomainSlug = normalizedHost.endsWith(publishedSuffix) ? normalizedHost.slice(0, -publishedSuffix.length) : '';
+  if (/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(subdomainSlug)) {
+    const slug = subdomainSlug;
     const url = request.nextUrl.clone();
     const trailingPath = pathname === '/' ? '' : pathname;
     url.pathname = `/sites/${slug}${trailingPath}`;
@@ -133,13 +142,12 @@ export function proxy(request: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers: reqHeaders } });
   }
 
-  // ── milestis.site → published projects only ───────────────────────────────
+  // Published projects on the base domain use path-based slugs.
   // Mode = photobook (path-based slug)
-  const isMilestisSite = host === 'milestis.site' || /^milestis\.site:\d+$/.test(host);
-  if (isMilestisSite) {
+  if (normalizedHost === siteConfig.publishedSiteHost) {
     // Root with no slug → redirect to main site
     if (pathname === '/' || pathname === '') {
-      return NextResponse.redirect('https://milestis.com');
+      return NextResponse.redirect(siteConfig.appUrl);
     }
 
     if (!isPublishedPhotobookPath(pathname)) {
@@ -152,15 +160,6 @@ export function proxy(request: NextRequest) {
     const reqHeaders = new Headers(request.headers);
     reqHeaders.set('x-milestis-mode', 'photobook');
     return NextResponse.rewrite(url, { request: { headers: reqHeaders } });
-  }
-
-  // ── Blocked pages (under construction) ─────────────────────────────────────
-  const bare0 = stripLocale(pathname);
-  const isBlocked = BLOCKED_PAGES.some(
-    (p) => bare0 === p || bare0.startsWith(`${p}/`)
-  );
-  if (isBlocked) {
-    return new NextResponse(null, { status: 404 });
   }
 
   // ── Preferred locale redirect ──────────────────────────────────────────────

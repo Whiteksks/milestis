@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import { type NextRequest, NextResponse } from "next/server"
 import { adminAuth } from "@/lib/firebase/admin"
 
@@ -12,7 +13,7 @@ function isSameOriginRequest(request: NextRequest): boolean {
   if (origin) {
     const trustedOrigins = new Set([
       request.nextUrl.origin,
-      process.env.NEXT_APP_URL,
+      siteConfig.appUrl,
     ].filter(Boolean))
     return trustedOrigins.has(origin)
   }

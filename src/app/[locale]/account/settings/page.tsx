@@ -340,33 +340,6 @@ export default function AccountSettings() {
           </div>
         </section>
 
-        {/* Privacy & Cookies */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-4">
-            <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-              {t("privacy.title")}
-            </h2>
-            <span className="h-px flex-1 bg-border/80" />
-          </div>
-          <p className="font-sans text-sm text-muted-foreground">{t("privacy.description")}</p>
-
-          <div className="rounded-xs border border-border bg-card p-5 md:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1 min-w-0">
-                <p className="font-sans text-sm font-medium text-foreground">{t("privacy.preferencesButton")}</p>
-                <p className="font-sans text-sm text-muted-foreground">{t("privacy.preferencesDescription")}</p>
-              </div>
-              <Button
-                variant="outline"
-                className="h-9 rounded-xs border-border px-4 font-sans text-xs hover:bg-secondary/60 shrink-0"
-                onClick={() => (window as Window & { _iub?: { cs?: { api?: { openPreferences?: () => void } } } })._iub?.cs?.api?.openPreferences?.()}
-              >
-                {t("privacy.preferencesButton")}
-              </Button>
-            </div>
-          </div>
-        </section>
-
         {/* Danger Zone */}
         <section className="space-y-4">
           <div className="flex items-center gap-4">

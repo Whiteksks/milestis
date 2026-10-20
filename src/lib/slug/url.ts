@@ -1,4 +1,4 @@
-import { PUBLIC_SITE_DOMAIN } from "./constants"
+import { siteConfig, publishedProjectUrl } from '../../config/site'
 import type { SlugMode } from "./policy"
 import { getSlugModePolicy } from "./policy"
 import { isPagePath } from "../../../functions/src/domain/pages"
@@ -21,10 +21,7 @@ export function buildPublishedProjectUrl(
   accessToken?: string | null,
 ): string {
   const policy = getSlugModePolicy(mode)
-  const baseUrl =
-    policy.routeKind === "subdomain"
-      ? `https://${slug}.${PUBLIC_SITE_DOMAIN}`
-      : `https://${PUBLIC_SITE_DOMAIN}/${slug}`
+  const baseUrl = publishedProjectUrl(slug, policy.routeKind === "subdomain")
 
   return policy.namespace === "token" && accessToken
     ? `${baseUrl}?share=${accessToken}`
@@ -45,6 +42,6 @@ export function getSlugInputChrome(mode: SlugMode): { prefix: string; suffix: st
   const policy = getSlugModePolicy(mode)
 
   return policy.routeKind === "subdomain"
-    ? { prefix: "https://", suffix: `.${PUBLIC_SITE_DOMAIN}` }
-    : { prefix: `https://${PUBLIC_SITE_DOMAIN}/`, suffix: "" }
+    ? { prefix: `${new URL(siteConfig.publishedSiteUrl).protocol}//`, suffix: `.${siteConfig.publishedSiteHost}` }
+    : { prefix: `${siteConfig.publishedSiteUrl}/`, suffix: "" }
 }

@@ -6,18 +6,10 @@ import { randomUUID, createHash } from "crypto";
 import { db } from "../../lib/firebaseAdmin";
 import { ALLOWED_ORIGINS } from "../../lib/cors";
 import { calculateCreditCost } from "./config";
+import { BODY_SIZE_LIMIT_BYTES, QUOTE_TTL_MS, buildDomain, countUniquePhotos } from "./analysis";
 import { VALID_MODES, type ProjectMode } from "../projectInterface";
 import { getSlugReservationDocId, PUBLISHED_PROJECT_SLUGS_COLLECTION } from "./slug/index";
-import { getSlugModePolicy } from "./slug/policy";
 import { runSafeSearchCheck, extractImageIds } from "../../lib/safeSearchCheck";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const PUBLIC_SITE_DOMAIN = "milestis.site";
-const QUOTE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const BODY_SIZE_LIMIT_BYTES = 1024;
-
-// ─── Error codes ──────────────────────────────────────────────────────────────
 
 const ERROR = {
 	METHOD_NOT_ALLOWED:       "METHOD_NOT_ALLOWED",
@@ -33,8 +25,6 @@ const ERROR = {
 } as const;
 
 class ValidationError extends Error {}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AnalyzeRepublishInput {
 	projectId: string;
@@ -56,11 +46,9 @@ export interface AnalyzeRepublishOutput {
 	userBalance: number;
 	expiresAt: number;
 	publishedSlug: string;
-	/** Only present for photobook mode. */
+	/** Share token for private published projects. */
 	publishedAccessToken?: string;
 }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function validatePayload(body: unknown): AnalyzeRepublishInput {
 	const b = body as Record<string, unknown> | null | undefined;
@@ -71,30 +59,6 @@ function validatePayload(body: unknown): AnalyzeRepublishInput {
 		throw new ValidationError("'projectId' must be a non-empty string.");
 	return { projectId: projectId.trim() };
 }
-
-function countUniquePhotos(content: unknown): number {
-	const json = JSON.stringify(content);
-	const unique = new Set<string>();
-	const re = /"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+(?:\/|%2F)images%2F([^%"]+)%2F[^"]+"/g;
-	let m: RegExpExecArray | null;
-	while ((m = re.exec(json)) !== null) {
-		unique.add(m[1]);
-	}
-	if (unique.size === 0) {
-		const urls = json.match(/"https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"]+"/g);
-		return urls ? new Set(urls).size : 0;
-	}
-	return unique.size;
-}
-
-function buildDomain(mode: ProjectMode, slug: string): string {
-	const policy = getSlugModePolicy(mode);
-	return policy.routeKind === "subdomain"
-		? `https://${slug}.${PUBLIC_SITE_DOMAIN}`
-		: `https://${PUBLIC_SITE_DOMAIN}/${slug}`;
-}
-
-// ─── Cloud Function ───────────────────────────────────────────────────────────
 
 /**
  * Analyzes a project before republish and returns a short-lived quote.
@@ -116,7 +80,6 @@ export const analyzeRepublish = onRequest(
 		cors: ALLOWED_ORIGINS,
 	},
 	async (req, res) => {
-		// ── Method guard ──────────────────────────────────────────────────
 		if (req.method !== "POST") {
 			res.status(405).json({ error: ERROR.METHOD_NOT_ALLOWED });
 			return;
@@ -128,7 +91,6 @@ export const analyzeRepublish = onRequest(
 			return;
 		}
 
-		// ── Auth ──────────────────────────────────────────────────────────
 		const authHeader = req.headers.authorization;
 		if (!authHeader?.startsWith("Bearer ")) {
 			res.status(401).json({ error: ERROR.UNAUTHORIZED });
@@ -144,7 +106,6 @@ export const analyzeRepublish = onRequest(
 			return;
 		}
 
-		// ── Payload ───────────────────────────────────────────────────────
 		let payload: AnalyzeRepublishInput;
 		try {
 			payload = validatePayload(req.body);
@@ -157,7 +118,6 @@ export const analyzeRepublish = onRequest(
 		const { projectId } = payload;
 
 		try {
-			// ── Load project + user in parallel ───────────────────────────
 			const [projectSnap, userSnap] = await Promise.all([
 				db.collection("projects").doc(projectId).get(),
 				db.collection("users").doc(uid).get(),
@@ -209,7 +169,6 @@ export const analyzeRepublish = onRequest(
 					? projectData.publishedAccessToken
 					: undefined;
 
-			// ── Check slug reservation still belongs to this project ──────
 			const hashedToken = publishedAccessToken
 				? createHash("sha256").update(publishedAccessToken).digest("hex")
 				: undefined;
@@ -225,7 +184,6 @@ export const analyzeRepublish = onRequest(
 				return;
 			}
 
-			// ── Count photos in current content ───────────────────────────
 			// Load current content + previously published content in parallel (for diff)
 			const [contentSnap, publishedSnap] = await Promise.all([
 				db.collection("projects").doc(projectId).collection("data").doc("content").get(),
@@ -234,7 +192,6 @@ export const analyzeRepublish = onRequest(
 			const editorData = contentSnap.exists ? contentSnap.data()! : {};
 			const photoCount = countUniquePhotos(editorData.content ?? null);
 
-			// ── SafeSearch content moderation (with republish diff) ────────
 			// previousImageIds = images that were already in the last published version.
 			// These are skipped entirely — cache or not — because they haven't changed.
 			const publishedContent = publishedSnap.exists ? publishedSnap.data()?.content : null;
@@ -256,13 +213,11 @@ export const analyzeRepublish = onRequest(
 			const userBalance: number =
 				typeof userData.balance?.total === "number" ? userData.balance.total : 0;
 
-			// ── Delta cost calculation ────────────────────────────────────
 			const newCreditCost = calculateCreditCost(mode, photoCount);
 			const previousCreditCost: number =
 				typeof projectData.publishedCreditCost === "number" ? projectData.publishedCreditCost : 0;
 			const deltaCost = Math.max(0, newCreditCost - previousCreditCost);
 
-			// ── Write quote ───────────────────────────────────────────────
 			const expiresAt = Date.now() + QUOTE_TTL_MS;
 			const quoteId = randomUUID();
 

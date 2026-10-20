@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     if (!project || project.ownerId !== auth.uid || project.status === 'deleted' || project.mode !== 'menu') {
       throw new AiServiceError('AI_PROJECT_UNAVAILABLE', 403)
     }
-    // Test access: no subscription check and no per-account generation allowance.
+    // Access is based on ownership; this endpoint has no subscription or per-user quota gate.
     const source = await createPhotoResolver(auth.uid, input.projectId, 'middle')(input.photoId)
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(170_000)])
     const image = await enhanceFoodPhoto(source, input.style, signal)

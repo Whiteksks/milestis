@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { MetadataRoute } from 'next'
 
 /**
@@ -6,7 +7,7 @@ import type { MetadataRoute } from 'next'
  */
 const SITEMAP_ENABLED = true
 
-const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com'
+const BASE_URL = siteConfig.appUrl
 const LOCALES = ['en', 'ru', 'kz'] as const
 
 /** URL locale slug → correct BCP-47 hreflang value (Kazakh's ISO 639-1 code is "kk", not "kz"). */
@@ -41,10 +42,6 @@ const PUBLIC_PAGES: Page[] = [
   { path: '/help/articles/how-credits-work',    changeFrequency: 'monthly', priority: 0.5 },
   { path: '/help/articles/archive-republish',   changeFrequency: 'monthly', priority: 0.5 },
   { path: '/help/articles/account-security',    changeFrequency: 'monthly', priority: 0.5 },
-  // ── Legal (low value, rarely change) ──────────────────────────────────────
-  { path: '/policies/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/policies/terms',          changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/policies/cookie-policy',  changeFrequency: 'yearly', priority: 0.2 },
   // ── Sitemap (human-readable index) ────────────────────────────────────────
   { path: '/sitemap', changeFrequency: 'monthly', priority: 0.3 },
 ]

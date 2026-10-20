@@ -1,44 +1,30 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import path from 'node:path'
-import vm from 'node:vm'
-import ts from 'typescript'
+import { createSourceLoader } from './support/source-loader.mjs'
 
-const root = path.resolve(import.meta.dirname, '..')
 const dependency = createRequire(import.meta.url)
 let headerMode = 'portfolio'
 let project
 let lookups = 0
 const MenuPageView = () => null
 const PublishedView = () => null
-const cache = new Map()
-function load(file) {
-  let filename = path.resolve(root, file)
-  if (!path.extname(filename)) filename += existsSync(`${filename}.ts`) ? '.ts' : '.tsx'
-  if (filename.endsWith('.json')) return JSON.parse(readFileSync(filename, 'utf8'))
-  if (cache.has(filename)) return cache.get(filename).exports
-  const sourceModule = { exports: {} }
-  cache.set(filename, sourceModule)
-  const source = ts.transpileModule(readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText
-  const require = (id) => {
-    if (id === 'react') return { ...dependency('react'), cache: (fn) => fn }
-    if (id === 'next/headers') return { headers: async () => new Headers(headerMode ? { 'x-milestis-mode': headerMode } : {}) }
-    if (id === 'next/navigation') return { notFound: () => { throw new Error('NEXT_HTTP_ERROR_FALLBACK;404') } }
-    if (id.endsWith('/published-project')) return { getPublishedProjectBySlugGlobal: async () => { lookups++; return project } }
-    if (id.endsWith('/menu-page-view')) return { MenuPageView }
-    if (id === '@/lib/firebase/admin') return { adminDb: {} }
-    if (id === '@/editor/lib/modes/registry') return { MODE_REGISTRY: {} }
-    if (id.endsWith('/published-view')) return { PublishedView }
-    if (id === '@/lib/slug') return { ...load('src/lib/slug/policy.ts'), ...load('src/lib/slug/constants.ts') }
-    if (id.startsWith('@/')) return load(`src/${id.slice(2)}`)
-    if (id.startsWith('.')) return load(path.resolve(path.dirname(filename), id))
-    return dependency(id)
-  }
-  vm.runInThisContext(`(function(require,module,exports){${source}\n})`, { filename })(require, sourceModule, sourceModule.exports)
-  return sourceModule.exports
+const publishedProject = { getPublishedProjectBySlugGlobal: async () => { lookups++; return project } }
+const mocks = {
+  react: { ...dependency('react'), cache: fn => fn },
+  'next/headers': { headers: async () => new Headers(headerMode ? { 'x-milestis-mode': headerMode } : {}) },
+  'next/navigation': { notFound: () => { throw new Error('NEXT_HTTP_ERROR_FALLBACK;404') } },
+  './published-project': publishedProject,
+  '../published-project': publishedProject,
+  './menu-page-view': { MenuPageView },
+  '../menu-page-view': { MenuPageView },
+  './published-view': { PublishedView },
+  '../published-view': { PublishedView },
+  '@/lib/firebase/admin': { adminDb: {} },
+  '@/editor/lib/modes/registry': { MODE_REGISTRY: {} },
 }
+const load = createSourceLoader(mocks)
+mocks['@/lib/slug'] = { ...load('src/lib/slug/policy.ts'), ...load('src/lib/slug/constants.ts') }
 
 const rootRoute = load('src/app/sites/[slug]/page.tsx')
 const pageRoute = load('src/app/sites/[slug]/[pagePath]/page.tsx')
@@ -60,8 +46,8 @@ test('root and nested Next routes pass the resolved published page to the shared
   assert.equal(home.props.resolved.page.id, 'home')
   assert.equal(drinks.type, MenuPageView)
   assert.equal(drinks.props.resolved.page.id, 'drinks')
-  assert.equal((await rootRoute.generateMetadata(props())).alternates.canonical, 'https://my-cafe.milestis.site')
-  assert.equal((await pageRoute.generateMetadata(props('drinks'))).alternates.canonical, 'https://my-cafe.milestis.site/drinks')
+  assert.equal((await rootRoute.generateMetadata(props())).alternates.canonical, 'https://my-cafe.pages.example.test')
+  assert.equal((await pageRoute.generateMetadata(props('drinks'))).alternates.canonical, 'https://my-cafe.pages.example.test/drinks')
 })
 
 test('public menu view forwards the saved template on home and nested pages', () => {

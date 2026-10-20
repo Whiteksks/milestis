@@ -1,32 +1,15 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import vm from 'node:vm'
-import ts from 'typescript'
 import { createStore } from 'zustand/vanilla'
+import { createSourceLoader } from './support/source-loader.mjs'
 
-// Exercise the actual TS modules without adding a test framework or changing app compilation.
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const root = path.resolve(import.meta.dirname, '..')
 const requireDependency = createRequire(import.meta.url)
-const cache = new Map()
-function loadSource(file) {
-  let filename = path.resolve(root, file)
-  if (!path.extname(filename)) filename += existsSync(`${filename}.ts`) ? '.ts' : '.tsx'
-  if (cache.has(filename)) return cache.get(filename).exports
-  const sourceModule = { exports: {} }
-  cache.set(filename, sourceModule)
-  const compiled = ts.transpileModule(readFileSync(filename, 'utf8'), {
-    fileName: filename,
-    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
-  }).outputText
-  const localRequire = (id) => id.startsWith('.') ? loadSource(path.resolve(path.dirname(filename), id))
-    : id.startsWith('@/') ? loadSource(path.join(root, 'src', id.slice(2))) : requireDependency(id)
-  vm.runInThisContext(`(function(require, module, exports) {${compiled}\n})`, { filename })(localRequire, sourceModule, sourceModule.exports)
-  return sourceModule.exports
-}
+
+const loadSource = createSourceLoader()
 
 const model = loadSource('src/editor/modes/menu/model.ts')
 const { createMenuSlice } = loadSource('src/editor/modes/menu/store-slice.ts')
@@ -423,7 +406,7 @@ test('public projection includes only referenced complete dishes and preserves p
   assert.deepEqual(draft, before)
 })
 
-test('menu publishing has no active price; existing publication prices remain unchanged', () => {
+test('menu bypasses one-time publication pricing while other mode prices remain unchanged', () => {
   const { calculateCreditCost } = loadSource('functions/src/projects/publish/config.ts')
   assert.throws(() => calculateCreditCost('menu', 0), /not enabled/)
   assert.equal(calculateCreditCost('portfolio', 0), 20)

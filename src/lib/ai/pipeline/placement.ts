@@ -13,11 +13,7 @@ import {
   type PortfolioSingleSlot,
 } from '../defaultPlacement'
 
-// Deterministic "smart" photo placement — runs BEFORE any model call, so every newly attached
-// photo already has a sensible home using cheap heuristics (orientation/resolution/attach order),
-// see ../defaultPlacement.ts for the actual ranking logic. Relocated here unchanged from the old
-// apply.ts (this was never the reliability problem — the mega-schema/mega-prompt was) so both the
-// old and new pipelines can share one implementation during the migration.
+// Place attached photos before model calls using orientation, resolution and attachment order.
 
 export function buildImageValue(doc: ProjectImageDoc, caption: string | undefined): ImageValue {
   return {

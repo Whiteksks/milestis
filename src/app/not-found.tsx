@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Home, HelpCircle } from "lucide-react"
@@ -20,14 +21,14 @@ export default function NotFound() {
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <a href="https://milestis.com">
+            <a href={`${siteConfig.appUrl}`}>
               <Home className="mr-2 h-4 w-4" />
               {t("goHome")}
             </a>
           </Button>
           
           <Button variant="outline" asChild className="bg-transparent">
-            <a href="https://milestis.com/help">
+            <a href={`${siteConfig.appUrl}/help`}>
               <HelpCircle className="mr-2 h-4 w-4" />
               {t("getHelp")}
             </a>

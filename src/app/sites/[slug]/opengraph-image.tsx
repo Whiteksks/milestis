@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import { ImageResponse } from 'next/og'
 import { headers } from 'next/headers'
 import { createHash } from 'crypto'
@@ -67,7 +68,7 @@ function menuPreview(name: string, slug: string): ImageResponse {
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', height: '100%', padding: 80, background: '#f6f1e8', color: '#25231e' }}>
       <div style={{ fontSize: 28, marginBottom: 32 }}>MENU</div>
       <div style={{ fontSize: 64 }}>{name.slice(0, 100)}</div>
-      <div style={{ fontSize: 24, marginTop: 36 }}>{slug}.milestis.site</div>
+      <div style={{ fontSize: 24, marginTop: 36 }}>{slug}.{siteConfig.publishedSiteHost}</div>
     </div>, size,
   )
 }

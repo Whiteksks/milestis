@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site'
 import type { MetadataRoute } from 'next'
 
 /**
@@ -7,7 +8,7 @@ import type { MetadataRoute } from 'next'
  */
 const INDEXING_ENABLED = true
 
-const BASE_URL = process.env.NEXT_APP_URL ?? 'https://milestis.com'
+const BASE_URL = siteConfig.appUrl
 
 export default function robots(): MetadataRoute.Robots {
   if (!INDEXING_ENABLED) {

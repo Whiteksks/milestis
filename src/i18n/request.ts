@@ -1,6 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getRequestConfig } from 'next-intl/server';
+import { hasLocale } from 'next-intl';
+import { routing } from './routing';
 
 type MessageRecord = Record<string, unknown>;
 
@@ -63,19 +65,12 @@ async function loadSplitMessages(locale: string) {
   return messages.reduce<MessageRecord>((merged, message) => deepMergeMessages(merged, message), {});
 }
 
-async function loadMessages(locale: string) {
-  try {
-    return await loadSplitMessages(locale);
-  } catch {
-    return (await import(`../../messages/${locale}.json`)).default;
-  }
-}
-
 export default getRequestConfig(async ({ requestLocale }) => {
-  const locale = (await requestLocale) ?? 'en';
+  const requested = await requestLocale;
+  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
   return {
     locale,
-    messages: await loadMessages(locale)
+    messages: await loadSplitMessages(locale)
   };
 });

@@ -320,7 +320,7 @@ export default function ArchiveSettingsPage() {
                           className="h-9 rounded-xs font-sans text-xs text-muted-foreground hover:text-foreground"
                         >
                           <Share2 className="mr-1.5 size-3.5" />
-                          {t("account.domains.shareVia") ?? "Поделиться"}
+                          {t("account.domains.shareVia")}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48 rounded-xs border border-border bg-card p-1 shadow-md">
@@ -334,15 +334,15 @@ export default function ArchiveSettingsPage() {
                             <Copy className="mr-2 size-3.5" />
                           )}
                           {copiedId === activeProject.id
-                            ? (t("account.domains.copied") ?? "Скопировано")
-                            : (t("account.domains.copyLink") ?? "Скопировать ссылку")}
+                            ? t("account.domains.copied")
+                            : t("account.domains.copyLink")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => window.open(getProjectShareUrl(activeProject)!, "_blank")}
                           className="cursor-pointer rounded-xs px-3 py-2 font-sans text-xs focus:bg-secondary/80"
                         >
                           <ExternalLink className="mr-2 size-3.5" />
-                          {t("account.domains.openProject") ?? "Открыть проект"}
+                          {t("account.domains.openProject")}
                         </DropdownMenuItem>
                         {shareChannels(getProjectShareUrl(activeProject)!).map(({ key, label, icon: Icon, href }) => (
                           <DropdownMenuItem

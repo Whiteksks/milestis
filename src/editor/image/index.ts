@@ -20,7 +20,7 @@ export {
 export { useImageCrop, type UseImageCropOptions, type UseImageCropReturn } from './crop/use-image-crop'
 export { ImageCropPanel, type ImageCropPanelProps } from './crop/image-crop-panel'
 
-// Full editor picker (replaces ImagePickerCore for new image system):
+// Image picker:
 export { ImagePicker, type ImagePickerProps } from './editor/image-picker'
 
 // Data types templates and store contracts need:

@@ -30,16 +30,6 @@ export interface SubscriptionFeatures {
   prioritySupport: boolean;
 }
 
-export interface UserBilling {
-  customerId: string;
-  subscriptionId: string; 
-  cardBrand: string;
-  cardLastFour: string;
-  cardExpiry: string;
-}
-
-
-
 export interface UserProfileTemplate {
   name?: string;
   location?: string;
@@ -64,10 +54,6 @@ export interface UserStats {
 export interface UserMetadata {
   createdAt: FieldValue;
   lastLoginAt?: FieldValue;
-  terms: {
-    acceptedVersion: string;
-    acceptedAt: FieldValue;
-  };
   schemaVersion: number;
 }
 

@@ -61,12 +61,6 @@
         "exportProjectContent": "Export Project",
         "descriptionLong": "Account data includes your profile, preferences, and usage history. Project export includes design content and publish history."
       },
-      "privacy": {
-        "title": "Privacy & Cookies",
-        "description": "Manage your cookie preferences and data consent settings.",
-        "preferencesButton": "Manage Cookie Preferences",
-        "preferencesDescription": "Update which cookies and tracking technologies are active on your device."
-      },
       "danger": {
         "title": "Danger Zone",
         "description": "Permanent actions that cannot be undone",
@@ -80,7 +74,7 @@
           "warnBilling": "If you have an active subscription, cancel it before deleting the account.",
           "inputLabel": "Type your email address to confirm:",
           "confirmButton": "Permanently Delete Account",
-          "deleting": "Deleting\u2026",
+          "deleting": "Deleting…",
           "cancelButton": "Cancel",
           "activeSubTitle": "Active subscription detected",
           "activeSubDescription": "Account deletion is locked while your paid plan is active. Cancel the subscription first, then return here.",

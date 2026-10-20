@@ -11,24 +11,18 @@ import { useParallaxLayer } from '@/editor/hooks/use-parallax-layer'
  * the viewport div — so they fill exactly the visible area and are never stretched across
  * tall page content.
  *
- * placement="viewport" → renders effects; in scroll mode applies parallax translate
- * placement="content"  → no-op (returns null); kept for API compatibility
+ * In scroll mode, applies parallax translation relative to the scroll container.
  */
 export function BackgroundLayers({
-  placement,
   scrollContainerRef,
   viewportRef,
 }: {
-  placement: 'viewport' | 'content'
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>
   viewportRef?: React.RefObject<HTMLDivElement | null>
 }) {
   const layerRef = useRef<HTMLDivElement>(null)
 
-  // currentTheme is a primitive — no useShallow needed, stable reference
   const currentTheme = useThemeSelector((state) => state.currentTheme)
-  // getTheme is pure and cheap, but called on every store update when inside a selector.
-  // Moving it outside with useMemo ties the cost to theme changes only.
   const {
     primary:   primaryColor,
     secondary: secondaryColor,
@@ -56,7 +50,7 @@ export function BackgroundLayers({
   // In scroll mode, translate the layer upward as the user scrolls, creating a parallax
   // effect that makes the background visibly move relative to the content.
   useParallaxLayer({
-    enabled: placement === 'viewport' && scrollMode === 'scroll' && !!scrollContainerRef,
+    enabled: scrollMode === 'scroll' && !!scrollContainerRef,
     scrollContainerRef: (scrollContainerRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
     viewportRef: (viewportRef ?? { current: null }) as React.RefObject<HTMLElement | null>,
     layerRef,
@@ -64,8 +58,7 @@ export function BackgroundLayers({
     scale: 1.2,
   })
 
-  // Derived: whether there are any active layers at all.
-  // Computed here (before the early return) to satisfy rules-of-hooks.
+  // Skip registry lookups when all effects are disabled.
   const noLayers = depth === 'none' && rays === 'none' && texture === 'none'
 
   const [activeDepth, activeRays, activeTexture] = useMemo(
@@ -79,9 +72,6 @@ export function BackgroundLayers({
           ],
     [noLayers, depth, rays, texture],
   )
-
-  // All effects live in viewport placement only — content placement is a no-op.
-  if (placement === 'content') return null
 
   const colors = { isDark, primaryColor, secondaryColor, rayColor, subtleColor, highlightColor, shadowColor, accent2Color }
 
