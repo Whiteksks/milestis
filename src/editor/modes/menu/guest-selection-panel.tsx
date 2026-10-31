@@ -3,6 +3,7 @@
 import { useRef, useState, type CSSProperties } from 'react'
 import { ArrowUpRight, Minus, Plus, ShoppingBag, Sparkles, Trash2, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import type { ThemeConfig } from '@/editor/lib/config/themes'
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -38,6 +39,7 @@ export function MenuGuestSelectionPanel({ content, images, pageId, theme, menuSt
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<DrawerView>('recommendations')
   const scrollRef = useRef<HTMLDivElement>(null)
+  const reduceMotion = useReducedMotion()
   const { playback, play } = useMascot(content.mascot.enabled, interaction)
   const money = new Intl.NumberFormat(locale === 'kz' ? 'kk-KZ' : locale, {
     style: 'currency', currency: content.venue.currency, maximumFractionDigits: 2,
@@ -52,21 +54,29 @@ export function MenuGuestSelectionPanel({ content, images, pageId, theme, menuSt
   }
 
   return <>
-    {count > 0 && <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <button type="button" onClick={() => openView('selection')} className={cn(
-        'pointer-events-auto flex min-h-16 w-full max-w-md items-center justify-between gap-3 rounded-full px-6 py-3 text-left shadow-[0_8px_32px_-8px_rgba(30,40,28,.35)] transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2',
-        theme.primary, theme.primaryText,
-      )}>
-        <span className="flex min-w-0 items-center gap-3 text-sm font-semibold"><ShoppingBag aria-hidden="true" className="size-4 shrink-0" />{t('title')}</span>
-        <span className="flex shrink-0 items-center gap-3"><span className="grid size-8 place-items-center rounded-full bg-white/15 text-xs tabular-nums" aria-label={t('count', { count })}>{count}</span><ArrowUpRight aria-hidden="true" className="size-4" /></span>
-      </button>
-    </div>}
-    <button type="button" onClick={() => openView('recommendations')} aria-label={tr('open')}
-      className={cn('fixed right-4 z-40 flex max-w-[calc(100%-2rem)] items-center gap-2 rounded-full border border-[var(--menu-accent-line)] bg-[var(--menu-surface-raised)] py-2 pl-2 pr-4 text-[var(--menu-text)] shadow-[0_4px_24px_-6px_rgba(44,39,26,.2)] transition-[bottom,transform] motion-reduce:transition-none motion-safe:hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--menu-accent)]',
-        count > 0 ? 'bottom-[calc(6rem+env(safe-area-inset-bottom))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]')}>
-      {content.mascot.enabled ? <MenuMascot settings={content.mascot} playback={playback} className="size-12 shrink-0" /> : <Sparkles aria-hidden="true" className="m-2 size-5 shrink-0" />}
-      <span className="text-xs font-semibold">{tr('title')}</span>
-    </button>
+    {/* One stack: the mascot sits above the selection bar and glides up when the bar appears. */}
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex flex-col items-end gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <motion.div layout="position" transition={{ duration: reduceMotion ? 0 : .25, ease: 'easeOut' }} className="pointer-events-auto max-w-full">
+        <button type="button" onClick={() => openView('recommendations')} aria-label={tr('open')}
+          className="flex max-w-full items-center gap-2 rounded-full border border-[var(--menu-accent-line)] bg-[var(--menu-surface-raised)] py-2 pl-2 pr-4 text-[var(--menu-text)] shadow-[0_4px_24px_-6px_rgba(44,39,26,.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--menu-accent)]">
+          {content.mascot.enabled ? <MenuMascot settings={content.mascot} playback={playback} className="size-12 shrink-0" /> : <Sparkles aria-hidden="true" className="m-2 size-5 shrink-0" />}
+          <span className="text-xs font-semibold">{tr('title')}</span>
+        </button>
+      </motion.div>
+      <AnimatePresence initial={false}>
+        {count > 0 && <motion.div key="selection-bar" layout="position" className="pointer-events-auto flex w-full max-w-md items-center self-center"
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+          transition={{ duration: reduceMotion ? 0 : .25, ease: 'easeOut' }}>
+          <button type="button" onClick={() => openView('selection')} className={cn(
+            'flex min-h-16 w-full items-center justify-between gap-3 rounded-full px-6 py-3 text-left shadow-[0_8px_32px_-8px_rgba(30,40,28,.35)] focus-visible:outline-2 focus-visible:outline-offset-2',
+            theme.primary, theme.primaryText,
+          )}>
+            <span className="flex min-w-0 items-center gap-3 text-sm font-semibold"><ShoppingBag aria-hidden="true" className="size-4 shrink-0" />{t('title')}</span>
+            <span className="flex shrink-0 items-center gap-3"><span className="grid size-8 place-items-center rounded-full bg-white/15 text-xs tabular-nums" aria-label={t('count', { count })}>{count}</span><ArrowUpRight aria-hidden="true" className="size-4" /></span>
+          </button>
+        </motion.div>}
+      </AnimatePresence>
+    </div>
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent style={menuStyle} className={cn(
         'z-[220] h-[min(85dvh,44rem)] min-h-[min(85dvh,32rem)] data-[vaul-drawer-direction=bottom]:max-h-[85dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[2rem] border-t p-0 [&>div:first-child]:bg-[var(--menu-accent-line)]', theme.card, theme.cardForeground, theme.border, theme.fontBody,
