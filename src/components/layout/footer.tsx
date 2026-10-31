@@ -86,7 +86,7 @@ export function Footer({
             <div className="flex flex-row items-center gap-4">
               {showThemeSwitcher && (
                 <Select value={theme ?? "light"} onValueChange={setTheme}>
-                <SelectTrigger className="w-36 rounded-xs border border-border/50 bg-background/50 text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-background focus:ring-0">
+                <SelectTrigger className="w-32 rounded-xs border border-border/50 bg-background/50 text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-background focus:ring-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xs border border-border bg-popover shadow-sm">

@@ -15,7 +15,7 @@ export function RestaurantTemplateGallery() {
         <div className={`relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#d7cbb8] shadow-[0_8px_24px_-15px_#594734] transition-transform motion-safe:group-hover:-translate-y-2 ${index % 2 ? 'lg:mt-8' : ''}`}>
           <div className="absolute inset-0 select-none [container-type:size]"><Preview theme={getTheme('parchment')} title="Café Milestis" /></div>
         </div>
-        <figcaption className="mt-4 flex items-center justify-between gap-2 border-b border-[#d7cbb8] pb-3 text-sm font-semibold"><span>{names(nameKey)}</span><span className="font-mono text-xs text-[#8c7663]">0{index + 1}</span></figcaption>
+        <figcaption className="mt-4 flex items-center justify-between gap-2 border-b border-[#d7cbb8] pb-3 text-sm font-medium"><span>{names(nameKey)}</span><span className="font-mono text-xs text-[#8c7663]">0{index + 1}</span></figcaption>
         <p className="mt-2 text-xs leading-5 text-[#776456]">{t(`templates.${id}`)}</p>
       </figure>
     })}

@@ -16,15 +16,15 @@ export function MascotStudio() {
   const { playback, play } = useMascot(true)
   const settings = { enabled: true, characterId, animations: true }
   return <div className="relative mx-auto w-full max-w-[500px]" id="meet-mascot">
-    <div className="absolute -right-2 -top-5 z-10 flex size-24 rotate-12 items-center justify-center rounded-full border border-[#343d2d] bg-[#e1efad] p-3 text-center text-xs font-bold leading-4 sm:-right-5 sm:size-28">
+    <div className="absolute -right-2 -top-5 z-10 flex size-24 rotate-12 items-center justify-center rounded-full border border-[#343d2d] bg-[#e1efad] p-3 text-center text-xs font-medium leading-4 sm:-right-5 sm:size-28">
       {t('studio.sticker')}<ArrowUpRight aria-hidden="true" className="absolute bottom-2 size-4" />
     </div>
     <div className="overflow-hidden rounded-[2rem] border border-[#d9ccba] bg-[#f2e9db] p-5 shadow-[12px_16px_0_0_#e7ddcb] sm:p-7">
-      <div className="flex items-center gap-2 pr-20 text-[10px] font-bold uppercase tracking-[.18em]">
+      <div className="restaurant-eyebrow flex items-center gap-2 pr-20">
         <span className="size-2 rounded-full bg-[#76885a]" />{t('studio.label')}
       </div>
       {gaming ? <div className="mt-5">
-        <button type="button" onClick={() => setGaming(false)} className="mb-3 flex min-h-11 items-center gap-2 text-xs font-semibold"><MoveLeft className="size-4" />{t('studio.back')}</button>
+        <button type="button" onClick={() => setGaming(false)} className="mb-3 flex min-h-11 items-center gap-2 text-xs font-medium"><MoveLeft className="size-4" />{t('studio.back')}</button>
         <MascotPairGame key={characterId} settings={settings} playback={playback} onReaction={play} />
       </div> : <>
         <div className="relative mt-5 flex h-64 items-center justify-center sm:h-72">
@@ -39,13 +39,13 @@ export function MascotStudio() {
         </div>
         <div className="mt-5 grid grid-cols-3 gap-2" aria-label={t('studio.choose')}>
           {MENU_MASCOT_IDS.map(id => <button key={id} type="button" aria-pressed={id === characterId} onClick={() => { setCharacter(id); play('welcome') }}
-            className={`flex min-h-11 items-center justify-center rounded-full border px-2 text-xs font-semibold transition-colors ${id === characterId ? 'border-[#35432e] bg-[#35432e] text-[#fff8e9]' : 'border-[#d5c5af] hover:bg-[#e8ddcc]'}`}>
+            className={`flex min-h-11 items-center justify-center rounded-full border px-2 text-xs font-medium transition-colors ${id === characterId ? 'border-[#35432e] bg-[#35432e] text-[#fff8e9]' : 'border-[#d5c5af] hover:bg-[#e8ddcc]'}`}>
             {mascots(`characters.${id}.name`)}
           </button>)}
         </div>
         <div className="mt-5 grid grid-cols-2 gap-2 border-t border-[#d9ccba] pt-4">
-          <button type="button" onClick={() => play('happy')} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#fffaf1] px-3 text-sm font-semibold hover:bg-white"><Cookie className="size-4" />{t('studio.treat')}</button>
-          <button type="button" onClick={() => { setGaming(true); play('curious') }} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#bb5439] px-3 text-sm font-semibold text-white hover:bg-[#a74730]"><Gamepad2 className="size-4" />{t('studio.play')}</button>
+          <button type="button" onClick={() => play('happy')} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#fffaf1] px-3 text-sm font-medium hover:bg-white"><Cookie className="size-4" />{t('studio.treat')}</button>
+          <button type="button" onClick={() => { setGaming(true); play('curious') }} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#bb5439] px-3 text-sm font-medium text-white hover:bg-[#a74730]"><Gamepad2 className="size-4" />{t('studio.play')}</button>
         </div>
       </>}
     </div>

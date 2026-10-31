@@ -1,13 +1,20 @@
 .restaurant-page {
-  font-family: 'Menu Manrope', sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: #343d2d;
   background: #faf6ed;
   overflow-x: clip;
   --restaurant-line: #d9ccba;
 }
 .restaurant-page .restaurant-display {
-  font-family: 'Menu Forum', Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-weight: 400;
+}
+.restaurant-page .restaurant-eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .restaurant-page button:focus-visible,
 .restaurant-page a:focus-visible,
