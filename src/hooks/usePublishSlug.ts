@@ -1,15 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getSlugValidationError, isSlugBlocked, normalizeSlugInput, setStoredPublishSlug, type SlugMode } from '@/lib/slug'
+import { getSlugValidationError, isSlugBlocked, normalizeSlug, normalizeSlugInput, setStoredPublishSlug, type SlugMode } from '@/lib/slug'
 
 export type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'reserved' | 'error'
 
 export function usePublishSlug(projectId: string, mode: SlugMode, initialSlug = '', fixed = false) {
-  const [slug, setSlug] = useState(initialSlug)
+  // input is what the user is typing and may end with a hyphen; slug is the value that is validated, checked and published.
+  const [input, setInput] = useState(initialSlug)
+  const slug = normalizeSlug(input)
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<{ slug: string; projectId: string; mode: SlugMode; attempt: number; status: SlugStatus } | null>(null)
-  useEffect(() => { setSlug(initialSlug) }, [initialSlug])
+  useEffect(() => { setInput(initialSlug) }, [initialSlug])
   const localStatus: SlugStatus | null = !slug ? 'idle' : getSlugValidationError(slug) ? 'invalid' : isSlugBlocked(slug) ? 'reserved' : null
   const currentResult = result?.slug === slug && result.projectId === projectId && result.mode === mode && result.attempt === attempt
   const slugStatus: SlugStatus = localStatus ?? (fixed ? 'available' : currentResult ? result.status : 'checking')
@@ -36,12 +38,13 @@ export function usePublishSlug(projectId: string, mode: SlugMode, initialSlug = 
   function handleSlugChange(value: string) {
     if (fixed) return
     const next = normalizeSlugInput(value)
-    if (next === slug) return
-    setSlug(next)
-    setResult(null)
+    if (next === input) return
+    setInput(next)
+    // A trailing hyphen does not change the address, so the finished check stays valid.
+    if (normalizeSlug(next) !== slug) setResult(null)
     if (next.length >= 3) setStoredPublishSlug(projectId, next)
   }
   function retryAvailability() { setResult(null); setAttempt((value) => value + 1) }
-  function resetSlug(value = initialSlug) { setSlug(value); retryAvailability() }
-  return { slug, slugStatus, handleSlugChange, resetSlug, retryAvailability }
+  function resetSlug(value = initialSlug) { setInput(value); retryAvailability() }
+  return { slug, input, slugStatus, handleSlugChange, resetSlug, retryAvailability }
 }

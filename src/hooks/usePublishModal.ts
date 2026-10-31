@@ -24,7 +24,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   const ratePerDollar = options?.ratePerDollar ?? 1
   const republishMode = options?.republishMode ?? false
   const [step, setStep] = useState<PublishStep>('slug')
-  const { slug, slugStatus, handleSlugChange, resetSlug, retryAvailability } = usePublishSlug(projectId, mode, initialSlug, republishMode)
+  const { slug, input, slugStatus, handleSlugChange, resetSlug, retryAvailability } = usePublishSlug(projectId, mode, initialSlug, republishMode)
   // Stable token per modal instance — generated once for modes that require access tokens
   const [accessToken, setAccessToken] = useState<string>(() =>
     getProjectConfig(mode).hasAccessToken ? options?.initialAccessToken ?? generateToken() : '',
@@ -162,6 +162,7 @@ export function usePublishModal(projectId: string, mode: SlugMode, options?: { i
   return {
     step,
     slug,
+    input,
     handleSlugChange,
     retryAvailability,
     slugStatus,

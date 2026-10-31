@@ -18,12 +18,12 @@ export function PublishForm({
   notice,
 }: {
   mode: SlugMode
-  data: Pick<ReturnType<typeof usePublishModal>, 'slug' | 'handleSlugChange' | 'slugStatus' | 'retryAvailability'>
+  data: Pick<ReturnType<typeof usePublishModal>, 'input' | 'handleSlugChange' | 'slugStatus' | 'retryAvailability'>
   disabled?: boolean
   hint?: string
   notice?: string
 }) {
-  const { slug, handleSlugChange, slugStatus } = data
+  const { input: slug, handleSlugChange, slugStatus } = data
   const maxLength = 24
   const chrome = getSlugInputChrome(mode)
   const subdomain = getSlugModePolicy(mode).routeKind === 'subdomain'
