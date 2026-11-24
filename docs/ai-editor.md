@@ -1,35 +1,28 @@
-# ИИ в редакторе
+# AI in the editor
 
-Портфолио и фотокнига используют ИИ для текста и оформления. Меню поддерживает создание и редактирование категорий, блюд, цен, страниц и шаблона по тексту или фотографии, а также улучшение фото блюда.
+- **Portfolio and photobook:** the AI edits text and styling.
+- **Menu:** the AI creates and edits categories, dishes, prices, pages and the template from pasted text or a photo, and it can restyle dish photos.
 
-## Подключение
+The server needs `OPENAI_API_KEY`, `OPENAI_TEXT_MODEL`, `OPENAI_IMAGE_MODEL` and Firebase Admin access.
 
-Серверу нужны `OPENAI_API_KEY`, `OPENAI_TEXT_MODEL`, `OPENAI_IMAGE_MODEL` и доступ Firebase Admin к проектам и медиатеке. Имена моделей берутся из окружения. Настройка локального доступа и секрета App Hosting описана в [инструкции подключения сервисов](handoff/services-and-deploy.md); значения — в [справочнике конфигурации](handoff/configuration.md).
+## Chat (`/api/ai`)
 
-## Чат
+The browser sends the project ID, an allowed operation and its input. The server then:
 
-Браузер отправляет ID проекта, разрешённую операцию и данные в `/api/ai`. Сервер проверяет сессию, владельца, режим проекта, размер запроса и лимиты. Модель, инструкции и схемы задаются сервером в `src/lib/ai/server/`. Изображения разрешаются по ID медиатеки с проверкой владельца и проекта; для чтения меню используется полноразмерное фото.
+1. Checks the session, project ownership, project mode, payload size and rate limits.
+2. Resolves images by media library ID, checking that they belong to the owner and the project.
+3. Calls the Responses API with `store: false`, a strict JSON schema and low reasoning effort. Models, prompts and schemas are defined only on the server, in `src/lib/ai/server/`.
+4. Validates the response against the schema. Menu responses also go through the shared domain validator.
 
-Текстовый вызов использует Responses API, `reasoning.effort: low`, `store: false`, строгую JSON-схему и до 24 000 выходных токенов. Ответ проверяется по схеме; меню дополнительно проходит общий доменный валидатор. Автоматического повторного вызова модели нет.
+The result is applied only if the draft version has not changed since the request. A manual edit, switching projects or cancelling discards a late response. For menus, the last change can be undone and the last 8 messages are sent as context. A dish with an unknown price gets `null` and is left out of publishing until a price is set.
 
-Результат применяется к черновику только при актуальной версии проекта. Ручная правка, смена проекта или отмена запрещают применение устаревшего ответа. В меню доступны отмена последнего изменения до следующей правки и последние восемь текстовых сообщений как контекст. Сообщения живут до перезагрузки; закрытие чата отменяет запрос и убирает возможность отмены правки, но сохраняет сообщения сеанса.
+## Photo enhancement (`/api/ai/enhance-photo`)
 
-Неизвестная цена остаётся `null`. Такое блюдо не попадает в публикацию до заполнения цены.
+- The server checks the session, menu ownership and that the photo belongs to the menu.
+- It makes one Images API call: 1024×1024, medium quality, WebP output.
+- There are three server-defined styles: `eveningWood`, `daylightCeramic`, `darkSlate`. The client sends only the style ID.
+- The user compares the result with the original before applying it. The original stays in the media library.
 
-## Доступ и лимиты
+## Limits
 
-Подписка для чата не требуется; кредиты за запросы не списываются. Коллекция `aiUsage` ограничивает пользователя до 30 операций в минуту и 120 в сутки UTC. Портфолио и фотокнига могут выполнять несколько операций на одно сообщение. Отменённые и неудачные попытки после резервирования лимита также учитываются. Расходы провайдера оплачивает владелец API-ключа.
-
-## Улучшение фото блюда
-
-В форме блюда владелец выбирает фото и стиль, запускает обработку, сравнивает результат с оригиналом и нажимает «Применить». Смена стиля сбрасывает предпросмотр; повторный вызов запускается только кнопкой. До применения результат хранится в браузере. Применение использует существующую очередь загрузки; изображение блюда меняется после получения постоянного URL. Оригинал остаётся в медиатеке.
-
-`/api/ai/enhance-photo` проверяет сессию, владельца меню и фотографии. Использует Images API и `OPENAI_IMAGE_MODEL`: один результат, `quality: medium`, `1024x1024`, WebP со сжатием 85. Источник — версия `middle`, если доступна. Дополнительного текстового вызова и автоматических повторов нет.
-
-Три серверных стиля: `eveningWood` — тёплый вечерний свет и дерево; `daylightCeramic` — дневной свет и светлая керамика; `darkSlate` — тёмный камень и сланцевая доска. Клиент передаёт только ID стиля. Промпты требуют сохранять блюдо, порцию и ракурс; пользователь проверяет результат перед применением.
-
-Подписка, списание кредитов и пользовательский счётчик обработок отсутствуют; лимиты чата не применяются. При сохранении действует обычный лимит медиатеки.
-
-## Проверка
-
-Используйте команды из [общих проверок](handoff/architecture-and-checks.md#автоматические-проверки). Реальный ответ требует доступных моделей и ключа. Вручную проверяются создание меню, исправление цены, вопрос, чтение фото, отмена и ручная правка во время генерации: старый ответ не должен её перезаписать. Для фото — сравнение, смена стиля, применение и повторное открытие сохранённого блюда.
+The `aiUsage` collection limits each user to 30 operations per minute and 120 per day (UTC). AI calls do not spend credits or require a subscription.

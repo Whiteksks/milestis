@@ -1,30 +1,21 @@
-# Персонажи и игра меню
+# Menu mascots and game
 
-Персонажи `bun`, `mochi` и `pepper` реагируют на гостевой выбор блюд и игру. В документ сохраняются только `enabled`, `characterId` и `animations` из `MenuContent.mascot`. Контракт и валидация — `functions/src/domain/menu/mascot.ts`.
+The characters `bun`, `mochi` and `pepper` react to the dishes a guest picks and to the game. Only `enabled`, `characterId` and `animations` from `MenuContent.mascot` are saved. The contract and validation are in `functions/src/domain/menu/mascot.ts`.
 
-## Модули
-
-| Модуль | Ответственность |
+| Module | Responsibility |
 | --- | --- |
-| `characters/` | SVG-компоненты, анимации и статичные позы трёх персонажей |
-| `registry.ts` | Компоненты и ключи перевода |
-| `behavior.ts` | События, эмоции, длительности и переходы |
-| `use-mascot.ts` | Общий контроллер реакций кнопки и панели |
-| `mascot.tsx` | Персонаж и сообщение |
-| `use-mascot-motion.ts` | Уменьшение движения и остановка в скрытой вкладке |
-| `settings-panel.tsx` | Настройки и независимая демонстрация |
-| `game/model.ts`, `game/pair-game.tsx` | Правила и интерфейс «Найди пару» |
+| `characters/` | SVG components, animations and static poses |
+| `registry.ts` | Components and translation keys |
+| `behavior.ts` | Events, moods, durations and transitions |
+| `use-mascot.ts` | Shared reaction controller |
+| `mascot.tsx` | Character and speech bubble |
+| `use-mascot-motion.ts` | Reduced motion; pauses in hidden tabs |
+| `settings-panel.tsx` | Settings and an isolated demo |
+| `game/model.ts`, `game/pair-game.tsx` | Memory game rules and UI |
 
-Настроение, последовательность реакций и таймеры существуют только в UI. Новая реакция заменяет предыдущую; завершение старой не завершает новую. Выключение анимаций оставляет выражения лица. Выключение персонажа скрывает игру, но сохраняет рекомендации.
+- Mood, reaction queue and timers exist only in the UI. A new reaction replaces the current one.
+- With animations off, facial expressions still change. With the mascot off, the game is hidden but recommendations stay visible.
+- The guest session belongs to the shared menu layout, so game progress survives page navigation and resets on a full reload. The preview and the sidebar demo have their own sessions.
+- The game has six cards. Each match adds 34 interest points, up to 100. A mismatched pair closes after one second.
 
-## Состояние игры
-
-Гостевая сессия принадлежит общему layout меню. Закрытие панели и SPA-переходы между страницами сохраняют прогресс; полная перезагрузка начинает новую игру. Выбор блюд отдельно восстанавливается из `localStorage`. Предпросмотр и демонстрация sidebar имеют независимые сессии.
-
-В игре шесть карточек. Совпадение добавляет 34 пункта интереса, максимум 100; повтор игры сохраняет интерес. Несовпавшая пара закрывается через секунду; таймер очищается при размонтировании блока. Игра не меняет сохранённый контент.
-
-## Особенность SVG-анимации
-
-При реакции компонент персонажа пересоздаётся для повторного проигрывания. Анимированные группы задают явную начальную позу: `initial={false}` подавляет запуск при монтировании вне анимированного родителя и используется только при выключенной анимации. Проверка движения требует сравнения кадров: изменение `data-mood` само по себе не подтверждает проигрывание.
-
-Общие данные, гостевая панель и публикация описаны в [документации меню](../../../../../docs/menu.md).
+**SVG animation note.** On each reaction the character component is remounted so the animation replays. Animated groups set an explicit initial pose. `initial={false}` is used only when animations are off. To check that an animation actually plays, compare frames; a change in `data-mood` alone does not prove it.

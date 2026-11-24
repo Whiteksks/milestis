@@ -2,9 +2,9 @@
 
 **A web editor for turning photos into shareable interactive pages: portfolios, photobooks and restaurant menus, published by link or QR code.**
 
-Milestis was a solo startup I built and ran in 2025–2026: product, design, frontend, backend, billing and operations. The product is no longer running and all production services have been shut down. The repository is published as-is, with its full commit history, as a record of the work.
+Built solo, 2025–2026.
 
-> **Status:** discontinued. There is no live demo, and the code will not run without your own Firebase, Polar and OpenAI accounts.
+> **Status:** discontinued. All production services have been shut down. There is no live demo, and the code will not run without your own Firebase, Polar and OpenAI accounts.
 
 <!-- Screenshots / demo video go here -->
 
@@ -119,17 +119,14 @@ npm run dev
 
 The app runs on `localhost:3000` and published pages on `pages.localhost:3000`. [`apphosting.yaml`](apphosting.yaml), [`.firebaserc`](.firebaserc) and [`storage-cors.json`](storage-cors.json) contain placeholders. `npm run configure` regenerates them from your `.env.local`.
 
-Detailed setup, configuration and deployment guides are in [`docs/`](docs/) (in Russian):
+## Documentation
 
 | Topic | Document |
 | --- | --- |
-| Local setup | [getting-started.md](docs/handoff/getting-started.md) |
-| Environment variables and domains | [configuration.md](docs/handoff/configuration.md) |
-| Firebase, Polar, secrets, DNS, deploy | [services-and-deploy.md](docs/handoff/services-and-deploy.md) |
-| Architecture and checks | [architecture-and-checks.md](docs/handoff/architecture-and-checks.md) |
-| Restaurant menu, publishing and billing | [menu.md](docs/menu.md) |
-| AI in the editor | [ai-editor.md](docs/ai-editor.md) |
-| Admin credit tools | [admin-credits.md](docs/admin-credits.md) |
+| Setup, environment, services, deploy | [docs/setup.md](docs/setup.md) |
+| Architecture, publishing, credits, checks | [docs/architecture.md](docs/architecture.md) |
+| Restaurant menu: data, publishing, billing | [docs/menu.md](docs/menu.md) |
+| AI in the editor | [docs/ai-editor.md](docs/ai-editor.md) |
 
 ## Tests and checks
 
@@ -144,12 +141,6 @@ npm run check       # config, both linters, tests, both builds
 
 The tests cover the credit engine, admin operations, slug policy, menu billing and publishing, public menu routes, AI editor contracts and editor reliability.
 
-## Lessons learned
-
-- **The architecture took most of the time.** Once the data model, the draft and snapshot split, and the credit ledger were right, new modes and features came quickly.
-- **Shipping less is faster.** The features that mattered were editing, publishing and payments that never lose money. Much of the rest could have waited.
-- **A startup is mostly not code.** As a solo founder I also handled the company, taxes, legal policies, support and operations. That showed me I most enjoy building the product itself.
-
 ## License
 
-<!-- Choose a license: MIT, or "All rights reserved" if the code is for viewing only. -->
+[MIT](LICENSE)

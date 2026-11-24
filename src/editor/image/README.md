@@ -1,22 +1,21 @@
-# Изображения редактора
+# Editor images
 
-Общие контракты, политики, инструменты редактирования и рендеринг. Поток данных:
+Shared contracts, policies, editing tools and rendering for images.
 
-`шаблон → слот → политика → resolve.ts → рендер`
+Data flow: `template → slot → policy → resolve.ts → render`
 
-| Модуль | Ответственность |
+| Module | Responsibility |
 | --- | --- |
-| `data.ts` | Ассеты, кадрирование, фокус и настройки отображения |
-| `slots.ts` | Семантические слоты изображений |
-| `policy/` | Итоговые правила отображения для слота |
-| `image-ratio.ts` | Разбор пропорций для рендера и редактора кадрирования |
-| `editor/` | Выбор, замена ассета и настройки отображения |
-| `crop/` | Редактирование и нормализованные координаты кадрирования |
-| `resolve.ts` | Преобразование исходных данных в контракт рендера |
-| `render.ts`, `render/` | Контракты и компоненты рендеринга |
+| `data.ts` | Assets, crop, focus point, display settings |
+| `slots.ts` | Semantic image slots |
+| `policy/` | Final display rules for a slot |
+| `image-ratio.ts` | Aspect ratio parsing for rendering and the crop editor |
+| `editor/` | Selecting and replacing assets, display settings |
+| `crop/` | Crop editing with normalized coordinates |
+| `resolve.ts` | Converts stored data into the render contract |
+| `render.ts`, `render/` | Render contracts and components |
 
-Политика слота имеет приоритет над входными настройками. Явное кадрирование необязательно: resolver работает и без него. Инструменты редактирования создают значения через общие helpers в `editor/`.
-
-Структуры коллекций и мутации принадлежат режимам. У портфолио и фотокниги они находятся в `src/editor/modes/portfolio/image/` и `src/editor/modes/photobook/image/`; меню связывает изображения с блюдами и страницами через свой режим.
-
-Реестр режима извлекает изображения в `content.imageContent`. Сохранение записывает их в `projects/{id}/data/content`, загрузка восстанавливает store. Соответствующие данные получают canvas, предпросмотр и публичный рендер.
+- The slot policy takes precedence over input settings.
+- An explicit crop is optional; the resolver works without one.
+- Collection structure and mutations are defined by each mode: `src/editor/modes/portfolio/image/` and `src/editor/modes/photobook/image/`. The menu mode links images to dishes and pages.
+- Images are saved to `content.imageContent` in `projects/{id}/data/content`. The canvas, the preview and the public renderer all read the same data.

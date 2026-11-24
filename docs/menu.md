@@ -1,98 +1,78 @@
-# Ресторанное меню
+# Restaurant menu
 
-Владелец редактирует заведение, страницы, категории и блюда; публикует меню на поддомене и получает QR для каждой страницы. Гость читает меню, собирает список для официанта, просматривает рекомендации и играет с персонажем. Список хранится в браузере и не отправляется ресторану как заказ.
+The owner edits the venue, pages, categories and dishes, publishes the menu to a subdomain and gets a QR code for each page. Guests read the menu, build a list to show the waiter, browse recommendations and can play a small game with a mascot. The list stays in the browser; it is not sent to the restaurant as an order.
 
-## Редактор и данные
+## Data model
 
-Документ `projects/{id}/data/content` содержит `{ theme, content }`. В `content.sectionContent` находятся:
+`projects/{id}/data/content` holds `{ theme, content }`. Its `content.sectionContent` contains:
 
-| Поле | Назначение |
+| Field | Purpose |
 | --- | --- |
-| `venue` | Название, описание и валюта заведения |
-| `categories[]` | Общий каталог категорий |
-| `dishes[]` | Блюда: категория, название, описание, цена, видимость и признак рекомендации |
-| `homePageId`, `pages[]` | Главная страница и страницы с ID, названием, путём и `content.categoryIds[]` |
-| `mascot` | Включение персонажа, ID и включение анимаций |
+| `venue` | Name, description, currency |
+| `categories[]` | Shared category catalog |
+| `dishes[]` | Category, name, description, `priceMinor`, visibility, recommended flag |
+| `homePageId`, `pages[]` | Pages with ID, title, path and `content.categoryIds[]` |
+| `mascot` | Enabled flag, character, animations |
 
-Цены — целые числа в минимальных единицах валюты (`priceMinor`). Поддерживаются KZT, USD, EUR, RUB и GBP. Пустые названия и цена `null` допустимы в черновике; блюда без названия или цены не публикуются. Лимиты проекта: 20 страниц, 30 категорий и 200 блюд. Повреждённые связи и превышение лимитов отклоняются валидатором.
+- Prices are integers in minor currency units. Supported currencies: KZT, USD, EUR, RUB, GBP.
+- Limits: 20 pages, 30 categories, 200 dishes.
+- The catalog is shared across pages, and one category can appear on several pages.
+- The home page has the path `/`. Other paths are single lowercase segments, such as `/drinks`.
+- Drafts may contain unnamed dishes and dishes without a price. Those dishes are left out when the menu is published.
+- There are five templates: `menu-classic`, `menu-bistro`, `menu-picnic`, `menu-gallery`, `menu-pulse`.
 
-Изображения находятся в `content.imageContent`: блюда связаны с фото по ID. Каталог категорий и блюд общий для всех страниц. Порядок категорий задаёт `page.content.categoryIds`, порядок блюд — массив `dishes`. Одну категорию можно использовать на нескольких страницах. Скрытие и редактирование категории или блюда действуют везде.
+## Publishing
 
-У проекта одна главная страница с путём `/`. Остальные пути состоят из одного сегмента строчных латинских букв, цифр и дефисов, например `/drinks`. ID и пути уникальны; название не меняет сохранённый адрес. Назначение главной страницы обменивает её путь с прежней главной. Главную нельзя удалить до назначения другой. Удаление страницы или снятие категории со страницы сохраняет каталог и изображения. Категорию можно удалить из каталога после удаления или переноса её блюд.
+1. The editor saves the draft and requests a quote from `menuBilling`.
+2. The owner picks a plan and confirms the payment.
+3. `publishMenu` checks the owner, the quote, the slug and the draft version, then copies the used media to `public/{projectId}/menu/`.
+4. One transaction spends the credits, writes the public snapshot and billing state, and reserves the slug.
 
-Выбранные страница и категория хранятся в UI-store. Их переключение не меняет документ и не запускает автосохранение. Форма блюда сохраняет правки одной операцией; отмена создания не оставляет пустую запись.
+The draft stays editable after publishing. "Update menu" replaces the snapshot at the same address. A failure before the transaction commits changes nothing. The slug can't be changed after the first publish. Old paths are not redirected.
 
-Доступны пять шаблонов: `menu-classic`, `menu-bistro`, `menu-picnic`, `menu-gallery`, `menu-pulse`. Canvas, предпросмотр и публикация используют общий реестр. Тема и типографика общие для проекта; фотографии страниц настраиваются отдельно. Декорации и фоновые эффекты в меню скрыты. Создание меню из текста или фото и улучшение фотографий описаны в [ИИ в редакторе](ai-editor.md).
+## Billing
 
-## Публикация и QR
-
-1. Редактор сохраняет черновик и запрашивает расчёт в `menuBilling`.
-2. Владелец выбирает пакет и подтверждает платёж, если сумма ненулевая.
-3. `publishMenu` проверяет владельца, расчёт, адрес и версию черновика, затем копирует используемые медиа.
-4. Одна транзакция списывает кредиты, записывает публичный снимок и состояние оплаты, резервирует slug и переводит проект в `archived`.
-
-Черновик и оригиналы изображений сохраняются; меню можно редактировать из Архива. «Обновить меню» заменяет опубликованный снимок по тому же адресу. Автосохранение черновика само по себе не обновляет сайт. Ошибка до фиксации транзакции не меняет прежний снимок и не списывает кредиты.
-
-Публикуются все страницы и только видимые заполненные блюда в видимых категориях, назначенных страницам. Требуется хотя бы одно такое блюдо. Пустые страницы сохраняются. Скрытые и неиспользуемые данные остаются в черновике.
-
-Адрес строится из `NEXT_PUBLIC_PUBLISHED_SITE_URL`: `https://cafe.pages.example.com`, дополнительная страница — `/drinks`. Slug после первой публикации неизменяем. Неизвестный путь возвращает 404. Canonical и заголовок относятся к выбранной странице. Публичный загрузчик проверяет опубликованность, статус проекта и оплаченный доступ.
-
-QR использует страницы опубликованного снимка. Переименование пути и смена главной начинают действовать после обновления публикации. Старые пути не перенаправляются; QR для изменённого пути нужно заменить. Снятие с публикации сразу закрывает доступ. Снятое меню не продлевается; планировщик отключает его автопродление при обработке наступившего платежа.
-
-Медиа из Storage копируются в `public/{projectId}/menu/`. Ключ копии учитывает поколение исходного файла. Старые публичные копии сохраняются до окончательного удаления проекта; отдельной очистки устаревших версий нет. Внешние URL остаются внешними.
-
-## Гостевая панель
-
-- «Корзина» хранит ID блюд и количество в `localStorage` под ID проекта. Выбор сохраняется между страницами и после перезагрузки. Названия и цены берутся из текущего снимка; скрытое или удалённое блюдо показывается недоступным без цены.
-- «Рекомендуемое» показывает блюда, отмеченные владельцем. Рекомендации доступны и при выключенном персонаже.
-- «Игра» содержит шесть карточек «Найди пару». Прогресс сохраняется при закрытии панели и переходе между страницами, сбрасывается при полной перезагрузке. Игра скрыта при выключенном персонаже.
-
-Персонажи: Булочка (`bun`), Моти (`mochi`) и Перчик (`pepper`). Реакции на выбор блюд и игру существуют только в гостевой сессии. Предпросмотр и демонстрация в редакторе изолированы от публичной сессии. Системное уменьшение движения учитывается, анимация в скрытой вкладке останавливается. Плашка Milestis в меню не показывается.
-
-## Оплата кредитами
-
-| Вместимость пакета: блюда с фото | Кредитов в месяц |
+| Plan (dishes with photos) | Credits per month |
 | --- | ---: |
-| До 50 | 200 |
-| До 100 | 350 |
-| До 150 | 500 |
-| До 200 | 650 |
+| Up to 50 | 200 |
+| Up to 100 | 350 |
+| Up to 150 | 500 |
+| Up to 200 | 650 |
 
-Пакеты определены в `functions/src/projects/menu/billing/model.ts`. Считаются блюда с фото в публичном содержимом: повтор блюда на нескольких страницах не увеличивает счётчик, разные блюда с одной картинкой считаются отдельно. Логотип, обложки, скрытые блюда и файлы только в медиатеке не учитываются. Пакет до 50 оплачивается и при отсутствии фото. Посещения не влияют на стоимость.
+Plans are defined in `functions/src/projects/menu/billing/model.ts`.
 
-- Первая публикация оплачивает месяц и включает автопродление. Месяцы отсчитываются от исходной даты в UTC: 31 января → 28/29 февраля → 31 марта.
-- Обновление в пределах оплаченного пакета бесплатно. Повышение списывает полную разницу цен сразу и сохраняет дату продления.
-- Понижение применяется со следующего периода, если опубликованные данные помещаются в выбранный пакет. Возврата за текущий период нет.
-- Отключение автопродления сохраняет доступ до конца оплаченного периода. Включить его без списания можно, пока период оплачен и меню опубликовано.
-- `renewMenuBillingCron` работает раз в час. При нехватке кредитов повторяет попытки три дня; меню в это время доступно. Затем доступ и автопродление останавливаются.
-- Повторная активация после остановки оплачивает новый месяц без долга за пропущенные периоды. Продление использует опубликованное содержимое, а не черновик.
+- The first publish pays for a month and turns on auto-renewal. Periods are counted from the original date in UTC.
+- Updating within the paid plan is free. An upgrade charges the price difference immediately. A downgrade applies from the next period.
+- `renewMenuBillingCron` runs hourly. If the owner is short on credits, it retries for 3 days and then stops access.
+- The public loader checks the access period itself, so a delayed scheduler does not extend access.
 
-Состояние оплаты, пакет, дата следующего списания и управление автопродлением доступны в окне публикации и QR. Публичный загрузчик проверяет срок доступа независимо от задержки планировщика.
+## API
 
-## API и защита платежей
+Both endpoints are HTTPS POST with a Firebase Bearer token.
 
-Оба endpoint — HTTPS POST с Firebase Bearer token. Адреса строятся из проекта и региона Firebase; отдельной переменной URL для биллинга нет.
-
-| Endpoint | Тело запроса |
+| Endpoint | Body |
 | --- | --- |
-| `menuBilling`: состояние | `{ projectId, action: "status" }` |
-| `menuBilling`: расчёт | `{ projectId, action: "review", planId? }` |
-| `menuBilling`: автопродление | `{ projectId, action: "autoRenew", autoRenew, revision }` |
+| `menuBilling` status | `{ projectId, action: "status" }` |
+| `menuBilling` quote | `{ projectId, action: "review", planId? }` |
+| `menuBilling` auto-renew | `{ projectId, action: "autoRenew", autoRenew, revision }` |
 | `publishMenu` | `{ projectId, slug, locale, quoteId }` |
 
-Расчёт в `menuBillingQuotes` действует 10 минут и привязан к владельцу, проекту, снимку черновика и версии оплаты. Изменение этих данных или переход границы периода требует нового расчёта. Повтор использованного расчёта возвращает сохранённую квитанцию без повторного списания, пока соответствующая публикация остаётся текущей. Расчёты и квитанции имеют TTL `deleteAt` через сутки; удаление Firestore асинхронное.
+- A quote is valid for 10 minutes. It is bound to the owner, the project, the draft snapshot and the billing revision.
+- Reusing a quote that has already been used returns the stored receipt without charging again.
+- Quotes and receipts expire through the Firestore TTL field `deleteAt`.
 
-Списания выполняет общий кредитный движок. Расхождение баланса с партиями кредитов возвращает `BALANCE_INCONSISTENT` без изменения данных. Просмотр статуса и отмена автопродления остаются доступны. Правила кредитов описаны в [архитектуре](handoff/architecture-and-checks.md#кредиты-и-подписки).
+## Guest session
 
-## Карта кода
+- **List.** Dish IDs and quantities are stored in `localStorage` per project.
+- **Recommended.** Shows the dishes the owner has flagged.
+- **Game.** A six-card memory game. Progress survives page changes but resets on a full reload. See [mascot README](../src/editor/modes/menu/mascot/README.md).
 
-| Путь | Ответственность |
+## Code map
+
+| Path | Responsibility |
 | --- | --- |
-| `functions/src/domain/pages.ts`, `functions/src/domain/menu/` | Контракт, лимиты, пути, шаблоны, персонажи и публичная проекция |
-| `src/editor/modes/menu/` | Команды страниц, store, формы, шаблоны и гостевая сессия |
-| `src/editor/modes/menu/mascot/` | [Персонажи и игра](../src/editor/modes/menu/mascot/README.md) |
-| `functions/src/projects/menu/` | Подготовка снимка, медиа, публикация и оплата |
-| `functions/src/projects/menuBilling.ts`, `functions/src/projects/publishMenu.ts` | HTTP-обработчики |
-| `src/app/sites/[slug]/` | Публичные страницы и общий layout гостевой сессии |
-
-Деплой включает правила, индексы, TTL, Functions и приложение по [инструкции](handoff/services-and-deploy.md). Проверки меню запускаются общей командой `npm.cmd run test`; реальную оплату, Scheduler и доменные маршруты проверяют на развёрнутом окружении.
+| `functions/src/domain/pages.ts`, `functions/src/domain/menu/` | Contract, limits, paths, templates, public projection |
+| `src/editor/modes/menu/` | Page commands, store, forms, templates, guest session |
+| `functions/src/projects/menu/` | Snapshot, media, publishing, billing |
+| `functions/src/projects/menuBilling.ts`, `publishMenu.ts` | HTTP handlers |
+| `src/app/sites/[slug]/` | Public pages |
