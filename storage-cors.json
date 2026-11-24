@@ -1,8 +1,8 @@
 [
   {
     "origin": [
-      "https://milestis.com",
-      "https://milestis.site",
+      "https://app.example.com",
+      "https://pages.example.com",
       "http://localhost:3000",
       "http://localhost:3001"
     ],
